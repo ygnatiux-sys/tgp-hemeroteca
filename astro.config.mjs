@@ -14,6 +14,9 @@ export default defineConfig({
   },
   
   output: 'static',
+  build: {
+    format: 'directory'
+  },
   adapter: node({
     mode: 'standalone'
   }),
