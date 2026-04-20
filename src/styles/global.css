@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-theme-dark: #121413;
+  
+  /* Colores Mate */
+  --color-british-green: #1B382A;
+  --color-bordeaux: #5B2326;
+  --color-old-navy: #1E2C3A;
+  --color-bus-red: #8B3A36;
+  --color-vintage-yellow: #D4A352;
+  --color-rust-orange: #B55A30;
+
+  --ease-cinematic: cubic-bezier(0.25, 1, 0.5, 1);
+  --font-serif: "Gloock", serif;
+  --font-body: "Newsreader", serif;
+  --font-mono: "Geist Mono", "Space Mono", monospace;
+}

@@ -1,0 +1,19 @@
+***Corrección Crítica de Arquitectura: Inyección de Tema Dinámico en Astro + Tailwind.***
+
+***Actualmente, el*** ***`themeColor`*** ***que viene de Keystatic no se está renderizando en el front-end porque Tailwind JIT purga las clases dinámicas. Necesitamos implementar un mapeo estricto a Variables CSS.***
+
+***Tareas a ejecutar en*** ***`src/pages/hemeroteca/[slug].astro`******:***
+
+1. ***Crea un diccionario de colores en el frontmatter de Astro que mapee el string de Keystatic a los códigos Hexadecimales mate exactos:***
+
+```
+const colorMap = {
+  'british-green': '#1B382A',
+  'bordeaux': '#5B2326',
+  'old-navy': '#1E2C3A',
+  'bus-red': '#8B3A36',
+  'vintage-yellow': '#D4A352',
+  'rust-orange': '#B55A30'
+};
+const activeHex = colorMap[ensayo.data.themeColor] || '#ffffff';
+```

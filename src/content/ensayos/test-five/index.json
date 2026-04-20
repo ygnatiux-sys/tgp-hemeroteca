@@ -1,0 +1,8 @@
+{
+  "title": "TEST FIVE",
+  "date": "2026-04-19",
+  "category": "ARQUEOLOGIA",
+  "themeColor": "rust-orange",
+  "coverImage": "/src/assets/ensayos/test-five/coverImage.avif",
+  "excerpt": "---\n\nCon esto, el Agente no solo hará que el color funcione, sino que sabrá exactamente que **Gloock** domina los titulares inmensos, **Newsreader** sostiene la lectura de los ensayos, y **Geist Mono** estructura los metadatos como \"Dossier 2026\", todo sobre ese fondo antracita (`#121413`) que simula la oscuridad de una sala de lectura.\n\nPerdona el desliz anterior. Cuando uno diseña a este nivel, las tipografías y los Hexadecimales son intocables. ¿Le pasamos esto al Agente y vemos cómo se ven esas fuentes finalmente renderizadas en pantalla?"
+}

@@ -1,0 +1,7 @@
+{
+  "title": "test four hemeroteca",
+  "date": "2026-04-19",
+  "themeColor": "vintage-yellow",
+  "coverImage": "/src/assets/ensayos/test-four-hemeroteca/coverImage.avif",
+  "excerpt": "Corrección Crítica de Arquitectura: Inyección de Tema Dinámico en Astro + Tailwind.\n\nActualmente, el `themeColor` que viene de Keystatic no se está renderizando en el front-end porque Tailwind JIT purga las clases dinámicas. Necesitamos implementar un mapeo estricto a Variables CSS.\n\nTareas a ejecutar en `src/pages/hemeroteca/[slug].astro`:\n"
+}

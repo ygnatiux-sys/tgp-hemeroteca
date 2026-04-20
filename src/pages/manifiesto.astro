@@ -1,0 +1,65 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Manifiesto | TGP PROJECT">
+  <section class="relative min-h-screen flex flex-col justify-center items-center overflow-hidden bg-theme-dark">
+    {/* Fondo con Ken Burns CSS Puro */}
+    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      <div class="w-full h-full bg-white/5 animate-ken-burns"></div>
+    </div>
+
+    <div class="z-10 flex flex-col items-center justify-center space-y-32 md:space-y-48 py-32 px-6 text-center w-full max-w-5xl">
+      <header class="mb-12 opacity-40 font-mono text-xs uppercase tracking-[0.3em]">
+        Declaración de Intenciones
+      </header>
+
+      <p class="manifesto-phrase font-serif text-3xl md:text-5xl lg:text-6xl antialiased text-white/90 blur-md opacity-0 translate-y-4 transition-all duration-1000 ease-cinematic">
+        La historia no es una narrativa lineal, sino un archivo de señales esperando ser decodificadas.
+      </p>
+      
+      <p class="manifesto-phrase font-serif text-3xl md:text-5xl lg:text-6xl antialiased text-white/90 blur-md opacity-0 translate-y-4 transition-all duration-1000 ease-cinematic">
+        Buscamos la arqueosemiótica de lo cotidiano, el lenguaje oculto tras la piedra y el algoritmo.
+      </p>
+
+      <p class="manifesto-phrase font-serif text-3xl md:text-5xl lg:text-6xl antialiased text-white/90 blur-md opacity-0 translate-y-4 transition-all duration-1000 ease-cinematic">
+        Bienvenido al gran rompecabezas. Aquí el silencio tiene su propia frecuencia.
+      </p>
+
+      <div class="pt-24 manifesto-phrase opacity-0 blur-md transition-all duration-1000 delay-500">
+        <a href="/archivo" class="font-mono text-[10px] tracking-widest uppercase border border-white/20 px-12 py-5 hover:bg-white hover:text-theme-dark transition-all duration-700">
+          Explorar el Archivo
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  @keyframes kenBurns {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.15); }
+  }
+  .animate-ken-burns {
+    animation: kenBurns 40s ease-out infinite alternate;
+  }
+</style>
+
+<script>
+  const observerCallback = (entries: IntersectionObserverEntry[]) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.remove('blur-md', 'opacity-0', 'translate-y-4');
+        entry.target.classList.add('blur-0', 'opacity-100', 'translate-y-0');
+      }
+    });
+  };
+
+  const observer = new IntersectionObserver(observerCallback, {
+    threshold: 0.3
+  });
+  
+  document.querySelectorAll('.manifesto-phrase').forEach(phrase => {
+    observer.observe(phrase);
+  });
+</script>

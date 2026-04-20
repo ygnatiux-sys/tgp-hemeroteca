@@ -1,0 +1,48 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+
+const allEssaysRaw = await getCollection('ensayos');
+
+const sortedEssays = allEssaysRaw.map(item => ({
+  slug: item.id.replace(/\/index$/, ''),
+  entry: item.data
+})).sort((a, b) => {
+  return new Date(b.entry.date || 0).getTime() - new Date(a.entry.date || 0).getTime();
+});
+---
+
+<Layout title="Archivo Completo | Hemeroteca TGP">
+  <section class="max-w-7xl mx-auto px-6 lg:px-8 py-32 mt-16">
+    <header class="mb-24 border-b border-white/10 pb-16">
+      <h1 class="text-6xl md:text-8xl font-serif tracking-tighter opacity-90">Archivo</h1>
+      <p class="font-mono text-xs uppercase tracking-widest mt-6 opacity-40">Registros Editoriales Completos</p>
+    </header>
+
+    <div class="flex flex-col">
+      {sortedEssays.map(({ slug, entry }) => (
+        <a href={`/hemeroteca/${slug}`} class="group border-b border-white/10 py-12 grid grid-cols-12 items-baseline cursor-pointer transition-colors duration-700 hover:bg-white/5">
+          
+          <div class="col-span-12 md:col-span-3 mb-4 md:mb-0 font-mono text-xs text-white/60 tracking-widest uppercase">
+            <span>[ {entry.category} ]</span><br>
+            <span class="opacity-50 mt-2 block">Dossier . {entry.date ? new Date(entry.date).getFullYear() : 'S/F'}</span>
+          </div>
+
+          <div class="col-span-10 md:col-span-8">
+            <h2 class="text-3xl md:text-5xl lg:text-6xl font-serif antialiased opacity-80 group-hover:opacity-100 transition-opacity duration-700 ease-cinematic">
+              {entry.title}
+            </h2>
+            <p class="max-h-0 overflow-hidden group-hover:max-h-24 transition-all duration-1000 ease-cinematic text-sm mt-4 opacity-70">
+              {entry.excerpt}
+            </p>
+          </div>
+
+          <div class="col-span-2 md:col-span-1 text-right font-mono text-xs opacity-50 group-hover:text-white transition-colors duration-500">
+            ->
+          </div>
+          
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>

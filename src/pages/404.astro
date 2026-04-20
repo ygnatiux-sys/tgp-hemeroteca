@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="404 - Señal Perdida | Hemeroteca TGP">
+  <section class="relative h-screen flex flex-col items-center justify-center text-center overflow-hidden bg-theme-dark">
+    {/* Fondo Cinematográfico sutil */}
+    <div class="absolute inset-0 z-0 bg-white/5 animate-pulse opacity-20"></div>
+    
+    <div class="relative z-10 px-6">
+      <h1 class="font-mono text-xs tracking-widest uppercase opacity-40 mb-8">
+        [ Error 404 . Señal Interrumpida ]
+      </h1>
+      
+      <h2 class="text-6xl md:text-8xl font-serif antialiased tracking-tighter mb-12 text-transparent bg-clip-text bg-linear-to-b from-white to-white/30">
+        El fragmento no existe.
+      </h2>
+      
+      <p class="font-body text-xl md:text-2xl opacity-60 max-w-lg mx-auto mb-16 italic">
+        Esta coordenada del archivo ha sido eliminada o nunca llegó a ser codificada en el sistema.
+      </p>
+      
+      <a 
+        href="/" 
+        class="inline-block font-mono text-xs tracking-widest uppercase border border-white/20 px-12 py-6 hover:bg-white hover:text-theme-dark transition-all duration-700 ease-cinematic"
+      >
+        ← Volver al Centro del Archivo
+      </a>
+    </div>
+
+    {/* Elemento decorativo: Scanline */}
+    <div class="fixed inset-0 pointer-events-none archive-scanline"></div>
+  </section>
+</Layout>
+
+<style>
+  @keyframes pulse {
+    0%, 100% { opacity: 0.1; }
+    50% { opacity: 0.2; }
+  }
+  .animate-pulse {
+    animation: pulse 4s ease-in-out infinite;
+  }
+  .archive-scanline {
+    opacity: 0.15;
+    background-size: 100% 2px, 3px 100%;
+    background-image: 
+      linear-gradient(0deg, transparent 50%, rgba(255,255,255,0.05) 50%), 
+      linear-gradient(90deg, transparent 50%, rgba(255,255,255,0.05) 50%);
+  }
+</style>

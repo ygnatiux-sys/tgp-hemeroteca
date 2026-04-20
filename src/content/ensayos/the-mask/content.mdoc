@@ -1,0 +1,42 @@
+**Atención: Corrección Crítica de Arquitectura Visual y Renderizado de Assets Locales.**
+
+**Actúa como desarrollador Frontend Editorial Senior. Basado en las imágenes 0-4 proporcionadas por el usuario, debemos ejecutar un parche arquitectónico en** **`src/pages/index.astro`** **para asegurar la atmósfera de lujo.**
+
+**Directriz Estricta: NO usar video. Cero tags** **`<video>`****. La estética cinemática se logra exclusivamente con imágenes estáticas locales subidas vía Keystatic (****`latestEssay.data.coverImage`\*\*\*\*) aplicando FX cinemáticos mediante CSS nativo.**
+
+**Tareas Quirúrgicas:**
+
+1. **Reparación del Pipeline de Imágenes Dinámicas locales (****`index.astro`****):**
+   - **Keystatic guarda imágenes en** **`src/assets/ensayos/`\*\*\*\*. Para que Astro renderice rutas dinámicas desde KS, debes implementar estrictamente la importación dinámica usando** **`import.meta.glob`\*\*\*\*.**
+   - **Lógica a implementar en el frontmatter de Astro:**
+   - **Usa** **`latestCoverImage`** **en lugar de la ruta de texto pura.**
+1. **Implementación del Hero con FX Cinemático (Latest):**
+   - **Modifica el contenedor Hero (****`h-screen`****) en** **`index.astro`\*\*\*\*.**
+   - **Utiliza la imagen local optimizada (****`latestCoverImage`****) como fondo absolute, usando la etiqueta nativa** **`<Image>`** **de Astro para optimización (****`object-cover w-full h-full opacity-30`****).**
+   - **Implementa el FX Ken Burns SUSPENDIDO: Aplica una animación CSS pura** **`@keyframes scaleUp`** **que escale lentamente la imagen de** **`scale-100`** **a** **`scale-110`** **en 30 segundos, de forma lineal e infinita.**
+   - **Asegura que el H1 masivo con el gradiente cinemático (****`bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40`****) se renderice sobre la imagen de fallback.**
+1. **Inyección de Miniaturas Estáticas en el Dossier (Archivo List):**
+   - **Modifica el loop de renderizado de** **`archivedEssays`** **en** **`index.astro`** **(la lista que se ve en image\_0.png).**
+   - **Implementa la misma lógica de importación dinámica de imágenes para cada ítem de la lista.**
+   - **Actualiza el layout de Grid de 12 columnas. El nuevo layout debe ser:**
+     - **2 columnas para Metadatos Técnicos (Categoría y Fecha en Space Mono).**
+     - **1 columna para la Miniatura Visual (Nuevo campo).**
+     - **8 columnas para el Título (Gloock/Newsreader).**
+     - **1 columna para el indicador visual (arrow).**
+   - **En la nueva columna de Miniatura Visual (****`class="group border border-white/20 w-16 h-16 rounded-full overflow-hidden"`****):**
+     - **Renderiza obligatoriamente la** **`coverImage`** **optimizada con** **`object-cover`\*\*\*\*.**
+     - **Al hacer hover en el contenedor principal (****`group`****), aplica un FX Parallax micrométrico (un sutil desplazamiento en el eje Y de la imagen dentro de la miniatura) usando** **`group-hover:scale-105 transition-transform duration-700 ease-cinematic`\*\*\*\*.**
+1. **Verificación Estética: Mantén el rigor editorial. Fondo antracita (#121413), texto blanco atenuado. Asegura que el antialiasing esté activado para el efecto "pegado al papel".**
+
+```
+const allEssays = await getCollection('ensayos');
+// Ordenar por fecha desc...
+const latestEssay = sortedEssays[0];
+const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/ensayos/*.{jpeg,jpg,png,gif,webp}');
+const currentImagePath = latestEssay.data.coverImage;
+const imageModule = currentImagePath && images[currentImagePath];
+if (!imageModule) throw new Error(`Image not found: ${currentImagePath}`);
+const { default: latestCoverImage } = await imageModule();
+```
+
+**No crees componentes "placeholders". Todo el contenido debe ser extraído dinámicamente de Keystatic. Avísame cuando compile limpio.**

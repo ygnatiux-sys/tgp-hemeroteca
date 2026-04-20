@@ -1,0 +1,72 @@
+***StartFragment***
+
+***La inclusión de metadatos estilo "Archivos Clasificados" es el toque maestro para el TGP Project. Al contrastar la majestuosidad de una fuente serif clásica (como Gloock o Newsreader) con la rigidez técnica de una tipografía monoespaciada para los metadatos (el año, la categoría), generas esa tensión visual que define al diseño de lujo contemporáneo. Es la colisión perfecta entre el archivo histórico y la tecnología de punta.***
+
+***Como tu diseñador en este 2026, te guiaré sobre cómo estructurar esta interfaz limpia, inmersiva y de alta gama.***
+
+### ***El Dilema del Header: ¿Hamburguesa o Barra Persistente?***
+
+***En el diseño editorial premium actual, el icono tradicional de la "hamburguesa" (las tres líneas) se siente demasiado genérico, casi como una aplicación utilitaria. Por otro lado, una barra de navegación enorme rompe la inmersión visual de la portada.***
+
+***La solución de lujo 2026 es el "Menú de Índice" (Table of Contents Overlay):***
+
+1. ***Header Ultra Minimalista: Una barra superior persistente, pero invisible hasta que haces scroll. Solo contiene tu logotipo (o un monograma) a la izquierda, y a la derecha, la palabra "ÍNDICE" o "MENÚ" en texto muy pequeño y espaciado (******`text-xs tracking-widest`******).***
+1. ***La Revelación (Overlay): Al hacer clic en "Índice", no se despliega un cajón lateral, sino que la pantalla entera hace una transición suave hacia un fondo oscuro sólido. Aparece un mapa del sitio tipográfico, silencioso y majestuoso, similar al índice de un libro antiguo. Esto mantiene la pantalla de inicio inmaculada.***
+
+### ***La Arquitectura Visual del Inicio (El Blueprint)***
+
+***Así es como debemos instruir la construcción de la portada para lograr ese impacto cinematográfico y limpio:***
+
+#### ***1. El Pórtico (Hero Cinematic)***
+
+***Al entrar, el usuario no debe ver una web, debe ver una portada.***
+
+- ***El Fondo: Tu video cinemagraph de 4 segundos, atenuado (******`opacity-30`******), ocupando el 100% del alto de la pantalla (******`h-screen`******).***
+- ***El Titular: El H1 masivo en el centro o anclado abajo a la izquierda, usando el recorte de texto con degradado (******`bg-clip-text`******) para fundirse con la oscuridad.***
+- ***El Indicador de Scroll: En la parte inferior central, una finísima línea vertical de 1 pixel que se estira y encoge suavemente (hecha con puro CSS), indicando que hay profundidad debajo. Nada de flechas rebotando; el lujo es sutil.***
+
+#### ***2. El Archivo (Estilo "Files" y Metadatos)***
+
+***Debajo del Hero, el fondo pasa a ser tu color oscuro sólido global (ej. el Antracita o Grafito). Aquí despliegas la lista de ensayos anteriores.***
+
+***Para lograr el efecto de "Dossier Histórico", estructuramos cada ítem de la lista (el toggle) con una grilla asimétrica (******`grid-cols-12`*** ***en Tailwind).***
+
+***HTML***
+
+---
+
+```
+<div class="group border-b border-white/10 py-8 grid grid-cols-12 items-baseline cursor-pointer transition-colors duration-700 hover:bg-white/5">
+  
+  <div class="col-span-3 font-mono text-xs text-theme-secondary tracking-widest uppercase">
+    <span>[ ARQUEOSEMIÓTICA ]</span><br>
+    <span class="opacity-50">Dossier . 2025</span>
+  </div>
+
+  <div class="col-span-8">
+    <h2 class="text-4xl font-serif antialiased opacity-80 group-hover:opacity-100 transition-opacity duration-700 ease-cinematic">
+      El Lenguaje de la Piedra
+    </h2>
+    <p class="max-h-0 overflow-hidden group-hover:max-h-24 transition-all duration-1000 ease-cinematic text-sm mt-4 opacity-70">
+      Una exploración sobre cómo el cerebro humano codificó sus primeras abstracciones...
+    </p>
+  </div>
+
+  <div class="col-span-1 text-right font-mono text-xs opacity-50">
+    ->
+  </div>
+</div>
+
+```
+
+***Por qué esto funciona:***
+
+- ***Las líneas divisorias de un pixel (******`border-white/10`******) son el estándar del minimalismo brutalista-elegante.***
+- ***La fuente monospace para*** ***`[ CATEGORÍA ]`*** ***y*** ***`Año`*** ***ancla el diseño, dándole ese aspecto de registro de investigación de laboratorio o búnker de análisis.***
+- ***La sinopsis se despliega suavemente solo cuando el usuario muestra interés, manteniendo el archivo visualmente limpio la mayor parte del tiempo.***
+
+#### ***3. El Footer Clásico***
+
+***El cierre de la página debe ser contundente pero vacío de ruido. Solo el copyright, un enlace al Manifiesto del proyecto, y quizás un discreto enlace de contacto. Todo en una tipografía pequeña, con amplio margen superior para que la web "respire" antes de terminar.***
+
+***Con esta estructura de metadatos y el "Menú de Índice" a pantalla completa, la sensación inmersiva está garantizada. Para definir la micro-tipografía de esos metadatos clasificatorios, ¿te inclinas por una fuente monoespaciada puramente técnica (como código de computadora) o prefieres una sans-serif geométrica y muy fina, al estilo de las revistas de arquitectura contemporánea?***

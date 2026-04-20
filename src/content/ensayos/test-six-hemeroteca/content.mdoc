@@ -1,0 +1,40 @@
+**Atención: Corrección Crítica de Arquitectura (Navegación Global).**
+
+**El sitio actualmente carece de navegación visible porque los componentes de Header y Footer no están integrados en el cascarón principal.**
+
+**Debes ejecutar estrictamente las siguientes tareas para implementar un sistema de navegación Luxury Minimalist (Cero JS de terceros, solo HTML/CSS nativo y un mínimo script en Astro):**
+
+1. **Construir** **`src/components/Header.astro`\*\*\*\*:**
+   - **Crea un** **`header`** **con clase** **`fixed top-0 w-full z-50 px-8 py-6 flex justify-between items-center mix-blend-difference text-white/90`\*\*\*\*.**
+   - **Lado izquierdo: El logo o texto "TGP PROJECT" en** **`font-serif tracking-widest text-sm uppercase`\*\*\*\*.**
+   - **Lado derecho: Un botón nativo** **`<button id="menu-btn">`** **con el texto "[ ÍNDICE ]" en** **`font-mono text-xs tracking-widest uppercase cursor-pointer opacity-80 hover:opacity-100 transition-opacity`\*\*\*\*.**
+   - **El Menú Overlay: Dentro del mismo archivo, añade un** **`<dialog id="menu-overlay">`** **nativo de HTML5.**
+     - **Estilos del dialog:** **`fixed inset-0 w-full h-full bg-[#121413] text-white/90 backdrop:bg-[#121413] p-8 m-0 max-w-none max-h-none`\*\*\*\*.**
+     - **Contenido del dialog: Un botón de "[ CERRAR ]" arriba a la derecha, y en el centro de la pantalla una lista gigante (****`text-6xl font-serif`****) con los links: INICIO, MANIFIESTO, ARCHIVO.**
+   - **Script: Añade un pequeño** **`<script>`** **de lado del cliente para que al hacer clic en el botón se ejecute** **`dialog.showModal()`** **y al hacer clic en cerrar,** **`dialog.close()`\*\*\*\*.**
+1. **Construir** **`src/components/Footer.astro`\*\*\*\*:**
+   - **Crea un** **`footer`** **minimalista. Clases sugeridas:** **`w-full border-t border-white/10 py-12 mt-32 px-8`\*\*\*\*.**
+   - **Contenido: Grid simple. A la izquierda: "The Great Puzzle Project © 2026". A la derecha: links discretos a "Manifiesto" y "Contacto".**
+   - **Tipografía: Todo en** **`font-mono text-xs opacity-50 uppercase tracking-widest`\*\*\*\*.**
+1. **Integración en** **`src/layouts/Layout.astro`** **(EL PASO CLAVE):**
+   - **Importa los componentes:**
+     \
+     \******`import Header from '../components/Header.astro';`**
+     \****\
+     \******`import Footer from '../components/Footer.astro';`**
+   - **Dentro del** **`<body>`\*\*\*\*, la estructura DEBE ser exactamente esta:**
+   - **<body>**
+     \
+     **<Header />**
+     \
+     **<main>**
+     \
+     **<slot />**
+     \
+     **</main>**
+     \
+     **<Footer />**
+     \
+     **</body>**
+
+**No modifiques el contenido de las páginas, solo asegura que esta estructura global funcione sin errores y que el** **`<dialog>`** **se abra suavemente con CSS.**

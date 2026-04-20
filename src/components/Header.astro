@@ -1,0 +1,69 @@
+---
+// Header Component (Nativo 0-JS de terceros)
+---
+
+<header class="fixed top-0 w-full z-100 px-8 py-6 flex justify-between items-center mix-blend-difference text-white/90">
+  <a href="/" class="flex flex-row items-center gap-3 font-serif tracking-widest text-sm uppercase opacity-100 hover:text-[#C8A98B] transition-all duration-500">
+    <img src="/images/tgp-img-16.webp" alt="TGP Logo" class="w-6 h-6 object-cover rounded-sm grayscale mix-blend-luminosity" />
+    TGP PROJECT
+  </a>
+  
+  <button id="menu-btn" class="font-mono text-xs tracking-widest uppercase cursor-pointer opacity-80 hover:text-[#C8A98B] hover:opacity-100 transition-all duration-500">
+    [ ÍNDICE ]
+  </button>
+</header>
+
+<dialog id="menu-overlay" class="fixed inset-0 w-full h-full bg-theme-dark text-white/90 backdrop:bg-theme-dark p-8 m-0 max-w-none max-h-none opacity-0 transition-opacity duration-700 open:opacity-100">
+  <div class="w-full h-full flex flex-col">
+    <!-- Header interno del Dialog -->
+    <div class="flex justify-end w-full">
+      <button id="close-btn" class="font-mono text-xs tracking-widest uppercase cursor-pointer opacity-80 hover:text-[#C8A98B] hover:opacity-100 transition-all duration-500 mt-4 mr-4">
+        [ CERRAR ]
+      </button>
+    </div>
+
+    <!-- Navegación Gigante central -->
+    <nav class="grow flex flex-col items-center justify-center gap-12 text-center pb-20">
+      <a href="/" class="text-6xl md:text-8xl font-serif antialiased opacity-70 hover:text-[#C8A98B] hover:opacity-100 transition-colors duration-700">
+        INICIO
+      </a>
+      <a href="/manifiesto" class="text-6xl md:text-8xl font-serif antialiased opacity-70 hover:text-[#C8A98B] hover:opacity-100 transition-colors duration-700">
+        MANIFIESTO
+      </a>
+      <a href="/archivo" class="text-6xl md:text-8xl font-serif antialiased opacity-70 hover:text-[#C8A98B] hover:opacity-100 transition-colors duration-700">
+        ARCHIVO
+      </a>
+    </nav>
+  </div>
+</dialog>
+
+<script>
+  const menuBtn = document.getElementById('menu-btn');
+  const closeBtn = document.getElementById('close-btn');
+  const dialog = document.getElementById('menu-overlay') as HTMLDialogElement;
+
+  if (menuBtn && closeBtn && dialog) {
+    menuBtn.addEventListener('click', () => {
+      dialog.showModal();
+      document.body.style.overflow = 'hidden';
+    });
+
+    closeBtn.addEventListener('click', () => {
+      dialog.close();
+      document.body.style.overflow = '';
+    });
+
+    // Cierre clickeando el fondo
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) {
+        dialog.close();
+        document.body.style.overflow = '';
+      }
+    });
+  }
+</script>
+
+<style>
+  /* Reseteo de border y estilos default del diálogo */
+  dialog { border: none; }
+</style>

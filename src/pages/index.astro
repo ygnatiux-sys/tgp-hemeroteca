@@ -1,0 +1,236 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+
+// Resolvemos todos los ensayos vía Content Collections (Astro Sync)
+const allEssaysRaw = await getCollection('ensayos').catch(err => {
+  console.error("-----------------------------------------");
+  console.error("❌ [ZOD VALIDATION ERROR]: Falló la carga de la colección.");
+  console.error(err);
+  console.error("-----------------------------------------");
+  return [];
+});
+
+// 🔍 Log de Auditoría solicitado por el usuario
+console.log("-----------------------------------------");
+console.log(`[AUDIT] Ensayos detectados (Astro): ${allEssaysRaw.length}`);
+if (allEssaysRaw.length === 0) {
+  console.warn("⚠️ [WARN] No se detectaron ensayos. Verifica src/content/ensayos");
+} else {
+  console.log("✅ [SUCCESS] Pipeline de contenido sincronizado.");
+  allEssaysRaw.forEach(e => console.log(` - ID: ${e.id} | Título: ${e.data.title}`));
+}
+console.log("-----------------------------------------");
+
+// Glob dynamics for images procesadas por astro:assets
+const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}');
+
+// Transformamos los datos para mantener compatibilidad con el resto del componente
+const ensayos = allEssaysRaw.map(item => ({
+  slug: item.id.replace(/\/index$/, ''), // Normalizamos slug (id de Astro 6 tiene /index)
+  entry: item.data
+}));
+
+const sortedEssays = ensayos.sort((a, b) => {
+  return new Date(b.entry.date || 0).getTime() - new Date(a.entry.date || 0).getTime();
+});
+
+const latestEssay = sortedEssays[0];
+const archivedEssays = sortedEssays.slice(1);
+
+// Resolve latest essay cover with fallback logic
+let latestCoverImageMetadata = null;
+if (latestEssay?.entry.coverImage && images[latestEssay.entry.coverImage]) {
+  try {
+    const { default: metadata } = await images[latestEssay.entry.coverImage]();
+    latestCoverImageMetadata = metadata;
+  } catch (err) {
+    console.error(`[ERROR] Falló carga de imagen para ${latestEssay.slug}:`, err);
+  }
+}
+
+// Resolve archived essays covers
+const resolvedArchivedEssays = await Promise.all(
+  archivedEssays.map(async (essay) => {
+    let coverImageMetadata = null;
+    if (essay.entry.coverImage && images[essay.entry.coverImage]) {
+      try {
+        const { default: metadata } = await images[essay.entry.coverImage]();
+        coverImageMetadata = metadata;
+      } catch (e) {
+        console.warn(`[WARN] Imagen no encontrada para ${essay.slug}`);
+      }
+    }
+    return { ...essay, coverImageMetadata };
+  })
+);
+
+
+---
+
+<Layout title="Hemeroteca TGP - Archivo Premium">
+  
+  {/* 1. Prólogo (Manifiesto) */}
+  <section class="relative min-h-[150vh] flex flex-col justify-center items-center overflow-hidden">
+    {/* Fondo con Ken Burns CSS Puro */}
+    <div class="absolute inset-0 z-0 bg-theme-dark overflow-hidden pointer-events-none">
+      <div class="w-full h-full bg-white/5 animate-ken-burns"></div>
+    </div>
+
+    {/* Blur Reveal: Frases del Manifiesto */}
+    <div class="z-10 flex flex-col items-center justify-center space-y-48 md:space-y-64 py-32 px-6 text-center w-full max-w-5xl">
+      <p class="manifesto-phrase font-serif text-4xl md:text-6xl lg:text-7xl antialiased text-white/80 blur-md opacity-0 translate-y-4 transition-all duration-1000 ease-out">
+        La historia no es una narrativa lineal.
+      </p>
+      <p class="manifesto-phrase font-serif text-4xl md:text-6xl lg:text-7xl antialiased text-white/80 blur-md opacity-0 translate-y-4 transition-all duration-1000 ease-out">
+        Sino un archivo de señales esperando ser decodificadas.
+      </p>
+      <p class="manifesto-phrase font-serif text-4xl md:text-6xl lg:text-7xl antialiased text-white/80 blur-md opacity-0 translate-y-4 transition-all duration-1000 ease-out">
+        Bienvenido al gran rompecabezas.
+      </p>
+    </div>
+  </section>
+
+  {/* 2. Hero Cinematic (latestEssay) */}
+  {latestEssay ? (
+    <section class="relative min-h-screen flex items-center justify-center border-t border-white/5 overflow-hidden">
+      {/* Imagen estática local optimizada con FX Ken Burns CSS Puro */}
+      {latestCoverImageMetadata ? (
+        <Image 
+          src={latestCoverImageMetadata} 
+          alt={`Portada de ${latestEssay.entry.title}`}
+          class="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none z-0 animate-scale-up-slow"
+        />
+      ) : (
+        /* Parche de Emergencia: Fallback sólido si no hay imagen */
+        <div 
+          class="absolute inset-0 w-full h-full bg-[#121413] opacity-50 z-0"
+        >
+          <div class="absolute inset-0 bg-white/[0.02] animate-ken-burns"></div>
+        </div>
+      )}
+      
+      <div class="relative z-10 w-full max-w-7xl px-6 lg:px-8 flex flex-col items-center text-center">
+        {/* Título gigante usando text-clip */}
+        <h1 class="text-transparent bg-clip-text bg-linear-to-b from-white to-white/40 tracking-tighter text-6xl md:text-8xl lg:text-[10rem] leading-none font-serif">
+          {latestEssay.entry.title}
+        </h1>
+        <div class="mt-12 flex flex-col items-center gap-6">
+          <p class="font-mono text-xs uppercase tracking-widest text-white/60">
+            [ Último Dossier . {latestEssay.entry.category} ]
+          </p>
+          <a href={`/hemeroteca/${latestEssay.slug}`} class="font-mono text-[10px] tracking-widest uppercase border border-white/20 px-8 py-4 hover:bg-white hover:text-theme-dark transition-colors duration-500">
+             Acceder al Archivo
+          </a>
+        </div>
+      </div>
+    </section>
+  ) : (
+    <section class="relative h-screen flex items-center justify-center border-t border-white/5">
+      <h1 class="font-serif text-4xl opacity-50 tracking-widest uppercase">Hemeroteca Vacía</h1>
+    </section>
+  )}
+
+  {/* 3. Archivo Dossier (archivedEssays) */}
+  {resolvedArchivedEssays.length > 0 && (
+    <section class="max-w-7xl mx-auto px-6 lg:px-8 py-32 pb-48">
+      <div class="flex flex-col border-t border-white/10">
+        {resolvedArchivedEssays.map(({ slug, entry, coverImageMetadata }) => (
+          <a href={`/hemeroteca/${slug}`} class="group border-b border-white/10 py-10 grid grid-cols-12 items-center gap-4 cursor-pointer transition-colors duration-700 hover:bg-white/5">
+            
+            {/* Metadatos (2 columnas) */}
+            <div class="col-span-12 md:col-span-2 font-mono text-xs text-white/60 tracking-widest uppercase">
+              <span>[ {entry.category} ]</span><br>
+              <span class="opacity-50 mt-2 block">Dossier . {entry.date ? new Date(entry.date).getFullYear() : 'S/F'}</span>
+            </div>
+
+            {/* Miniatura (1 columna) */}
+            <div class="col-span-12 md:col-span-1 flex justify-start md:justify-center">
+              <div class="w-16 h-16 rounded-full border border-white/20 overflow-hidden relative">
+                {coverImageMetadata ? (
+                  <Image 
+                    src={coverImageMetadata} 
+                    alt={`Miniatura de ${entry.title}`}
+                    class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-cinematic"
+                  />
+                ) : (
+                  /* Parche de Emergencia: Miniatura de fallback */
+                  <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                    <span class="font-mono text-[8px] opacity-20">TGP</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Titulo (8 columnas) */}
+            <div class="col-span-10 md:col-span-8">
+              <h2 class="text-3xl md:text-4xl lg:text-5xl font-serif antialiased opacity-80 group-hover:opacity-100 transition-opacity duration-700 ease-cinematic">
+                {entry.title}
+              </h2>
+            </div>
+
+            {/* Indicador visual (1 columna) */}
+            <div class="col-span-2 md:col-span-1 text-right font-mono text-xs opacity-50 group-hover:text-white transition-colors duration-500">
+              ->
+            </div>
+            
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+</Layout>
+
+<style>
+  /* Animación Ken Burns CSS Puro para el Prólogo y el Hero */
+  @keyframes kenBurns {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); }
+  }
+
+  .animate-ken-burns {
+    animation: kenBurns 30s ease-out infinite alternate;
+  }
+
+  /* Animación Escala Linear Hero Cinemático */
+  @keyframes scaleUp {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); }
+  }
+
+  .animate-scale-up-slow {
+    animation: scaleUp 30s linear infinite alternate;
+  }
+</style>
+
+<script>
+  // Implementación nativa de Intersection Observer para el "Blur Reveal"
+  const observerCallback = (entries: IntersectionObserverEntry[]) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // Aparece cinemáticamente
+        entry.target.classList.remove('blur-md', 'opacity-0', 'translate-y-4');
+        entry.target.classList.add('blur-0', 'opacity-100', 'translate-y-0');
+      } else {
+        // Desaparece y vuelve al estado inicial al salir del viewport
+        entry.target.classList.remove('blur-0', 'opacity-100', 'translate-y-0');
+        entry.target.classList.add('blur-md', 'opacity-0', 'translate-y-4');
+      }
+    });
+  };
+
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.6 // Dispara cuando el 60% del bloque es visible
+  };
+
+  const observer = new IntersectionObserver(observerCallback, observerOptions);
+  
+  const manifestoPhrases = document.querySelectorAll('.manifesto-phrase');
+  manifestoPhrases.forEach(phrase => {
+    observer.observe(phrase);
+  });
+</script>
