@@ -6,14 +6,20 @@ import react from '@astrojs/react';
 import markdoc from '@astrojs/markdoc';
 import keystatic from '@keystatic/astro';
 
+import cloudflare from '@astrojs/cloudflare';
+
 // https://astro.build/config
 export default defineConfig({
-  // CAMBIO VITAL: Volvemos a 'static' para evitar el error de Cloudflare Workers
-  output: 'static',
+  output: 'server',
   build: {
     format: 'directory'
   },
-  // ELIMINADO: Se quitó el adapter de Cloudflare que causaba el pánico del sistema
+  adapter: cloudflare({
+    imageService: 'cloudflare',
+    platformProxy: {
+      enabled: true
+    }
+  }),
   vite: {
     plugins: [tailwindcss()]
   },
