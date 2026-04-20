@@ -2,7 +2,8 @@ import { config, fields, collection } from '@keystatic/core';
 
 export default config({
   storage: {
-    kind: 'local',
+    kind: process.env.NODE_ENV === 'production' ? 'github' : 'local',
+    repo: 'ygnatiux-sys/tgp-hemeroteca',
   },
   collections: {
     ensayos: collection({

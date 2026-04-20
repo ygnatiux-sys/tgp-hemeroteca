@@ -6,6 +6,7 @@ import Layout from '../../layouts/Layout.astro';
 import { DocumentRenderer } from '@keystatic/core/renderer';
 import { Image } from 'astro:assets';
 
+export const prerender = true;
 export async function getStaticPaths() {
   const essays = await getCollection('ensayos');
   
@@ -59,7 +60,7 @@ const activeAccent = data.themeColor ? (roomColors[data.themeColor] || '#ffffff'
   <section class="hero-section relative w-full h-screen flex flex-col justify-end pb-24 px-6 md:px-12 lg:px-24 z-10 overflow-hidden">
     
     {/* Fondo Fijo: La imagen actúa estática en el fondo, creando parallax 100% nativo y perfecto */}
-    <div class="fixed top-0 left-0 w-full h-screen -z-10 bg-[#121413]">
+    <div class="fixed top-0 left-0 w-full h-screen -z-10 bg-theme-dark">
       {optimizedImage ? (
         <Image 
           src={optimizedImage} 
@@ -72,13 +73,13 @@ const activeAccent = data.themeColor ? (roomColors[data.themeColor] || '#ffffff'
     </div>
 
     {/* Filtro volumétrico de la zona inferior del hero hacia el negro puro */}
-    <div class="absolute inset-0 bg-gradient-to-t from-[#121413] via-[#121413]/30 to-transparent pointer-events-none -z-0"></div>
+    <div class="absolute inset-0 bg-linear-to-t from-theme-dark via-theme-dark/30 to-transparent pointer-events-none z-0"></div>
 
     {/* 3. Tipografía Monumental "Pegada y Viva" */}
     <div class="relative z-10 max-w-6xl mt-auto">
       <h1 class="text-6xl md:text-8xl lg:text-9xl font-serif tracking-tighter antialiased leading-[1.05] flex flex-wrap gap-x-2 md:gap-x-4 lg:gap-x-6 gap-y-2 pt-4 pb-2">
-        {data.title.split(' ').map((word: string) => (
-          <span class="hero-word inline-block translate-y-6 opacity-0 blur-md transition-all duration-[1200ms] ease-cinematic text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/20 pb-2">
+        {(data.title || '').split(' ').map((word: string) => (
+          <span class="hero-word inline-block translate-y-6 opacity-0 blur-md transition-all duration-1200 ease-cinematic text-transparent bg-clip-text bg-linear-to-b from-white via-white to-white/20 pb-2">
             {word}
           </span>
         ))}
@@ -93,7 +94,7 @@ const activeAccent = data.themeColor ? (roomColors[data.themeColor] || '#ffffff'
   </section>
 
   {/* 5. Transición Fluida al Contenido */}
-  <article class="w-full bg-[#121413] relative overflow-hidden z-20 pt-24 pb-32 px-6 md:px-8 shadow-[0_-20px_50px_rgba(18,20,19,1)]" style={`--theme-accent: ${activeAccent};`}>
+  <article class="w-full bg-theme-dark relative overflow-hidden z-20 pt-24 pb-32 px-6 md:px-8 shadow-[0_-20px_50px_rgba(18,20,19,1)]" style={`--theme-accent: ${activeAccent};`}>
     
     {/* Capas FX: Aura Atmosférica sutil */}
     <div class="pointer-events-none absolute inset-0 opacity-20" style="background: radial-gradient(circle at 50% 20%, var(--theme-accent) 0%, transparent 70%); mix-blend-screen;"></div>
@@ -112,17 +113,17 @@ const activeAccent = data.themeColor ? (roomColors[data.themeColor] || '#ffffff'
         prose-p:font-serif prose-p:font-normal prose-p:not-italic prose-p:text-[1.15rem] prose-p:leading-[1.8] prose-p:tracking-normal prose-p:text-white/80
         prose-headings:font-serif prose-headings:font-normal prose-headings:tracking-tight prose-headings:text-white/95
         prose-strong:font-bold prose-strong:text-white/90
-        prose-blockquote:border-none prose-blockquote:bg-[var(--theme-accent)] prose-blockquote:text-[#121413] prose-blockquote:p-10 prose-blockquote:md:-mx-16 prose-blockquote:shadow-2xl prose-blockquote:text-2xl prose-blockquote:leading-snug
-        prose-a:border-b prose-a:border-[var(--theme-accent)]/40 prose-a:text-white hover:prose-a:text-[var(--theme-accent)] transition-colors
-        prose-p:first-of-type:first-letter:text-6xl prose-p:first-of-type:first-letter:text-[var(--theme-accent)] prose-p:first-of-type:first-letter:mr-4 prose-p:first-of-type:first-letter:float-left prose-p:first-of-type:first-letter:leading-[0.8] prose-p:first-of-type:first-letter:mt-2
-        prose-hr:border-t prose-hr:border-[var(--theme-accent)]/30 prose-hr:my-16"
+        prose-blockquote:border-none prose-blockquote:bg-(--theme-accent) prose-blockquote:text-theme-dark prose-blockquote:p-10 prose-blockquote:md:-mx-16 prose-blockquote:shadow-2xl prose-blockquote:text-2xl prose-blockquote:leading-snug
+        prose-a:border-b prose-a:border-(--theme-accent)/40 prose-a:text-white hover:prose-a:text-(--theme-accent) transition-colors
+        prose-p:first-of-type:first-letter:text-6xl prose-p:first-of-type:first-letter:text-(--theme-accent) prose-p:first-of-type:first-letter:mr-4 prose-p:first-of-type:first-letter:float-left prose-p:first-of-type:first-letter:leading-[0.8] prose-p:first-of-type:first-letter:mt-2
+        prose-hr:border-t prose-hr:border-(--theme-accent)/30 prose-hr:my-16"
       >
         <DocumentRenderer document={contentData} />
       </div>
     </div>
     
     <div class="max-w-2xl mx-auto relative z-10 pt-24 mt-32 border-t border-white/10 text-center">
-      <a href="/archivo" class="inline-block font-mono text-xs border border-white/20 px-8 py-4 uppercase tracking-widest text-[#F5F5F7] hover:bg-[#C8A98B] hover:border-[#C8A98B] hover:text-[#121413] transition-all duration-700">
+      <a href="/archivo" class="inline-block font-mono text-xs border border-white/20 px-8 py-4 uppercase tracking-widest text-[#F5F5F7] hover:bg-[#C8A98B] hover:border-[#C8A98B] hover:text-theme-dark transition-all duration-700">
         Retornar al Archivo
       </a>
     </div>
