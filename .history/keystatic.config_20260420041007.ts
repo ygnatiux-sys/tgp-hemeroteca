@@ -2,10 +2,8 @@ import { config, fields, collection } from '@keystatic/core';
 
 export default config({
   storage: {
-    // CORRECCIÓN VITAL: Forzamos 'local' absoluto.
-    // Al ser un sitio puramente estático, Keystatic no debe intentar 
-    // buscar conexiones a GitHub en el entorno de producción de Cloudflare.
-    kind: 'local',
+    kind: process.env.NODE_ENV === 'production' ? 'github' : 'local',
+    repo: 'ygnatiux-sys/tgp-hemeroteca',
   },
   collections: {
     ensayos: collection({
