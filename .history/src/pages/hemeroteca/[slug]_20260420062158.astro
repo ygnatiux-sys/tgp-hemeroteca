@@ -6,7 +6,7 @@ import Layout from "../../layouts/Layout.astro";
 import { DocumentRenderer } from "@keystatic/core/renderer";
 import { Image } from "astro:assets";
 
-export const prerender = true;
+export const prerender = false;
 export async function getStaticPaths() {
   const essays = await getCollection("ensayos");
 
