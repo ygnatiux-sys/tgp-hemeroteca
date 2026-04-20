@@ -6,12 +6,20 @@ import react from '@astrojs/react';
 import markdoc from '@astrojs/markdoc';
 import keystatic from '@keystatic/astro';
 
+import cloudflare from '@astrojs/cloudflare';
+
 // https://astro.build/config
 export default defineConfig({
-  output: 'static',
+  output: 'server',
   build: {
     format: 'directory'
   },
+  adapter: cloudflare({
+    imageService: 'cloudflare',
+    platformProxy: {
+      enabled: true
+    }
+  }),
   vite: {
     plugins: [tailwindcss()]
   },
