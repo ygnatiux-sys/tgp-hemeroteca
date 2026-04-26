@@ -4,13 +4,15 @@ import Layout from '../layouts/Layout.astro';
 import { Image } from 'astro:assets';
 
 // Resolvemos todos los ensayos vía Content Collections (Astro Sync)
-const allEssaysRaw = await getCollection('ensayos').catch(err => {
-  console.error("-----------------------------------------");
-  console.error("❌ [ZOD VALIDATION ERROR]: Falló la carga de la colección.");
-  console.error(err);
-  console.error("-----------------------------------------");
-  return [];
-});
+const allEssaysRaw = await getCollection('ensayos')
+  .then(entries => import.meta.env.PROD ? entries.filter(e => !e.data.draft) : entries)
+  .catch(err => {
+    console.error("-----------------------------------------");
+    console.error("❌ [ZOD VALIDATION ERROR]: Falló la carga de la colección.");
+    console.error(err);
+    console.error("-----------------------------------------");
+    return [];
+  });
 
 // 🔍 Log de Auditoría solicitado por el usuario
 console.log("-----------------------------------------");

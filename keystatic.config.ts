@@ -1,4 +1,5 @@
 import { config, fields, collection } from '@keystatic/core';
+import { GeneradorTGP } from './src/components/GeneradorTGP';
 
 export default config({
   storage: {
@@ -15,6 +16,14 @@ export default config({
       format: { data: 'json' },
       schema: {
         title: fields.slug({ name: { label: 'Título' } }),
+        generador: {
+          ...fields.text({ 
+            label: 'Ensayo Generado (TGP)', 
+            multiline: true,
+            defaultValue: '',
+          }),
+          Input: GeneradorTGP 
+        } as any,
         date: fields.date({ label: 'Fecha' }),
         category: fields.text({ label: 'Categoría (ej. Arqueosemiótica)' }),
         themeColor: fields.select({
@@ -29,8 +38,13 @@ export default config({
           ],
           defaultValue: 'british-green',
         }),
+        draft: fields.checkbox({ 
+          label: 'Borrador', 
+          description: 'Si está marcado, no se publicará en producción',
+          defaultValue: true 
+        }),
         coverImage: fields.image({ 
-          label: 'Imagen de Portada', 
+          label: 'Imagen de Portada (Opcional)', 
           directory: 'src/assets/ensayos', 
           publicPath: '/src/assets/ensayos/' 
         }),

@@ -1,19 +1,20 @@
 import { defineConfig } from 'astro/config';
-import tailwindcss from '@tailwindcss/vite';
-import react from '@astrojs/react';
-import markdoc from '@astrojs/markdoc';
-import keystatic from '@keystatic/astro';
 import cloudflare from '@astrojs/cloudflare';
+import { tgpIntegrations, tgpViteConfig } from './src/config/integrations.js';
+
+const isDev = process.env.NODE_ENV === 'development';
 
 // https://astro.build/config
 export default defineConfig({
-  // Modo híbrido: Todo es estático, excepto Keystatic
-  output: 'hybrid',
-  adapter: cloudflare(),
+  // En desarrollo desactivamos el adaptador de Cloudflare para evitar el error de 'unenv' (fs).
+  // Keystatic necesita acceso al sistema de archivos (fs) para leer el contenido localmente.
+  adapter: isDev ? undefined : cloudflare({
+    platformProxy: {
+      enabled: true,
+    },
+  }),
   
-  vite: {
-    plugins: [tailwindcss()]
-  },
+  vite: tgpViteConfig,
   
-  integrations: [react(), markdoc(), keystatic()]
+  integrations: tgpIntegrations
 });

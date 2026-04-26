@@ -5,10 +5,13 @@ import keystaticConfig from "../../../keystatic.config";
 import Layout from "../../layouts/Layout.astro";
 import { DocumentRenderer } from "@keystatic/core/renderer";
 import { Image } from "astro:assets";
+import { marked } from 'marked';
 
 export const prerender = true;
 export async function getStaticPaths() {
-  const essays = await getCollection("ensayos");
+  const essays = await getCollection("ensayos").then(entries => 
+    import.meta.env.PROD ? entries.filter(e => !e.data.draft) : entries
+  );
 
   return essays.map((item) => ({
     params: { slug: item.id.replace(/\/index$/, "") },
@@ -150,7 +153,11 @@ const activeAccent = data.themeColor
         prose-p:first-of-type:first-letter:text-6xl prose-p:first-of-type:first-letter:text-(--theme-accent) prose-p:first-of-type:first-letter:mr-4 prose-p:first-of-type:first-letter:float-left prose-p:first-of-type:first-letter:leading-[0.8] prose-p:first-of-type:first-letter:mt-2
         prose-hr:border-t prose-hr:border-(--theme-accent)/30 prose-hr:my-16"
       >
-        <DocumentRenderer document={contentData} />
+        {data.generador ? (
+          <div set:html={marked.parse(data.generador)} />
+        ) : (
+          <DocumentRenderer document={contentData} />
+        )}
       </div>
     </div>
 
