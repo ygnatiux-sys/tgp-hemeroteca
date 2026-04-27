@@ -26,7 +26,7 @@ function startupLogger() {
 export const tgpIntegrations = [
   react(), 
   markdoc(), 
-  keystatic(),
+  // keystatic(),
   startupLogger()
 ];
 

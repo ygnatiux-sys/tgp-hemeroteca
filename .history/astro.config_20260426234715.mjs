@@ -3,8 +3,7 @@ import { tgpIntegrations, tgpViteConfig } from './src/config/integrations.js';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://tgp-hemeroteca.pages.dev',
-  output: 'static', 
+  output: 'static', // Garantiza que Astro genere solo HTML/CSS/JS plano
   vite: tgpViteConfig,
   integrations: tgpIntegrations
 });

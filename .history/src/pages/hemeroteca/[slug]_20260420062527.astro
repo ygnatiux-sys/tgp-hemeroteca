@@ -1,0 +1,240 @@
+---
+import { getCollection } from "astro:content";
+import { createReader } from "@keystatic/core/reader";
+import keystaticConfig from "../../../keystatic.config";
+import Layout from "../../layouts/Layout.astro";
+import { DocumentRenderer } from "@keystatic/core/renderer";
+import { Image } from "astro:assets";
+
+export const prerender = true;
+export async function getStaticPaths() {
+  const essays = await getCollection("ensayos");
+
+  return essays.map((item) => ({
+    params: { slug: item.id.replace(/\/index$/, "") },
+    props: { data: item.data },
+  }));
+}
+
+const { slug } = Astro.params;
+const { data } = Astro.props;
+
+// Keystatic Reader para el contenido Markdoc
+const reader = createReader(process.cwd(), keystaticConfig);
+const postEntry = await reader.collections.ensayos.read(slug);
+
+if (!postEntry) {
+  throw new Error(`No se pudo encontrar el contenido para ${slug}`);
+}
+
+const contentData = await postEntry.content();
+
+// 1. ORO ESTRICTO: Importación dinámica exclusiva de la portada local
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}",
+);
+const ensayoPath = data.coverImage;
+let optimizedImage = null;
+
+if (ensayoPath && images[ensayoPath]) {
+  try {
+    const { default: loadedImage } = await images[ensayoPath]();
+    optimizedImage = loadedImage;
+  } catch (err) {
+    console.warn(
+      `[ERROR] No image module could be loaded for ${ensayoPath}:`,
+      err,
+    );
+  }
+}
+// Tolerancia para borradores que no tengan imagen todavía, manteniendo el background antracita por seguridad.
+
+const roomColors: Record<string, string> = {
+  "british-green": "#1B382A",
+  bordeaux: "#5B2326",
+  "old-navy": "#1E2C3A",
+  "bus-red": "#8B3A36",
+  "vintage-yellow": "#D4A352",
+  "rust-orange": "#B55A30",
+};
+const activeAccent = data.themeColor
+  ? roomColors[data.themeColor] || "#ffffff"
+  : "#ffffff";
+---
+
+<Layout title={`${data.title} | Hemeroteca TGP`}>
+  {/* 2. Hero Cinemático Full-Width con Parallax Nativo Constante */}
+  <section
+    class="hero-section relative w-full h-screen flex flex-col justify-end pb-24 px-6 md:px-12 lg:px-24 z-10 overflow-hidden"
+  >
+    {
+      /* Fondo Fijo: La imagen actúa estática en el fondo, creando parallax 100% nativo y perfecto */
+    }
+    <div class="fixed top-0 left-0 w-full h-screen -z-10 bg-theme-dark">
+      {
+        optimizedImage ? (
+          <Image
+            src={optimizedImage}
+            alt={`Portada de ${data.title}`}
+            class="w-full h-full object-cover opacity-40"
+          />
+        ) : (
+          <div class="w-full h-full bg-white/5 opacity-40" />
+        )
+      }
+    </div>
+
+    {/* Filtro volumétrico de la zona inferior del hero hacia el negro puro */}
+    <div
+      class="absolute inset-0 bg-linear-to-t from-theme-dark via-theme-dark/30 to-transparent pointer-events-none z-0"
+    >
+    </div>
+
+    {/* 3. Tipografía Monumental "Pegada y Viva" */}
+    <div class="relative z-10 max-w-6xl mt-auto">
+      <h1
+        class="text-6xl md:text-8xl lg:text-9xl font-serif tracking-tighter antialiased leading-[1.05] flex flex-wrap gap-x-2 md:gap-x-4 lg:gap-x-6 gap-y-2 pt-4 pb-2"
+      >
+        {
+          (data.title || "")
+            .split(" ")
+            .map((word: string) => (
+              <span class="hero-word inline-block translate-y-6 opacity-0 blur-md transition-all duration-1200 ease-cinematic text-transparent bg-clip-text bg-linear-to-b from-white via-white to-white/20 pb-2">
+                {word}
+              </span>
+            ))
+        }
+      </h1>
+
+      <div
+        class="hero-meta mt-10 font-mono text-xs opacity-0 translate-y-4 blur-sm flex items-center uppercase tracking-widest text-[#C8A98B] transition-all duration-1000 ease-cinematic border-l border-[#C8A98B]/30 pl-4"
+      >
+        <span>[ {data.category || "ARCHIVO CLASIFICADO"} ]</span>
+        <span class="mx-4 opacity-50">—</span>
+        <span>{data.date ? new Date(data.date).getFullYear() : "S/F"}</span>
+      </div>
+    </div>
+  </section>
+
+  {/* 5. Transición Fluida al Contenido */}
+  <article
+    class="w-full bg-theme-dark relative overflow-hidden z-20 pt-24 pb-32 px-6 md:px-8 shadow-[0_-20px_50px_rgba(18,20,19,1)]"
+    style={`--theme-accent: ${activeAccent};`}
+  >
+    {/* Capas FX: Aura Atmosférica sutil */}
+    <div
+      class="pointer-events-none absolute inset-0 opacity-20"
+      style="background: radial-gradient(circle at 50% 20%, var(--theme-accent) 0%, transparent 70%); mix-blend-screen;"
+    >
+    </div>
+
+    <div class="max-w-2xl mx-auto relative z-10 px-6 md:px-0">
+      {
+        data.excerpt && (
+          <div class="border-l border-white/10 pl-8 mb-24 max-w-2xl">
+            <p class="text-2xl md:text-3xl font-serif opacity-70 italic text-[#C8A98B] leading-relaxed">
+              "{data.excerpt}"
+            </p>
+          </div>
+        )
+      }
+
+      {/* Redacción Editorial */}
+      <div
+        class="prose prose-invert prose-lg max-w-2xl mx-auto
+        prose-p:font-serif prose-p:font-normal prose-p:not-italic prose-p:text-[1.15rem] prose-p:leading-[1.8] prose-p:tracking-normal prose-p:text-white/80
+        prose-headings:font-serif prose-headings:font-normal prose-headings:tracking-tight prose-headings:text-white/95
+        prose-strong:font-bold prose-strong:text-white/90
+        prose-blockquote:border-none prose-blockquote:bg-(--theme-accent) prose-blockquote:text-theme-dark prose-blockquote:p-10 prose-blockquote:md:-mx-16 prose-blockquote:shadow-2xl prose-blockquote:text-2xl prose-blockquote:leading-snug
+        prose-a:border-b prose-a:border-(--theme-accent)/40 prose-a:text-white hover:prose-a:text-(--theme-accent) transition-colors
+        prose-p:first-of-type:first-letter:text-6xl prose-p:first-of-type:first-letter:text-(--theme-accent) prose-p:first-of-type:first-letter:mr-4 prose-p:first-of-type:first-letter:float-left prose-p:first-of-type:first-letter:leading-[0.8] prose-p:first-of-type:first-letter:mt-2
+        prose-hr:border-t prose-hr:border-(--theme-accent)/30 prose-hr:my-16"
+      >
+        <DocumentRenderer document={contentData} />
+      </div>
+    </div>
+
+    <div
+      class="max-w-2xl mx-auto relative z-10 pt-24 mt-32 border-t border-white/10 text-center"
+    >
+      <a
+        href="/archivo"
+        class="inline-block font-mono text-xs border border-white/20 px-8 py-4 uppercase tracking-widest text-[#F5F5F7] hover:bg-[#C8A98B] hover:border-[#C8A98B] hover:text-theme-dark transition-all duration-700"
+      >
+        Retornar al Archivo
+      </a>
+    </div>
+  </article>
+
+  {/* 4. Animación de Entrada "Aparición Volumétrica" */}
+  <script>
+    const setupHeroAnimation = () => {
+      const heroSection = document.querySelector(".hero-section");
+      if (!heroSection) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              // Animar palabras del H1 de manera secuencial (Stagger)
+              const words = entry.target.querySelectorAll(".hero-word");
+              words.forEach((word, index) => {
+                setTimeout(
+                  () => {
+                    word.classList.remove(
+                      "opacity-0",
+                      "translate-y-6",
+                      "blur-md",
+                    );
+                    word.classList.add(
+                      "opacity-100",
+                      "translate-y-0",
+                      "blur-0",
+                    );
+                  },
+                  index * 150 + 100,
+                ); // 150ms delay entre cada palabra
+              });
+
+              // Animar meta al finalizar las palabras
+              const meta = entry.target.querySelector(".hero-meta");
+              if (meta) {
+                setTimeout(
+                  () => {
+                    meta.classList.remove(
+                      "opacity-0",
+                      "translate-y-4",
+                      "blur-sm",
+                    );
+                    meta.classList.add(
+                      "opacity-100",
+                      "translate-y-0",
+                      "blur-0",
+                    );
+                  },
+                  words.length * 150 + 400,
+                ); // 400ms buffer after last word
+              }
+
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1 },
+      );
+
+      observer.observe(heroSection);
+    };
+
+    // Ejecutar en render normal y tolerar view transitions
+    document.addEventListener("DOMContentLoaded", setupHeroAnimation);
+    document.addEventListener("astro:page-load", setupHeroAnimation);
+  </script>
+
+  <style>
+    /* Soporte de la curva Bézier cinemática */
+    .ease-cinematic {
+      transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+    }
+  </style>
+</Layout>

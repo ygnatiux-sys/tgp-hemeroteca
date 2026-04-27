@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@0no-co/graphql.web": "^1.2.0",
+    "@astrojs/cloudflare": "^13.1.10",
     "@astrojs/markdoc": "^1.0.3",
     "@astrojs/node": "^10.0.5",
     "@astrojs/react": "^5.0.3",
