@@ -44,30 +44,34 @@ export const POST: APIRoute = async ({ request }) => {
         // Inyectamos instrucción de formato 16:9 explícita
         finalImagePrompt += " --ar 16:9, panoramic wide shot, landscape orientation";
 
-        // Usamos generateContent para Nano Banana 2 (basado en el soporte del modelo)
+        // --- FASE DE ARTE VISUAL (Nano Banana 2: Gemini 3.1 Flash Image Preview) ---
         const response = await ai.models.generateContent({
           model: 'gemini-3.1-flash-image-preview',
-          contents: [{ role: 'user', parts: [{ text: finalImagePrompt }] }],
+          contents: [{ 
+            role: 'user', 
+            parts: [{ 
+              text: `Genera una dirección de arte detallada en formato JSON. 
+              Prompt base: ${finalImagePrompt}. 
+              Estructura JSON requerida: {"imagePrompt": "...", "imageUrl": ""}` 
+            }] 
+          }],
           config: {
-            responseMimeType: 'image/jpeg',
-            aspectRatio: '16:9'
+            responseMimeType: 'application/json',
           },
         });
 
-        const candidate = response.candidates?.[0];
-        const imagePart = candidate?.content?.parts?.find(p => p.inlineData);
+        const resText = response.text;
+        if (!resText) throw new Error('El motor no devolvió un JSON de dirección de arte válido (vacío).');
+        const resJson = JSON.parse(resText);
 
-        if (imagePart?.inlineData?.data) {
-          const base64Image = imagePart.inlineData.data;
-          const imageUrl = `data:image/jpeg;base64,${base64Image}`;
-          
+        if (resJson && resJson.imagePrompt) {
           return new Response(JSON.stringify({ 
             success: true, 
-            imageUrl, 
-            imagePrompt: finalImagePrompt 
+            imageUrl: resJson.imageUrl || null, 
+            imagePrompt: resJson.imagePrompt 
           }), { status: 200, headers });
         } else {
-          throw new Error('El motor Nano Banana 2 no devolvió bytes de imagen válidos o la cuota está agotada.');
+          throw new Error('El motor no devolvió un JSON de dirección de arte válido.');
         }
 
       } catch (errorImg: any) {

@@ -2,5 +2,7 @@
   "title": "TEST SIX HEMEROTECA",
   "themeColor": "rust-orange",
   "coverImage": "/src/assets/ensayos/test-six-hemeroteca/coverImage.avif",
-  "excerpt": "TESTIN ONLY..."
+  "excerpt": "TESTIN ONLY...",
+  "generador": "Gemini-1.5-Pro",
+  "notasInvestigador": ""
 }

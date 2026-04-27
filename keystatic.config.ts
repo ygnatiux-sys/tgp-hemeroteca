@@ -18,19 +18,44 @@ export default config({
       schema: {
         title: fields.slug({ name: { label: 'Título' } }),
         
+        generador: fields.text({ 
+          label: 'Motor de Generación', 
+          description: 'Identificador del motor de IA utilizado para este post.'
+        }),
+
+        notasInvestigador: fields.text({
+          label: 'Notas del Investigador',
+          description: 'Espacio privado para ideas y borradores antes de la publicación final.',
+          multiline: true
+        }),
+        
         // FASE 1: Motor de Pensamiento (Texto)
-        generadorTexto: fields.text({ 
-          label: '1. Motor de Pensamiento TGP', 
-          multiline: true,
-          Input: GeneradorTextoTGP
-        } as any),
+        generadorTexto: {
+          kind: 'form',
+          label: '1. Motor de Pensamiento TGP',
+          Input: GeneradorTextoTGP,
+          defaultValue: () => '',
+          parse: (v: any) => v || '',
+          serialize: (v: any) => ({ value: v }),
+          validate: (v: any) => v,
+          reader: {
+            parse: (v: any) => v || '',
+          },
+        } as any,
 
         // FASE 2: Motor de Materialización (Arte)
-        generadorImagen: fields.text({
+        generadorImagen: {
+          kind: 'form',
           label: '2. Motor de Arte Nano Banana',
-          multiline: true,
-          Input: MotorArteTGP
-        } as any),
+          Input: MotorArteTGP,
+          defaultValue: () => '',
+          parse: (v: any) => v || '',
+          serialize: (v: any) => ({ value: v }),
+          validate: (v: any) => v,
+          reader: {
+            parse: (v: any) => v || '',
+          },
+        } as any,
         date: fields.date({ label: 'Fecha' }),
         category: fields.text({ label: 'Categoría (ej. Arqueosemiótica)' }),
         themeColor: fields.select({

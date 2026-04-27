@@ -2,5 +2,7 @@
   "title": "TEST THREE",
   "category": "DOSSIER",
   "themeColor": "old-navy",
-  "excerpt": ":23 [200] /api/keystatic/blob/37d8c1bba9e908f43fcf08d70fd6543c86b4efa7/src/content/ensayos/test-0-ne-hemeroteca/index.json 3ms\n21:54:04 [200] / 8ms\n21:55:20 [200] POST /api/keystatic/update 48ms\n21:55:25 [200] / 10ms\n21:55:32 [404] /ensayos/test-two-hemeroteca 4ms\n21:55:36 [404] /ensayos/test-two-hemeroteca 1ms\n"
+  "excerpt": ":23 [200] /api/keystatic/blob/37d8c1bba9e908f43fcf08d70fd6543c86b4efa7/src/content/ensayos/test-0-ne-hemeroteca/index.json 3ms\n21:54:04 [200] / 8ms\n21:55:20 [200] POST /api/keystatic/update 48ms\n21:55:25 [200] / 10ms\n21:55:32 [404] /ensayos/test-two-hemeroteca 4ms\n21:55:36 [404] /ensayos/test-two-hemeroteca 1ms\n",
+  "generador": "Gemini-1.5-Pro",
+  "notasInvestigador": ""
 }

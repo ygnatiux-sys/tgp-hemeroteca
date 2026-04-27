@@ -3,5 +3,7 @@
   "date": "2026-04-25",
   "themeColor": "bordeaux",
   "draft": true,
-  "coverImage": "/src/assets/ensayos/nag-hammadi-abril-2026/coverImage.png"
+  "coverImage": "/src/assets/ensayos/nag-hammadi-abril-2026/coverImage.png",
+  "generador": "Gemini-1.5-Pro",
+  "notasInvestigador": ""
 }

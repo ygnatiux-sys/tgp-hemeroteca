@@ -1,5 +1,7 @@
 {
   "title": "TEST TEN",
   "themeColor": "vintage-yellow",
-  "coverImage": "/src/assets/ensayos/test-ten/coverImage.png"
+  "coverImage": "/src/assets/ensayos/test-ten/coverImage.png",
+  "generador": "Gemini-1.5-Pro",
+  "notasInvestigador": ""
 }

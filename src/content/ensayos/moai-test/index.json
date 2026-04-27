@@ -2,5 +2,7 @@
   "title": "MOAI TEST",
   "category": "ETNICA",
   "themeColor": "british-green",
-  "coverImage": "/src/assets/ensayos/moai-test/coverImage.jpg"
+  "coverImage": "/src/assets/ensayos/moai-test/coverImage.jpg",
+  "generador": "Gemini-1.5-Pro",
+  "notasInvestigador": ""
 }

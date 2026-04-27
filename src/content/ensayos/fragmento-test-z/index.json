@@ -3,5 +3,7 @@
   "category": "arqueologia",
   "themeColor": "bus-red",
   "coverImage": "/src/assets/ensayos/fragmento-test-z/coverImage.webp",
-  "excerpt": "oh"
+  "excerpt": "oh",
+  "generador": "Gemini-1.5-Pro",
+  "notasInvestigador": ""
 }

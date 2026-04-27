@@ -2,5 +2,7 @@
   "title": "america invertida",
   "themeColor": "rust-orange",
   "draft": true,
-  "coverImage": "/src/assets/ensayos/america-invertida/coverImage.avif"
+  "coverImage": "/src/assets/ensayos/america-invertida/coverImage.avif",
+  "generador": "Gemini-1.5-Pro",
+  "notasInvestigador": ""
 }

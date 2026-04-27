@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
 
 export function MotorArteTGP({ value, onChange }: any) {
-  const [tema, setTema] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [titulo, setTitulo] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [previsualizacionImagen, setPrevisualizacionImagen] = useState<string | null>(null);
   const [promptAplicado, setPromptAplicado] = useState<string | null>(null);
-  const [estilo, setEstilo] = useState('editorial');
+  const [stiloId, setStiloId] = useState('editorial');
   
   const [arteMetadata, setArteMetadata] = useState(value || '');
 
 
-  const handleMaterializarArte = async () => {
-    if (!tema) return alert('Por favor, ingresa el concepto visual o título del ensayo.');
-    if (!atmosfera) return alert('No hay estilos disponibles.');
 
-    setLoading(true);
+  const handleMaterializarArte = async () => {
+    if (!titulo) return alert('Por favor, ingresa el concepto visual o título del ensayo.');
+    if (!stiloId) return alert('Por favor, selecciona un estilo visual.');
+
+    setIsLoading(true);
     setErrorMsg(null);
     setPrevisualizacionImagen(null);
     setPromptAplicado(null);
@@ -25,9 +26,9 @@ export function MotorArteTGP({ value, onChange }: any) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          titulo: tema, 
+          titulo: titulo, 
           generarImagen: true, 
-          estilo 
+          estilo: stiloId 
         }),
       });
 
@@ -49,7 +50,7 @@ export function MotorArteTGP({ value, onChange }: any) {
     } catch (err: any) {
       setErrorMsg(err.message);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -73,8 +74,8 @@ export function MotorArteTGP({ value, onChange }: any) {
       <div style={{ marginBottom: '20px' }}>
         <input
           type="text"
-          value={tema}
-          onChange={(e) => setTema(e.target.value)}
+          value={titulo}
+          onChange={(e) => setTitulo(e.target.value)}
           placeholder="Título o Concepto Clave..."
           style={{ 
             width: '100%', 
@@ -92,8 +93,8 @@ export function MotorArteTGP({ value, onChange }: any) {
         <select 
           id="estilo_visual" 
           name="estilo_visual" 
-          value={estilo} 
-          onChange={(e) => setEstilo(e.target.value)}
+          value={stiloId} 
+          onChange={(e) => setStiloId(e.target.value)}
           style={{ 
             width: '100%', 
             padding: '12px', 
@@ -112,25 +113,34 @@ export function MotorArteTGP({ value, onChange }: any) {
         </select>
       </div>
 
+      {/* --- INICIO INYECCIÓN EXPLÍCITA DE BOTÓN DE ACCIÓN --- */}
       <button
+        type="button"
         onClick={handleMaterializarArte}
-        disabled={loading}
+        disabled={isLoading || !titulo}
         style={{
+          display: 'block',
           width: '100%',
-          padding: '14px',
-          background: loading ? '#1a1a1a' : '#fff',
-          color: loading ? '#444' : '#000',
-          border: 'none',
-          borderRadius: '6px',
-          fontWeight: 700,
-          cursor: loading ? 'not-allowed' : 'pointer',
+          padding: '16px',
+          marginTop: '20px',
           marginBottom: '20px',
-          transition: 'all 0.3s ease',
-          fontSize: '0.85rem'
+          // Colores de ALTO CONTRASTE (Azul brillante si está activo, Gris oscuro si está deshabilitado)
+          background: (isLoading || !titulo) ? '#333' : '#007bff', 
+          color: (isLoading || !titulo) ? '#777' : '#fff',
+          border: 'none',
+          borderRadius: '8px',
+          fontWeight: 700,
+          fontSize: '1rem',
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+          cursor: (isLoading || !titulo) ? 'not-allowed' : 'pointer',
+          transition: 'all 0.2s ease',
+          boxShadow: (isLoading || !titulo) ? 'none' : '0 4px 6px rgba(0, 123, 255, 0.3)'
         }}
       >
-        {loading ? 'Ensamblando Prompt...' : 'Materializar con Estilo Dinámico'}
+        {isLoading ? 'MATERIALIZANDO...' : 'GENERAR ARTE VISUAL'}
       </button>
+      {/* --- FIN INYECCIÓN EXPLÍCITA DE BOTÓN DE ACCIÓN --- */}
 
       {errorMsg && (
         <div style={{ color: '#ff5252', fontSize: '0.75rem', padding: '12px', background: 'rgba(255,82,82,0.05)', borderRadius: '6px', border: '1px solid rgba(255,82,82,0.2)', marginBottom: '20px' }}>
@@ -159,3 +169,4 @@ export function MotorArteTGP({ value, onChange }: any) {
     </div>
   );
 }
+

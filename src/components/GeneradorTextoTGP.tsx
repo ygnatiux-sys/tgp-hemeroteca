@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export function GeneradorTextoTGP({ value, onChange }: any) {
-  const [tema, setTema] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [titulo, setTitulo] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // El estado local se sincroniza con el valor que Keystatic ya tenga guardado
   const [ensayo, setEnsayo] = useState(value || '');
 
+
+
   const handleGenerarTexto = async () => {
-    if (!tema) return alert('Por favor, ingresa un tema para el ensayo.');
-    setLoading(true);
+    if (!titulo) return alert('Por favor, ingresa un tema para el ensayo.');
+    setIsLoading(true);
     setErrorMsg(null);
 
     try {
@@ -18,7 +20,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          titulo: tema, 
+          titulo: titulo, 
           generarImagen: false 
         }),
       });
@@ -32,7 +34,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
     } catch (err: any) {
       setErrorMsg(err.message);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -54,8 +56,8 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
       <div style={{ marginBottom: '15px' }}>
         <input
           type="text"
-          value={tema}
-          onChange={(e) => setTema(e.target.value)}
+          value={titulo}
+          onChange={(e) => setTitulo(e.target.value)}
           placeholder="¿Sobre qué quieres reflexionar hoy? (ej. El mito de Sísifo en la era digital)"
           style={{ 
             width: '100%', 
@@ -70,24 +72,34 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         />
       </div>
 
+      {/* --- INICIO INYECCIÓN EXPLÍCITA DE BOTÓN DE ACCIÓN --- */}
       <button
-        onClick={handleGenerarTexto}
-        disabled={loading}
+        type="button"
+        onClick={handleGenerarTexto} // Asegúrate de usar la función correcta para texto
+        disabled={isLoading || !titulo}
         style={{
+          display: 'block',
           width: '100%',
-          padding: '12px',
-          background: loading ? '#222' : '#1b5e20',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '4px',
-          fontWeight: 'bold',
-          cursor: loading ? 'not-allowed' : 'pointer',
+          padding: '16px',
+          marginTop: '20px',
           marginBottom: '20px',
-          transition: 'all 0.2s ease'
+          // Colores de ALTO CONTRASTE (Verde brillante si está activo, Gris oscuro si está deshabilitado)
+          background: (isLoading || !titulo) ? '#333' : '#28a745', 
+          color: (isLoading || !titulo) ? '#777' : '#fff',
+          border: 'none',
+          borderRadius: '8px',
+          fontWeight: 700,
+          fontSize: '1rem',
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+          cursor: (isLoading || !titulo) ? 'not-allowed' : 'pointer',
+          transition: 'all 0.2s ease',
+          boxShadow: (isLoading || !titulo) ? 'none' : '0 4px 6px rgba(40, 167, 69, 0.3)'
         }}
       >
-        {loading ? 'Generando Pensamiento...' : '✍️ Generar Ensayo TGP'}
+        {isLoading ? 'GENERANDO...' : 'GENERAR TEXTO DEL ENSAYO'}
       </button>
+      {/* --- FIN INYECCIÓN EXPLÍCITA DE BOTÓN DE ACCIÓN --- */}
 
       {errorMsg && (
         <div style={{ color: '#ff5252', fontSize: '0.8rem', padding: '10px', background: 'rgba(255,82,82,0.1)', borderRadius: '4px', border: '1px solid #ff5252', marginBottom: '15px' }}>
@@ -122,3 +134,4 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
     </div>
   );
 }
+

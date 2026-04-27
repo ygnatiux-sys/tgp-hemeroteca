@@ -3,5 +3,7 @@
   "category": "sociologia",
   "themeColor": "old-navy",
   "coverImage": "/src/assets/ensayos/la-chilinga/coverImage.png",
-  "excerpt": "testin g always testing for now"
+  "excerpt": "testin g always testing for now",
+  "generador": "Gemini-1.5-Pro",
+  "notasInvestigador": ""
 }
