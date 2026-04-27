@@ -21,6 +21,15 @@ const ensayos = defineCollection({
   })
 });
 
+const ensayosContent = defineCollection({
+  // Cargamos los archivos .mdoc como una colección de contenido nativa
+  loader: glob({ 
+    pattern: "**/content.mdoc", 
+    base: "src/content/ensayos" 
+  }),
+});
+
 export const collections = {
   ensayos,
+  ensayosContent,
 };

@@ -16,6 +16,7 @@
     "@astrojs/markdoc": "^1.0.3",
     "@astrojs/node": "^10.0.5",
     "@astrojs/react": "^5.0.3",
+    "@google/genai": "^1.50.1",
     "@google/generative-ai": "^0.24.1",
     "@keystatic/astro": "^5.0.6",
     "@keystatic/core": "^0.5.50",

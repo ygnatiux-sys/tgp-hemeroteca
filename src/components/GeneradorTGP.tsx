@@ -7,6 +7,7 @@ export function GeneradorTGP({ value, onChange }: any) {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [previsualizacionImagen, setPrevisualizacionImagen] = useState<string | null>(null);
+  const [promptSugerido, setPromptSugerido] = useState<string | null>(null);
 
   // El estado local se sincroniza con el valor que Keystatic ya tenga guardado
   const [ensayo, setEnsayo] = useState(value || '');
@@ -16,23 +17,44 @@ export function GeneradorTGP({ value, onChange }: any) {
     setLoading(true);
     setErrorMsg(null);
     setPrevisualizacionImagen(null);
+    setPromptSugerido(null);
 
     try {
-      const response = await fetch('/api/generar-tgp', {
+      // 1. Llamada al Motor de Texto (Siempre se genera primero)
+      const resTexto = await fetch('/api/generar-tgp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ titulo: tema, generarImagen, generarTexto: true, atmosfera }),
+        body: JSON.stringify({ titulo: tema, generarImagen: false, atmosfera }),
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Error en el motor');
+      const dataTexto = await resTexto.json();
+      if (!resTexto.ok) throw new Error(dataTexto.error || 'Error en el motor de texto');
 
-      // Sincronización Doble: Local y Keystatic
-      setEnsayo(data.content);
-      onChange(data.content); 
-      
-      if (data.imagePath) {
-        setPrevisualizacionImagen(data.imagePath);
+      setEnsayo(dataTexto.content);
+      onChange(dataTexto.content); 
+
+      // 2. Llamada al Motor de Arte Nano Banana 2 (Si está marcado)
+      if (generarImagen) {
+        try {
+          const resImagen = await fetch('/api/generar-tgp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ titulo: tema, generarImagen: true, atmosfera }),
+          });
+
+          const dataImagen = await resImagen.json();
+          
+          if (resImagen.ok && dataImagen.imageUrl) {
+            setPrevisualizacionImagen(dataImagen.imageUrl);
+            setPromptSugerido(dataImagen.imagePrompt);
+          } else {
+            // Si la imagen falla, guardamos el prompt sugerido si existe
+            if (dataImagen.imagePrompt) setPromptSugerido(dataImagen.imagePrompt);
+            console.warn('Nano Banana 2 no pudo generar la imagen:', dataImagen.error);
+          }
+        } catch (imgErr) {
+          console.error('Error de red en el motor de imagen:', imgErr);
+        }
       }
       
     } catch (err: any) {
@@ -135,7 +157,7 @@ export function GeneradorTGP({ value, onChange }: any) {
             }}
           />
           
-          {previsualizacionImagen && (
+          {previsualizacionImagen ? (
             <div style={{ marginTop: '15px', padding: '10px', background: '#111', borderRadius: '4px', border: '1px solid #333' }}>
               <label style={{ fontSize: '0.7rem', color: '#888', display: 'block', marginBottom: '5px' }}>ARTE CONCEPTUAL GENERADO (Nano Banana 2):</label>
               <img 
@@ -145,7 +167,7 @@ export function GeneradorTGP({ value, onChange }: any) {
               />
               <a 
                 href={previsualizacionImagen} 
-                download="portada-tgp.png"
+                download={`portada-${tema.toLowerCase().replace(/\s+/g, '-')}.png`}
                 style={{
                   display: 'block',
                   width: '100%',
@@ -161,10 +183,20 @@ export function GeneradorTGP({ value, onChange }: any) {
                   fontSize: '0.8rem'
                 }}
               >
-                📥 Descargar Portada (PNG)
+                📥 DESCARGAR IMAGEN GENERADA (PNG)
               </a>
               <p style={{ fontSize: '0.7rem', color: '#666', marginTop: '10px' }}>
-                Aviso: Descarga la portada y súbela al campo "Imagen de Portada" más abajo para guardarla en el ensayo.
+                Aviso: Descarga esta imagen y súbela al campo "Imagen de Portada" más abajo para finalizar el ensayo.
+              </p>
+            </div>
+          ) : promptSugerido && generarImagen && (
+            <div style={{ marginTop: '15px', padding: '15px', background: '#1a1a10', borderRadius: '4px', border: '1px solid #555' }}>
+              <label style={{ fontSize: '0.7rem', color: '#ffd54f', display: 'block', marginBottom: '5px' }}>💡 PROMPT SUGERIDO (API de Imagen no disponible):</label>
+              <p style={{ fontSize: '0.85rem', color: '#eee', fontStyle: 'italic', background: '#000', padding: '10px', borderRadius: '4px', border: '1px solid #333' }}>
+                {promptSugerido}
+              </p>
+              <p style={{ fontSize: '0.7rem', color: '#888', marginTop: '5px' }}>
+                Copia este prompt y úsalo en un generador externo (ej. Midjourney o DALL-E) si necesitas la imagen ahora.
               </p>
             </div>
           )}

@@ -1,17 +1,13 @@
 ---
-import { getCollection } from "astro:content";
-import { createReader } from "@keystatic/core/reader";
-import keystaticConfig from "../../../keystatic.config";
+import { render, getEntry, getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
-import { DocumentRenderer } from "@keystatic/core/renderer";
 import { Image } from "astro:assets";
 import { marked } from 'marked';
 
 export const prerender = true;
 export async function getStaticPaths() {
-  const essays = await getCollection("ensayos").then(entries => 
-    import.meta.env.PROD ? entries.filter(e => !e.data.draft) : entries
-  );
+  const essays = await getCollection("ensayos");
+  // Nota: No filtramos por draft para asegurar que se generen todos los ensayos solicitados (27+)
 
   return essays.map((item) => ({
     params: { slug: item.id.replace(/\/index$/, "") },
@@ -22,15 +18,15 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const { data } = Astro.props;
 
-// Keystatic Reader para el contenido Markdoc
-const reader = createReader(process.cwd(), keystaticConfig);
-const postEntry = await reader.collections.ensayos.read(slug);
+// Obtenemos el contenido usando la nueva colección de contenido para evitar el uso de fs.readFile
+const contentEntry = await getEntry("ensayosContent", `${slug}/content`);
 
-if (!postEntry) {
+if (!contentEntry) {
   throw new Error(`No se pudo encontrar el contenido para ${slug}`);
 }
 
-const contentData = await postEntry.content();
+const { Content } = await render(contentEntry);
+const contentData = contentEntry.data; 
 
 // 1. ORO ESTRICTO: Importación dinámica exclusiva de la portada local
 const images = import.meta.glob<{ default: ImageMetadata }>(
@@ -156,7 +152,7 @@ const activeAccent = data.themeColor
         {data.generador ? (
           <div set:html={marked.parse(data.generador)} />
         ) : (
-          <DocumentRenderer document={contentData} />
+          <Content />
         )}
       </div>
     </div>

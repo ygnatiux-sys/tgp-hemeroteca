@@ -26,7 +26,8 @@ function startupLogger() {
 export const tgpIntegrations = [
   react(), 
   markdoc(), 
-  // keystatic(),
+  // Solo cargamos Keystatic si no estamos en producción para evitar el error de adaptador
+  ...(process.env.NODE_ENV !== 'production' ? [keystatic()] : []),
   startupLogger()
 ];
 

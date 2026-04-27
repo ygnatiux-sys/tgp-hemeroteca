@@ -15,7 +15,11 @@ pnpm-debug.log*
 
 # environment variables
 .env
-.env.production
+.env.*
+
+# local history and IDE settings
+.history/
+.vscode/
 
 # macOS-specific files
 .DS_Store
