@@ -1,14 +1,10 @@
 import { defineConfig } from 'astro/config';
-import node from '@astrojs/node';
 import { tgpIntegrations, tgpViteConfig } from './src/config/integrations.js';
-
-const isDev = process.env.NODE_ENV !== 'production';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://tgp-hemeroteca.pages.dev',
-  output: isDev ? 'server' : 'static', 
-  adapter: isDev ? node({ mode: 'standalone' }) : undefined,
+  output: 'static', 
   vite: tgpViteConfig,
   integrations: [
     ...tgpIntegrations,
@@ -16,10 +12,10 @@ export default defineConfig({
       name: 'gemini-motor-local',
       hooks: {
         'astro:config:setup': ({ injectRoute }) => {
-          if (isDev) {
+          if (process.env.NODE_ENV === 'development') {
             injectRoute({
               pattern: '/api/generar-tgp',
-              entrypoint: './src/api/generar-tgp.ts'
+              entrypoint: './src/api/_generar-tgp.ts'
             });
           }
         }

@@ -56,6 +56,6 @@
 
 /* Soporte para el plugin de tipografía */
 .prose h1, .prose h2 {
-  @apply !bg-linear-to-b !from-[#e0e0e0] !to-[#e0e0e0]/20 !bg-clip-text !text-transparent;
+  @apply bg-linear-to-b! from-[#e0e0e0]! to-[#e0e0e0]/20! bg-clip-text! text-transparent!;
   filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
 }
