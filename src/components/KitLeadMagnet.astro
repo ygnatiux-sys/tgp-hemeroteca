@@ -1,0 +1,142 @@
+---
+/**
+ * KitLeadMagnet.astro
+ * Componente premium para captación de leads conectado a Kit (ConvertKit).
+ * Estética Dark Academia / Glassmorphism.
+ */
+---
+
+<section class="max-w-5xl mx-auto px-6 my-24 relative group">
+  <!-- Tarjeta Principal Glassmorphism -->
+  <div class="relative overflow-hidden bg-[#0a0a0a]/80 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl transition-all duration-700 hover:border-white/20">
+    
+    <div class="grid grid-cols-1 md:grid-cols-2">
+      
+      <!-- Columna Izquierda: Composición Visual (Bento-style) -->
+      <div class="relative p-8 md:p-12 border-b md:border-b-0 md:border-r border-white/5 flex flex-col gap-6 bg-linear-to-br from-white/2 to-transparent">
+        
+        <!-- Xavier Bento Horizontal -->
+        <div class="flex items-center gap-4 bg-white/3 border border-white/5 p-4 rounded-2xl overflow-hidden group/xavier">
+          <div class="w-16 h-16 rounded-xl overflow-hidden grayscale group-hover/xavier:grayscale-0 transition-all duration-700">
+            <img 
+              src="/images/lead-magnet/xavier.jpg" 
+              alt="Xavier Benítez" 
+              class="w-full h-full object-cover scale-110 group-hover/xavier:scale-100 transition-transform duration-700"
+            />
+          </div>
+          <div class="flex-1">
+            <h4 class="font-serif text-sm text-white/80">Xavier Benítez</h4>
+            <p class="font-mono text-[9px] uppercase tracking-widest text-white/40 mt-1">Historiador & Investigador</p>
+          </div>
+        </div>
+
+        <!-- Portada del Libro (Códice) -->
+        <div class="relative aspect-3/4 rounded-xl overflow-hidden shadow-2xl group/book">
+          <div class="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent z-10"></div>
+          <img 
+            src="/images/lead-magnet/book-cover.jpg" 
+            alt="El Códice Fundacional" 
+            class="w-full h-full object-cover transition-transform duration-1000 group-hover/book:scale-105"
+          />
+          <div class="absolute bottom-6 left-6 z-20">
+            <span class="font-mono text-[10px] text-white/50 uppercase tracking-[0.4em] block mb-2">Edición Limitada</span>
+            <h5 class="font-serif text-xl text-white italic">Volumen I: La Génesis</h5>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Copy & Formulario -->
+      <div class="p-8 md:p-12 flex flex-col justify-center gap-10">
+        <div class="space-y-6">
+          <!-- Kit Brand Logo: Match Image -->
+          <div class="w-20 h-20 bg-[#2483EB] rounded-2xl flex items-center justify-center shadow-lg shadow-[#2483EB]/20">
+            <span class="font-sans text-3xl font-black text-[#1a1a1a] tracking-tighter">kit</span>
+          </div>
+          
+          <h2 class="font-sans italic font-semibold text-4xl md:text-5xl text-white/90 leading-tight pt-4 tracking-tighter">
+            Unirse al <br/>
+            <span class="reveal-item inline-block not-italic font-black text-[#2483EB]">Puzzle</span>
+          </h2>
+          
+          <p class="font-mono text-xs text-white/40 leading-relaxed max-w-sm">
+            Accede a los documentos de investigación y material inédito. Ingresa tu correo para recibir el volumen digital en tu buzón.
+          </p>
+        </div>
+
+        <!-- Formulario Kit (ConvertKit) -->
+        <!-- NOTA PARA XAVIER: Pega la URL de tu formulario de Kit en el atributo 'action' -->
+        <form 
+          action="" 
+          method="POST" 
+          class="flex flex-col gap-4 w-full max-w-sm"
+        >
+          <div class="relative">
+            <input 
+              type="email" 
+              name="email_address" 
+              placeholder="Escribe tu dirección de correo..." 
+              required
+              class="w-full bg-white/3 border border-white/5 rounded-xl px-5 py-4 text-white font-mono text-xs focus:border-[#2483EB]/50 focus:bg-white/5 outline-none transition-all placeholder:text-white/10"
+            />
+          </div>
+          
+          <button 
+            type="submit" 
+            class="bg-[#2483EB] text-[#1a1a1a] px-8 py-5 rounded-2xl font-sans text-xl font-black italic uppercase tracking-tighter transition-all hover:bg-[#1a66ba] hover:text-white shadow-xl shadow-[#2483EB]/20 transform active:scale-[0.98]"
+          >
+            unirse al puzzle
+          </button>
+        </form>
+
+        <div class="flex items-center gap-3">
+          <p class="font-mono text-[8px] text-white/20 uppercase tracking-widest">
+            Enviado con seguridad por 
+          </p>
+          <img src="/images/lead-magnet/kit-logo.png" alt="Kit Logo" class="h-2 w-auto opacity-20" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Franja Minimalista / Mini Hero de Footer -->
+    <div class="relative h-24 border-t border-white/5 bg-black overflow-hidden flex items-center px-8 md:px-12 justify-between">
+      <!-- Fondo Crowd (Franja) -->
+      <img 
+        src="/images/lead-magnet/crowd.jpg" 
+        alt="The Crowds" 
+        class="absolute inset-0 w-full h-full object-cover opacity-10 grayscale mix-blend-overlay"
+      />
+      
+      <!-- Logo TGP Reveal -->
+      <div class="relative z-10 flex items-center gap-3">
+        <img src="/images/lead-magnet/puzzle.jpg" alt="Logo" class="w-6 h-6 rounded shadow-lg shadow-[#2483EB]/10" />
+        <h3 class="font-mono text-[11px] font-bold tracking-[0.5em] uppercase reveal-item text-transparent bg-clip-text bg-linear-to-b from-[#e0e0e0] to-[#e0e0e0]/20">
+          The Great Puzzle Project
+        </h3>
+      </div>
+
+      <div class="relative z-10 hidden md:block">
+        <span class="font-mono text-[8px] text-white/30 tracking-[0.4em] uppercase">Establecido en la Sombra</span>
+      </div>
+    </div>
+
+    <!-- Glow Decorativo -->
+    <div class="absolute -left-20 -top-20 w-80 h-80 bg-[#2483EB]/3 rounded-full blur-[120px] pointer-events-none group-hover:bg-[#2483EB]/5 transition-all duration-1000"></div>
+  </div>
+</section>
+
+<script>
+  const setupReveals = () => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal-item').forEach(el => observer.observe(el));
+  };
+
+  document.addEventListener('DOMContentLoaded', setupReveals);
+  document.addEventListener('astro:page-load', setupReveals);
+</script>
