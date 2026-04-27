@@ -1,0 +1,67 @@
+---
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+
+interface Props {
+  currentSlug: string;
+  category?: string;
+}
+
+const { currentSlug, category } = Astro.props;
+
+const allEssays = await getCollection("ensayos");
+const exploreEssays = allEssays
+  .filter(essay => essay.id.replace(/\/index$/, "") !== currentSlug)
+  .sort(() => Math.random() - 0.5)
+  .slice(0, 3);
+
+// Importar imágenes
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}",
+);
+---
+
+<section class="max-w-6xl mx-auto px-6 py-32 border-t border-white/5">
+  <div class="flex flex-col gap-12">
+    <div class="flex justify-between items-end">
+      <div>
+        <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B]">Sigue Explorando</span>
+        <h3 class="text-4xl font-serif text-white/95 mt-4">Continuar la lectura</h3>
+      </div>
+      <a href="/archivo" class="hidden md:block font-mono text-[10px] uppercase tracking-widest text-white/40 hover:text-[#C8A98B] transition-colors border-b border-white/10 pb-1">Ver todo el archivo</a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {exploreEssays.map(async (essay) => {
+        const slug = essay.id.replace(/\/index$/, "");
+        const imgPath = essay.data.coverImage;
+        let optimizedImg = null;
+        if (imgPath && images[imgPath]) {
+          const mod = await images[imgPath]();
+          optimizedImg = mod.default;
+        }
+
+        return (
+          <a href={`/hemeroteca/${slug}`} class="group flex flex-col gap-6">
+            <div class="aspect-4/5 overflow-hidden rounded-2xl bg-white/5 relative">
+              {optimizedImg && (
+                <Image 
+                  src={optimizedImg} 
+                  alt={essay.data.title || ""} 
+                  class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000 group-hover:scale-105" 
+                />
+              )}
+              <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 via-transparent to-transparent opacity-60"></div>
+            </div>
+            <div class="flex flex-col gap-3">
+              <span class="text-[10px] font-mono text-[#C8A98B] uppercase tracking-[0.2em]">{essay.data.category}</span>
+              <h4 class="text-xl font-serif text-white/80 group-hover:text-white transition-colors leading-snug">
+                {essay.data.title}
+              </h4>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </div>
+</section>

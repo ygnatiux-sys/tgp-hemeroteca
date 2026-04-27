@@ -3,6 +3,11 @@ import { render, getEntry, getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import { Image } from "astro:assets";
 import { marked } from 'marked';
+import { StickyReaderHeader } from "../../components/StickyReaderHeader";
+import { QuickReturnButton } from "../../components/QuickReturnButton";
+import SubstackPrefooter from "../../components/SubstackPrefooter.astro";
+import RelatedReading from "../../components/RelatedReading.astro";
+import ExploreMore from "../../components/ExploreMore.astro";
 
 export const prerender = true;
 export async function getStaticPaths() {
@@ -62,6 +67,9 @@ const activeAccent = data.themeColor
 ---
 
 <Layout title={`${data.title} | Hemeroteca TGP`}>
+  <StickyReaderHeader client:load title={data.title || "Ensayo TGP"} accentColor={activeAccent} />
+  <QuickReturnButton client:load accentColor={activeAccent} />
+
   {/* 2. Hero Cinemático Full-Width con Parallax Nativo Constante */}
   <section
     class="hero-section relative w-full h-screen flex flex-col justify-end pb-24 px-6 md:px-12 lg:px-24 z-10 overflow-hidden"
@@ -98,7 +106,7 @@ const activeAccent = data.themeColor
           (data.title || "")
             .split(" ")
             .map((word: string) => (
-              <span class="hero-word inline-block translate-y-6 opacity-0 blur-md transition-all duration-1200 ease-cinematic text-transparent bg-clip-text bg-linear-to-b from-white via-white to-white/20 pb-2">
+              <span class="hero-word inline-block translate-y-6 opacity-0 blur-md transition-all duration-3000 ease-cinematic pb-2 bg-linear-to-b from-[#e0e0e0] to-[#e0e0e0]/20 bg-clip-text text-transparent drop-shadow-2xl">
                 {word}
               </span>
             ))
@@ -127,11 +135,11 @@ const activeAccent = data.themeColor
     >
     </div>
 
-    <div class="max-w-2xl mx-auto relative z-10 px-6 md:px-0">
+    <div class="max-w-3xl mx-auto relative z-10 px-6 md:px-0">
       {
         data.excerpt && (
-          <div class="border-l border-white/10 pl-8 mb-24 max-w-2xl">
-            <p class="text-2xl md:text-3xl font-serif opacity-70 italic text-[#C8A98B] leading-relaxed">
+          <div class="border-l border-[#C8A98B]/30 pl-8 mb-24 max-w-2xl">
+            <p class="text-2xl md:text-3xl font-serif opacity-90 italic text-[#C8A98B] leading-relaxed tracking-wide">
               "{data.excerpt}"
             </p>
           </div>
@@ -140,31 +148,55 @@ const activeAccent = data.themeColor
 
       {/* Redacción Editorial */}
       <div
-        class="prose prose-invert prose-lg max-w-2xl mx-auto
-        prose-p:font-serif prose-p:font-normal prose-p:not-italic prose-p:text-[1.15rem] prose-p:leading-[1.8] prose-p:tracking-normal prose-p:text-white/80
-        prose-headings:font-serif prose-headings:font-normal prose-headings:tracking-tight prose-headings:text-white/95
+        class="prose prose-invert prose-lg max-w-none
+        prose-p:font-serif prose-p:font-normal prose-p:not-italic prose-p:text-[1.25rem] prose-p:leading-[1.85] prose-p:tracking-[0.015em] prose-p:text-white/85 prose-p:mb-10 prose-p:text-left
+        prose-headings:font-serif prose-headings:font-normal prose-headings:tracking-[-0.02em] prose-headings:text-white/95 prose-headings:mt-16 prose-headings:mb-8
         prose-strong:font-bold prose-strong:text-white/90
-        prose-blockquote:border-none prose-blockquote:bg-(--theme-accent) prose-blockquote:text-theme-dark prose-blockquote:p-10 prose-blockquote:md:-mx-16 prose-blockquote:shadow-2xl prose-blockquote:text-2xl prose-blockquote:leading-snug
-        prose-a:border-b prose-a:border-(--theme-accent)/40 prose-a:text-white hover:prose-a:text-(--theme-accent) transition-colors
-        prose-p:first-of-type:first-letter:text-6xl prose-p:first-of-type:first-letter:text-(--theme-accent) prose-p:first-of-type:first-letter:mr-4 prose-p:first-of-type:first-letter:float-left prose-p:first-of-type:first-letter:leading-[0.8] prose-p:first-of-type:first-letter:mt-2
-        prose-hr:border-t prose-hr:border-(--theme-accent)/30 prose-hr:my-16"
+        prose-blockquote:border-none prose-blockquote:bg-white/5 prose-blockquote:text-white/90 prose-blockquote:p-12 prose-blockquote:md:-mx-20 prose-blockquote:rounded-2xl prose-blockquote:shadow-2xl prose-blockquote:text-2xl prose-blockquote:leading-snug prose-blockquote:font-serif prose-blockquote:italic
+        prose-a:border-b prose-a:border-[#C8A98B]/40 prose-a:text-[#C8A98B] hover:prose-a:text-white transition-colors
+        prose-p:first-of-type:first-letter:text-8xl prose-p:first-of-type:first-letter:font-serif prose-p:first-of-type:first-letter:text-[#C8A98B] prose-p:first-of-type:first-letter:mr-4 prose-p:first-of-type:first-letter:float-left prose-p:first-of-type:first-letter:leading-[0.7] prose-p:first-of-type:first-letter:mt-3
+        prose-hr:border-t prose-hr:border-white/10 prose-hr:my-20"
       >
-        {data.generador ? (
-          <div set:html={marked.parse(data.generador)} />
-        ) : (
-          <Content />
-        )}
+        {(() => {
+          if (data.generador) {
+            const html = marked.parse(data.generador) as string;
+            const paragraphs = html.split('</p>');
+            if (paragraphs.length > 4) {
+              const middle = Math.floor(paragraphs.length / 2);
+              const part1 = paragraphs.slice(0, middle).join('</p>') + '</p>';
+              const part2 = paragraphs.slice(middle).join('</p>');
+              return (
+                <>
+                  <div set:html={part1} />
+                  <RelatedReading currentSlug={slug!} category={data.category ?? undefined} />
+                  <div set:html={part2} />
+                </>
+              );
+            }
+            return <div set:html={html} />;
+          }
+          return (
+            <>
+              <Content />
+              <RelatedReading currentSlug={slug!} category={data.category ?? undefined} />
+            </>
+          );
+        })()}
       </div>
     </div>
+    
+    <ExploreMore currentSlug={slug!} category={data.category ?? undefined} />
+
+    <SubstackPrefooter />
 
     <div
-      class="max-w-2xl mx-auto relative z-10 pt-24 mt-32 border-t border-white/10 text-center"
+      class="max-w-2xl mx-auto relative z-10 pt-24 pb-32 text-center"
     >
       <a
         href="/archivo"
-        class="inline-block font-mono text-xs border border-white/20 px-8 py-4 uppercase tracking-widest text-[#F5F5F7] hover:bg-[#C8A98B] hover:border-[#C8A98B] hover:text-theme-dark transition-all duration-700"
+        class="inline-block font-mono text-[10px] border border-white/10 px-10 py-5 uppercase tracking-[0.3em] text-white/40 hover:bg-white/5 hover:border-[#C8A98B]/50 hover:text-[#C8A98B] transition-all duration-700 rounded-full"
       >
-        Retornar al Archivo
+        Cerrar Archivo
       </a>
     </div>
   </article>
@@ -179,6 +211,10 @@ const activeAccent = data.themeColor
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
+              // Revelar el H1 globalmente
+              const h1 = entry.target.querySelector("h1");
+              if (h1) h1.classList.add("revealed");
+
               // Animar palabras del H1 de manera secuencial (Stagger)
               const words = entry.target.querySelectorAll(".hero-word");
               words.forEach((word, index) => {
@@ -195,8 +231,8 @@ const activeAccent = data.themeColor
                       "blur-0",
                     );
                   },
-                  index * 150 + 100,
-                ); // 150ms delay entre cada palabra
+                  index * 300 + 100,
+                ); // 300ms delay entre cada palabra
               });
 
               // Animar meta al finalizar las palabras

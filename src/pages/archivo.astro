@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
+import { Image } from "astro:assets";
 
 const allEssaysRaw = await getCollection('ensayos').then(entries => 
   import.meta.env.PROD ? entries.filter(e => !e.data.draft) : entries
@@ -12,39 +13,131 @@ const sortedEssays = allEssaysRaw.map(item => ({
 })).sort((a, b) => {
   return new Date(b.entry.date || 0).getTime() - new Date(a.entry.date || 0).getTime();
 });
+
+// Mapeo de imágenes
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}",
+);
+
+const getOptimizedImage = async (path: string | null | undefined) => {
+  if (path && images[path]) {
+    const mod = await images[path]();
+    return mod.default;
+  }
+  return null;
+};
+
+// Función para determinar el span de la tarjeta basado en el índice
+const getGridSpan = (index: number) => {
+  if (index === 0) return "md:col-span-2 md:row-span-2 h-[600px] md:h-auto"; // Hero
+  if (index % 7 === 3) return "md:col-span-1 md:row-span-2 h-[600px] md:h-auto"; // Tall
+  if (index % 7 === 4) return "md:col-span-2 md:row-span-1 h-[300px] md:h-auto"; // Wide
+  return "md:col-span-1 md:row-span-1 h-[300px] md:h-auto"; // Standard
+};
 ---
 
-<Layout title="Archivo Completo | Hemeroteca TGP">
-  <section class="max-w-7xl mx-auto px-6 lg:px-8 py-32 mt-16">
-    <header class="mb-24 border-b border-white/10 pb-16">
-      <h1 class="text-6xl md:text-8xl font-serif tracking-tighter opacity-90">Archivo</h1>
-      <p class="font-mono text-xs uppercase tracking-widest mt-6 opacity-40">Registros Editoriales Completos</p>
+<Layout title="Archivo | The Great Puzzle">
+  <div class="bg-theme-dark text-white min-h-screen selection:bg-[#C8A98B] selection:text-black pt-32 pb-64 px-6 lg:px-12">
+    
+    <header class="max-w-7xl mx-auto mb-32 border-l border-[#C8A98B]/30 pl-8">
+       <h1 class="text-6xl md:text-8xl font-serif tracking-tighter leading-none">Hemeroteca</h1>
+       <div class="reveal-item flex items-center gap-6 mt-8">
+         <p class="font-mono text-[10px] uppercase tracking-[0.4em] opacity-40">Registros de Investigación Trans-histórica</p>
+         <div class="h-px w-24 bg-white/10"></div>
+         <p class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B]">{sortedEssays.length} Entradas disponibles</p>
+       </div>
     </header>
 
-    <div class="flex flex-col">
-      {sortedEssays.map(({ slug, entry }) => (
-        <a href={`/hemeroteca/${slug}`} class="group border-b border-white/10 py-12 grid grid-cols-12 items-baseline cursor-pointer transition-colors duration-700 hover:bg-white/5">
-          
-          <div class="col-span-12 md:col-span-3 mb-4 md:mb-0 font-mono text-xs text-white/60 tracking-widest uppercase">
-            <span>[ {entry.category} ]</span><br>
-            <span class="opacity-50 mt-2 block">Dossier . {entry.date ? new Date(entry.date).getFullYear() : 'S/F'}</span>
-          </div>
+    {/* GRILLA MASONRY ASIMÉTRICA */}
+    <section class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 grid-auto-flow-dense">
+      
+      {await Promise.all(sortedEssays.map(async ({ slug, entry }, index) => {
+        const optimizedImage = await getOptimizedImage(entry.coverImage);
+        const spanClass = getGridSpan(index);
+        
+        return (
+          <a 
+            href={`/hemeroteca/${slug}`} 
+            class={`relative group overflow-hidden bg-white/2 flex flex-col justify-end p-8 md:p-12 transition-all duration-700 ${spanClass}`}
+          >
+            {/* Imagen de Fondo con Efecto Zoom Cinematic */}
+            <div class="absolute inset-0 z-0">
+              {optimizedImage ? (
+                <Image 
+                  src={optimizedImage} 
+                  alt={entry.title || ""} 
+                  class="w-full h-full object-cover transition-transform duration-800 ease-in-out scale-105 group-hover:scale-110 grayscale-30 group-hover:grayscale-0 opacity-40 group-hover:opacity-70"
+                />
+              ) : (
+                <div class="w-full h-full bg-white/5 opacity-20" />
+              )}
+              
+              {/* Overlay Gradiente Editorial */}
+              <div class="absolute inset-0 bg-linear-to-t from-theme-dark via-theme-dark/40 to-transparent group-hover:via-theme-dark/20 transition-all duration-700"></div>
+            </div>
 
-          <div class="col-span-10 md:col-span-8">
-            <h2 class="text-3xl md:text-5xl lg:text-6xl font-serif antialiased opacity-80 group-hover:opacity-100 transition-opacity duration-700 ease-cinematic">
-              {entry.title}
-            </h2>
-            <p class="max-h-0 overflow-hidden group-hover:max-h-24 transition-all duration-1000 ease-cinematic text-sm mt-4 opacity-70">
-              {entry.excerpt}
-            </p>
-          </div>
+            {/* Contenido de la Tarjeta */}
+            <div class="relative z-10">
+              <header class="mb-6">
+                <div class="flex items-center gap-3 mb-4">
+                  <span class="text-[9px] font-mono text-[#C8A98B] uppercase tracking-widest">[ {entry.category} ]</span>
+                  <span class="w-1 h-1 rounded-full bg-white/20"></span>
+                  <span class="text-[9px] font-mono text-white/30 uppercase tracking-widest">{entry.date ? new Date(entry.date).getFullYear() : 'S/F'}</span>
+                </div>
+                <h2 class={`font-serif tracking-tighter leading-[0.95] group-hover:text-[#C8A98B] transition-colors duration-500 ${index === 0 ? 'text-5xl md:text-8xl' : 'text-3xl md:text-5xl'}`}>
+                  {entry.title}
+                </h2>
+              </header>
 
-          <div class="col-span-2 md:col-span-1 text-right font-mono text-xs opacity-50 group-hover:text-white transition-colors duration-500">
-            ->
-          </div>
-          
-        </a>
-      ))}
+              {/* Excerpt solo en items grandes */}
+              {(index === 0 || index % 7 === 3 || index % 7 === 4) && (
+                <p class="text-sm md:text-base font-serif opacity-40 group-hover:opacity-80 transition-opacity duration-700 leading-relaxed max-w-lg line-clamp-2 italic">
+                  {entry.excerpt}
+                </p>
+              )}
+
+              <footer class="mt-8 pt-8 border-t border-white/5 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 flex items-center justify-between">
+                <span class="text-[9px] font-mono tracking-[0.2em] uppercase">Registrum {index + 1}</span>
+                <span class="text-xs">→</span>
+              </footer>
+            </div>
+            
+            {/* Decoración: Corner Accent */}
+            <div class="absolute top-0 right-0 w-12 h-12 border-t border-r border-white/0 group-hover:border-white/10 transition-all duration-700 m-6"></div>
+          </a>
+        );
+      }))}
+
+    </section>
+
+    {/* FOOTER EXPLORACIÓN */}
+    <div class="max-w-7xl mx-auto mt-64 text-center">
+       <div class="inline-block px-12 py-1 border border-white/10 font-mono text-[10px] uppercase tracking-[0.6em] opacity-20">
+          Exploratio Continua
+       </div>
     </div>
-  </section>
+
+  </div>
+
+  <style>
+    /* Soporte para grid denso */
+    .grid-auto-flow-dense {
+      grid-auto-flow: dense;
+    }
+  </style>
+
+  <script>
+    const setupArchiveAnimation = () => {
+      const h1 = document.querySelector('h1');
+      if (h1) {
+        // Pequeño delay para asegurar que el Layout y CSS estén listos
+        setTimeout(() => {
+          h1.classList.add('revealed');
+        }, 300);
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', setupArchiveAnimation);
+    document.addEventListener('astro:page-load', setupArchiveAnimation);
+  </script>
 </Layout>

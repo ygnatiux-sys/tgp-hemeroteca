@@ -1,0 +1,61 @@
+---
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+
+interface Props {
+  currentSlug: string;
+  category?: string;
+  limit?: number;
+}
+
+const { currentSlug, category, limit = 2 } = Astro.props;
+
+const allEssays = await getCollection("ensayos");
+const relatedEssays = allEssays
+  .filter(essay => essay.id.replace(/\/index$/, "") !== currentSlug && (category ? essay.data.category === category : true))
+  .sort(() => Math.random() - 0.5)
+  .slice(0, limit);
+
+// Importar imágenes
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}",
+);
+---
+
+<div class="not-prose my-16 py-12 border-y border-white/5 bg-white/2 -mx-6 md:-mx-12 lg:-mx-24 px-6 md:px-24">
+  <div class="flex flex-col md:flex-row items-center gap-12 max-w-4xl mx-auto">
+    <div class="flex-1 space-y-4">
+      <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-[#C8A98B] block mb-2">Lectura Relacionada</span>
+      <h4 class="text-3xl font-serif text-white/90 leading-tight">Profundiza en la {category || 'colección'}</h4>
+      <p class="text-sm text-white/40 leading-relaxed max-w-sm">
+        Fragmentos seleccionados de nuestro archivo para expandir la perspectiva editorial.
+      </p>
+    </div>
+    
+    <div class="flex-1 w-full grid grid-cols-1 gap-6">
+      {relatedEssays.map(async (essay) => {
+        const slug = essay.id.replace(/\/index$/, "");
+        const imgPath = essay.data.coverImage;
+        let optimizedImg = null;
+        if (imgPath && images[imgPath]) {
+          const mod = await images[imgPath]();
+          optimizedImg = mod.default;
+        }
+
+        return (
+          <a href={`/hemeroteca/${slug}`} class="group flex items-center gap-4 bg-white/5 p-3 rounded-xl hover:bg-white/10 transition-all border border-white/5 hover:border-[#C8A98B]/30">
+            <div class="w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-theme-dark">
+              {optimizedImg && <Image src={optimizedImg} alt={essay.data.title || ""} class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />}
+            </div>
+            <div class="flex flex-col gap-1">
+              <span class="text-[9px] font-mono text-[#C8A98B] uppercase tracking-widest">{essay.data.category}</span>
+              <h5 class="text-sm font-serif text-white/80 group-hover:text-[#C8A98B] transition-colors leading-snug line-clamp-2">
+                {essay.data.title}
+              </h5>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </div>
+</div>

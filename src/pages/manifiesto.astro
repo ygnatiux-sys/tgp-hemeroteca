@@ -1,65 +1,139 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import m1 from '../assets/manifiesto/m1.png';
+import m2 from '../assets/manifiesto/m2.png';
+import m3 from '../assets/manifiesto/m3.png';
 ---
 
 <Layout title="Manifiesto | TGP PROJECT">
-  <section class="relative min-h-screen flex flex-col justify-center items-center overflow-hidden bg-theme-dark">
-    {/* Fondo con Ken Burns CSS Puro */}
-    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-      <div class="w-full h-full bg-white/5 animate-ken-burns"></div>
-    </div>
-
-    <div class="z-10 flex flex-col items-center justify-center space-y-32 md:space-y-48 py-32 px-6 text-center w-full max-w-5xl">
-      <header class="mb-12 opacity-40 font-mono text-xs uppercase tracking-[0.3em]">
-        Declaración de Intenciones
-      </header>
-
-      <p class="manifesto-phrase font-serif text-3xl md:text-5xl lg:text-6xl antialiased text-white/90 blur-md opacity-0 translate-y-4 transition-all duration-1000 ease-cinematic">
-        La historia no es una narrativa lineal, sino un archivo de señales esperando ser decodificadas.
-      </p>
-      
-      <p class="manifesto-phrase font-serif text-3xl md:text-5xl lg:text-6xl antialiased text-white/90 blur-md opacity-0 translate-y-4 transition-all duration-1000 ease-cinematic">
-        Buscamos la arqueosemiótica de lo cotidiano, el lenguaje oculto tras la piedra y el algoritmo.
-      </p>
-
-      <p class="manifesto-phrase font-serif text-3xl md:text-5xl lg:text-6xl antialiased text-white/90 blur-md opacity-0 translate-y-4 transition-all duration-1000 ease-cinematic">
-        Bienvenido al gran rompecabezas. Aquí el silencio tiene su propia frecuencia.
-      </p>
-
-      <div class="pt-24 manifesto-phrase opacity-0 blur-md transition-all duration-1000 delay-500">
-        <a href="/archivo" class="font-mono text-[10px] tracking-widest uppercase border border-white/20 px-12 py-5 hover:bg-white hover:text-theme-dark transition-all duration-700">
-          Explorar el Archivo
-        </a>
+  <div class="bg-[#050505]">
+    
+    <!-- BLOQUE 1 -->
+    <section class="relative h-screen w-full flex items-center justify-center snap-start overflow-hidden">
+      <div class="absolute inset-0 z-0">
+        <Image src={m1} alt="Signals" class="w-full h-full object-cover opacity-50 animate-ken-burns" />
+        <div class="absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/80"></div>
       </div>
-    </div>
-  </section>
+      <div class="relative z-10 text-center px-8 max-w-6xl">
+        <header class="mb-12 opacity-20 font-mono text-[9px] uppercase tracking-[0.8em]">Fragmento I</header>
+        <p class="manifesto-phrase glow-text font-serif text-4xl md:text-6xl lg:text-7xl leading-[1.1] bg-linear-to-b from-[#e0e0e0] to-[#e0e0e0]/20 bg-clip-text text-transparent drop-shadow-2xl antialiased">
+          La historia no es una narrativa lineal, sino un archivo de señales esperando ser decodificadas.
+        </p>
+      </div>
+    </section>
+
+    <!-- BLOQUE 2 -->
+    <section class="relative h-screen w-full flex items-center justify-center snap-start overflow-hidden">
+      <div class="absolute inset-0 z-0">
+        <Image src={m2} alt="Stone & Algorithm" class="w-full h-full object-cover opacity-50 animate-ken-burns-reverse" />
+        <div class="absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/80"></div>
+      </div>
+      <div class="relative z-10 text-center px-8 max-w-6xl">
+        <header class="mb-12 opacity-20 font-mono text-[9px] uppercase tracking-[0.8em]">Fragmento II</header>
+        <p class="manifesto-phrase glow-text font-serif text-4xl md:text-6xl lg:text-7xl leading-[1.1] bg-linear-to-b from-[#e0e0e0] to-[#e0e0e0]/20 bg-clip-text text-transparent drop-shadow-2xl antialiased">
+          Buscamos la arqueosemiótica de lo cotidiano, el lenguaje oculto tras la piedra y el algoritmo.
+        </p>
+      </div>
+    </section>
+
+    <!-- BLOQUE 3 -->
+    <section class="relative h-screen w-full flex items-center justify-center snap-start overflow-hidden">
+      <div class="absolute inset-0 z-0">
+        <Image src={m3} alt="The Puzzle" class="w-full h-full object-cover opacity-50 animate-ken-burns" />
+        <div class="absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/80"></div>
+      </div>
+      <div class="relative z-10 text-center px-8 max-w-6xl">
+        <header class="mb-12 opacity-20 font-mono text-[9px] uppercase tracking-[0.8em]">Fragmento III</header>
+        <p class="manifesto-phrase glow-text font-serif text-4xl md:text-6xl lg:text-7xl leading-[1.1] bg-linear-to-b from-[#e0e0e0] to-[#e0e0e0]/20 bg-clip-text text-transparent drop-shadow-2xl antialiased mb-16">
+          Bienvenido al gran rompecabezas. Aquí el silencio tiene su propia frecuencia.
+        </p>
+        
+        <div class="manifesto-phrase opacity-0 pt-12">
+          <a href="/archivo" class="group relative inline-flex items-center gap-4 font-mono text-[10px] tracking-[0.4em] uppercase border border-white/10 bg-white/5 backdrop-blur-xl px-16 py-6 rounded-full transition-all duration-1000 hover:border-[#C8A98B]/40">
+            <span class="text-white/40 group-hover:text-white transition-colors">Explorar Archivo</span>
+            <div class="absolute inset-0 bg-linear-to-r from-transparent via-[#C8A98B]/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 opacity-20">
+        <span class="font-mono text-[8px] tracking-[0.5em] uppercase rotate-90">Scroll</span>
+        <div class="w-px h-16 bg-linear-to-b from-white to-transparent"></div>
+      </div>
+    </section>
+
+  </div>
 </Layout>
 
 <style>
+  /* Ken Burns Ultralento */
   @keyframes kenBurns {
-    0% { transform: scale(1); }
-    100% { transform: scale(1.15); }
+    0% { transform: scale(1) translate(0, 0); }
+    100% { transform: scale(1.1) translate(-1%, -1%); }
   }
+  @keyframes kenBurnsReverse {
+    0% { transform: scale(1.1) translate(1%, 1%); }
+    100% { transform: scale(1) translate(0, 0); }
+  }
+  
   .animate-ken-burns {
-    animation: kenBurns 40s ease-out infinite alternate;
+    animation: kenBurns 60s ease-in-out infinite alternate;
+  }
+  .animate-ken-burns-reverse {
+    animation: kenBurnsReverse 60s ease-in-out infinite alternate;
+  }
+
+  /* Glow Motion Sutil - Adaptado para Gradient Text */
+  .glow-text {
+    /* Usamos filter en lugar de text-shadow para no romper el bg-clip-text */
+    filter: blur(25px) drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+    transition: filter 4s ease-out, opacity 4s ease-out, transform 8s cubic-bezier(0.2, 0, 0.2, 1);
+    transform: translateY(30px) scale(0.98);
+    opacity: 0;
+  }
+
+  .manifesto-phrase.revealed {
+    opacity: 1;
+    filter: blur(0) drop-shadow(0 0 20px rgba(255, 255, 255, 0.1));
+    transform: translateY(0) scale(1);
+  }
+
+  /* Animación de pulsación de glow muy lenta usando filter */
+  @keyframes subtleGlowFilter {
+    0%, 100% { filter: blur(0) drop-shadow(0 0 20px rgba(255, 255, 255, 0.05)); }
+    50% { filter: blur(0) drop-shadow(0 0 40px rgba(200, 169, 139, 0.15)); }
+  }
+
+  .manifesto-phrase.revealed {
+    animation: subtleGlowFilter 10s ease-in-out infinite;
+  }
+
+  /* Snapping Global para esta página */
+  :root {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
   }
 </style>
 
 <script>
-  const observerCallback = (entries: IntersectionObserverEntry[]) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.remove('blur-md', 'opacity-0', 'translate-y-4');
-        entry.target.classList.add('blur-0', 'opacity-100', 'translate-y-0');
-      }
+  const initManifesto = () => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+        } else {
+          entry.target.classList.remove('revealed');
+        }
+      });
+    }, { 
+      threshold: 0.5,
+      rootMargin: "0px"
     });
+
+    document.querySelectorAll('.manifesto-phrase').forEach(el => observer.observe(el));
   };
 
-  const observer = new IntersectionObserver(observerCallback, {
-    threshold: 0.3
-  });
-  
-  document.querySelectorAll('.manifesto-phrase').forEach(phrase => {
-    observer.observe(phrase);
-  });
+  document.addEventListener('DOMContentLoaded', initManifesto);
+  document.addEventListener('astro:page-load', initManifesto);
 </script>

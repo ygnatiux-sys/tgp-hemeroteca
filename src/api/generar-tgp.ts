@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import type { APIRoute } from 'astro';
 import { GoogleGenAI } from '@google/genai';
+import fs from 'fs';
+import path from 'path';
 
 export const prerender = false;
 
@@ -9,7 +11,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     const body = await request.json();
-    const { titulo, generarImagen, atmosfera } = body;
+    const { titulo, generarImagen, estilo } = body;
 
     if (!titulo) return new Response(JSON.stringify({ error: 'Falta el título.' }), { status: 400, headers });
     
@@ -22,29 +24,41 @@ export const POST: APIRoute = async ({ request }) => {
     // --- BIFURCACIÓN LÓGICA OBLIGATORIA (Ruteo de API) ---
     if (generarImagen) {
       try {
-        const stylePrompt = "Hyper-realistic photography, 8k resolution, cinematic lighting, highly detailed, photorealistic. NO illustration, NO cartoon, NO painting. ";
-        let specificPrompt = "";
+        let finalImagePrompt = "";
         
-        if (atmosfera === 'museo') specificPrompt = "Museum artifact display, dramatic spotlight, dark background, sharp focus. ";
-        else if (atmosfera === 'ruinas') specificPrompt = "Ancient historical ruins, golden hour, sun flare, weathered textures, atmospheric depth. ";
-        else if (atmosfera === 'amanecer') specificPrompt = "Historical epic scene, dawn lighting, heavy mist, hyper-realistic, volumetric fog. ";
-        else specificPrompt = "Cinematic conceptual art, deep symbolism, dramatic composition. ";
+        // Cargar estilo dinámico desde la colección direccionArte
+        const stylePath = path.join(process.cwd(), 'src', 'content', 'estilos-visuales', `${estilo}.json`);
+        
+        let styleConfig;
+        if (fs.existsSync(stylePath)) {
+          const fileContent = fs.readFileSync(stylePath, 'utf-8');
+          styleConfig = JSON.parse(fileContent);
+          
+          // Ensamblaje de Micro-Dirección
+          finalImagePrompt = `${styleConfig.formatoCamara} Subject: ${titulo}. ${styleConfig.iluminacion} ${styleConfig.colorTextura} ${styleConfig.descripcionEstetica}`;
+        } else {
+          // Fallback por si el estilo no existe o es una atmósfera antigua
+          finalImagePrompt = `Cinematic conceptual photography. Subject: ${titulo}. Moody lighting, sharp focus, photorealistic film still.`;
+        }
 
-        const finalImagePrompt = stylePrompt + specificPrompt + "Subject: " + titulo;
+        // Inyectamos instrucción de formato 16:9 explícita
+        finalImagePrompt += " --ar 16:9, panoramic wide shot, landscape orientation";
 
-        // Llamada al nuevo método especializado de generación de imágenes
-        const response = await ai.models.generateImages({
+        // Usamos generateContent para Nano Banana 2 (basado en el soporte del modelo)
+        const response = await ai.models.generateContent({
           model: 'gemini-3.1-flash-image-preview',
-          prompt: finalImagePrompt,
+          contents: [{ role: 'user', parts: [{ text: finalImagePrompt }] }],
           config: {
-            numberOfImages: 1,
-            outputMimeType: 'image/jpeg',
+            responseMimeType: 'image/jpeg',
             aspectRatio: '16:9'
           },
         });
 
-        if (response.generatedImages?.[0]?.image?.imageBytes) {
-          const base64Image = response.generatedImages[0].image.imageBytes;
+        const candidate = response.candidates?.[0];
+        const imagePart = candidate?.content?.parts?.find(p => p.inlineData);
+
+        if (imagePart?.inlineData?.data) {
+          const base64Image = imagePart.inlineData.data;
           const imageUrl = `data:image/jpeg;base64,${base64Image}`;
           
           return new Response(JSON.stringify({ 
@@ -53,7 +67,7 @@ export const POST: APIRoute = async ({ request }) => {
             imagePrompt: finalImagePrompt 
           }), { status: 200, headers });
         } else {
-          throw new Error('El motor Nano Banana 2 no devolvió bytes de imagen válidos.');
+          throw new Error('El motor Nano Banana 2 no devolvió bytes de imagen válidos o la cuota está agotada.');
         }
 
       } catch (errorImg: any) {
@@ -65,11 +79,14 @@ export const POST: APIRoute = async ({ request }) => {
       try {
         const responseTexto = await ai.models.generateContent({
           model: "gemini-1.5-flash-latest",
-          systemInstruction: "Eres el motor cognitivo TGP y socio analítico de Xavier Benítez. Regla estricta: Identidad implícita. NUNCA declares tu rol, ni menciones 'Análisis Cognitivo', ni uses fórmulas autorreferenciales. Escribe directamente el ensayo de forma profunda. Tono: Dark Academia accesible — preciso, sobrio, agudo. Sin tono casual. Estructura: Apertura con tensión, desarrollo que articule historia/filosofía/simbolismo, y cierre reflexivo universal. Ve directo al núcleo.",
-          contents: [{ role: 'user', parts: [{ text: `Escribe un ensayo profundo sobre: ${titulo}` }] }]
+          contents: [{ role: 'user', parts: [{ text: `Escribe un ensayo profundo sobre: ${titulo}` }] }],
+          config: {
+            systemInstruction: "Eres el motor cognitivo TGP. Tu objetivo es producir ensayos de alta profundidad filosófica y análisis cultural agudo. Regla estricta: Identidad implícita. NUNCA declares tu rol ni uses fórmulas autorreferenciales. Escribe directamente el ensayo. Tono: Dark Academia — preciso, sobrio, erudito pero accesible. Estructura: Apertura con tensión intelectual, desarrollo articulando historia/filosofía/simbolismo, y cierre reflexivo universal. Ve directo al núcleo del análisis cultural.",
+          }
         });
 
-        const content = responseTexto.text();
+        const content = responseTexto.text;
+        if (!content) throw new Error("El motor de texto no devolvió contenido.");
 
         return new Response(JSON.stringify({ success: true, content }), { status: 200, headers });
       } catch (errorText: any) {

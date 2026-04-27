@@ -15,7 +15,7 @@ const { title = "Hemeroteca TGP" } = Astro.props;
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/webp" href="/images/tgp-img-16.webp" />
+		<link rel="icon" type="image/png" href="/favicon.png" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 
@@ -31,5 +31,26 @@ const { title = "Hemeroteca TGP" } = Astro.props;
 			<slot />
 		</main>
 		<Footer />
+
+		<script>
+			const setupGlobalReveal = () => {
+				const observer = new IntersectionObserver((entries) => {
+					entries.forEach(entry => {
+						if (entry.isIntersecting) {
+							entry.target.classList.add('revealed');
+							observer.unobserve(entry.target);
+						}
+					});
+				}, { 
+					threshold: 0.1,
+					rootMargin: '0px 0px -10% 0px' // Se activa un poco antes de llegar
+				});
+
+				document.querySelectorAll('h1, h2, .reveal-item').forEach(el => observer.observe(el));
+			};
+
+			document.addEventListener('DOMContentLoaded', setupGlobalReveal);
+			document.addEventListener('astro:page-load', setupGlobalReveal);
+		</script>
 	</body>
 </html>

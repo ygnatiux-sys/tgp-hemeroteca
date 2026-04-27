@@ -12,8 +12,50 @@
   --color-vintage-yellow: #D4A352;
   --color-rust-orange: #B55A30;
 
-  --ease-cinematic: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-cinematic: cubic-bezier(0.2, 0.8, 0.2, 1);
   --font-serif: "Gloock", serif;
   --font-body: "Newsreader", serif;
   --font-mono: "Geist Mono", "Space Mono", monospace;
+}
+
+@layer base {
+  /* Efecto Esfumado Global para Títulos */
+  h1, h2 {
+    @apply bg-linear-to-b from-[#e0e0e0] to-[#e0e0e0]/20 bg-clip-text text-transparent;
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));
+  }
+
+  /* Animación de Revelado Global para H1 y H2 */
+  h1, h2 {
+    opacity: 0;
+    filter: blur(15px) drop-shadow(0 10px 20px rgba(0,0,0,0.4));
+    transform: translateY(30px);
+    transition: opacity 4s ease-out, filter 4s ease-out, transform 5s var(--ease-cinematic);
+  }
+
+  h1.revealed, h2.revealed {
+    opacity: 1;
+    filter: blur(0) drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+    transform: translateY(0);
+  }
+
+  /* Items Genéricos con Revelado */
+  .reveal-item {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(5px);
+    transition: all 2s var(--ease-cinematic);
+  }
+
+  .reveal-item.revealed {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* Soporte para el plugin de tipografía */
+.prose h1, .prose h2 {
+  @apply !bg-linear-to-b !from-[#e0e0e0] !to-[#e0e0e0]/20 !bg-clip-text !text-transparent;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
 }
