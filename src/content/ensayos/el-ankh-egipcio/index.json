@@ -1,9 +1,10 @@
 {
   "title": "El Ankh Egipcio",
+  "slug": "el-ankh-egipcio",
   "generador": "Gemini-1.5-Pro",
   "date": "2026-04-26",
   "category": "antropologia",
   "themeColor": "rust-orange",
-  "draft": true,
+  "draft": false,
   "coverImage": "/src/assets/ensayos/el-ankh-egipcio/coverImage.jpg"
 }

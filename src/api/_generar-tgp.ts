@@ -44,15 +44,15 @@ export const POST: APIRoute = async ({ request }) => {
         // Inyectamos instrucción de formato 16:9 explícita
         finalImagePrompt += " --ar 16:9, panoramic wide shot, landscape orientation";
 
-        // --- FASE DE ARTE VISUAL (Nano Banana 2: Gemini 3.1 Flash Image Preview) ---
-        const response = await ai.models.generateContent({
-          model: 'gemini-3.1-flash-image-preview',
+        // --- PASO A: EL DIRECTOR DE ARTE (Gemini 3 Flash Preview) ---
+        const responseDirector = await ai.models.generateContent({
+          model: 'gemini-3-flash-preview',
           contents: [{ 
             role: 'user', 
             parts: [{ 
-              text: `Genera una dirección de arte detallada en formato JSON. 
-              Prompt base: ${finalImagePrompt}. 
-              Estructura JSON requerida: {"imagePrompt": "...", "imageUrl": ""}` 
+              text: `Actúa como un director de arte. Transforma este concepto en un prompt ultradetallado ensamblado por capas para una imagen cinematográfica de alta calidad. 
+              Concepto: ${finalImagePrompt}. 
+              Devuelve estrictamente un JSON con la llave "imagePrompt".` 
             }] 
           }],
           config: {
@@ -60,29 +60,54 @@ export const POST: APIRoute = async ({ request }) => {
           },
         });
 
-        const resText = response.text;
-        if (!resText) throw new Error('El motor no devolvió un JSON de dirección de arte válido (vacío).');
-        const resJson = JSON.parse(resText);
+        const dirText = responseDirector.text;
+        if (!dirText) throw new Error('El Director de Arte no devolvió contenido.');
+        const dirJson = JSON.parse(dirText);
+        const detailedPrompt = dirJson.imagePrompt || finalImagePrompt;
 
-        if (resJson && resJson.imagePrompt) {
+        // --- PASO B: LA MATERIALIZACIÓN (Nano Banana 2: Gemini 3.1 Flash Image Preview) ---
+        const responseImagen = await ai.models.generateContent({
+          model: 'gemini-3.1-flash-image-preview',
+          contents: [{ 
+            role: 'user', 
+            parts: [{ text: detailedPrompt }] 
+          }],
+          config: {
+            // NO forzamos JSON aquí para permitir la respuesta nativa de imagen
+            aspectRatio: '16:9'
+          },
+        });
+
+        // Extracción de la imagen nativa del payload de la Serie 3
+        const candidate = responseImagen.candidates?.[0];
+        const imagePart = candidate?.content?.parts?.find(p => p.inlineData);
+
+        if (imagePart?.inlineData?.data) {
+          const imageUrl = `data:image/jpeg;base64,${imagePart.inlineData.data}`;
           return new Response(JSON.stringify({ 
             success: true, 
-            imageUrl: resJson.imageUrl || null, 
-            imagePrompt: resJson.imagePrompt 
+            imageUrl, 
+            imagePrompt: detailedPrompt 
           }), { status: 200, headers });
         } else {
-          throw new Error('El motor no devolvió un JSON de dirección de arte válido.');
+          // Fallback: Si no hay bytes de imagen, devolvemos al menos la dirección de arte
+          return new Response(JSON.stringify({ 
+            success: true, 
+            imageUrl: null, 
+            imagePrompt: detailedPrompt,
+            warning: "El modelo de materialización no devolvió bytes de imagen. Se muestra la dirección de arte." 
+          }), { status: 200, headers });
         }
 
       } catch (errorImg: any) {
-        console.error('⚠️ Error en Nano Banana 2:', errorImg.message);
-        return new Response(JSON.stringify({ error: `Fallo en Nano Banana 2: ${errorImg.message}` }), { status: 500, headers });
+        console.error('❌ Error nativo en Nano Banana 2:', errorImg);
+        return new Response(JSON.stringify({ error: `Fallo en el Motor de Arte: ${errorImg.message}` }), { status: 500, headers });
       }
     } else {
-      // --- MOTOR DE TEXTO (Gemini 1.5 Flash Latest) ---
+      // --- MOTOR DE PENSAMIENTO (Gemini 3 Flash Preview - PAYG) ---
       try {
         const responseTexto = await ai.models.generateContent({
-          model: "gemini-1.5-flash-latest",
+          model: "gemini-3-flash-preview",
           contents: [{ role: 'user', parts: [{ text: `Escribe un ensayo profundo sobre: ${titulo}` }] }],
           config: {
             systemInstruction: "Eres el motor cognitivo TGP. Tu objetivo es producir ensayos de alta profundidad filosófica y análisis cultural agudo. Regla estricta: Identidad implícita. NUNCA declares tu rol ni uses fórmulas autorreferenciales. Escribe directamente el ensayo. Tono: Dark Academia — preciso, sobrio, erudito pero accesible. Estructura: Apertura con tensión intelectual, desarrollo articulando historia/filosofía/simbolismo, y cierre reflexivo universal. Ve directo al núcleo del análisis cultural.",
@@ -94,8 +119,8 @@ export const POST: APIRoute = async ({ request }) => {
 
         return new Response(JSON.stringify({ success: true, content }), { status: 200, headers });
       } catch (errorText: any) {
-        console.error('⚠️ Error en el motor de texto:', errorText.message);
-        return new Response(JSON.stringify({ error: `Fallo en el motor de texto: ${errorText.message}` }), { status: 500, headers });
+        console.error('❌ Error nativo en el Motor de Pensamiento:', errorText);
+        return new Response(JSON.stringify({ error: `Fallo en el Motor de Pensamiento: ${errorText.message}` }), { status: 500, headers });
       }
     }
 

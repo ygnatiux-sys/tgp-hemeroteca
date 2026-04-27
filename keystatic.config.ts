@@ -1,6 +1,7 @@
 import { config, fields, collection } from '@keystatic/core';
 import { GeneradorTextoTGP } from './src/components/GeneradorTextoTGP';
 import { MotorArteTGP } from './src/components/MotorArteTGP';
+import { componentBlocks } from './src/components/component-blocks';
 
 export default config({
   storage: {
@@ -91,6 +92,7 @@ export default config({
             directory: 'src/assets/ensayos',
             publicPath: '/src/assets/ensayos/'
           },
+          componentBlocks,
         }),
       },
     }),

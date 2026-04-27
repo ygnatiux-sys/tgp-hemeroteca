@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
-export function MotorArteTGP({ value, onChange }: any) {
-  const [titulo, setTitulo] = useState('');
+export function MotorArteTGP({ value, onChange, initialTitulo = '', initialEstilo = 'editorial' }: any) {
+  const [titulo, setTitulo] = useState(initialTitulo);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [previsualizacionImagen, setPrevisualizacionImagen] = useState<string | null>(null);
+  const [previsualizacionImagen, setPrevisualizacionImagen] = useState<string | null>(value || null);
   const [promptAplicado, setPromptAplicado] = useState<string | null>(null);
-  const [stiloId, setStiloId] = useState('editorial');
+  const [stiloId, setStiloId] = useState(initialEstilo);
   
   const [arteMetadata, setArteMetadata] = useState(value || '');
 
