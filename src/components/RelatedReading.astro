@@ -26,36 +26,40 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
   <div class="flex flex-col md:flex-row items-center gap-12 max-w-4xl mx-auto">
     <div class="flex-1 space-y-4">
       <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-[#C8A98B] block mb-2">Lectura Relacionada</span>
-      <h4 class="text-3xl font-serif text-white/90 leading-tight">Profundiza en la {category || 'colección'}</h4>
+      <h4 class="text-3xl font-serif text-white/90 leading-tight">Únete a la investigación</h4>
       <p class="text-sm text-white/40 leading-relaxed max-w-sm">
-        Fragmentos seleccionados de nuestro archivo para expandir la perspectiva editorial.
+        Accede a nuestros documentos exclusivos y mantente al tanto de los nuevos descubrimientos de la colección.
       </p>
     </div>
     
     <div class="flex-1 w-full grid grid-cols-1 gap-6">
-      {relatedEssays.map(async (essay) => {
-        const slug = essay.id.replace(/\/index$/, "");
-        const imgPath = essay.data.coverImage;
-        let optimizedImg = null;
-        if (imgPath && images[imgPath]) {
-          const mod = await images[imgPath]();
-          optimizedImg = mod.default;
-        }
+      <!-- Enlace a El Códice Fundacional -->
+      <a href="/codice" class="group flex items-center gap-4 bg-white/5 p-3 rounded-xl hover:bg-white/10 transition-all border border-white/5 hover:border-[#C8A98B]/30">
+        <div class="w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-theme-dark relative">
+          <img src="/images/lead-magnet/book-cover.jpg" alt="El Códice Fundacional" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <span class="text-[9px] font-mono text-[#C8A98B] uppercase tracking-widest">DOCUMENTO EXCLUSIVO</span>
+          <h5 class="text-sm font-serif text-white/80 group-hover:text-[#C8A98B] transition-colors leading-snug line-clamp-2">
+            El Códice Fundacional
+          </h5>
+          <p class="text-[11px] text-white/40 mt-0.5">La verdad no es algo que se encuentra, es algo que se recuerda.</p>
+        </div>
+      </a>
 
-        return (
-          <a href={`/hemeroteca/${slug}`} class="group flex items-center gap-4 bg-white/5 p-3 rounded-xl hover:bg-white/10 transition-all border border-white/5 hover:border-[#C8A98B]/30">
-            <div class="w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-theme-dark">
-              {optimizedImg && <Image src={optimizedImg} alt={essay.data.title || ""} class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />}
-            </div>
-            <div class="flex flex-col gap-1">
-              <span class="text-[9px] font-mono text-[#C8A98B] uppercase tracking-widest">{essay.data.category}</span>
-              <h5 class="text-sm font-serif text-white/80 group-hover:text-[#C8A98B] transition-colors leading-snug line-clamp-2">
-                {essay.data.title}
-              </h5>
-            </div>
-          </a>
-        );
-      })}
+      <!-- Enlace a Kit (Newsletter) -->
+      <a href="#" class="group flex items-center gap-4 bg-white/5 p-3 rounded-xl hover:bg-white/10 transition-all border border-white/5 hover:border-[#2483EB]/30">
+        <div class="w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-[#2483EB]/10 flex items-center justify-center">
+          <span class="font-sans text-3xl font-black text-[#2483EB] tracking-tighter opacity-80 group-hover:opacity-100 transition-opacity">kit</span>
+        </div>
+        <div class="flex flex-col gap-1">
+          <span class="text-[9px] font-mono text-[#2483EB] uppercase tracking-widest">NEWSLETTER SECRETA</span>
+          <h5 class="text-sm font-serif text-white/80 group-hover:text-[#2483EB] transition-colors leading-snug line-clamp-2">
+            Suscríbete en Kit
+          </h5>
+          <p class="text-[11px] text-white/40 mt-0.5">Recibe el volumen digital directamente en tu buzón.</p>
+        </div>
+      </a>
     </div>
   </div>
 </div>

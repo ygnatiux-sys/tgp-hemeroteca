@@ -1,6 +1,7 @@
 import { config, fields, collection } from '@keystatic/core';
 import { GeneradorTextoTGP } from './src/components/GeneradorTextoTGP';
 import { MotorArteTGP } from './src/components/MotorArteTGP';
+import { ProbadorArteTGP } from './src/components/ProbadorArteTGP';
 import { componentBlocks } from './src/components/component-blocks';
 
 export default config({
@@ -103,10 +104,28 @@ export default config({
       format: { data: 'json' },
       schema: {
         nombre: fields.slug({ name: { label: 'Nombre del Estilo (Slug)' } }),
-        formatoCamara: fields.text({ label: 'Cámara y Óptica', multiline: true }),
-        iluminacion: fields.text({ label: 'Esquema de Iluminación', multiline: true }),
-        colorTextura: fields.text({ label: 'Etalonaje y Color', multiline: true }),
-        descripcionEstetica: fields.text({ label: 'Instrucción Estética', multiline: true }),
+        
+        // Reemplazamos los campos sueltos por un bloque unificado
+        constructorEstilo: {
+          kind: 'form',
+          label: 'Constructor y Prueba de Estilo (Nano Banana)',
+          Input: ProbadorArteTGP,
+          defaultValue: () => ({
+            conceptoBase: '',
+            lineaEditorial: 'personalizado',
+            camara: '',
+            iluminacion: '',
+            color: '',
+            estetica: '',
+            imagenBase64: ''
+          }),
+          parse: (v: any) => v || {},
+          serialize: (v: any) => ({ value: v }),
+          validate: (v: any) => v,
+          reader: {
+            parse: (v: any) => v.value || {},
+          },
+        } as any,
       },
     }),
   },

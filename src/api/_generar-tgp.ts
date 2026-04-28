@@ -75,7 +75,7 @@ export const POST: APIRoute = async ({ request }) => {
           config: {
             // NO forzamos JSON aquí para permitir la respuesta nativa de imagen
             aspectRatio: '16:9'
-          },
+          } as any,
         });
 
         // Extracción de la imagen nativa del payload de la Serie 3
