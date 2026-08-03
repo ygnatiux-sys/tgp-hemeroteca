@@ -10,6 +10,7 @@ import {
   formatDate,
   formatYear,
   normalizeCategory,
+  resolveEssayImage,
 } from '../lib/content-filter';
 
 // ─── CARGA Y FILTRADO CENTRALIZADO ───────────────────────────────────────────
@@ -34,21 +35,11 @@ const years = [...new Set(
     .filter(Boolean)
 )].sort((a, b) => Number(b) - Number(a));
 
-// ─── CARGA DE IMÁGENES ────────────────────────────────────────────────────────
-const images = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}'
-);
-
-const getImg = async (path: string | null | undefined) => {
-  if (path && images[path]) {
-    try { return (await images[path]()).default; } catch {}
-  }
-  return null;
-};
-
-const resolvedEssays = await Promise.all(
-  publishable.map(async e => ({ ...e, img: await getImg(e.entry.coverImage) }))
-);
+// ─── CARGA DE IMÁGENES CON RESOLUCIÓN INTELIGENTE ─────────────────────────────
+const resolvedEssays = publishable.map(e => ({
+  ...e,
+  img: resolveEssayImage(e.entry.coverImage, e.slug),
+}));
 ---
 
 <Layout title="Archivo General | The Great Puzzle Project">

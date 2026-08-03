@@ -9,6 +9,7 @@ import {
   normalizeCategory,
   formatDate,
   formatYear,
+  resolveEssayImage,
 } from '../../lib/content-filter';
 
 // ─── GENERACIÓN ESTÁTICA DE RUTAS ────────────────────────────────────────────
@@ -28,23 +29,14 @@ export async function getStaticPaths() {
 const { essays, key } = Astro.props;
 const label = formatCategory(essays[0]?.entry.category);
 
-// ─── IMÁGENES ────────────────────────────────────────────────────────────────
-const images = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}'
-);
-const getImg = async (path: string | null | undefined) => {
-  if (path && images[path]) {
-    try { return (await images[path]()).default; } catch {}
-  }
-  return null;
-};
-
+// ─── IMÁGENES CON RESOLUCIÓN INTELIGENTE ──────────────────────────────────────
 const featuredEssay = essays[0];
-const featuredImg = await getImg(featuredEssay?.entry.coverImage);
+const featuredImg = featuredEssay ? resolveEssayImage(featuredEssay.entry.coverImage, featuredEssay.slug) : null;
 
-const resolvedEssays = await Promise.all(
-  essays.map(async (e: typeof essays[0]) => ({ ...e, img: await getImg(e.entry.coverImage) }))
-);
+const resolvedEssays = essays.map((e: typeof essays[0]) => ({
+  ...e,
+  img: resolveEssayImage(e.entry.coverImage, e.slug),
+}));
 const listEssays = resolvedEssays.slice(1); // el [0] va como destacado
 ---
 

@@ -11,6 +11,7 @@ import {
   formatDate,
   formatYear,
   normalizeCategory,
+  resolveEssayImage,
 } from '../lib/content-filter';
 
 // ─── CARGA Y FILTRADO CENTRALIZADO ───────────────────────────────────────────
@@ -50,33 +51,21 @@ const heroOrigin = (heroEssay?.entry as any)?.heroOrigin
   || (heroEssay?.entry as any)?.transformOrigin
   || 'center center';
 
-// ─── CARGA DE IMÁGENES ────────────────────────────────────────────────────────
-const images = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}'
-);
+// ─── CARGA DE IMÁGENES CON RESOLUCIÓN INTELIGENTE ─────────────────────────────
+const heroImage  = resolveEssayImage(heroEssay?.entry.coverImage, heroEssay?.slug);
+const leadImage  = resolveEssayImage(leadStory?.entry.coverImage, leadStory?.slug);
+const secAImage  = resolveEssayImage(secondaryA?.entry.coverImage, secondaryA?.slug);
+const secBImage  = resolveEssayImage(secondaryB?.entry.coverImage, secondaryB?.slug);
 
-const getImg = async (path: string | null | undefined) => {
-  if (path && images[path]) {
-    try { return (await images[path]()).default; } catch {}
-  }
-  return null;
-};
+const resolvedRecent = recentEssays.map(e => ({
+  ...e,
+  img: resolveEssayImage(e.entry.coverImage, e.slug),
+}));
 
-const heroImage  = await getImg(heroEssay?.entry.coverImage);
-const leadImage  = await getImg(leadStory?.entry.coverImage);
-const secAImage  = await getImg(secondaryA?.entry.coverImage);
-const secBImage  = await getImg(secondaryB?.entry.coverImage);
-
-const resolvedRecent = await Promise.all(
-  recentEssays.map(async e => ({ ...e, img: await getImg(e.entry.coverImage) }))
-);
-
-const resolvedCollections = await Promise.all(
-  collections.map(async c => ({
-    ...c,
-    img: await getImg(c.coverEssay.entry.coverImage),
-  }))
-);
+const resolvedCollections = collections.map(c => ({
+  ...c,
+  img: resolveEssayImage(c.coverEssay.entry.coverImage, c.coverEssay.slug),
+}));
 ---
 
 <Layout title="Hemeroteca TGP - Editorial & Cartografía Epistémica">

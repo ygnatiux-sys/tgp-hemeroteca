@@ -7,6 +7,7 @@ import {
   groupByCategory,
   formatCategory,
   normalizeCategory,
+  resolveEssayImage,
 } from '../../lib/content-filter';
 
 // ─── CARGA Y FILTRADO ────────────────────────────────────────────────────────
@@ -33,25 +34,15 @@ const collections = Array.from(categoryGroups.entries())
 const featured = collections[0] ?? null;
 const rest = collections.slice(1);
 
-// ─── IMÁGENES ────────────────────────────────────────────────────────────────
-const images = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}'
-);
-const getImg = async (path: string | null | undefined) => {
-  if (path && images[path]) {
-    try { return (await images[path]()).default; } catch {}
-  }
-  return null;
-};
+// ─── IMÁGENES CON RESOLUCIÓN INTELIGENTE ──────────────────────────────────────
+const featuredImg = featured
+  ? resolveEssayImage(featured.coverEssay.entry.coverImage, featured.coverEssay.slug)
+  : null;
 
-const featuredImg = featured ? await getImg(featured.coverEssay.entry.coverImage) : null;
-
-const resolvedRest = await Promise.all(
-  rest.map(async col => ({
-    ...col,
-    img: await getImg(col.coverEssay.entry.coverImage),
-  }))
-);
+const resolvedRest = rest.map(col => ({
+  ...col,
+  img: resolveEssayImage(col.coverEssay.entry.coverImage, col.coverEssay.slug),
+}));
 ---
 
 <Layout title="Colecciones | The Great Puzzle Project">

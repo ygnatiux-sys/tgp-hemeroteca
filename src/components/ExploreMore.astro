@@ -1,6 +1,6 @@
----
 import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
+import { resolveEssayImage } from "../lib/content-filter";
 
 interface Props {
   currentSlug: string;
@@ -14,11 +14,6 @@ const exploreEssays = allEssays
   .filter(essay => essay.id.replace(/\/index$/, "") !== currentSlug)
   .sort(() => Math.random() - 0.5)
   .slice(0, 3);
-
-// Importar imágenes
-const images = import.meta.glob<{ default: ImageMetadata }>(
-  "/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}",
-);
 ---
 
 <section class="max-w-6xl mx-auto px-6 py-32 border-t border-white/5">
@@ -32,14 +27,9 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {exploreEssays.map(async (essay) => {
+      {exploreEssays.map((essay) => {
         const slug = essay.id.replace(/\/index$/, "");
-        const imgPath = essay.data.coverImage;
-        let optimizedImg = null;
-        if (imgPath && images[imgPath]) {
-          const mod = await images[imgPath]();
-          optimizedImg = mod.default;
-        }
+        const optimizedImg = resolveEssayImage(essay.data.coverImage, slug);
 
         return (
           <a href={`/hemeroteca/${slug}`} class="group flex flex-col gap-6">

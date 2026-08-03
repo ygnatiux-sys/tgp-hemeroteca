@@ -111,3 +111,31 @@ export function groupByCategory(
   }
   return groups;
 }
+
+/**
+ * Mapa centralizado de imágenes de ensayos en Vite/Astro.
+ */
+export const essayImages = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}',
+  { eager: true }
+);
+
+/**
+ * Resuelve la imagen óptima de un ensayo:
+ * 1. Coincidencia exacta con coverImage si existe.
+ * 2. Si no, busca automáticamente cualquier imagen en la carpeta del slug (`/src/assets/ensayos/${slug}/`).
+ */
+export function resolveEssayImage(coverPath?: string | null, slug?: string): ImageMetadata | null {
+  if (coverPath && essayImages[coverPath]) {
+    return essayImages[coverPath].default;
+  }
+  if (slug) {
+    const slugPrefix = `/src/assets/ensayos/${slug}/`;
+    for (const [key, mod] of Object.entries(essayImages)) {
+      if (key.startsWith(slugPrefix)) {
+        return mod.default;
+      }
+    }
+  }
+  return null;
+}

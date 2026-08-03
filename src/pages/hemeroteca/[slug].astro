@@ -10,6 +10,7 @@ import { QuickReturnButton } from "../../components/QuickReturnButton";
 import SubstackPrefooter from "../../components/SubstackPrefooter.astro";
 import RelatedReading from "../../components/RelatedReading.astro";
 import ExploreMore from "../../components/ExploreMore.astro";
+import { resolveEssayImage, essayImages } from "../../lib/content-filter";
 
 export const prerender = true;
 export async function getStaticPaths() {
@@ -25,7 +26,16 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const { data } = Astro.props;
 
-// 1. Carga segura del contenido Markdown/MDoc si existe
+// 1. Cargar contenido raw de .mdoc si existe en disco
+const rawMdocs = import.meta.glob<string>(
+  "/src/content/ensayos/**/content.mdoc",
+  { query: '?raw', import: 'default', eager: true }
+);
+
+const mdocKey = `/src/content/ensayos/${slug}/content.mdoc`;
+const rawMdocText = rawMdocs[mdocKey] || '';
+
+// 2. Carga segura del componente Markdoc si existe
 let Content: any = null;
 try {
   const contentEntry = await getEntry("ensayosContent", `${slug}/content`);
@@ -34,28 +44,33 @@ try {
     Content = rendered.Content;
   }
 } catch (err) {
-  console.warn(`[INFO] Sin content.mdoc estructurado para ${slug}, se utilizará el contenido dinámico del ensayo.`);
+  // Fallback silencioso
 }
 
-// 1. ORO ESTRICTO: Importación dinámica exclusiva de la portada local
-const images = import.meta.glob<{ default: ImageMetadata }>(
-  "/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}",
-);
-const ensayoPath = data.coverImage;
-let optimizedImage = null;
+// 3. Resolución universal y resiliente del texto del ensayo
+let finalMarkdownText = '';
+if (rawMdocText && rawMdocText.trim().length > 0) {
+  finalMarkdownText = rawMdocText.trim();
+} else if ((data as any).generadorTexto && (data as any).generadorTexto.trim().length > 0) {
+  finalMarkdownText = (data as any).generadorTexto.trim();
+} else if (data.generador && data.generador.length > 50) {
+  finalMarkdownText = data.generador.trim();
+}
 
-if (ensayoPath && images[ensayoPath]) {
-  try {
-    const { default: loadedImage } = await images[ensayoPath]();
-    optimizedImage = loadedImage;
-  } catch (err) {
-    console.warn(
-      `[ERROR] No image module could be loaded for ${ensayoPath}:`,
-      err,
-    );
+// 4. Procesar HTML y vincular imágenes relativas a los assets procesados de Vite
+let renderedHtml = '';
+if (finalMarkdownText) {
+  renderedHtml = marked.parse(finalMarkdownText) as string;
+  // Reemplazar rutas de assets /src/assets/ensayos/... por su URL procesada por Vite
+  for (const [imgKey, imgModule] of Object.entries(essayImages)) {
+    if (renderedHtml.includes(imgKey)) {
+      renderedHtml = renderedHtml.replaceAll(imgKey, imgModule.default.src);
+    }
   }
 }
-// Tolerancia para borradores que no tengan imagen todavía, manteniendo el background antracita por seguridad.
+
+// 5. Resolución de imagen de portada (exacta o auto-detectada de la carpeta)
+const optimizedImage = resolveEssayImage(data.coverImage, slug);
 
 const roomColors: Record<string, string> = {
   "british-green": "#1B382A",
@@ -108,7 +123,7 @@ const heroOrigin = (data as any).heroOrigin || (data as any).transformOrigin || 
     <div class="relative z-10 max-w-7xl lg:max-w-360 w-full mx-auto">
       {/* Categoría y Año */}
       <div
-        class="reveal-item mb-3 font-mono text-[10px] md:text-[11px] flex items-center gap-3 uppercase tracking-[0.3em] text-[#C8A98B]"
+        class="mb-3 font-mono text-[10px] md:text-[11px] flex items-center gap-3 uppercase tracking-[0.3em] text-[#C8A98B]"
       >
         <span>[ {data.category || "ARCHIVO CLASIFICADO"} ]</span>
         <span class="opacity-40">—</span>
@@ -117,21 +132,21 @@ const heroOrigin = (data as any).heroOrigin || (data as any).transformOrigin || 
 
       {/* Título Display Monumental con Acero Pulido / Titanio Cinemático */}
       <h1
-        class="reveal-item text-[clamp(3.25rem,7.5vw,8.5rem)] leading-[0.98] font-serif font-display tracking-tight antialiased max-w-5xl pt-2 pb-3 bg-linear-to-b from-white via-[#CBD5E1] via-45% to-[#64748B] bg-clip-text text-transparent drop-shadow-2xl"
+        class="text-[clamp(3.25rem,7.5vw,8.5rem)] leading-[0.98] font-serif font-display tracking-tight antialiased max-w-5xl pt-2 pb-3 bg-linear-to-b from-white via-[#CBD5E1] via-45% to-[#64748B] bg-clip-text text-transparent drop-shadow-2xl"
       >
         {data.title}
       </h1>
 
       {/* Bajada Breve */}
       {data.excerpt && (
-        <p class="reveal-item font-serif font-light text-base md:text-lg lg:text-xl text-white/80 leading-normal max-w-2xl lg:max-w-3xl italic mt-2 line-clamp-2">
+        <p class="font-serif font-light text-base md:text-lg lg:text-xl text-white/80 leading-normal max-w-2xl lg:max-w-3xl italic mt-2 line-clamp-2">
           "{data.excerpt}"
         </p>
       )}
 
       {/* Podcast Icons en el ángulo inferior derecho del Hero */}
       {(data.spotifyLink || data.youtubeLink) && (
-        <div class="absolute bottom-0 right-0 hidden md:flex items-center gap-6 text-white reveal-item">
+        <div class="absolute bottom-0 right-0 hidden md:flex items-center gap-6 text-white">
           {data.spotifyLink && (
             <a 
               href={data.spotifyLink} 
@@ -210,18 +225,13 @@ const heroOrigin = (data as any).heroOrigin || (data as any).transformOrigin || 
           prose-strong:font-medium prose-strong:text-white/95
           prose-blockquote:border-none prose-blockquote:bg-white/5 prose-blockquote:text-white/85 prose-blockquote:p-12 prose-blockquote:md:-mx-12 prose-blockquote:rounded-2xl prose-blockquote:shadow-2xl prose-blockquote:text-2xl prose-blockquote:leading-normal prose-blockquote:font-body prose-blockquote:font-light prose-blockquote:italic
           prose-a:border-b prose-a:border-[#C8A98B]/40 prose-a:text-[#C8A98B] hover:prose-a:text-white transition-colors
+          prose-img:rounded-2xl prose-img:border prose-img:border-white/10 prose-img:shadow-2xl prose-img:my-12 prose-img:w-full prose-img:object-cover
           prose-p:first-of-type:first-letter:text-7xl prose-p:first-of-type:first-letter:font-body prose-p:first-of-type:first-letter:font-light prose-p:first-of-type:first-letter:text-[#C8A98B] prose-p:first-of-type:first-letter:mr-3 prose-p:first-of-type:first-letter:float-left prose-p:first-of-type:first-letter:leading-[0.8] prose-p:first-of-type:first-letter:mt-2
           prose-hr:border-none prose-hr:text-center prose-hr:text-stone-600 prose-hr:tracking-[1em] prose-hr:py-12 prose-hr:after:content-['***']"
         >
         {(() => {
-          // CRÍTICO: El texto de Gemini se guarda en 'generadorTexto', NO en 'generador'
-          // 'generador' solo contiene el identificador del motor (ej. "Gemini-1.5-Pro")
-          const textoEnsayo = (data as any).generadorTexto || data.generador || '';
-          const hasGeneradorText = textoEnsayo && textoEnsayo.length > 50;
-          
-          if (hasGeneradorText) {
-            const html = marked.parse(textoEnsayo) as string;
-            const paragraphs = html.split('</p>');
+          if (renderedHtml) {
+            const paragraphs = renderedHtml.split('</p>');
             if (paragraphs.length > 4) {
               const middle = Math.floor(paragraphs.length / 2);
               const part1 = paragraphs.slice(0, middle).join('</p>') + '</p>';
@@ -241,7 +251,7 @@ const heroOrigin = (data as any).heroOrigin || (data as any).transformOrigin || 
             }
             return (
               <>
-                <div class="essay-content" set:html={html} />
+                <div class="essay-content" set:html={renderedHtml} />
                 {Content && (
                   <div class="essay-content">
                     <Content />
@@ -251,8 +261,23 @@ const heroOrigin = (data as any).heroOrigin || (data as any).transformOrigin || 
               </>
             );
           }
-          
 
+          if (Content) {
+            return (
+              <>
+                <div class="essay-content">
+                  <Content />
+                </div>
+                <RelatedReading currentSlug={slug!} category={data.category ?? undefined} />
+              </>
+            );
+          }
+
+          return (
+            <div class="py-12 text-white/50 font-serif italic text-lg text-center">
+              Documento en proceso de catalogación en el archivo hemerográfico.
+            </div>
+          );
         })()}
       </div>
       </div>
