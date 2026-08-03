@@ -72,7 +72,7 @@ const imagePosition = (data as any).coverImagePosition || (data as any).imagePos
 const heroOrigin = (data as any).heroOrigin || (data as any).transformOrigin || 'center center';
 ---
 
-<Layout hideHeader={true} title={`${data.title} | Hemeroteca TGP`}>
+<Layout hideHeader={true} footerVariant="minimal" title={`${data.title} | Hemeroteca TGP`}>
   <StickyReaderHeader client:load title={data.title || "Ensayo TGP"} accentColor={activeAccent} />
   <QuickReturnButton client:load accentColor={activeAccent} />
 

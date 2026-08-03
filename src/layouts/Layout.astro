@@ -6,9 +6,10 @@ import Footer from '../components/Footer.astro';
 interface Props {
 	title?: string;
 	hideHeader?: boolean;
+	footerVariant?: 'full' | 'minimal';
 }
 
-const { title = "Hemeroteca TGP", hideHeader = false } = Astro.props;
+const { title = "Hemeroteca TGP", hideHeader = false, footerVariant = 'full' } = Astro.props;
 ---
 
 <!doctype html>
@@ -31,7 +32,7 @@ const { title = "Hemeroteca TGP", hideHeader = false } = Astro.props;
 		<main class="grow relative">
 			<slot />
 		</main>
-		<Footer />
+		<Footer variant={footerVariant} />
 
 		<script>
 			const setupGlobalReveal = () => {
