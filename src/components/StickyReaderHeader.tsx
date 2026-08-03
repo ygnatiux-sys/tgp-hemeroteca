@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BuscadorModal } from './BuscadorModal';
 
 interface Props {
   title: string;
@@ -12,10 +13,8 @@ export const StickyReaderHeader: React.FC<Props> = ({ title, accentColor }) => {
   const [backPath, setBackPath] = useState('/archivo');
 
   useEffect(() => {
-    // Tarea 2: Lógica de Breadcrumbs Dinámicos
     if (typeof document !== 'undefined') {
       const referrer = document.referrer;
-      // Detectamos si venimos de la hemeroteca o el inicio
       if (referrer.includes('/archivo')) {
         setBackPath('/archivo');
       } else if (referrer.includes('/ensayos')) {
@@ -27,13 +26,12 @@ export const StickyReaderHeader: React.FC<Props> = ({ title, accentColor }) => {
       const currentScrollY = window.scrollY;
       const windowHeight = document.documentElement.scrollHeight - window.innerHeight;
       
-      // Calcular progreso de lectura
       const scrollProgress = (currentScrollY / windowHeight) * 100;
       setProgress(scrollProgress);
 
-      // Tarea 1: Lógica de visibilidad (Scroll Up detection)
-      // Solo aparece si se ha bajado más de 300px (para no molestar en el hero)
-      if (currentScrollY > 300) {
+      // Al abrir el post o hacer scroll hacia abajo -> HIDE (ocultar)
+      // Al hacer scroll hacia arriba (scroll up) tras haber bajado > 250px -> BAJAR (mostrar)
+      if (currentScrollY > 250) {
         if (currentScrollY < lastScrollY) {
           setIsVisible(true);
         } else {
@@ -46,64 +44,64 @@ export const StickyReaderHeader: React.FC<Props> = ({ title, accentColor }) => {
       setLastScrollY(currentScrollY);
     };
 
-    // Tarea 3: Atajo de Teclado (Esc)
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        window.location.href = backPath;
+    // Al interactuar moviendo el cursor a la parte superior de la pantalla (< 60px), revelar suavemente la barra
+    const handleMouseMove = (e: MouseEvent) => {
+      if (e.clientY < 60 && window.scrollY > 250) {
+        setIsVisible(true);
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('mousemove', handleMouseMove);
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('mousemove', handleMouseMove);
     };
   }, [lastScrollY, backPath]);
 
   return (
     <header 
-      className={`fixed top-0 left-0 w-full z-100 transition-all duration-300 ease-in-out transform ${
+      className={`fixed top-0 left-0 w-full z-100 transition-all duration-500 ease-in-out transform ${
         isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
       }`}
     >
-      {/* Background Glassmorphism (Tarea 1) */}
-      <div className="absolute inset-0 bg-[#0a0a0a]/85 backdrop-blur-md border-b border-white/5" />
+      {/* Background Glassmorphism */}
+      <div className="absolute inset-0 bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-white/10" />
 
       <div className="relative max-w-7xl mx-auto px-6 h-16 flex items-center justify-between pointer-events-auto">
         {/* Breadcrumb Inteligente */}
-        <div className="flex items-center gap-5 text-[10px] font-mono tracking-[0.3em] uppercase">
-          <a href="/" className="hover:opacity-80 transition-opacity flex items-center" title="Inicio">
-             <img src="/favicon.png" alt="TGP" className="w-6 h-6 object-contain" />
+        <div className="flex items-center gap-4 text-[10px] font-mono tracking-[0.25em] uppercase">
+          <a href="/" className="hover:opacity-80 transition-opacity flex items-center" title="Inicio TGP">
+             <img src="/favicon.png" alt="TGP" className="w-5 h-5 object-contain grayscale brightness-150" />
           </a>
-          <span className="opacity-10">/</span>
+          <span className="opacity-20">/</span>
           <a 
             href={backPath} 
-            className="text-white/40 hover:text-white transition-colors flex items-center gap-2"
+            className="text-white/50 hover:text-white transition-colors flex items-center gap-1.5"
           >
-            <span className="text-[14px]">←</span> Hemeroteca
+            <span className="text-[12px]">←</span> Hemeroteca
           </a>
-          <span className="opacity-10 hidden lg:inline">/</span>
-          <span className="text-[#C8A98B] truncate max-w-[300px] hidden lg:inline font-serif italic normal-case tracking-normal text-[15px] opacity-80">
+          <span className="opacity-20 hidden md:inline">/</span>
+          <span className="text-[#C8A98B] truncate max-w-70 hidden md:inline font-serif italic normal-case tracking-normal text-[14px] opacity-90">
             {title}
           </span>
         </div>
 
-        {/* Indicador de Sección */}
-        <div className="text-[9px] font-mono text-white/20 uppercase tracking-[0.4em] hidden sm:block">
-          Archivo TGP
+        {/* Lupa de Búsqueda 🔍 + Menú Sándwich 3 Guiones ≡ */}
+        <div className="flex items-center gap-4">
+          <BuscadorModal />
         </div>
       </div>
 
-      {/* Progress Bar (Capa de Progreso) */}
-      <div className="absolute bottom-0 left-0 w-full h-px bg-white/5">
+      {/* Progress Bar (Capa de Progreso de Lectura) */}
+      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-white/5">
         <div 
-          className="h-full transition-all duration-100 ease-out"
+          className="h-full transition-all duration-150 ease-out"
           style={{ 
             width: `${Math.min(100, Math.max(0, progress))}%`,
             backgroundColor: accentColor,
-            boxShadow: `0 0 12px ${accentColor}33`
+            boxShadow: `0 0 10px ${accentColor}aa`
           }}
         />
       </div>

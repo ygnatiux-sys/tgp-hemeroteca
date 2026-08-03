@@ -72,13 +72,13 @@ const imagePosition = (data as any).coverImagePosition || (data as any).imagePos
 const heroOrigin = (data as any).heroOrigin || (data as any).transformOrigin || 'center center';
 ---
 
-<Layout title={`${data.title} | Hemeroteca TGP`}>
+<Layout hideHeader={true} title={`${data.title} | Hemeroteca TGP`}>
   <StickyReaderHeader client:load title={data.title || "Ensayo TGP"} accentColor={activeAccent} />
   <QuickReturnButton client:load accentColor={activeAccent} />
 
-  {/* 2. Hero Cinemático Full-Bleed con Reverse Ken Burns */}
+  {/* 2. Hero Cinemático iOS-Style Full-Bleed con Reverse Ken Burns */}
   <section
-    class="hero-section relative w-full h-[74svh] md:h-[65vh] lg:h-[78vh] min-h-130 flex flex-col justify-end pb-12 md:pb-16 lg:pb-20 px-6 md:px-12 lg:px-24 z-10 overflow-hidden"
+    class="hero-section relative w-full h-[88vh] md:h-[90vh] lg:h-[95vh] min-h-160 flex flex-col justify-end pb-16 md:pb-24 lg:pb-28 px-6 md:px-14 lg:px-24 z-10 overflow-hidden"
     style={`--hero-origin: ${heroOrigin};`}
   >
     {/* Imagen de Fondo Full Bleed con Reverse Ken Burns */}
@@ -104,8 +104,8 @@ const heroOrigin = (data as any).heroOrigin || (data as any).transformOrigin || 
       ></div>
     </div>
 
-    {/* Contenido Editorial del Hero */}
-    <div class="relative z-10 max-w-6xl w-full">
+    {/* Contenido Editorial del Hero (iOS Style Wide Bounds) */}
+    <div class="relative z-10 max-w-7xl lg:max-w-360 w-full mx-auto">
       {/* Categoría y Año */}
       <div
         class="reveal-item mb-3 font-mono text-[10px] md:text-[11px] flex items-center gap-3 uppercase tracking-[0.3em] text-[#C8A98B]"
@@ -115,16 +115,16 @@ const heroOrigin = (data as any).heroOrigin || (data as any).transformOrigin || 
         <span class="text-white/60">{data.date ? new Date(data.date).getFullYear() : "S/F"}</span>
       </div>
 
-      {/* Título Display Monumental */}
+      {/* Título Display Monumental con Acero Pulido / Titanio Cinemático */}
       <h1
-        class="reveal-item text-[clamp(3.25rem,7.5vw,8.5rem)] leading-[0.98] font-serif font-display tracking-tight antialiased max-w-5xl pt-2 pb-3 bg-linear-to-b from-white via-white/95 to-white/70 bg-clip-text text-transparent drop-shadow-2xl"
+        class="reveal-item text-[clamp(3.25rem,7.5vw,8.5rem)] leading-[0.98] font-serif font-display tracking-tight antialiased max-w-5xl pt-2 pb-3 bg-linear-to-b from-white via-[#CBD5E1] via-45% to-[#64748B] bg-clip-text text-transparent drop-shadow-2xl"
       >
         {data.title}
       </h1>
 
       {/* Bajada Breve */}
       {data.excerpt && (
-        <p class="reveal-item font-serif text-base md:text-lg lg:text-xl text-white/80 leading-relaxed max-w-2xl lg:max-w-3xl italic mt-2 line-clamp-2">
+        <p class="reveal-item font-serif font-light text-base md:text-lg lg:text-xl text-white/80 leading-normal max-w-2xl lg:max-w-3xl italic mt-2 line-clamp-2">
           "{data.excerpt}"
         </p>
       )}
@@ -180,7 +180,7 @@ const heroOrigin = (data as any).heroOrigin || (data as any).transformOrigin || 
       {/* 1. Canal Izquierdo: Marginalia Contemporánea */}
       <aside class="col-span-12 lg:col-span-3 hidden lg:block sticky top-32 h-fit">
         <div class="p-6 border-l border-white/10 bg-white/5 rounded-sm">
-          <p class="font-serif italic text-[#C8A98B]/80 text-sm leading-relaxed">
+          <p class="font-serif italic font-light text-[#C8A98B]/80 text-sm leading-normal">
             "La verdad no es algo que se encuentra, es algo que se recuerda."
           </p>
           <p class="mt-4 font-mono text-[10px] uppercase tracking-widest text-white/40">Contexto: Archivo Base</p>
@@ -192,7 +192,7 @@ const heroOrigin = (data as any).heroOrigin || (data as any).transformOrigin || 
         {
           data.excerpt && (
             <div class="border-l border-[#C8A98B]/30 pl-8 mb-16 max-w-2xl">
-              <p class="text-2xl md:text-3xl font-serif opacity-90 italic text-[#C8A98B] leading-relaxed tracking-wide">
+              <p class="text-2xl md:text-3xl font-serif font-light opacity-90 italic text-[#C8A98B] leading-normal tracking-wide">
                 "{data.excerpt}"
               </p>
             </div>
@@ -202,14 +202,15 @@ const heroOrigin = (data as any).heroOrigin || (data as any).transformOrigin || 
         {/* Redacción Editorial */}
         <div
           class="prose prose-invert prose-lg max-w-none
-          prose-p:font-serif prose-p:font-normal prose-p:not-italic prose-p:text-[1.25rem] prose-p:leading-[1.85] prose-p:tracking-[0.015em] prose-p:text-white/85 prose-p:mb-10 prose-p:text-left
+          prose-p:font-body prose-p:font-light prose-p:not-italic prose-p:text-[1.25rem] prose-p:leading-[1.9] prose-p:tracking-[0.01em] prose-p:text-white/80 prose-p:mb-10 prose-p:text-left
           prose-h1:hidden
-          prose-h2:font-serif prose-h2:font-medium prose-h2:tracking-[-0.02em] prose-h2:text-white/95 prose-h2:mt-16 prose-h2:mb-6
-          prose-h3:font-serif prose-h3:font-normal prose-h3:italic prose-h3:text-stone-300 prose-h3:mt-12 prose-h3:mb-4
-          prose-strong:font-bold prose-strong:text-white/90
-          prose-blockquote:border-none prose-blockquote:bg-white/5 prose-blockquote:text-white/90 prose-blockquote:p-12 prose-blockquote:md:-mx-12 prose-blockquote:rounded-2xl prose-blockquote:shadow-2xl prose-blockquote:text-2xl prose-blockquote:leading-snug prose-blockquote:font-serif prose-blockquote:italic
+          prose-h2:font-sans prose-h2:not-italic prose-h2:font-medium prose-h2:tracking-tight prose-h2:mt-16 prose-h2:mb-6 prose-h2:leading-snug
+          prose-h3:font-body prose-h3:font-light prose-h3:italic prose-h3:text-stone-300 prose-h3:leading-normal prose-h3:mt-12 prose-h3:mb-4
+          prose-h4:font-sans prose-h4:font-extralight prose-h4:tracking-widest prose-h4:uppercase prose-h4:text-xs prose-h4:text-[#C8A98B] prose-h4:leading-normal prose-h4:mt-10 prose-h4:mb-3
+          prose-strong:font-medium prose-strong:text-white/95
+          prose-blockquote:border-none prose-blockquote:bg-white/5 prose-blockquote:text-white/85 prose-blockquote:p-12 prose-blockquote:md:-mx-12 prose-blockquote:rounded-2xl prose-blockquote:shadow-2xl prose-blockquote:text-2xl prose-blockquote:leading-normal prose-blockquote:font-body prose-blockquote:font-light prose-blockquote:italic
           prose-a:border-b prose-a:border-[#C8A98B]/40 prose-a:text-[#C8A98B] hover:prose-a:text-white transition-colors
-          prose-p:first-of-type:first-letter:text-8xl prose-p:first-of-type:first-letter:font-serif prose-p:first-of-type:first-letter:text-[#C8A98B] prose-p:first-of-type:first-letter:mr-4 prose-p:first-of-type:first-letter:float-left prose-p:first-of-type:first-letter:leading-[0.7] prose-p:first-of-type:first-letter:mt-3
+          prose-p:first-of-type:first-letter:text-7xl prose-p:first-of-type:first-letter:font-body prose-p:first-of-type:first-letter:font-light prose-p:first-of-type:first-letter:text-[#C8A98B] prose-p:first-of-type:first-letter:mr-3 prose-p:first-of-type:first-letter:float-left prose-p:first-of-type:first-letter:leading-[0.8] prose-p:first-of-type:first-letter:mt-2
           prose-hr:border-none prose-hr:text-center prose-hr:text-stone-600 prose-hr:tracking-[1em] prose-hr:py-12 prose-hr:after:content-['***']"
         >
         {(() => {

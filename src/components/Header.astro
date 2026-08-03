@@ -1,5 +1,6 @@
 ---
 // Header Component Institucional (Dark Academia Premium)
+import { BuscadorModal } from './BuscadorModal';
 ---
 
 <header class="fixed top-0 w-full z-100 bg-black/60 backdrop-blur-xl border-b border-white/5 transition-all duration-700">
@@ -24,13 +25,19 @@
       </div>
     </div>
     
-    <nav class="flex items-center gap-3 sm:gap-6 md:gap-8 shrink-0">
-      <a href="/" class="hidden sm:inline-block font-mono text-[9px] uppercase tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Inicio</a>
-      <a href="/colecciones" class="font-mono text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Colecciones</a>
-      <a href="/archivo" class="font-mono text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Archivo</a>
-      <a href="/manifiesto" class="font-mono text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Manifiesto</a>
-      <a href="/codice" class="px-3 sm:px-4 py-1 sm:py-2 border border-white/10 rounded-full font-mono text-[8px] sm:text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/80 hover:text-white hover:border-white/30 transition-all duration-500 bg-white/5 whitespace-nowrap">El Códice</a>
-    </nav>
+    <div class="flex items-center gap-4 md:gap-6">
+      {/* Navegación Tradicional (Se oculta en móvil o al condensar) */}
+      <nav class="hidden md:flex items-center gap-3 sm:gap-6 shrink-0">
+        <a href="/" class="font-mono text-[9px] uppercase tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Inicio</a>
+        <a href="/colecciones" class="font-mono text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Colecciones</a>
+        <a href="/archivo" class="font-mono text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Archivo</a>
+        <a href="/manifiesto" class="font-mono text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Manifiesto</a>
+        <a href="/codice" class="px-3 sm:px-4 py-1 sm:py-2 border border-white/10 rounded-full font-mono text-[8px] sm:text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/80 hover:text-white hover:border-white/30 transition-all duration-500 bg-white/5 whitespace-nowrap">El Códice</a>
+      </nav>
+
+      {/* Lupa de Búsqueda + Menú Sándwich 3 Guiones ≡ */}
+      <BuscadorModal client:load />
+    </div>
   </div>
 </header>
 
