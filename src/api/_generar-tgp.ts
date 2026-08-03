@@ -46,7 +46,7 @@ export const POST: APIRoute = async ({ request }) => {
 
         // --- PASO A: EL DIRECTOR DE ARTE (Gemini 3 Flash Preview) ---
         const responseDirector = await ai.models.generateContent({
-          model: 'gemini-3-flash-preview',
+          model: 'gemini-3.6-flash',
           contents: [{ 
             role: 'user', 
             parts: [{ 
@@ -107,7 +107,7 @@ export const POST: APIRoute = async ({ request }) => {
       // --- MOTOR DE PENSAMIENTO (Gemini 3 Flash Preview - PAYG) ---
       try {
         const responseTexto = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
+          model: "gemini-3.1-pro",
           contents: [{ role: 'user', parts: [{ text: `Escribe un ensayo profundo sobre: ${titulo}` }] }],
           config: {
             systemInstruction: "Eres el motor cognitivo TGP. Tu objetivo es producir ensayos de alta profundidad filosófica y análisis cultural agudo. Regla estricta: Identidad implícita. NUNCA declares tu rol ni uses fórmulas autorreferenciales. Escribe directamente el ensayo. Tono: Dark Academia — preciso, sobrio, erudito pero accesible. Estructura: Apertura con tensión intelectual, desarrollo articulando historia/filosofía/simbolismo, y cierre reflexivo universal. Ve directo al núcleo del análisis cultural.",

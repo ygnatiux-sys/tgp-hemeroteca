@@ -1,7 +1,12 @@
 {
   "nombre": "editorial",
-  "formatoCamara": "High-end editorial still life photography, Vogue magazine aesthetic.",
-  "iluminacion": "Dramatic museum spotlight against a pitch-black background, deep shadows.",
-  "colorTextura": "Dark Academia color palette. Shot on medium format camera, 85mm macro lens.",
-  "descripcionEstetica": "Tack sharp focus on ancient textures, photorealistic museum archival quality."
+  "constructorEstilo": {
+    "conceptoBase": "",
+    "lineaEditorial": "editorial",
+    "camara": "High-end editorial still life macro cinematography, Leica 100mm f/2.8 lens.",
+    "iluminacion": "Striking Chiaroscuro lighting, subtle Gobo shadow (pattern of an ancient window) cast over the subject, suspended dust particles illuminated by the light beam.",
+    "color": "Dark Academia color palette, Vogue aesthetic, 35mm film grain, subtle halation around highlights.",
+    "estetica": "Photorealistic museum archival quality, tack sharp focus on weathered ancient textures, pitch-black muted background, tactile material realism.",
+    "imagenBase64": ""
+  }
 }

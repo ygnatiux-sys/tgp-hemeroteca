@@ -4,5 +4,7 @@
   "themeColor": "british-green",
   "coverImage": "/src/assets/ensayos/moai-test/coverImage.jpg",
   "generador": "Gemini-1.5-Pro",
-  "notasInvestigador": ""
+  "notasInvestigador": "",
+  "spotifyLink": "https://open.spotify.com/show/test",
+  "youtubeLink": "https://youtube.com/test"
 }

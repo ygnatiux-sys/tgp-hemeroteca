@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 export function GeneradorTextoTGP({ value, onChange }: any) {
   const [titulo, setTitulo] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isPublished, setIsPublished] = useState(false);
 
   // El estado local se sincroniza con el valor que Keystatic ya tenga guardado
   const [ensayo, setEnsayo] = useState(value || '');
-
-
 
   const handleGenerarTexto = async () => {
     if (!titulo) return alert('Por favor, ingresa un tema para el ensayo.');
     setIsLoading(true);
     setErrorMsg(null);
+    setIsPublished(false);
 
     try {
       const res = await fetch('/api/generar-tgp', {
@@ -36,6 +36,14 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePublicar = () => {
+    // Sincronizamos el texto actual con Keystatic
+    onChange(ensayo);
+    setIsPublished(true);
+    setTimeout(() => setIsPublished(false), 4000);
+    alert('✅ Informe confirmado.\n\nAhora:\n1. Asegurate de que la imagen de portada esté cargada arriba.\n2. Desactivá el checkbox "Borrador" si querés publicar.\n3. Presioná "Save" en Keystatic para que aparezca en el inicio y el archivo.');
   };
 
   return (
@@ -72,25 +80,23 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         />
       </div>
 
-      {/* --- INICIO INYECCIÓN EXPLÍCITA DE BOTÓN DE ACCIÓN --- */}
       <button
         type="button"
-        onClick={handleGenerarTexto} // Asegúrate de usar la función correcta para texto
+        onClick={handleGenerarTexto}
         disabled={isLoading || !titulo}
         style={{
           display: 'block',
           width: '100%',
           padding: '16px',
-          marginTop: '20px',
-          marginBottom: '20px',
-          // Colores de ALTO CONTRASTE (Verde brillante si está activo, Gris oscuro si está deshabilitado)
+          marginTop: '10px',
+          marginBottom: '10px',
           background: (isLoading || !titulo) ? '#333' : '#28a745', 
           color: (isLoading || !titulo) ? '#777' : '#fff',
           border: 'none',
           borderRadius: '8px',
           fontWeight: 700,
           fontSize: '1rem',
-          textTransform: 'uppercase',
+          textTransform: 'uppercase' as const,
           letterSpacing: '0.1em',
           cursor: (isLoading || !titulo) ? 'not-allowed' : 'pointer',
           transition: 'all 0.2s ease',
@@ -99,7 +105,6 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
       >
         {isLoading ? 'GENERANDO...' : 'GENERAR TEXTO DEL ENSAYO'}
       </button>
-      {/* --- FIN INYECCIÓN EXPLÍCITA DE BOTÓN DE ACCIÓN --- */}
 
       {errorMsg && (
         <div style={{ color: '#ff5252', fontSize: '0.8rem', padding: '10px', background: 'rgba(255,82,82,0.1)', borderRadius: '4px', border: '1px solid #ff5252', marginBottom: '15px' }}>
@@ -115,7 +120,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
             setEnsayo(e.target.value);
             onChange(e.target.value);
           }}
-          placeholder="El ensayo aparecerá aquí..."
+          placeholder="El ensayo aparecerá aquí. También puedes pegar texto manualmente."
           style={{
             width: '100%',
             height: '350px',
@@ -127,9 +132,82 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
             fontSize: '1rem',
             lineHeight: '1.6',
             borderRadius: '4px',
-            resize: 'vertical'
+            resize: 'vertical' as const
           }}
         />
+      </div>
+
+      {/* ============================================================ */}
+      {/* BOTÓN PRINCIPAL: PUBLICAR ENSAYO CON TEXTO + IMAGEN          */}
+      {/* ============================================================ */}
+      <div style={{ 
+        marginTop: '24px', 
+        padding: '20px', 
+        background: 'linear-gradient(135deg, #0d1f0d, #1a2e1a)',
+        border: '1px solid #2d5a2d',
+        borderRadius: '10px'
+      }}>
+        <p style={{ 
+          margin: '0 0 6px 0', 
+          fontSize: '0.65rem', 
+          color: '#5a9e5a', 
+          textTransform: 'uppercase' as const,
+          letterSpacing: '0.2em',
+          fontWeight: 700
+        }}>
+          📤 PUBLICACIÓN FINAL
+        </p>
+        <p style={{ 
+          margin: '0 0 16px 0', 
+          fontSize: '0.8rem', 
+          color: '#aaa',
+          lineHeight: '1.5'
+        }}>
+          Cuando el informe esté listo y la <strong style={{ color: '#fff' }}>imagen de portada</strong> esté cargada 
+          (manual o generada por el Motor de Arte), presioná este botón y luego <strong style={{ color: '#4caf50' }}>Save</strong> en Keystatic.
+          El ensayo aparecerá en el inicio y en el archivo automáticamente.
+        </p>
+
+        <button
+          type="button"
+          onClick={handlePublicar}
+          disabled={!ensayo || ensayo.length < 50}
+          style={{
+            display: 'block',
+            width: '100%',
+            padding: '20px',
+            background: (!ensayo || ensayo.length < 50) 
+              ? '#1a1a1a' 
+              : isPublished 
+                ? 'linear-gradient(135deg, #1a5c1a, #2d8c2d)' 
+                : 'linear-gradient(135deg, #1a4d1a, #2d7a2d)',
+            color: (!ensayo || ensayo.length < 50) ? '#555' : '#fff',
+            border: (!ensayo || ensayo.length < 50) ? '1px solid #333' : '1px solid #4caf50',
+            borderRadius: '8px',
+            fontWeight: 800,
+            fontSize: '1.1rem',
+            textTransform: 'uppercase' as const,
+            letterSpacing: '0.15em',
+            cursor: (!ensayo || ensayo.length < 50) ? 'not-allowed' : 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: (!ensayo || ensayo.length < 50) ? 'none' : '0 6px 20px rgba(45, 122, 45, 0.4)',
+          }}
+        >
+          {isPublished 
+            ? '✅ LISTO — DESACTIVÁ BORRADOR Y PRESIONÁ SAVE' 
+            : '🚀 CONFIRMAR INFORME PARA PUBLICACIÓN'}
+        </button>
+
+        {ensayo && ensayo.length >= 50 && (
+          <p style={{ 
+            margin: '10px 0 0 0', 
+            fontSize: '0.72rem', 
+            color: '#5a9e5a',
+            textAlign: 'center' as const
+          }}>
+            {ensayo.length.toLocaleString()} caracteres · Informe listo
+          </p>
+        )}
       </div>
     </div>
   );

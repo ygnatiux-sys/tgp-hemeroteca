@@ -1,213 +1,315 @@
 import React, { useState } from 'react';
+import { PRESETS_ARTE, type EditorialPreset, type LineaEditorialKey } from '../config/presetsArte';
 
-const directricesVisuales: Record<string, any> = {
-  "personalizado": {
-    label: "✨ Estilo Personalizado (Manual)",
-    contexto: "",
-    camara: "",
-    iluminacion: "",
-    etalonaje: ""
-  },
-  "dark-academia": {
-    label: "📚 Dark Academia (Investigación)",
-    contexto: "rodeado de libros con encuadernación de cuero gastado, compases de bronce, mapas antiguos esparcidos. Atmósfera de investigación profunda.",
-    camara: "Fotografía de formato medio, lente 50mm, enfoque preciso, ligera viñeta óptica, profundidad de campo reducida f/2.8",
-    iluminacion: "Claroscuro intenso, luz cálida direccional imitando lámpara de queroseno, sombras dramáticas",
-    etalonaje: "Estilo Dark Academia, paleta desaturada, tonos ámbar y sepia, negros densos, grano fotográfico antiguo"
-  },
-  "victorian-archeo": {
-    label: "🏛️ Victorian Archeo",
-    contexto: "rodeado de libros con encuadernación de cuero gastado, compases de bronce, mapas antiguos esparcidos. Atmósfera de investigación profunda.",
-    camara: "Fotografía de formato medio, lente 50mm, enfoque preciso, ligera viñeta óptica, profundidad de campo reducida f/2.8",
-    iluminacion: "Claroscuro intenso, luz cálida direccional imitando lámpara de queroseno, sombras dramáticas",
-    etalonaje: "Estilo Dark Academia, paleta desaturada, tonos ámbar y sepia, negros densos, grano fotográfico antiguo"
-  },
-  "travel-senses": {
-    label: "🌍 Travel & Senses (Descubrimiento)",
-    contexto: "personas a lo lejos dando escala humana. Sensación de descubrimiento e inmersión en el entorno natural.",
-    camara: "Fotografía analógica 35mm, estilo documental fotoperiodístico, lente gran angular 24mm",
-    iluminacion: "Luz natural de Golden Hour, luz solar rasante, contraste orgánico",
-    etalonaje: "Estética de película Kodachrome vintage, colores ricos, amarillos cálidos, verdes profundos"
-  },
-  "italian-interiors": {
-    label: "🍷 Italian Interiors (Sofisticación)",
-    contexto: "arquitectura renacentista de fondo, frescos desgastados, textiles de terciopelo, mármol. Ambiente clásico y opulento.",
-    camara: "Fotografía de interiores arquitectónica, lente 35mm f/4, nitidez impecable, composición simétrica",
-    iluminacion: "Luz difusa de ventanal, iluminación suave y envolvente, reflejos sutiles",
-    etalonaje: "Tonos cálidos de terracota y verde oliva, contraste moderado, colores ricos y pictóricos"
-  },
-  "cine": {
-    label: "🎬 Cine (Cinematográfico)",
-    contexto: "Hyper-realistic historical setting, breathtaking depth of field, solemn and immersive environment, authentic historical grit.",
-    camara: "Cinematic wide establishing sequence, 1970s Panavision anamorphic lens, filmed on Arri Alexa 65.",
-    iluminacion: "Practical firelight mixed with cool ambient moonlight (dual color lighting), long dramatic shadows.",
-    etalonaje: "Kodak Vision3 500T film stock, visceral muddy textures, subtle chromatic aberration at the edges, anamorphic blue lens flare."
-  },
-  "concepto": {
-    label: "🧠 Concepto (Metáfora Visual)",
-    contexto: "Visual metaphor, philosophical weight, hyper-detailed conceptual environment, monumental atmosphere, sharp focus on symbolic elements.",
-    camara: "Avant-garde cinematic surrealism, medium format portrait orientation.",
-    iluminacion: "Volumetric lighting piercing through ethereal geometric fog, deep dramatic contrast.",
-    etalonaje: "Bleach bypass film process look (desaturated but high contrast), solemn muted tones, earthy monochrome spectrum."
-  },
-  "editorial": {
-    label: "📰 Editorial (Fotoperiodismo de Lujo)",
-    contexto: "Photorealistic museum archival quality, tack sharp focus on weathered ancient textures, pitch-black muted background, tactile material realism.",
-    camara: "High-end editorial still life macro cinematography, Leica 100mm f/2.8 lens.",
-    iluminacion: "Striking Chiaroscuro lighting, subtle Gobo shadow (pattern of an ancient window) cast over the subject, suspended dust particles illuminated by the light beam.",
-    etalonaje: "Dark Academia color palette, Vogue aesthetic, 35mm film grain, subtle halation around highlights."
-  }
-};
+export interface ProbadorArteData {
+  conceptoBase: string;
+  sujetoIA: string;
+  lineaEditorial: LineaEditorialKey;
+  usarManuales: boolean;
+  overrideCamara: string;
+  overrideIluminacion: string;
+  overrideColor: string;
+  imagenBase64?: string;
+  // Campos legacy para retrocompatibilidad
+  camara?: string;
+  iluminacion?: string;
+  color?: string;
+  estetica?: string;
+}
 
-export function ProbadorArteTGP({ value, onChange }: any) {
-  const [loading, setLoading] = useState(false);
+export function ProbadorArteTGP({ value, onChange }: { value: any; onChange: (val: ProbadorArteData) => void }) {
+  const [loadingSujeto, setLoadingSujeto] = useState(false);
+  const [loadingImagen, setLoadingImagen] = useState(false);
   const [error, setError] = useState('');
-  const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // Inicializamos el estado con los nuevos campos
-  const data = value || { 
-    conceptoBase: '', 
-    lineaEditorial: 'personalizado', 
-    camara: '', 
-    iluminacion: '', 
-    color: '', 
-    estetica: '', 
-    imagenBase64: '' 
+  // Estado inicial normalizado con fallbacks
+  const data: ProbadorArteData = {
+    conceptoBase: value?.conceptoBase || '',
+    sujetoIA: value?.sujetoIA || '',
+    lineaEditorial: (value?.lineaEditorial in PRESETS_ARTE) ? value.lineaEditorial : 'archivo-museo',
+    usarManuales: Boolean(value?.usarManuales),
+    overrideCamara: value?.overrideCamara || value?.camara || '',
+    overrideIluminacion: value?.overrideIluminacion || value?.iluminacion || '',
+    overrideColor: value?.overrideColor || value?.color || '',
+    imagenBase64: value?.imagenBase64 || '',
   };
 
-  const handleChange = (field: string, text: string) => {
-    onChange({ ...data, [field]: text });
+  const currentPreset: EditorialPreset = PRESETS_ARTE[data.lineaEditorial] || PRESETS_ARTE['archivo-museo'];
+
+  // Técnica efectiva (Preset o Overrides Manuales)
+  const efectivaCamara = data.usarManuales ? data.overrideCamara : currentPreset.camara;
+  const efectivaIluminacion = data.usarManuales ? data.overrideIluminacion : currentPreset.iluminacion;
+  const efectivaColor = data.usarManuales ? data.overrideColor : currentPreset.color;
+
+  const handleChange = (field: keyof ProbadorArteData, val: any) => {
+    onChange({ ...data, [field]: val });
   };
 
-  const handleStyleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selected = e.target.value;
-    const directriz = directricesVisuales[selected];
-    
-    onChange({ 
-      ...data, 
-      lineaEditorial: selected,
-      estetica: directriz.contexto,
-      camara: directriz.camara,
-      iluminacion: directriz.iluminacion,
-      color: directriz.etalonaje
-    });
-  };
-
-  const handleGenerate = async () => {
-    setLoading(true);
+  // 1. Generación de Sujeto mediante Gemini (/api/generar-sujeto)
+  const handleGenerateSujeto = async () => {
+    if (!data.conceptoBase.trim()) return;
+    setLoadingSujeto(true);
     setError('');
-    
-    // El Super Prompt interceptado
-    const promptCombinado = `Sujeto principal: ${data.conceptoBase}. Entorno: ${data.estetica}. Dirección de cámara: ${data.camara}. Iluminación: ${data.iluminacion}. Postproducción: ${data.color}.`;
+
+    try {
+      const response = await fetch('/api/generar-sujeto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conceptoBase: data.conceptoBase }),
+      });
+
+      const result = await response.json();
+      if (result.success && result.sujetoIA) {
+        handleChange('sujetoIA', result.sujetoIA);
+      } else {
+        setError(result.error || 'Error al generar sujeto en inglés con Gemini');
+      }
+    } catch (err) {
+      setError('Error de conexión al endpoint /api/generar-sujeto');
+    } finally {
+      setLoadingSujeto(false);
+    }
+  };
+
+  // 2. Concatenación Estricta: [sujetoIA] + [Camara] + [Iluminacion] + [Color]
+  const buildFinalPrompt = (): string => {
+    const sujeto = data.sujetoIA.trim() || data.conceptoBase.trim();
+    const camara = efectivaCamara.trim();
+    const iluminacion = efectivaIluminacion.trim();
+    const color = efectivaColor.trim();
+
+    return [sujeto, camara, iluminacion, color].filter(Boolean).join(' ');
+  };
+
+  // 3. Generación de Imagen Definitiva
+  const handleGenerateImagen = async () => {
+    setLoadingImagen(true);
+    setError('');
+
+    const promptCombinado = buildFinalPrompt();
 
     try {
       const response = await fetch('/api/generar-arte', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: promptCombinado })
+        body: JSON.stringify({ 
+          prompt: promptCombinado,
+          mode: 'manual',
+        }),
       });
 
       const result = await response.json();
 
-      if (result.success) {
+      if (result.success && result.image) {
         onChange({ ...data, imagenBase64: result.image });
       } else {
-        setError(result.error || 'Error desconocido al generar la imagen');
+        setError(result.error || 'Error al generar la imagen.');
       }
     } catch (err) {
-      setError('Error de conexión con el endpoint de Astro.');
+      setError('Error de conexión con el servidor.');
     } finally {
-      setLoading(false);
+      setLoadingImagen(false);
     }
   };
 
-  const inputStyle = {
-    width: '100%', padding: '10px', marginBottom: '16px', 
-    backgroundColor: '#1a1a1a', color: '#fff', border: '1px solid #333', borderRadius: '4px', boxSizing: 'border-box' as const
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '10px',
+    marginBottom: '14px',
+    backgroundColor: '#1a1a1a',
+    color: '#fff',
+    border: '1px solid #333',
+    borderRadius: '4px',
+    boxSizing: 'border-box',
+    fontFamily: 'inherit',
+  };
+
+  const readOnlyStyle: React.CSSProperties = {
+    ...inputStyle,
+    backgroundColor: '#111827',
+    color: '#9ca3af',
+    border: '1px solid #1f2937',
+    cursor: 'not-allowed',
   };
 
   return (
     <div style={{ padding: '20px', backgroundColor: '#242424', borderRadius: '8px', color: '#e5e5e5', fontFamily: 'system-ui, sans-serif' }}>
       
+      {/* SECCIÓN 1: SUJETO (CONCEPTO + GEMINI) */}
       <div style={{ marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid #333' }}>
-        <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#60a5fa' }}>🧠 Director de Arte Automático</h3>
-        
-        <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold' }}>1. Concepto Base</label>
+        <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#60a5fa', fontSize: '1.2em' }}>
+          🧠 Motor Nano Banana (Modelo Sujeto + Envoltorio)
+        </h3>
+
+        <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold', fontSize: '0.95em' }}>
+          1. Concepto Base (Español)
+        </label>
+
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
+          <textarea 
+            rows={2} 
+            style={{ ...inputStyle, marginBottom: 0, flex: 1, borderColor: '#4b5563' }} 
+            value={data.conceptoBase} 
+            onChange={(e) => handleChange('conceptoBase', e.target.value)} 
+            placeholder="Ej: Una vasija de obsidiana maya con inscripciones jeroglíficas..." 
+          />
+          <button
+            type="button"
+            onClick={handleGenerateSujeto}
+            disabled={loadingSujeto || !data.conceptoBase.trim()}
+            style={{
+              padding: '0 16px',
+              backgroundColor: loadingSujeto || !data.conceptoBase.trim() ? '#374151' : '#2563eb',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              fontWeight: 'bold',
+              cursor: loadingSujeto || !data.conceptoBase.trim() ? 'not-allowed' : 'pointer',
+              whiteSpace: 'nowrap',
+              fontSize: '0.9em',
+            }}
+          >
+            {loadingSujeto ? '⏳ Traduciendo...' : '🤖 Generar Sujeto (IA)'}
+          </button>
+        </div>
+
+        <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold', fontSize: '0.95em' }}>
+          2. Sujeto IA aislado (Inglés Descriptivo)
+        </label>
         <textarea 
           rows={2} 
-          style={{...inputStyle, fontSize: '1.1em', borderColor: '#4b5563'}} 
-          value={data.conceptoBase || ''} 
-          onChange={(e) => handleChange('conceptoBase', e.target.value)} 
-          placeholder="Ej: Una estela grabada en piedra basalto..." 
+          style={{ ...inputStyle, borderColor: data.sujetoIA ? '#10b981' : '#333' }} 
+          value={data.sujetoIA} 
+          onChange={(e) => handleChange('sujetoIA', e.target.value)} 
+          placeholder="A Mayan obsidian vessel with sharp hand-carved hieroglyphs on its polished dark surface..." 
         />
+      </div>
 
-        <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold' }}>2. Línea Editorial (Presets)</label>
+      {/* SECCIÓN 2: TÉCNICA (PRESET VS OVERRIDES) */}
+      <div style={{ marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid #333' }}>
+        <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold', fontSize: '0.95em' }}>
+          3. Línea Editorial (Preset Fotográfico)
+        </label>
         <select 
-          style={{...inputStyle, cursor: 'pointer'}} 
-          value={data.lineaEditorial || 'personalizado'} 
-          onChange={handleStyleChange}
+          style={{ ...inputStyle, cursor: 'pointer' }} 
+          value={data.lineaEditorial} 
+          onChange={(e) => handleChange('lineaEditorial', e.target.value as LineaEditorialKey)}
         >
-          {Object.entries(directricesVisuales).map(([key, styleData]) => (
-            <option key={key} value={key}>{styleData.label}</option>
+          {Object.entries(PRESETS_ARTE).map(([key, preset]) => (
+            <option key={key} value={key}>{preset.label}</option>
           ))}
         </select>
-      </div>
 
-      <div style={{ marginBottom: '16px' }}>
-        <button 
-          onClick={() => setShowAdvanced(!showAdvanced)}
-          style={{ 
-            background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', 
-            padding: 0, fontSize: '0.9em', display: 'flex', alignItems: 'center', gap: '6px' 
-          }}
-        >
-          {showAdvanced ? '🔽 Ocultar ajustes granulares (Excepciones)' : '▶️ Mostrar ajustes granulares (Excepciones)'}
-        </button>
-      </div>
-
-      {showAdvanced && (
-        <div style={{ padding: '16px', backgroundColor: '#1f1f1f', borderRadius: '6px', marginBottom: '20px' }}>
-          <p style={{ fontSize: '0.85em', color: '#9ca3af', marginTop: 0, marginBottom: '16px' }}>
-            Estos campos se autocompletan al elegir una línea editorial, pero puedes modificarlos libremente para excepciones puntuales.
-          </p>
-          
-          <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.9em' }}>Entorno / Contexto</label>
-          <textarea rows={2} style={inputStyle} value={data.estetica} onChange={(e) => handleChange('estetica', e.target.value)} />
-
-          <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.9em' }}>Cámara y Óptica</label>
-          <textarea rows={2} style={inputStyle} value={data.camara} onChange={(e) => handleChange('camara', e.target.value)} />
-
-          <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.9em' }}>Esquema de Iluminación</label>
-          <textarea rows={2} style={inputStyle} value={data.iluminacion} onChange={(e) => handleChange('iluminacion', e.target.value)} />
-
-          <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.9em' }}>Etalonaje y Color</label>
-          <textarea rows={2} style={inputStyle} value={data.color} onChange={(e) => handleChange('color', e.target.value)} />
+        {/* Toggle Overrides Manuales */}
+        <div style={{ marginTop: '12px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <input 
+            type="checkbox"
+            id="toggle-manuales"
+            checked={data.usarManuales}
+            onChange={(e) => handleChange('usarManuales', e.target.checked)}
+            style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+          />
+          <label htmlFor="toggle-manuales" style={{ cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9em', color: data.usarManuales ? '#f59e0b' : '#9ca3af' }}>
+            ⚡ Activar Overrides Manuales (Modo Granular de Excepciones)
+          </label>
         </div>
-      )}
 
+        {/* Campos de Técnica */}
+        <div style={{ padding: '16px', backgroundColor: '#1a1a1a', borderRadius: '6px' }}>
+          <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.85em', color: '#9ca3af' }}>
+            📷 Cámara y Óptica {data.usarManuales && <span style={{ color: '#f59e0b' }}>(Anulación Manual)</span>}
+          </label>
+          {data.usarManuales ? (
+            <textarea 
+              rows={2} 
+              style={inputStyle} 
+              value={data.overrideCamara} 
+              onChange={(e) => handleChange('overrideCamara', e.target.value)}
+              placeholder={currentPreset.camara}
+            />
+          ) : (
+            <textarea rows={2} style={readOnlyStyle} value={currentPreset.camara} readOnly />
+          )}
+
+          <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.85em', color: '#9ca3af' }}>
+            💡 Esquema de Iluminación {data.usarManuales && <span style={{ color: '#f59e0b' }}>(Anulación Manual)</span>}
+          </label>
+          {data.usarManuales ? (
+            <textarea 
+              rows={2} 
+              style={inputStyle} 
+              value={data.overrideIluminacion} 
+              onChange={(e) => handleChange('overrideIluminacion', e.target.value)}
+              placeholder={currentPreset.iluminacion}
+            />
+          ) : (
+            <textarea rows={2} style={readOnlyStyle} value={currentPreset.iluminacion} readOnly />
+          )}
+
+          <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.85em', color: '#9ca3af' }}>
+            🎨 Etalonaje y Color {data.usarManuales && <span style={{ color: '#f59e0b' }}>(Anulación Manual)</span>}
+          </label>
+          {data.usarManuales ? (
+            <textarea 
+              rows={2} 
+              style={inputStyle} 
+              value={data.overrideColor} 
+              onChange={(e) => handleChange('overrideColor', e.target.value)}
+              placeholder={currentPreset.color}
+            />
+          ) : (
+            <textarea rows={2} style={readOnlyStyle} value={currentPreset.color} readOnly />
+          )}
+        </div>
+      </div>
+
+      {/* PROMPT CONCATENADO PREVIEW */}
+      <div style={{ marginBottom: '20px', padding: '12px', backgroundColor: '#111827', border: '1px border #1f2937', borderRadius: '6px' }}>
+        <span style={{ fontSize: '0.75em', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '4px' }}>
+          Prompt Final Concatenado ([SujetoIA] + [Camara] + [Iluminacion] + [Color]):
+        </span>
+        <code style={{ fontSize: '0.85em', color: '#34d399', wordBreak: 'break-word' }}>
+          {buildFinalPrompt() || '(Ingresa un concepto base para ver el prompt ensamblado...)'}
+        </code>
+      </div>
+
+      {/* BOTÓN GENERAR IMAGEN */}
       <button 
-        onClick={handleGenerate} 
-        disabled={loading || !data.conceptoBase}
+        type="button"
+        onClick={handleGenerateImagen} 
+        disabled={loadingImagen || (!data.conceptoBase && !data.sujetoIA)}
         style={{
-          width: '100%', padding: '14px', marginTop: '8px', cursor: loading || !data.conceptoBase ? 'not-allowed' : 'pointer',
-          backgroundColor: loading ? '#444' : (data.conceptoBase ? '#2563eb' : '#374151'), 
-          color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', fontSize: '1.05em',
-          transition: 'background-color 0.2s'
+          width: '100%', 
+          padding: '14px', 
+          cursor: loadingImagen || (!data.conceptoBase && !data.sujetoIA) ? 'not-allowed' : 'pointer',
+          backgroundColor: loadingImagen ? '#444' : ((data.conceptoBase || data.sujetoIA) ? '#2563eb' : '#374151'), 
+          color: 'white', 
+          border: 'none', 
+          borderRadius: '6px', 
+          fontWeight: 'bold', 
+          fontSize: '1.05em',
+          transition: 'background-color 0.2s',
         }}
       >
-        {loading ? '🎨 Ensamblando imagen en Nano Banana...' : '🚀 Generar Previsualización Definitiva'}
+        {loadingImagen ? '🎨 Generando imagen en Nano Banana...' : '🚀 Generar Previsualización Definitiva'}
       </button>
 
       {error && (
-        <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#7f1d1d', borderRadius: '4px', color: 'white' }}>
-          <strong>Error Crítico:</strong> {error}
+        <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#7f1d1d', borderRadius: '4px', color: 'white', fontSize: '0.9em' }}>
+          <strong>Error:</strong> {error}
         </div>
       )}
 
       {data.imagenBase64 && (
         <div style={{ marginTop: '24px' }}>
-          <h4 style={{ marginBottom: '12px', color: '#9ca3af', borderBottom: '1px solid #333', paddingBottom: '8px' }}>VISTA PREVIA DEL ESTILO:</h4>
-          <img src={data.imagenBase64} alt="Preview" style={{ width: '100%', borderRadius: '8px', border: '1px solid #444', marginBottom: '16px', boxShadow: '0 4px 6px rgba(0,0,0,0.3)' }} />
+          <h4 style={{ marginBottom: '12px', color: '#9ca3af', borderBottom: '1px solid #333', paddingBottom: '8px' }}>
+            VISTA PREVIA DEL ESTILO:
+          </h4>
+          <img 
+            src={data.imagenBase64} 
+            alt="Preview" 
+            style={{ width: '100%', borderRadius: '8px', border: '1px solid #444', marginBottom: '16px', boxShadow: '0 4px 6px rgba(0,0,0,0.3)' }} 
+          />
           <a
             href={data.imagenBase64}
             download={`estilo-tgp-${data.conceptoBase ? data.conceptoBase.slice(0, 15).replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'generado'}.jpg`}
@@ -222,10 +324,8 @@ export function ProbadorArteTGP({ value, onChange }: any) {
               color: 'white', 
               borderRadius: '6px', 
               fontWeight: 'bold',
-              transition: 'background-color 0.2s'
+              transition: 'background-color 0.2s',
             }}
-            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#059669')}
-            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#10b981')}
           >
             ⬇️ Descargar a mi equipo
           </a>

@@ -48,7 +48,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
                 <Image 
                   src={optimizedImg} 
                   alt={essay.data.title || ""} 
-                  class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000 group-hover:scale-105" 
+                  class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-1000 group-hover:scale-105" 
                 />
               )}
               <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 via-transparent to-transparent opacity-60"></div>

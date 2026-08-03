@@ -1,7 +1,12 @@
 {
   "nombre": "concepto",
-  "formatoCamara": "Epic historical cinematography, anamorphic lens.",
-  "iluminacion": "Dawn lighting, heavy volumetric morning mist obscuring the background.",
-  "colorTextura": "Cool cinematic color grading, highly detailed period-accurate environment.",
-  "descripcionEstetica": "Hyper-realistic human presence, immersive and solemn atmosphere."
+  "constructorEstilo": {
+    "conceptoBase": "",
+    "lineaEditorial": "concepto",
+    "camara": "Avant-garde cinematic surrealism, medium format portrait orientation.",
+    "iluminacion": "Volumetric lighting piercing through ethereal geometric fog, deep dramatic contrast.",
+    "color": "Bleach bypass film process look (desaturated but high contrast), solemn muted tones, earthy monochrome spectrum.",
+    "estetica": "Visual metaphor, philosophical weight, hyper-detailed conceptual environment, monumental atmosphere, sharp focus on symbolic elements.",
+    "imagenBase64": ""
+  }
 }

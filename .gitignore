@@ -12,20 +12,26 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-
-# environment variables
+# environment variables & secrets
 .env
 .env.local
 .env.development
 .env.production
+.env.staging
+.env.test
 .env.*
+*.env
 
 # local history and IDE settings
 .history/
 .vscode/
-
-# macOS-specific files
-.DS_Store
-
-# jetbrains setting folder
 .idea/
+
+# temporary, scratch and backups
+scratch/
+api_backup_local/
+models_list.json
+
+# OS files
+.DS_Store
+Thumbs.db

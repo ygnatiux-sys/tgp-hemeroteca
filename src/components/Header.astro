@@ -3,7 +3,7 @@
 ---
 
 <header class="fixed top-0 w-full z-100 bg-black/60 backdrop-blur-xl border-b border-white/5 transition-all duration-700">
-  <div class="max-w-7xl mx-auto px-6 md:px-12 py-5 flex justify-between items-center">
+  <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 py-4 flex justify-between items-center">
     <div class="flex items-center gap-6">
       <a href="/" class="group flex flex-row items-center gap-3">
         <div class="brand-element w-8 h-8 rounded-full border border-white/20 flex items-center justify-center overflow-hidden group-hover:border-[#C8A98B]/50 transition-all duration-700 opacity-0 blur-md translate-y-2">
@@ -24,11 +24,12 @@
       </div>
     </div>
     
-    <nav class="flex items-center gap-8">
-      <a href="/" class="font-mono text-[9px] uppercase tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Inicio</a>
-      <a href="/manifiesto" class="font-mono text-[9px] uppercase tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Manifiesto</a>
-      <a href="/archivo" class="font-mono text-[9px] uppercase tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Archivo</a>
-      <a href="/codice" class="px-4 py-2 border border-white/10 rounded-full font-mono text-[9px] uppercase tracking-[0.3em] text-white/80 hover:text-white hover:border-white/30 transition-all duration-500 bg-white/5">El Códice</a>
+    <nav class="flex items-center gap-3 sm:gap-6 md:gap-8 shrink-0">
+      <a href="/" class="hidden sm:inline-block font-mono text-[9px] uppercase tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Inicio</a>
+      <a href="/colecciones" class="font-mono text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Colecciones</a>
+      <a href="/archivo" class="font-mono text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Archivo</a>
+      <a href="/manifiesto" class="font-mono text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Manifiesto</a>
+      <a href="/codice" class="px-3 sm:px-4 py-1 sm:py-2 border border-white/10 rounded-full font-mono text-[8px] sm:text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/80 hover:text-white hover:border-white/30 transition-all duration-500 bg-white/5 whitespace-nowrap">El Códice</a>
     </nav>
   </div>
 </header>
@@ -40,7 +41,7 @@
       setTimeout(() => {
         el.classList.remove('opacity-0', 'blur-md', 'translate-y-2');
         el.classList.add('opacity-100', 'blur-0', 'translate-y-0');
-      }, index * 500 + 500);
+      }, index * 400 + 400);
     });
   };
 
@@ -50,6 +51,6 @@
 
 <style>
   .brand-element {
-    transition: all 3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: all 2.5s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 </style>

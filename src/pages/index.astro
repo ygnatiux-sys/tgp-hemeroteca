@@ -2,232 +2,474 @@
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import { Image } from 'astro:assets';
+import SpotifyIcon from '../components/icons/Spotify.astro';
+import YouTubeIcon from '../components/icons/YouTube.astro';
+import {
+  getPublishableEssays,
+  groupByCategory,
+  formatCategory,
+  formatDate,
+  formatYear,
+  normalizeCategory,
+} from '../lib/content-filter';
 
-// Resolvemos todos los ensayos vía Content Collections
-const allEssaysRaw = await getCollection('ensayos')
-  .then(entries => import.meta.env.PROD ? entries.filter(e => !e.data.draft) : entries)
-  .catch(err => {
-    console.error("❌ [ZOD VALIDATION ERROR]: Falló la carga de la colección.", err);
-    return [];
-  });
-
-// Glob dynamics for images
-const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}');
-
-// Transformamos los datos
-const ensayos = allEssaysRaw.map(item => ({
-  slug: item.id.replace(/\/index$/, ''),
-  entry: item.data
-}));
-
-const sortedEssays = ensayos.sort((a, b) => {
-  return new Date(b.entry.date || 0).getTime() - new Date(a.entry.date || 0).getTime();
+// ─── CARGA Y FILTRADO CENTRALIZADO ───────────────────────────────────────────
+const allEssaysRaw = await getCollection('ensayos').catch(err => {
+  console.error("❌ [INDEX] Falló carga de ensayos:", err);
+  return [];
 });
 
-const latestEssay = sortedEssays[0];
-const archivedEssays = sortedEssays.slice(1);
+const isProd = import.meta.env.PROD;
+const publishable = getPublishableEssays(allEssaysRaw, isProd);
 
-// Resolve latest essay cover
-let latestCoverImageMetadata = null;
-if (latestEssay?.entry.coverImage && images[latestEssay.entry.coverImage]) {
-  try {
-    const { default: metadata } = await images[latestEssay.entry.coverImage]();
-    latestCoverImageMetadata = metadata;
-  } catch (err) {
-    console.error(`[ERROR] Falló carga de imagen para ${latestEssay.slug}:`, err);
+// ─── SEGMENTACIÓN EDITORIAL (sin repeticiones) ────────────────────────────────
+const heroEssay    = publishable[0] ?? null;
+const leadStory    = publishable[1] ?? null;
+const secondaryA   = publishable[2] ?? null;
+const secondaryB   = publishable[3] ?? null;
+const recentEssays = publishable.slice(4, 10);           // 4–6 artículos
+const archiveRows  = publishable.slice(10, 20);          // índice compacto (§5.5)
+
+// ─── COLECCIONES DESTACADAS (§5.4) ────────────────────────────────────────────
+// Solo categorías con ≥ 2 artículos publicables. Sin inventar descripciones.
+const categoryGroups = groupByCategory(publishable, 2);
+const collections = Array.from(categoryGroups.entries())
+  .map(([key, essays]) => ({
+    key,
+    label: formatCategory(essays[0].entry.category),
+    count: essays.length,
+    coverEssay: essays[0],
+  }))
+  .slice(0, 4); // máx 4 colecciones en portada
+
+// ─── IMAGEN HERO OBJECT-POSITION ──────────────────────────────────────────────
+const heroImagePosition = (heroEssay?.entry as any)?.coverImagePosition
+  || (heroEssay?.entry as any)?.imagePosition
+  || 'center center';
+const heroOrigin = (heroEssay?.entry as any)?.heroOrigin
+  || (heroEssay?.entry as any)?.transformOrigin
+  || 'center center';
+
+// ─── CARGA DE IMÁGENES ────────────────────────────────────────────────────────
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}'
+);
+
+const getImg = async (path: string | null | undefined) => {
+  if (path && images[path]) {
+    try { return (await images[path]()).default; } catch {}
   }
-}
+  return null;
+};
 
-// Resolve archived essays covers
-const resolvedArchivedEssays = await Promise.all(
-  archivedEssays.map(async (essay) => {
-    let coverImageMetadata = null;
-    if (essay.entry.coverImage && images[essay.entry.coverImage]) {
-      try {
-        const { default: metadata } = await images[essay.entry.coverImage]();
-        coverImageMetadata = metadata;
-      } catch (e) {
-        console.warn(`[WARN] Imagen no encontrada para ${essay.slug}`);
-      }
-    }
-    return { ...essay, coverImageMetadata };
-  })
+const heroImage  = await getImg(heroEssay?.entry.coverImage);
+const leadImage  = await getImg(leadStory?.entry.coverImage);
+const secAImage  = await getImg(secondaryA?.entry.coverImage);
+const secBImage  = await getImg(secondaryB?.entry.coverImage);
+
+const resolvedRecent = await Promise.all(
+  recentEssays.map(async e => ({ ...e, img: await getImg(e.entry.coverImage) }))
+);
+
+const resolvedCollections = await Promise.all(
+  collections.map(async c => ({
+    ...c,
+    img: await getImg(c.coverEssay.entry.coverImage),
+  }))
 );
 ---
 
-<Layout title="Hemeroteca TGP - Editorial de Alta Gama">
-  
-  {/* 1. Hero Full-Bleed Inmersivo */}
-  {latestEssay ? (
-    <section class="hero-home relative min-h-screen flex items-end pb-32 px-6 md:px-12 lg:px-24 overflow-hidden">
-      {/* Background Full-Bleed con Parallax Sutil */}
-      <div class="absolute inset-0 z-0 bg-theme-dark overflow-hidden">
-        {latestCoverImageMetadata ? (
-          <Image 
-            src={latestCoverImageMetadata} 
-            alt={`Portada de ${latestEssay.entry.title}`}
-            class="w-full h-full object-cover opacity-60 animate-ken-burns scale-110"
-          />
-        ) : (
-          <div class="w-full h-full bg-white/5 animate-ken-burns"></div>
-        )}
-        {/* Overlay de Degradado para Legibilidad */}
-        <div class="absolute inset-0 bg-linear-to-t from-theme-dark via-theme-dark/40 to-transparent"></div>
-      </div>
-      
-      <div class="relative z-10 w-full max-w-5xl">
-        <div class="hero-content flex flex-col gap-8">
-          {/* Metadatos en Monospace */}
-          <div class="reveal-item flex items-center gap-4 font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B]">
-            <span>[ Dossier Destacado ]</span>
-            <span class="opacity-30">—</span>
-            <span>{latestEssay.entry.category}</span>
-            <span class="opacity-30">—</span>
-            <span>{latestEssay.entry.date ? new Date(latestEssay.entry.date).getFullYear() : 'S/F'}</span>
-          </div>
+<Layout title="Hemeroteca TGP - Editorial & Cartografía Epistémica">
+  <div class="w-full bg-theme-dark text-[#F5F5F7] pb-20">
 
-          {/* Título Monumental Serif con Efecto Revelado Global */}
-          <h1 class="text-6xl md:text-8xl lg:text-9xl font-serif leading-[0.9] tracking-tighter antialiased">
-            {latestEssay.entry.title}
-          </h1>
+    {/* ═══════════════════════════════════════════════════════════════════════
+        BLOQUE 1: HERO CINEMATOGRÁFICO FULL-BLEED
+        Mapeo: sortedPublishable[0]
+    ═══════════════════════════════════════════════════════════════════════ */}
+    {heroEssay && (
+      <section
+        class="hero-home relative w-full h-[74svh] md:h-[65vh] lg:h-[78vh] min-h-130 flex flex-col justify-end pb-12 md:pb-16 lg:pb-20 px-6 md:px-12 lg:px-24 overflow-hidden border-b border-white/10"
+        style={`--hero-origin: ${heroOrigin};`}
+      >
+        {/* Background full-bleed con reverse Ken Burns */}
+        <div class="absolute inset-0 z-0 bg-theme-dark overflow-hidden pointer-events-none">
+          {heroImage ? (
+            <Image
+              src={heroImage}
+              alt={`Portada de ${heroEssay.entry.title}`}
+              class="w-full h-full object-cover opacity-90 hero-reverse-ken-burns"
+              style={`object-position: ${heroImagePosition}; transform-origin: ${heroOrigin};`}
+            />
+          ) : (
+            <div class="w-full h-full bg-white/5 opacity-40 hero-reverse-ken-burns" />
+          )}
+          <div class="absolute inset-0 bg-linear-to-t from-theme-dark via-theme-dark/50 to-transparent pointer-events-none z-0" />
+          <div class="absolute inset-0 bg-radial-[ellipse_85%_65%_at_15%_100%] from-theme-dark/90 via-theme-dark/35 to-transparent pointer-events-none z-0" />
+        </div>
 
-          {/* CTA Button Minimalista */}
-          <div class="reveal-item mt-8">
-            <a 
-              href={`/hemeroteca/${latestEssay.slug}`} 
-              class="group inline-flex items-center gap-6 border border-white/20 bg-white/5 backdrop-blur-sm px-10 py-5 rounded-full hover:bg-[#C8A98B] hover:border-[#C8A98B] hover:text-theme-dark transition-all duration-700"
-            >
-              <span class="font-mono text-[10px] uppercase tracking-[0.3em] font-bold">Leer Investigación</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform duration-500"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
+        <div class="relative z-10 w-full max-w-5xl">
+          <div class="hero-content flex flex-col gap-4">
+            <div class="reveal-item flex items-center gap-3 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-[#C8A98B]">
+              <span class="px-2.5 py-0.5 bg-white/10 backdrop-blur-md rounded-full border border-white/10 text-white font-bold text-[9px]">Destacado</span>
+              <span class="opacity-40">•</span>
+              <span>{formatCategory(heroEssay.entry.category)}</span>
+              <span class="opacity-40">•</span>
+              <span class="text-white/60">{formatYear(heroEssay.entry.date)}</span>
+            </div>
+
+            <h1 class="text-[clamp(3.25rem,7.5vw,8.5rem)] leading-[0.98] font-serif tracking-tight antialiased max-w-5xl pt-1 pb-2 bg-linear-to-b from-white via-white/95 to-white/70 bg-clip-text text-transparent drop-shadow-2xl">
+              {heroEssay.entry.title}
+            </h1>
+
+            {heroEssay.entry.excerpt && (
+              <p class="font-serif text-base md:text-lg lg:text-xl text-white/80 leading-relaxed max-w-2xl lg:max-w-3xl line-clamp-2 italic">
+                "{heroEssay.entry.excerpt}"
+              </p>
+            )}
+
+            <div class="reveal-item mt-2">
+              <a
+                href={`/hemeroteca/${heroEssay.slug}`}
+                class="group inline-flex items-center gap-4 border border-white/20 bg-white/10 backdrop-blur-md px-7 py-3.5 rounded-full hover:bg-[#C8A98B] hover:border-[#C8A98B] hover:text-theme-dark transition-all duration-500"
+              >
+                <span class="font-mono text-[10px] uppercase tracking-[0.3em] font-bold">Leer Investigación</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform duration-300"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-  ) : (
-    <section class="h-screen flex items-center justify-center">
-      <h1 class="font-serif text-4xl opacity-50 tracking-widest uppercase">Hemeroteca en Preparación</h1>
-    </section>
-  )}
+      </section>
+    )}
 
-  {/* 2. Editorial Grid Asimétrico (American Archaeology Style) */}
-  {resolvedArchivedEssays.length > 0 && (
-    <section class="max-w-7xl mx-auto px-6 lg:px-12 py-32 pb-48">
-      <div class="reveal-item flex flex-col gap-4 mb-16">
-        <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B]">Archivo Hemeroteca</span>
-        <h2 class="text-4xl md:text-5xl font-serif">Investigaciones en el Tiempo</h2>
-      </div>
+    <div class="container-editorial max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-20 md:gap-28 pt-16 md:pt-24">
 
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16">
-        {resolvedArchivedEssays.map(({ slug, entry, coverImageMetadata }, index) => {
-          // Lógica de Jerarquía de Grid
-          let gridClass = "md:col-span-4"; // Default (Base Grid)
-          let imageAspect = "aspect-square";
-          let showExcerpt = false;
-          let titleClass = "text-2xl";
+      {/* ═══════════════════════════════════════════════════════════════════
+          BLOQUE 2: TRES HISTORIAS PRINCIPALES
+          Mapeo: [1] lead (8 cols) + [2] secA + [3] secB (4 cols apiladas)
+      ═══════════════════════════════════════════════════════════════════ */}
+      {(leadStory || secondaryA) && (
+        <section class="flex flex-col gap-8">
+          <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
+            <div>
+              <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-1">Dossieres Seleccionados</span>
+              <h2 class="text-3xl md:text-5xl font-serif">Historias Fundamentales</h2>
+            </div>
+            <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40">Perspectivas Cruciales</span>
+          </div>
 
-          if (index === 0) {
-            gridClass = "md:col-span-12";
-            imageAspect = "aspect-video md:aspect-[21/9]";
-            showExcerpt = true;
-            titleClass = "text-4xl md:text-6xl";
-          } else if (index === 1 || index === 2) {
-            gridClass = "md:col-span-6";
-            imageAspect = "aspect-4/3";
-            titleClass = "text-3xl";
-          }
-
-          return (
-            <a href={`/hemeroteca/${slug}`} class={`group flex flex-col gap-6 ${gridClass}`}>
-              <div class={`overflow-hidden rounded-sm bg-white/5 relative ${imageAspect}`}>
-                {coverImageMetadata ? (
-                  <Image 
-                    src={coverImageMetadata} 
-                    alt={entry.title || ""}
-                    class="object-cover w-full h-full grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000 ease-cinematic"
-                  />
-                ) : (
-                  <div class="w-full h-full bg-white/5"></div>
-                )}
-                <div class="absolute inset-0 bg-linear-to-t from-theme-dark/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-              </div>
-
-              <div class="flex flex-col gap-4">
-                <div class="flex items-center gap-4 font-mono text-[9px] text-[#C8A98B] tracking-[0.2em] uppercase">
-                  <span>{entry.category}</span>
-                  <span class="opacity-20">/</span>
-                  <span class="opacity-60">{entry.date ? new Date(entry.date).toLocaleDateString('es-ES', { year: 'numeric' }) : 'S/F'}</span>
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            {/* Historia Principal: 8 cols */}
+            {leadStory && (
+              <article class="lg:col-span-8 group flex flex-col justify-between bg-white/5 border border-white/10 rounded-xl overflow-hidden p-6 md:p-8 hover:border-[#C8A98B]/50 transition-all duration-500">
+                <div class="flex flex-col gap-6">
+                  {leadImage && (
+                    <div class="overflow-hidden rounded-lg bg-black/40 aspect-video relative">
+                      <Image src={leadImage} alt={leadStory.entry.title || "Historia"} class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                      <div class="absolute inset-0 bg-linear-to-t from-theme-dark/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                    </div>
+                  )}
+                  <div class="flex items-center gap-3 font-mono text-[9px] text-[#C8A98B] tracking-[0.2em] uppercase">
+                    <span class="px-2.5 py-0.5 bg-white/10 rounded-full border border-white/10">{formatCategory(leadStory.entry.category)}</span>
+                    <span class="opacity-30">•</span>
+                    <span class="text-white/40">{formatDate(leadStory.entry.date)}</span>
+                  </div>
+                  <h3 class="text-2xl md:text-4xl font-serif leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
+                    <a href={`/hemeroteca/${leadStory.slug}`} class="hover:underline">{leadStory.entry.title}</a>
+                  </h3>
+                  {leadStory.entry.excerpt && (
+                    <p class="font-serif text-white/70 text-base md:text-lg leading-relaxed line-clamp-3 italic">"{leadStory.entry.excerpt}"</p>
+                  )}
                 </div>
-
-                <h3 class={`${titleClass} font-serif group-hover:text-white transition-colors duration-500 leading-tight`}>
-                  {entry.title}
-                </h3>
-
-                {showExcerpt && entry.excerpt && (
-                  <p class="text-white/50 font-serif text-lg leading-relaxed max-w-3xl line-clamp-3">
-                    {entry.excerpt}
-                  </p>
-                )}
-                
-                <div class="mt-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-700 text-[#C8A98B] font-mono text-[10px] uppercase tracking-widest">
-                  <span>Explorar Dossier</span>
-                  <span>→</span>
+                <div class="mt-8 pt-4 border-t border-white/5 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
+                  <a href={`/hemeroteca/${leadStory.slug}`} class="inline-flex items-center gap-2 hover:text-[#C8A98B] transition-colors">Explorar Dossier →</a>
+                  {(leadStory.entry.spotifyLink || leadStory.entry.youtubeLink) && (
+                    <div class="flex items-center gap-3">
+                      {leadStory.entry.spotifyLink && <a href={leadStory.entry.spotifyLink} target="_blank" rel="noopener noreferrer" class="opacity-40 hover:opacity-100 hover:text-[#C8A98B] transition-all"><SpotifyIcon class="w-3.5 h-3.5" /></a>}
+                      {leadStory.entry.youtubeLink && <a href={leadStory.entry.youtubeLink} target="_blank" rel="noopener noreferrer" class="opacity-40 hover:opacity-100 hover:text-[#C8A98B] transition-all"><YouTubeIcon class="w-3.5 h-3.5" /></a>}
+                    </div>
+                  )}
                 </div>
-              </div>
+              </article>
+            )}
+
+            {/* Secundarias: 4 cols apiladas */}
+            <div class="lg:col-span-4 flex flex-col gap-8 justify-between">
+              {secondaryA && (
+                <article class="group flex-1 flex flex-col justify-between bg-white/5 border border-white/10 rounded-xl overflow-hidden p-6 hover:border-[#C8A98B]/50 transition-all duration-500">
+                  <div class="flex flex-col gap-4">
+                    {secAImage && (
+                      <div class="overflow-hidden rounded-lg bg-black/40 aspect-video relative">
+                        <Image src={secAImage} alt={secondaryA.entry.title || "Historia"} class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                      </div>
+                    )}
+                    <div class="flex items-center gap-3 font-mono text-[9px] text-[#C8A98B] tracking-[0.2em] uppercase">
+                      <span>{formatCategory(secondaryA.entry.category)}</span>
+                      <span class="opacity-30">•</span>
+                      <span class="text-white/40">{formatDate(secondaryA.entry.date)}</span>
+                    </div>
+                    <h3 class="text-xl md:text-2xl font-serif leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
+                      <a href={`/hemeroteca/${secondaryA.slug}`} class="hover:underline">{secondaryA.entry.title}</a>
+                    </h3>
+                    {secondaryA.entry.excerpt && (
+                      <p class="font-serif text-white/60 text-sm leading-relaxed line-clamp-2 italic">"{secondaryA.entry.excerpt}"</p>
+                    )}
+                  </div>
+                  <div class="mt-6 pt-4 border-t border-white/5 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
+                    <a href={`/hemeroteca/${secondaryA.slug}`} class="hover:text-[#C8A98B] transition-colors">Explorar →</a>
+                  </div>
+                </article>
+              )}
+              {secondaryB && (
+                <article class="group flex-1 flex flex-col justify-between bg-white/5 border border-white/10 rounded-xl overflow-hidden p-6 hover:border-[#C8A98B]/50 transition-all duration-500">
+                  <div class="flex flex-col gap-4">
+                    {secBImage && (
+                      <div class="overflow-hidden rounded-lg bg-black/40 aspect-video relative">
+                        <Image src={secBImage} alt={secondaryB.entry.title || "Historia"} class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                      </div>
+                    )}
+                    <div class="flex items-center gap-3 font-mono text-[9px] text-[#C8A98B] tracking-[0.2em] uppercase">
+                      <span>{formatCategory(secondaryB.entry.category)}</span>
+                      <span class="opacity-30">•</span>
+                      <span class="text-white/40">{formatDate(secondaryB.entry.date)}</span>
+                    </div>
+                    <h3 class="text-xl md:text-2xl font-serif leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
+                      <a href={`/hemeroteca/${secondaryB.slug}`} class="hover:underline">{secondaryB.entry.title}</a>
+                    </h3>
+                    {secondaryB.entry.excerpt && (
+                      <p class="font-serif text-white/60 text-sm leading-relaxed line-clamp-2 italic">"{secondaryB.entry.excerpt}"</p>
+                    )}
+                  </div>
+                  <div class="mt-6 pt-4 border-t border-white/5 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
+                    <a href={`/hemeroteca/${secondaryB.slug}`} class="hover:text-[#C8A98B] transition-colors">Explorar →</a>
+                  </div>
+                </article>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          BLOQUE 3: ENSAYOS RECIENTES (tarjetas horizontales)
+          Mapeo: publishable[4..9] (máx 6)
+      ═══════════════════════════════════════════════════════════════════ */}
+      {resolvedRecent.length > 0 && (
+        <section class="flex flex-col gap-8">
+          <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
+            <div>
+              <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-1">Archivo de Ensayos</span>
+              <h2 class="text-3xl md:text-5xl font-serif">Ensayos Recientes</h2>
+            </div>
+            <a href="/archivo" class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-[#C8A98B] transition-colors">
+              Ver Catálogo Completo ({publishable.length}) →
             </a>
-          );
-        })}
-      </div>
-    </section>
-  )}
+          </div>
 
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            {resolvedRecent.map(({ slug, entry, img }) => (
+              <article class="group bg-white/5 border border-white/10 rounded-xl p-5 md:p-6 flex flex-col gap-4 hover:border-[#C8A98B]/50 transition-all duration-500">
+                {/* Horizontal: imagen izq, texto der en md+ */}
+                <div class={img ? "flex flex-col md:flex-row gap-5 items-start" : "flex flex-col gap-3"}>
+                  {img && (
+                    <div class="w-full md:w-2/5 shrink-0 overflow-hidden rounded-lg bg-black/40 aspect-video md:aspect-auto md:h-32 relative">
+                      <Image src={img} alt={entry.title || "Ensayo"} class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    </div>
+                  )}
+                  <div class="flex flex-col gap-2 flex-1 min-w-0">
+                    <div class="flex items-center gap-3 font-mono text-[9px] text-[#C8A98B] tracking-[0.2em] uppercase">
+                      <span>{formatCategory(entry.category)}</span>
+                      <span class="opacity-30">•</span>
+                      <span class="text-white/40">{formatYear(entry.date)}</span>
+                    </div>
+                    <h3 class="text-xl font-serif leading-tight group-hover:text-[#C8A98B] transition-colors duration-300 line-clamp-2">
+                      <a href={`/hemeroteca/${slug}`} class="hover:underline">{entry.title}</a>
+                    </h3>
+                    {entry.excerpt && (
+                      <p class="font-serif text-white/60 text-sm leading-relaxed line-clamp-2 italic">"{entry.excerpt}"</p>
+                    )}
+                  </div>
+                </div>
+                <div class="pt-3 border-t border-white/5 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
+                  <a href={`/hemeroteca/${slug}`} class="hover:text-[#C8A98B] transition-colors">Explorar →</a>
+                  {(entry.spotifyLink || entry.youtubeLink) && (
+                    <div class="flex items-center gap-3">
+                      {entry.spotifyLink && <a href={entry.spotifyLink} target="_blank" rel="noopener noreferrer" class="opacity-40 hover:opacity-100 hover:text-[#C8A98B] transition-all"><SpotifyIcon class="w-3.5 h-3.5" /></a>}
+                      {entry.youtubeLink && <a href={entry.youtubeLink} target="_blank" rel="noopener noreferrer" class="opacity-40 hover:opacity-100 hover:text-[#C8A98B] transition-all"><YouTubeIcon class="w-3.5 h-3.5" /></a>}
+                    </div>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          BLOQUE 4: COLECCIONES DESTACADAS (§5.4)
+          Solo categorías con ≥ 2 artículos publicables. Sin descripciones inventadas.
+      ═══════════════════════════════════════════════════════════════════ */}
+      {resolvedCollections.length > 0 && (
+        <section class="flex flex-col gap-8">
+          <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
+            <div>
+              <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-1">Organización Temática</span>
+              <h2 class="text-3xl md:text-5xl font-serif">Colecciones</h2>
+            </div>
+          </div>
+
+          {/* Mobile: scroll horizontal snapping */}
+          <div class="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
+            {resolvedCollections.map(({ key, label, count, img, coverEssay }) => (
+              <a
+                href={`/archivo?categoria=${encodeURIComponent(key)}`}
+                class="group shrink-0 w-[72vw] sm:w-[55vw] md:w-auto snap-start bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-[#C8A98B]/50 transition-all duration-500 flex flex-col"
+              >
+                {img ? (
+                  <div class="overflow-hidden aspect-video relative">
+                    <Image src={img} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-70 group-hover:opacity-90" />
+                    <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent" />
+                    <div class="absolute bottom-0 left-0 p-4">
+                      <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-[#C8A98B] mb-1">{count} artículos</p>
+                      <h3 class="font-serif text-lg leading-tight text-white">{label}</h3>
+                    </div>
+                  </div>
+                ) : (
+                  <div class="p-5 flex flex-col gap-2 flex-1">
+                    <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-[#C8A98B]">{count} artículos</p>
+                    <h3 class="font-serif text-lg leading-tight">{label}</h3>
+                  </div>
+                )}
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          BLOQUE 5: ACCESO BREVE AL ARCHIVO (§5.5)
+          Índice compacto: AÑO · CATEGORÍA · TÍTULO
+          Mapeo: publishable[10..19]
+      ═══════════════════════════════════════════════════════════════════ */}
+      {archiveRows.length > 0 && (
+        <section class="flex flex-col gap-6">
+          <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
+            <div>
+              <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-1">Hemeroteca</span>
+              <h2 class="text-3xl md:text-5xl font-serif">Del Archivo</h2>
+            </div>
+            <a href="/archivo" class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-[#C8A98B] transition-colors shrink-0">
+              Ver archivo completo →
+            </a>
+          </div>
+
+          <ol class="flex flex-col divide-y divide-white/5">
+            {archiveRows.map(({ slug, entry }) => (
+              <li>
+                <a
+                  href={`/hemeroteca/${slug}`}
+                  class="group flex items-baseline gap-3 md:gap-6 py-3 md:py-4 hover:text-[#C8A98B] transition-colors duration-300"
+                >
+                  <span class="font-mono text-[10px] text-white/30 tracking-[0.2em] shrink-0 tabular-nums">
+                    {formatYear(entry.date)}
+                  </span>
+                  <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-[#C8A98B]/70 shrink-0 hidden sm:inline">
+                    {formatCategory(entry.category)}
+                  </span>
+                  <span class="font-serif text-sm md:text-base text-white/80 group-hover:text-[#C8A98B] transition-colors leading-snug line-clamp-1 flex-1">
+                    {entry.title}
+                  </span>
+                  <span class="font-mono text-[9px] text-white/20 shrink-0 group-hover:text-[#C8A98B]/50 transition-colors">→</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+
+          <div class="text-center pt-4">
+            <a
+              href="/archivo"
+              class="inline-block font-mono text-[10px] border border-white/10 px-10 py-4 uppercase tracking-[0.3em] text-white/40 hover:bg-white/5 hover:border-[#C8A98B]/50 hover:text-[#C8A98B] transition-all duration-700 rounded-full"
+            >
+              Ver archivo completo ({publishable.length} investigaciones)
+            </a>
+          </div>
+        </section>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          BLOQUE 6: FRANJA AUTORAL — solo en Inicio, al final
+      ═══════════════════════════════════════════════════════════════════ */}
+      <section class="w-full rounded-2xl bg-linear-to-r from-white/5 via-white/10 to-white/5 border border-white/10 p-8 md:p-12 backdrop-blur-md shadow-2xl">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-4 flex flex-col md:flex-row lg:flex-col items-start gap-6">
+            <div class="w-24 h-24 rounded-2xl overflow-hidden border-2 border-[#C8A98B]/40 shrink-0 shadow-xl">
+              <img src="/perfil.webp" alt="Xavier Benítez" class="w-full h-full object-cover" />
+            </div>
+            <div>
+              <span class="font-mono text-[9px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-1">[ Dirección Editorial & Autoría ]</span>
+              <h3 class="font-serif text-3xl md:text-4xl text-white tracking-tight">Xavier Benítez</h3>
+              <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">Investigador & Editor General</p>
+            </div>
+          </div>
+          <div class="lg:col-span-8 flex flex-col gap-4 text-white/80 font-serif text-base md:text-lg leading-relaxed border-t lg:border-t-0 lg:border-l border-white/10 pt-6 lg:pt-0 lg:pl-10">
+            <p>
+              Con <strong>25 años de trayectoria educativa</strong> e investigación en semiótica y tecnología, Xavier Benítez dirige <em>The Great Puzzle Project</em> como una plataforma de investigación independiente, cartografía epistémica y archivo sobre la interacción entre la cultura visual, la memoria histórica y los sistemas de información.
+            </p>
+            <div class="flex flex-wrap items-center gap-6 mt-4 pt-4 border-t border-white/10 font-mono text-[10px] uppercase tracking-[0.2em] text-white/50">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-[#C8A98B]" />
+                <span>Burzaco, Buenos Aires, Argentina</span>
+              </div>
+              <span class="hidden md:inline text-white/20">•</span>
+              <a href="mailto:thegreatpuzzleproject@gmail.com" class="text-[#C8A98B] hover:underline transition-all">
+                thegreatpuzzleproject@gmail.com
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
 </Layout>
 
 <script>
   const setupHomeAnimation = () => {
     const heroHome = document.querySelector('.hero-home');
     if (!heroHome) return;
-
-    const observer = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const h1 = entry.target.querySelector('h1');
           const content = entry.target.querySelector('.hero-content');
-          
           if (h1) h1.classList.add('revealed');
           if (content) {
             content.classList.remove('opacity-0', 'translate-y-8');
             content.classList.add('opacity-100', 'translate-y-0');
           }
-          
           observer.unobserve(entry.target);
         }
       });
     }, { threshold: 0.1 });
-
     observer.observe(heroHome);
   };
-
   document.addEventListener('DOMContentLoaded', setupHomeAnimation);
   document.addEventListener('astro:page-load', setupHomeAnimation);
 </script>
 
 <style>
-  @keyframes kenBurns {
-    0% { transform: scale(1.1); }
-    100% { transform: scale(1.2); }
+  @keyframes reverseKenBurns {
+    0%   { transform: scale(1.06) translateY(1%); }
+    100% { transform: scale(1) translateY(0); }
   }
-
-  .animate-ken-burns {
-    animation: kenBurns 40s ease-out infinite alternate;
+  .hero-reverse-ken-burns {
+    animation: reverseKenBurns 10s cubic-bezier(0.25, 1, 0.5, 1) 1 forwards;
   }
-
   .hero-content {
     transition: all 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
     transition-delay: 0.2s;
   }
-
-  .ease-cinematic {
-    transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+  @media (prefers-reduced-motion: reduce) {
+    .hero-reverse-ken-burns { animation: none !important; transform: none !important; }
+    .hero-content, .reveal-item { transition: none !important; opacity: 1 !important; transform: none !important; }
   }
 </style>

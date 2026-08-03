@@ -1,7 +1,12 @@
 {
   "nombre": "cine",
-  "formatoCamara": "Cinematic wide establishing shot, filmed on Arri Alexa 65.",
-  "iluminacion": "Ancient historical ruins during golden hour, long dramatic shadows, sun flare piercing through cracked stone.",
-  "colorTextura": "Kodak Portra 400 film stock, muted earthy tones.",
-  "descripcionEstetica": "Hyper-realistic architectural depth, tactile realism."
+  "constructorEstilo": {
+    "conceptoBase": "",
+    "lineaEditorial": "cine",
+    "camara": "Cinematic wide establishing sequence, 1970s Panavision anamorphic lens, filmed on Arri Alexa 65.",
+    "iluminacion": "Practical firelight mixed with cool ambient moonlight (dual color lighting), long dramatic shadows.",
+    "color": "Kodak Vision3 500T film stock, visceral muddy textures, subtle chromatic aberration at the edges, anamorphic blue lens flare.",
+    "estetica": "Hyper-realistic historical setting, breathtaking depth of field, solemn and immersive environment, authentic historical grit.",
+    "imagenBase64": ""
+  }
 }

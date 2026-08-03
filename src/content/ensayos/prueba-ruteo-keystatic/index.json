@@ -1,0 +1,13 @@
+{
+  "title": "Prueba de Ruteo Keystatic",
+  "volanta": "Post de verificación del pipeline",
+  "date": "2026-08-02",
+  "category": "Sistema",
+  "themeColor": "british-green",
+  "draft": false,
+  "coverImage": null,
+  "excerpt": "Este post verifica que el pipeline Keystatic → Astro Content Layer → getStaticPaths → renderizado Markdoc funcione correctamente de extremo a extremo.",
+  "generador": "Manual",
+  "generadorTexto": "",
+  "notasInvestigador": "Post de auditoría técnica. Puede eliminarse una vez confirmado el funcionamiento."
+}

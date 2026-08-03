@@ -1,0 +1,222 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import {
+  getPublishableEssays,
+  groupByCategory,
+  formatCategory,
+  normalizeCategory,
+} from '../../lib/content-filter';
+
+// ─── CARGA Y FILTRADO ────────────────────────────────────────────────────────
+const allEssaysRaw = await getCollection('ensayos').catch(() => []);
+const isProd = import.meta.env.PROD;
+const publishable = getPublishableEssays(allEssaysRaw, isProd);
+
+// ─── COLECCIONES CON ≥ 2 ARTÍCULOS ──────────────────────────────────────────
+const categoryGroups = groupByCategory(publishable, 2);
+
+// Convertir a array ordenado por número de artículos (descendente)
+const collections = Array.from(categoryGroups.entries())
+  .map(([key, essays]) => ({
+    key,
+    label: formatCategory(essays[0].entry.category),
+    count: essays.length,
+    essays,
+    coverEssay: essays[0],
+    secondEssay: essays[1] ?? null,
+  }))
+  .sort((a, b) => b.count - a.count);
+
+// La colección con más artículos es la destacada
+const featured = collections[0] ?? null;
+const rest = collections.slice(1);
+
+// ─── IMÁGENES ────────────────────────────────────────────────────────────────
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}'
+);
+const getImg = async (path: string | null | undefined) => {
+  if (path && images[path]) {
+    try { return (await images[path]()).default; } catch {}
+  }
+  return null;
+};
+
+const featuredImg = featured ? await getImg(featured.coverEssay.entry.coverImage) : null;
+
+const resolvedRest = await Promise.all(
+  rest.map(async col => ({
+    ...col,
+    img: await getImg(col.coverEssay.entry.coverImage),
+  }))
+);
+---
+
+<Layout title="Colecciones | The Great Puzzle Project">
+  <div class="bg-theme-dark text-white min-h-screen pt-28 pb-32">
+    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-20">
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          CABECERA
+      ═══════════════════════════════════════════════════════════════════ */}
+      <header class="border-l border-[#C8A98B]/40 pl-6 md:pl-10">
+        <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-2">The Great Puzzle Project</span>
+        <h1 class="text-5xl md:text-6xl lg:text-7xl font-serif tracking-tighter leading-none">Colecciones</h1>
+        <div class="reveal-item flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 mt-4">
+          <p class="font-mono text-[10px] uppercase tracking-[0.3em] opacity-50">Organización temática del archivo</p>
+          <div class="h-px w-16 bg-white/10 hidden sm:block" />
+          <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-[#C8A98B]">
+            {collections.length} {collections.length === 1 ? 'colección' : 'colecciones'}
+          </p>
+        </div>
+      </header>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          COLECCIÓN DESTACADA (la de mayor número de artículos)
+          Desktop: imagen 7–8 cols / texto 4–5 cols
+      ═══════════════════════════════════════════════════════════════════ */}
+      {featured && (
+        <section class="flex flex-col gap-6">
+          <div class="reveal-item border-b border-white/10 pb-4">
+            <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B]">Colección Destacada</span>
+          </div>
+
+          <a
+            href={`/colecciones/${encodeURIComponent(featured.key)}`}
+            class="group grid grid-cols-1 lg:grid-cols-12 gap-0 rounded-2xl border border-white/10 overflow-hidden hover:border-[#C8A98B]/40 transition-all duration-500"
+          >
+            {/* Imagen: 7 cols */}
+            <div class="lg:col-span-7 relative overflow-hidden aspect-video lg:aspect-auto min-h-70">
+              {featuredImg ? (
+                <>
+                  <Image
+                    src={featuredImg}
+                    alt={featured.label}
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
+                  />
+                  <div class="absolute inset-0 bg-linear-to-r from-transparent to-theme-dark/60 hidden lg:block pointer-events-none" />
+                  <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent lg:hidden pointer-events-none" />
+                </>
+              ) : (
+                <div class="w-full h-full bg-white/5 flex items-center justify-center">
+                  <span class="font-mono text-[9px] uppercase tracking-[0.3em] text-white/20">Sin imagen</span>
+                </div>
+              )}
+            </div>
+
+            {/* Texto: 5 cols */}
+            <div class="lg:col-span-5 flex flex-col justify-center gap-5 p-8 md:p-10 bg-white/3">
+              <div class="flex flex-col gap-2">
+                <span class="font-mono text-[9px] uppercase tracking-[0.3em] text-[#C8A98B]">
+                  {featured.count} {featured.count === 1 ? 'investigación' : 'investigaciones'}
+                </span>
+                <h2 class="font-serif text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight group-hover:text-[#C8A98B] transition-colors duration-500">
+                  {featured.label}
+                </h2>
+              </div>
+
+              {/* Vista previa de primeros artículos */}
+              <ol class="flex flex-col gap-2 border-t border-white/10 pt-4">
+                {featured.essays.slice(0, 3).map(({ slug, entry }) => (
+                  <li class="flex items-baseline gap-3 font-mono text-[9px] text-white/50">
+                    <span class="text-[#C8A98B]/60 shrink-0">→</span>
+                    <span class="line-clamp-1">{entry.title}</span>
+                  </li>
+                ))}
+                {featured.count > 3 && (
+                  <li class="font-mono text-[9px] text-white/30">
+                    + {featured.count - 3} más
+                  </li>
+                )}
+              </ol>
+
+              <div class="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-white/40 group-hover:text-[#C8A98B] transition-colors duration-300 mt-2">
+                <span>Explorar colección</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform duration-300"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </div>
+            </div>
+          </a>
+        </section>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          GRILLA DE COLECCIONES
+          Desktop: 3 cols / Tablet: 2 cols / Mobile: 1 col
+      ═══════════════════════════════════════════════════════════════════ */}
+      {resolvedRest.length > 0 && (
+        <section class="flex flex-col gap-6">
+          <div class="reveal-item border-b border-white/10 pb-4">
+            <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B]">Todas las Colecciones</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {resolvedRest.map(({ key, label, count, essays, img }) => (
+              <a
+                href={`/colecciones/${encodeURIComponent(key)}`}
+                class="group flex flex-col border border-white/10 rounded-xl overflow-hidden hover:border-[#C8A98B]/40 transition-all duration-500 bg-white/3"
+              >
+                {/* Imagen */}
+                <div class="relative overflow-hidden aspect-video">
+                  {img ? (
+                    <>
+                      <Image
+                        src={img}
+                        alt={label}
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-70 group-hover:opacity-90"
+                      />
+                      <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent pointer-events-none" />
+                    </>
+                  ) : (
+                    <div class="w-full h-full bg-white/5" />
+                  )}
+                </div>
+
+                {/* Info */}
+                <div class="flex flex-col gap-3 p-6">
+                  <div class="flex items-center justify-between">
+                    <h2 class="font-serif text-2xl leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
+                      {label}
+                    </h2>
+                    <span class="font-mono text-[9px] text-[#C8A98B] tracking-[0.2em] shrink-0 ml-4">
+                      {count}
+                    </span>
+                  </div>
+
+                  <ol class="flex flex-col gap-1">
+                    {essays.slice(0, 2).map(({ entry }) => (
+                      <li class="font-mono text-[9px] text-white/40 line-clamp-1">
+                        — {entry.title}
+                      </li>
+                    ))}
+                    {count > 2 && (
+                      <li class="font-mono text-[9px] text-white/25">+ {count - 2} más</li>
+                    )}
+                  </ol>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Fallback si no hay colecciones */}
+      {collections.length === 0 && (
+        <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/30 text-center py-20">
+          No hay colecciones disponibles.
+        </p>
+      )}
+
+    </div>
+  </div>
+
+  <script>
+    const h1 = document.querySelector('h1');
+    if (h1) setTimeout(() => h1.classList.add('revealed'), 200);
+    document.addEventListener('astro:page-load', () => {
+      const h1 = document.querySelector('h1');
+      if (h1) setTimeout(() => h1.classList.add('revealed'), 200);
+    });
+  </script>
+</Layout>

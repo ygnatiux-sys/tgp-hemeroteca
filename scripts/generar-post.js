@@ -1,118 +1,210 @@
+/**
+ * scripts/generar-post.js
+ *
+ * TGP Hemeroteca — CLI Cognitivo de Generación de Ensayos
+ * SDK: @google/genai (moderno)
+ * Modelo texto: gemini-3.1-pro
+ * Modelo imagen: imagen-3.0-generate-001
+ *
+ * Uso: node scripts/generar-post.js
+ */
+
 import 'dotenv/config';
 import { createInterface } from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import fs from "node:fs";
-import path from "node:path";
+import { GoogleGenAI } from '@google/genai';
+import fs from 'node:fs';
+import path from 'node:path';
 
-// Función para crear slugs compatibles con URLs y Keystatic
-const slugify = (text) => text.toString().toLowerCase().trim()
-  .replace(/\s+/g, '-')
-  .replace(/[^\w-]+/g, '')
-  .replace(/--+/g, '-');
+// ─── SLUGIFY CON SOPORTE UNICODE / TILDES ─────────────────────────────────────
+// "Chichén Itzá" → "chichen-itza"
+const slugify = (text) =>
+  text
+    .toString()
+    .normalize('NFD')                         // Descompone diacríticos (á → a + ́)
+    .replace(/[\u0300-\u036f]/g, '')          // Elimina los diacríticos
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')            // Solo letras, números, espacios y guiones
+    .replace(/\s+/g, '-')                     // Espacios → guiones
+    .replace(/-+/g, '-')                      // Guiones múltiples → uno
+    .replace(/^-+|-+$/g, '');                 // Sin guiones al inicio/fin
 
+// ─── MAIN ─────────────────────────────────────────────────────────────────────
 async function main() {
   const rl = createInterface({ input, output });
 
-  console.log('\n🚀 TGP Hemeroteca - Generador de Posts (Motor Cognitivo)\n');
+  console.log('\n╔════════════════════════════════════════════════════╗');
+  console.log('║  TGP Hemeroteca — Motor Cognitivo (gemini-3.1-pro)  ║');
+  console.log('╚════════════════════════════════════════════════════╝\n');
 
   try {
-    // Paso 1: Interactividad en terminal
-    const titulo = await rl.question('¿Cuál es el tema o título del ensayo? ');
-    const respuestaImagen = await rl.question('¿Deseas generar una imagen de portada con IA? (s/n) ');
-    
-    // Cerramos el readline antes de iniciar procesos pesados o de red
+    // ── Paso 1: Input interactivo ──────────────────────────────────────────
+    const titulo = (await rl.question('  📝 Título o tema del ensayo: ')).trim();
+    if (!titulo) throw new Error('El título no puede estar vacío.');
+
+    const categoriaInput = (await rl.question('  🗂  Categoría (ej. Historia, Arqueología) [Ensayo]: ')).trim();
+    const categoria = categoriaInput || 'Ensayo';
+
+    const respuestaImagen = await rl.question('  🎨 ¿Generar imagen de portada? (s/n) [n]: ');
     rl.close();
 
-    const generarIA = respuestaImagen.toLowerCase() === 's';
-    const API_KEY = process.env.GEMINI_API_KEY;
+    const generarImagen = respuestaImagen.toLowerCase() === 's';
 
+    // ── Paso 2: Validar API Key ────────────────────────────────────────────
+    const API_KEY = process.env.GEMINI_API_KEY;
     if (!API_KEY) {
-      throw new Error('La variable GEMINI_API_KEY no se encontró en el archivo .env');
+      throw new Error('GEMINI_API_KEY no encontrada en .env');
     }
 
-    // Paso 2: Conexión con Gemini
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-pro",
-      systemInstruction: 'Eres el motor cognitivo TGP y socio analítico de Xavier Benítez. Tu función es redactar textos orientados al análisis cultural, histórico y filosófico bajo el formato de ensayo argentino contemporáneo. Tono: Dark Academia accesible — preciso, sobrio, agudo. Sin tono casual. Estructura: Apertura con tensión, desarrollo que articule historia/filosofía/simbolismo, y cierre reflexivo universal. Ve directo al núcleo.'
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+    // ── Paso 3: Generar texto con gemini-2.0-flash ─────────────────────────
+    console.log('\n  🧠 Generando ensayo con gemini-3.1-pro...');
+
+    const textResult = await ai.models.generateContent({
+      model: 'gemini-3.1-pro',
+      contents: titulo,
+      config: {
+        systemInstruction:
+          'Eres el motor cognitivo TGP y socio analítico de Xavier Benítez. ' +
+          'Tu función es redactar textos orientados al análisis cultural, histórico y filosófico ' +
+          'bajo el formato de ensayo argentino contemporáneo. ' +
+          'Tono: Dark Academia accesible — preciso, sobrio, agudo. Sin tono casual. ' +
+          'Estructura: Apertura con tensión, desarrollo que articule historia/filosofía/simbolismo, ' +
+          'y cierre reflexivo universal. Ve directo al núcleo. ' +
+          'Usa Markdown para párrafos y encabezados (##, ###). No uses H1.',
+      },
     });
 
-    console.log('\n🧠 Gemini redactando ensayo...');
-    const result = await model.generateContent(titulo);
-    const content = result.response.text();
+    const textoEnsayo = textResult.text;
+    if (!textoEnsayo || textoEnsayo.length < 100) {
+      throw new Error('El texto generado está vacío o es demasiado corto.');
+    }
 
-    let imagePath = null;
+    // ── Paso 4: Preparar rutas ─────────────────────────────────────────────
     const slug = slugify(titulo);
-    const folderPath = path.join(process.cwd(), 'src/content/ensayos', slug);
-    const assetsPath = path.join(process.cwd(), 'src/assets/ensayos');
+    if (!slug) throw new Error(`No se pudo generar un slug válido para: "${titulo}"`);
 
-    // Paso 3: Generación de Imagen (opcional)
-    if (generarIA) {
-      console.log('🎨 Generando arte conceptual (Imagen 3)...');
+    const folderPath = path.join(process.cwd(), 'src/content/ensayos', slug);
+    const assetsPath = path.join(process.cwd(), 'src/assets/ensayos', slug);
+
+    if (fs.existsSync(folderPath)) {
+      throw new Error(`Ya existe un post con el slug "${slug}". Elige un título diferente.`);
+    }
+
+    // ── Paso 5: Generar imagen (opcional) ────────────────────────────────
+    let coverImage = null;
+
+    if (generarImagen) {
+      console.log('  🖼  Generando portada con imagen-3.0-generate-001...');
       try {
-        const imagePrompt = `A high-end, conceptual Dark Academia style visual representation of: ${titulo}. Cinematic lighting, moody atmosphere, archival texture, deep shadows, intellectual and historical symbolism.`;
-        
-        const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${API_KEY}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            instances: [{ prompt: imagePrompt }],
-            parameters: { sampleCount: 1 }
-          })
-        });
+        const imagePrompt =
+          `Cinematic, dark academia editorial photography. Concept: ${titulo}. ` +
+          `Category: ${categoria}. Moody atmosphere, archival textures, deep shadows, ` +
+          `historical symbolism. No text, no people, no fantasy elements. ` +
+          `Restrained color palette, fine grain, high detail.`;
+
+        const imageResponse = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${API_KEY}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              instances: [{ prompt: imagePrompt }],
+              parameters: { sampleCount: 1, aspectRatio: '16:9' },
+            }),
+          }
+        );
 
         const imageData = await imageResponse.json();
-        
-        if (imageData.predictions && imageData.predictions[0].bytesBase64Encoded) {
+
+        if (imageData?.predictions?.[0]?.bytesBase64Encoded) {
           const buffer = Buffer.from(imageData.predictions[0].bytesBase64Encoded, 'base64');
-          const fileName = `${slug}.jpg`;
-          const fullImagePath = path.join(assetsPath, fileName);
-          
+          const fileName = 'coverImage.jpg';
+
           if (!fs.existsSync(assetsPath)) fs.mkdirSync(assetsPath, { recursive: true });
-          fs.writeFileSync(fullImagePath, buffer);
-          
-          imagePath = `/src/assets/ensayos/${fileName}`;
-          console.log(`✅ Imagen guardada: ${imagePath}`);
+          fs.writeFileSync(path.join(assetsPath, fileName), buffer);
+
+          coverImage = `/src/assets/ensayos/${slug}/${fileName}`;
+          console.log(`  ✅ Portada guardada: ${coverImage}`);
+        } else {
+          console.warn('  ⚠️  La API de imagen no devolvió datos. Continuando sin portada.');
+          if (imageData?.error) {
+            console.warn('     Error API:', imageData.error.message || JSON.stringify(imageData.error));
+          }
         }
       } catch (imgErr) {
-        console.warn('⚠️ Error al generar imagen, continuando solo con texto:', imgErr.message);
+        console.warn('  ⚠️  Error generando imagen:', imgErr.message);
       }
     }
 
-    // Paso 4: Guardado en formato Keystatic (JSON + Markdoc)
-    console.log('💾 Persistiendo archivos en el sistema...');
-    
-    if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
+    // ── Paso 6: Construir excerpt desde el texto ───────────────────────────
+    // Tomar el primer párrafo de texto plano (sin # ni **)
+    const excerptRaw = textoEnsayo
+      .split('\n')
+      .map(l => l.trim())
+      .find(l => l.length > 40 && !l.startsWith('#') && !l.startsWith('*') && !l.startsWith('-'));
+    const excerpt = excerptRaw
+      ? excerptRaw.replace(/\*\*/g, '').substring(0, 200) + (excerptRaw.length > 200 ? '...' : '')
+      : '';
 
+    // ── Paso 7: Escribir archivos atómicamente ────────────────────────────
+    console.log('  💾 Escribiendo archivos...');
+    fs.mkdirSync(folderPath, { recursive: true });
+
+    // index.json — metadatos (lo que lee Astro Content Layer y Keystatic)
     const metadata = {
       title: titulo,
+      volanta: '',
       date: new Date().toISOString().split('T')[0],
-      category: "Ensayo IA",
-      themeColor: "british-green",
-      draft: true,
-      coverImage: imagePath,
+      category: categoria,
+      themeColor: 'british-green',
+      draft: true,                              // Siempre empieza como borrador
+      coverImage: coverImage,
       videoBg: null,
-      excerpt: content.split('\n')[0].substring(0, 150) + "..."
+      excerpt,
+      generador: 'gemini-3.1-pro',
+      generadorTexto: textoEnsayo,             // El texto completo en el campo tipado
+      generadorImagen: '',
+      notasInvestigador: '',
+      spotifyLink: null,
+      youtubeLink: null,
     };
 
-    // Archivo de metadata
-    fs.writeFileSync(path.join(folderPath, 'index.json'), JSON.stringify(metadata, null, 2));
-    
-    // Archivo de contenido (Keystatic Markdoc)
-    fs.writeFileSync(path.join(folderPath, 'content.mdoc'), content);
+    fs.writeFileSync(
+      path.join(folderPath, 'index.json'),
+      JSON.stringify(metadata, null, 2),
+      'utf-8'
+    );
 
-    console.log('\n-----------------------------------------');
-    console.log('🎉 ¡PROCESO COMPLETADO!');
-    console.log(` - Título: ${titulo}`);
-    console.log(` - Slug: ${slug}`);
-    console.log(` - Ruta: src/content/ensayos/${slug}`);
-    console.log('-----------------------------------------\n');
+    // content.mdoc — contenido Markdoc (lo lee Keystatic en su editor)
+    fs.writeFileSync(
+      path.join(folderPath, 'content.mdoc'),
+      textoEnsayo,
+      'utf-8'
+    );
+
+    // ── Paso 8: Reporte final ─────────────────────────────────────────────
+    console.log('\n  ╔═══════════════════════════════════════════╗');
+    console.log('  ║           ✅ ENSAYO CREADO                ║');
+    console.log('  ╠═══════════════════════════════════════════╣');
+    console.log(`  ║  Título:   ${titulo.substring(0, 33).padEnd(33)} ║`);
+    console.log(`  ║  Slug:     ${slug.substring(0, 33).padEnd(33)} ║`);
+    console.log(`  ║  Categoría: ${categoria.substring(0, 32).padEnd(32)} ║`);
+    console.log(`  ║  Portada:  ${(coverImage ? '✓ Generada' : '✗ Sin portada').padEnd(33)} ║`);
+    console.log(`  ║  Estado:   BORRADOR (draft: true)          ║`);
+    console.log('  ╠═══════════════════════════════════════════╣');
+    console.log(`  ║  Ruta: src/content/ensayos/${slug.substring(0, 15)}  ║`);
+    console.log('  ╠═══════════════════════════════════════════╣');
+    console.log('  ║  ⚠️  Para publicar: abre Keystatic y       ║');
+    console.log('  ║     desmarca "Borrador" en este ensayo.    ║');
+    console.log('  ╚═══════════════════════════════════════════╝\n');
 
   } catch (error) {
-    console.error('\n❌ ERROR EN EL PROCESO:');
-    console.error(error.message || error);
-    console.log('-----------------------------------------\n');
+    console.error('\n  ❌ ERROR:', error.message || error);
+    console.log('');
+    process.exit(1);
   }
 }
 

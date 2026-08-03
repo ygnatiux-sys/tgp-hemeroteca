@@ -1,143 +1,347 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
-import { Image } from "astro:assets";
+import { Image } from 'astro:assets';
+import SpotifyIcon from '../components/icons/Spotify.astro';
+import YouTubeIcon from '../components/icons/YouTube.astro';
+import {
+  getPublishableEssays,
+  formatCategory,
+  formatDate,
+  formatYear,
+  normalizeCategory,
+} from '../lib/content-filter';
 
-const allEssaysRaw = await getCollection('ensayos').then(entries => 
-  import.meta.env.PROD ? entries.filter(e => !e.data.draft) : entries
-);
-
-const sortedEssays = allEssaysRaw.map(item => ({
-  slug: item.id.replace(/\/index$/, ''),
-  entry: item.data
-})).sort((a, b) => {
-  return new Date(b.entry.date || 0).getTime() - new Date(a.entry.date || 0).getTime();
+// ─── CARGA Y FILTRADO CENTRALIZADO ───────────────────────────────────────────
+const allEssaysRaw = await getCollection('ensayos').catch(err => {
+  console.error("❌ [ARCHIVO] Falló carga de ensayos:", err);
+  return [];
 });
 
-// Mapeo de imágenes
+const isProd = import.meta.env.PROD;
+const publishable = getPublishableEssays(allEssaysRaw, isProd);
+
+// ─── CATEGORÍAS Y AÑOS REALES PARA FILTROS ───────────────────────────────────
+const categories = [...new Set(
+  publishable
+    .map(e => normalizeCategory(e.entry.category))
+    .filter(c => c !== 'ensayo')
+)].sort();
+
+const years = [...new Set(
+  publishable
+    .map(e => e.entry.date ? new Date(e.entry.date).getFullYear().toString() : '')
+    .filter(Boolean)
+)].sort((a, b) => Number(b) - Number(a));
+
+// ─── CARGA DE IMÁGENES ────────────────────────────────────────────────────────
 const images = import.meta.glob<{ default: ImageMetadata }>(
-  "/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}",
+  '/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}'
 );
 
-const getOptimizedImage = async (path: string | null | undefined) => {
+const getImg = async (path: string | null | undefined) => {
   if (path && images[path]) {
-    const mod = await images[path]();
-    return mod.default;
+    try { return (await images[path]()).default; } catch {}
   }
   return null;
 };
 
-// Función para determinar el span de la tarjeta basado en el índice
-const getGridSpan = (index: number) => {
-  if (index === 0) return "md:col-span-2 md:row-span-2 h-[600px] md:h-auto"; // Hero
-  if (index % 7 === 3) return "md:col-span-1 md:row-span-2 h-[600px] md:h-auto"; // Tall
-  if (index % 7 === 4) return "md:col-span-2 md:row-span-1 h-[300px] md:h-auto"; // Wide
-  return "md:col-span-1 md:row-span-1 h-[300px] md:h-auto"; // Standard
-};
+const resolvedEssays = await Promise.all(
+  publishable.map(async e => ({ ...e, img: await getImg(e.entry.coverImage) }))
+);
 ---
 
-<Layout title="Archivo | The Great Puzzle">
-  <div class="bg-theme-dark text-white min-h-screen selection:bg-[#C8A98B] selection:text-black pt-32 pb-64 px-6 lg:px-12">
-    
-    <header class="max-w-7xl mx-auto mb-32 border-l border-[#C8A98B]/30 pl-8">
-       <h1 class="text-6xl md:text-8xl font-serif tracking-tighter leading-none">Hemeroteca</h1>
-       <div class="reveal-item flex items-center gap-6 mt-8">
-         <p class="font-mono text-[10px] uppercase tracking-[0.4em] opacity-40">Registros de Investigación Trans-histórica</p>
-         <div class="h-px w-24 bg-white/10"></div>
-         <p class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B]">{sortedEssays.length} Entradas disponibles</p>
-       </div>
-    </header>
+<Layout title="Archivo General | The Great Puzzle Project">
+  <div class="bg-theme-dark text-white min-h-screen selection:bg-[#C8A98B] selection:text-black pt-28 pb-32">
 
-    {/* GRILLA MASONRY ASIMÉTRICA */}
-    <section class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 grid-auto-flow-dense">
-      
-      {await Promise.all(sortedEssays.map(async ({ slug, entry }, index) => {
-        const optimizedImage = await getOptimizedImage(entry.coverImage);
-        const spanClass = getGridSpan(index);
-        
-        return (
-          <a 
-            href={`/hemeroteca/${slug}`} 
-            class={`relative group overflow-hidden bg-white/2 flex flex-col justify-end p-8 md:p-12 transition-all duration-700 ${spanClass}`}
+    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16">
+
+      {/* ══════════════════════════════════════════════════════════════════
+          CABECERA DEL ARCHIVO (§6.1)
+          Sin hero cinematográfico. Función documental.
+      ══════════════════════════════════════════════════════════════════ */}
+      <header class="border-l border-[#C8A98B]/40 pl-6 md:pl-10">
+        <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-2">The Great Puzzle Project</span>
+        <h1 class="text-5xl md:text-6xl lg:text-7xl font-serif tracking-tighter leading-none">Archivo</h1>
+        <div class="reveal-item flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 mt-4">
+          <p class="font-mono text-[10px] uppercase tracking-[0.3em] opacity-50">Hemeroteca completa de investigaciones</p>
+          <div class="h-px w-16 bg-white/10 hidden sm:block" />
+          <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-[#C8A98B]">
+            {publishable.length} {publishable.length === 1 ? 'entrada' : 'entradas'}
+          </p>
+        </div>
+      </header>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          FILTROS (§6.2)
+          Categorías y años reales con filtrado dinámico.
+      ══════════════════════════════════════════════════════════════════ */}
+      <nav aria-label="Filtros del archivo" class="flex flex-wrap items-center gap-2 md:gap-3 border-b border-white/5 pb-6">
+        <span class="font-mono text-[9px] uppercase tracking-[0.3em] text-white/30 self-center mr-2 hidden sm:inline">Filtrar:</span>
+        <button
+          type="button"
+          data-filter-btn="all"
+          class="archive-filter-btn font-mono text-[9px] uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-[#C8A98B]/50 text-[#C8A98B] bg-[#C8A98B]/10 cursor-pointer transition-all duration-300"
+        >
+          Todos
+        </button>
+        {categories.map(cat => (
+          <button
+            type="button"
+            data-filter-btn="category"
+            data-filter-value={cat}
+            class="archive-filter-btn font-mono text-[9px] uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-white/10 text-white/40 hover:border-[#C8A98B]/50 hover:text-[#C8A98B] cursor-pointer transition-all duration-300"
           >
-            {/* Imagen de Fondo con Efecto Zoom Cinematic */}
-            <div class="absolute inset-0 z-0">
-              {optimizedImage ? (
-                <Image 
-                  src={optimizedImage} 
-                  alt={entry.title || ""} 
-                  class="w-full h-full object-cover transition-transform duration-800 ease-in-out scale-105 group-hover:scale-110 grayscale-30 group-hover:grayscale-0 opacity-40 group-hover:opacity-70"
-                />
-              ) : (
-                <div class="w-full h-full bg-white/5 opacity-20" />
-              )}
-              
-              {/* Overlay Gradiente Editorial */}
-              <div class="absolute inset-0 bg-linear-to-t from-theme-dark via-theme-dark/40 to-transparent group-hover:via-theme-dark/20 transition-all duration-700"></div>
-            </div>
+            {formatCategory(cat)}
+          </button>
+        ))}
+        {years.length > 0 && (
+          <span class="font-mono text-[9px] uppercase tracking-[0.3em] text-white/20 self-center mx-1">|</span>
+        )}
+        {years.map(year => (
+          <button
+            type="button"
+            data-filter-btn="year"
+            data-filter-value={year}
+            class="archive-filter-btn font-mono text-[9px] uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-white/10 text-white/40 hover:border-[#C8A98B]/50 hover:text-[#C8A98B] cursor-pointer transition-all duration-300"
+          >
+            {year}
+          </button>
+        ))}
+      </nav>
 
-            {/* Contenido de la Tarjeta */}
-            <div class="relative z-10">
-              <header class="mb-6">
-                <div class="flex items-center gap-3 mb-4">
-                  <span class="text-[9px] font-mono text-[#C8A98B] uppercase tracking-widest">[ {entry.category} ]</span>
-                  <span class="w-1 h-1 rounded-full bg-white/20"></span>
-                  <span class="text-[9px] font-mono text-white/30 uppercase tracking-widest">{entry.date ? new Date(entry.date).getFullYear() : 'S/F'}</span>
+      {/* ══════════════════════════════════════════════════════════════════
+          LISTA COMPLETA (§6.3)
+          Tarjetas horizontales compactas: imagen 30–35% / texto 65–70%
+      ══════════════════════════════════════════════════════════════════ */}
+      <section class="flex flex-col gap-4" id="archive-list">
+        {resolvedEssays.map(({ slug, entry, img }, index) => (
+          <article
+            class="archive-card group bg-white/3 border border-white/8 rounded-xl hover:border-[#C8A98B]/40 transition-all duration-400 overflow-hidden"
+            data-category={normalizeCategory(entry.category)}
+            data-year={formatYear(entry.date)}
+          >
+            <div class={img ? "flex flex-col md:flex-row" : "flex flex-col"}>
+              {/* Imagen: 30–35% en desktop, full en mobile */}
+              {img && (
+                <div class="w-full md:w-[32%] shrink-0 overflow-hidden relative">
+                  <div class="aspect-video md:aspect-auto md:h-full min-h-30">
+                    <Image
+                      src={img}
+                      alt={entry.title || "Ensayo"}
+                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
+                    />
+                    <div class="absolute inset-0 bg-linear-to-r from-transparent to-theme-dark/30 pointer-events-none hidden md:block" />
+                  </div>
                 </div>
-                <h2 class={`font-serif tracking-tighter leading-[0.95] group-hover:text-[#C8A98B] transition-colors duration-500 ${index === 0 ? 'text-5xl md:text-8xl' : 'text-3xl md:text-5xl'}`}>
-                  {entry.title}
-                </h2>
-              </header>
-
-              {/* Excerpt solo en items grandes */}
-              {(index === 0 || index % 7 === 3 || index % 7 === 4) && (
-                <p class="text-sm md:text-base font-serif opacity-40 group-hover:opacity-80 transition-opacity duration-700 leading-relaxed max-w-lg line-clamp-2 italic">
-                  {entry.excerpt}
-                </p>
               )}
 
-              <footer class="mt-8 pt-8 border-t border-white/5 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 flex items-center justify-between">
-                <span class="text-[9px] font-mono tracking-[0.2em] uppercase">Registrum {index + 1}</span>
-                <span class="text-xs">→</span>
-              </footer>
+              {/* Texto: 65–70% en desktop */}
+              <div class={`flex flex-col justify-between gap-3 p-5 md:p-6 flex-1 ${!img ? 'border-l-2 border-[#C8A98B]/20' : ''}`}>
+                <div class="flex flex-col gap-2">
+                  <div class="flex flex-wrap items-center gap-3 font-mono text-[9px] text-[#C8A98B] tracking-[0.2em] uppercase">
+                    <span>{formatCategory(entry.category)}</span>
+                    <span class="opacity-30">•</span>
+                    <span class="text-white/40">{formatDate(entry.date)}</span>
+                  </div>
+                  <h2 class="text-lg md:text-xl font-serif leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
+                    <a href={`/hemeroteca/${slug}`} class="hover:underline">{entry.title}</a>
+                  </h2>
+                  {entry.excerpt && (
+                    <p class="font-serif text-white/55 text-sm leading-relaxed line-clamp-2 italic">
+                      "{entry.excerpt}"
+                    </p>
+                  )}
+                </div>
+
+                <div class="flex items-center justify-between font-mono text-[9px] tracking-[0.3em] uppercase text-white/30 pt-3 border-t border-white/5">
+                  <a href={`/hemeroteca/${slug}`} class="hover:text-[#C8A98B] transition-colors">
+                    Registrum #{String(index + 1).padStart(2, '0')} →
+                  </a>
+                  {(entry.spotifyLink || entry.youtubeLink) && (
+                    <div class="flex items-center gap-3">
+                      {entry.spotifyLink && (
+                        <a href={entry.spotifyLink} target="_blank" rel="noopener noreferrer" class="opacity-40 hover:opacity-100 hover:text-[#C8A98B] transition-all" aria-label="Spotify">
+                          <SpotifyIcon class="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                      {entry.youtubeLink && (
+                        <a href={entry.youtubeLink} target="_blank" rel="noopener noreferrer" class="opacity-40 hover:opacity-100 hover:text-[#C8A98B] transition-all" aria-label="YouTube">
+                          <YouTubeIcon class="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-            
-            {/* Decoración: Corner Accent */}
-            <div class="absolute top-0 right-0 w-12 h-12 border-t border-r border-white/0 group-hover:border-white/10 transition-all duration-700 m-6"></div>
-          </a>
-        );
-      }))}
+          </article>
+        ))}
+      </section>
 
-    </section>
+      {/* ══════════════════════════════════════════════════════════════════
+          ÍNDICE FINAL POR AÑO (§6.4)
+          AÑO · CATEGORÍA · TÍTULO — agrupado por año.
+      ══════════════════════════════════════════════════════════════════ */}
+      {years.length > 0 && (
+        <section class="flex flex-col gap-8 border-t border-white/5 pt-12" id="archive-yearly-index">
+          <div class="reveal-item">
+            <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-2">Índice Cronológico</span>
+            <h2 class="text-3xl md:text-4xl font-serif">Por Año</h2>
+          </div>
 
-    {/* FOOTER EXPLORACIÓN */}
-    <div class="max-w-7xl mx-auto mt-64 text-center">
-       <div class="inline-block px-12 py-1 border border-white/10 font-mono text-[10px] uppercase tracking-[0.6em] opacity-20">
-          Exploratio Continua
-       </div>
+          <div class="flex flex-col gap-8">
+            {years.map(year => {
+              const yearEssays = resolvedEssays.filter(e =>
+                e.entry.date && new Date(e.entry.date).getFullYear().toString() === year
+              );
+              return (
+                <div class="archive-year-group flex flex-col gap-0" data-year-group={year}>
+                  <h3 class="font-mono text-[10px] uppercase tracking-[0.4em] text-white/30 pb-3 border-b border-white/5">
+                    {year} — {yearEssays.length} {yearEssays.length === 1 ? 'entrada' : 'entradas'}
+                  </h3>
+                  <ol class="flex flex-col divide-y divide-white/5">
+                    {yearEssays.map(({ slug, entry }) => (
+                      <li class="archive-index-item" data-category={normalizeCategory(entry.category)}>
+                        <a
+                          href={`/hemeroteca/${slug}`}
+                          class="group flex items-baseline gap-3 md:gap-6 py-2.5 hover:text-[#C8A98B] transition-colors duration-300"
+                        >
+                          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-[#C8A98B]/60 shrink-0 hidden sm:inline">
+                            {formatCategory(entry.category)}
+                          </span>
+                          <span class="font-serif text-sm md:text-base text-white/70 group-hover:text-[#C8A98B] transition-colors leading-snug line-clamp-1 flex-1">
+                            {entry.title}
+                          </span>
+                          <span class="font-mono text-[9px] text-white/20 shrink-0 group-hover:text-[#C8A98B]/50">→</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
     </div>
-
   </div>
 
-  <style>
-    /* Soporte para grid denso */
-    .grid-auto-flow-dense {
-      grid-auto-flow: dense;
-    }
-  </style>
-
   <script>
-    const setupArchiveAnimation = () => {
+    const setupArchiveFilter = () => {
       const h1 = document.querySelector('h1');
-      if (h1) {
-        // Pequeño delay para asegurar que el Layout y CSS estén listos
-        setTimeout(() => {
-          h1.classList.add('revealed');
-        }, 300);
+      if (h1) setTimeout(() => h1.classList.add('revealed'), 200);
+
+      const buttons = document.querySelectorAll<HTMLButtonElement>('.archive-filter-btn');
+      const cards = document.querySelectorAll<HTMLElement>('.archive-card');
+      const indexItems = document.querySelectorAll<HTMLElement>('.archive-index-item');
+      const yearGroups = document.querySelectorAll<HTMLElement>('.archive-year-group');
+
+      if (!buttons.length) return;
+
+      const activeClasses = ['border-[#C8A98B]/50', 'text-[#C8A98B]', 'bg-[#C8A98B]/10'];
+      const inactiveClasses = ['border-white/10', 'text-white/40'];
+
+      const applyFilter = (type: string, value?: string | null) => {
+        // Actualizar estilos de botones
+        buttons.forEach(btn => {
+          const btnType = btn.getAttribute('data-filter-btn');
+          const btnVal = btn.getAttribute('data-filter-value');
+          const isActive = (type === 'all' && btnType === 'all') ||
+                           (btnType === type && btnVal === value);
+
+          if (isActive) {
+            btn.classList.remove(...inactiveClasses);
+            btn.classList.add(...activeClasses);
+          } else {
+            btn.classList.remove(...activeClasses);
+            btn.classList.add(...inactiveClasses);
+          }
+        });
+
+        // Filtrar tarjetas
+        cards.forEach(card => {
+          const cardCat = card.getAttribute('data-category');
+          const cardYear = card.getAttribute('data-year');
+
+          let show = true;
+          if (type === 'category' && value) {
+            show = cardCat === value;
+          } else if (type === 'year' && value) {
+            show = cardYear === value;
+          }
+
+          if (show) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        // Filtrar índice por año
+        if (type === 'year' && value) {
+          yearGroups.forEach(group => {
+            if (group.getAttribute('data-year-group') === value) {
+              group.style.display = '';
+            } else {
+              group.style.display = 'none';
+            }
+          });
+        } else if (type === 'category' && value) {
+          yearGroups.forEach(group => {
+            let hasVisible = false;
+            group.querySelectorAll<HTMLElement>('.archive-index-item').forEach(item => {
+              if (item.getAttribute('data-category') === value) {
+                item.style.display = '';
+                hasVisible = true;
+              } else {
+                item.style.display = 'none';
+              }
+            });
+            group.style.display = hasVisible ? '' : 'none';
+          });
+        } else {
+          yearGroups.forEach(group => {
+            group.style.display = '';
+            group.querySelectorAll<HTMLElement>('.archive-index-item').forEach(item => {
+              item.style.display = '';
+            });
+          });
+        }
+      };
+
+      // Manejar clics
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const type = btn.getAttribute('data-filter-btn') || 'all';
+          const value = btn.getAttribute('data-filter-value');
+
+          if (type === 'all') {
+            history.replaceState(null, '', window.location.pathname);
+          } else if (type === 'category' && value) {
+            history.replaceState(null, '', `?categoria=${encodeURIComponent(value)}`);
+          } else if (type === 'year' && value) {
+            history.replaceState(null, '', `?año=${encodeURIComponent(value)}`);
+          }
+
+          applyFilter(type, value);
+        });
+      });
+
+      // Leer query params iniciales
+      const params = new URLSearchParams(window.location.search);
+      const initialCat = params.get('categoria');
+      const initialYear = params.get('año');
+
+      if (initialCat) {
+        applyFilter('category', initialCat.toLowerCase().trim());
+      } else if (initialYear) {
+        applyFilter('year', initialYear);
       }
     };
 
-    document.addEventListener('DOMContentLoaded', setupArchiveAnimation);
-    document.addEventListener('astro:page-load', setupArchiveAnimation);
+    document.addEventListener('DOMContentLoaded', setupArchiveFilter);
+    document.addEventListener('astro:page-load', setupArchiveFilter);
   </script>
 </Layout>

@@ -1,14 +1,13 @@
 import { config, fields, collection } from '@keystatic/core';
-import { GeneradorTextoTGP } from './src/components/GeneradorTextoTGP';
-import { MotorArteTGP } from './src/components/MotorArteTGP';
-import { ProbadorArteTGP } from './src/components/ProbadorArteTGP';
-import { componentBlocks } from './src/components/component-blocks';
+import { 
+  GeneradorTextoTGP, 
+  MotorArteTGP, 
+  ProbadorArteTGP, 
+  componentBlocks 
+} from './src/components';
 
 export default config({
   storage: {
-    // CORRECCIÓN VITAL: Forzamos 'local' absoluto.
-    // Al ser un sitio puramente estático, Keystatic no debe intentar 
-    // buscar conexiones a GitHub en el entorno de producción de Cloudflare.
     kind: 'local',
   },
   collections: {
@@ -20,6 +19,11 @@ export default config({
       schema: {
         title: fields.slug({ name: { label: 'Título' } }),
         
+        volanta: fields.text({
+          label: 'Volanta (Subtítulo o contexto de lectura)',
+          description: 'Aparecerá en tipografía Mono por encima del título principal.',
+        }),
+
         generador: fields.text({ 
           label: 'Motor de Generación', 
           description: 'Identificador del motor de IA utilizado para este post.'
@@ -38,7 +42,7 @@ export default config({
           Input: GeneradorTextoTGP,
           defaultValue: () => '',
           parse: (v: any) => v || '',
-          serialize: (v: any) => ({ value: v }),
+          serialize: (v: any) => v || '',
           validate: (v: any) => v,
           reader: {
             parse: (v: any) => v || '',
@@ -52,7 +56,7 @@ export default config({
           Input: MotorArteTGP,
           defaultValue: () => '',
           parse: (v: any) => v || '',
-          serialize: (v: any) => ({ value: v }),
+          serialize: (v: any) => v || '',
           validate: (v: any) => v,
           reader: {
             parse: (v: any) => v || '',
@@ -75,7 +79,7 @@ export default config({
         draft: fields.checkbox({ 
           label: 'Borrador', 
           description: 'Si está marcado, no se publicará en producción',
-          defaultValue: true 
+          defaultValue: false 
         }),
         coverImage: fields.image({ 
           label: 'Imagen de Portada (Opcional)', 
@@ -83,6 +87,8 @@ export default config({
           publicPath: '/src/assets/ensayos/' 
         }),
         videoBg: fields.text({ label: 'URL del Video Cinemagraph' }),
+        spotifyLink: fields.url({ label: 'Link de Spotify Podcast (Opcional)' }),
+        youtubeLink: fields.url({ label: 'Link de YouTube Podcast (Opcional)' }),
         excerpt: fields.text({ label: 'Excerpt (Sinopsis)', multiline: true }),
         content: fields.document({
           label: 'Contenido',
@@ -105,25 +111,25 @@ export default config({
       schema: {
         nombre: fields.slug({ name: { label: 'Nombre del Estilo (Slug)' } }),
         
-        // Reemplazamos los campos sueltos por un bloque unificado
         constructorEstilo: {
           kind: 'form',
           label: 'Constructor y Prueba de Estilo (Nano Banana)',
           Input: ProbadorArteTGP,
           defaultValue: () => ({
             conceptoBase: '',
-            lineaEditorial: 'personalizado',
-            camara: '',
-            iluminacion: '',
-            color: '',
-            estetica: '',
+            sujetoIA: '',
+            lineaEditorial: 'archivo-museo',
+            usarManuales: false,
+            overrideCamara: '',
+            overrideIluminacion: '',
+            overrideColor: '',
             imagenBase64: ''
           }),
           parse: (v: any) => v || {},
-          serialize: (v: any) => ({ value: v }),
+          serialize: (v: any) => v || {},
           validate: (v: any) => v,
           reader: {
-            parse: (v: any) => v.value || {},
+            parse: (v: any) => v || {},
           },
         } as any,
       },
