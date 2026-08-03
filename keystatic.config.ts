@@ -3,6 +3,8 @@ import {
   GeneradorTextoTGP, 
   MotorArteTGP, 
   ProbadorArteTGP, 
+  BuscadorWikimediaTGP,
+  SelectorCategoriaTGP,
   componentBlocks 
 } from './src/components';
 
@@ -35,10 +37,10 @@ export default config({
           multiline: true
         }),
         
-        // FASE 1: Motor de Pensamiento (Texto)
+        // FASE 1: Motor de Pensamiento (Texto + Portada Unificada)
         generadorTexto: {
           kind: 'form',
-          label: '1. Motor de Pensamiento TGP',
+          label: '1. Motor de Pensamiento & Arte Unificado TGP',
           Input: GeneradorTextoTGP,
           defaultValue: () => '',
           parse: (v: any) => v || '',
@@ -49,10 +51,24 @@ export default config({
           },
         } as any,
 
-        // FASE 2: Motor de Materialización (Arte)
+        // FASE 2: Buscador y Selector de Imágenes Wikimedia Commons TGP
+        bancoImagenesWikimedia: {
+          kind: 'form',
+          label: '2. Buscador & Galería de Archivo Wikimedia Commons',
+          Input: BuscadorWikimediaTGP,
+          defaultValue: () => '',
+          parse: (v: any) => v || '',
+          serialize: (v: any) => v || '',
+          validate: (v: any) => v,
+          reader: {
+            parse: (v: any) => v || '',
+          },
+        } as any,
+
+        // FASE 3: Motor de Materialización Manual (Arte)
         generadorImagen: {
           kind: 'form',
-          label: '2. Motor de Arte Nano Banana',
+          label: '3. Motor de Arte Nano Banana (Laboratorio Manual)',
           Input: MotorArteTGP,
           defaultValue: () => '',
           parse: (v: any) => v || '',
@@ -62,8 +78,22 @@ export default config({
             parse: (v: any) => v || '',
           },
         } as any,
+
         date: fields.date({ label: 'Fecha' }),
-        category: fields.text({ label: 'Categoría (ej. Arqueosemiótica)' }),
+        
+        category: {
+          kind: 'form',
+          label: 'Categoría / Campo Disciplinar TGP',
+          Input: SelectorCategoriaTGP,
+          defaultValue: () => 'Historia',
+          parse: (v: any) => v || 'Historia',
+          serialize: (v: any) => v || 'Historia',
+          validate: (v: any) => v,
+          reader: {
+            parse: (v: any) => v || 'Historia',
+          },
+        } as any,
+
         themeColor: fields.select({
           label: 'Theme Color',
           options: [
@@ -89,7 +119,7 @@ export default config({
         videoBg: fields.text({ label: 'URL del Video Cinemagraph' }),
         spotifyLink: fields.url({ label: 'Link de Spotify Podcast (Opcional)' }),
         youtubeLink: fields.url({ label: 'Link de YouTube Podcast (Opcional)' }),
-        excerpt: fields.text({ label: 'Excerpt (Sinopsis)', multiline: true }),
+        excerpt: fields.text({ label: 'Excerpt (Sinopsis / Cita Filosofica 2-4 Renglones)', multiline: true }),
         content: fields.document({
           label: 'Contenido',
           formatting: true,
@@ -99,40 +129,33 @@ export default config({
             directory: 'src/assets/ensayos',
             publicPath: '/src/assets/ensayos/'
           },
-          componentBlocks,
+          tables: true,
+          componentBlocks
         }),
       },
     }),
+
+    // Colección secundaria: Laboratorio de Dirección de Arte en Keystatic
     direccionArte: collection({
       label: 'Dirección de Arte (IA)',
       slugField: 'nombre',
       path: 'src/content/estilos-visuales/*',
       format: { data: 'json' },
       schema: {
-        nombre: fields.slug({ name: { label: 'Nombre del Estilo (Slug)' } }),
-        
+        nombre: fields.slug({ name: { label: 'Identificador del Estilo' } }),
         constructorEstilo: {
           kind: 'form',
-          label: 'Constructor y Prueba de Estilo (Nano Banana)',
+          label: 'Laboratorio de Estilos e Imágenes TGP',
           Input: ProbadorArteTGP,
-          defaultValue: () => ({
-            conceptoBase: '',
-            sujetoIA: '',
-            lineaEditorial: 'archivo-museo',
-            usarManuales: false,
-            overrideCamara: '',
-            overrideIluminacion: '',
-            overrideColor: '',
-            imagenBase64: ''
-          }),
-          parse: (v: any) => v || {},
-          serialize: (v: any) => v || {},
+          defaultValue: () => '',
+          parse: (v: any) => v || '',
+          serialize: (v: any) => v || '',
           validate: (v: any) => v,
           reader: {
-            parse: (v: any) => v || {},
+            parse: (v: any) => v || '',
           },
         } as any,
-      },
+      }
     }),
   },
 });

@@ -26,6 +26,10 @@ export default defineConfig({
               pattern: '/api/generar-arte',
               entrypoint: './src/api/_generar-arte.ts'
             });
+            injectRoute({
+              pattern: '/api/guardar-ensayo',
+              entrypoint: './src/api/_guardar-ensayo.ts'
+            });
           }
         }
       }

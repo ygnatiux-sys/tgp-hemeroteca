@@ -5,7 +5,7 @@
   "category": "Filosofía",
   "themeColor": "bordeaux",
   "draft": false,
-  "coverImage": null,
+  "coverImage": "/src/assets/ensayos/el-simbolismo-del-laberinto/coverImage.jpeg",
   "videoBg": null,
   "excerpt": "El laberinto ha sido desde la antigüedad una de las arquitecturas metafóricas más potentes para representar la pérdida y la búsqueda de sentido.",
   "generador": "gemini-3.1-pro",

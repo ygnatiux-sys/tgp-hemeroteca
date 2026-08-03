@@ -1,17 +1,129 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export function GeneradorTextoTGP({ value, onChange }: any) {
   const [titulo, setTitulo] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [generarAmbosJuntos, setGenerarAmbosJuntos] = useState(true);
+  
+  const [isGeneratingText, setIsGeneratingText] = useState(false);
+  const [isGeneratingArt, setIsGeneratingArt] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPublished, setIsPublished] = useState(false);
 
-  // El estado local se sincroniza con el valor que Keystatic ya tenga guardado
+  // Estado local para el texto del ensayo, excerpt y sugerencias
   const [ensayo, setEnsayo] = useState(value || '');
+  const [excerptIA, setExcerptIA] = useState<string>('');
+  const [categoryIA, setCategoryIA] = useState<string>('');
 
+  const [arteResult, setArteResult] = useState<{
+    imageUrl: string | null;
+    imagePrompt: string;
+    brief: string;
+    resolvedDirection?: any;
+  } | null>(null);
+
+  // Sincronizar estado local con Keystatic si value cambia externamente
+  useEffect(() => {
+    if (value && value !== ensayo) {
+      setEnsayo(value);
+    }
+  }, [value]);
+
+  // Extraer el slug actual de la URL de Keystatic
+  const getSlugFromUrl = (): string | null => {
+    if (typeof window === 'undefined') return null;
+    const parts = window.location.pathname.split('/');
+    const itemIndex = parts.indexOf('item');
+    if (itemIndex !== -1 && parts[itemIndex + 1] && parts[itemIndex + 1] !== 'new') {
+      return parts[itemIndex + 1];
+    }
+    return null;
+  };
+
+  // Auto-detectar el título del post desde el DOM de Keystatic si 'titulo' está vacío
+  const detectPostTitle = (): string => {
+    if (titulo.trim()) return titulo.trim();
+    
+    // 1. Buscar en el input de título de Keystatic
+    const titleInput = document.querySelector<HTMLInputElement>('input[name="title"], input[id^="title"]');
+    if (titleInput && titleInput.value.trim()) {
+      return titleInput.value.trim();
+    }
+    
+    // 2. Extraer del slug en la URL si está editando
+    const slug = getSlugFromUrl();
+    if (slug) {
+      return slug.replace(/-/g, ' ');
+    }
+
+    // 3. Extraer del primer párrafo o primera línea del ensayo si existe
+    if (ensayo) {
+      const firstLine = ensayo.slice(0, 120).replace(/^[#\s]+/, '').split('\n')[0].trim();
+      if (firstLine) return firstLine;
+    }
+
+    return '';
+  };
+
+  const effectiveTopic = detectPostTitle();
+
+  // Guardado directo y persistente en el sistema de archivos (index.json + content.mdoc + assets/coverImage)
+  const handleSaveDirectlyToDisk = async (overrides?: { text?: string; excerpt?: string; category?: string; image?: string }) => {
+    const slugToUse = getSlugFromUrl();
+    const temaToUse = effectiveTopic;
+    const textToUse = overrides?.text !== undefined ? overrides.text : ensayo;
+    const excToUse = overrides?.excerpt !== undefined ? overrides.excerpt : excerptIA;
+    const catToUse = overrides?.category !== undefined ? overrides.category : categoryIA;
+    const imgToUse = overrides?.image !== undefined ? overrides.image : arteResult?.imageUrl;
+
+    try {
+      const res = await fetch('/api/guardar-ensayo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug: slugToUse,
+          title: temaToUse,
+          content: textToUse,
+          excerpt: excToUse,
+          category: catToUse,
+          imageUrl: imgToUse
+        })
+      });
+      const data = await res.json();
+      return data;
+    } catch (e) {
+      console.error('Error guardando directamente en disco:', e);
+    }
+  };
+
+  // Inyectar automáticamente la categoría y el excerpt en los campos de Keystatic
+  const syncFieldsToKeystaticDOM = (suggestedCategory?: string, suggestedExcerpt?: string) => {
+    const catToUse = suggestedCategory || categoryIA;
+    const excToUse = suggestedExcerpt || excerptIA;
+
+    if (catToUse) {
+      const catSelect = document.querySelector<HTMLSelectElement>('select[name="category"], select');
+      if (catSelect) {
+        catSelect.value = catToUse;
+        catSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+
+    if (excToUse) {
+      const excTextarea = document.querySelector<HTMLTextAreaElement>('textarea[name="excerpt"], textarea');
+      if (excTextarea) {
+        excTextarea.value = excToUse;
+        excTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+        excTextarea.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+  };
+
+  // 1. Generación de Texto con Gemini 3.1 Pro (Incluye Excerpt 2-4 renglones y Categoría IA)
   const handleGenerarTexto = async () => {
-    if (!titulo) return alert('Por favor, ingresa un tema para el ensayo.');
-    setIsLoading(true);
+    const temaFinal = detectPostTitle() || titulo.trim();
+    if (!temaFinal) return alert('Por favor, escribe un título arriba en Keystatic o ingresa un tema aquí.');
+    
+    setIsGeneratingText(true);
     setErrorMsg(null);
     setIsPublished(false);
 
@@ -20,7 +132,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          titulo: titulo, 
+          titulo: temaFinal, 
           generarImagen: false 
         }),
       });
@@ -29,119 +141,410 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
       if (!res.ok) throw new Error(data.error || 'Error en el motor de texto');
 
       setEnsayo(data.content);
-      onChange(data.content); 
+      onChange(data.content); // Sincronización inmediata de generadorTexto
+
+      if (data.excerpt) setExcerptIA(data.excerpt);
+      if (data.category) setCategoryIA(data.category);
+
+      // Inyectar en el formulario de Keystatic y guardar directamente a disco
+      syncFieldsToKeystaticDOM(data.category, data.excerpt);
+      await handleSaveDirectlyToDisk({
+        text: data.content,
+        excerpt: data.excerpt,
+        category: data.category
+      });
+
+      return data.content;
 
     } catch (err: any) {
-      setErrorMsg(err.message);
+      setErrorMsg(`Texto: ${err.message}`);
     } finally {
-      setIsLoading(false);
+      setIsGeneratingText(false);
     }
   };
 
-  const handlePublicar = () => {
-    // Sincronizamos el texto actual con Keystatic
-    onChange(ensayo);
-    setIsPublished(true);
-    setTimeout(() => setIsPublished(false), 4000);
-    alert('✅ Informe confirmado.\n\nAhora:\n1. Asegurate de que la imagen de portada esté cargada arriba.\n2. Desactivá el checkbox "Borrador" si querés publicar.\n3. Presioná "Save" en Keystatic para que aparezca en el inicio y el archivo.');
+  // 2. Generación de Arte Especializado con Nano Banana V2 / Semantic Router
+  const handleGenerarArte = async () => {
+    const temaFinal = detectPostTitle() || titulo.trim() || 'Ensayo conceptual y filosófico';
+    const currentSlug = getSlugFromUrl();
+
+    setIsGeneratingArt(true);
+    setErrorMsg(null);
+    setIsPublished(false);
+
+    try {
+      const res = await fetch('/api/generar-arte', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug: currentSlug,
+          mode: 'intelligent',
+          intelligentInput: {
+            title: temaFinal,
+            concept: temaFinal
+          }
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error en el motor de arte');
+
+      const imageUrl = data.imageUrl || data.image;
+
+      setArteResult({
+        imageUrl,
+        imagePrompt: data.imagePrompt,
+        brief: data.brief,
+        resolvedDirection: data.resolvedDirection
+      });
+
+      // Autoguardar la imagen generada directamente a disco
+      if (imageUrl) {
+        await handleSaveDirectlyToDisk({ image: imageUrl });
+      }
+
+    } catch (err: any) {
+      setErrorMsg(`Arte: ${err.message}`);
+    } finally {
+      setIsGeneratingArt(false);
+    }
   };
+
+  // 3. Ejecución Unificada o Selección según Toggle
+  const handleGenerarAmbos = async () => {
+    const temaFinal = detectPostTitle() || titulo.trim();
+    if (!temaFinal) return alert('Por favor, ingresa un título en Keystatic arriba para iniciar la generación.');
+    
+    if (generarAmbosJuntos) {
+      const text = await handleGenerarTexto();
+      await handleGenerarArte();
+      if (text) {
+        await handleSaveDirectlyToDisk({ text });
+      }
+    } else {
+      await handleGenerarTexto();
+    }
+  };
+
+  const handleConfirmarSincronizacion = async () => {
+    if (!ensayo) return alert('No hay texto de ensayo generado para guardar.');
+    onChange(ensayo);
+    syncFieldsToKeystaticDOM();
+    setIsPublished(true);
+
+    const res = await handleSaveDirectlyToDisk();
+
+    setTimeout(() => setIsPublished(false), 4000);
+    alert('✅ ENSAYO, EXCERPT, CATEGORÍA Y PORTADA GUARDADOS EXITOSAMENTE!\n\nSe han guardado todos los contenidos directamente en los archivos de la hemeroteca.\nTambién puedes presionar "Save" o "Create" arriba en Keystatic.');
+  };
+
+  const isGlobalLoading = isGeneratingText || isGeneratingArt;
 
   return (
     <div style={{
-      padding: '20px',
+      padding: '24px',
       background: '#0a0a0a',
       color: '#e0e0e0',
-      borderRadius: '8px',
+      borderRadius: '12px',
       border: '1px solid #333',
       fontFamily: 'Inter, system-ui, sans-serif',
       marginTop: '10px'
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-        <h3 style={{ margin: 0, fontSize: '1rem', color: '#4caf50' }}>🧠 Motor de Pensamiento TGP</h3>
-        <span style={{ fontSize: '0.7rem', color: '#666' }}>Fase 1: Narrativa & Profundidad</span>
+      {/* Encabezado Principal */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+        <div>
+          <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#4caf50', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            🧠 Motor de Generación Unificado TGP
+          </h3>
+          <p style={{ margin: '4px 0 0 0', fontSize: '0.75rem', color: '#888' }}>
+            Redacción de Ensayo + Excerpt/Quote + Categoría Sugerida (Gemini 3.1 Pro)
+          </p>
+        </div>
       </div>
 
-      <div style={{ marginBottom: '15px' }}>
+      {/* Indicador de Tema Auto-detectado */}
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{ fontSize: '0.75rem', color: '#aaa', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
+          TEMA / TÍTULO PARA LA IA:
+        </label>
         <input
           type="text"
           value={titulo}
           onChange={(e) => setTitulo(e.target.value)}
-          placeholder="¿Sobre qué quieres reflexionar hoy? (ej. El mito de Sísifo en la era digital)"
+          placeholder={effectiveTopic ? `TÍTULO AUTO-DETECTADO: "${effectiveTopic}"` : "Escribe un tema (o deja vacío para auto-detectar el título del post)"}
           style={{ 
             width: '100%', 
-            padding: '12px', 
-            background: '#1a1a1a', 
+            padding: '14px', 
+            background: '#141414', 
             border: '1px solid #444', 
-            borderRadius: '4px', 
+            borderRadius: '6px', 
             color: '#fff', 
-            marginBottom: '10px',
-            fontSize: '0.9rem'
+            fontSize: '0.95rem',
+            outline: 'none'
           }}
         />
+        {effectiveTopic && !titulo && (
+          <span style={{ fontSize: '0.72rem', color: '#81c784', marginTop: '4px', display: 'block' }}>
+            ✓ Auto-detectado desde el post: <strong>"{effectiveTopic}"</strong>
+          </span>
+        )}
       </div>
 
-      <button
-        type="button"
-        onClick={handleGenerarTexto}
-        disabled={isLoading || !titulo}
-        style={{
-          display: 'block',
-          width: '100%',
-          padding: '16px',
-          marginTop: '10px',
-          marginBottom: '10px',
-          background: (isLoading || !titulo) ? '#333' : '#28a745', 
-          color: (isLoading || !titulo) ? '#777' : '#fff',
-          border: 'none',
-          borderRadius: '8px',
-          fontWeight: 700,
-          fontSize: '1rem',
-          textTransform: 'uppercase' as const,
-          letterSpacing: '0.1em',
-          cursor: (isLoading || !titulo) ? 'not-allowed' : 'pointer',
-          transition: 'all 0.2s ease',
-          boxShadow: (isLoading || !titulo) ? 'none' : '0 4px 6px rgba(40, 167, 69, 0.3)'
-        }}
-      >
-        {isLoading ? 'GENERANDO...' : 'GENERAR TEXTO DEL ENSAYO'}
-      </button>
+      {/* Checkbox Toggle para modo de disparo */}
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '12px', 
+        padding: '14px 18px', 
+        background: generarAmbosJuntos ? '#121912' : '#191924', 
+        border: generarAmbosJuntos ? '1px solid #254025' : '1px solid #3b3b54', 
+        borderRadius: '8px',
+        marginBottom: '20px',
+        transition: 'all 0.2s ease'
+      }}>
+        <input 
+          type="checkbox" 
+          id="toggleAmbos"
+          checked={generarAmbosJuntos} 
+          onChange={(e) => setGenerarAmbosJuntos(e.target.checked)} 
+          style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: '#28a745' }}
+        />
+        <label htmlFor="toggleAmbos" style={{ fontSize: '0.9rem', color: generarAmbosJuntos ? '#d0ebd0' : '#d4c7ff', cursor: 'pointer', fontWeight: 600 }}>
+          ⚡ {generarAmbosJuntos ? 'Modo Simultáneo Activado (Texto + Excerpt + Portada en 1 clic)' : 'Modo Manual / Paso a Paso (Selecciona Texto o Portada individualmente)'}
+        </label>
+      </div>
+
+      {/* Botones de Acción (2 Pasos o 1 Clic según toggle) */}
+      <div style={{ display: 'grid', gridTemplateColumns: generarAmbosJuntos ? '1fr' : '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
+        {generarAmbosJuntos ? (
+          <button
+            type="button"
+            onClick={handleGenerarAmbos}
+            disabled={isGlobalLoading}
+            style={{
+              padding: '16px',
+              background: isGlobalLoading ? '#222' : 'linear-gradient(135deg, #1b5e20, #2e7d32)', 
+              color: isGlobalLoading ? '#666' : '#fff',
+              border: '1px solid #4caf50',
+              borderRadius: '8px',
+              fontWeight: 800,
+              fontSize: '1rem',
+              letterSpacing: '0.08em',
+              cursor: isGlobalLoading ? 'not-allowed' : 'pointer',
+              boxShadow: isGlobalLoading ? 'none' : '0 4px 15px rgba(46, 125, 50, 0.4)'
+            }}
+          >
+            {isGlobalLoading 
+              ? (isGeneratingText ? '🧠 GENERANDO ENSAYO & EXCERPT...' : '🎨 MATERIALIZANDO PORTADA...') 
+              : '⚡ GENERAR ENSAYO, EXCERPT Y PORTADA'}
+          </button>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={handleGenerarTexto}
+              disabled={isGlobalLoading}
+              style={{
+                padding: '16px',
+                background: isGeneratingText ? '#222' : '#28a745', 
+                color: isGeneratingText ? '#666' : '#fff',
+                border: '1px solid #34ce57',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                cursor: isGeneratingText ? 'not-allowed' : 'pointer',
+                boxShadow: isGeneratingText ? 'none' : '0 4px 12px rgba(40, 167, 69, 0.3)',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              {isGeneratingText ? '🧠 GENERANDO...' : '1. GENERAR TEXTO & EXCERPT'}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleGenerarArte}
+              disabled={isGlobalLoading}
+              style={{
+                padding: '16px',
+                background: isGeneratingArt ? '#222' : '#6f42c1', 
+                color: isGeneratingArt ? '#666' : '#fff',
+                border: '1px solid #8a57e3',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                cursor: isGlobalLoading ? 'not-allowed' : 'pointer',
+                boxShadow: isGlobalLoading ? 'none' : '0 4px 12px rgba(111, 66, 193, 0.4)',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              {isGeneratingArt ? '🎨 MATERIALIZANDO...' : '2. GENERAR PORTADA INTELIGENTE'}
+            </button>
+          </>
+        )}
+      </div>
 
       {errorMsg && (
-        <div style={{ color: '#ff5252', fontSize: '0.8rem', padding: '10px', background: 'rgba(255,82,82,0.1)', borderRadius: '4px', border: '1px solid #ff5252', marginBottom: '15px' }}>
-          <strong>Error de Conexión:</strong> {errorMsg}
+        <div style={{ color: '#ff5252', fontSize: '0.8rem', padding: '12px', background: 'rgba(255,82,82,0.1)', borderRadius: '6px', border: '1px solid #ff5252', marginBottom: '18px' }}>
+          <strong>Error de Generación:</strong> {errorMsg}
         </div>
       )}
 
-      <div style={{ marginTop: '10px' }}>
-        <label style={{ fontSize: '0.75rem', color: '#888', display: 'block', marginBottom: '5px' }}>CONTENIDO DEL ENSAYO:</label>
+      {/* MOSTRAR EXCERPT SUGERIDO Y CATEGORÍA IA */}
+      {(excerptIA || categoryIA) && (
+        <div style={{ 
+          marginBottom: '20px', 
+          padding: '16px', 
+          background: '#131813', 
+          border: '1px solid #285428', 
+          borderRadius: '8px' 
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <span style={{ fontSize: '0.75rem', color: '#81c784', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              💡 SINOPSIS (EXCERPT) & CATEGORÍA SUGERIDAS POR IA
+            </span>
+            {categoryIA && (
+              <span style={{ fontSize: '0.7rem', padding: '3px 8px', background: '#254725', color: '#b9f6ca', borderRadius: '4px', fontWeight: 700 }}>
+                CATEGORÍA: {categoryIA}
+              </span>
+            )}
+          </div>
+
+          {excerptIA && (
+            <blockquote style={{ 
+              margin: '0 0 10px 0', 
+              paddingLeft: '14px', 
+              borderLeft: '3px solid #4caf50', 
+              fontSize: '0.9rem', 
+              fontStyle: 'italic', 
+              color: '#d0ebd0',
+              lineHeight: '1.5'
+            }}>
+              "{excerptIA}"
+            </blockquote>
+          )}
+
+          <button
+            type="button"
+            onClick={async () => {
+              syncFieldsToKeystaticDOM(categoryIA, excerptIA);
+              await handleSaveDirectlyToDisk({ category: categoryIA, excerpt: excerptIA });
+            }}
+            style={{
+              padding: '6px 12px',
+              background: '#2e7d32',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            ✓ Aplicar y Guardar Categoría y Excerpt
+          </button>
+        </div>
+      )}
+
+      {/* ÁREA DE TEXTO DEL ENSAYO */}
+      <div style={{ marginBottom: '24px' }}>
+        <label style={{ fontSize: '0.75rem', color: '#aaa', display: 'block', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.05em' }}>
+          📝 CONTENIDO DEL ENSAYO:
+        </label>
         <textarea
           value={ensayo}
           onChange={(e) => {
-            setEnsayo(e.target.value);
-            onChange(e.target.value);
+            const val = e.target.value;
+            setEnsayo(val);
+            onChange(val); // Inmediatamente notificar a Keystatic
           }}
-          placeholder="El ensayo aparecerá aquí. También puedes pegar texto manualmente."
+          placeholder="El ensayo redactado por Gemini 3.1 Pro aparecerá aquí..."
           style={{
             width: '100%',
-            height: '350px',
+            height: '320px',
             background: '#111',
             color: '#eee',
             border: '1px solid #333',
-            padding: '15px',
-            fontFamily: 'serif',
+            padding: '16px',
+            fontFamily: 'Georgia, serif',
             fontSize: '1rem',
             lineHeight: '1.6',
-            borderRadius: '4px',
+            borderRadius: '6px',
             resize: 'vertical' as const
           }}
         />
       </div>
 
-      {/* ============================================================ */}
-      {/* BOTÓN PRINCIPAL: PUBLICAR ENSAYO CON TEXTO + IMAGEN          */}
-      {/* ============================================================ */}
+      {/* VISTA PREVIA DE PORTADA ESPECIALIZADA NANO BANANA V2 */}
+      {arteResult && (
+        <div style={{ 
+          marginBottom: '24px', 
+          padding: '18px', 
+          background: '#121216', 
+          border: '1px solid #3d3b54', 
+          borderRadius: '10px' 
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <span style={{ fontSize: '0.75rem', color: '#a594fd', fontWeight: 700, letterSpacing: '0.1em' }}>
+              🎨 PORTADA ESPECIALIZADA NANO BANANA V2
+            </span>
+            {arteResult.resolvedDirection?.selectedPresetName && (
+              <span style={{ 
+                fontSize: '0.7rem', 
+                padding: '4px 8px', 
+                background: '#2c2547', 
+                color: '#d4c7ff', 
+                borderRadius: '4px',
+                border: '1px solid #5a4b9c',
+                fontWeight: 600
+              }}>
+                PRESET IA: {arteResult.resolvedDirection.selectedPresetName}
+              </span>
+            )}
+          </div>
+
+          {arteResult.imageUrl ? (
+            <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+              <img 
+                src={arteResult.imageUrl} 
+                alt="Portada Generada" 
+                style={{ 
+                  maxWidth: '100%', 
+                  maxHeight: '360px', 
+                  borderRadius: '6px', 
+                  border: '1px solid #444',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.6)'
+                }} 
+              />
+              <div style={{ marginTop: '10px' }}>
+                <a 
+                  href={arteResult.imageUrl} 
+                  download={`portada-${effectiveTopic || 'ensayo'}.png`}
+                  style={{
+                    display: 'inline-block',
+                    padding: '8px 16px',
+                    background: '#333',
+                    color: '#fff',
+                    borderRadius: '4px',
+                    fontSize: '0.8rem',
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    border: '1px solid #555'
+                  }}
+                >
+                  💾 Descargar Imagen de Portada
+                </a>
+              </div>
+            </div>
+          ) : (
+            <div style={{ padding: '15px', background: '#1a1a1a', borderRadius: '4px', fontSize: '0.8rem', color: '#ffb74d' }}>
+              ⚠️ Dirección de Arte generada pero sin render visual. Prompt: {arteResult.imagePrompt}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* BOTÓN PRINCIPAL DE CONFIRMACIÓN CONJUNTA */}
       <div style={{ 
-        marginTop: '24px', 
         padding: '20px', 
         background: 'linear-gradient(135deg, #0d1f0d, #1a2e1a)',
         border: '1px solid #2d5a2d',
@@ -155,7 +558,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
           letterSpacing: '0.2em',
           fontWeight: 700
         }}>
-          📤 PUBLICACIÓN FINAL
+          📤 PASO FINAL DE VINCULACIÓN
         </p>
         <p style={{ 
           margin: '0 0 16px 0', 
@@ -163,53 +566,39 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
           color: '#aaa',
           lineHeight: '1.5'
         }}>
-          Cuando el informe esté listo y la <strong style={{ color: '#fff' }}>imagen de portada</strong> esté cargada 
-          (manual o generada por el Motor de Arte), presioná este botón y luego <strong style={{ color: '#4caf50' }}>Save</strong> en Keystatic.
-          El ensayo aparecerá en el inicio y en el archivo automáticamente.
+          Presioná este botón para guardar el ensayo, la categoría, la sinopsis y la portada directamente en el sistema de archivos de la hemeroteca.
         </p>
 
         <button
           type="button"
-          onClick={handlePublicar}
-          disabled={!ensayo || ensayo.length < 50}
+          onClick={handleConfirmarSincronizacion}
+          disabled={!ensayo || ensayo.length < 10}
           style={{
             display: 'block',
             width: '100%',
-            padding: '20px',
-            background: (!ensayo || ensayo.length < 50) 
+            padding: '18px',
+            background: (!ensayo || ensayo.length < 10) 
               ? '#1a1a1a' 
               : isPublished 
                 ? 'linear-gradient(135deg, #1a5c1a, #2d8c2d)' 
                 : 'linear-gradient(135deg, #1a4d1a, #2d7a2d)',
-            color: (!ensayo || ensayo.length < 50) ? '#555' : '#fff',
-            border: (!ensayo || ensayo.length < 50) ? '1px solid #333' : '1px solid #4caf50',
+            color: (!ensayo || ensayo.length < 10) ? '#555' : '#fff',
+            border: (!ensayo || ensayo.length < 10) ? '1px solid #333' : '1px solid #4caf50',
             borderRadius: '8px',
             fontWeight: 800,
-            fontSize: '1.1rem',
+            fontSize: '1rem',
             textTransform: 'uppercase' as const,
-            letterSpacing: '0.15em',
-            cursor: (!ensayo || ensayo.length < 50) ? 'not-allowed' : 'pointer',
+            letterSpacing: '0.12em',
+            cursor: (!ensayo || ensayo.length < 10) ? 'not-allowed' : 'pointer',
             transition: 'all 0.3s ease',
-            boxShadow: (!ensayo || ensayo.length < 50) ? 'none' : '0 6px 20px rgba(45, 122, 45, 0.4)',
+            boxShadow: (!ensayo || ensayo.length < 10) ? 'none' : '0 6px 20px rgba(45, 122, 45, 0.4)',
           }}
         >
           {isPublished 
-            ? '✅ LISTO — DESACTIVÁ BORRADOR Y PRESIONÁ SAVE' 
-            : '🚀 CONFIRMAR INFORME PARA PUBLICACIÓN'}
+            ? '✅ ENSAYO Y METADATOS GUARDADOS EN DISCO' 
+            : '🚀 CONFIRMAR ENSAYO Y PORTADA EN LA HEMEROTECA'}
         </button>
-
-        {ensayo && ensayo.length >= 50 && (
-          <p style={{ 
-            margin: '10px 0 0 0', 
-            fontSize: '0.72rem', 
-            color: '#5a9e5a',
-            textAlign: 'center' as const
-          }}>
-            {ensayo.length.toLocaleString()} caracteres · Informe listo
-          </p>
-        )}
       </div>
     </div>
   );
 }
-

@@ -63,7 +63,7 @@ async function main() {
     console.log('\n  🧠 Generando ensayo con gemini-3.1-pro...');
 
     const textResult = await ai.models.generateContent({
-      model: 'gemini-3.1-pro',
+      model: 'gemini-3.1-pro-preview',
       contents: titulo,
       config: {
         systemInstruction:
@@ -164,7 +164,7 @@ async function main() {
       coverImage: coverImage,
       videoBg: null,
       excerpt,
-      generador: 'gemini-3.1-pro',
+      generador: 'gemini-3.1-pro-preview',
       generadorTexto: textoEnsayo,             // El texto completo en el campo tipado
       generadorImagen: '',
       notasInvestigador: '',

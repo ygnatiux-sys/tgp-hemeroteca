@@ -251,16 +251,7 @@ const heroOrigin = (data as any).heroOrigin || (data as any).transformOrigin || 
             );
           }
           
-          return (
-            <>
-              {Content && (
-                <div class="essay-content">
-                  <Content />
-                </div>
-              )}
-              <RelatedReading currentSlug={slug!} category={data.category ?? undefined} />
-            </>
-          );
+
         })()}
       </div>
       </div>

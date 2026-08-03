@@ -1,17 +1,12 @@
 {
   "title": "La Estética del Silencio en el Cine",
   "volanta": "Una reflexión sobre la ausencia de sonido como recurso narrativo",
+  "generador": "gemini-3.1-pro",
+  "notasInvestigador": "Prueba de integración",
   "date": "2026-08-03",
-  "category": "Cine",
+  "category": "Historia de la Cultura",
   "themeColor": "old-navy",
   "draft": false,
-  "coverImage": null,
-  "videoBg": null,
-  "excerpt": "El silencio en el séptimo arte no es una mera ausencia de sonido, sino una presencia tangible que amplifica la tensión y la introspección.",
-  "generador": "gemini-3.1-pro",
-  "generadorTexto": "El silencio en el cine moderno...",
-  "generadorImagen": "",
-  "notasInvestigador": "Prueba de integración",
-  "spotifyLink": null,
-  "youtubeLink": null
+  "coverImage": "/src/assets/ensayos/la-estetica-del-silencio/coverImage.png",
+  "excerpt": "El silencio en el séptimo arte no es una mera ausencia de sonido, sino una presencia tangible que amplifica la tensión y la introspección."
 }

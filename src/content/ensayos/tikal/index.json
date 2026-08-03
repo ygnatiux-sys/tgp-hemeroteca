@@ -1,8 +1,7 @@
 {
   "title": "Tikal ",
-  "generadorTexto": "",
-  "generadorImagen": "",
   "date": "2026-08-02",
   "themeColor": "british-green",
-  "draft": true
+  "draft": false,
+  "coverImage": "/src/assets/ensayos/tikal/coverImage.jpeg"
 }
