@@ -11,11 +11,20 @@ export default defineConfig({
     {
       name: 'gemini-motor-local',
       hooks: {
-        'astro:config:setup': ({ injectRoute }) => {
-          if (process.env.NODE_ENV === 'development') {
+        'astro:config:setup': ({ injectRoute, command }) => {
+          // En modo desarrollo local (astro dev), inyectamos dinámicamente las rutas API de Keystatic y Gemini
+          if (command === 'dev' || process.env.NODE_ENV === 'development') {
             injectRoute({
               pattern: '/api/generar-tgp',
               entrypoint: './src/api/_generar-tgp.ts'
+            });
+            injectRoute({
+              pattern: '/api/generar-sujeto',
+              entrypoint: './src/api/_generar-sujeto.ts'
+            });
+            injectRoute({
+              pattern: '/api/generar-arte',
+              entrypoint: './src/api/_generar-arte.ts'
             });
           }
         }

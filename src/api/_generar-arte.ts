@@ -6,8 +6,8 @@ import {
   buildFinalImagePrompt,
   generateImageWithGemini,
   adaptLegacyToV2Intelligent,
-} from '../../lib/arte-tgp';
-import type { IntelligentDirectorInput, ManualLabInput, ResolvedArtDirection } from '../../lib/arte-tgp/types';
+} from '../lib/arte-tgp';
+import type { IntelligentDirectorInput, ManualLabInput, ResolvedArtDirection } from '../lib/arte-tgp/types';
 
 export const prerender = false;
 
