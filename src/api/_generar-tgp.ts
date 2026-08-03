@@ -117,8 +117,8 @@ export const POST: APIRoute = async ({ request }) => {
         const prompt = `Escribe un ensayo profundo sobre: "${titulo}".
 Devuelve estrictamente un JSON válido con esta estructura:
 {
-  "content": "Texto completo del ensayo en Markdown con subtítulos (##, ###). Tono Dark Academia preciso, erudito pero accesible. Apertura con tensión intelectual y cierre reflexivo universal.",
-  "excerpt": "Un abstract o sinopsis en forma de cita filosófica impactante de entre 2 y 4 renglones máximo (tipo quote editorial).",
+  "content": "Texto completo del ensayo en Markdown con subtítulos (##, ###). Tono Dark Academia erudito, estilizado y riguroso.\\n\\nREGLAS HISTÓRICAS Y CITAS OBLIGATORIAS:\\n1. FUENTES PRIMARIAS: Intercala testimonios y fuentes históricas originales de los actores o documentos involucrados (ej. citas de Nestorio, Simón el Estilita, San Agustín, Carpócrates, manuscritos o códices antiguos).\\n2. QUOTES LATERALES: Formatea estas fuentes o reflexiones clave como bloques de cita Markdown (> \\\"Cita histórica o testimonio...\\\") intercalados en el cuerpo (hasta 3 citas destacadas).\\n3. RECUADRO DE FUENTES ERUDITAS: Al final del ensayo, incluye de manera obligatoria una sección en recuadro titulada '## Fuentes Eruditas & Referencias Históricas' enumerando las fuentes primarias y bibliografía especializada en itálica soft de la tipografía principal.",
+  "excerpt": "Un abstract o sinopsis en forma de cita filosófica e histórica impactante de entre 2 y 4 renglones máximo (tipo quote editorial).",
   "category": "La categoría disciplinar TGP más apropiada elegida únicamente de esta lista: [${CATEGORIAS_TGP.join(', ')}]"
 }`;
 
@@ -127,7 +127,7 @@ Devuelve estrictamente un JSON válido con esta estructura:
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
           config: {
             responseMimeType: 'application/json',
-            systemInstruction: "Eres el motor cognitivo TGP. Tu objetivo es producir ensayos de alta profundidad filosófica y análisis cultural agudo en formato JSON. Identidad implícita. NUNCA declares tu rol ni uses fórmulas autorreferenciales.",
+            systemInstruction: "Eres el motor cognitivo TGP (The Great Puzzle Project). Tu objetivo es producir ensayos de alta erudición e investigación histórica basada en fuentes primarias y testimonios originales de los actores históricos. Todo ensayo debe incluir quotes Markdown (>) con citas textuales originales e incluir al final una sección '## Fuentes Eruditas & Referencias Históricas' en itálica soft. NUNCA declares tu rol ni uses fórmulas autorreferenciales.",
           }
         });
 
