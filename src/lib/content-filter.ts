@@ -113,29 +113,120 @@ export function groupByCategory(
 }
 
 /**
- * Mapa centralizado de imágenes de ensayos en Vite/Astro.
+ * Mapa centralizado de imágenes de ensayos y georreferencias en Vite/Astro.
  */
 export const essayImages = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}',
+  ['/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}', '/src/assets/georreferencias/**/*.{jpeg,jpg,png,gif,webp,avif}'],
   { eager: true }
 );
 
 /**
- * Resuelve la imagen óptima de un ensayo:
+ * Resuelve la imagen óptima de un ensayo o georreferencia:
  * 1. Coincidencia exacta con coverImage si existe.
- * 2. Si no, busca automáticamente cualquier imagen en la carpeta del slug (`/src/assets/ensayos/${slug}/`).
+ * 2. Si no, busca automáticamente cualquier imagen en la carpeta del slug (`/src/assets/ensayos/${slug}/` o `/src/assets/georreferencias/${slug}/`).
  */
 export function resolveEssayImage(coverPath?: string | null, slug?: string): ImageMetadata | null {
   if (coverPath && essayImages[coverPath]) {
     return essayImages[coverPath].default;
   }
   if (slug) {
-    const slugPrefix = `/src/assets/ensayos/${slug}/`;
+    const ensayoPrefix = `/src/assets/ensayos/${slug}/`;
+    const georefPrefix = `/src/assets/georreferencias/${slug}/`;
     for (const [key, mod] of Object.entries(essayImages)) {
-      if (key.startsWith(slugPrefix)) {
+      if (key.startsWith(ensayoPrefix) || key.startsWith(georefPrefix)) {
         return mod.default;
       }
     }
   }
   return null;
+}
+
+export interface GalleryImageItem {
+  id?: string;
+  url: string;
+  thumbUrl?: string;
+  title: string;
+  caption?: string;
+  author?: string;
+  license?: string;
+  width?: number;
+  height?: number;
+  aspectRatio?: number;
+  role?: string;
+}
+
+/**
+ * Recopila automáticamente todas las imágenes vinculadas a un post:
+ * - Imágenes seleccionadas de Wikimedia (bancoImagenesWikimedia o buscadorWikimedia)
+ * - Imágenes en disco (/src/assets/ensayos/${slug}/ o /src/assets/georreferencias/${slug}/)
+ * - Portada principal
+ */
+export function resolveAllPostGalleryImages(doc: any, slug?: string): GalleryImageItem[] {
+  const images: GalleryImageItem[] = [];
+  const seenUrls = new Set<string>();
+
+  const addImg = (item: GalleryImageItem) => {
+    if (!item.url || seenUrls.has(item.url)) return;
+    seenUrls.add(item.url);
+    images.push(item);
+  };
+
+  // 1. Imágenes seleccionadas de Wikimedia
+  const rawWm = doc?.bancoImagenesWikimedia || doc?.buscadorWikimedia;
+  if (rawWm) {
+    try {
+      const parsed = typeof rawWm === 'string' ? JSON.parse(rawWm) : rawWm;
+      if (parsed && Array.isArray(parsed.selectedItems)) {
+        for (const item of parsed.selectedItems) {
+          addImg({
+            id: item.id,
+            url: item.url || item.thumbUrl,
+            thumbUrl: item.thumbUrl || item.url,
+            title: item.title || 'Registro Visual',
+            caption: item.description || item.title,
+            author: item.author || 'Wikimedia Commons',
+            license: item.license || 'Licencia Libre',
+            width: item.width,
+            height: item.height,
+            aspectRatio: item.aspectRatio,
+            role: item.role
+          });
+        }
+      }
+    } catch (e) {}
+  }
+
+  // 2. Imágenes locales en carpeta del slug
+  if (slug) {
+    const ensayoPrefix = `/src/assets/ensayos/${slug}/`;
+    const georefPrefix = `/src/assets/georreferencias/${slug}/`;
+    for (const [key, mod] of Object.entries(essayImages)) {
+      if (key.startsWith(ensayoPrefix) || key.startsWith(georefPrefix)) {
+        const fileName = key.split('/').pop() || 'Fotografía de Archivo';
+        addImg({
+          url: mod.default.src,
+          thumbUrl: mod.default.src,
+          title: fileName.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
+          caption: `Registro de archivo fotográfico: ${slug}`,
+          width: mod.default.width,
+          height: mod.default.height
+        });
+      }
+    }
+  }
+
+  // 3. Portada si no está en la lista
+  if (doc?.coverImage && essayImages[doc.coverImage]) {
+    const mod = essayImages[doc.coverImage];
+    addImg({
+      url: mod.default.src,
+      thumbUrl: mod.default.src,
+      title: doc.title || 'Portada de Archivo',
+      caption: doc.excerpt || 'Registro principal',
+      width: mod.default.width,
+      height: mod.default.height
+    });
+  }
+
+  return images;
 }

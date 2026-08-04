@@ -1,7 +1,12 @@
 {
-  "title": "Tikal ",
+  "title": "tikal",
   "date": "2026-08-02",
+  "category": "Arqueosemiótica",
   "themeColor": "british-green",
   "draft": false,
-  "coverImage": "/src/assets/ensayos/tikal/coverImage.jpeg"
+  "sitioGeohistorico": "tikal",
+  "publicarConImagen": true,
+  "coverImage": "/src/assets/ensayos/tikal/coverImage.jpeg",
+  "excerpt": "Una exploración multidimensional de Bonampak, donde los murales mayas actúan como códices líticos que entrelazan la geopolítica del Clásico Tardío, la mineralogía kárstica de la selva y la cosmovisión viva de sus guardianes lacandones.",
+  "generador": "Gemini-3.1-Pro"
 }

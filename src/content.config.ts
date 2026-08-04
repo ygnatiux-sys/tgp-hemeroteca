@@ -18,6 +18,8 @@ const ensayos = defineCollection({
     coverImage: z.string().optional().nullable().catch(null),
     videoBg: z.string().optional().nullable().catch(null),
     excerpt: z.string().optional().nullable().catch("Sin descripción disponible."),
+    sitioGeohistorico: z.string().optional().nullable().catch(null),
+    publicarConImagen: z.boolean().default(true),
     generador: z.string().optional().default(''),
     generadorTexto: z.string().optional().nullable().catch(null),
     generadorImagen: z.string().optional().nullable().catch(null),
@@ -37,7 +39,7 @@ const ensayosContent = defineCollection({
 
 const direccionArte = defineCollection({
   loader: glob({ 
-    pattern: "**/*.json", 
+    pattern: "**/index.json", 
     base: "src/content/estilos-visuales" 
   }),
   schema: z.object({
@@ -69,8 +71,29 @@ const direccionArte = defineCollection({
   })
 });
 
+const georreferencias = defineCollection({
+  loader: glob({ 
+    pattern: "**/index.json", 
+    base: "src/content/georreferencias" 
+  }),
+  schema: z.object({
+    title: z.string().optional().catch("Sin Título"),
+    sitioGeohistorico: z.string().optional().nullable().catch(null),
+    volantaHook: z.string().optional().nullable().catch(null),
+    saberMasDato: z.string().optional().nullable().catch(null),
+    draft: z.boolean().default(false),
+    date: z.string().optional().nullable().catch(null),
+    category: z.string().optional().nullable().default("Arqueosemiótica"),
+    publicarConImagen: z.boolean().default(true),
+    coverImage: z.string().optional().nullable().catch(null),
+    bancoImagenesWikimedia: z.string().optional().nullable().catch(null),
+    excerpt: z.string().optional().nullable().catch("Sin descripción disponible."),
+  })
+});
+
 export const collections = {
   ensayos,
   ensayosContent,
   direccionArte,
+  georreferencias,
 };

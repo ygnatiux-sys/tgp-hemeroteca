@@ -21,14 +21,16 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     const body = await request.json();
-    let { slug, title, content, excerpt, category, imageUrl } = body;
+    const { slug, title, content, excerpt, category, imageUrl, sitioGeohistorico, publicarConImagen } = body;
 
-    if (!slug && title) {
-      slug = slugify(title);
-    }
-
-    if (!slug) {
-      return new Response(JSON.stringify({ error: 'No se especificó un slug ni un título para guardar el ensayo.' }), { status: 400, headers });
+    // GUARD CRÍTICO: Solo operar si hay un slug explícito y confirmado.
+    // NUNCA auto-generar slug desde title (eso le corresponde exclusivamente a Keystatic).
+    if (!slug || typeof slug !== 'string' || slug.trim() === '') {
+      console.warn('[guardar-ensayo] Rechazado: sin slug válido. Los posts nuevos deben ser guardados por Keystatic primero.');
+      return new Response(JSON.stringify({ 
+        error: 'Se requiere un slug válido. Para posts nuevos, usa el botón Create/Save de Keystatic primero.',
+        skipped: true 
+      }), { status: 400, headers });
     }
 
     const contentDirPath = path.join(process.cwd(), 'src', 'content', 'ensayos', slug);
@@ -88,21 +90,28 @@ export const POST: APIRoute = async ({ request }) => {
 
     const todayStr = new Date().toISOString().split('T')[0];
 
+    // Normalizar coverImage existente si tenía ruta relativa rota
+    let finalCoverImage = coverImagePath || existingData.coverImage || null;
+    if (finalCoverImage && !finalCoverImage.startsWith('/') && !finalCoverImage.startsWith('http')) {
+      finalCoverImage = `/src/assets/ensayos/${slug}/${finalCoverImage}`;
+    }
+
     const updatedData = {
       title: title || existingData.title || slug,
       date: existingData.date || todayStr,
       category: category || existingData.category || 'Historia',
       themeColor: existingData.themeColor || 'british-green',
       draft: existingData.draft ?? false,
-      coverImage: coverImagePath || existingData.coverImage || null,
+      sitioGeohistorico: sitioGeohistorico !== undefined ? sitioGeohistorico : (existingData.sitioGeohistorico || null),
+      publicarConImagen: publicarConImagen !== undefined ? Boolean(publicarConImagen) : (existingData.publicarConImagen ?? true),
+      coverImage: finalCoverImage,
       excerpt: excerpt || existingData.excerpt || '',
-      generadorTexto: content || existingData.generadorTexto || '',
       generador: 'Gemini-3.1-Pro'
     };
 
     fs.writeFileSync(jsonFilePath, JSON.stringify(updatedData, null, 2), 'utf-8');
 
-    // 3. GUARDADO DE CONTENT.MDOC
+    // 3. GUARDADO EXCLUSIVO DE CONTENIDO EN CONTENT.MDOC
     if (content) {
       const mdocFilePath = path.join(contentDirPath, 'content.mdoc');
       fs.writeFileSync(mdocFilePath, content, 'utf-8');

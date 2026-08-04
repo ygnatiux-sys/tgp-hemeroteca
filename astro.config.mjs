@@ -30,6 +30,14 @@ export default defineConfig({
               pattern: '/api/guardar-ensayo',
               entrypoint: './src/api/_guardar-ensayo.ts'
             });
+            injectRoute({
+              pattern: '/api/generar-georreferencia',
+              entrypoint: './src/api/_generar-georreferencia.ts'
+            });
+            injectRoute({
+              pattern: '/api/guardar-georreferencia',
+              entrypoint: './src/api/_guardar-georreferencia.ts'
+            });
           }
         }
       }

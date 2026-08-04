@@ -1,0 +1,12 @@
+{
+  "title": "tikal",
+  "date": "2026-08-03",
+  "category": "Historia",
+  "themeColor": "british-green",
+  "draft": true,
+  "sitioGeohistorico": null,
+  "publicarConImagen": true,
+  "coverImage": "/src/assets/ensayos/tikal-1/coverImage.jpg",
+  "excerpt": "",
+  "generador": "Gemini-3.1-Pro"
+}

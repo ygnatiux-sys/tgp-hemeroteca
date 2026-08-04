@@ -1,0 +1,179 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import {
+  getPublishableEssays,
+  formatDate,
+  formatYear,
+  resolveEssayImage,
+} from '../../lib/content-filter';
+
+// ─── CARGA Y FILTRADO ────────────────────────────────────────────────────────
+const allEssaysRaw = await getCollection('ensayos').catch(() => []);
+const allGeorefsRaw = await getCollection('georreferencias').catch(() => []);
+
+const isProd = import.meta.env.PROD;
+const publishableEssays = getPublishableEssays(allEssaysRaw, isProd);
+const publishableGeorefs = getPublishableEssays(allGeorefsRaw, isProd);
+
+const publishable = [...publishableEssays, ...publishableGeorefs];
+
+// Filtrar artículos de la colección "Sitios Geohistóricos & Arqueohistóricos"
+const geohistoricalEssays = publishable.filter(e => {
+  const cat = e.entry.category?.toLowerCase() || '';
+  return Boolean(e.entry.sitioGeohistorico) || Boolean((e.entry as any).volantaHook) || (e as any).collection === 'georreferencias' || cat.includes('arqueo') || cat.includes('sitio') || cat.includes('historia antigua');
+});
+
+const resolvedEssays = geohistoricalEssays.map(e => {
+  const showImg = e.entry.publicarConImagen !== false;
+  const img = showImg ? resolveEssayImage(e.entry.coverImage, e.slug) : null;
+  return {
+    ...e,
+    showImg,
+    img
+  };
+});
+---
+
+<Layout title="Sitios Geohistóricos & Arqueohistóricos | Hemeroteca TGP">
+  <div class="bg-theme-dark text-white min-h-screen pb-32">
+
+    {/* ═══════════════════════════════════════════════════════════════════
+        HERO INSTITUCIONAL DE LA NUEVA COLECCIÓN
+    ═══════════════════════════════════════════════════════════════════ */}
+    <section class="relative w-full h-[58vh] min-h-96 flex flex-col justify-end pb-12 px-6 md:px-12 lg:px-24 overflow-hidden border-b border-white/10 bg-linear-to-b from-[#0a0f0d] via-theme-dark to-theme-dark">
+      
+      <div class="relative z-10 max-w-5xl">
+        <nav class="mb-6 flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
+          <a href="/colecciones" class="hover:text-[#C8A98B] transition-colors">Colecciones</a>
+          <span>/</span>
+          <span class="text-[#C8A98B]">Georreferencias</span>
+        </nav>
+
+        {/* H1 CON CINZEL EXTRABOLD Y GRADIENTE ACERO iOS STYLE */}
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-cinzel font-extrabold tracking-tight leading-none mb-4 gradient-acero-ios drop-shadow-2xl">
+          SITIOS GEOHISTÓRICOS
+        </h1>
+
+        {/* H2 CON SANS OUTFIT / JAKARTA THIN Y LETTER-SPACING AMPIO */}
+        <h2 class="text-xl md:text-2xl lg:text-3xl h2-thin-hook text-white/70 max-w-3xl leading-relaxed">
+          CARTOGRAFÍA EPISTÉMICA & ANÁLISIS ARQUEOSEMIÓTICO DE LUGARES SAGRADOS
+        </h2>
+
+        <div class="flex items-center gap-4 mt-6 pt-6 border-t border-white/10">
+          <span class="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/15 font-mono text-[10px] uppercase tracking-[0.3em] text-[#C8A98B] font-bold">
+            {resolvedEssays.length} {resolvedEssays.length === 1 ? 'sitio documentado' : 'sitios documentados'}
+          </span>
+          <span class="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40">
+            Geología · Arqueología · Etnografía · Hermenéutica
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-16 pt-16">
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          GRILLA DE SITIOS GEOHISTÓRICOS
+      ═══════════════════════════════════════════════════════════════════ */}
+      <section class="flex flex-col gap-8">
+        <div class="reveal-item flex items-end justify-between border-b border-white/10 pb-4">
+          <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B]">
+            Catálogo Georreferenciado
+          </span>
+          <span class="font-mono text-[9px] text-white/40 tracking-[0.2em]">
+            Investigaciones con Módulo Multi-Dimensional
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {resolvedEssays.map(({ slug, entry, showImg, img }) => (
+            <article class="group flex flex-col bg-white/3 border border-white/10 rounded-2xl overflow-hidden hover:border-[#C8A98B]/50 transition-all duration-500 shadow-xl">
+              
+              {/* TOGGLE CON/SIN IMAGEN */}
+              {showImg && img && (
+                <div class="relative overflow-hidden aspect-video bg-black/40">
+                  <Image
+                    src={img}
+                    alt={entry.title || "Sitio Geohistórico"}
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
+                  />
+                  <div class="absolute inset-0 bg-linear-to-t from-theme-dark/90 via-transparent to-transparent pointer-events-none" />
+                  {entry.sitioGeohistorico && (
+                    <div class="absolute bottom-4 left-4 z-10">
+                      <span class="px-2.5 py-1 bg-black/70 backdrop-blur-md rounded-md border border-white/20 font-mono text-[9px] uppercase tracking-[0.2em] text-[#C8A98B]">
+                        📍 {entry.sitioGeohistorico}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div class="p-7 md:p-9 flex flex-col justify-between flex-1 gap-5">
+                <div class="flex flex-col gap-3">
+                  <div class="flex items-center justify-between font-mono text-[9px] text-[#C8A98B] tracking-[0.2em] uppercase">
+                    <span>{entry.category || 'Arqueosemiótica'}</span>
+                    <span class="text-white/40">{formatYear(entry.date)}</span>
+                  </div>
+
+                  {/* H1 O H3 DEL ARTÍCULO CON CINZEL */}
+                  <h3 class="font-cinzel font-bold text-2xl md:text-3xl leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
+                    <a href={`/hemeroteca/${slug}`} class="hover:underline">
+                      {entry.title}
+                    </a>
+                  </h3>
+
+                  {entry.sitioGeohistorico && !img && (
+                    <div class="font-mono text-[10px] text-[#C8A98B] tracking-[0.2em] uppercase">
+                      📍 Ubicación: {entry.sitioGeohistorico}
+                    </div>
+                  )}
+
+                  {entry.excerpt && (
+                    <p class="font-serif text-white/70 text-base leading-relaxed line-clamp-3 italic">
+                      "{entry.excerpt}"
+                    </p>
+                  )}
+                </div>
+
+                <div class="pt-4 border-t border-white/5 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
+                  <a href={`/hemeroteca/${slug}`} class="hover:text-[#C8A98B] transition-colors inline-flex items-center gap-2">
+                    Explorar Georreferencia →
+                  </a>
+                  {showImg ? (
+                    <span class="text-white/30 text-[8px]">📷 Con Portada</span>
+                  ) : (
+                    <span class="text-white/30 text-[8px]">📝 Edición Texto Puro</span>
+                  )}
+                </div>
+              </div>
+
+            </article>
+          ))}
+        </div>
+
+        {resolvedEssays.length === 0 && (
+          <div class="p-16 text-center bg-white/3 border border-white/10 rounded-xl">
+            <p class="font-mono text-[11px] uppercase tracking-[0.3em] text-white/40 mb-3">
+              No hay sitios geohistóricos guardados aún.
+            </p>
+            <p class="font-serif text-white/60 text-sm italic">
+              Al guardar o crear un post desde Keystatic con la categoría o sitio arqueohistórico (ej: Aramu Muru, Tikal, Bonampak), aparecerá automáticamente en esta sección.
+            </p>
+          </div>
+        )}
+      </section>
+
+      <div class="pt-8 border-t border-white/10 flex justify-between">
+        <a href="/colecciones" class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40 hover:text-[#C8A98B] transition-colors">
+          ← Volver a Colecciones
+        </a>
+        <a href="/archivo" class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40 hover:text-[#C8A98B] transition-colors">
+          Catálogo Completo →
+        </a>
+      </div>
+
+    </div>
+  </div>
+</Layout>

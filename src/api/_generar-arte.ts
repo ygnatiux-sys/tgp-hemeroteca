@@ -88,6 +88,7 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(JSON.stringify({
       success: true,
       image: imageResult.image,
+      imageUrl: imageResult.image,
       coverImagePath: imageResult.coverImagePath,
       imagePrompt: finalPrompt,
       resolvedDirection,

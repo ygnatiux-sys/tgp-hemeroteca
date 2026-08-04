@@ -10,21 +10,40 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [activeModalItem, setActiveModalItem] = useState<WikimediaImageItem | null>(null);
 
+  // Extraer el slug actual de la URL de Keystatic
+  const getSlugFromUrl = (): string | null => {
+    if (typeof window === 'undefined') return null;
+    const parts = window.location.pathname.split('/');
+    const itemIndex = parts.indexOf('item');
+    if (itemIndex !== -1 && parts[itemIndex + 1] && parts[itemIndex + 1] !== 'new') {
+      return parts[itemIndex + 1];
+    }
+    return null;
+  };
+
   // Inicializar selección guardada en Keystatic si existe
   useEffect(() => {
     if (value) {
       try {
-        const parsed = typeof value === 'string' ? JSON.parse(value) : value;
-        if (Array.isArray(parsed?.selectedItems)) {
-          setItems(parsed.selectedItems);
-          setSelectedIds(new Set(parsed.selectedItems.map((i: any) => i.id)));
-          if (parsed.query) setQuery(parsed.query);
+        let raw = typeof value === 'object' && value !== null && 'value' in value ? value.value : value;
+        if (typeof raw === 'string') {
+          if (raw.startsWith('"') && raw.endsWith('"')) {
+            try { raw = JSON.parse(raw); } catch (e) {}
+          }
+          if (typeof raw === 'string' && raw.trim().startsWith('{')) {
+            raw = JSON.parse(raw);
+          }
+        }
+        if (raw && typeof raw === 'object' && Array.isArray(raw.selectedItems)) {
+          setItems(raw.selectedItems);
+          setSelectedIds(new Set(raw.selectedItems.map((i: any) => i.id)));
+          if (raw.query) setQuery(raw.query);
         }
       } catch (e) {
-        // Ignorar si no es JSON
+        console.warn('[BuscadorWikimediaTGP] Error parseando value:', e);
       }
     }
-  }, []);
+  }, [value]);
 
   // Guardar en Keystatic cuando cambien los ítems seleccionados
   const updateKeystaticValue = (newSelectedIds: Set<string>, currentItems: WikimediaImageItem[]) => {
@@ -35,6 +54,59 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
       selectedItems: selectedList
     }, null, 2);
     onChange(payload);
+  };
+
+  // Establecer foto de Wikimedia como portada principal (ensayo o georreferencia)
+  const handleEstablecerComoPortada = async (item: WikimediaImageItem) => {
+    const slugFromUrl = getSlugFromUrl();
+    const imageUrlToUse = item.url || item.thumbUrl;
+
+    if (!imageUrlToUse) return alert('No se encontró una URL de imagen válida.');
+
+    const isGeoref = typeof window !== 'undefined' && window.location.pathname.includes('georreferencias');
+    const endpoint = isGeoref ? '/api/guardar-georreferencia' : '/api/guardar-ensayo';
+
+    // Disparar evento global para que GeneradorGeorreferenciaTGP y GeneradorTextoTGP reciban la portada de inmediato
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('tgp:cover-selected', {
+        detail: { imageUrl: imageUrlToUse, title: item.title }
+      }));
+      try {
+        localStorage.setItem('tgp_last_selected_cover', imageUrlToUse);
+      } catch (e) {}
+    }
+
+    // Auto-detectar slug o título si no está en la URL (creación de nuevo post)
+    let slugToSave = slugFromUrl;
+    if (!slugToSave && typeof document !== 'undefined') {
+      const titleInput = document.querySelector<HTMLInputElement>('input[name="title"], input[id^="title"]');
+      if (titleInput && titleInput.value.trim()) {
+        slugToSave = titleInput.value.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
+      }
+    }
+
+    try {
+      if (slugToSave) {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slug: slugToSave,
+            imageUrl: imageUrlToUse,
+            publicarConImagen: true
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`✅ Portada "${item.title}" vinculada y guardada en disco para ${slugToSave}!`);
+          return;
+        }
+      }
+      alert(`✅ Foto "${item.title}" seleccionada como Portada.\n\nSe ha sincronizado con el generador. Guarda los cambios con el botón Save.`);
+    } catch (e) {
+      console.error('Error aplicando portada de Wikimedia:', e);
+      alert('✅ Foto seleccionada como Portada. Recuerda presionar "Save" en Keystatic.');
+    }
   };
 
   // Ejecutar Búsqueda en Wikimedia Commons
@@ -62,24 +134,35 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
     }
   };
 
-  // Toggle Seleccionar Todo / Deseleccionar Todo
+  // Seleccionar Todas las imágenes (marca todas las casillas sin perder la lista)
+  const handleSelectAll = () => {
+    const allSet = new Set(items.map(i => i.id));
+    setSelectedIds(allSet);
+    updateKeystaticValue(allSet, items);
+  };
+
+  // Deseleccionar Todas las imágenes (desmarca todas las casillas para seleccionar una a una)
+  const handleDeselectAll = () => {
+    const emptySet = new Set<string>();
+    setSelectedIds(emptySet);
+    updateKeystaticValue(emptySet, items);
+  };
+
+  // Alias de compatibilidad total
   const handleToggleSelectAll = () => {
     if (selectedIds.size === items.length) {
-      const emptySet = new Set<string>();
-      setSelectedIds(emptySet);
-      updateKeystaticValue(emptySet, items);
+      handleDeselectAll();
     } else {
-      const allSet = new Set(items.map(i => i.id));
-      setSelectedIds(allSet);
-      updateKeystaticValue(allSet, items);
+      handleSelectAll();
     }
   };
 
-  // Resetear Toda la Selección
-  const handleResetAll = () => {
+  // Limpiar Búsqueda por completo
+  const handleClearSearch = () => {
     const emptySet = new Set<string>();
     setSelectedIds(emptySet);
     setItems([]);
+    setQuery('');
     updateKeystaticValue(emptySet, []);
   };
 
@@ -216,42 +299,62 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
           flexWrap: 'wrap',
           gap: '12px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <button
               type="button"
-              onClick={handleToggleSelectAll}
+              onClick={handleSelectAll}
+              title="Marcar todas las imágenes de la búsqueda actual"
               style={{
                 padding: '8px 14px',
-                background: selectedIds.size === items.length ? '#2e7d32' : '#333',
+                background: selectedIds.size === items.length ? '#2e7d32' : '#22303c',
                 color: '#fff',
-                border: '1px solid #555',
+                border: '1px solid #388e3c',
                 borderRadius: '4px',
                 fontSize: '0.8rem',
                 fontWeight: 600,
                 cursor: 'pointer'
               }}
             >
-              {selectedIds.size === items.length ? '☑️ Deseleccionar Todo' : '☑️ Seleccionar Todo'}
+              ☑️ Seleccionar Todas ({items.length})
             </button>
 
             <button
               type="button"
-              onClick={handleResetAll}
+              onClick={handleDeselectAll}
+              title="Desmarcar todas las casillas para poder elegir una por una (mantiene las fotos visibles)"
               style={{
                 padding: '8px 14px',
-                background: '#c62828',
-                color: '#fff',
-                border: 'none',
+                background: selectedIds.size === 0 ? '#1b2838' : '#37474f',
+                color: '#eceff1',
+                border: '1px solid #607d8b',
                 borderRadius: '4px',
                 fontSize: '0.8rem',
                 fontWeight: 600,
                 cursor: 'pointer'
               }}
             >
-              🔄 Reset All
+              ◻️ Desmarcar Todo
             </button>
 
-            <span style={{ fontSize: '0.85rem', color: '#90caf9', fontWeight: 600 }}>
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              title="Borrar resultados y limpiar búsqueda"
+              style={{
+                padding: '8px 12px',
+                background: '#421b1b',
+                color: '#ffcdd2',
+                border: '1px solid #b71c1c',
+                borderRadius: '4px',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              🗑️ Limpiar Búsqueda
+            </button>
+
+            <span style={{ fontSize: '0.85rem', color: '#90caf9', fontWeight: 600, marginLeft: '6px' }}>
               {selectedCount} de {items.length} seleccionadas
             </span>
           </div>
@@ -419,13 +522,38 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
                   </div>
 
                   <div style={{ borderTop: '1px solid #282838', paddingTop: '10px', fontSize: '0.7rem', color: '#888' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                       <span>📐 {item.width}×{item.height}px</span>
                       <span style={{ color: '#81c784', fontWeight: 600 }}>{item.license}</span>
                     </div>
-                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '8px' }}>
                       👤 Autor: {item.author}
                     </div>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEstablecerComoPortada(item);
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '6px 10px',
+                        background: '#1b5e20',
+                        color: '#fff',
+                        border: '1px solid #4caf50',
+                        borderRadius: '4px',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      🖼️ Fijar como Portada Principal (Hero)
+                    </button>
                   </div>
                 </div>
               </div>
@@ -434,7 +562,7 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
         </div>
       )}
 
-      {/* MODAL AMPLIADO FANCYBOX PARA INSPECCIÓN DE DETALLES */}
+      {/* MODAL LUPA 60% SCREEN PARA INSPECCIÓN DE DETALLES Y NAVEGACIÓN */}
       {activeModalItem && (
         <div style={{
           position: 'fixed',
@@ -443,62 +571,184 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
           right: 0,
           bottom: 0,
           zIndex: 99999,
-          background: 'rgba(0, 0, 0, 0.85)',
-          backdropFilter: 'blur(8px)',
+          background: 'rgba(0, 0, 0, 0.88)',
+          backdropFilter: 'blur(12px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '30px'
+          padding: '20px'
         }} onClick={() => setActiveModalItem(null)}>
           <div style={{
-            background: '#121218',
-            border: '1px solid #444',
-            borderRadius: '12px',
-            maxWidth: '900px',
-            maxHeight: '90vh',
+            background: '#101016',
+            border: '1px solid #3d3d52',
+            borderRadius: '16px',
+            width: 'clamp(320px, 60vw, 1150px)',
+            maxHeight: '86vh',
             overflowY: 'auto',
             padding: '24px',
             color: '#fff',
-            position: 'relative'
+            position: 'relative',
+            boxShadow: '0 25px 70px rgba(0,0,0,0.9)'
           }} onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              onClick={() => setActiveModalItem(null)}
-              style={{
-                position: 'absolute',
-                top: '15px',
-                right: '15px',
-                background: '#c62828',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '50%',
-                width: '32px',
-                height: '32px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
-            >
-              ✕
-            </button>
+            {/* Cabecera del Visor Lupa 60% */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid #282838', paddingBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ background: 'rgba(100, 181, 246, 0.15)', color: '#64b5f6', border: '1px solid rgba(100,181,246,0.3)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>
+                  🔍 Lupa 60% Screen
+                </span>
+                <h3 style={{ margin: 0, fontSize: '1rem', color: '#fff', maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {activeModalItem.title}
+                </h3>
+              </div>
 
-            <h3 style={{ margin: '0 0 15px 0', fontSize: '1.1rem', color: '#90caf9' }}>
-              {activeModalItem.title}
-            </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => handleEstablecerComoPortada(activeModalItem)}
+                  style={{
+                    padding: '6px 12px',
+                    background: '#1b5e20',
+                    color: '#fff',
+                    border: '1px solid #4caf50',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  🖼️ Fijar como Portada
+                </button>
 
-            <div style={{ textAlignment: 'center', marginBottom: '20px' }}>
-              <img 
-                src={activeModalItem.url} 
-                alt={activeModalItem.title}
-                style={{ maxWidth: '100%', maxHeight: '500px', borderRadius: '8px', border: '1px solid #333' }}
-              />
+                <button
+                  type="button"
+                  onClick={() => setActiveModalItem(null)}
+                  style={{
+                    background: '#d32f2f',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  title="Cerrar Lupa (Esc)"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
-            <div style={{ background: '#0a0a0f', padding: '16px', borderRadius: '6px', fontSize: '0.85rem', lineHeight: '1.6' }}>
-              <p style={{ margin: '0 0 8px 0' }}><strong>Rol Asignado:</strong> {activeModalItem.roleLabel}</p>
-              <p style={{ margin: '0 0 8px 0' }}><strong>Resolución Nativa:</strong> {activeModalItem.width} × {activeModalItem.height} px (Ratio: {activeModalItem.aspectRatio})</p>
-              <p style={{ margin: '0 0 8px 0' }}><strong>Autor / Créditos:</strong> {activeModalItem.author}</p>
-              <p style={{ margin: '0 0 8px 0' }}><strong>Licencia Legal:</strong> <a href={activeModalItem.licenseUrl} target="_blank" rel="noreferrer" style={{ color: '#64b5f6' }}>{activeModalItem.license}</a></p>
-              <p style={{ margin: '0 0 8px 0' }}><strong>Página de Origen:</strong> <a href={activeModalItem.pageUrl} target="_blank" rel="noreferrer" style={{ color: '#64b5f6' }}>Ver en Wikimedia Commons</a></p>
+            {/* Imagen Principal en Visor 60% */}
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '20px',
+              position: 'relative',
+              background: '#07070a',
+              borderRadius: '10px',
+              padding: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: '320px'
+            }}>
+              <img 
+                src={activeModalItem.url || activeModalItem.thumbUrl} 
+                alt={activeModalItem.title}
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '52vh',
+                  objectFit: 'contain',
+                  borderRadius: '6px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.8)'
+                }}
+              />
+
+              {/* Botones de Navegación Previa / Siguiente en el Visor */}
+              {items.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const curIdx = items.findIndex(i => i.id === activeModalItem.id);
+                      const prevIdx = curIdx > 0 ? curIdx - 1 : items.length - 1;
+                      setActiveModalItem(items[prevIdx]);
+                    }}
+                    style={{
+                      position: 'absolute',
+                      left: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'rgba(0,0,0,0.7)',
+                      color: '#fff',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      borderRadius: '50%',
+                      width: '40px',
+                      height: '40px',
+                      fontSize: '1.2rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    title="Foto anterior"
+                  >
+                    ❮
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const curIdx = items.findIndex(i => i.id === activeModalItem.id);
+                      const nextIdx = curIdx < items.length - 1 ? curIdx + 1 : 0;
+                      setActiveModalItem(items[nextIdx]);
+                    }}
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'rgba(0,0,0,0.7)',
+                      color: '#fff',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      borderRadius: '50%',
+                      width: '40px',
+                      height: '40px',
+                      fontSize: '1.2rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    title="Foto siguiente"
+                  >
+                    ❯
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Metadatos y Licencias */}
+            <div style={{ background: '#0a0a0f', padding: '16px', borderRadius: '8px', fontSize: '0.82rem', lineHeight: '1.6', border: '1px solid #1f1f2e' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', marginBottom: '10px' }}>
+                <p style={{ margin: 0 }}><strong>Rol Asignado:</strong> {activeModalItem.roleLabel}</p>
+                <p style={{ margin: 0 }}><strong>Resolución:</strong> {activeModalItem.width} × {activeModalItem.height} px</p>
+                <p style={{ margin: 0 }}><strong>Autor:</strong> {activeModalItem.author}</p>
+                <p style={{ margin: 0 }}><strong>Licencia:</strong> <span style={{ color: '#81c784', fontWeight: 600 }}>{activeModalItem.license}</span></p>
+              </div>
+              <div style={{ borderTop: '1px solid #1a1a26', paddingTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <a href={activeModalItem.url} target="_blank" rel="noreferrer" style={{ color: '#64b5f6', textDecoration: 'none', fontWeight: 600 }}>
+                  ↗ Abrir Archivo Original
+                </a>
+                <a href={activeModalItem.pageUrl} target="_blank" rel="noreferrer" style={{ color: '#aaa', textDecoration: 'none' }}>
+                  Ficha en Wikimedia Commons ↗
+                </a>
+              </div>
             </div>
           </div>
         </div>

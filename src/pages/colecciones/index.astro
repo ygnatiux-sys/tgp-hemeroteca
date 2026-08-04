@@ -64,6 +64,34 @@ const resolvedRest = rest.map(col => ({
         </div>
       </header>
 
+      {/* BANNER DESTACADO: NUEVA SECCIÓN SITIOS GEOHISTÓRICOS */}
+      <section class="reveal-item">
+        <a
+          href="/colecciones/sitios-arqueohistoricos"
+          class="group block p-8 md:p-12 rounded-2xl border border-white/15 bg-linear-to-r from-[#0d141b] via-[#121c24] to-[#0a0f14] hover:border-[#64b5f6]/60 transition-all duration-500 shadow-2xl relative overflow-hidden"
+        >
+          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="flex flex-col gap-2 max-w-3xl">
+              <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#64b5f6]">
+                📍 Nueva Colección Especializada
+              </span>
+              <h2 class="text-3xl md:text-5xl font-cinzel font-extrabold tracking-tight leading-tight gradient-acero-ios">
+                Sitios Geohistóricos & Arqueohistóricos
+              </h2>
+              <p class="h2-thin-hook text-sm md:text-base text-white/60 tracking-[0.2em] mt-1">
+                Aramu Muru · Tikal · Bonampak · Cartago · Qapaq Ñan
+              </p>
+            </div>
+
+            <div class="shrink-0">
+              <span class="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-[#1e4976]/40 border border-[#64b5f6]/40 text-[#90caf9] font-mono text-[10px] uppercase tracking-[0.3em] font-bold group-hover:bg-[#1976d2] group-hover:text-white transition-all duration-300">
+                Explorar Cartografía →
+              </span>
+            </div>
+          </div>
+        </a>
+      </section>
+
       {/* ═══════════════════════════════════════════════════════════════════
           COLECCIÓN DESTACADA (la de mayor número de artículos)
           Desktop: imagen 7–8 cols / texto 4–5 cols
@@ -71,7 +99,7 @@ const resolvedRest = rest.map(col => ({
       {featured && (
         <section class="flex flex-col gap-6">
           <div class="reveal-item border-b border-white/10 pb-4">
-            <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B]">Colección Destacada</span>
+            <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B]">Colecciones Temáticas Generales</span>
           </div>
 
           <a

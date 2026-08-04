@@ -187,7 +187,7 @@ export async function generateImageWithGemini(
 
     let coverImagePath: string | null = null;
 
-    // Si se especificó slug, guardamos la imagen directamente a disco
+    // Si se especificó slug, guardamos la imagen en assets
     if (slug) {
       try {
         const buffer = Buffer.from(base64Image, 'base64');
@@ -198,17 +198,8 @@ export async function generateImageWithGemini(
         const imgFile = path.join(assetDir, 'coverImage.jpeg');
         fs.writeFileSync(imgFile, buffer);
         coverImagePath = `/src/assets/ensayos/${slug}/coverImage.jpeg`;
-
-        // Actualizar index.json del ensayo
-        const indexFile = path.join(process.cwd(), 'src', 'content', 'ensayos', slug, 'index.json');
-        if (fs.existsSync(indexFile)) {
-          const raw = fs.readFileSync(indexFile, 'utf-8');
-          const json = JSON.parse(raw);
-          json.coverImage = coverImagePath;
-          fs.writeFileSync(indexFile, JSON.stringify(json, null, 2));
-        }
       } catch (saveErr: any) {
-        console.warn('⚠️ No se pudo guardar la imagen a disco:', saveErr.message);
+        console.warn('⚠️ No se pudo guardar la imagen en assets:', saveErr.message);
       }
     }
 

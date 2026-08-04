@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export function GeneradorTextoTGP({ value, onChange }: any) {
   const [titulo, setTitulo] = useState('');
@@ -8,6 +8,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
   const [isGeneratingArt, setIsGeneratingArt] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPublished, setIsPublished] = useState(false);
+  const [isNewPost, setIsNewPost] = useState(false);
 
   // Estado local para el texto del ensayo, excerpt y sugerencias
   const [ensayo, setEnsayo] = useState(value || '');
@@ -21,22 +22,90 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
     resolvedDirection?: any;
   } | null>(null);
 
-  // Sincronizar estado local con Keystatic si value cambia externamente
-  useEffect(() => {
-    if (value && value !== ensayo) {
-      setEnsayo(value);
-    }
-  }, [value]);
+  // Ref acumulador para evitar race conditions al guardar
+  // Almacena el dato más reciente de cada campo durante una sesión de generación
+  const pendingRef = useRef<{ text?: string; excerpt?: string; category?: string; imageUrl?: string }>({});
 
   // Extraer el slug actual de la URL de Keystatic
   const getSlugFromUrl = (): string | null => {
     if (typeof window === 'undefined') return null;
     const parts = window.location.pathname.split('/');
     const itemIndex = parts.indexOf('item');
-    if (itemIndex !== -1 && parts[itemIndex + 1] && parts[itemIndex + 1] !== 'new') {
+    if (itemIndex !== -1 && parts[itemIndex + 1]) {
       return parts[itemIndex + 1];
     }
     return null;
+  };
+
+  const currentSlug = getSlugFromUrl() || 'nuevo_post';
+  // Key de backup local AISLADA POR SLUG (Evita contaminación cruzada entre posts)
+  const BACKUP_KEY = `tgp_essay_post_${currentSlug}`;
+
+  // Sincronizar estado local con Keystatic si value cambia externamente y cargar backup si existe
+  useEffect(() => {
+    if (value && value !== ensayo) {
+      setEnsayo(value);
+    } else if (!value) {
+      try {
+        const savedBackup = localStorage.getItem(BACKUP_KEY);
+        if (savedBackup && currentSlug !== 'new' && currentSlug !== 'nuevo_post') {
+          const parsed = JSON.parse(savedBackup);
+          if (parsed.ensayo && !ensayo) {
+            setEnsayo(parsed.ensayo);
+            if (parsed.excerptIA) setExcerptIA(parsed.excerptIA);
+            if (parsed.categoryIA) setCategoryIA(parsed.categoryIA);
+            if (parsed.arteResult) setArteResult(parsed.arteResult);
+          }
+        }
+      } catch (e) {
+        console.warn('Error leyendo backup local:', e);
+      }
+    }
+  }, [value, currentSlug]);
+
+  // Guardar copia de seguridad automáticamente en LocalStorage cada vez que cambie algo clave
+  const saveToLocalBackup = (dataToSave: {
+    ensayo?: string;
+    excerptIA?: string;
+    categoryIA?: string;
+    arteResult?: any;
+  }) => {
+    try {
+      const currentBackup = JSON.parse(localStorage.getItem(BACKUP_KEY) || '{}');
+      const updated = {
+        ...currentBackup,
+        ...dataToSave,
+        slug: currentSlug,
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem(BACKUP_KEY, JSON.stringify(updated));
+    } catch (e) {
+      console.warn('Error guardando en backup local:', e);
+    }
+  };
+
+  // Limpiar lienzo para empezar de cero sin arrastrar datos viejos
+  const handleLimpiarLienzo = () => {
+    if (ensayo && !window.confirm('¿Estás seguro de que deseas limpiar el lienzo de este post? Se restablecerán todos los campos en blanco.')) {
+      return;
+    }
+    setEnsayo('');
+    onChange('');
+    setExcerptIA('');
+    setCategoryIA('');
+    setArteResult(null);
+    setGeorefResult(null);
+    setTitulo('');
+    pendingRef.current = {};
+    try {
+      localStorage.removeItem(BACKUP_KEY);
+    } catch (e) {}
+  };
+
+  // Detectar si estamos en un post NUEVO (URL contiene /create)
+  const isCreatingNewPost = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    return window.location.pathname.includes('/create') || window.location.pathname.includes('/new');
   };
 
   // Auto-detectar el título del post desde el DOM de Keystatic si 'titulo' está vacío
@@ -66,14 +135,31 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
 
   const effectiveTopic = detectPostTitle();
 
-  // Guardado directo y persistente en el sistema de archivos (index.json + content.mdoc + assets/coverImage)
-  const handleSaveDirectlyToDisk = async (overrides?: { text?: string; excerpt?: string; category?: string; image?: string }) => {
+  const [publicarConImagen, setPublicarConImagen] = useState(true);
+  const [sitioGeohistoricoInput, setSitioGeohistoricoInput] = useState('');
+
+  /**
+   * Guardado seguro a disco: SOLO opera si hay un slug confirmado de URL.
+   * Para posts nuevos (/create), los datos se acumulan en pendingRef y
+   * se guardan cuando el usuario presiona "Confirmar & Guardar" manualmente.
+   */
+  const handleSaveDirectlyToDisk = async (overrides?: { text?: string; excerpt?: string; category?: string; image?: string; sitio?: string; conImagen?: boolean }) => {
     const slugToUse = getSlugFromUrl();
+
+    // GUARD: Si no hay slug (post nuevo), NO guardar a disco.
+    // Keystatic maneja el save inicial. Nosotros solo actualizamos posts EXISTENTES.
+    if (!slugToUse) {
+      console.info('[TGP] Post nuevo detectado: omitiendo guardado a disco. Keystatic manejará el save inicial.');
+      return null;
+    }
+
     const temaToUse = effectiveTopic;
-    const textToUse = overrides?.text !== undefined ? overrides.text : ensayo;
-    const excToUse = overrides?.excerpt !== undefined ? overrides.excerpt : excerptIA;
-    const catToUse = overrides?.category !== undefined ? overrides.category : categoryIA;
-    const imgToUse = overrides?.image !== undefined ? overrides.image : arteResult?.imageUrl;
+    const textToUse = overrides?.text !== undefined ? overrides.text : (pendingRef.current.text ?? ensayo);
+    const excToUse = overrides?.excerpt !== undefined ? overrides.excerpt : (pendingRef.current.excerpt ?? excerptIA);
+    const catToUse = overrides?.category !== undefined ? overrides.category : (pendingRef.current.category ?? categoryIA);
+    const imgToUse = overrides?.image !== undefined ? overrides.image : (pendingRef.current.imageUrl ?? arteResult?.imageUrl);
+    const sitioToUse = overrides?.sitio !== undefined ? overrides.sitio : (sitioGeohistoricoInput || temaToUse);
+    const conImagenToUse = overrides?.conImagen !== undefined ? overrides.conImagen : publicarConImagen;
 
     try {
       const res = await fetch('/api/guardar-ensayo', {
@@ -85,7 +171,9 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
           content: textToUse,
           excerpt: excToUse,
           category: catToUse,
-          imageUrl: imgToUse
+          imageUrl: imgToUse,
+          sitioGeohistorico: sitioToUse,
+          publicarConImagen: conImagenToUse
         })
       });
       const data = await res.json();
@@ -119,10 +207,16 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
   };
 
   // 1. Generación de Texto con Gemini 3.1 Pro (Incluye Excerpt 2-4 renglones y Categoría IA)
-  const handleGenerarTexto = async () => {
+  const handleGenerarTexto = async (): Promise<{ content: string; excerpt: string; category: string } | null> => {
     const temaFinal = detectPostTitle() || titulo.trim();
-    if (!temaFinal) return alert('Por favor, escribe un título arriba en Keystatic o ingresa un tema aquí.');
+    if (!temaFinal) { alert('Por favor, escribe un título arriba en Keystatic o ingresa un tema aquí.'); return null; }
     
+    // Fallback de confirmación si ya existe texto
+    if (ensayo && ensayo.length > 50) {
+      const confirmar = window.confirm(`Este post ya tiene un ensayo redactado (${ensayo.length} caracteres). ¿Estás seguro de que deseas regenerarlo y sobreescribir el contenido?`);
+      if (!confirmar) return null;
+    }
+
     setIsGeneratingText(true);
     setErrorMsg(null);
     setIsPublished(false);
@@ -141,30 +235,38 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
       if (!res.ok) throw new Error(data.error || 'Error en el motor de texto');
 
       setEnsayo(data.content);
-      onChange(data.content); // Sincronización inmediata de generadorTexto
+      onChange(data.content); // Sincronización inmediata de generadorTexto en Keystatic
 
       if (data.excerpt) setExcerptIA(data.excerpt);
       if (data.category) setCategoryIA(data.category);
 
-      // Inyectar en el formulario de Keystatic y guardar directamente a disco
+      // Acumular en pendingRef
+      pendingRef.current.text = data.content;
+      pendingRef.current.excerpt = data.excerpt;
+      pendingRef.current.category = data.category;
+
+      // Inyectar en el formulario de Keystatic (categoría, excerpt)
       syncFieldsToKeystaticDOM(data.category, data.excerpt);
-      await handleSaveDirectlyToDisk({
-        text: data.content,
-        excerpt: data.excerpt,
-        category: data.category
+
+      // Backup local
+      saveToLocalBackup({
+        ensayo: data.content,
+        excerptIA: data.excerpt,
+        categoryIA: data.category
       });
 
-      return data.content;
+      return { content: data.content, excerpt: data.excerpt, category: data.category };
 
     } catch (err: any) {
       setErrorMsg(`Texto: ${err.message}`);
+      return null;
     } finally {
       setIsGeneratingText(false);
     }
   };
 
   // 2. Generación de Arte Especializado con Nano Banana V2 / Semantic Router
-  const handleGenerarArte = async () => {
+  const handleGenerarArte = async (): Promise<string | null> => {
     const temaFinal = detectPostTitle() || titulo.trim() || 'Ensayo conceptual y filosófico';
     const currentSlug = getSlugFromUrl();
 
@@ -191,35 +293,144 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
 
       const imageUrl = data.imageUrl || data.image;
 
-      setArteResult({
+      const artData = {
         imageUrl,
         imagePrompt: data.imagePrompt,
         brief: data.brief,
         resolvedDirection: data.resolvedDirection
-      });
+      };
 
-      // Autoguardar la imagen generada directamente a disco
+      setArteResult(artData);
+
+      // Acumular imageUrl en ref y en local backup
       if (imageUrl) {
-        await handleSaveDirectlyToDisk({ image: imageUrl });
+        pendingRef.current.imageUrl = imageUrl;
+        saveToLocalBackup({ arteResult: artData });
       }
+
+      return imageUrl || null;
 
     } catch (err: any) {
       setErrorMsg(`Arte: ${err.message}`);
+      return null;
     } finally {
       setIsGeneratingArt(false);
     }
   };
 
-  // 3. Ejecución Unificada o Selección según Toggle
+  // 2b. Generar Ficha de Georreferencias Arqueosemióticas (Gemini 3.1 Pro)
+  const [isGeneratingGeoref, setIsGeneratingGeoref] = useState(false);
+  const [georefResult, setGeorefResult] = useState<{
+    volantaHook: string;
+    informeMarkdown: string;
+    excerpt: string;
+    saberMasDato: string;
+  } | null>(null);
+
+  const handleGenerarGeorreferencia = async () => {
+    const lugarToUse = detectPostTitle() || titulo.trim();
+    if (!lugarToUse) return alert('Por favor, ingresa o auto-detecta un lugar o tema (ej. Aramu Muru, Perú).');
+
+    setIsGeneratingGeoref(true);
+    setErrorMsg(null);
+
+    try {
+      const res = await fetch('/api/generar-georreferencia', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lugar: lugarToUse })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error generando georreferencia');
+
+      const georefData = {
+        volantaHook: data.volantaHook,
+        informeMarkdown: data.informeMarkdown,
+        excerpt: data.excerpt,
+        saberMasDato: data.saberMasDato
+      };
+
+      setGeorefResult(georefData);
+      if (data.excerpt) setExcerptIA(data.excerpt);
+
+      // Anexar automáticamente la Georreferencia al final del ensayo o como bloque principal
+      const newEssayContent = ensayo 
+        ? `${ensayo.trim()}\n\n---\n\n${data.informeMarkdown}`
+        : data.informeMarkdown;
+
+      setEnsayo(newEssayContent);
+      onChange(newEssayContent);
+      pendingRef.current.text = newEssayContent;
+      if (data.excerpt) pendingRef.current.excerpt = data.excerpt;
+
+      syncFieldsToKeystaticDOM(categoryIA || 'Arqueosemiótica', data.excerpt);
+
+      saveToLocalBackup({
+        ensayo: newEssayContent,
+        excerptIA: data.excerpt,
+        categoryIA: categoryIA || 'Arqueosemiótica'
+      });
+
+      alert('✅ INFORME DE GEORREFERENCIAS ARQUEOSEMIÓTICAS GENERADO E INYECTADO');
+
+    } catch (err: any) {
+      setErrorMsg(`Georreferencia: ${err.message}`);
+    } finally {
+      setIsGeneratingGeoref(false);
+    }
+  };
+
+  const handleGuardarEnColeccionGeorreferencias = async () => {
+    if (!georefResult) return alert('Primero debes generar la georreferencia.');
+    const temaToUse = detectPostTitle() || titulo.trim();
+    if (!temaToUse) return alert('Debes proporcionar un nombre o título para la georreferencia.');
+
+    const slug = temaToUse.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
+
+    try {
+      const res = await fetch('/api/guardar-georreferencia', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug,
+          title: temaToUse,
+          content: georefResult.informeMarkdown,
+          volantaHook: georefResult.volantaHook,
+          saberMasDato: georefResult.saberMasDato,
+          sitioGeohistorico: sitioGeohistoricoInput || temaToUse,
+          excerpt: georefResult.excerpt,
+          category: 'Arqueosemiótica',
+          imageUrl: pendingRef.current.imageUrl || arteResult?.imageUrl,
+          publicarConImagen
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(`✅ GEORREFERENCIA GUARDADA EN LA COLECCIÓN INDEPENDIENTE:\n\nsrc/content/georreferencias/${slug}/`);
+      } else {
+        alert(`Error guardando georreferencia: ${data.error}`);
+      }
+    } catch (e: any) {
+      alert(`Error de conexión: ${e.message}`);
+    }
+  };
+
+  // 3. Ejecución Unificada: genera texto y arte en memoria de forma segura
   const handleGenerarAmbos = async () => {
     const temaFinal = detectPostTitle() || titulo.trim();
     if (!temaFinal) return alert('Por favor, ingresa un título en Keystatic arriba para iniciar la generación.');
+
+    pendingRef.current = {};
+    const isNew = isCreatingNewPost();
+    setIsNewPost(isNew);
     
     if (generarAmbosJuntos) {
-      const text = await handleGenerarTexto();
-      await handleGenerarArte();
-      if (text) {
-        await handleSaveDirectlyToDisk({ text });
+      const textResult = await handleGenerarTexto();
+      const imageUrl = await handleGenerarArte();
+      
+      if (textResult || imageUrl) {
+        setIsPublished(true);
       }
     } else {
       await handleGenerarTexto();
@@ -232,10 +443,22 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
     syncFieldsToKeystaticDOM();
     setIsPublished(true);
 
-    const res = await handleSaveDirectlyToDisk();
+    const slugConfirmado = getSlugFromUrl();
+    if (slugConfirmado) {
+      // Post existente: guardar directamente a disco
+      await handleSaveDirectlyToDisk({
+        text: pendingRef.current.text ?? ensayo,
+        excerpt: pendingRef.current.excerpt ?? excerptIA,
+        category: pendingRef.current.category ?? categoryIA,
+        image: pendingRef.current.imageUrl ?? arteResult?.imageUrl
+      });
+      alert('✅ ENSAYO, EXCERPT, CATEGORÍA Y PORTADA GUARDADOS EXITOSAMENTE!');
+    } else {
+      // Post nuevo: solo sincronizar con Keystatic, el Save lo hace el usuario
+      alert('✅ DATOS SINCRONIZADOS CON KEYSTATIC.\n\nAhora presiona el botón "Save" / "Create" de Keystatic para crear el post en el sistema de archivos.');
+    }
 
     setTimeout(() => setIsPublished(false), 4000);
-    alert('✅ ENSAYO, EXCERPT, CATEGORÍA Y PORTADA GUARDADOS EXITOSAMENTE!\n\nSe han guardado todos los contenidos directamente en los archivos de la hemeroteca.\nTambién puedes presionar "Save" o "Create" arriba en Keystatic.');
   };
 
   const isGlobalLoading = isGeneratingText || isGeneratingArt;
@@ -250,8 +473,8 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
       fontFamily: 'Inter, system-ui, sans-serif',
       marginTop: '10px'
     }}>
-      {/* Encabezado Principal */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+      {/* Encabezado Principal y Controles de Lienzo */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
         <div>
           <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#4caf50', display: 'flex', alignItems: 'center', gap: '8px' }}>
             🧠 Motor de Generación Unificado TGP
@@ -260,7 +483,75 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
             Redacción de Ensayo + Excerpt/Quote + Categoría Sugerida (Gemini 3.1 Pro)
           </p>
         </div>
+
+        {/* Botón de Reset / Limpiar Lienzo */}
+        <button
+          type="button"
+          onClick={handleLimpiarLienzo}
+          style={{
+            padding: '6px 12px',
+            background: '#2d1b1b',
+            color: '#ff8a80',
+            border: '1px solid #c62828',
+            borderRadius: '6px',
+            fontSize: '0.75rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}
+          title="Borra el borrador actual y resetea el lienzo en blanco"
+        >
+          🔄 Limpiar Lienzo
+        </button>
       </div>
+
+      {/* Badge de Estado del Post */}
+      <div style={{
+        marginBottom: '16px',
+        padding: '8px 14px',
+        background: ensayo ? '#0d2818' : '#262210',
+        border: ensayo ? '1px solid #2e7d32' : '1px solid #f57f17',
+        borderRadius: '6px',
+        fontSize: '0.78rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{
+            display: 'inline-block',
+            width: '10px',
+            height: '10px',
+            borderRadius: '50%',
+            background: ensayo ? '#4caf50' : '#ffeb3b',
+            boxShadow: ensayo ? '0 0 8px #4caf50' : '0 0 8px #ffeb3b'
+          }} />
+          <span style={{ fontWeight: 700, color: ensayo ? '#a5d6a7' : '#fff59d' }}>
+            {ensayo ? `🟢 LISTO PARA EDICIÓN (${ensayo.length} caracteres cargados)` : '🟡 LIENZO LIMPIO (Listo para nuevo artículo)'}
+          </span>
+        </div>
+        <span style={{ color: '#aaa', fontSize: '0.72rem' }}>
+          ID: {currentSlug}
+        </span>
+      </div>
+
+      {/* ⚠️ AVISO PARA POSTS NUEVOS */}
+      {isNewPost && (
+        <div style={{
+          marginBottom: '18px',
+          padding: '12px 16px',
+          background: 'rgba(255, 193, 7, 0.08)',
+          border: '1px solid rgba(255, 193, 7, 0.4)',
+          borderRadius: '8px',
+          fontSize: '0.82rem',
+          color: '#ffd54f',
+          lineHeight: '1.5'
+        }}>
+          <strong>⚠️ POST NUEVO DETECTADO:</strong> Generá el texto y portada libremente. Al terminar, usá el botón <strong>"Create"</strong> de Keystatic arriba para crear el post. Luego podrás guardar actualizaciones directas desde aquí.
+        </div>
+      )}
 
       {/* Indicador de Tema Auto-detectado */}
       <div style={{ marginBottom: '16px' }}>
@@ -288,6 +579,44 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
             ✓ Auto-detectado desde el post: <strong>"{effectiveTopic}"</strong>
           </span>
         )}
+      </div>
+
+      {/* CONTROLES DE COLECCIÓN Y TOGGLE DE IMAGEN */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '20px' }}>
+        <div>
+          <label style={{ fontSize: '0.75rem', color: '#64b5f6', display: 'block', marginBottom: '6px', fontWeight: 700 }}>
+            📍 SITIO / LUGAR GEOHISTÓRICO:
+          </label>
+          <input
+            type="text"
+            value={sitioGeohistoricoInput}
+            onChange={(e) => setSitioGeohistoricoInput(e.target.value)}
+            placeholder={effectiveTopic ? `Ej: ${effectiveTopic}` : "Ej: Aramu Muru (Perú), Tikal, Bonampak..."}
+            style={{
+              width: '100%',
+              padding: '12px',
+              background: '#121c24',
+              border: '1px solid #1e4976',
+              borderRadius: '6px',
+              color: '#fff',
+              fontSize: '0.88rem',
+              outline: 'none'
+            }}
+          />
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '22px' }}>
+          <input
+            type="checkbox"
+            id="toggleConImagen"
+            checked={publicarConImagen}
+            onChange={(e) => setPublicarConImagen(e.target.checked)}
+            style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#1976d2' }}
+          />
+          <label htmlFor="toggleConImagen" style={{ fontSize: '0.85rem', color: publicarConImagen ? '#90caf9' : '#888', cursor: 'pointer', fontWeight: 600 }}>
+            🖼️ {publicarConImagen ? 'Publicar con Imagen de Portada' : 'Publicar sin Imagen (Edición Texto Puro)'}
+          </label>
+        </div>
       </div>
 
       {/* Checkbox Toggle para modo de disparo */}
@@ -383,9 +712,91 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         )}
       </div>
 
+      {/* BOTÓN DEDICADO: GEORREFERENCIAS ARQUEOSEMIÓTICAS */}
+      <div style={{ marginBottom: '24px' }}>
+        <button
+          type="button"
+          onClick={handleGenerarGeorreferencia}
+          disabled={isGeneratingGeoref || isGlobalLoading}
+          style={{
+            width: '100%',
+            padding: '16px',
+            background: isGeneratingGeoref 
+              ? '#222' 
+              : 'linear-gradient(135deg, #0d47a1, #1976d2)',
+            color: isGeneratingGeoref ? '#888' : '#fff',
+            border: '1px solid #42a5f5',
+            borderRadius: '8px',
+            fontWeight: 800,
+            fontSize: '0.95rem',
+            letterSpacing: '0.05em',
+            cursor: (isGeneratingGeoref || isGlobalLoading) ? 'not-allowed' : 'pointer',
+            boxShadow: '0 4px 14px rgba(25, 118, 210, 0.35)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px'
+          }}
+        >
+          {isGeneratingGeoref 
+            ? '🌐 INVESTIGANDO GEOLOGÍA, ETNOGRAFÍA & HISTORIA LOCAL...' 
+            : '🗺️ GENERAR GEORREFERENCIA ARQUEOSEMIÓTICA (Gemini 3.1 Pro)'}
+        </button>
+      </div>
+
       {errorMsg && (
         <div style={{ color: '#ff5252', fontSize: '0.8rem', padding: '12px', background: 'rgba(255,82,82,0.1)', borderRadius: '6px', border: '1px solid #ff5252', marginBottom: '18px' }}>
           <strong>Error de Generación:</strong> {errorMsg}
+        </div>
+      )}
+
+      {/* BLOQUE GEORREFERENCIA RESULTADO */}
+      {georefResult && (
+        <div style={{
+          marginBottom: '24px',
+          padding: '18px',
+          background: '#0a141d',
+          border: '1px solid #1e4976',
+          borderRadius: '10px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <span style={{ fontSize: '0.75rem', color: '#64b5f6', fontWeight: 800, letterSpacing: '0.1em' }}>
+              🗺️ FICHA DE GEORREFERENCIAS ARQUEOSEMIÓTICAS GENERADA
+            </span>
+          </div>
+
+          <p style={{ margin: '0 0 10px 0', fontSize: '0.85rem', color: '#90caf9', fontStyle: 'italic', fontWeight: 600 }}>
+            H2 Hook / Volanta: "{georefResult.volantaHook}"
+          </p>
+
+          {georefResult.saberMasDato && (
+            <div style={{ padding: '10px 14px', background: '#102030', borderLeft: '3px solid #64b5f6', borderRadius: '4px', fontSize: '0.8rem', color: '#e3f2fd', marginBottom: '12px' }}>
+              <strong>💡 Saber Más (Dato Local No Divulgado):</strong> {georefResult.saberMasDato}
+            </div>
+          )}
+
+          <div style={{ marginTop: '12px', display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.72rem', color: '#81c784', flex: 1 }}>
+              ✓ Este informe multidimensional (Geología + Arqueología + Etnografía + Teorías Alternativas + Saber Más) ya fue inyectado al contenido.
+            </span>
+            <button
+              type="button"
+              onClick={handleGuardarEnColeccionGeorreferencias}
+              style={{
+                padding: '8px 14px',
+                background: '#1976d2',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(25, 118, 210, 0.4)'
+              }}
+            >
+              💾 Guardar en Colección Georreferencias
+            </button>
+          </div>
         </div>
       )}
 

@@ -5,6 +5,7 @@ import {
   ProbadorArteTGP, 
   BuscadorWikimediaTGP,
   SelectorCategoriaTGP,
+  GeneradorGeorreferenciaTGP,
   componentBlocks 
 } from './src/components';
 
@@ -43,11 +44,11 @@ export default config({
           label: '1. Motor de Pensamiento & Arte Unificado TGP',
           Input: GeneradorTextoTGP,
           defaultValue: () => '',
-          parse: (v: any) => v || '',
-          serialize: (v: any) => v || '',
+          parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || '') }),
           validate: (v: any) => v,
           reader: {
-            parse: (v: any) => v || '',
+            parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
           },
         } as any,
 
@@ -57,11 +58,11 @@ export default config({
           label: '2. Buscador & Galería de Archivo Wikimedia Commons',
           Input: BuscadorWikimediaTGP,
           defaultValue: () => '',
-          parse: (v: any) => v || '',
-          serialize: (v: any) => v || '',
+          parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || '') }),
           validate: (v: any) => v,
           reader: {
-            parse: (v: any) => v || '',
+            parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
           },
         } as any,
 
@@ -71,11 +72,11 @@ export default config({
           label: '3. Motor de Arte Nano Banana (Laboratorio Manual)',
           Input: MotorArteTGP,
           defaultValue: () => '',
-          parse: (v: any) => v || '',
-          serialize: (v: any) => v || '',
+          parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || '') }),
           validate: (v: any) => v,
           reader: {
-            parse: (v: any) => v || '',
+            parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
           },
         } as any,
 
@@ -86,11 +87,11 @@ export default config({
           label: 'Categoría / Campo Disciplinar TGP',
           Input: SelectorCategoriaTGP,
           defaultValue: () => 'Historia',
-          parse: (v: any) => v || 'Historia',
-          serialize: (v: any) => v || 'Historia',
+          parse: (v: any) => (typeof v === 'string' ? v : (v?.value || 'Historia')),
+          serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || 'Historia') }),
           validate: (v: any) => v,
           reader: {
-            parse: (v: any) => v || 'Historia',
+            parse: (v: any) => (typeof v === 'string' ? v : (v?.value || 'Historia')),
           },
         } as any,
 
@@ -105,6 +106,15 @@ export default config({
             { label: 'Rust Orange', value: 'rust-orange' },
           ],
           defaultValue: 'british-green',
+        }),
+        sitioGeohistorico: fields.text({
+          label: 'Lugar Geohistórico / Sitio Arqueohistórico',
+          description: 'Ej: Aramu Muru (Perú), Tikal (Guatemala), Bonampak (México), Cartago (Túnez)',
+        }),
+        publicarConImagen: fields.checkbox({
+          label: 'Publicar con Imagen de Portada (Toggle)',
+          description: 'Marca este casillero para publicar con imagen. Desmárcalo para publicar en modo puramente textual.',
+          defaultValue: true
         }),
         draft: fields.checkbox({ 
           label: 'Borrador', 
@@ -147,14 +157,115 @@ export default config({
           kind: 'form',
           label: 'Laboratorio de Estilos e Imágenes TGP',
           Input: ProbadorArteTGP,
-          defaultValue: () => '',
-          parse: (v: any) => v || '',
-          serialize: (v: any) => v || '',
+          defaultValue: () => ({
+            conceptoBase: '',
+            sujetoIA: '',
+            lineaEditorial: 'archivo-museo',
+            usarManuales: false,
+            overrideCamara: '',
+            overrideIluminacion: '',
+            overrideColor: '',
+            imagenBase64: ''
+          }),
+          parse: (v: any) => (v && typeof v === 'object' ? v : {}),
+          serialize: (v: any) => ({ value: v && typeof v === 'object' ? v : {} }),
           validate: (v: any) => v,
           reader: {
-            parse: (v: any) => v || '',
+            parse: (v: any) => (v && typeof v === 'object' ? v : {}),
           },
         } as any,
+      }
+    }),
+
+    // Colección terciaria: Georreferencias Arqueosemióticas (Aislada e Independiente)
+    georreferencias: collection({
+      label: 'Georreferencias Arqueosemióticas',
+      slugField: 'title',
+      path: 'src/content/georreferencias/*/',
+      format: { data: 'json' },
+      schema: {
+        title: fields.slug({ name: { label: 'Nombre del Sitio / Lugar' } }),
+
+        // MÓDULO IA DEDICADO: Motor de Georreferencias Arqueosemióticas
+        generadorGeoref: {
+          kind: 'form',
+          label: '🌐 Motor de Georreferencias Arqueosemióticas (Gemini 3.1 Pro)',
+          Input: GeneradorGeorreferenciaTGP,
+          defaultValue: () => '',
+          parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || '') }),
+          validate: (v: any) => v,
+          reader: {
+            parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          },
+        } as any,
+
+        // BUSCADOR & GALERÍA DE ARCHIVOS WIKIMEDIA COMMONS
+        bancoImagenesWikimedia: {
+          kind: 'form',
+          label: '📷 Buscador & Galería de Archivo Wikimedia Commons',
+          Input: BuscadorWikimediaTGP,
+          defaultValue: () => '',
+          parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || '') }),
+          validate: (v: any) => v,
+          reader: {
+            parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          },
+        } as any,
+
+        sitioGeohistorico: fields.text({
+          label: 'Ubicación Geohistórica (País / Región / Coordenadas)',
+          description: 'Ej: Aramu Muru (Puno, Perú), Tikal (Guatemala), Bonampak (México)',
+        }),
+
+        volantaHook: fields.text({
+          label: 'Volanta / H2 Hook (2 Renglones)',
+          description: 'Copete conceptual que sirve como gancho para el informe geohistórico.',
+          multiline: true
+        }),
+
+        saberMasDato: fields.text({
+          label: 'Saber Más (Dato Local No Divulgado)',
+          description: 'Dato o micro-narrativa etnográfica no divulgada masivamente.',
+          multiline: true
+        }),
+
+        date: fields.date({ label: 'Fecha' }),
+        
+        category: fields.text({
+          label: 'Categoría Disciplinar',
+          defaultValue: 'Arqueosemiótica'
+        }),
+
+        publicarConImagen: fields.checkbox({
+          label: 'Publicar con Imagen de Portada (Toggle)',
+          description: 'Marca este casillero para publicar con imagen. Desmárcalo para publicación pura texto.',
+          defaultValue: true
+        }),
+
+        draft: fields.checkbox({ 
+          label: 'Borrador', 
+          description: 'Si está marcado, no se publicará en producción',
+          defaultValue: false 
+        }),
+
+        coverImage: fields.image({ 
+          label: 'Imagen del Sitio (Opcional)', 
+          directory: 'src/assets/georreferencias', 
+          publicPath: '/src/assets/georreferencias/' 
+        }),
+
+        excerpt: fields.text({ label: 'Sinopsis / Excerpt', multiline: true }),
+
+        content: fields.document({
+          label: 'Informe Geohistórico Multidimensional',
+          formatting: true,
+          dividers: true,
+          links: true,
+          tables: true,
+          componentBlocks
+        }),
       }
     }),
   },
