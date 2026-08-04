@@ -177,15 +177,15 @@ export function BuscadorModal() {
           }}
         >
           <div style={{ fontSize: '9px', fontFamily: 'Space Mono, monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: '#C8A98B', marginBottom: '12px', opacity: 0.8 }}>
-            🧭 NAVTOOL TGP (MINIMALISTA)
+            NAVEGACIÓN TGP
           </div>
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {[
-              { label: '🏠 Inicio', href: '/' },
-              { label: '📚 Colecciones', href: '/colecciones' },
-              { label: '🏛️ Archivo de Ensayos', href: '/archivo' },
-              { label: '📜 Manifiesto', href: '/manifiesto' },
-              { label: '✨ El Códice', href: '/codice' },
+              { label: 'Inicio', href: '/' },
+              { label: 'Colecciones', href: '/colecciones' },
+              { label: 'Archivo de Ensayos', href: '/archivo' },
+              { label: 'Manifiesto', href: '/manifiesto' },
+              { label: 'El Códice', href: '/codice' },
             ].map(link => (
               <a
                 key={link.href}
@@ -315,12 +315,11 @@ export function BuscadorModal() {
             {/* Lista de Resultados */}
             <div style={{ maxHeight: '420px', overflowY: 'auto', padding: '12px' }}>
               {isLoading ? (
-                <div style={{ padding: '30px', textAlign: 'center', color: '#a1a1aa', fontSize: '13px' }}>
-                  ⏳ Buscando en el archivo...
+                <div style={{ padding: '30px', textAlign: 'center', color: '#a1a1aa', fontSize: '13px', fontFamily: 'Space Mono, monospace' }}>
+                  Buscando en el archivo...
                 </div>
               ) : filtered.length === 0 ? (
                 <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-                  <div style={{ fontSize: '24px', marginBottom: '8px' }}>🔍</div>
                   <div style={{ color: '#e4e4e7', fontSize: '14px', fontWeight: 600 }}>No se encontraron contenidos para "{query}"</div>
                   <div style={{ color: '#71717a', fontSize: '12px', marginTop: '4px' }}>Prueba buscar por palabras clave como "Sísifo", "Troya", "Arqueología" o "Filosofía"</div>
                 </div>
@@ -359,8 +358,11 @@ export function BuscadorModal() {
                         style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)' }} 
                       />
                     ) : (
-                      <div style={{ width: '48px', height: '48px', background: '#1c1c22', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
-                        📖
+                      <div style={{ width: '48px', height: '48px', background: '#1c1c22', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#71717a' }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                        </svg>
                       </div>
                     )}
 

@@ -17,7 +17,7 @@ export async function getStaticPaths() {
   const allEssaysRaw = await getCollection('ensayos').catch(() => []);
   const isProd = import.meta.env.PROD;
   const publishable = getPublishableEssays(allEssaysRaw, isProd);
-  const groups = groupByCategory(publishable, 2);
+  const groups = groupByCategory(publishable, 1);
 
   return Array.from(groups.entries()).map(([key, essays]) => ({
     params: { categoria: key },

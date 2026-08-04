@@ -7,7 +7,7 @@ export interface CategoryGroup {
 
 export const CATEGORY_GROUPS: CategoryGroup[] = [
   {
-    group: '🏛️ Disciplinas Fundamentales',
+    group: 'Disciplinas Fundamentales',
     options: [
       'Historia',
       'Antropología',
@@ -26,7 +26,7 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
     ]
   },
   {
-    group: '🌌 Métodos y Perspectivas TGP',
+    group: 'Métodos y Perspectivas TGP',
     options: [
       'Deep History',
       'Arqueosemiótica',
@@ -42,7 +42,7 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
     ]
   },
   {
-    group: '📜 Formatos Editoriales & Géneros',
+    group: 'Formatos Editoriales & Géneros',
     options: [
       'Ensayos',
       'Dossiers',
@@ -167,7 +167,7 @@ export function SelectorCategoriaTGP({ value, onChange }: { value: string; onCha
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
         <label style={{ fontSize: '13px', fontWeight: 600, color: '#e4e4e7', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span>📚</span> Categoría / Campo Disciplinar TGP
+          Categoría / Campo Disciplinar TGP
         </label>
         <button
           type="button"
@@ -182,7 +182,7 @@ export function SelectorCategoriaTGP({ value, onChange }: { value: string; onCha
             padding: '2px 4px'
           }}
         >
-          {isCustomMode ? '⬅️ Volver a Lista Oficial' : '✏️ Categoría Libre / Manual'}
+          {isCustomMode ? 'Volver a Lista Oficial' : 'Categoría Libre / Manual'}
         </button>
       </div>
 
@@ -221,7 +221,7 @@ export function SelectorCategoriaTGP({ value, onChange }: { value: string; onCha
           ))}
 
           <option value="__CUSTOM__" style={{ background: '#27272a', color: '#38bdf8' }}>
-            ➕ [Otra categoría no listada...]
+            + [Otra categoría no listada...]
           </option>
         </select>
       ) : (

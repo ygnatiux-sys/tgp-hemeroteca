@@ -138,7 +138,7 @@ export function ProbadorArteTGP({ value, onChange }: { value: any; onChange: (va
       {/* SECCIÓN 1: SUJETO (CONCEPTO + GEMINI) */}
       <div style={{ marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid #333' }}>
         <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#60a5fa', fontSize: '1.2em' }}>
-          🧠 Motor Nano Banana (Modelo Sujeto + Envoltorio)
+          Motor Nano Banana (Modelo Sujeto + Envoltorio)
         </h3>
 
         <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold', fontSize: '0.95em' }}>
@@ -169,7 +169,7 @@ export function ProbadorArteTGP({ value, onChange }: { value: any; onChange: (va
               fontSize: '0.9em',
             }}
           >
-            {loadingSujeto ? '⏳ Traduciendo...' : '🤖 Generar Sujeto (IA)'}
+            {loadingSujeto ? 'Traduciendo...' : 'Generar Sujeto (IA)'}
           </button>
         </div>
 
@@ -210,14 +210,14 @@ export function ProbadorArteTGP({ value, onChange }: { value: any; onChange: (va
             style={{ width: '18px', height: '18px', cursor: 'pointer' }}
           />
           <label htmlFor="toggle-manuales" style={{ cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9em', color: data.usarManuales ? '#f59e0b' : '#9ca3af' }}>
-            ⚡ Activar Overrides Manuales (Modo Granular de Excepciones)
+            Activar Overrides Manuales (Modo Granular de Excepciones)
           </label>
         </div>
 
         {/* Campos de Técnica */}
         <div style={{ padding: '16px', backgroundColor: '#1a1a1a', borderRadius: '6px' }}>
           <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.85em', color: '#9ca3af' }}>
-            📷 Cámara y Óptica {data.usarManuales && <span style={{ color: '#f59e0b' }}>(Anulación Manual)</span>}
+            Cámara y Óptica {data.usarManuales && <span style={{ color: '#f59e0b' }}>(Anulación Manual)</span>}
           </label>
           {data.usarManuales ? (
             <textarea 
@@ -232,7 +232,7 @@ export function ProbadorArteTGP({ value, onChange }: { value: any; onChange: (va
           )}
 
           <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.85em', color: '#9ca3af' }}>
-            💡 Esquema de Iluminación {data.usarManuales && <span style={{ color: '#f59e0b' }}>(Anulación Manual)</span>}
+            Esquema de Iluminación {data.usarManuales && <span style={{ color: '#f59e0b' }}>(Anulación Manual)</span>}
           </label>
           {data.usarManuales ? (
             <textarea 
@@ -247,7 +247,7 @@ export function ProbadorArteTGP({ value, onChange }: { value: any; onChange: (va
           )}
 
           <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.85em', color: '#9ca3af' }}>
-            🎨 Etalonaje y Color {data.usarManuales && <span style={{ color: '#f59e0b' }}>(Anulación Manual)</span>}
+            Etalonaje y Color {data.usarManuales && <span style={{ color: '#f59e0b' }}>(Anulación Manual)</span>}
           </label>
           {data.usarManuales ? (
             <textarea 
@@ -291,7 +291,7 @@ export function ProbadorArteTGP({ value, onChange }: { value: any; onChange: (va
           transition: 'background-color 0.2s',
         }}
       >
-        {loadingImagen ? '🎨 Generando imagen en Nano Banana...' : '🚀 Generar Previsualización Definitiva'}
+        {loadingImagen ? 'Generando imagen en Nano Banana...' : 'Generar Previsualización Definitiva'}
       </button>
 
       {error && (
@@ -327,7 +327,7 @@ export function ProbadorArteTGP({ value, onChange }: { value: any; onChange: (va
               transition: 'background-color 0.2s',
             }}
           >
-            ⬇️ Descargar a mi equipo
+            Descargar a mi equipo
           </a>
         </div>
       )}

@@ -199,7 +199,7 @@ export async function generateImageWithGemini(
         fs.writeFileSync(imgFile, buffer);
         coverImagePath = `/src/assets/ensayos/${slug}/coverImage.jpeg`;
       } catch (saveErr: any) {
-        console.warn('⚠️ No se pudo guardar la imagen en assets:', saveErr.message);
+        console.warn('No se pudo guardar la imagen en assets:', saveErr.message);
       }
     }
 
@@ -209,7 +209,7 @@ export async function generateImageWithGemini(
       coverImagePath,
     };
   } catch (error: any) {
-    console.error('❌ Error en generador de imagen:', error);
+    console.error('Error en generador de imagen:', error);
     const normalized = normalizeProviderError(error);
     return {
       success: false,

@@ -158,7 +158,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
     try {
       localStorage.removeItem(BACKUP_KEY);
     } catch (e) {}
-    setStatusFeedback('🟡 Lienzo reseteado y en blanco para nueva edición');
+    setStatusFeedback('Lienzo reseteado y en blanco para nueva edición');
   };
 
   // Aplicar un título sugerido por Gemini
@@ -223,8 +223,8 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
         titulosSugeridos: data.titulosSugeridos
       });
 
-      setStatusFeedback('🟢 Informe generado exitosamente. Listo para guardar.');
-
+      setStatusFeedback('Informe generado exitosamente. Listo para guardar.');
+      
       // Si el toggle de imagen está activado, generar también imagen de portada
       if (generarConImagen) {
         await handleGenerarImagenSitio(temaToUse);
@@ -232,7 +232,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
 
     } catch (err: any) {
       setErrorMsg(`Georreferencia: ${err.message}`);
-      setStatusFeedback('🔴 Error en la generación');
+      setStatusFeedback('Error en la generación');
     } finally {
       setIsLoading(false);
     }
@@ -307,8 +307,8 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       const data = await res.json();
       if (data.success) {
         setIsSaved(true);
-        setStatusFeedback('🔵 ¡Fue publicada nueva reseña y guardada exitosamente en disco!');
-        alert(`✅ ¡PUBLICACIÓN GUARDADA EXITOSAMENTE EN DISCO!\n\nArtículo: "${temaToUse}"\nRuta: src/content/georreferencias/${slugConfirmado}/`);
+        setStatusFeedback('¡Fue publicada nueva reseña y guardada exitosamente en disco!');
+        alert(`¡PUBLICACIÓN GUARDADA EXITOSAMENTE EN DISCO!\n\nArtículo: "${temaToUse}"\nRuta: src/content/georreferencias/${slugConfirmado}/`);
         setTimeout(() => setIsSaved(false), 5000);
       } else {
         alert(`Aviso: ${data.error || 'Sincronizado con Keystatic. Presiona Save arriba.'}`);
@@ -332,7 +332,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
         <div>
           <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#64b5f6', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            🗺️ Motor de Georreferencias Arqueosemióticas (Gemini 3.1 Pro)
+            Motor de Georreferencias Arqueosemióticas (Gemini 3.1 Pro)
           </h3>
           <p style={{ margin: '4px 0 0 0', fontSize: '0.75rem', color: '#888' }}>
             Generación Geohistórica Multidimensional: Geología + Arqueología + Etnografía + Mitos + Saber Más
@@ -359,7 +359,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
             }}
             title="Borra el borrador actual y resetea el lienzo en blanco para evitar mezclar contenido"
           >
-            🔄 Limpiar Lienzo
+            Limpiar Lienzo
           </button>
         </div>
       </div>
@@ -386,7 +386,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
             boxShadow: informe ? '0 0 8px #4caf50' : '0 0 8px #ffeb3b'
           }} />
           <span style={{ fontWeight: 700, color: informe ? '#a5d6a7' : '#fff59d' }}>
-            {informe ? `🟢 LISTO PARA EDICIÓN (${informe.length} caracteres)` : '🟡 LIENZO LIMPIO (Listo para nueva reseña)'}
+            {informe ? `LISTO PARA EDICIÓN (${informe.length} caracteres)` : 'LIENZO LIMPIO (Listo para nueva reseña)'}
           </span>
         </div>
         {statusFeedback && (
@@ -427,7 +427,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
         {titulosSugeridos && titulosSugeridos.length > 0 && (
           <div style={{ marginTop: '10px' }}>
             <span style={{ fontSize: '0.72rem', color: '#90caf9', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
-              💡 TÍTULOS SUGERIDOS POR GEMINI (Haz clic para aplicar):
+              TÍTULOS SUGERIDOS POR GEMINI (Haz clic para aplicar):
             </span>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               {titulosSugeridos.map((ts, idx) => (
@@ -446,7 +446,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
                     transition: 'all 0.15s ease'
                   }}
                 >
-                  ✨ {ts}
+                  {ts}
                 </button>
               ))}
             </div>
@@ -473,7 +473,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
           style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: '#1976d2' }}
         />
         <label htmlFor="toggleGenImagenGeoref" style={{ fontSize: '0.88rem', color: generarConImagen ? '#e3f2fd' : '#aaa', cursor: 'pointer', fontWeight: 600 }}>
-          🖼️ {generarConImagen ? 'Modo Completo: Generar Informe + Portada Fotográfica (Nano Banana V2)' : 'Modo Texto Puro: Generar únicamente Informe Geohistórico Multidimensional'}
+          {generarConImagen ? 'Modo Completo: Generar Informe + Portada Fotográfica (Nano Banana V2)' : 'Modo Texto Puro: Generar únicamente Informe Geohistórico Multidimensional'}
         </label>
       </div>
 
@@ -495,7 +495,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
             boxShadow: '0 4px 14px rgba(25, 118, 210, 0.4)'
           }}
         >
-          {isLoading ? '🌐 INVESTIGANDO GEOLOGÍA & ETNOGRAFÍA...' : '🌐 GENERAR INFORME GEOHISTÓRICO MULTIDIMENSIONAL'}
+          {isLoading ? 'INVESTIGANDO GEOLOGÍA & ETNOGRAFÍA...' : 'GENERAR INFORME GEOHISTÓRICO MULTIDIMENSIONAL'}
         </button>
 
         {generarConImagen && (
@@ -514,7 +514,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
               cursor: (isLoading || isGeneratingArt) ? 'not-allowed' : 'pointer'
             }}
           >
-            {isGeneratingArt ? '🎨 GENERANDO...' : '📷 SOLO PORTADA'}
+            {isGeneratingArt ? 'GENERANDO...' : 'SOLO PORTADA'}
           </button>
         )}
       </div>
@@ -528,7 +528,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       {/* ÁREA DE TEXTO DEL INFORME */}
       <div style={{ marginBottom: '24px' }}>
         <label style={{ fontSize: '0.75rem', color: '#aaa', display: 'block', marginBottom: '6px', fontWeight: 700 }}>
-          📝 INFORME GEOHISTÓRICO (MARKDOWN):
+          INFORME GEOHISTÓRICO (MARKDOWN):
         </label>
         <textarea
           value={informe}
@@ -558,7 +558,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       {imageUrl && (
         <div style={{ marginBottom: '24px', textAlign: 'center', background: '#081018', padding: '16px', borderRadius: '8px', border: '1px solid #19436d' }}>
           <span style={{ fontSize: '0.75rem', color: '#90caf9', fontWeight: 700, display: 'block', marginBottom: '10px' }}>
-            🎨 PORTADA FOTOGRÁFICA GENERADA
+            PORTADA FOTOGRÁFICA GENERADA
           </span>
           <img src={imageUrl} alt="Portada Sitio" style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '6px', border: '1px solid #333' }} />
         </div>
@@ -587,7 +587,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
           boxShadow: '0 4px 14px rgba(21, 101, 192, 0.4)'
         }}
       >
-        {isSaved ? '✅ ¡PUBLICACIÓN GUARDADA EXITOSAMENTE EN DISCO!' : '🚀 CONFIRMAR & GUARDAR GEORREFERENCIA EN DISCO'}
+        {isSaved ? '¡PUBLICACIÓN GUARDADA EXITOSAMENTE EN DISCO!' : 'CONFIRMAR & GUARDAR GEORREFERENCIA EN DISCO'}
       </button>
     </div>
   );

@@ -108,7 +108,7 @@ export const POST: APIRoute = async ({ request }) => {
         }
 
       } catch (errorImg: any) {
-        console.error('❌ Error nativo en Nano Banana 2:', errorImg);
+        console.error('[Error] Fallo nativo en Nano Banana 2:', errorImg);
         return new Response(JSON.stringify({ error: `Fallo en el Motor de Arte: ${errorImg.message}` }), { status: 500, headers });
       }
     } else {
@@ -158,13 +158,13 @@ Devuelve estrictamente un JSON válido con esta estructura:
         }), { status: 200, headers });
 
       } catch (errorText: any) {
-        console.error('❌ Error nativo en el Motor de Pensamiento:', errorText);
+        console.error('[Error] Fallo nativo en el Motor de Pensamiento:', errorText);
         return new Response(JSON.stringify({ error: `Fallo en el Motor de Pensamiento: ${errorText.message}` }), { status: 500, headers });
       }
     }
 
   } catch (error: any) {
-    console.error('❌ Error fatal en el motor:', error.message);
+    console.error('[Error] Fallo fatal en el motor:', error.message);
     return new Response(JSON.stringify({ error: `Error del Sistema: ${error.message}` }), { status: 500, headers });
   }
 };

@@ -60,16 +60,45 @@ export function getPublishableEssays(
     });
 }
 
-/** Normaliza una categoría para agrupación (lowercase, trim). */
+/** Normaliza una categoría para agrupación (elimina tildes, convierte a lowercase y agrupa sinónimos). */
 export function normalizeCategory(cat?: string | null): string {
   if (!cat || cat.trim() === '' || cat.toLowerCase() === 's/f') return 'ensayo';
-  return cat.toLowerCase().trim();
+  
+  const raw = cat
+    .toLowerCase()
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  if (raw === 'arqueologia' || raw === 'arqueo') return 'arqueologia';
+  if (raw === 'arqueosemiotica' || raw === 'arqueosemiotica') return 'arqueosemiotica';
+  if (raw.includes('semiotica') || raw.includes('semiotic')) return 'semiotica-cultural';
+  if (raw === 'historia' || raw === 'historia antigua') return 'historia';
+  if (raw.includes('religiones') || raw.includes('religios')) return 'historia-religiones';
+  if (raw.includes('ideas') || raw.includes('pensamiento')) return 'historia-ideas';
+  if (raw.includes('filosofia') || raw.includes('filosofic')) return 'filosofia';
+  if (raw.includes('cahier')) return 'cahiers';
+  if (raw.includes('georreferencia') || raw.includes('georeferencia') || raw.includes('geohistoric') || raw.includes('geocultura')) return 'georreferencias';
+  
+  return raw;
 }
 
-/** Formatea una categoría para visualización. */
+/** Formatea una categoría para visualización sobria y nítida. */
 export function formatCategory(cat?: string | null): string {
   const normalized = normalizeCategory(cat);
-  if (normalized === 'ensayo') return 'Ensayo';
+  const map: Record<string, string> = {
+    'arqueologia': 'Arqueología',
+    'arqueosemiotica': 'Arqueosemiótica',
+    'semiotica-cultural': 'Semiótica Cultural',
+    'historia': 'Historia',
+    'historia-religiones': 'Historia de las Religiones',
+    'historia-ideas': 'Historia de las Ideas',
+    'filosofia': 'Filosofía',
+    'cahiers': 'Cahiers Épistémiques',
+    'georreferencias': 'Georreferencias',
+    'ensayo': 'Ensayo',
+  };
+  if (map[normalized]) return map[normalized];
   return normalized.charAt(0).toUpperCase() + normalized.slice(1);
 }
 

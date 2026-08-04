@@ -80,7 +80,7 @@ Return ONLY the raw JSON without markdown code fences.`;
       uncertainty: Array.isArray(parsed.uncertainty) ? parsed.uncertainty : [],
     };
   } catch (err) {
-    console.warn('⚠️ Error en Semantic Router LLM, usando fallback heurístico:', err);
+    console.warn('Error en Semantic Router LLM, usando fallback heurístico:', err);
     return fallbackResult;
   }
 }

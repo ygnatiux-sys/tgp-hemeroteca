@@ -301,7 +301,7 @@ export function MotorArteTGP({ value, onChange, initialTitulo = '', initialEstil
             transition: 'all 0.2s',
           }}
         >
-          🧠 Combinador Inteligente
+          Combinador Inteligente
         </button>
         <button
           type="button"
@@ -319,7 +319,7 @@ export function MotorArteTGP({ value, onChange, initialTitulo = '', initialEstil
             transition: 'all 0.2s',
           }}
         >
-          🔬 Laboratorio Manual (19 Módulos)
+          Laboratorio Manual (19 Módulos)
         </button>
       </div>
 
@@ -545,13 +545,13 @@ export function MotorArteTGP({ value, onChange, initialTitulo = '', initialEstil
               onClick={() => setOpenSection(openSection === 'panelA' ? '' : 'panelA')}
               style={{ padding: '12px 16px', background: '#0f172a', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
             >
-              <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>📌 Panel A: Sujeto e Historia</span>
+              <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>Panel A: Sujeto e Historia</span>
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); toggleLock('lockSubject'); }}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}
               >
-                {locks.lockSubject ? '🔒 Bloqueado' : '🔓 Libre'}
+                {locks.lockSubject ? '[Bloqueado]' : '[Libre]'}
               </button>
             </div>
             {openSection === 'panelA' && (
@@ -578,13 +578,13 @@ export function MotorArteTGP({ value, onChange, initialTitulo = '', initialEstil
               onClick={() => setOpenSection(openSection === 'panelB' ? '' : 'panelB')}
               style={{ padding: '12px 16px', background: '#0f172a', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
             >
-              <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>📷 Panel B: Cámara y Composición</span>
+              <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>Panel B: Cámara y Composición</span>
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); toggleLock('lockCamera'); }}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}
               >
-                {locks.lockCamera ? '🔒 Bloqueado' : '🔓 Libre'}
+                {locks.lockCamera ? '[Bloqueado]' : '[Libre]'}
               </button>
             </div>
             {openSection === 'panelB' && (
@@ -617,13 +617,13 @@ export function MotorArteTGP({ value, onChange, initialTitulo = '', initialEstil
               onClick={() => setOpenSection(openSection === 'panelC' ? '' : 'panelC')}
               style={{ padding: '12px 16px', background: '#0f172a', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
             >
-              <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>💡 Panel C: Luz y Color</span>
+              <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>Panel C: Luz y Color</span>
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); toggleLock('lockLighting'); }}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}
               >
-                {locks.lockLighting ? '🔒 Bloqueado' : '🔓 Libre'}
+                {locks.lockLighting ? '[Bloqueado]' : '[Libre]'}
               </button>
             </div>
             {openSection === 'panelC' && (
@@ -650,13 +650,13 @@ export function MotorArteTGP({ value, onChange, initialTitulo = '', initialEstil
               onClick={() => setOpenSection(openSection === 'panelD' ? '' : 'panelD')}
               style={{ padding: '12px 16px', background: '#0f172a', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
             >
-              <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>🧱 Panel D: Captura y Materialidad</span>
+              <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>Panel D: Captura y Materialidad</span>
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); toggleLock('lockMateriality'); }}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}
               >
-                {locks.lockMateriality ? '🔒 Bloqueado' : '🔓 Libre'}
+                {locks.lockMateriality ? '[Bloqueado]' : '[Libre]'}
               </button>
             </div>
             {openSection === 'panelD' && (
@@ -717,13 +717,13 @@ export function MotorArteTGP({ value, onChange, initialTitulo = '', initialEstil
           boxShadow: (isLoading || !titulo) ? 'none' : '0 4px 14px rgba(37,99,235,0.4)',
         }}
       >
-        {isLoading ? (statusMessage || 'MATERIALIZANDO DIRECCIÓN DE ARTE...') : '✨ MATERIALIZAR DIRECCIÓN VISUAL (2 FASES)'}
+        {isLoading ? (statusMessage || 'MATERIALIZANDO DIRECCIÓN DE ARTE...') : 'MATERIALIZAR DIRECCIÓN VISUAL (2 FASES)'}
       </button>
 
       {/* MENSAJE DE ERROR */}
       {errorMsg && (
         <div style={{ color: '#f87171', fontSize: '0.8rem', padding: '12px', background: 'rgba(239,68,68,0.1)', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.3)', marginBottom: '16px' }}>
-          ⚠️ {errorMsg}
+          {errorMsg}
         </div>
       )}
 
@@ -736,7 +736,7 @@ export function MotorArteTGP({ value, onChange, initialTitulo = '', initialEstil
 
           {coverImagePath && (
             <div style={{ padding: '10px 14px', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '8px', fontSize: '0.8rem', color: '#34d399' }}>
-              ✅ Imagen guardada y sincronizada en disco: <code>{coverImagePath}</code>
+              Imagen guardada y sincronizada en disco: <code>{coverImagePath}</code>
             </div>
           )}
 
@@ -760,7 +760,7 @@ export function MotorArteTGP({ value, onChange, initialTitulo = '', initialEstil
                     cursor: 'pointer',
                   }}
                 >
-                  {copiedPrompt ? '✓ Copiado' : '📋 Copiar Prompt'}
+                  {copiedPrompt ? '✓ Copiado' : 'Copiar Prompt'}
                 </button>
               </div>
               <p style={{ fontSize: '0.8rem', color: '#cbd5e1', margin: 0, lineHeight: '1.5', wordBreak: 'break-word' }}>
@@ -773,7 +773,7 @@ export function MotorArteTGP({ value, onChange, initialTitulo = '', initialEstil
           {resolvedDirection && resolvedDirection.decisions.length > 0 && (
             <details style={{ background: '#0f172a', padding: '12px', borderRadius: '8px', border: '1px solid #1e293b' }}>
               <summary style={{ fontSize: '0.75rem', fontWeight: 600, color: '#f59e0b', cursor: 'pointer' }}>
-                📋 Informe de Decisiones de Compatibilidad ({resolvedDirection.decisions.length})
+                Informe de Decisiones de Compatibilidad ({resolvedDirection.decisions.length})
               </summary>
               <ul style={{ marginTop: '10px', marginBottom: 0, paddingLeft: '20px', fontSize: '0.75rem', color: '#94a3b8', lineHeight: '1.6' }}>
                 {resolvedDirection.decisions.map((dec, idx) => (

@@ -10,7 +10,14 @@ import { QuickReturnButton } from "../../components/QuickReturnButton";
 import SubstackPrefooter from "../../components/SubstackPrefooter.astro";
 import RelatedReading from "../../components/RelatedReading.astro";
 import ExploreMore from "../../components/ExploreMore.astro";
-import { resolveEssayImage, resolveAllPostGalleryImages, essayImages } from "../../lib/content-filter";
+import {
+  resolveEssayImage,
+  resolveAllPostGalleryImages,
+  essayImages,
+  groupByCategory,
+  formatCategory,
+  getPublishableEssays,
+} from "../../lib/content-filter";
 import { MagazineFlipGallery } from "../../components/MagazineFlipGallery";
 
 export const prerender = true;
@@ -66,7 +73,6 @@ if (rawMdocText && rawMdocText.trim().length > 0) {
 let renderedHtml = '';
 if (finalMarkdownText) {
   renderedHtml = marked.parse(finalMarkdownText) as string;
-  // Reemplazar rutas de assets /src/assets/ensayos/... por su URL procesada por Vite
   for (const [imgKey, imgModule] of Object.entries(essayImages)) {
     if (renderedHtml.includes(imgKey)) {
       renderedHtml = renderedHtml.replaceAll(imgKey, imgModule.default.src);
@@ -74,12 +80,72 @@ if (finalMarkdownText) {
   }
 }
 
-// 5. Resolución de imagen de portada (exacta o auto-detectada de la carpeta)
+// 5. Resolución de imagen de portada
 const optimizedImage = resolveEssayImage(doc.coverImage, slug);
 
-// 6. Recopilación Universal de Galería Magazine / Flipbook (para posts nuevos y existentes)
+// 6. Recopilación Universal de Galería Magazine
 const allGalleryImages = resolveAllPostGalleryImages(doc, slug);
 let wikimediaImages: any[] = allGalleryImages;
+
+// 7. Colecciones para la Barra Lateral
+const allEssaysRaw = await getCollection("ensayos").catch(() => []);
+const publishable = getPublishableEssays(allEssaysRaw, import.meta.env.PROD);
+const collectionsMap = groupByCategory(publishable, 1);
+const sidebarCollections = Array.from(collectionsMap.entries())
+  .map(([k, list]) => ({
+    key: k,
+    label: formatCategory(list[0].entry.category),
+    count: list.length,
+  }))
+  .filter(c => c.key !== (doc.category || '').toLowerCase())
+  .slice(0, 6);
+
+// 8. Cita Histórica Contextualizada al Post
+function getContextualCitation(item: any) {
+  if (item.citaHistorica) return { text: item.citaHistorica, source: item.citaFuente || "Fuente Historiográfica" };
+  if (item.epigrafe) return { text: item.epigrafe, source: item.epigrafeFuente || "Epígrafe del Documento" };
+  if (item.quote) return { text: item.quote, source: item.quoteSource || "Registro Documental" };
+
+  const cat = (item.category || '').toLowerCase();
+  const title = (item.title || '').toLowerCase();
+
+  if (title.includes('tikal') || title.includes('maya') || cat.includes('arqueolog')) {
+    return {
+      text: "Las piedras silenciosas de las selvas guardan la memoria de civilizaciones que miraron al cielo antes de desvanecerse en el tiempo.",
+      source: "Crónica Arqueológica del Nuevo Mundo"
+    };
+  }
+  if (title.includes('homero') || cat.includes('historia-ideas') || cat.includes('filosof')) {
+    return {
+      text: "Cantar es recordar aquello que los dioses otorgaron a los mortales para no olvidar el origen de las cosas.",
+      source: "Tradición Clásica & Filosofía Epistémica"
+    };
+  }
+  if (title.includes('atila') || title.includes('roma') || title.includes('papa') || cat.includes('historia')) {
+    return {
+      text: "Los imperios no caen por la fuerza de las espadas que los asedian, sino por el agotamiento del espíritu que los sostenía.",
+      source: "Anales de la Antigüedad Tardía"
+    };
+  }
+  if (cat.includes('cahiers') || cat.includes('semiotica')) {
+    return {
+      text: "El signo no sustituye a la realidad: la funda en el entendimiento humano y preserva su código a través de las edades.",
+      source: "Cahiers Épistémiques · Cuaderno de Semiótica"
+    };
+  }
+  if (cat.includes('georreferencia') || cat.includes('sitio')) {
+    return {
+      text: "La geografía es la partitura sobre la cual la historia escribe su marcha inexorable.",
+      source: "Cartografía Histórica & Territorial"
+    };
+  }
+  return {
+    text: "El documento histórico no es un vestigio inerte, sino una conversación abierta con aquellos que nos precedieron.",
+    source: "Archivo Historiográfico TGP"
+  };
+}
+
+const contextualCitation = getContextualCitation(doc);
 
 const roomColors: Record<string, string> = {
   "british-green": "#1B382A",
@@ -119,7 +185,6 @@ const heroOrigin = doc.heroOrigin || doc.transformOrigin || 'center center';
           <div class="w-full h-full bg-white/5 opacity-40 hero-reverse-ken-burns" />
         )
       }
-      {/* Fade-Out y Gradiente Localizado para Contraste Impecable */}
       <div
         class="absolute inset-0 bg-linear-to-t from-theme-dark via-theme-dark/65 via-35% to-theme-dark/20 pointer-events-none z-0"
       ></div>
@@ -128,7 +193,7 @@ const heroOrigin = doc.heroOrigin || doc.transformOrigin || 'center center';
       ></div>
     </div>
 
-    {/* Contenido Editorial del Hero (iOS Style Wide Bounds) */}
+    {/* Contenido Editorial del Hero */}
     <div class="relative z-10 max-w-7xl lg:max-w-360 w-full mx-auto">
       {/* Categoría, Sitio y Año */}
       <div
@@ -138,21 +203,21 @@ const heroOrigin = doc.heroOrigin || doc.transformOrigin || 'center center';
         {doc.sitioGeohistorico && (
           <>
             <span class="opacity-40">—</span>
-            <span class="text-white/80">📍 {doc.sitioGeohistorico}</span>
+            <span class="text-white/80">{doc.sitioGeohistorico}</span>
           </>
         )}
         <span class="opacity-40">—</span>
         <span class="text-white/60">{data.date ? new Date(data.date).getFullYear() : "S/F"}</span>
       </div>
 
-      {/* Título Display Monumental con Cinzel ExtraBold y Gradiente Acero Especular */}
+      {/* Título Display Monumental con Cinzel ExtraBold y Gradiente Acero */}
       <h1
         class="text-[clamp(2.75rem,6.5vw,7.5rem)] leading-[0.98] font-cinzel font-extrabold tracking-tight antialiased max-w-5xl pt-2 pb-3 gradient-acero-ios drop-shadow-2xl"
       >
         {doc.title}
       </h1>
 
-      {/* Volanta / H2 Smart Hook Inteligente y Conciso (2 Renglones) */}
+      {/* Volanta / H2 Smart Hook */}
       {doc.volantaHook ? (
         <h2 class="text-lg md:text-xl lg:text-2xl h2-smart-hook text-slate-100/90 max-w-3xl leading-snug mt-3 drop-shadow-md">
           {doc.volantaHook}
@@ -163,7 +228,7 @@ const heroOrigin = doc.heroOrigin || doc.transformOrigin || 'center center';
         </p>
       ) : null}
 
-      {/* Podcast Icons en el ángulo inferior derecho del Hero */}
+      {/* Podcast Icons */}
       {(doc.spotifyLink || doc.youtubeLink) && (
         <div class="absolute bottom-0 right-0 hidden md:flex items-center gap-6 text-white">
           {doc.spotifyLink && (
@@ -197,9 +262,9 @@ const heroOrigin = doc.heroOrigin || doc.transformOrigin || 'center center';
     </div>
   </section>
 
-  {/* 3. Área Editorial y Grid Scrollytelling de Gran Lecturabilidad (The Atlantic / Medium Style) */}
+  {/* 3. Área Editorial con Proporción 80/20 (Lecturabilidad Suiza Premium) */}
   <article
-    class="w-full bg-theme-dark relative z-20 pt-20 pb-32 px-4 md:px-8 lg:px-12 shadow-[0_-20px_50px_rgba(18,20,19,1)]"
+    class="w-full bg-theme-dark relative z-20 pt-16 md:pt-20 pb-32 px-4 md:px-8 lg:px-12 shadow-[0_-20px_50px_rgba(18,20,19,1)]"
     style={`--theme-accent: ${activeAccent};`}
   >
     {/* Capas FX: Aura Atmosférica sutil */}
@@ -209,10 +274,10 @@ const heroOrigin = doc.heroOrigin || doc.transformOrigin || 'center center';
     >
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 max-w-7xl mx-auto relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 max-w-7xl mx-auto relative z-10">
       
-      {/* ─── COLUMNA PRINCIPAL DE LECTURA (Holgada, Amplia y UI/UX Descansada) ─── */}
-      <div class="col-span-12 lg:col-span-8 max-w-3xl">
+      {/* ─── 80% COLUMNA PRINCIPAL DE LECTURA (Cuerpo Editorial Amplio) ─── */}
+      <div class="col-span-12 lg:col-span-9 max-w-4xl">
         {
           data.excerpt && (
             <div class="border-l-2 border-[#C8A98B]/40 pl-6 md:pl-8 mb-14">
@@ -232,7 +297,7 @@ const heroOrigin = doc.heroOrigin || doc.transformOrigin || 'center center';
           prose-h3:font-body prose-h3:font-normal prose-h3:italic prose-h3:text-xl md:prose-h3:text-2xl prose-h3:text-[#C8A98B] prose-h3:leading-normal prose-h3:mt-12 prose-h3:mb-4
           prose-h4:font-sans prose-h4:font-extralight prose-h4:tracking-widest prose-h4:uppercase prose-h4:text-xs prose-h4:text-[#C8A98B] prose-h4:leading-normal prose-h4:mt-10 prose-h4:mb-3
           prose-strong:font-semibold prose-strong:text-white
-          prose-blockquote:border-l-3 prose-blockquote:border-[#C8A98B] prose-blockquote:bg-white/[0.03] prose-blockquote:text-white/90 prose-blockquote:p-8 prose-blockquote:md:p-10 prose-blockquote:my-12 prose-blockquote:rounded-r-2xl prose-blockquote:shadow-xl prose-blockquote:text-xl prose-blockquote:md:text-2xl prose-blockquote:leading-relaxed prose-blockquote:font-serif prose-blockquote:font-light prose-blockquote:italic
+          prose-blockquote:border-l-3 prose-blockquote:border-[#C8A98B] prose-blockquote:bg-white/3 prose-blockquote:text-white/90 prose-blockquote:p-8 prose-blockquote:md:p-10 prose-blockquote:my-12 prose-blockquote:rounded-r-2xl prose-blockquote:shadow-xl prose-blockquote:text-xl prose-blockquote:md:text-2xl prose-blockquote:leading-relaxed prose-blockquote:font-serif prose-blockquote:font-light prose-blockquote:italic
           prose-a:border-b prose-a:border-[#C8A98B]/40 prose-a:text-[#C8A98B] hover:prose-a:text-white transition-colors
           prose-img:rounded-2xl prose-img:border prose-img:border-white/10 prose-img:shadow-2xl prose-img:my-12 prose-img:w-full prose-img:object-cover
           prose-p:first-of-type:first-letter:text-7xl prose-p:first-of-type:first-letter:font-body prose-p:first-of-type:first-letter:font-light prose-p:first-of-type:first-letter:text-[#C8A98B] prose-p:first-of-type:first-letter:mr-3.5 prose-p:first-of-type:first-letter:float-left prose-p:first-of-type:first-letter:leading-[0.8] prose-p:first-of-type:first-letter:mt-2
@@ -290,16 +355,16 @@ const heroOrigin = doc.heroOrigin || doc.transformOrigin || 'center center';
         })()}
         </div>
 
-        {/* ─── MAGAZINE FLIPBOOK GALLERY (Automático para posts con variedad de fotos) ─── */}
+        {/* ─── VISOR DE REVISTA / FLIPBOOK AMPLIO Y LUMINOSO ─── */}
         {allGalleryImages.length > 1 && (
           <MagazineFlipGallery client:load images={allGalleryImages} title={doc.title} accentColor={activeAccent} />
         )}
 
         {/* Card Saber Más para Móviles / Tablets */}
         {doc.saberMasDato && (
-          <div class="my-12 p-8 border border-[#C8A98B]/35 bg-white/[0.04] rounded-2xl backdrop-blur-md shadow-2xl lg:hidden">
+          <div class="my-12 p-8 border border-[#C8A98B]/35 bg-white/4 rounded-2xl backdrop-blur-md shadow-2xl lg:hidden">
             <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-[#C8A98B] font-bold block mb-3">
-              ✦ Saber Más: La Historia dentro de la Historia
+              Saber Más: La Historia dentro de la Historia
             </span>
             <p class="font-serif italic font-light text-white/95 text-base md:text-lg leading-relaxed">
               {doc.saberMasDato}
@@ -308,40 +373,68 @@ const heroOrigin = doc.heroOrigin || doc.transformOrigin || 'center center';
         )}
       </div>
 
-      {/* ─── COLUMNA LATERAL SCROLLYTELLING ACOMPAÑANTE (Desktop) ─── */}
-      <aside class="col-span-12 lg:col-span-4 hidden lg:flex flex-col gap-8 sticky top-28 h-fit self-start">
+      {/* ─── 20% COLUMNA LATERAL ADELGAZADA & EDITORIAL (Desktop) ─── */}
+      <aside class="col-span-12 lg:col-span-3 hidden lg:flex flex-col gap-7 sticky top-28 h-fit self-start">
         
-        {/* 1. Marginalia Epistémica */}
-        <div class="p-6 border-l-2 border-[#C8A98B]/40 bg-white/[0.03] rounded-r-xl">
-          <p class="font-serif italic font-light text-[#C8A98B]/90 text-sm leading-relaxed">
-            "La verdad no es algo que se encuentra, es algo que se recuerda."
+        {/* 1. Cita Histórica Contextualizada al Post */}
+        <div class="p-5 border-l-2 border-[#C8A98B]/50 bg-white/3 rounded-r-xl flex flex-col gap-3">
+          <p class="font-serif italic font-light text-white/90 text-xs md:text-sm leading-relaxed">
+            "{contextualCitation.text}"
           </p>
-          <div class="mt-4 flex items-center justify-between font-mono text-[9px] uppercase tracking-widest text-white/40 border-t border-white/5 pt-3">
-            <span>Contexto: TGP Archive</span>
-            <span>{data.category || 'Epistemología'}</span>
+          <div class="flex items-center justify-between font-mono text-[8px] uppercase tracking-widest text-[#C8A98B]/70 border-t border-white/5 pt-2.5">
+            <span>{contextualCitation.source}</span>
           </div>
         </div>
 
-        {/* 2. Saber Más: La Historia dentro de la Historia (Desktop Scrollytelling Card) */}
+        {/* 2. Saber Más: La Historia dentro de la Historia */}
         {doc.saberMasDato && (
-          <div class="p-7 border border-[#C8A98B]/35 bg-linear-to-b from-white/[0.06] to-white/[0.02] rounded-2xl backdrop-blur-md shadow-2xl relative overflow-hidden group">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-[#C8A98B]/10 rounded-full blur-2xl pointer-events-none group-hover:bg-[#C8A98B]/20 transition-all duration-700"></div>
-            <span class="font-mono text-[9px] uppercase tracking-[0.3em] text-[#C8A98B] font-bold block mb-3 flex items-center gap-2">
-              <span class="text-xs">✦</span> Saber Más
+          <div class="p-5 border border-[#C8A98B]/30 bg-linear-to-b from-white/5 to-white/2 rounded-xl backdrop-blur-md shadow-xl relative overflow-hidden group">
+            <span class="font-mono text-[9px] uppercase tracking-[0.25em] text-[#C8A98B] font-bold mb-2.5 flex items-center gap-1.5">
+              Saber Más
             </span>
-            <p class="font-serif italic font-light text-white/90 text-sm leading-relaxed">
+            <p class="font-serif italic font-light text-white/85 text-xs leading-relaxed">
               {doc.saberMasDato}
             </p>
           </div>
         )}
 
-        {/* 3. Visor Fotográfico Indexado / Wikimedia Selected Gallery */}
+        {/* 3. Links a Otras Colecciones (Grid Cómodo y No Invasivo UI/UX) */}
+        {sidebarCollections.length > 0 && (
+          <div class="flex flex-col gap-3 p-5 rounded-xl border border-white/10 bg-white/2">
+            <div class="flex items-center justify-between border-b border-white/8 pb-2">
+              <span class="font-mono text-[9px] uppercase tracking-[0.25em] text-[#C8A98B] font-bold">
+                Colecciones
+              </span>
+              <a href="/colecciones" class="font-mono text-[8px] uppercase tracking-widest text-white/40 hover:text-[#C8A98B] transition-colors">
+                Ver todas →
+              </a>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-1.5">
+              {sidebarCollections.map((col) => (
+                <a
+                  href={`/colecciones/${encodeURIComponent(col.key)}`}
+                  class="group/item flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-white/5 transition-all text-xs"
+                >
+                  <span class="font-mono text-[10px] text-white/70 group-hover/item:text-[#C8A98B] transition-colors truncate">
+                    {col.label}
+                  </span>
+                  <span class="font-mono text-[8px] text-white/30 group-hover/item:text-white/60 shrink-0">
+                    {col.count}
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 4. Visor de Registros Visuales Seleccionados */}
         {wikimediaImages.length > 0 ? (
-          <div class="flex flex-col gap-4">
-            <span class="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40 block">
-              Registros Visuales Seleccionados ({wikimediaImages.length})
+          <div class="flex flex-col gap-3">
+            <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40 block">
+              Registros Visuales ({wikimediaImages.length})
             </span>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-2 gap-2">
               {wikimediaImages.slice(0, 4).map((wmItem: any, idx: number) => (
                 <a
                   href={wmItem.pageUrl || wmItem.url}
@@ -356,7 +449,7 @@ const heroOrigin = doc.heroOrigin || doc.transformOrigin || 'center center';
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
                     loading="lazy"
                   />
-                  <span class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/70 text-[8px] font-mono text-white/70">
+                  <span class="absolute bottom-1 right-1 px-1 py-0.2 bg-black/80 text-[7px] font-mono text-white/70 rounded">
                     #{idx + 1}
                   </span>
                 </a>
@@ -364,11 +457,10 @@ const heroOrigin = doc.heroOrigin || doc.transformOrigin || 'center center';
             </div>
           </div>
         ) : optimizedImage ? (
-          <div class="overflow-hidden rounded-xl border border-white/10 aspect-4/5 relative group shadow-2xl">
-            <div class="absolute inset-0 bg-theme-dark/10 z-10 pointer-events-none group-hover:bg-transparent transition-all duration-700"></div>
-            <Image src={optimizedImage} alt={`Registro visual`} class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-1000 ease-out" />
-            <div class="absolute bottom-0 inset-x-0 p-3 bg-linear-to-t from-black/90 to-transparent z-20">
-              <p class="font-mono text-[9px] text-white/60 tracking-wider uppercase">FIG I. Registro visual indexado.</p>
+          <div class="overflow-hidden rounded-xl border border-white/10 aspect-4/5 relative group shadow-xl">
+            <Image src={optimizedImage} alt={`Registro visual`} class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out" />
+            <div class="absolute bottom-0 inset-x-0 p-2.5 bg-linear-to-t from-black/90 to-transparent">
+              <p class="font-mono text-[8px] text-white/60 tracking-wider uppercase">FIG I. Portada de archivo.</p>
             </div>
           </div>
         ) : null}
@@ -376,54 +468,24 @@ const heroOrigin = doc.heroOrigin || doc.transformOrigin || 'center center';
       </aside>
 
     </div>
-    
-    {/* 4. El Búnker de Referencias (Footer Editorial) */}
-    <footer class="mt-32 border-t border-white/5 bg-[#0a0a0a] shadow-inner relative z-10 w-full">
-      <div class="max-w-7xl mx-auto px-4 md:px-8 py-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="p-6 border border-white/5 bg-white/2 rounded-sm hover:border-white/10 transition-colors">
-          <h6 class="font-mono text-[10px] uppercase tracking-[0.2em] text-[#C8A98B]/80 mb-4">Bibliografía Principal</h6>
-          <ul class="font-mono text-xs text-white/40 space-y-3">
-            <li class="pl-3 border-l border-white/10 hover:text-white/70 transition-colors">Fragmentos del Archivo Original. Vol II.</li>
-            <li class="pl-3 border-l border-white/10 hover:text-white/70 transition-colors">Transcripciones Esteparias (1230 DC).</li>
-            <li class="pl-3 border-l border-white/10 hover:text-white/70 transition-colors">El Códice Fundacional.</li>
-          </ul>
-        </div>
-        <div class="p-6 border border-white/5 bg-white/2 rounded-sm hover:border-white/10 transition-colors">
-          <h6 class="font-mono text-[10px] uppercase tracking-[0.2em] text-[#C8A98B]/80 mb-4">Metadatos de Indexación</h6>
-          <ul class="font-mono text-xs text-white/40 space-y-3">
-            <li class="flex justify-between border-b border-white/5 pb-2"><span>Nivel de Autenticidad</span> <span class="text-[#2483EB]">98.4%</span></li>
-            <li class="flex justify-between border-b border-white/5 pb-2"><span>Anomalías Temporales</span> <span class="text-[#2483EB]">Ninguna</span></li>
-            <li class="flex justify-between border-b border-white/5 pb-2"><span>Nivel de Clasificación</span> <span class="text-[#C8A98B]">Abierto</span></li>
-          </ul>
-        </div>
-        <div class="p-6 border border-white/5 bg-white/2 rounded-sm hover:border-white/10 transition-colors">
-          <h6 class="font-mono text-[10px] uppercase tracking-[0.2em] text-[#C8A98B]/80 mb-4">Rutas Cognitivas</h6>
-          <ul class="font-mono text-xs text-white/40 space-y-3">
-            <li class="pl-3 border-l border-[#2483EB]/40 hover:text-white/80 transition-colors cursor-pointer">Revisar nodo de asimetría 04x</li>
-            <li class="pl-3 border-l border-[#2483EB]/40 hover:text-white/80 transition-colors cursor-pointer">Consultar registros paralelos</li>
-          </ul>
-        </div>
-      </div>
-    </footer>
 
     <ExploreMore currentSlug={slug!} category={data.category ?? undefined} />
 
     <SubstackPrefooter />
 
     <div
-      class="max-w-2xl mx-auto relative z-10 pt-24 pb-32 text-center"
+      class="max-w-2xl mx-auto relative z-10 pt-20 pb-28 text-center"
     >
       <a
         href="/archivo"
-        class="inline-block font-mono text-[10px] border border-white/10 px-10 py-5 uppercase tracking-[0.3em] text-white/40 hover:bg-white/5 hover:border-[#C8A98B]/50 hover:text-[#C8A98B] transition-all duration-700 rounded-full"
+        class="inline-block font-mono text-[10px] border border-white/10 px-10 py-4 uppercase tracking-[0.3em] text-white/40 hover:bg-white/5 hover:border-[#C8A98B]/50 hover:text-[#C8A98B] transition-all duration-500 rounded-full"
       >
         Cerrar Archivo
       </a>
     </div>
   </article>
 
-  {/* 4. Animación de Entrada "Aparición Volumétrica" */}
-  {/* Floating Action Bar: Podcast links at bottom right */}
+  {/* Floating Action Bar: Podcast links */}
   {(doc.spotifyLink || doc.youtubeLink) && (
     <div class="fixed bottom-8 right-8 z-50 flex flex-col gap-4">
       {doc.spotifyLink && (
@@ -450,77 +512,4 @@ const heroOrigin = doc.heroOrigin || doc.transformOrigin || 'center center';
       )}
     </div>
   )}
-
-  <style>
-    /* Reverse Ken Burns: scale(1.06) translateY(1%) hacia scale(1), 10s, single run */
-    @keyframes reverseKenBurns {
-      0% {
-        transform: scale(1.06) translateY(1%);
-      }
-      100% {
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    .hero-reverse-ken-burns {
-      animation: reverseKenBurns 10s cubic-bezier(0.25, 1, 0.5, 1) 1 forwards;
-    }
-
-    /* Soporte de la curva Bézier cinemática */
-    .ease-cinematic {
-      transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    /* Blockquotes laterales / fuentes históricas con línea editorial de color destacado */
-    .essay-content blockquote {
-      border-left: 3px solid var(--theme-accent, #C8A98B) !important;
-      background: rgba(255, 255, 255, 0.03) !important;
-      padding: 1.5rem 2rem !important;
-      margin: 2.5rem 0 !important;
-      border-radius: 0 1rem 1rem 0 !important;
-      font-family: var(--font-serif), Georgia, serif !important;
-      font-style: italic !important;
-      font-weight: 300 !important;
-      color: rgba(255, 255, 255, 0.9) !important;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
-    }
-    .essay-content blockquote p {
-      font-size: 1.25rem !important;
-      line-height: 1.75 !important;
-      margin-bottom: 0 !important;
-    }
-
-    /* Recuadro de Fuentes Eruditas & Referencias al final del ensayo */
-    .essay-content h2:last-of-type {
-      margin-top: 4rem !important;
-      padding-top: 1.5rem !important;
-      border-top: 1px dashed rgba(200, 169, 139, 0.25) !important;
-      color: #C8A98B !important;
-      font-family: var(--font-serif), Georgia, serif !important;
-      font-weight: 300 !important;
-      font-style: italic !important;
-      font-size: 1.6rem !important;
-    }
-
-    .essay-content ul:last-of-type {
-      background: rgba(255, 255, 255, 0.02) !important;
-      border: 1px solid rgba(255, 255, 255, 0.08) !important;
-      border-left: 3px solid #C8A98B !important;
-      padding: 1.75rem 2rem 1.75rem 2.5rem !important;
-      border-radius: 0.75rem !important;
-      font-family: var(--font-serif), Georgia, serif !important;
-      font-style: italic !important;
-      font-weight: 300 !important;
-      font-size: 1rem !important;
-      color: rgba(255, 255, 255, 0.75) !important;
-      line-height: 1.8 !important;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .hero-reverse-ken-burns {
-        animation: none !important;
-        transform: none !important;
-      }
-    }
-  </style>
 </Layout>

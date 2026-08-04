@@ -110,9 +110,9 @@ export function exportMetadataPdfDossier(topic: string, items: WikimediaImageIte
 </head>
 <body>
   <div class="no-print" style="background: #222; color: #fff; padding: 15px; text-align: center; margin-bottom: 20px; border-radius: 6px; font-family: sans-serif;">
-    <p style="margin: 0 0 10px 0; font-size: 14px;">📄 <strong>Dossier de Archivo TGP Listo para Exportar</strong></p>
+    <p style="margin: 0 0 10px 0; font-size: 14px;"><strong>Dossier de Archivo TGP Listo para Exportar</strong></p>
     <button onclick="window.print()" style="padding: 10px 20px; background: #28a745; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
-      🖨️ Imprimir / Guardar como PDF
+      Imprimir / Guardar como PDF
     </button>
   </div>
 

@@ -16,12 +16,12 @@ import {
 
 // ─── CARGA Y FILTRADO CENTRALIZADO ───────────────────────────────────────────
 const allEssaysRaw = await getCollection('ensayos').catch(err => {
-  console.error("❌ [INDEX] Falló carga de ensayos:", err);
+  console.error("[INDEX] Falló carga de ensayos:", err);
   return [];
 });
 
 const allGeorefsRaw = await getCollection('georreferencias').catch(err => {
-  console.error("❌ [INDEX] Falló carga de georreferencias:", err);
+  console.error("[INDEX] Falló carga de georreferencias:", err);
   return [];
 });
 
@@ -70,6 +70,11 @@ const secAImage  = resolveEssayImage(secondaryA?.entry.coverImage, secondaryA?.s
 const secBImage  = resolveEssayImage(secondaryB?.entry.coverImage, secondaryB?.slug);
 
 const resolvedRecent = recentEssays.map(e => ({
+  ...e,
+  img: resolveEssayImage(e.entry.coverImage, e.slug),
+}));
+
+const resolvedArchiveRows = archiveRows.map(e => ({
   ...e,
   img: resolveEssayImage(e.entry.coverImage, e.slug),
 }));
@@ -153,7 +158,9 @@ const resolvedCollections = collections.map(c => ({
           <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
             <div>
               <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-1">Dossieres Seleccionados</span>
-              <h2 class="text-3xl md:text-5xl font-serif">Historias Fundamentales</h2>
+              <h2 class="text-3xl md:text-5xl font-cinzel font-extrabold tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-md">
+                Historias Fundamentales
+              </h2>
             </div>
             <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40">Perspectivas Cruciales</span>
           </div>
@@ -174,7 +181,7 @@ const resolvedCollections = collections.map(c => ({
                     <span class="opacity-30">•</span>
                     <span class="text-white/40">{formatDate(leadStory.entry.date)}</span>
                   </div>
-                  <h3 class="text-2xl md:text-4xl font-serif leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
+                  <h3 class="text-2xl md:text-4xl font-cinzel font-bold leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
                     <a href={`/hemeroteca/${leadStory.slug}`} class="hover:underline">{leadStory.entry.title}</a>
                   </h3>
                   {leadStory.entry.excerpt && (
@@ -208,7 +215,7 @@ const resolvedCollections = collections.map(c => ({
                       <span class="opacity-30">•</span>
                       <span class="text-white/40">{formatDate(secondaryA.entry.date)}</span>
                     </div>
-                    <h3 class="text-xl md:text-2xl font-serif leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
+                    <h3 class="text-xl md:text-2xl font-cinzel font-bold leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
                       <a href={`/hemeroteca/${secondaryA.slug}`} class="hover:underline">{secondaryA.entry.title}</a>
                     </h3>
                     {secondaryA.entry.excerpt && (
@@ -233,7 +240,7 @@ const resolvedCollections = collections.map(c => ({
                       <span class="opacity-30">•</span>
                       <span class="text-white/40">{formatDate(secondaryB.entry.date)}</span>
                     </div>
-                    <h3 class="text-xl md:text-2xl font-serif leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
+                    <h3 class="text-xl md:text-2xl font-cinzel font-bold leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
                       <a href={`/hemeroteca/${secondaryB.slug}`} class="hover:underline">{secondaryB.entry.title}</a>
                     </h3>
                     {secondaryB.entry.excerpt && (
@@ -259,7 +266,9 @@ const resolvedCollections = collections.map(c => ({
           <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
             <div>
               <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-1">Archivo de Ensayos</span>
-              <h2 class="text-3xl md:text-5xl font-serif">Ensayos Recientes</h2>
+              <h2 class="text-3xl md:text-5xl font-cinzel font-extrabold tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-md">
+                Ensayos Recientes
+              </h2>
             </div>
             <a href="/archivo" class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-[#C8A98B] transition-colors">
               Ver Catálogo Completo ({publishable.length}) →
@@ -282,7 +291,7 @@ const resolvedCollections = collections.map(c => ({
                       <span class="opacity-30">•</span>
                       <span class="text-white/40">{formatYear(entry.date)}</span>
                     </div>
-                    <h3 class="text-xl font-serif leading-tight group-hover:text-[#C8A98B] transition-colors duration-300 line-clamp-2">
+                    <h3 class="text-xl font-cinzel font-bold leading-tight group-hover:text-[#C8A98B] transition-colors duration-300 line-clamp-2">
                       <a href={`/hemeroteca/${slug}`} class="hover:underline">{entry.title}</a>
                     </h3>
                     {entry.excerpt && (
@@ -314,7 +323,9 @@ const resolvedCollections = collections.map(c => ({
           <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
             <div>
               <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-1">Organización Temática</span>
-              <h2 class="text-3xl md:text-5xl font-serif">Colecciones</h2>
+              <h2 class="text-3xl md:text-5xl font-cinzel font-extrabold tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-md">
+                Colecciones
+              </h2>
             </div>
           </div>
 
@@ -331,13 +342,13 @@ const resolvedCollections = collections.map(c => ({
                     <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent" />
                     <div class="absolute bottom-0 left-0 p-4">
                       <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-[#C8A98B] mb-1">{count} artículos</p>
-                      <h3 class="font-serif text-lg leading-tight text-white">{label}</h3>
+                      <h3 class="font-cinzel font-bold text-lg leading-tight text-white group-hover:text-[#C8A98B] transition-colors">{label}</h3>
                     </div>
                   </div>
                 ) : (
                   <div class="p-5 flex flex-col gap-2 flex-1">
                     <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-[#C8A98B]">{count} artículos</p>
-                    <h3 class="font-serif text-lg leading-tight">{label}</h3>
+                    <h3 class="font-cinzel font-bold text-lg leading-tight group-hover:text-[#C8A98B] transition-colors">{label}</h3>
                   </div>
                 )}
               </a>
@@ -356,34 +367,50 @@ const resolvedCollections = collections.map(c => ({
           <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
             <div>
               <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-1">Hemeroteca</span>
-              <h2 class="text-3xl md:text-5xl font-serif">Del Archivo</h2>
+              <h2 class="text-3xl md:text-5xl font-cinzel font-extrabold tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-md">
+                Del Archivo
+              </h2>
             </div>
             <a href="/archivo" class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-[#C8A98B] transition-colors shrink-0">
               Ver archivo completo →
             </a>
           </div>
 
-          <ol class="flex flex-col divide-y divide-white/5">
-            {archiveRows.map(({ slug, entry }) => (
-              <li>
-                <a
-                  href={`/hemeroteca/${slug}`}
-                  class="group flex items-baseline gap-3 md:gap-6 py-3 md:py-4 hover:text-[#C8A98B] transition-colors duration-300"
-                >
-                  <span class="font-mono text-[10px] text-white/30 tracking-[0.2em] shrink-0 tabular-nums">
-                    {formatYear(entry.date)}
-                  </span>
-                  <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-[#C8A98B]/70 shrink-0 hidden sm:inline">
-                    {formatCategory(entry.category)}
-                  </span>
-                  <span class="font-serif text-sm md:text-base text-white/80 group-hover:text-[#C8A98B] transition-colors leading-snug line-clamp-1 flex-1">
+          {/* Grilla Editorial Prolija Estilo Suizo con Miniaturas */}
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {resolvedArchiveRows.map(({ slug, entry, img }) => (
+              <a
+                href={`/hemeroteca/${slug}`}
+                class="group flex items-center gap-4 p-3.5 md:p-4 bg-white/3 border border-white/8 rounded-xl hover:border-[#C8A98B]/40 hover:bg-white/5 transition-all duration-400 overflow-hidden"
+              >
+                {img ? (
+                  <div class="w-16 h-12 md:w-20 md:h-14 shrink-0 overflow-hidden rounded-lg bg-black/40 aspect-video relative">
+                    <Image src={img} alt={entry.title || "Ensayo"} class="w-full h-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500" />
+                  </div>
+                ) : (
+                  <div class="w-16 h-12 md:w-20 md:h-14 shrink-0 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-mono text-[9px] text-[#C8A98B]">
+                    TGP
+                  </div>
+                )}
+                <div class="flex flex-col gap-1 min-w-0 flex-1">
+                  <div class="flex items-center gap-2 font-mono text-[9px] text-[#C8A98B] tracking-[0.2em] uppercase">
+                    <span>{formatCategory(entry.category)}</span>
+                    <span class="opacity-30">•</span>
+                    <span class="text-white/40 tabular-nums">{formatYear(entry.date)}</span>
+                  </div>
+                  <h3 class="font-cinzel text-sm md:text-base text-white/90 group-hover:text-[#C8A98B] transition-colors leading-snug line-clamp-1">
                     {entry.title}
-                  </span>
-                  <span class="font-mono text-[9px] text-white/20 shrink-0 group-hover:text-[#C8A98B]/50 transition-colors">→</span>
-                </a>
-              </li>
+                  </h3>
+                  {entry.excerpt && (
+                    <p class="font-sans text-xs text-white/50 line-clamp-1 font-light tracking-wide italic">
+                      "{entry.excerpt}"
+                    </p>
+                  )}
+                </div>
+                <span class="font-mono text-[10px] text-white/20 group-hover:text-[#C8A98B] transition-colors shrink-0 pr-1">→</span>
+              </a>
             ))}
-          </ol>
+          </div>
 
           <div class="text-center pt-4">
             <a

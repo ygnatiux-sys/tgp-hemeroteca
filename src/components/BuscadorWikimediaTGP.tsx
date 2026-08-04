@@ -98,14 +98,14 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
         });
         const data = await res.json();
         if (data.success) {
-          alert(`✅ Portada "${item.title}" vinculada y guardada en disco para ${slugToSave}!`);
+          alert(`Portada "${item.title}" vinculada y guardada en disco para ${slugToSave}!`);
           return;
         }
       }
-      alert(`✅ Foto "${item.title}" seleccionada como Portada.\n\nSe ha sincronizado con el generador. Guarda los cambios con el botón Save.`);
+      alert(`Foto "${item.title}" seleccionada como Portada.\n\nSe ha sincronizado con el generador. Guarda los cambios con el botón Save.`);
     } catch (e) {
       console.error('Error aplicando portada de Wikimedia:', e);
-      alert('✅ Foto seleccionada como Portada. Recuerda presionar "Save" en Keystatic.');
+      alert('Foto seleccionada como Portada. Recuerda presionar "Save" en Keystatic.');
     }
   };
 
@@ -169,7 +169,7 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
   // Limpiar Caché Local
   const handleClearCache = () => {
     clearWikimediaCache();
-    alert('✅ Caché local de Wikimedia limpiada con éxito.');
+    alert('Caché local de Wikimedia limpiada con éxito.');
   };
 
   // Seleccionar / Deseleccionar una imagen individual
@@ -214,7 +214,7 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <div>
           <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#64b5f6', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            🏛️ Buscador & Galería Wikimedia Commons TGP
+            Buscador & Galería Wikimedia Commons TGP
           </h3>
           <p style={{ margin: '4px 0 0 0', fontSize: '0.75rem', color: '#888' }}>
             Filtro Estricto Anti-Basura ($\ge 1000px$, CC0/CC-BY) · Clasificación de Roles (Hero, Secundaria, B-Roll)
@@ -235,7 +235,7 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
             cursor: 'pointer'
           }}
         >
-          ⚡ Limpiar Caché
+          Limpiar Caché
         </button>
       </div>
 
@@ -275,7 +275,7 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
             boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)'
           }}
         >
-          {isLoading ? '🔍 BUSCANDO...' : '🔍 BUSCAR IMÁGENES'}
+          {isLoading ? 'BUSCANDO...' : 'BUSCAR IMÁGENES'}
         </button>
       </div>
 
@@ -315,7 +315,7 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
                 cursor: 'pointer'
               }}
             >
-              ☑️ Seleccionar Todas ({items.length})
+              Seleccionar Todas ({items.length})
             </button>
 
             <button
@@ -333,7 +333,7 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
                 cursor: 'pointer'
               }}
             >
-              ◻️ Desmarcar Todo
+              Desmarcar Todo
             </button>
 
             <button
@@ -351,7 +351,7 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
                 cursor: 'pointer'
               }}
             >
-              🗑️ Limpiar Búsqueda
+              Limpiar Búsqueda
             </button>
 
             <span style={{ fontSize: '0.85rem', color: '#90caf9', fontWeight: 600, marginLeft: '6px' }}>
@@ -375,7 +375,7 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
                 cursor: selectedCount === 0 ? 'not-allowed' : 'pointer'
               }}
             >
-              📄 Exportar PDF Metadatos
+              Exportar PDF Metadatos
             </button>
 
             <button
@@ -393,7 +393,7 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
                 cursor: selectedCount === 0 ? 'not-allowed' : 'pointer'
               }}
             >
-              📦 Descargar Selección (Lote)
+              Descargar Selección (Lote)
             </button>
           </div>
         </div>
@@ -523,11 +523,11 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
 
                   <div style={{ borderTop: '1px solid #282838', paddingTop: '10px', fontSize: '0.7rem', color: '#888' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <span>📐 {item.width}×{item.height}px</span>
+                      <span>{item.width}×{item.height}px</span>
                       <span style={{ color: '#81c784', fontWeight: 600 }}>{item.license}</span>
                     </div>
                     <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '8px' }}>
-                      👤 Autor: {item.author}
+                      Autor: {item.author}
                     </div>
 
                     <button
@@ -552,7 +552,7 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
                         gap: '4px'
                       }}
                     >
-                      🖼️ Fijar como Portada Principal (Hero)
+                      Fijar como Portada Principal (Hero)
                     </button>
                   </div>
                 </div>
@@ -594,7 +594,7 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid #282838', paddingBottom: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ background: 'rgba(100, 181, 246, 0.15)', color: '#64b5f6', border: '1px solid rgba(100,181,246,0.3)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>
-                  🔍 Lupa 60% Screen
+                  Lupa 60% Screen
                 </span>
                 <h3 style={{ margin: 0, fontSize: '1rem', color: '#fff', maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {activeModalItem.title}
@@ -616,7 +616,7 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
                     cursor: 'pointer'
                   }}
                 >
-                  🖼️ Fijar como Portada
+                  Fijar como Portada
                 </button>
 
                 <button

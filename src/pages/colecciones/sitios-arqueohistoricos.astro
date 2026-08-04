@@ -103,7 +103,7 @@ const resolvedEssays = geohistoricalEssays.map(e => {
                   {entry.sitioGeohistorico && (
                     <div class="absolute bottom-4 left-4 z-10">
                       <span class="px-2.5 py-1 bg-black/70 backdrop-blur-md rounded-md border border-white/20 font-mono text-[9px] uppercase tracking-[0.2em] text-[#C8A98B]">
-                        📍 {entry.sitioGeohistorico}
+                        {entry.sitioGeohistorico}
                       </span>
                     </div>
                   )}
@@ -126,7 +126,7 @@ const resolvedEssays = geohistoricalEssays.map(e => {
 
                   {entry.sitioGeohistorico && !img && (
                     <div class="font-mono text-[10px] text-[#C8A98B] tracking-[0.2em] uppercase">
-                      📍 Ubicación: {entry.sitioGeohistorico}
+                      Ubicación: {entry.sitioGeohistorico}
                     </div>
                   )}
 
@@ -142,9 +142,9 @@ const resolvedEssays = geohistoricalEssays.map(e => {
                     Explorar Georreferencia →
                   </a>
                   {showImg ? (
-                    <span class="text-white/30 text-[8px]">📷 Con Portada</span>
+                    <span class="text-white/30 text-[8px]">Con Portada</span>
                   ) : (
-                    <span class="text-white/30 text-[8px]">📝 Edición Texto Puro</span>
+                    <span class="text-white/30 text-[8px]">Edición Texto Puro</span>
                   )}
                 </div>
               </div>

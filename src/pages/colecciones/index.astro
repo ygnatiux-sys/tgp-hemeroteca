@@ -6,7 +6,7 @@ import {
   getPublishableEssays,
   groupByCategory,
   formatCategory,
-  normalizeCategory,
+  formatYear,
   resolveEssayImage,
 } from '../../lib/content-filter';
 
@@ -15,56 +15,51 @@ const allEssaysRaw = await getCollection('ensayos').catch(() => []);
 const isProd = import.meta.env.PROD;
 const publishable = getPublishableEssays(allEssaysRaw, isProd);
 
-// ─── COLECCIONES CON ≥ 2 ARTÍCULOS ──────────────────────────────────────────
-const categoryGroups = groupByCategory(publishable, 2);
+// ─── TODAS LAS COLECCIONES TEMÁTICAS (≥ 1 ARTÍCULO) ──────────────────────────
+const categoryGroups = groupByCategory(publishable, 1);
 
 // Convertir a array ordenado por número de artículos (descendente)
 const collections = Array.from(categoryGroups.entries())
-  .map(([key, essays]) => ({
-    key,
-    label: formatCategory(essays[0].entry.category),
-    count: essays.length,
-    essays,
-    coverEssay: essays[0],
-    secondEssay: essays[1] ?? null,
-  }))
+  .map(([key, rawEssays]) => {
+    const essays = rawEssays.map(essay => ({
+      ...essay,
+      img: resolveEssayImage(essay.entry.coverImage, essay.slug),
+    }));
+    return {
+      key,
+      label: formatCategory(rawEssays[0].entry.category),
+      count: essays.length,
+      essays,
+      coverEssay: essays[0],
+    };
+  })
   .sort((a, b) => b.count - a.count);
-
-// La colección con más artículos es la destacada
-const featured = collections[0] ?? null;
-const rest = collections.slice(1);
-
-// ─── IMÁGENES CON RESOLUCIÓN INTELIGENTE ──────────────────────────────────────
-const featuredImg = featured
-  ? resolveEssayImage(featured.coverEssay.entry.coverImage, featured.coverEssay.slug)
-  : null;
-
-const resolvedRest = rest.map(col => ({
-  ...col,
-  img: resolveEssayImage(col.coverEssay.entry.coverImage, col.coverEssay.slug),
-}));
 ---
 
 <Layout title="Colecciones | The Great Puzzle Project">
   <div class="bg-theme-dark text-white min-h-screen pt-28 pb-32">
-    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-20">
+    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16">
 
       {/* ═══════════════════════════════════════════════════════════════════
           CABECERA
       ═══════════════════════════════════════════════════════════════════ */}
       <header class="border-l border-[#C8A98B]/40 pl-6 md:pl-10">
         <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-2">The Great Puzzle Project</span>
-        <h1 class="text-5xl md:text-6xl lg:text-7xl font-serif tracking-tighter leading-none">Colecciones</h1>
+        <h1 class="text-5xl md:text-6xl lg:text-7xl font-cinzel font-extrabold tracking-tight leading-none bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-md">
+          Colecciones
+        </h1>
         <div class="reveal-item flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 mt-4">
-          <p class="font-mono text-[10px] uppercase tracking-[0.3em] opacity-50">Organización temática del archivo</p>
-          <div class="h-px w-16 bg-white/10 hidden sm:block" />
-          <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-[#C8A98B]">
-            {collections.length} {collections.length === 1 ? 'colección' : 'colecciones'}
+          <p class="h2-thin-hook font-outfit uppercase tracking-[0.15em] text-white/60 text-xs md:text-sm">
+            Organización temática del archivo de investigaciones
+          </p>
+          <div class="h-px w-12 bg-white/15 hidden sm:block" />
+          <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-[#C8A98B] font-bold">
+            {collections.length} {collections.length === 1 ? 'colección' : 'colecciones'} · {publishable.length} dossiers
           </p>
         </div>
       </header>
 
-      {/* BANNER DESTACADO: NUEVA SECCIÓN SITIOS GEOHISTÓRICOS */}
+      {/* BANNER DESTACADO: SITIOS GEOHISTÓRICOS */}
       <section class="reveal-item">
         <a
           href="/colecciones/sitios-arqueohistoricos"
@@ -73,13 +68,13 @@ const resolvedRest = rest.map(col => ({
           <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div class="flex flex-col gap-2 max-w-3xl">
               <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#64b5f6]">
-                📍 Nueva Colección Especializada
+                Colección Especializada
               </span>
               <h2 class="text-3xl md:text-5xl font-cinzel font-extrabold tracking-tight leading-tight gradient-acero-ios">
                 Sitios Geohistóricos & Arqueohistóricos
               </h2>
               <p class="h2-thin-hook text-sm md:text-base text-white/60 tracking-[0.2em] mt-1">
-                Aramu Muru · Tikal · Bonampak · Cartago · Qapaq Ñan
+                Aramu Muru · Tikal · Bonampak · Cartago · Qapaq Ñan · Yonaguni
               </p>
             </div>
 
@@ -93,132 +88,146 @@ const resolvedRest = rest.map(col => ({
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════
-          COLECCIÓN DESTACADA (la de mayor número de artículos)
-          Desktop: imagen 7–8 cols / texto 4–5 cols
+          COLECCIONES TEMÁTICAS GENERALES
+          Formato: Hero de categoría a 2 columnas (foto izq / títulos y datos der)
+          + debajo la galería de miniaturas desplazada horizontalmente.
       ═══════════════════════════════════════════════════════════════════ */}
-      {featured && (
-        <section class="flex flex-col gap-6">
-          <div class="reveal-item border-b border-white/10 pb-4">
-            <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B]">Colecciones Temáticas Generales</span>
-          </div>
+      <section class="flex flex-col gap-12 md:gap-16">
+        <div class="reveal-item border-b border-white/10 pb-4 flex items-center justify-between">
+          <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] font-bold">
+            Colecciones Temáticas Generales
+          </span>
+          <span class="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40 hidden sm:inline">
+            Desplazamiento horizontal para explorar
+          </span>
+        </div>
 
-          <a
-            href={`/colecciones/${encodeURIComponent(featured.key)}`}
-            class="group grid grid-cols-1 lg:grid-cols-12 gap-0 rounded-2xl border border-white/10 overflow-hidden hover:border-[#C8A98B]/40 transition-all duration-500"
-          >
-            {/* Imagen: 7 cols */}
-            <div class="lg:col-span-7 relative overflow-hidden aspect-video lg:aspect-auto min-h-70">
-              {featuredImg ? (
-                <>
-                  <Image
-                    src={featuredImg}
-                    alt={featured.label}
-                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
-                  />
-                  <div class="absolute inset-0 bg-linear-to-r from-transparent to-theme-dark/60 hidden lg:block pointer-events-none" />
-                  <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent lg:hidden pointer-events-none" />
-                </>
-              ) : (
-                <div class="w-full h-full bg-white/5 flex items-center justify-center">
-                  <span class="font-mono text-[9px] uppercase tracking-[0.3em] text-white/20">Sin imagen</span>
-                </div>
-              )}
-            </div>
-
-            {/* Texto: 5 cols */}
-            <div class="lg:col-span-5 flex flex-col justify-center gap-5 p-8 md:p-10 bg-white/3">
-              <div class="flex flex-col gap-2">
-                <span class="font-mono text-[9px] uppercase tracking-[0.3em] text-[#C8A98B]">
-                  {featured.count} {featured.count === 1 ? 'investigación' : 'investigaciones'}
-                </span>
-                <h2 class="font-serif text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight group-hover:text-[#C8A98B] transition-colors duration-500">
-                  {featured.label}
-                </h2>
-              </div>
-
-              {/* Vista previa de primeros artículos */}
-              <ol class="flex flex-col gap-2 border-t border-white/10 pt-4">
-                {featured.essays.slice(0, 3).map(({ slug, entry }) => (
-                  <li class="flex items-baseline gap-3 font-mono text-[9px] text-white/50">
-                    <span class="text-[#C8A98B]/60 shrink-0">→</span>
-                    <span class="line-clamp-1">{entry.title}</span>
-                  </li>
-                ))}
-                {featured.count > 3 && (
-                  <li class="font-mono text-[9px] text-white/30">
-                    + {featured.count - 3} más
-                  </li>
-                )}
-              </ol>
-
-              <div class="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-white/40 group-hover:text-[#C8A98B] transition-colors duration-300 mt-2">
-                <span>Explorar colección</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform duration-300"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-              </div>
-            </div>
-          </a>
-        </section>
-      )}
-
-      {/* ═══════════════════════════════════════════════════════════════════
-          GRILLA DE COLECCIONES
-          Desktop: 3 cols / Tablet: 2 cols / Mobile: 1 col
-      ═══════════════════════════════════════════════════════════════════ */}
-      {resolvedRest.length > 0 && (
-        <section class="flex flex-col gap-6">
-          <div class="reveal-item border-b border-white/10 pb-4">
-            <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B]">Todas las Colecciones</span>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {resolvedRest.map(({ key, label, count, essays, img }) => (
-              <a
-                href={`/colecciones/${encodeURIComponent(key)}`}
-                class="group flex flex-col border border-white/10 rounded-xl overflow-hidden hover:border-[#C8A98B]/40 transition-all duration-500 bg-white/3"
-              >
-                {/* Imagen */}
-                <div class="relative overflow-hidden aspect-video">
-                  {img ? (
+        <div class="flex flex-col gap-14 md:gap-20">
+          {collections.map(({ key, label, count, essays, coverEssay }) => (
+            <div class="reveal-item flex flex-col gap-6 border-b border-white/10 pb-14 last:border-b-0">
+              
+              {/* Hero Principal de la Categoría */}
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
+                {/* Imagen Izquierda: 7 cols */}
+                <a
+                  href={`/colecciones/${encodeURIComponent(key)}`}
+                  class="lg:col-span-7 group relative overflow-hidden rounded-2xl aspect-video bg-black/60 border border-white/10 hover:border-[#C8A98B]/50 transition-all duration-500 block"
+                >
+                  {coverEssay.img ? (
                     <>
                       <Image
-                        src={img}
+                        src={coverEssay.img}
                         alt={label}
-                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-70 group-hover:opacity-90"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-85 group-hover:opacity-100"
                       />
-                      <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent pointer-events-none" />
+                      <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 via-transparent to-transparent pointer-events-none" />
                     </>
                   ) : (
-                    <div class="w-full h-full bg-white/5" />
+                    <div class="w-full h-full bg-linear-to-br from-[#1b2326] via-theme-dark to-[#0c0d0d] flex items-center justify-center">
+                      <span class="font-cinzel text-sm text-[#C8A98B]/40 tracking-widest uppercase">TGP Archive</span>
+                    </div>
                   )}
-                </div>
+                </a>
 
-                {/* Info */}
-                <div class="flex flex-col gap-3 p-6">
-                  <div class="flex items-center justify-between">
-                    <h2 class="font-serif text-2xl leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
-                      {label}
-                    </h2>
-                    <span class="font-mono text-[9px] text-[#C8A98B] tracking-[0.2em] shrink-0 ml-4">
-                      {count}
+                {/* Info Derecha: 5 cols */}
+                <div class="lg:col-span-5 flex flex-col justify-center gap-5">
+                  <div class="flex flex-col gap-2">
+                    <span class="font-mono text-[10px] uppercase tracking-[0.35em] text-[#C8A98B] font-bold">
+                      {count} {count === 1 ? 'INVESTIGACIÓN' : 'INVESTIGACIONES'}
                     </span>
+                    <a href={`/colecciones/${encodeURIComponent(key)}`} class="group">
+                      <h2 class="font-cinzel font-bold text-4xl md:text-5xl lg:text-6xl leading-tight text-white group-hover:text-[#C8A98B] transition-colors">
+                        {label}
+                      </h2>
+                    </a>
                   </div>
 
-                  <ol class="flex flex-col gap-1">
-                    {essays.slice(0, 2).map(({ entry }) => (
-                      <li class="font-mono text-[9px] text-white/40 line-clamp-1">
-                        — {entry.title}
+                  {/* Lista de primeros artículos */}
+                  <ul class="flex flex-col gap-2 border-t border-white/10 pt-4">
+                    {essays.slice(0, 3).map(({ slug, entry }) => (
+                      <li class="flex items-baseline gap-2 font-mono text-[10px] text-white/50 hover:text-white transition-colors">
+                        <span class="text-[#C8A98B]/60 shrink-0">-</span>
+                        <a href={`/hemeroteca/${slug}`} class="line-clamp-1 hover:underline">
+                          {entry.title}
+                        </a>
                       </li>
                     ))}
-                    {count > 2 && (
-                      <li class="font-mono text-[9px] text-white/25">+ {count - 2} más</li>
+                    {count > 3 && (
+                      <li class="font-mono text-[9px] text-white/30 pt-1">
+                        + {count - 3} más
+                      </li>
                     )}
-                  </ol>
+                  </ul>
+
+                  <a
+                    href={`/colecciones/${encodeURIComponent(key)}`}
+                    class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/60 hover:text-[#C8A98B] flex items-center gap-2 transition-colors duration-300 mt-2 group"
+                  >
+                    <span>EXPLORAR COLECCIÓN</span>
+                    <span class="group-hover:translate-x-1.5 transition-transform">→</span>
+                  </a>
                 </div>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
+              </div>
+
+              {/* Galería de Miniaturas Desplazada Lateralmente DEBAJO */}
+              {essays.length > 0 && (
+                <div class="relative mt-2">
+                  <div class="collection-gallery-scroll flex gap-4 md:gap-5 overflow-x-auto pb-4 pt-2 snap-x snap-mandatory scroll-smooth">
+                    {essays.map(({ slug, entry, img }) => (
+                      <a
+                        href={`/hemeroteca/${slug}`}
+                        class="group shrink-0 snap-start w-60 sm:w-68 md:w-76 flex flex-col rounded-xl overflow-hidden border border-white/10 bg-white/3 hover:border-[#C8A98B]/60 hover:bg-white/6 hover:shadow-[0_0_18px_rgba(200,169,139,0.18)] hover:-translate-y-1 transition-all duration-400"
+                      >
+                        {/* Miniatura Imagen */}
+                        <div class="relative overflow-hidden aspect-16/10 bg-black/60">
+                          {img ? (
+                            <Image
+                              src={img}
+                              alt={entry.title || label}
+                              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
+                            />
+                          ) : (
+                            <div class="w-full h-full bg-linear-to-br from-[#1b2326] via-theme-dark to-[#0c0d0d] flex items-center justify-center">
+                              <span class="font-cinzel text-[9px] text-[#C8A98B]/40 tracking-widest uppercase">TGP Archive</span>
+                            </div>
+                          )}
+                          <div class="absolute inset-0 bg-linear-to-t from-black/85 via-black/20 to-transparent" />
+                          {entry.date && (
+                            <div class="absolute top-2.5 right-2.5">
+                              <span class="px-2 py-0.5 bg-black/75 backdrop-blur-sm rounded font-mono text-[8px] uppercase tracking-[0.2em] text-[#C8A98B] border border-white/10">
+                                {formatYear(entry.date)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Título y volanta dentro de la miniatura */}
+                        <div class="p-4 flex flex-col justify-between flex-1 gap-2.5">
+                          <div class="flex flex-col gap-1">
+                            <h3 class="font-cinzel font-bold text-xs md:text-sm leading-snug text-white/90 group-hover:text-[#C8A98B] transition-colors line-clamp-2">
+                              {entry.title}
+                            </h3>
+                            {entry.volanta && (
+                              <p class="font-mono text-[9px] text-white/40 tracking-[0.05em] line-clamp-1">
+                                {entry.volanta}
+                              </p>
+                            )}
+                          </div>
+                          <div class="flex items-center gap-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-white/35 group-hover:text-[#C8A98B] transition-colors pt-2 border-t border-white/5">
+                            <span>Leer investigación</span>
+                            <span class="group-hover:translate-x-1 transition-transform">→</span>
+                          </div>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* Fallback si no hay colecciones */}
       {collections.length === 0 && (
@@ -229,6 +238,23 @@ const resolvedRest = rest.map(col => ({
 
     </div>
   </div>
+
+  <style>
+    .collection-gallery-scroll::-webkit-scrollbar {
+      height: 4px;
+    }
+    .collection-gallery-scroll::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 4px;
+    }
+    .collection-gallery-scroll::-webkit-scrollbar-thumb {
+      background: rgba(200, 169, 139, 0.25);
+      border-radius: 4px;
+    }
+    .collection-gallery-scroll::-webkit-scrollbar-thumb:hover {
+      background: rgba(200, 169, 139, 0.6);
+    }
+  </style>
 
   <script>
     const h1 = document.querySelector('h1');

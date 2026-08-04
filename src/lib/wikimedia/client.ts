@@ -130,14 +130,14 @@ export async function searchWikimediaCommons(query: string, limit: number = 25):
       // E. Clasificación por Rol Visual
       const aspectRatio = Number((width / height).toFixed(2));
       let role: 'HERO' | 'SECUNDARIA' | 'B_ROLL' = 'B_ROLL';
-      let roleLabel = '📷 B-Roll / Relleno (Detalles)';
+      let roleLabel = 'B-Roll / Relleno (Detalles)';
 
       if (aspectRatio >= 1.5 && width >= 1600) {
         role = 'HERO';
-        roleLabel = '👑 Hero Image (Encabezado Panorámico)';
+        roleLabel = 'Hero Image (Encabezado Panorámico)';
       } else if (aspectRatio >= 1.0 && width >= 1200) {
         role = 'SECUNDARIA';
-        roleLabel = '🖼️ Imagen Secundaria (Editorial)';
+        roleLabel = 'Imagen Secundaria (Editorial)';
       }
 
       rawItems.push({

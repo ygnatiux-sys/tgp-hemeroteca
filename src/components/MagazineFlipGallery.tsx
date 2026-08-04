@@ -53,12 +53,12 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
 
   return (
     <section className="my-16 w-full relative z-20 font-sans select-none">
-      {/* Encabezado Editorial del Magazine Flipbook */}
+      {/* Encabezado Editorial del Visor */}
       <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6 flex-wrap gap-4">
         <div className="flex items-center gap-3">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: accentColor }}></span>
-          <h3 className="font-mono text-xs md:text-sm uppercase tracking-[0.25em] text-white/90 font-semibold">
-            📖 Magazine Flipbook · Registro Visual ({images.length} {images.length === 1 ? 'Lámina' : 'Láminas'})
+          <span className="w-2 h-2 rounded-full bg-[#C8A98B]"></span>
+          <h3 className="font-mono text-xs uppercase tracking-[0.25em] text-white/90 font-semibold">
+            Registro Visual & Documental ({images.length} {images.length === 1 ? 'lámina' : 'láminas'})
           </h3>
         </div>
 
@@ -67,57 +67,47 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
             type="button"
             onClick={() => setViewMode(viewMode === 'flipbook' ? 'grid' : 'flipbook')}
             className="px-3 py-1.5 rounded-full border border-white/15 bg-white/5 hover:bg-white/10 text-white/80 font-mono text-[10px] uppercase tracking-wider transition-all duration-300 flex items-center gap-1.5"
-            title="Alternar entre modo revista y cuadrícula"
+            title="Alternar vista"
           >
-            {viewMode === 'flipbook' ? '▦ Ver Mosaico' : '📖 Modo Revista'}
+            {viewMode === 'flipbook' ? 'Mosaico' : 'Visor Amplio'}
           </button>
 
           <button
             type="button"
             onClick={() => setIsZoomOpen(true)}
-            className="px-3 py-1.5 rounded-full border border-[#C8A98B]/40 bg-[#C8A98B]/10 hover:bg-[#C8A98B]/20 text-[#C8A98B] font-mono text-[10px] uppercase tracking-wider transition-all duration-300 flex items-center gap-1.5"
-            title="Ampliar imagen al 60% de pantalla con Lupa"
+            className="px-3.5 py-1.5 rounded-full border border-[#C8A98B]/40 bg-[#C8A98B]/10 hover:bg-[#C8A98B]/20 text-[#C8A98B] font-mono text-[10px] uppercase tracking-wider transition-all duration-300 flex items-center gap-1.5"
+            title="Ampliar a pantalla completa"
           >
-            🔍 Lupa 60% Screen
+            Pantalla Completa
           </button>
         </div>
       </div>
 
       {viewMode === 'flipbook' ? (
         /* ═══════════════════════════════════════════════════════════════════
-           MODO FLIPBOOK / MAGAZINE SPREAD EDITORIAL
+           MODO VISOR AMPLIO & LUMINOSO (Sin doblez de libro)
         ═══════════════════════════════════════════════════════════════════ */
         <div
-          className="relative bg-gradient-to-b from-[#16161f] to-[#0d0d12] border border-white/10 rounded-2xl overflow-hidden shadow-2xl p-4 md:p-8"
+          className="relative bg-[#0d0f12] border border-white/10 rounded-2xl overflow-hidden shadow-2xl p-4 sm:p-6 md:p-8"
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
         >
-          {/* Sombra de Encuadernación Central para Efecto Revista */}
-          <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-8 bg-gradient-to-r from-transparent via-black/30 to-transparent pointer-events-none z-10 hidden md:block"></div>
-
-          {/* Marco Principal de la Lámina */}
+          {/* Marco Principal de la Lámina Limpio y Luminoso */}
           <div
-            className="relative w-full aspect-[4/3] md:aspect-[16/10] max-h-[620px] rounded-xl overflow-hidden bg-black/60 flex items-center justify-center cursor-zoom-in group"
+            className="relative w-full aspect-16/10 sm:aspect-video max-h-[68vh] rounded-xl overflow-hidden bg-black/80 flex items-center justify-center cursor-zoom-in group"
             onClick={() => setIsZoomOpen(true)}
           >
             <img
               src={currentItem.url || currentItem.thumbUrl}
               alt={currentItem.title}
-              className="w-full h-full object-contain md:object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+              className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-[1.01]"
               loading="lazy"
             />
 
-            {/* Overlay sutil al hover con botón de lupa */}
-            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
-              <div className="px-4 py-2 rounded-full bg-black/80 border border-white/30 text-white font-mono text-xs uppercase tracking-widest backdrop-blur-md flex items-center gap-2 shadow-2xl">
-                <span>🔍 Click para Lupa 60%</span>
-              </div>
-            </div>
-
             {/* Badge de Posición / Página */}
             <div className="absolute top-4 left-4 z-20">
-              <span className="px-3 py-1 bg-black/80 backdrop-blur-md rounded-full border border-white/20 font-mono text-[10px] uppercase tracking-[0.2em] text-[#C8A98B]">
-                LÁMINA {String(currentIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
+              <span className="px-3 py-1 bg-black/80 backdrop-blur-md rounded-full border border-white/15 font-mono text-[9px] uppercase tracking-[0.2em] text-[#C8A98B]">
+                REGISTRO {String(currentIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
               </span>
             </div>
 
@@ -128,17 +118,20 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
                 e.stopPropagation();
                 setIsZoomOpen(true);
               }}
-              className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/70 hover:bg-[#C8A98B] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 shadow-xl"
-              title="Abrir lupa a 60% de pantalla"
+              className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/75 hover:bg-[#C8A98B] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 shadow-xl"
+              title="Ampliar imagen"
             >
-              🔍
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
             </button>
 
             {/* Flechas de Navegación Flotantes */}
             <button
               type="button"
               onClick={handlePrev}
-              className="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/70 hover:bg-[#C8A98B] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 backdrop-blur-md shadow-2xl"
+              className="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/75 hover:bg-[#C8A98B] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 backdrop-blur-md shadow-2xl"
               title="Lámina anterior (←)"
             >
               ❮
@@ -147,52 +140,49 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
             <button
               type="button"
               onClick={handleNext}
-              className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/70 hover:bg-[#C8A98B] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 backdrop-blur-md shadow-2xl"
+              className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/75 hover:bg-[#C8A98B] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 backdrop-blur-md shadow-2xl"
               title="Lámina siguiente (→)"
             >
               ❯
             </button>
           </div>
 
-          {/* Información y Pie de Lámina Editorial */}
-          <div className="mt-5 pt-4 border-t border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
-            <div className="max-w-xl">
-              <h4 className="font-serif italic text-base text-white/95 leading-snug">
+          {/* Información y Pie de Lámina Limpio de Metadata Técnica */}
+          <div className="mt-5 pt-4 border-t border-white/8 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+            <div className="max-w-2xl flex flex-col gap-1">
+              <h4 className="font-serif italic text-base md:text-lg text-white/95 leading-snug">
                 {currentItem.title}
               </h4>
               {currentItem.caption && currentItem.caption !== currentItem.title && (
-                <p className="text-white/60 text-xs mt-1 font-sans line-clamp-2">
+                <p className="text-white/60 text-xs font-sans line-clamp-2">
                   {currentItem.caption}
                 </p>
               )}
             </div>
 
-            <div className="flex items-center gap-4 font-mono text-[10px] text-white/50 uppercase tracking-wider flex-wrap">
-              {currentItem.width && currentItem.height && (
-                <span>📐 {currentItem.width}×{currentItem.height}px</span>
-              )}
-              {currentItem.author && (
-                <span>👤 {currentItem.author}</span>
-              )}
-              {currentItem.license && (
-                <span className="text-[#81c784] font-semibold">{currentItem.license}</span>
-              )}
+            <div className="flex flex-col md:items-end gap-1 font-mono text-[10px] text-white/50">
+              {currentItem.author ? (
+                <span className="text-white/70">Atribución / Autor: {currentItem.author}</span>
+              ) : null}
+              <span className="text-[#C8A98B]/70 tracking-wider">
+                Documentación fotográfica original del archivo
+              </span>
             </div>
           </div>
 
           {/* Tira Inferior de Miniaturas (Filmstrip) */}
-          <div className="mt-6 flex items-center gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-white/20">
+          <div className="mt-5 flex items-center gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-white/20">
             {images.map((item, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => setCurrentIndex(idx)}
-                className={`relative flex-shrink-0 w-16 md:w-20 aspect-[4/3] rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                className={`relative shrink-0 w-18 md:w-22 aspect-4/3 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
                   currentIndex === idx
                     ? 'border-[#C8A98B] scale-105 shadow-lg opacity-100'
                     : 'border-white/10 opacity-50 hover:opacity-90 hover:border-white/30'
                 }`}
-                title={`Ir a lámina #${idx + 1}: ${item.title}`}
+                title={`Ver registro #${idx + 1}: ${item.title}`}
               >
                 <img src={item.thumbUrl || item.url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
                 <span className="absolute bottom-0.5 right-1 px-1 rounded bg-black/80 font-mono text-[8px] text-white/80">
@@ -210,13 +200,13 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
           {images.map((item, idx) => (
             <div
               key={idx}
-              className="group relative bg-[#13131c] border border-white/10 rounded-xl overflow-hidden hover:border-[#C8A98B]/60 transition-all duration-500 cursor-pointer shadow-xl"
+              className="group relative bg-[#101216] border border-white/10 rounded-xl overflow-hidden hover:border-[#C8A98B]/60 transition-all duration-500 cursor-pointer shadow-xl"
               onClick={() => {
                 setCurrentIndex(idx);
                 setIsZoomOpen(true);
               }}
             >
-              <div className="aspect-[4/3] overflow-hidden bg-black/40 relative">
+              <div className="aspect-4/3 overflow-hidden bg-black/50 relative">
                 <img
                   src={item.thumbUrl || item.url}
                   alt={item.title}
@@ -224,16 +214,19 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
                   loading="lazy"
                 />
                 <div className="absolute top-2 right-2 p-1.5 rounded-full bg-black/70 text-white font-mono text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
-                  🔍
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
                 </div>
               </div>
-              <div className="p-4">
+              <div className="p-4 flex flex-col gap-1.5">
                 <h5 className="font-serif italic text-sm text-white/90 line-clamp-1 group-hover:text-[#C8A98B] transition-colors">
                   {item.title}
                 </h5>
-                <div className="mt-2 flex items-center justify-between font-mono text-[9px] text-white/40 uppercase">
+                <div className="flex items-center justify-between font-mono text-[9px] text-white/40 uppercase">
                   <span>Lámina #{idx + 1}</span>
-                  <span className="text-[#81c784]">{item.license || 'CC'}</span>
+                  {item.author && <span className="truncate max-w-28 text-white/60">{item.author}</span>}
                 </div>
               </div>
             </div>
@@ -242,24 +235,22 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════
-          VISOR MODAL LUPA AL 60% DE PANTALLA (SCREEN LIGHTBOX)
+          VISOR MODAL PANTALLA COMPLETA
       ═══════════════════════════════════════════════════════════════════ */}
       {isZoomOpen && (
         <div
-          className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-xl flex items-center justify-center p-4 md:p-8 animate-fadeIn"
+          className="fixed inset-0 z-99999 bg-black/90 backdrop-blur-2xl flex items-center justify-center p-4 md:p-8 animate-fadeIn"
           onClick={() => setIsZoomOpen(false)}
         >
-          {/* Contenedor al 60% del Viewport */}
           <div
-            className="relative w-full max-w-[62vw] max-h-[82vh] bg-[#0f0f15] border border-white/20 rounded-2xl shadow-[0_25px_70px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col"
+            className="relative w-full max-w-5xl max-h-[90vh] bg-[#0c0d11] border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
-            style={{ width: 'clamp(320px, 60vw, 1100px)' }}
           >
             {/* Barra de Control Superior */}
-            <div className="p-4 bg-black/60 border-b border-white/10 flex items-center justify-between gap-4">
+            <div className="p-4 bg-black/70 border-b border-white/10 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <span className="px-2.5 py-0.5 rounded-full bg-[#C8A98B]/20 border border-[#C8A98B]/40 font-mono text-[10px] text-[#C8A98B] uppercase tracking-wider">
-                  🔍 Lupa 60% Screen · Lámina {currentIndex + 1} de {images.length}
+                  Lámina {currentIndex + 1} / {images.length}
                 </span>
                 <h4 className="font-serif italic text-sm text-white/90 truncate max-w-xs md:max-w-md">
                   {currentItem.title}
@@ -272,30 +263,29 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3 py-1 rounded bg-white/10 hover:bg-white/20 text-white/80 font-mono text-[10px] uppercase tracking-wider transition-colors"
-                  title="Abrir imagen original en tamaño completo"
+                  title="Abrir imagen original"
                 >
                   ↗ Original
                 </a>
                 <button
                   type="button"
                   onClick={() => setIsZoomOpen(false)}
-                  className="w-8 h-8 rounded-full bg-red-600/80 hover:bg-red-600 text-white flex items-center justify-center font-bold text-sm transition-colors"
-                  title="Cerrar Lupa (Esc)"
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-red-600 text-white flex items-center justify-center font-bold text-sm transition-colors"
+                  title="Cerrar (Esc)"
                 >
                   ✕
                 </button>
               </div>
             </div>
 
-            {/* Imagen Principal en Visor 60% con Flechas */}
-            <div className="relative flex-1 bg-black/90 flex items-center justify-center p-4 min-h-[350px] overflow-hidden">
+            {/* Imagen Principal */}
+            <div className="relative flex-1 bg-black flex items-center justify-center p-4 min-h-100 overflow-hidden">
               <img
                 src={currentItem.url || currentItem.thumbUrl}
                 alt={currentItem.title}
-                className="max-w-full max-h-[60vh] object-contain rounded-lg shadow-2xl transition-all duration-300"
+                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-2xl transition-all duration-300"
               />
 
-              {/* Controles de Navegación en el Visor 60% */}
               <button
                 type="button"
                 onClick={handlePrev}
@@ -315,20 +305,18 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
               </button>
             </div>
 
-            {/* Metadatos y Pie de Visor */}
+            {/* Pie de Visor */}
             <div className="p-4 bg-[#0a0a0e] border-t border-white/10 flex items-center justify-between text-xs font-mono text-white/60 flex-wrap gap-2">
-              <div className="flex items-center gap-4">
-                {currentItem.width && currentItem.height && (
-                  <span>📐 {currentItem.width}×{currentItem.height} px</span>
-                )}
-                {currentItem.author && (
-                  <span>👤 Autor: {currentItem.author}</span>
+              <div>
+                {currentItem.author ? (
+                  <span>Autor / Atribución: <span className="text-white/80">{currentItem.author}</span></span>
+                ) : (
+                  <span className="text-white/50">Registro documental original</span>
                 )}
               </div>
 
-              <div className="flex items-center gap-3">
-                <span className="text-[#81c784]">Licencia: {currentItem.license || 'Libre'}</span>
-                <span className="text-white/30">| Atajos: ← / → / Esc</span>
+              <div className="text-white/40">
+                <span>Navegación: ← / → · Cerrar: Esc</span>
               </div>
             </div>
           </div>

@@ -108,7 +108,7 @@ RULES:
 
     return text;
   } catch (err) {
-    console.warn('⚠️ Fallback a prompt por plantilla determinista:', err);
+    console.warn('Fallback a prompt por plantilla determinista:', err);
     return fallback;
   }
 }

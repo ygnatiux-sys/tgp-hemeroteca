@@ -372,7 +372,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         categoryIA: categoryIA || 'Arqueosemiótica'
       });
 
-      alert('✅ INFORME DE GEORREFERENCIAS ARQUEOSEMIÓTICAS GENERADO E INYECTADO');
+      alert('INFORME DE GEORREFERENCIAS ARQUEOSEMIÓTICAS GENERADO E INYECTADO');
 
     } catch (err: any) {
       setErrorMsg(`Georreferencia: ${err.message}`);
@@ -407,7 +407,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
       });
       const data = await res.json();
       if (data.success) {
-        alert(`✅ GEORREFERENCIA GUARDADA EN LA COLECCIÓN INDEPENDIENTE:\n\nsrc/content/georreferencias/${slug}/`);
+        alert(`GEORREFERENCIA GUARDADA EN LA COLECCIÓN INDEPENDIENTE:\n\nsrc/content/georreferencias/${slug}/`);
       } else {
         alert(`Error guardando georreferencia: ${data.error}`);
       }
@@ -452,10 +452,10 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         category: pendingRef.current.category ?? categoryIA,
         image: pendingRef.current.imageUrl ?? arteResult?.imageUrl
       });
-      alert('✅ ENSAYO, EXCERPT, CATEGORÍA Y PORTADA GUARDADOS EXITOSAMENTE!');
+      alert('ENSAYO, EXCERPT, CATEGORÍA Y PORTADA GUARDADOS EXITOSAMENTE!');
     } else {
       // Post nuevo: solo sincronizar con Keystatic, el Save lo hace el usuario
-      alert('✅ DATOS SINCRONIZADOS CON KEYSTATIC.\n\nAhora presiona el botón "Save" / "Create" de Keystatic para crear el post en el sistema de archivos.');
+      alert('DATOS SINCRONIZADOS CON KEYSTATIC.\n\nAhora presiona el botón "Save" / "Create" de Keystatic para crear el post en el sistema de archivos.');
     }
 
     setTimeout(() => setIsPublished(false), 4000);
@@ -477,7 +477,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
         <div>
           <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#4caf50', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            🧠 Motor de Generación Unificado TGP
+            Motor de Generación Unificado TGP
           </h3>
           <p style={{ margin: '4px 0 0 0', fontSize: '0.75rem', color: '#888' }}>
             Redacción de Ensayo + Excerpt/Quote + Categoría Sugerida (Gemini 3.1 Pro)
@@ -503,7 +503,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
           }}
           title="Borra el borrador actual y resetea el lienzo en blanco"
         >
-          🔄 Limpiar Lienzo
+          Limpiar Lienzo
         </button>
       </div>
 
@@ -529,7 +529,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
             boxShadow: ensayo ? '0 0 8px #4caf50' : '0 0 8px #ffeb3b'
           }} />
           <span style={{ fontWeight: 700, color: ensayo ? '#a5d6a7' : '#fff59d' }}>
-            {ensayo ? `🟢 LISTO PARA EDICIÓN (${ensayo.length} caracteres cargados)` : '🟡 LIENZO LIMPIO (Listo para nuevo artículo)'}
+            {ensayo ? `LISTO PARA EDICIÓN (${ensayo.length} caracteres cargados)` : 'LIENZO LIMPIO (Listo para nuevo artículo)'}
           </span>
         </div>
         <span style={{ color: '#aaa', fontSize: '0.72rem' }}>
@@ -537,7 +537,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         </span>
       </div>
 
-      {/* ⚠️ AVISO PARA POSTS NUEVOS */}
+      {/* AVISO PARA POSTS NUEVOS */}
       {isNewPost && (
         <div style={{
           marginBottom: '18px',
@@ -549,7 +549,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
           color: '#ffd54f',
           lineHeight: '1.5'
         }}>
-          <strong>⚠️ POST NUEVO DETECTADO:</strong> Generá el texto y portada libremente. Al terminar, usá el botón <strong>"Create"</strong> de Keystatic arriba para crear el post. Luego podrás guardar actualizaciones directas desde aquí.
+          <strong>POST NUEVO DETECTADO:</strong> Generá el texto y portada libremente. Al terminar, usá el botón <strong>"Create"</strong> de Keystatic arriba para crear el post. Luego podrás guardar actualizaciones directas desde aquí.
         </div>
       )}
 
@@ -585,7 +585,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '20px' }}>
         <div>
           <label style={{ fontSize: '0.75rem', color: '#64b5f6', display: 'block', marginBottom: '6px', fontWeight: 700 }}>
-            📍 SITIO / LUGAR GEOHISTÓRICO:
+            SITIO / LUGAR GEOHISTÓRICO:
           </label>
           <input
             type="text"
@@ -614,7 +614,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
             style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#1976d2' }}
           />
           <label htmlFor="toggleConImagen" style={{ fontSize: '0.85rem', color: publicarConImagen ? '#90caf9' : '#888', cursor: 'pointer', fontWeight: 600 }}>
-            🖼️ {publicarConImagen ? 'Publicar con Imagen de Portada' : 'Publicar sin Imagen (Edición Texto Puro)'}
+            {publicarConImagen ? 'Publicar con Imagen de Portada' : 'Publicar sin Imagen (Edición Texto Puro)'}
           </label>
         </div>
       </div>
@@ -639,7 +639,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
           style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: '#28a745' }}
         />
         <label htmlFor="toggleAmbos" style={{ fontSize: '0.9rem', color: generarAmbosJuntos ? '#d0ebd0' : '#d4c7ff', cursor: 'pointer', fontWeight: 600 }}>
-          ⚡ {generarAmbosJuntos ? 'Modo Simultáneo Activado (Texto + Excerpt + Portada en 1 clic)' : 'Modo Manual / Paso a Paso (Selecciona Texto o Portada individualmente)'}
+          {generarAmbosJuntos ? 'Modo Simultáneo Activado (Texto + Excerpt + Portada en 1 clic)' : 'Modo Manual / Paso a Paso (Selecciona Texto o Portada individualmente)'}
         </label>
       </div>
 
@@ -664,8 +664,8 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
             }}
           >
             {isGlobalLoading 
-              ? (isGeneratingText ? '🧠 GENERANDO ENSAYO & EXCERPT...' : '🎨 MATERIALIZANDO PORTADA...') 
-              : '⚡ GENERAR ENSAYO, EXCERPT Y PORTADA'}
+              ? (isGeneratingText ? 'GENERANDO ENSAYO & EXCERPT...' : 'MATERIALIZANDO PORTADA...') 
+              : 'GENERAR ENSAYO, EXCERPT Y PORTADA'}
           </button>
         ) : (
           <>
@@ -686,7 +686,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
                 transition: 'all 0.2s ease'
               }}
             >
-              {isGeneratingText ? '🧠 GENERANDO...' : '1. GENERAR TEXTO & EXCERPT'}
+              {isGeneratingText ? 'GENERANDO...' : '1. GENERAR TEXTO & EXCERPT'}
             </button>
 
             <button
@@ -706,7 +706,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
                 transition: 'all 0.2s ease'
               }}
             >
-              {isGeneratingArt ? '🎨 MATERIALIZANDO...' : '2. GENERAR PORTADA INTELIGENTE'}
+              {isGeneratingArt ? 'MATERIALIZANDO...' : '2. GENERAR PORTADA INTELIGENTE'}
             </button>
           </>
         )}
@@ -739,8 +739,8 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
           }}
         >
           {isGeneratingGeoref 
-            ? '🌐 INVESTIGANDO GEOLOGÍA, ETNOGRAFÍA & HISTORIA LOCAL...' 
-            : '🗺️ GENERAR GEORREFERENCIA ARQUEOSEMIÓTICA (Gemini 3.1 Pro)'}
+            ? 'INVESTIGANDO GEOLOGÍA, ETNOGRAFÍA & HISTORIA LOCAL...' 
+            : 'GENERAR GEORREFERENCIA ARQUEOSEMIÓTICA (Gemini 3.1 Pro)'}
         </button>
       </div>
 
@@ -761,7 +761,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
             <span style={{ fontSize: '0.75rem', color: '#64b5f6', fontWeight: 800, letterSpacing: '0.1em' }}>
-              🗺️ FICHA DE GEORREFERENCIAS ARQUEOSEMIÓTICAS GENERADA
+              FICHA DE GEORREFERENCIAS ARQUEOSEMIÓTICAS GENERADA
             </span>
           </div>
 
@@ -771,7 +771,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
 
           {georefResult.saberMasDato && (
             <div style={{ padding: '10px 14px', background: '#102030', borderLeft: '3px solid #64b5f6', borderRadius: '4px', fontSize: '0.8rem', color: '#e3f2fd', marginBottom: '12px' }}>
-              <strong>💡 Saber Más (Dato Local No Divulgado):</strong> {georefResult.saberMasDato}
+              <strong>Saber Más (Dato Local No Divulgado):</strong> {georefResult.saberMasDato}
             </div>
           )}
 
@@ -794,7 +794,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
                 boxShadow: '0 2px 8px rgba(25, 118, 210, 0.4)'
               }}
             >
-              💾 Guardar en Colección Georreferencias
+              Guardar en Colección Georreferencias
             </button>
           </div>
         </div>
@@ -811,7 +811,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
             <span style={{ fontSize: '0.75rem', color: '#81c784', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              💡 SINOPSIS (EXCERPT) & CATEGORÍA SUGERIDAS POR IA
+              SINOPSIS (EXCERPT) & CATEGORÍA SUGERIDAS POR IA
             </span>
             {categoryIA && (
               <span style={{ fontSize: '0.7rem', padding: '3px 8px', background: '#254725', color: '#b9f6ca', borderRadius: '4px', fontWeight: 700 }}>
@@ -859,7 +859,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
       {/* ÁREA DE TEXTO DEL ENSAYO */}
       <div style={{ marginBottom: '24px' }}>
         <label style={{ fontSize: '0.75rem', color: '#aaa', display: 'block', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.05em' }}>
-          📝 CONTENIDO DEL ENSAYO:
+          CONTENIDO DEL ENSAYO:
         </label>
         <textarea
           value={ensayo}
@@ -896,7 +896,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
             <span style={{ fontSize: '0.75rem', color: '#a594fd', fontWeight: 700, letterSpacing: '0.1em' }}>
-              🎨 PORTADA ESPECIALIZADA NANO BANANA V2
+              PORTADA ESPECIALIZADA NANO BANANA V2
             </span>
             {arteResult.resolvedDirection?.selectedPresetName && (
               <span style={{ 
@@ -942,13 +942,13 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
                     border: '1px solid #555'
                   }}
                 >
-                  💾 Descargar Imagen de Portada
+                  Descargar Imagen de Portada
                 </a>
               </div>
             </div>
           ) : (
             <div style={{ padding: '15px', background: '#1a1a1a', borderRadius: '4px', fontSize: '0.8rem', color: '#ffb74d' }}>
-              ⚠️ Dirección de Arte generada pero sin render visual. Prompt: {arteResult.imagePrompt}
+              Dirección de Arte generada pero sin render visual. Prompt: {arteResult.imagePrompt}
             </div>
           )}
         </div>
@@ -969,7 +969,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
           letterSpacing: '0.2em',
           fontWeight: 700
         }}>
-          📤 PASO FINAL DE VINCULACIÓN
+          PASO FINAL DE VINCULACIÓN
         </p>
         <p style={{ 
           margin: '0 0 16px 0', 
@@ -1006,8 +1006,8 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
           }}
         >
           {isPublished 
-            ? '✅ ENSAYO Y METADATOS GUARDADOS EN DISCO' 
-            : '🚀 CONFIRMAR ENSAYO Y PORTADA EN LA HEMEROTECA'}
+            ? 'ENSAYO Y METADATOS GUARDADOS EN DISCO' 
+            : 'CONFIRMAR ENSAYO Y PORTADA EN LA HEMEROTECA'}
         </button>
       </div>
     </div>

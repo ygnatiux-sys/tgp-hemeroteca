@@ -72,8 +72,8 @@ export const StickyReaderHeader: React.FC<Props> = ({ title, accentColor }) => {
       <div className="relative max-w-7xl mx-auto px-6 h-16 flex items-center justify-between pointer-events-auto">
         {/* Breadcrumb Inteligente */}
         <div className="flex items-center gap-4 text-[10px] font-mono tracking-[0.25em] uppercase">
-          <a href="/" className="hover:opacity-80 transition-opacity flex items-center" title="Inicio TGP">
-             <img src="/favicon.png" alt="TGP" className="w-5 h-5 object-contain grayscale brightness-150" />
+          <a href="/" className="hover:opacity-100 transition-all flex items-center p-1 rounded-full border border-white/20 bg-white/5 hover:border-[#C8A98B]/50" title="Inicio TGP">
+             <img src="/favicon.png" alt="TGP" className="w-6 h-6 object-contain grayscale brightness-150" />
           </a>
           <span className="opacity-20">/</span>
           <a 
@@ -88,7 +88,7 @@ export const StickyReaderHeader: React.FC<Props> = ({ title, accentColor }) => {
           </span>
         </div>
 
-        {/* Lupa de Búsqueda 🔍 + Menú Sándwich 3 Guiones ≡ */}
+        {/* Buscador Modal */}
         <div className="flex items-center gap-4">
           <BuscadorModal />
         </div>
