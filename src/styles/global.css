@@ -1,6 +1,445 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* ═════════════════════════════════════════════════════════════════════════
+   PALETA Y VARIABLES DE TEMA (DARK ACADEMIA / MODO DÍA PAPIRO FRÍO)
+═════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Modo Oscuro Base (Preserva la estética actual intacta) */
+  --bg-main: #121413;
+  --bg-alt: #181d1a;
+  --bg-surface: rgba(255, 255, 255, 0.04);
+  --text-main: #FFFFFF;
+  --text-body: #F5F5F7;
+  --accent-primary: #C8A98B;
+  --accent-secondary: #D4A352;
+  --accent-silver: #94A3B8;
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --header-bg: rgba(18, 20, 19, 0.85); /* Coincidencia exacta con --bg-main #121413 */
+  --header-border: rgba(255, 255, 255, 0.08);
+  --theme-transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out, border-color 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   SISTEMA DE MODO CLARO EDITORIAL (PAPIRO FRÍO / VELLUM)
+   1. Mapeo completo de escalas de blanco/gris a carbón y plomo oscuro.
+   2. Resaltado de selección en Lacre / Sangre de Buey (#6E2424).
+   3. Voz de la Máquina en Plata / Acero (#B0B5B9 / #6E747A).
+   4. Superficie y elevación en Papiro (#E2DFD8).
+═════════════════════════════════════════════════════════════════════════ */
+[data-theme='light'] {
+  /* Paleta Exigida: Modo Día Editorial / Papiro Frío - Vellum */
+  --bg-main: #F5F4F0;       /* Alabastro/papiro frío. Evitar blanco óptico */
+  --bg-alt: #EBE9E1;        /* Soporte alternativo para bloques */
+  --bg-surface: #E2DFD8;    /* Elevación de tarjetas de ensayo */
+  --text-main: #1C1E21;     /* Carbón denso para titulares */
+  --text-body: #2A2927;     /* Plomo oscuro para párrafos de ensayo (mitiga halación) */
+  --accent-primary: #6E2424;/* Sangre de buey / lacre para enlaces y botones */
+  --accent-secondary: #8F6A35;/* Ocre envejecido para categorías y citas */
+  --accent-silver: #B0B5B9;/* Plata / acero - La voz de la máquina */
+  --border-subtle: rgba(42, 41, 39, 0.15); /* Marcas de agua imperceptibles */
+  --header-bg: rgba(245, 244, 240, 0.92);
+  --header-border: rgba(42, 41, 39, 0.12);
+  color: #2A2927;
+}
+
+/* Transición suave global entre temas */
+body, header, footer, article, section, nav, div, aside, p, span, h1, h2, h3, h4, a, button {
+  transition: var(--theme-transition);
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   NAVBAR / HEADER & FOOTER: MARCA GRADIENTE ACERO/PLATA EXACTO
+═════════════════════════════════════════════════════════════════════════ */
+.gradient-steel-brand {
+  background: linear-gradient(180deg, #FFFFFF 0%, #B0B8C1 50%, #5B6574 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-fill-color: transparent !important;
+  transition: all 0.3s ease !important;
+}
+
+.gradient-steel-line-1 {
+  background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-fill-color: transparent !important;
+  transition: all 0.3s ease !important;
+}
+
+.gradient-steel-line-2 {
+  background: linear-gradient(180deg, #CBD5E1 0%, #718096 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-fill-color: transparent !important;
+  transition: all 0.3s ease !important;
+}
+
+.gradient-steel-line-3 {
+  background: linear-gradient(180deg, #718096 0%, #334155 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-fill-color: transparent !important;
+  transition: all 0.3s ease !important;
+}
+
+.group:hover .gradient-steel-brand,
+.group:hover .gradient-steel-line-1,
+.group:hover .gradient-steel-line-2,
+.group:hover .gradient-steel-line-3,
+.gradient-steel-brand:hover {
+  background: linear-gradient(180deg, #D47545 0%, #B55A30 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-fill-color: transparent !important;
+}
+
+header .header-brand-title {
+  font-family: "Gloock", serif !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+}
+
+header nav a,
+header .header-nav-link {
+  font-weight: 300 !important; /* Thin/Light weight for category items */
+  letter-spacing: 0.25em !important; /* High tracking for spacious institutional feel */
+}
+
+/* Botones sin bordes para Hamburger, Códice, Buscar y ThemeToggle (Page Mode) */
+header .header-action-btn,
+header .header-btn-codice {
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+/* ─── MODO CLARO (PAPIRO) ─── */
+[data-theme='light'] header {
+  background-color: rgba(245, 244, 240, 0.96) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme='light'] header .header-brand-title {
+  color: #000000 !important;
+}
+
+[data-theme='light'] header a:hover .header-brand-title {
+  color: #B55A30 !important; /* Rojo Óxido / Lantern Glow */
+}
+
+[data-theme='light'] header nav a,
+[data-theme='light'] header .header-nav-link {
+  color: #1C1E21 !important;
+}
+
+[data-theme='light'] header nav a:hover,
+[data-theme='light'] header .header-nav-link:hover {
+  color: #B55A30 !important;
+  text-shadow: 0 0 12px rgba(181, 90, 48, 0.35) !important; /* Lantern Hover Glow */
+}
+
+[data-theme='light'] header .header-btn-codice {
+  color: #1C1E21 !important;
+  font-weight: 300 !important;
+}
+
+[data-theme='light'] header .header-btn-codice:hover {
+  color: #B55A30 !important;
+  background-color: rgba(181, 90, 48, 0.1) !important; /* Lantern Hover */
+}
+
+[data-theme='light'] header .header-action-btn {
+  color: #1C1E21 !important;
+}
+
+[data-theme='light'] header .header-action-btn:hover {
+  color: #B55A30 !important;
+  background-color: rgba(181, 90, 48, 0.1) !important; /* Lantern Hover */
+}
+
+[data-theme='light'] header .header-action-btn svg {
+  stroke: #1C1E21 !important;
+  color: #1C1E21 !important;
+}
+
+[data-theme='light'] header .header-action-btn:hover svg {
+  stroke: #B55A30 !important;
+  color: #B55A30 !important;
+}
+
+[data-theme='light'] header .header-action-btn kbd {
+  color: #1C1E21 !important;
+  background-color: rgba(0, 0, 0, 0.06) !important;
+  border: none !important;
+}
+
+/* ─── MODO OSCURO (BASE) ─── */
+:root:not([data-theme='light']) header .header-brand-title {
+  color: #F5F5F7 !important;
+}
+
+:root:not([data-theme='light']) header a:hover .header-brand-title {
+  color: #B55A30 !important; /* Rojo Óxido / Lantern Glow */
+}
+
+:root:not([data-theme='light']) header nav a,
+:root:not([data-theme='light']) header .header-nav-link {
+  color: #E2DFD8 !important;
+}
+
+:root:not([data-theme='light']) header nav a:hover,
+:root:not([data-theme='light']) header .header-nav-link:hover {
+  color: #B55A30 !important;
+  text-shadow: 0 0 14px rgba(181, 90, 48, 0.5) !important; /* Lantern Hover Glow */
+}
+
+:root:not([data-theme='light']) header .header-btn-codice {
+  color: #E2DFD8 !important;
+  font-weight: 300 !important;
+}
+
+:root:not([data-theme='light']) header .header-btn-codice:hover {
+  color: #B55A30 !important;
+  background-color: rgba(181, 90, 48, 0.15) !important; /* Lantern Hover */
+}
+
+:root:not([data-theme='light']) header .header-action-btn {
+  color: #E2DFD8 !important;
+}
+
+:root:not([data-theme='light']) header .header-action-btn:hover {
+  color: #B55A30 !important;
+  background-color: rgba(181, 90, 48, 0.15) !important; /* Lantern Hover */
+}
+
+:root:not([data-theme='light']) header .header-action-btn svg {
+  stroke: #E2DFD8 !important;
+  color: #E2DFD8 !important;
+}
+
+:root:not([data-theme='light']) header .header-action-btn:hover svg {
+  stroke: #B55A30 !important;
+  color: #B55A30 !important;
+}
+
+/* ─── 1. ESCALA DE TEXTO PRINCIPAL Y MATICES (CARBÓN & PLOMO OSCURO) ─────── */
+[data-theme='light'] body {
+  background-color: var(--bg-main) !important;
+  color: var(--text-body) !important;
+}
+
+[data-theme='light'] .text-white,
+[data-theme='light'] .text-\[\#F5F5F7\],
+[data-theme='light'] .text-\[\#f5f5f7\] {
+  color: #1C1E21 !important;
+}
+
+[data-theme='light'] .text-white\/95,
+[data-theme='light'] .text-white\/90 {
+  color: #1C1E21 !important;
+}
+
+[data-theme='light'] .text-white\/85,
+[data-theme='light'] .text-white\/80 {
+  color: #2A2927 !important;
+}
+
+[data-theme='light'] .text-white\/75,
+[data-theme='light'] .text-white\/70,
+[data-theme='light'] .text-white\/65,
+[data-theme='light'] .text-white\/60 {
+  color: rgba(42, 41, 39, 0.88) !important;
+}
+
+[data-theme='light'] .text-white\/55,
+[data-theme='light'] .text-white\/50,
+[data-theme='light'] .text-white\/45,
+[data-theme='light'] .text-white\/40 {
+  color: rgba(42, 41, 39, 0.72) !important;
+}
+
+/* La Voz de la Máquina (Metadatos, fechas, tiempos de lectura, divisores) */
+[data-theme='light'] .voice-of-machine,
+[data-theme='light'] .text-white\/35,
+[data-theme='light'] .text-white\/30,
+[data-theme='light'] .text-white\/25,
+[data-theme='light'] .text-white\/20,
+[data-theme='light'] .text-white\/15,
+[data-theme='light'] .text-white\/10 {
+  color: #6E747A !important;
+}
+
+/* Encabezados sólidos en el cuerpo de artículos (Body Text Headings) */
+.prose h2 {
+  color: #F5F4F0;
+}
+
+.prose h3,
+.prose h4,
+.prose h5 {
+  color: #C8A98B;
+}
+
+[data-theme='light'] .prose h2 {
+  color: #1C1E21 !important;
+  border-bottom-color: rgba(110, 36, 36, 0.35) !important;
+}
+
+[data-theme='light'] .prose h3,
+[data-theme='light'] .prose h4,
+[data-theme='light'] .prose h5 {
+  color: #6E2424 !important;
+}
+
+/* Hover de Enlaces en Modo Claro */
+[data-theme='light'] a:hover {
+  color: #6E2424;
+}
+
+[data-theme='light'] .hover\:text-white:hover {
+  color: #6E2424 !important;
+}
+
+[data-theme='light'] .hover\:text-\[\#C8A98B\]:hover {
+  color: #6E2424 !important;
+}
+
+/* ─── 2. SELECCIÓN DE TEXTO (LACRE / SANGRE DE BUEY CON TEXTO ALABASTRO) ─── */
+[data-theme='light'] ::selection {
+  background-color: #6E2424 !important;
+  color: #F5F4F0 !important;
+}
+
+[data-theme='light'] ::-moz-selection {
+  background-color: #6E2424 !important;
+  color: #F5F4F0 !important;
+}
+
+/* ─── 3. TITULARES & ENCABEZADOS LIMPIDOS Y NATURALES EN MODO CLARO ───────── */
+[data-theme='light'] main h1,
+[data-theme='light'] main h2,
+[data-theme='light'] main h3,
+[data-theme='light'] main h4,
+[data-theme='light'] main h5,
+[data-theme='light'] main h6,
+[data-theme='light'] .prose h1,
+[data-theme='light'] .prose h2,
+[data-theme='light'] .prose h3,
+[data-theme='light'] .prose h4 {
+  background-image: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  color: #1C1E21 !important;
+  filter: none !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+/* Excepción para Marca TGP en Footer */
+[data-theme='light'] footer h1,
+[data-theme='light'] footer .footer-brand-title {
+  color: #F5F4F0 !important;
+}
+
+[data-theme='light'] footer a:hover h1,
+[data-theme='light'] footer a:hover .footer-brand-title {
+  color: #FF5A5F !important;
+}
+
+[data-theme='light'] .prose h3,
+[data-theme='light'] .prose h4,
+[data-theme='light'] .prose h5 {
+  color: #6E2424 !important;
+}
+
+[data-theme='light'] .gradient-acero-ios {
+  background-image: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  color: #1C1E21 !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+
+[data-theme='light'] .drop-shadow-2xl,
+[data-theme='light'] .drop-shadow-xl,
+[data-theme='light'] .drop-shadow-lg,
+[data-theme='light'] .drop-shadow-md,
+[data-theme='light'] .drop-shadow,
+[data-theme='light'] .drop-shadow-sm {
+  filter: none !important;
+}
+
+/* ─── 4. PROSE / CONTENIDO DE ENSAYOS & ARTÍCULOS ────────────────────────── */
+[data-theme='light'] .prose {
+  --tw-prose-body: #2A2927;
+  --tw-prose-headings: #1C1E21;
+  --tw-prose-links: #6E2424;
+  --tw-prose-bold: #1C1E21;
+  --tw-prose-captions: #8F6A35;
+  --tw-prose-quotes: #1C1E21;
+  --tw-prose-quote-borders: #6E2424;
+  --tw-prose-code: #6E2424;
+  --tw-prose-hr: rgba(42, 41, 39, 0.15);
+  color: #2A2927 !important;
+}
+
+[data-theme='light'] .prose p,
+[data-theme='light'] .prose li,
+[data-theme='light'] .prose blockquote {
+  color: #2A2927 !important;
+}
+
+[data-theme='light'] .drop-cap-letter {
+  color: #6E2424 !important;
+}
+
+/* ─── 5. SUPERFICIES, TARJETAS & BORDES ──────────────────────────────────── */
+[data-theme='light'] .bg-theme-dark {
+  background-color: var(--bg-main) !important;
+}
+
+[data-theme='light'] .bg-white\/3,
+[data-theme='light'] .bg-white\/4,
+[data-theme='light'] .bg-white\/5,
+[data-theme='light'] .bg-white\/8,
+[data-theme='light'] .bg-white\/10,
+[data-theme='light'] .bg-white\/15 {
+  background-color: var(--bg-surface) !important;
+}
+
+[data-theme='light'] .border-white\/5,
+[data-theme='light'] .border-white\/8,
+[data-theme='light'] .border-white\/10,
+[data-theme='light'] .border-white\/15,
+[data-theme='light'] .border-white\/20 {
+  border-color: rgba(42, 41, 39, 0.14) !important;
+}
+
+[data-theme='light'] .divide-white\/5 > :not([hidden]) ~ :not([hidden]),
+[data-theme='light'] .divide-white\/10 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(42, 41, 39, 0.12) !important;
+}
+
+[data-theme='light'] .cinematic-card-lantern {
+  background: rgba(226, 223, 216, 0.85);
+  border-color: rgba(42, 41, 39, 0.15);
+  box-shadow: 0 10px 30px -10px rgba(42, 41, 39, 0.08);
+}
+
+[data-theme='light'] .cinematic-card-lantern:hover {
+  background: rgba(235, 233, 225, 0.98);
+  border-color: rgba(110, 36, 36, 0.45);
+  box-shadow: 0 0 32px -4px rgba(110, 36, 36, 0.18), 0 20px 40px -12px rgba(42, 41, 39, 0.12);
+}
+
 @theme {
   --color-theme-dark: #121413;
   

@@ -1,0 +1,116 @@
+---
+// Componente ThemeToggle.astro — Interruptor de Modo Claro (Papiro Frío) / Modo Oscuro (Dark Academia)
+---
+
+<button
+  id="theme-toggle-btn"
+  type="button"
+  aria-label="Alternar entre modo oscuro y modo claro (papiro)"
+  class="header-action-btn group relative inline-flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-rust-orange"
+>
+  {/* Icono del Sol (Visible en Modo Oscuro -> Activa Modo Claro) */}
+  <svg
+    id="theme-icon-sun"
+    class="w-5 h-5 text-stone-200 group-hover:text-[#C8A98B] transition-transform duration-500 rotate-0 scale-100 dark-icon"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    stroke-width="2.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="5"></circle>
+    <line x1="12" y1="1" x2="12" y2="3"></line>
+    <line x1="12" y1="21" x2="12" y2="23"></line>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+    <line x1="1" y1="12" x2="3" y2="12"></line>
+    <line x1="21" y1="12" x2="23" y2="12"></line>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+  </svg>
+
+  {/* Icono de la Luna (Visible en Modo Claro -> Activa Modo Oscuro) */}
+  <svg
+    id="theme-icon-moon"
+    class="w-5 h-5 text-stone-900 group-hover:text-[#6E2424] transition-transform duration-500 rotate-90 scale-0 hidden light-icon"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    stroke-width="2.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+  </svg>
+
+  {/* Micro-resplandor Especular */}
+  <span class="absolute inset-0 rounded-xl bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></span>
+</button>
+
+<script>
+  // Lógica del Toggle de Tema (Ejecución aislada y compatible con Astro View Transitions)
+  const initThemeToggle = () => {
+    const toggleBtn = document.getElementById('theme-toggle-btn');
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const moonIcon = document.getElementById('theme-icon-moon');
+
+    if (!toggleBtn || !sunIcon || !moonIcon) return;
+
+    const updateUI = (isLight: boolean) => {
+      if (isLight) {
+        sunIcon.classList.add('hidden', 'scale-0', 'rotate-90');
+        sunIcon.classList.remove('scale-100', 'rotate-0');
+        
+        moonIcon.classList.remove('hidden', 'scale-0', 'rotate-90');
+        moonIcon.classList.add('scale-100', 'rotate-0');
+
+        toggleBtn.setAttribute('title', 'Cambiar a Modo Oscuro (Luna)');
+      } else {
+        moonIcon.classList.add('hidden', 'scale-0', 'rotate-90');
+        moonIcon.classList.remove('scale-100', 'rotate-0');
+
+        sunIcon.classList.remove('hidden', 'scale-0', 'rotate-90');
+        sunIcon.classList.add('scale-100', 'rotate-0');
+
+        toggleBtn.setAttribute('title', 'Cambiar a Modo Claro Papiro (Sol)');
+      }
+    };
+
+    // Sincronizar estado inicial de los iconos
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    updateUI(currentTheme === 'light');
+
+    // Manejar evento de click
+    toggleBtn.addEventListener('click', () => {
+      const isCurrentlyLight = document.documentElement.getAttribute('data-theme') === 'light';
+      const newTheme = isCurrentlyLight ? 'dark' : 'light';
+
+      if (newTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('tgp-theme', 'light');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('tgp-theme', 'dark');
+      }
+
+      updateUI(newTheme === 'light');
+    });
+  };
+
+  document.addEventListener('DOMContentLoaded', initThemeToggle);
+  document.addEventListener('astro:page-load', initThemeToggle);
+</script>
+
+<style>
+  [data-theme='light'] #theme-toggle-btn {
+    border-color: rgba(0, 0, 0, 0.35);
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  [data-theme='light'] #theme-toggle-btn:hover {
+    border-color: #B55A30;
+    box-shadow: 0 0 14px rgba(181, 90, 48, 0.25);
+  }
+</style>
