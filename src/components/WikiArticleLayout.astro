@@ -1,0 +1,153 @@
+---
+// Componente WikiArticleLayout.astro — Layout de 3 Columnas Estilo Archivo Enciclopédico / Wiki Epistémica
+interface Props {
+  title: string;
+  excerpt?: string;
+  category?: string;
+  headings?: Array<{ depth: number; slug: string; text: string }>;
+  disambiguation?: string;
+}
+
+const {
+  title,
+  excerpt,
+  category = "Investigación Epistémica",
+  headings = [
+    { depth: 2, slug: "contexto", text: "Contexto & Antecedentes" },
+    { depth: 2, slug: "desarrollo", text: "Desarrollo del Análisis" },
+    { depth: 3, slug: "evidencia", text: "Evidencia Material" },
+    { depth: 2, slug: "conclusiones", text: "Implicaciones Hermenéuticas" },
+  ],
+  disambiguation = "Para otros registros de esta misma colección, véase el archivo completo de cartografía hemerográfica."
+} = Astro.props;
+---
+
+<div class="wiki-article-wrapper min-h-screen bg-(--bg-main) text-(--text-body) transition-colors duration-400">
+  
+  {/* Contenedor Principal: Grid de 3 Columnas Estilo Wiki (Índice - Contenido - Apariencia/Herramientas) */}
+  <div class="max-w-350 mx-auto grid grid-cols-1 md:grid-cols-[220px_minmax(0,1fr)] lg:grid-cols-[240px_minmax(0,1fr)_200px] gap-6 px-4 md:px-8 py-8 items-start">
+    
+    {/* ─── COLUMNA IZQUIERDA: Índice de Contenidos (Sticky) ─── */}
+    <aside class="hidden md:block sticky top-28 text-sm">
+      <h3 class="font-sans font-bold text-xs uppercase tracking-widest text-[#6E2424] dark:text-[#C8A98B] mb-3">
+        Contenidos
+      </h3>
+      
+      {/* Lista compacta y densa estilo Wiki */}
+      <nav class="border-l-2 border-stone-300 dark:border-white/10 pl-3.5">
+        <ul class="space-y-2">
+          <li>
+            <a href="#inicio" class="font-bold text-(--text-main) tracking-tight block hover:text-[#6E2424] dark:hover:text-[#C8A98B] transition-colors">
+              Inicio
+            </a>
+          </li>
+          {headings.map((h) => (
+            <li class={h.depth === 3 ? "pl-3 text-xs" : ""}>
+              <a
+                href={`#${h.slug}`}
+                class="font-medium text-stone-700 dark:text-stone-300 tracking-tight block hover:text-[#6E2424] dark:hover:text-[#C8A98B] hover:underline transition-colors truncate"
+              >
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </aside>
+
+    {/* ─── COLUMNA CENTRAL: Contenido Principal ─── */}
+    <main class="bg-transparent min-w-0" id="inicio">
+      
+      {/* Volanta de Categoría */}
+      <span class="font-mono text-xs font-bold uppercase tracking-widest text-[#6E2424] dark:text-[#C8A98B] block mb-2">
+        {category}
+      </span>
+
+      {/* H1 Masivo y Compacto */}
+      <h1 class="font-cinzel font-extrabold text-4xl md:text-5xl text-(--text-main) tracking-tighter mb-3 leading-tight">
+        {title}
+      </h1>
+      
+      <hr class="border-stone-300/80 dark:border-white/10 mb-4" />
+
+      {/* Nota de Desambiguación Estilo Wiki */}
+      {disambiguation && (
+        <p class="font-serif italic text-stone-500 dark:text-stone-400 text-sm mb-6 leading-relaxed">
+          {disambiguation} <a href="/archivo" class="text-[#6E2424] dark:text-[#C8A98B] font-medium hover:underline">Ver archivo completo →</a>
+        </p>
+      )}
+
+      {/* Cuerpo del Texto con Interlineado Compacto & Drop Cap */}
+      <div id="wiki-article-body" class="prose max-w-none prose-p:font-body prose-p:font-light prose-p:leading-snug prose-p:tracking-tight prose-p:text-(--text-body) prose-a:text-[#6E2424] dark:prose-a:text-[#C8A98B] prose-a:font-medium prose-a:no-underline hover:prose-a:underline">
+        <slot />
+      </div>
+    </main>
+
+    {/* ─── COLUMNA DERECHA: Apariencia & Herramientas (Sticky) ─── */}
+    <aside class="hidden lg:block sticky top-28 bg-(--bg-surface) p-4.5 rounded-xl border border-stone-300/60 dark:border-white/10 shadow-md">
+      <h4 class="font-sans font-bold text-xs uppercase tracking-widest text-stone-500 dark:text-stone-400 mb-4 border-b border-stone-300/60 dark:border-white/10 pb-2">
+        Apariencia
+      </h4>
+      
+      {/* Controles de Tamaño de Texto */}
+      <div class="space-y-4 text-xs font-medium text-stone-700 dark:text-stone-300 tracking-tight">
+        <div>
+          <span class="block mb-2.5 font-bold uppercase tracking-wider text-[10px] text-[#6E2424] dark:text-[#C8A98B]">
+            Tamaño de Lectura
+          </span>
+          <div class="flex flex-col gap-2 font-mono text-xs">
+            <label class="flex items-center gap-2 cursor-pointer hover:text-[#6E2424] dark:hover:text-[#C8A98B] transition-colors">
+              <input type="radio" name="font-size" value="sm" class="accent-[#6E2424] dark:accent-[#C8A98B]" />
+              <span>Pequeño</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer hover:text-[#6E2424] dark:hover:text-[#C8A98B] transition-colors">
+              <input type="radio" name="font-size" value="base" checked class="accent-[#6E2424] dark:accent-[#C8A98B]" />
+              <span>Estándar</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer hover:text-[#6E2424] dark:hover:text-[#C8A98B] transition-colors">
+              <input type="radio" name="font-size" value="lg" class="accent-[#6E2424] dark:accent-[#C8A98B]" />
+              <span>Grande</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-stone-300/60 dark:border-white/10">
+          <a href="/archivo" class="inline-flex items-center gap-1.5 text-[10.5px] uppercase tracking-wider font-mono font-bold text-[#6E2424] dark:text-[#C8A98B] hover:underline">
+            <span>🔍 Buscar en Archivo</span>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<script>
+  // Control interactivo del tamaño de fuente en tiempo real
+  const setupFontSizeControl = () => {
+    const radioInputs = document.querySelectorAll<HTMLInputElement>('input[name="font-size"]');
+    const articleBody = document.getElementById('wiki-article-body');
+
+    if (!articleBody || radioInputs.length === 0) return;
+
+    radioInputs.forEach(input => {
+      input.addEventListener('change', () => {
+        if (!input.checked) return;
+        const val = input.value;
+        if (val === 'sm') {
+          articleBody.style.fontSize = '0.95rem';
+          articleBody.style.lineHeight = '1.45';
+        } else if (val === 'lg') {
+          articleBody.style.fontSize = '1.25rem';
+          articleBody.style.lineHeight = '1.65';
+        } else {
+          articleBody.style.fontSize = '';
+          articleBody.style.lineHeight = '';
+        }
+      });
+    });
+  };
+
+  document.addEventListener('DOMContentLoaded', setupFontSizeControl);
+  document.addEventListener('astro:page-load', setupFontSizeControl);
+</script>

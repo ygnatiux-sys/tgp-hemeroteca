@@ -100,9 +100,9 @@ export const StickyReaderHeader: React.FC<Props> = ({ title, accentColor = '#B55
         }`}
       >
         {/* Background Glassmorphism Heredado del Canvas Central */}
-        <div className="absolute inset-0 bg-[#121413]/92 dark:bg-[#121413]/92 light:bg-[#F5F4F0]/92 backdrop-blur-xl border-b border-black/10 dark:border-white/10" />
+        <div className="absolute inset-0 bg-(--bg-main)/92 backdrop-blur-xl border-b border-black/10 dark:border-white/10" />
 
-        <div className="relative max-w-[1600px] mx-auto px-6 md:px-10 lg:px-14 py-3.5 md:py-4 flex items-center justify-between gap-6 pointer-events-auto">
+        <div className="relative max-w-400 mx-auto px-6 md:px-10 lg:px-14 py-3.5 md:py-4 flex items-center justify-between gap-6 pointer-events-auto">
           
           {/* LADO IZQUIERDO: ISOTIPO + REGRESO AL ORIGEN + TÍTULO DEL POST AMPLIADO */}
           <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
