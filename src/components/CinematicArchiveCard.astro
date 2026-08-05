@@ -1,0 +1,234 @@
+---
+import { Image } from 'astro:assets';
+import { getRelatedCategories, formatYear, normalizeCategory, splitTitleKeyword } from '../lib/content-filter';
+
+interface Props {
+  slug: string;
+  entry: any;
+  img?: ImageMetadata | null;
+  variant?: 'hero' | 'duo-60' | 'duo-40' | 'standard';
+  enableCinemagraph?: boolean;
+}
+
+const { slug, entry, img, variant = 'standard', enableCinemagraph = false } = Astro.props;
+
+const sitio = entry.sitioGeohistorico || null;
+const relatedTags = getRelatedCategories(entry.category, sitio, entry.title);
+const year = formatYear(entry.date);
+const excerpt = entry.excerpt || '';
+const href = `/hemeroteca/${slug}`;
+
+// Determinar botón secundario (media o registro)
+let secondaryLabel = 'VER REGISTRO ▸';
+let secondaryHref = href;
+let isExternal = false;
+
+if (entry.youtubeLink) {
+  secondaryLabel = 'WATCH TRAILER ▸';
+  secondaryHref = entry.youtubeLink;
+  isExternal = true;
+} else if (entry.spotifyLink) {
+  secondaryLabel = 'AUDIO PODCAST ▸';
+  secondaryHref = entry.spotifyLink;
+  isExternal = true;
+} else if (sitio) {
+  secondaryLabel = `${sitio.toUpperCase()} ▸`;
+  secondaryHref = href;
+}
+
+// Configuración visual por variante
+const isHero = variant === 'hero';
+const isDuo40 = variant === 'duo-40';
+
+const minHeightClass = isHero
+  ? 'min-h-[460px] sm:min-h-[520px] md:min-h-[560px] lg:min-h-[600px]'
+  : isDuo40
+  ? 'min-h-[380px] sm:min-h-[420px] md:min-h-[450px]'
+  : 'min-h-[400px] sm:min-h-[440px] md:min-h-[480px]';
+
+const paddingClass = isHero
+  ? 'p-6 sm:p-8 md:p-12 lg:p-14'
+  : isDuo40
+  ? 'p-5 sm:p-6 md:p-7'
+  : 'p-5 sm:p-7 md:p-8';
+
+const titleClass = isHero
+  ? 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black leading-[1.12]'
+  : isDuo40
+  ? 'text-lg sm:text-xl md:text-2xl font-extrabold leading-[1.2]'
+  : 'text-xl sm:text-2xl md:text-3xl font-extrabold leading-[1.16]';
+
+const excerptClass = isHero
+  ? 'text-xs sm:text-sm md:text-base text-white/80 line-clamp-2 max-w-3xl font-light'
+  : isDuo40
+  ? 'text-[11px] sm:text-xs text-white/70 line-clamp-1 max-w-xl font-light'
+  : 'text-xs sm:text-sm text-white/75 line-clamp-2 max-w-2xl font-light';
+const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(entry.title || '');
+---
+
+<article
+  class={`cinematic-archive-card cinematic-card-lantern group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 bg-theme-dark/80 transition-all duration-500 hover:border-[#C8A98B]/50 shadow-2xl flex flex-col justify-end w-full ${minHeightClass}`}
+  data-category={normalizeCategory(entry.category)}
+  data-year={year}
+>
+  {/* 1. Imagen de fondo cinematográfica con alta visibilidad y cinemagraph */}
+  {img ? (
+    <Image
+      src={img}
+      alt={entry.title || "Dossier del Archivo"}
+      class={`absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none ${
+        enableCinemagraph
+          ? 'cinemagraph-ken-burns'
+          : 'group-hover:scale-103 group-hover:brightness-95 transition-transform duration-700 ease-out'
+      }`}
+    />
+  ) : (
+    <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1c242b] via-theme-dark to-[#0a0b0b]" />
+  )}
+
+  {/* 2. Efecto Dynamis en Loop sutil */}
+  {enableCinemagraph && (
+    <div class="absolute inset-0 pointer-events-none cinemagraph-dynamis z-1" />
+  )}
+
+  {/* 3. Gradiente inferior suave (deja la imagen superior 100% visible) */}
+  <div
+    class={`absolute inset-0 bg-linear-to-t from-theme-dark/95 via-theme-dark/50 via-45% to-transparent pointer-events-none z-2 ${
+      enableCinemagraph ? 'cinemagraph-museum-fade' : ''
+    }`}
+  />
+
+  {/* 4. Contenido Editorial con Ley 60/40 (Título a la izq 60%, Subtítulo + Botones + Metadata a la der 40%) */}
+  <div class={`relative z-10 ${paddingClass} w-full max-w-7xl`}>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-end w-full">
+      
+      {/* Columna Izquierda: 60% (lg:col-span-7) -> Título Principal Extra Bold */}
+      <div class="lg:col-span-7 flex flex-col justify-end">
+        <h2 class={`font-cinzel tracking-tight drop-shadow-lg transition-all duration-300 ${titleClass}`}>
+          <a href={href} class="gradient-acero-ios hover:opacity-90 transition-opacity block">
+            {titlePrefix}<span class="title-keyword-shine-fade">{titleKeyword}</span>
+          </a>
+        </h2>
+      </div>
+
+      {/* Columna Derecha: 40% (lg:col-span-5) -> Excerpt / Subtítulo + Botones + Metadata */}
+      <div class="lg:col-span-5 flex flex-col gap-2.5 justify-end lg:translate-y-2 lg:pb-0.5">
+        {/* Excerpt / Subtítulo con Titileo Suave que Desaparece Hasta Hover */}
+        {excerpt && (
+          <p class={`font-sans leading-relaxed h2-soft-breathe-fade ${excerptClass}`}>
+            {excerpt}
+          </p>
+        )}
+
+        {/* Botones Superpuestos en el Mismo Espacio (Minimizando Espacio): Alternan cada 6s */}
+        <div class="relative min-h-10 flex items-center gap-3 pt-1">
+          {/* Botón Principal (Explore Now) Superpuesto */}
+          <a
+            href={href}
+            class="inline-flex items-center gap-2 px-4.5 sm:px-5 py-2.5 sm:py-3 bg-transparent border border-transparent text-white/75 font-mono font-bold text-[9.5px] sm:text-[10.5px] tracking-[0.2em] uppercase rounded-lg cta-stacked-primary hover:bg-white/15 hover:backdrop-blur-md hover:border-[#C8A98B] hover:text-white hover:shadow-[0_0_16px_rgba(200,169,139,0.35)] active:translate-y-0.5"
+          >
+            <span>EXPLORE NOW</span>
+            <span class="text-xs opacity-60 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-0.5">→</span>
+          </a>
+
+          {/* Botón Secundario (Watch Trailer / Learn More) Superpuesto en el Mismo Espacio (Aparece a los 6s) */}
+          <a
+            href={secondaryHref}
+            target={isExternal ? "_blank" : undefined}
+            rel={isExternal ? "noopener noreferrer" : undefined}
+            class="absolute left-0 inline-flex items-center gap-1.5 px-4 sm:px-4.5 py-2.5 sm:py-3 bg-transparent border border-transparent text-white/60 font-mono font-bold text-[9.5px] sm:text-[10.5px] tracking-[0.2em] uppercase rounded-lg cta-stacked-secondary hover:bg-black/40 hover:backdrop-blur-md hover:border-[#C8A98B]/70 hover:text-[#C8A98B] hover:shadow-[0_0_14px_rgba(200,169,139,0.25)] active:translate-y-0.5"
+          >
+            <span>{secondaryLabel}</span>
+          </a>
+        </div>
+
+        {/* Tags de Categorías Relacionadas y Metadata: INVISIBLES EN INACTIVO, Solo Visibles en Hover del Usuario */}
+        <div class="flex flex-wrap items-center gap-2 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.25em] text-[#C8A98B] font-bold pt-1 border-t border-white/8 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-700">
+          {relatedTags.map((tag, idx) => (
+            <>
+              <span>{tag}</span>
+              {idx < relatedTags.length - 1 && <span class="text-white/30 font-normal">·</span>}
+            </>
+          ))}
+          {year && (
+            <>
+              <span class="text-white/30 font-normal">·</span>
+              <span class="text-white/70">{year}</span>
+            </>
+          )}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</article>
+
+<style>
+  @keyframes kenBurnsAscent {
+    0% {
+      transform: scale(1.02) translateY(2.5%) translateZ(0);
+    }
+    50% {
+      transform: scale(1.08) translateY(0%) translateZ(0);
+    }
+    100% {
+      transform: scale(1.14) translateY(-3%) translateZ(0);
+    }
+  }
+
+  @keyframes museumFade {
+    0% {
+      opacity: 0.70;
+    }
+    50% {
+      opacity: 0.90;
+    }
+    100% {
+      opacity: 0.65;
+    }
+  }
+
+  @keyframes dynamisLoop {
+    0% {
+      opacity: 0.18;
+      transform: scale(1) translateZ(0);
+      filter: brightness(1) saturate(1);
+    }
+    50% {
+      opacity: 0.45;
+      transform: scale(1.04) translateZ(0);
+      filter: brightness(1.12) saturate(1.18);
+    }
+    100% {
+      opacity: 0.22;
+      transform: scale(1.01) translateZ(0);
+      filter: brightness(1.02) saturate(1.05);
+    }
+  }
+
+  .cinemagraph-ken-burns {
+    animation: kenBurnsAscent 24s cubic-bezier(0.4, 0, 0.6, 1) infinite alternate;
+    will-change: transform;
+    transform-origin: center center;
+  }
+
+  .cinemagraph-museum-fade {
+    animation: museumFade 14s ease-in-out infinite alternate;
+  }
+
+  .cinemagraph-dynamis {
+    background: radial-gradient(circle at 45% 45%, rgba(200, 169, 139, 0.25) 0%, rgba(74, 59, 50, 0.12) 45%, transparent 70%);
+    mix-blend-mode: screen;
+    animation: dynamisLoop 16s ease-in-out infinite alternate;
+    will-change: transform, opacity, filter;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cinemagraph-ken-burns,
+    .cinemagraph-museum-fade,
+    .cinemagraph-dynamis {
+      animation: none !important;
+    }
+  }
+</style>
+

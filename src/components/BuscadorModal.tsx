@@ -84,35 +84,39 @@ export function BuscadorModal() {
             alignItems: 'center',
             gap: '6px',
             padding: '7px 12px',
-            background: 'rgba(255, 255, 255, 0.06)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
+            background: 'transparent',
+            border: '1px solid transparent',
             borderRadius: '20px',
-            color: '#e4e4e7',
+            color: 'rgba(255, 255, 255, 0.75)',
             fontSize: '12px',
             cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            backdropFilter: 'blur(8px)'
+            transition: 'all 0.4s ease',
+            backdropFilter: 'none'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(200, 169, 139, 0.6)';
-            e.currentTarget.style.background = 'rgba(200, 169, 139, 0.15)';
+            e.currentTarget.style.borderColor = '#C8A98B';
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)';
+            e.currentTarget.style.color = '#ffffff';
+            e.currentTarget.style.boxShadow = '0 0 16px rgba(200, 169, 139, 0.35)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+            e.currentTarget.style.borderColor = 'transparent';
+            e.currentTarget.style.background = 'transparent';
+            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)';
+            e.currentTarget.style.boxShadow = 'none';
           }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.15em', opacity: 0.8 }}>
+          <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.15em', opacity: 0.9 }}>
             Buscar
           </span>
           <kbd style={{
             fontSize: '8px',
             padding: '2px 5px',
-            background: 'rgba(255,255,255,0.1)',
+            background: 'rgba(255,255,255,0.08)',
             borderRadius: '4px',
             color: '#a1a1aa',
             fontFamily: 'monospace'
@@ -133,19 +137,25 @@ export function BuscadorModal() {
             width: '36px',
             height: '36px',
             padding: '0',
-            background: isNavExpanded ? 'rgba(200, 169, 139, 0.2)' : 'rgba(255, 255, 255, 0.06)',
-            border: isNavExpanded ? '1px solid #C8A98B' : '1px solid rgba(255, 255, 255, 0.12)',
+            background: isNavExpanded ? 'rgba(200, 169, 139, 0.2)' : 'transparent',
+            border: isNavExpanded ? '1px solid #C8A98B' : '1px solid transparent',
             borderRadius: '50%',
-            color: isNavExpanded ? '#C8A98B' : '#e4e4e7',
+            color: isNavExpanded ? '#C8A98B' : 'rgba(255, 255, 255, 0.75)',
             cursor: 'pointer',
-            transition: 'all 0.3s ease',
+            transition: 'all 0.4s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(200, 169, 139, 0.6)';
+            e.currentTarget.style.borderColor = '#C8A98B';
+            e.currentTarget.style.background = 'rgba(200, 169, 139, 0.2)';
+            e.currentTarget.style.color = '#ffffff';
+            e.currentTarget.style.boxShadow = '0 0 16px rgba(200, 169, 139, 0.35)';
           }}
           onMouseLeave={(e) => {
             if (!isNavExpanded) {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+              e.currentTarget.style.borderColor = 'transparent';
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)';
+              e.currentTarget.style.boxShadow = 'none';
             }
           }}
         >

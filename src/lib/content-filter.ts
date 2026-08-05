@@ -102,6 +102,42 @@ export function formatCategory(cat?: string | null): string {
   return normalized.charAt(0).toUpperCase() + normalized.slice(1);
 }
 
+/** 
+ * Genera 2 a 3 categorías / etiquetas temáticas relacionadas para la cabecera cinematográfica
+ * (estilo: HISTORY · CULTURE · EXPLORATION).
+ */
+export function getRelatedCategories(
+  category?: string | null,
+  sitio?: string | null,
+  title?: string | null
+): string[] {
+  const normalized = normalizeCategory(category);
+  const baseMap: Record<string, string[]> = {
+    'arqueologia': ['ARQUEOLOGÍA', 'CIVILIZACIONES', 'VESTIGIOS'],
+    'arqueosemiotica': ['ARQUEOSEMIÓTICA', 'HERMENÉUTICA', 'CARTOGRAFÍA'],
+    'semiotica-cultural': ['SEMIÓTICA CULTURAL', 'SIMBOLISMO', 'ANTROPOLOGÍA'],
+    'historia': ['HISTORIA', 'CULTURA', 'CIVILIZACIONES'],
+    'historia-religiones': ['HISTORIA DE LAS RELIGIONES', 'MITOLOGÍA', 'GNOSIS'],
+    'historia-ideas': ['HISTORIA DE LAS IDEAS', 'EPISTEMOLOGÍA', 'PENSAMIENTO'],
+    'filosofia': ['FILOSOFÍA', 'ONTOLOGÍA', 'HERMENÉUTICA'],
+    'cahiers': ['CAHIERS ÉPISTÉMIQUES', 'CUADERNO DE CAMPO', 'ARCHIVO'],
+    'georreferencias': ['GEOCULTURA', 'PAISAJE SAGRADO', 'CARTOGRAFÍA'],
+    'ensayo': ['INVESTIGACIÓN', 'CARTOGRAFÍA EPISTÉMICA', 'CULTURA'],
+  };
+
+  const defaults = baseMap[normalized] || [
+    (formatCategory(category) || 'INVESTIGACIÓN').toUpperCase(),
+    'CARTOGRAFÍA EPISTÉMICA',
+    'CULTURA'
+  ];
+
+  if (sitio && sitio.trim().length > 0) {
+    return [defaults[0], sitio.trim().toUpperCase(), defaults[2] || 'EXPLORACIÓN'];
+  }
+
+  return defaults;
+}
+
 /** Formatea una fecha para visualización en español. */
 export function formatDate(dateStr?: string | null): string {
   if (!dateStr) return '';
@@ -258,4 +294,16 @@ export function resolveAllPostGalleryImages(doc: any, slug?: string): GalleryIma
   }
 
   return images;
+}
+
+export function splitTitleKeyword(titleStr: string): { prefix: string; keyword: string } {
+  if (!titleStr) return { prefix: '', keyword: '' };
+  const cleanTitle = titleStr.trim();
+  const words = cleanTitle.split(/\s+/);
+  if (words.length <= 1) {
+    return { prefix: '', keyword: cleanTitle };
+  }
+  const prefix = words.slice(0, -1).join(' ') + ' ';
+  const keyword = words[words.length - 1];
+  return { prefix, keyword };
 }

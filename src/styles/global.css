@@ -29,13 +29,25 @@
     font-family: "Outfit", "Plus Jakarta Sans", sans-serif;
   }
 
-  /* Gradiente Acero Cepillado / Titanium iOS Style con Brillo Especular */
+  /* Gradiente Acero Cepillado / Titanium iOS Style con Barrido Especular Metálico Secuencial */
   .gradient-acero-ios {
-    background-image: linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 18%, #F8FAFC 28%, #CBD5E1 55%, #94A3B8 80%, #475569 100%) !important;
+    background-image: linear-gradient(
+      110deg,
+      #FFFFFF 0%,
+      #F1F5F9 14%,
+      #CBD5E1 28%,
+      #94A3B8 42%,
+      #FFFFFF 55%,
+      #E2E8F0 68%,
+      #64748B 82%,
+      #FFFFFF 100%
+    ) !important;
+    background-size: 260% 100% !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     color: transparent !important;
-    filter: drop-shadow(0 2px 10px rgba(255, 255, 255, 0.42)) drop-shadow(0 8px 28px rgba(0, 0, 0, 0.95)) !important;
+    animation: titaniumMetallicSweep 16s ease-in-out infinite !important;
+    will-change: background-position, filter;
   }
 
   /* H2 Hook Inteligente Sans Outfit / Jakarta (Conciso de 2 renglones, elegante y equilibrado) */
@@ -93,4 +105,358 @@
   background-clip: text !important;
   color: transparent !important;
   filter: drop-shadow(0 4px 14px rgba(0,0,0,0.5));
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   EFECTO LINTERNA CINEMÁTICA PARA CARDS Y ASIDE (Lantern Ambient Glow)
+═════════════════════════════════════════════════════════════════════════ */
+.cinematic-card-lantern {
+  position: relative;
+  background: rgba(12, 14, 13, 0.55);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+  transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: hidden;
+}
+
+.cinematic-card-lantern::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  transition: all 0.6s ease;
+  pointer-events: none;
+}
+
+.cinematic-card-lantern:hover {
+  background: rgba(18, 22, 20, 0.8);
+  border-color: rgba(200, 169, 139, 0.4);
+  box-shadow: 
+    0 0 32px -4px rgba(200, 169, 139, 0.2),
+    inset 0 0 24px rgba(200, 169, 139, 0.06),
+    0 20px 40px -12px rgba(0, 0, 0, 0.8);
+  transform: translateY(-2px);
+}
+
+.cinematic-card-lantern:hover::before {
+  background: linear-gradient(90deg, transparent, rgba(200, 169, 139, 0.75), transparent);
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   EFECTOS CINEMÁTICOS SECUENCIALES Y DESTELLOS CELESTIALES
+   1. Flash secuencial entre botones CTA para invitar a la acción.
+   2. Palpitación / destello estelar suave para extractos, volantas y categorías.
+   3. Títulos H1/H2 permanecen estáticos con gradiente de titanio.
+═════════════════════════════════════════════════════════════════════════ */
+@keyframes ctaFlashPrimary {
+  0%, 100% {
+    box-shadow: none;
+    border-color: transparent;
+    background-color: transparent;
+    opacity: 0.65;
+  }
+  15%, 28% {
+    opacity: 1;
+    text-shadow: 0 0 10px rgba(200, 169, 139, 0.65);
+  }
+}
+
+@keyframes ctaFlashSecondary {
+  0%, 100% {
+    box-shadow: none;
+    border-color: transparent;
+    background-color: transparent;
+    opacity: 0.45;
+  }
+  15%, 28% {
+    opacity: 0.90;
+    text-shadow: 0 0 8px rgba(200, 169, 139, 0.5);
+  }
+}
+
+@keyframes starlightSubPulse {
+  0%, 100% {
+    opacity: 0.72;
+    filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+  }
+  50% {
+    opacity: 0.94;
+    filter: drop-shadow(0 0 4px rgba(200, 169, 139, 0.35));
+  }
+}
+
+@keyframes starlightTagTwinkle {
+  0%, 100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 8px rgba(200, 169, 139, 0.45);
+  }
+}
+
+@keyframes titaniumMetallicSweep {
+  0% {
+    background-position: 0% 50%;
+    filter: drop-shadow(0 2px 10px rgba(255, 255, 255, 0.40)) drop-shadow(0 8px 28px rgba(0, 0, 0, 0.95));
+  }
+  30% {
+    background-position: 50% 50%;
+    filter: drop-shadow(0 2px 16px rgba(255, 255, 255, 0.60)) drop-shadow(0 8px 28px rgba(0, 0, 0, 0.95));
+  }
+  60% {
+    background-position: 100% 50%;
+    filter: drop-shadow(0 2px 18px rgba(200, 169, 139, 0.45)) drop-shadow(0 8px 28px rgba(0, 0, 0, 0.95));
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: drop-shadow(0 2px 10px rgba(255, 255, 255, 0.40)) drop-shadow(0 8px 28px rgba(0, 0, 0, 0.95));
+  }
+}
+
+@keyframes subtlyBreatheAndFade {
+  0%, 100% {
+    opacity: 0;
+  }
+  45%, 55% {
+    opacity: 0.82;
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.22));
+  }
+}
+
+.h2-soft-breathe-fade {
+  animation: subtlyBreatheAndFade 12s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  transition: opacity 0.5s ease-out;
+}
+
+@keyframes ctaStackedPrimaryAnim {
+  0%, 45% {
+    opacity: 0.75;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+    pointer-events: auto;
+  }
+  50%, 95% {
+    opacity: 0;
+    pointer-events: none;
+  }
+  100% {
+    opacity: 0.75;
+    pointer-events: auto;
+  }
+}
+
+@keyframes ctaStackedSecondaryAnim {
+  0%, 45% {
+    opacity: 0;
+    pointer-events: none;
+  }
+  50%, 95% {
+    opacity: 0.75;
+    text-shadow: 0 0 8px rgba(200, 169, 139, 0.5);
+    pointer-events: auto;
+  }
+  100% {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.cta-stacked-primary {
+  animation: ctaStackedPrimaryAnim 12s ease-in-out infinite;
+  transition: all 0.5s ease-out;
+}
+
+.cta-stacked-secondary {
+  animation: ctaStackedSecondaryAnim 12s ease-in-out infinite;
+  transition: all 0.5s ease-out;
+}
+
+.group:hover .cta-stacked-primary,
+.hero-section:hover .cta-stacked-primary {
+  animation: none !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  left: auto !important;
+}
+
+.group:hover .cta-stacked-secondary,
+.hero-section:hover .cta-stacked-secondary {
+  animation: none !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  left: auto !important;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   ANIMACIÓN CINEMATOGRÁFICA DE PALABRA CLAVE: HYPE -> UMBRAL DE OSCURECIMIENTO TOTAL -> REINICIO
+   - La frase base (ej: "El mito de ") permanece legible.
+   - La palabra destacada (ej: "Sísifo") cobra un destello especular de titanio/oro.
+   - Pasa por el UMBRAL DE OSCURECERSE TOTALMENTE (brightness 0 y opacidad 0, apagándose en negro).
+   - Segundos después se reenciende restituyendo la frase completa para reiniciar el loop.
+═════════════════════════════════════════════════════════════════════════ */
+@keyframes titleKeywordShineFade {
+  0% {
+    opacity: 1;
+    filter: brightness(1) drop-shadow(0 2px 10px rgba(255, 255, 255, 0.40));
+  }
+  20% {
+    /* Destello Hype de Brillo Metálico Especular */
+    opacity: 1;
+    filter: brightness(1.25) drop-shadow(0 0 22px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 34px rgba(200, 169, 139, 0.85));
+  }
+  45% {
+    /* Umbral de Oscurecimiento Total: se apaga y oscurece completamente */
+    opacity: 0;
+    filter: brightness(0) drop-shadow(0 0 0px transparent);
+  }
+  75% {
+    /* Permanece en el umbral de total oscuridad */
+    opacity: 0;
+    filter: brightness(0) drop-shadow(0 0 0px transparent);
+  }
+  100% {
+    /* Se reenciende y reaparece la frase completa limpia para reiniciar el loop */
+    opacity: 1;
+    filter: brightness(1) drop-shadow(0 2px 10px rgba(255, 255, 255, 0.40));
+  }
+}
+
+.title-keyword-shine-fade {
+  display: inline;
+  animation: titleKeywordShineFade 9s ease-in-out infinite;
+  will-change: opacity, filter;
+}
+
+.group:hover .title-keyword-shine-fade,
+.hero-section:hover .cinema-bottom-grid-settle .title-keyword-shine-fade {
+  animation: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   TIMELINE CINEMÁTICA LENTIFICADA ("ENTRA UNO, SALE EL OTRO" CON TIEMPO DE LECTURA):
+   0.0s - 3.2s: H1 central emerge MUY LENTAMENTE del VACÍO TOTAL (0% -> 31.4%).
+   3.2s - 5.5s: Entra el subtítulo. Ambos se sostienen 2s para que el usuario lea con calma (31.4% -> 53.9%).
+   5.5s - 7.2s: H1 central se desintegra primero en oscuridad y desenfoque (53.9% -> 70.6%).
+   7.2s - 8.8s: El subtítulo se desintegra de inmediato después (70.6% -> 86.3%).
+   8.8s - 10.2s: Espacio lento en oscuridad total. El contenedor central se autodestruye (10.2s).
+   10.2s - 12.0s: PASO DOS emerge de forma MUY GRADUAL en Grid 60/40 inferior (10.2s -> 12.0s).
+═════════════════════════════════════════════════════════════════════════ */
+@keyframes cinemaIntroOverlayHide {
+  0%, 96% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    display: none !important;
+  }
+}
+
+@keyframes cinemaCenterTitleStagger {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+    filter: blur(22px);
+  }
+  31.4%, 53.9% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+  70.6%, 100% {
+    opacity: 0 !important;
+    transform: scale(1.04);
+    filter: blur(20px);
+    visibility: hidden !important;
+  }
+}
+
+@keyframes cinemaCenterSubStagger {
+  0%, 31.4% {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(14px);
+  }
+  53.9%, 70.6% {
+    opacity: 0.9;
+    transform: translateY(0);
+    filter: blur(0px);
+  }
+  86.3%, 100% {
+    opacity: 0 !important;
+    transform: translateY(-16px);
+    filter: blur(16px);
+    visibility: hidden !important;
+  }
+}
+
+@keyframes cinemaBottomGridSettle {
+  0%, 85% {
+    opacity: 0;
+    transform: translateY(28px);
+    pointer-events: none;
+    filter: blur(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    filter: blur(0px);
+  }
+}
+
+.cinema-intro-overlay-container {
+  animation: cinemaIntroOverlayHide 10.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.cinema-title-center-intro {
+  opacity: 0;
+  filter: blur(22px);
+  animation: cinemaCenterTitleStagger 10.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform, filter;
+}
+
+.cinema-sub-center-intro {
+  opacity: 0;
+  filter: blur(14px);
+  animation: cinemaCenterSubStagger 10.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform, filter;
+}
+
+.cinema-bottom-grid-settle {
+  opacity: 0;
+  animation: cinemaBottomGridSettle 12.0s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform, filter;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gradient-acero-ios,
+  .title-keyword-shine-fade,
+  .h2-soft-breathe-fade,
+  .cta-stacked-primary,
+  .cta-stacked-secondary,
+  .cta-flash-primary,
+  .cta-flash-secondary,
+  .starlight-sub-pulse,
+  .starlight-tag-twinkle,
+  .cinema-title-center-intro,
+  .cinema-sub-center-intro {
+    animation: none !important;
+  }
+  .cinema-bottom-grid-settle {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+  }
 }

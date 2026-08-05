@@ -29,7 +29,7 @@ export const QuickReturnButton: React.FC<Props> = ({ accentColor }) => {
   return (
     <button
       onClick={handleReturn}
-      className={`fixed bottom-10 right-10 z-90 w-14 h-14 rounded-full border border-white/5 bg-white/2 backdrop-blur-[2px] flex items-center justify-center text-white/20 hover:text-white/80 hover:border-white/20 hover:bg-white/5 transition-all duration-700 ease-in-out group ${
+      className={`fixed bottom-10 right-10 z-90 w-14 h-14 rounded-full border border-transparent bg-transparent backdrop-blur-none flex items-center justify-center text-white/30 hover:text-white hover:border-[#C8A98B] hover:bg-white/15 hover:backdrop-blur-md hover:shadow-[0_0_16px_rgba(200,169,139,0.35)] transition-all duration-500 ease-in-out group ${
         isVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-90 pointer-events-none'
       }`}
       title="Volver a la Hemeroteca"

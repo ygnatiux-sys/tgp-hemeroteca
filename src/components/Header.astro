@@ -3,36 +3,29 @@
 import { BuscadorModal } from './BuscadorModal';
 ---
 
-<header class="fixed top-0 w-full z-100 bg-black/60 backdrop-blur-xl border-b border-white/5 transition-all duration-700">
-  <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 py-4 flex justify-between items-center">
+<header class="fixed top-0 w-full z-100 bg-black/70 backdrop-blur-xl border-b border-white/5 transition-all duration-700">
+  <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 py-3.5 flex justify-between items-center">
     <div class="flex items-center gap-6">
       <a href="/" class="group flex flex-row items-center gap-3">
-        <div class="brand-element w-9.5 h-9.5 md:w-10 md:h-10 rounded-full border border-white/25 flex items-center justify-center overflow-hidden group-hover:border-[#C8A98B]/60 transition-all duration-700 opacity-0 blur-md translate-y-2 bg-white/3">
-          <img src="/favicon.png" alt="TGP Logo" class="w-6 h-6 md:w-6.5 md:h-6.5 object-contain brightness-150 grayscale group-hover:grayscale-0 transition-all duration-500" />
+        <div class="brand-element w-9 h-9 md:w-9.5 md:h-9.5 rounded-full border border-white/20 flex items-center justify-center overflow-hidden group-hover:border-[#C8A98B] group-hover:shadow-[0_0_14px_rgba(200,169,139,0.35)] transition-all duration-500 bg-transparent">
+          <img src="/favicon.png" alt="TGP Logo" class="w-5.5 h-5.5 object-contain brightness-150 grayscale group-hover:grayscale-0 transition-all duration-500" />
         </div>
-        <div class="brand-element flex flex-col opacity-0 blur-md translate-y-2">
-          <span class="font-serif tracking-[0.22em] text-[11px] md:text-[11.5px] uppercase text-transparent bg-clip-text bg-linear-to-b from-[#f0f0f0] to-[#e0e0e0]/40 drop-shadow-2xl group-hover:text-[#C8A98B] transition-all duration-700 font-medium">
+        <div class="brand-element flex flex-col">
+          <span class="font-serif tracking-[0.24em] text-[11px] md:text-[12px] uppercase text-transparent bg-clip-text bg-linear-to-b from-[#ffffff] to-[#ffffff]/70 drop-shadow-2xl group-hover:text-[#C8A98B] transition-all duration-500 font-semibold">
             The Great Puzzle Project
           </span>
         </div>
       </a>
-      
-      {/* Tagline de la Franja */}
-      <div class="hidden lg:block brand-element border-l border-white/10 pl-6 opacity-0 blur-md translate-y-2">
-        <span class="font-mono text-[8px] uppercase tracking-[0.4em] text-white/30 italic">
-          Investigación & Cartografía Epistémica
-        </span>
-      </div>
     </div>
     
     <div class="flex items-center gap-4 md:gap-6">
-      {/* Navegación Tradicional (Se oculta en móvil o al condensar) */}
-      <nav class="hidden md:flex items-center gap-3 sm:gap-6 shrink-0">
-        <a href="/" class="font-mono text-[9px] uppercase tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Inicio</a>
-        <a href="/colecciones" class="font-mono text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Colecciones</a>
-        <a href="/archivo" class="font-mono text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Archivo</a>
-        <a href="/manifiesto" class="font-mono text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/40 hover:text-white transition-all duration-500">Manifiesto</a>
-        <a href="/codice" class="px-3 sm:px-4 py-1 sm:py-2 border border-white/10 rounded-full font-mono text-[8px] sm:text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/80 hover:text-white hover:border-white/30 transition-all duration-500 bg-white/5 whitespace-nowrap">El Códice</a>
+      {/* Navegación Tradicional Limpia & Translúcida (Sin Bordes Persistentes) */}
+      <nav class="hidden md:flex items-center gap-4 sm:gap-6 shrink-0 font-mono text-[9px] uppercase tracking-[0.28em]">
+        <a href="/" class="text-white/60 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)] transition-all duration-300">Inicio</a>
+        <a href="/colecciones" class="text-white/60 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)] transition-all duration-300">Colecciones</a>
+        <a href="/archivo" class="text-white/60 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)] transition-all duration-300">Archivo</a>
+        <a href="/manifiesto" class="text-white/60 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)] transition-all duration-300">Manifiesto</a>
+        <a href="/codice" class="px-3.5 py-1.5 border border-transparent rounded-full text-white/70 bg-transparent hover:text-white hover:bg-white/15 hover:border-[#C8A98B] hover:shadow-[0_0_16px_rgba(200,169,139,0.35)] transition-all duration-300 whitespace-nowrap">El Códice</a>
       </nav>
 
       {/* Lupa de Búsqueda + Menú Sándwich 3 Guiones ≡ */}
