@@ -35,6 +35,10 @@ export default defineConfig({
               entrypoint: './src/api/_generar-georreferencia.ts'
             });
             injectRoute({
+              pattern: '/api/generar-arquetipo',
+              entrypoint: './src/api/_generar-arquetipo.ts'
+            });
+            injectRoute({
               pattern: '/api/guardar-georreferencia',
               entrypoint: './src/api/_guardar-georreferencia.ts'
             });

@@ -34,10 +34,51 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
   // CLAVE AISLADA POR POST (Evita que un post herede datos de otro como Yonaguni a Cueva de las Manos)
   const BACKUP_KEY = `tgp_georef_post_${currentSlug}`;
 
+  // Helper para desenredar JSON crudo si llega dentro del campo Markdown
+  const unnestMarkdownJson = (val: string) => {
+    if (!val || typeof val !== 'string') return null;
+    const trimmed = val.trim();
+    if (trimmed.startsWith('{') && (trimmed.includes('"informeMarkdown"') || trimmed.includes('"volantaHook"'))) {
+      try {
+        return JSON.parse(trimmed);
+      } catch (e) {
+        // Regex fallback
+        const extract = (field: string) => {
+          const match = trimmed.match(new RegExp(`"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*})`));
+          return match ? match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : null;
+        };
+        return {
+          informeMarkdown: extract('informeMarkdown'),
+          volantaHook: extract('volantaHook'),
+          excerpt: extract('excerpt'),
+          saberMasDato: extract('saberMasDato')
+        };
+      }
+    }
+    return null;
+  };
+
   useEffect(() => {
-    if (value && value !== informe) {
-      setInforme(value);
-      setStatusFeedback('Listo para edición');
+    if (value) {
+      const unnested = unnestMarkdownJson(value);
+      if (unnested && unnested.informeMarkdown) {
+        setInforme(unnested.informeMarkdown);
+        if (unnested.volantaHook) setVolanta(unnested.volantaHook);
+        if (unnested.saberMasDato) setSaberMas(unnested.saberMasDato);
+        if (unnested.excerpt) setExcerpt(unnested.excerpt);
+        if (unnested.titulosSugeridos) setTitulosSugeridos(unnested.titulosSugeridos);
+        syncFieldsToKeystaticDOM({
+          volanta: unnested.volantaHook,
+          saberMas: unnested.saberMasDato,
+          excerpt: unnested.excerpt,
+          sitio: lugar || effectiveTitle
+        });
+        onChange(unnested.informeMarkdown);
+        setStatusFeedback('Campos separados y desanidados correctamente');
+      } else if (value !== informe) {
+        setInforme(value);
+        setStatusFeedback('Listo para edición');
+      }
     } else if (!value) {
       // Solo recuperar backup SI coincide exactamente con este post
       try {
@@ -97,47 +138,47 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
 
   const effectiveTitle = detectTitleFromDOM();
 
+  const setInputElementValue = (el: HTMLInputElement | HTMLTextAreaElement | null, val: string) => {
+    if (!el || !val) return;
+    const nativeSetter = Object.getOwnPropertyDescriptor(
+      window.HTMLTextAreaElement.prototype,
+      'value'
+    )?.set || Object.getOwnPropertyDescriptor(
+      window.HTMLInputElement.prototype,
+      'value'
+    )?.set;
+
+    if (nativeSetter) {
+      nativeSetter.call(el, val);
+    } else {
+      el.value = val;
+    }
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  };
+
   const syncFieldsToKeystaticDOM = (data: { title?: string; volanta?: string; saberMas?: string; excerpt?: string; sitio?: string }) => {
     if (typeof document === 'undefined') return;
+
     if (data.title) {
       const titleEl = document.querySelector<HTMLInputElement>('input[name="title"], input[id^="title"]');
-      if (titleEl) {
-        titleEl.value = data.title;
-        titleEl.dispatchEvent(new Event('input', { bubbles: true }));
-        titleEl.dispatchEvent(new Event('change', { bubbles: true }));
-      }
+      setInputElementValue(titleEl, data.title);
     }
     if (data.volanta) {
-      const volantaEl = document.querySelector<HTMLTextAreaElement>('textarea[name="volantaHook"], textarea[id*="volantaHook"]');
-      if (volantaEl) {
-        volantaEl.value = data.volanta;
-        volantaEl.dispatchEvent(new Event('input', { bubbles: true }));
-        volantaEl.dispatchEvent(new Event('change', { bubbles: true }));
-      }
+      const volantaEl = document.querySelector<HTMLTextAreaElement>('textarea[name="volantaHook"], textarea[id*="volantaHook"], textarea[name*="volanta"], textarea[id*="volanta"]');
+      setInputElementValue(volantaEl, data.volanta);
     }
     if (data.saberMas) {
-      const saberEl = document.querySelector<HTMLTextAreaElement>('textarea[name="saberMasDato"], textarea[id*="saberMasDato"]');
-      if (saberEl) {
-        saberEl.value = data.saberMas;
-        saberEl.dispatchEvent(new Event('input', { bubbles: true }));
-        saberEl.dispatchEvent(new Event('change', { bubbles: true }));
-      }
+      const saberEl = document.querySelector<HTMLTextAreaElement>('textarea[name="saberMasDato"], textarea[id*="saberMasDato"], textarea[name*="saberMas"], textarea[id*="saberMas"]');
+      setInputElementValue(saberEl, data.saberMas);
     }
     if (data.excerpt) {
       const excEl = document.querySelector<HTMLTextAreaElement>('textarea[name="excerpt"], textarea[id*="excerpt"]');
-      if (excEl) {
-        excEl.value = data.excerpt;
-        excEl.dispatchEvent(new Event('input', { bubbles: true }));
-        excEl.dispatchEvent(new Event('change', { bubbles: true }));
-      }
+      setInputElementValue(excEl, data.excerpt);
     }
     if (data.sitio) {
-      const sitioEl = document.querySelector<HTMLInputElement>('input[name="sitioGeohistorico"], input[id*="sitioGeohistorico"]');
-      if (sitioEl) {
-        sitioEl.value = data.sitio;
-        sitioEl.dispatchEvent(new Event('input', { bubbles: true }));
-        sitioEl.dispatchEvent(new Event('change', { bubbles: true }));
-      }
+      const sitioEl = document.querySelector<HTMLInputElement>('input[name="sitioGeohistorico"], input[id*="sitioGeohistorico"], input[name*="sitio"], input[id*="sitio"]');
+      setInputElementValue(sitioEl, data.sitio);
     }
   };
 

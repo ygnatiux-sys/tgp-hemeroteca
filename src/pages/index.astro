@@ -26,11 +26,14 @@ const allGeorefsRaw = await getCollection('georreferencias').catch(err => {
   return [];
 });
 
+const allArquetiposRaw = await getCollection('arquetiposGlobales').catch(() => []);
+
 const isProd = import.meta.env.PROD;
 const publishableEssays = getPublishableEssays(allEssaysRaw, isProd);
 const publishableGeorefs = getPublishableEssays(allGeorefsRaw, isProd);
+const publishableArquetipos = getPublishableEssays(allArquetiposRaw, isProd);
 
-const publishable = [...publishableEssays, ...publishableGeorefs].sort((a, b) => {
+const publishable = [...publishableEssays, ...publishableGeorefs, ...publishableArquetipos].sort((a, b) => {
   const dateA = a.entry.date ? new Date(a.entry.date).getTime() : 0;
   const dateB = b.entry.date ? new Date(b.entry.date).getTime() : 0;
   return dateB - dateA;

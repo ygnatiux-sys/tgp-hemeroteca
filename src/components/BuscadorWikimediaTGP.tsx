@@ -8,7 +8,32 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [bookzineFeedback, setBookzineFeedback] = useState<string | null>(null);
   const [activeModalItem, setActiveModalItem] = useState<WikimediaImageItem | null>(null);
+
+  // Enviar selección completa o filtrada al post como Magazine Bookzine Full Bleed
+  const handleEnviarABookzine = (modo: 'all' | 'selected' = 'selected') => {
+    let targetItems = items;
+    let targetIds = new Set<string>();
+
+    if (modo === 'all' || selectedIds.size === 0) {
+      targetIds = new Set(items.map(i => i.id));
+      targetItems = items;
+    } else {
+      targetIds = new Set(selectedIds);
+      targetItems = items.filter(i => selectedIds.has(i.id));
+    }
+
+    if (targetItems.length === 0) {
+      return alert('No hay imágenes disponibles para enviar al post.');
+    }
+
+    setSelectedIds(targetIds);
+    updateKeystaticValue(targetIds, items);
+
+    setBookzineFeedback(`¡${targetItems.length} láminas vinculadas exitosamente al Magazine Bookzine Full Bleed del post! (Recuerda presionar "Save" en Keystatic para guardar los cambios).`);
+    setTimeout(() => setBookzineFeedback(null), 8000);
+  };
 
   // Extraer el slug actual de la URL de Keystatic
   const getSlugFromUrl = (): string | null => {
@@ -217,7 +242,7 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
             Buscador & Galería Wikimedia Commons TGP
           </h3>
           <p style={{ margin: '4px 0 0 0', fontSize: '0.75rem', color: '#888' }}>
-            Filtro Estricto Anti-Basura ($\ge 1000px$, CC0/CC-BY) · Clasificación de Roles (Hero, Secundaria, B-Roll)
+            Motor Adaptativo Multietapa · Búsqueda Abierta de Patrimonio Histórico, Archivo & Lugares Remotos (CC0, CC-BY, Citar Fuente)
           </p>
         </div>
 
@@ -289,7 +314,7 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
       {items.length > 0 && (
         <div style={{
           display: 'flex',
-          justify: 'space-between',
+          justifyContent: 'space-between',
           alignItems: 'center',
           padding: '14px 18px',
           background: '#14141e',
@@ -359,23 +384,66 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
             </span>
           </div>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            {/* BOTÓN MAESTRO: ENVIAR A MAGAZINE BOOKZINE FULL BLEED */}
+            <button
+              type="button"
+              onClick={() => handleEnviarABookzine('selected')}
+              style={{
+                padding: '8px 18px',
+                background: 'linear-gradient(135deg, #b8860b, #d4af37, #996515)',
+                color: '#000',
+                border: '1px solid #ffd700',
+                borderRadius: '6px',
+                fontSize: '0.82rem',
+                fontWeight: 800,
+                letterSpacing: '0.05em',
+                cursor: 'pointer',
+                boxShadow: '0 0 15px rgba(212, 175, 55, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+              title="Vincular la selección como dossier visual / Magazine Bookzine amplio en el pie del post"
+            >
+              <span>📖</span>
+              <span>VINCULAR A BOOKZINE FULL BLEED ({selectedCount > 0 ? selectedCount : items.length})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleEnviarABookzine('all')}
+              style={{
+                padding: '8px 14px',
+                background: '#1c2230',
+                color: '#90caf9',
+                border: '1px solid #3d5a80',
+                borderRadius: '6px',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+              title="Vincular TODAS las imágenes encontradas en la búsqueda al Bookzine"
+            >
+              Vincular Toda la Búsqueda ({items.length})
+            </button>
+
             <button
               type="button"
               onClick={handleExportPdf}
               disabled={selectedCount === 0}
               style={{
-                padding: '8px 16px',
+                padding: '8px 14px',
                 background: selectedCount === 0 ? '#222' : 'linear-gradient(135deg, #e65100, #f57c00)',
                 color: selectedCount === 0 ? '#666' : '#fff',
                 border: 'none',
                 borderRadius: '4px',
-                fontSize: '0.8rem',
+                fontSize: '0.78rem',
                 fontWeight: 700,
                 cursor: selectedCount === 0 ? 'not-allowed' : 'pointer'
               }}
             >
-              Exportar PDF Metadatos
+              PDF Metadatos
             </button>
 
             <button
@@ -383,19 +451,40 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
               onClick={handleDownloadBatch}
               disabled={selectedCount === 0}
               style={{
-                padding: '8px 16px',
+                padding: '8px 14px',
                 background: selectedCount === 0 ? '#222' : '#2e7d32',
                 color: selectedCount === 0 ? '#666' : '#fff',
                 border: 'none',
                 borderRadius: '4px',
-                fontSize: '0.8rem',
+                fontSize: '0.78rem',
                 fontWeight: 700,
                 cursor: selectedCount === 0 ? 'not-allowed' : 'pointer'
               }}
             >
-              Descargar Selección (Lote)
+              Descargar (Lote)
             </button>
           </div>
+        </div>
+      )}
+
+      {/* FEEDBACK BANNER DE BOOKZINE VINCULADO */}
+      {bookzineFeedback && (
+        <div style={{
+          padding: '12px 18px',
+          background: 'rgba(212, 175, 55, 0.15)',
+          border: '1px solid #d4af37',
+          borderRadius: '8px',
+          color: '#f5e6a2',
+          fontSize: '0.85rem',
+          fontWeight: 600,
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          boxShadow: '0 0 20px rgba(212, 175, 55, 0.2)'
+        }}>
+          <span style={{ fontSize: '1.2rem' }}>✨</span>
+          <span>{bookzineFeedback}</span>
         </div>
       )}
 

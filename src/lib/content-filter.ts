@@ -96,6 +96,7 @@ export function formatCategory(cat?: string | null): string {
     'filosofia': 'Filosofía',
     'cahiers': 'Cahiers Épistémiques',
     'georreferencias': 'Georreferencias',
+    'arquetipos-globales': 'Arquetipos Globales',
     'ensayo': 'Ensayo',
   };
   if (map[normalized]) return map[normalized];
@@ -265,8 +266,9 @@ export function resolveAllPostGalleryImages(doc: any, slug?: string): GalleryIma
   if (slug) {
     const ensayoPrefix = `/src/assets/ensayos/${slug}/`;
     const georefPrefix = `/src/assets/georreferencias/${slug}/`;
+    const arquetipoPrefix = `/src/assets/arquetipos-globales/${slug}/`;
     for (const [key, mod] of Object.entries(essayImages)) {
-      if (key.startsWith(ensayoPrefix) || key.startsWith(georefPrefix)) {
+      if (key.startsWith(ensayoPrefix) || key.startsWith(georefPrefix) || key.startsWith(arquetipoPrefix)) {
         const fileName = key.split('/').pop() || 'Fotografía de Archivo';
         addImg({
           url: mod.default.src,

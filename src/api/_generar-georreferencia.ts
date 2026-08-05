@@ -4,6 +4,58 @@ import { GoogleGenAI } from '@google/genai';
 
 export const prerender = false;
 
+function sanitizeAndParseJson(rawText: string, lugar: string) {
+  let clean = rawText.trim();
+  if (clean.startsWith('```json')) {
+    clean = clean.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+  } else if (clean.startsWith('```')) {
+    clean = clean.replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+  }
+
+  try {
+    return JSON.parse(clean);
+  } catch (err) {
+    // Intento de extracción con regex de campos individuales si el JSON está malformado
+    const extractField = (fieldName: string) => {
+      const match = clean.match(new RegExp(`"${fieldName}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*})`));
+      return match ? match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : null;
+    };
+
+    const informeMatch = extractField('informeMarkdown');
+    const volantaMatch = extractField('volantaHook');
+    const excerptMatch = extractField('excerpt');
+    const saberMasMatch = extractField('saberMasDato');
+
+    if (informeMatch) {
+      return {
+        titulosSugeridos: [`${lugar}: Cartografía Arqueosemiótica`, `${lugar}: El Secreto Geohistórico`],
+        volantaHook: volantaMatch || `Investigación geohistórica y registro arqueosemiótico sobre ${lugar}.`,
+        informeMarkdown: informeMatch,
+        excerpt: excerptMatch || `Informe geohistórico y etnográfico sobre ${lugar}.`,
+        saberMasDato: saberMasMatch || `Tradición etnográfica local documentada en ${lugar}.`
+      };
+    }
+
+    // Si todo falla, asegurar que informeMarkdown no sea un JSON crudo
+    let pureMarkdown = clean;
+    if (pureMarkdown.includes('informeMarkdown":')) {
+      const splitPart = pureMarkdown.split('"informeMarkdown":');
+      if (splitPart.length > 1) {
+        pureMarkdown = splitPart[1].replace(/^\s*"/, '').replace(/"\s*,?\s*"[\w]+":[\s\S]*$/, '').replace(/"\s*}\s*$/, '');
+        pureMarkdown = pureMarkdown.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+      }
+    }
+
+    return {
+      titulosSugeridos: [`${lugar}: Cartografía Arqueosemiótica`],
+      volantaHook: `Investigación geohistórica y registro arqueosemiótico sobre ${lugar}.`,
+      informeMarkdown: pureMarkdown,
+      excerpt: `Informe geohistórico y etnográfico sobre ${lugar}.`,
+      saberMasDato: `Tradición etnográfica local documentada en ${lugar}.`
+    };
+  }
+}
+
 export const POST: APIRoute = async ({ request }) => {
   const headers = { 'Content-Type': 'application/json' };
   let body: any = {};
@@ -51,24 +103,20 @@ Devolvé ESTRICTAMENTE un JSON válido con esta estructura exacta (sin texto fue
     const rawText = response.text?.trim() || '';
     if (!rawText) throw new Error('Gemini 3.1 Pro no devolvió contenido para la georreferencia.');
 
-    let parsed: any = {};
-    try {
-      parsed = JSON.parse(rawText);
-    } catch (e) {
-      parsed = {
-        titulosSugeridos: [`${lugar}: Cartografía Arqueosemiótica`, `${lugar}: El Secreto Geohistórico`],
-        volantaHook: `Georreferencia Arqueosemiótica e investigación geohistórica sobre ${lugar}.`,
-        informeMarkdown: rawText,
-        excerpt: `Informe geohistórico y etnográfico sobre ${lugar}.`,
-        saberMasDato: `Tradición etnográfica local documentada en las inmediaciones de ${lugar}.`
-      };
+    const parsed = sanitizeAndParseJson(rawText, lugar);
+
+    // Asegurar que informeMarkdown sea exclusivamente texto markdown limpio
+    let cleanInforme = parsed.informeMarkdown || '';
+    if (cleanInforme.trim().startsWith('{') && cleanInforme.includes('informeMarkdown')) {
+      const nested = sanitizeAndParseJson(cleanInforme, lugar);
+      cleanInforme = nested.informeMarkdown || cleanInforme;
     }
 
     return new Response(JSON.stringify({
       success: true,
       titulosSugeridos: Array.isArray(parsed.titulosSugeridos) ? parsed.titulosSugeridos : [`${lugar}: El Códice de la Piedra`],
       volantaHook: parsed.volantaHook || '',
-      informeMarkdown: parsed.informeMarkdown || rawText,
+      informeMarkdown: cleanInforme,
       excerpt: parsed.excerpt || '',
       saberMasDato: parsed.saberMasDato || ''
     }), { status: 200, headers });

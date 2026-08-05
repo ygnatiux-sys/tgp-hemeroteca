@@ -12,8 +12,12 @@ import {
 
 // ─── CARGA Y FILTRADO ────────────────────────────────────────────────────────
 const allEssaysRaw = await getCollection('ensayos').catch(() => []);
+const allArquetiposRaw = await getCollection('arquetiposGlobales').catch(() => []);
 const isProd = import.meta.env.PROD;
-const publishable = getPublishableEssays(allEssaysRaw, isProd);
+const publishable = [
+  ...getPublishableEssays(allEssaysRaw, isProd),
+  ...getPublishableEssays(allArquetiposRaw, isProd)
+];
 
 // ─── TODAS LAS COLECCIONES TEMÁTICAS (≥ 1 ARTÍCULO) ──────────────────────────
 const categoryGroups = groupByCategory(publishable, 1);

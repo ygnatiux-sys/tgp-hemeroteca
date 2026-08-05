@@ -88,7 +88,49 @@ const georreferencias = defineCollection({
     coverImage: z.string().optional().nullable().catch(null),
     bancoImagenesWikimedia: z.string().optional().nullable().catch(null),
     excerpt: z.string().optional().nullable().catch("Sin descripción disponible."),
+    generadorGeoref: z.string().optional().nullable().catch(null),
   })
+});
+
+const georreferenciasContent = defineCollection({
+  loader: glob({ 
+    pattern: "**/content.mdoc", 
+    base: "src/content/georreferencias" 
+  }),
+});
+
+const arquetiposGlobales = defineCollection({
+  loader: glob({ 
+    pattern: "**/index.json", 
+    base: "src/content/arquetipos-globales" 
+  }),
+  schema: z.object({
+    title: z.string().optional().catch("Sin Título"),
+    volanta: z.string().optional().nullable().catch(null),
+    draft: z.boolean().default(false),
+    date: z.string().optional().nullable().catch(null),
+    category: z.string().optional().nullable().catch("Arquetipos Globales"),
+    themeColor: z.string().optional().nullable().default('rust-orange'),
+    coverImage: z.string().optional().nullable().catch(null),
+    videoBg: z.string().optional().nullable().catch(null),
+    excerpt: z.string().optional().nullable().catch("Sin descripción disponible."),
+    sitioGeohistorico: z.string().optional().nullable().catch(null),
+    publicarConImagen: z.boolean().default(true),
+    generador: z.string().optional().default(''),
+    generadorTexto: z.string().optional().nullable().catch(null),
+    bancoImagenesWikimedia: z.string().optional().nullable().catch(null),
+    generadorImagen: z.string().optional().nullable().catch(null),
+    notasInvestigador: z.string().optional().nullable().catch(null),
+    spotifyLink: z.string().optional().nullable().catch(null),
+    youtubeLink: z.string().optional().nullable().catch(null),
+  })
+});
+
+const arquetiposGlobalesContent = defineCollection({
+  loader: glob({ 
+    pattern: "**/content.mdoc", 
+    base: "src/content/arquetipos-globales" 
+  }),
 });
 
 export const collections = {
@@ -96,4 +138,7 @@ export const collections = {
   ensayosContent,
   direccionArte,
   georreferencias,
+  georreferenciasContent,
+  arquetiposGlobales,
+  arquetiposGlobalesContent,
 };

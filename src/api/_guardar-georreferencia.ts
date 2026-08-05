@@ -4,18 +4,61 @@ import path from 'path';
 
 export const prerender = false;
 
+function unnestJsonIfPresent(rawText: string) {
+  if (!rawText || typeof rawText !== 'string') return null;
+  const trimmed = rawText.trim();
+  if (trimmed.startsWith('{') && (trimmed.includes('"informeMarkdown"') || trimmed.includes('"volantaHook"') || trimmed.includes('"content"'))) {
+    try {
+      return JSON.parse(trimmed);
+    } catch (e) {
+      // Regex extraction fallback
+      const extract = (field: string) => {
+        const match = trimmed.match(new RegExp(`"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*})`));
+        return match ? match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : null;
+      };
+      return {
+        informeMarkdown: extract('informeMarkdown'),
+        volantaHook: extract('volantaHook'),
+        excerpt: extract('excerpt'),
+        saberMasDato: extract('saberMasDato')
+      };
+    }
+  }
+  return null;
+}
+
 export const POST: APIRoute = async ({ request }) => {
   const headers = { 'Content-Type': 'application/json' };
 
   try {
     const body = await request.json();
-    const { slug, title, content, volantaHook, saberMasDato, sitioGeohistorico, excerpt, category, imageUrl, publicarConImagen, bancoImagenesWikimedia } = body;
+    let { slug, title, content, volantaHook, saberMasDato, sitioGeohistorico, excerpt, category, imageUrl, publicarConImagen, bancoImagenesWikimedia, generadorGeoref } = body;
 
     if (!slug || typeof slug !== 'string' || slug.trim() === '') {
       return new Response(JSON.stringify({ 
         error: 'Se requiere un slug válido para la georreferencia.',
         skipped: true 
       }), { status: 400, headers });
+    }
+
+    // Unnesting preventivo si el contenido venía como un payload JSON de Gemini
+    const unnestedFromContent = unnestJsonIfPresent(content) || unnestJsonIfPresent(generadorGeoref);
+    if (unnestedFromContent) {
+      if (unnestedFromContent.informeMarkdown || unnestedFromContent.content) {
+        content = unnestedFromContent.informeMarkdown || unnestedFromContent.content;
+      }
+      if (!volantaHook && unnestedFromContent.volantaHook) {
+        volantaHook = unnestedFromContent.volantaHook;
+      }
+      if (!saberMasDato && unnestedFromContent.saberMasDato) {
+        saberMasDato = unnestedFromContent.saberMasDato;
+      }
+      if (!excerpt && unnestedFromContent.excerpt) {
+        excerpt = unnestedFromContent.excerpt;
+      }
+      if (!sitioGeohistorico && unnestedFromContent.sitioGeohistorico) {
+        sitioGeohistorico = unnestedFromContent.sitioGeohistorico;
+      }
     }
 
     const contentDirPath = path.join(process.cwd(), 'src', 'content', 'georreferencias', slug);
@@ -88,7 +131,8 @@ export const POST: APIRoute = async ({ request }) => {
       draft: existingData.draft ?? false,
       coverImage: finalCoverImage,
       bancoImagenesWikimedia: bancoImagenesWikimedia !== undefined ? bancoImagenesWikimedia : (existingData.bancoImagenesWikimedia || null),
-      excerpt: excerpt || existingData.excerpt || ''
+      excerpt: excerpt || existingData.excerpt || '',
+      generadorGeoref: (typeof content === 'string' && content.trim().length > 0) ? content.trim() : (existingData.generadorGeoref || '')
     };
 
     fs.writeFileSync(jsonFilePath, JSON.stringify(updatedData, null, 2), 'utf-8');

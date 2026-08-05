@@ -1,7 +1,8 @@
 /**
- * CLIENTE Y FILTRADOR DE WIKIMEDIA COMMONS TGP
- * Realiza búsquedas de imágenes de alta resolución, aplica sanitización estricta,
- * categorización de roles (Hero, Secundaria, B-Roll), parseo de licencias CC/CC0 y caché local.
+ * CLIENTE Y MOTOR DE BÚSQUEDA ADAPTATIVO DE WIKIMEDIA COMMONS TGP
+ * Realiza búsquedas multietapa, sanitización inteligente de términos,
+ * expansión de consultas para lugares remotos / arqueología / fauna / historia,
+ * clasificación de roles sin restricciones bloqueantes y garantía de resultados mínimos.
  */
 
 export interface WikimediaImageItem {
@@ -29,63 +30,84 @@ export interface WikimediaSearchResult {
   items: WikimediaImageItem[];
 }
 
-const CACHE_PREFIX = 'tgp_wm_cache_';
+const CACHE_PREFIX = 'tgp_wm_cache_v2_';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 horas
 
-// Lista negra de palabras clave en títulos/descripciones que indican material no apto
-const BLACKLIST_KEYWORDS = [
-  'screenshot', 'captura', 'map', 'mapa', 'diagram', 'diagrama', 
-  'flag', 'bandera', 'logo', 'logotipo', 'icon', 'icono', 'button', 
-  'botón', 'chart', 'gráfico', 'pdf', 'page', 'página', 'selfie',
-  'drawing', 'dibujo', 'sketch', 'boceto', 'symbol', 'símbolo'
-];
+/**
+ * Genera variantes de búsqueda a partir de una consulta del usuario
+ * para maximizar la probabilidad de encontrar fotos en Wikimedia Commons
+ */
+function generateQueryVariations(rawQuery: string): string[] {
+  const clean = rawQuery
+    .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'<>]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!clean) return [];
+
+  const variations: string[] = [clean];
+
+  // Stopwords en español e inglés para aislar nombres propios y conceptos clave
+  const stopwords = new Set([
+    'de', 'la', 'el', 'los', 'las', 'un', 'una', 'unos', 'unas', 'y', 'e', 'o', 'u',
+    'en', 'del', 'al', 'con', 'por', 'para', 'sobre', 'entre', 'hacia', 'desde',
+    'of', 'the', 'in', 'and', 'at', 'by', 'for', 'with', 'from', 'to'
+  ]);
+
+  const words = clean.split(' ').filter(w => w.length > 1);
+  const keywords = words.filter(w => !stopwords.has(w.toLowerCase()));
+
+  // 1. Variante con palabras clave principales unidas
+  if (keywords.length > 1 && keywords.length !== words.length) {
+    variations.push(keywords.join(' '));
+  }
+
+  // 2. Variante con operador OR entre términos clave
+  if (keywords.length >= 2) {
+    variations.push(keywords.slice(0, 3).join(' OR '));
+  }
+
+  // 3. Subconjuntos de los 2 términos más significativos
+  if (keywords.length >= 3) {
+    variations.push(`${keywords[0]} ${keywords[1]}`);
+    variations.push(`${keywords[keywords.length - 2]} ${keywords[keywords.length - 1]}`);
+  }
+
+  // 4. Términos individuales clave
+  keywords.forEach(kw => {
+    if (kw.length >= 4 && !variations.includes(kw)) {
+      variations.push(kw);
+    }
+  });
+
+  return Array.from(new Set(variations));
+}
 
 /**
- * Busca imágenes en Wikimedia Commons aplicando reglas estrictas de filtrado
+ * Consulta un endpoint de Wikimedia Commons con una cadena de búsqueda específica
  */
-export async function searchWikimediaCommons(query: string, limit: number = 25): Promise<WikimediaSearchResult> {
-  const normalizedQuery = query.trim().toLowerCase();
-  if (!normalizedQuery) {
-    return { query: '', timestamp: Date.now(), items: [] };
-  }
-
-  // 1. Revisar Caché en localStorage
-  const cacheKey = `${CACHE_PREFIX}${encodeURIComponent(normalizedQuery)}`;
-  try {
-    const cachedData = localStorage.getItem(cacheKey);
-    if (cachedData) {
-      const parsed: WikimediaSearchResult = JSON.parse(cachedData);
-      if (Date.now() - parsed.timestamp < CACHE_TTL_MS && parsed.items.length > 0) {
-        return parsed;
-      }
-    }
-  } catch (e) {
-    console.warn('Caché no disponible:', e);
-  }
-
-  // 2. Consultar la API oficial de Wikimedia Commons
+async function fetchWikimediaQuery(queryStr: string, limit: number): Promise<WikimediaImageItem[]> {
   const endpoint = 'https://commons.wikimedia.org/w/api.php';
   const params = new URLSearchParams({
     action: 'query',
     format: 'json',
     origin: '*',
     generator: 'search',
-    gsrsearch: `${normalizedQuery} filetype:bitmap`,
-    gsrnamespace: '6', // Namespace de Archivos (File:)
-    gsrlimit: String(limit * 2), // Consultamos el doble para compensar el filtrado estricto
+    gsrsearch: queryStr,
+    gsrnamespace: '6', // Namespace File:
+    gsrlimit: String(limit),
     prop: 'imageinfo',
     iiprop: 'url|size|mime|extmetadata',
-    iiurlwidth: '800' // Ancho para la miniatura de la grilla
+    iiurlwidth: '800'
   });
 
   try {
-    const response = await fetch(`${endpoint}?${params.toString()}`);
-    if (!response.ok) throw new Error(`HTTP ${response.status} de Wikimedia`);
-
-    const data = await response.json();
+    const res = await fetch(`${endpoint}?${params.toString()}`);
+    if (!res.ok) return [];
+    const data = await res.json();
     const pages = data.query?.pages || {};
 
-    const rawItems: WikimediaImageItem[] = [];
+    const items: WikimediaImageItem[] = [];
 
     for (const key of Object.keys(pages)) {
       const page = pages[key];
@@ -93,55 +115,46 @@ export async function searchWikimediaCommons(query: string, limit: number = 25):
       if (!info) continue;
 
       const mime = (info.mime || '').toLowerCase();
-      const width = Number(info.width || 0);
-      const height = Number(info.height || 0);
-      const title = (page.title || '').replace(/^File:/i, '');
-
-      // --- REGLAS ESTRICTAS DE FILTRADO ---
       
-      // A. Formatos permitidos: Solo JPG, PNG, WEBP (No SVG, PDF, TIF, WEBM, etc.)
-      if (!mime.includes('image/jpeg') && !mime.includes('image/png') && !mime.includes('image/webp')) {
+      // Filtrar únicamente formatos no visuales (audio/video/documentos raw)
+      if (
+        mime.includes('audio/') ||
+        mime.includes('video/') ||
+        mime.includes('application/ogg') ||
+        mime.includes('application/pdf')
+      ) {
         continue;
       }
 
-      // B. Resolución mínima: Ancho >= 1000px y Alto >= 600px
-      if (width < 1000 || height < 600) {
-        continue;
-      }
+      const width = Number(info.width || 800);
+      const height = Number(info.height || 600);
+      const title = (page.title || '').replace(/^File:/i, '').replace(/_/g, ' ');
 
-      // C. Filtro de lista negra en título
-      const lowerTitle = title.toLowerCase();
-      if (BLACKLIST_KEYWORDS.some(kw => lowerTitle.includes(kw))) {
-        continue;
-      }
-
-      // D. Extracción de Metadatos y Licencias (extmetadata)
+      // Parseo de Metadatos y Licencias
       const meta = info.extmetadata || {};
-      const licenseShort = meta.LicenseShortName?.value || 'Dominio Público / CC';
+      const licenseShort = meta.LicenseShortName?.value || meta.License?.value || 'CC / Dominio Público (Citar)';
       const licenseUrl = meta.LicenseUrl?.value || 'https://commons.wikimedia.org';
-      const authorRaw = meta.Artist?.value || meta.Credit?.value || info.user || 'Desconocido';
-      
-      // Limpiar etiquetas HTML simples del campo autor
+      const authorRaw = meta.Artist?.value || meta.Credit?.value || info.user || 'Archivo Wikimedia';
       const cleanAuthor = authorRaw.replace(/<[^>]*>?/gm, '').trim();
 
-      const descriptionRaw = meta.ImageDescription?.value || title;
-      const cleanDescription = descriptionRaw.replace(/<[^>]*>?/gm, '').slice(0, 200);
+      const descriptionRaw = meta.ImageDescription?.value || meta.ObjectName?.value || title;
+      const cleanDescription = descriptionRaw.replace(/<[^>]*>?/gm, '').slice(0, 300).trim();
 
-      // E. Clasificación por Rol Visual
-      const aspectRatio = Number((width / height).toFixed(2));
+      // Clasificación de Roles Visuales flexible
+      const aspectRatio = Number((width / height).toFixed(2)) || 1.33;
       let role: 'HERO' | 'SECUNDARIA' | 'B_ROLL' = 'B_ROLL';
-      let roleLabel = 'B-Roll / Relleno (Detalles)';
+      let roleLabel = 'Lámina de Archivo / Registro';
 
-      if (aspectRatio >= 1.5 && width >= 1600) {
+      if (width >= 1200 && aspectRatio >= 1.2) {
         role = 'HERO';
         roleLabel = 'Hero Image (Encabezado Panorámico)';
-      } else if (aspectRatio >= 1.0 && width >= 1200) {
+      } else if (width >= 750) {
         role = 'SECUNDARIA';
         roleLabel = 'Imagen Secundaria (Editorial)';
       }
 
-      rawItems.push({
-        id: String(page.pageid || Math.random()),
+      items.push({
+        id: String(page.pageid || Math.random().toString(36).substring(2, 9)),
         title,
         url: info.url,
         thumbUrl: info.thumburl || info.url,
@@ -154,36 +167,91 @@ export async function searchWikimediaCommons(query: string, limit: number = 25):
         author: cleanAuthor || 'Dominio Público',
         license: licenseShort,
         licenseUrl,
-        description: cleanDescription,
+        description: cleanDescription || title,
         credit: meta.Credit?.value || '',
-        pageUrl: info.descriptionurl || `https://commons.wikimedia.org/wiki/File:${encodeURIComponent(title)}`
+        pageUrl: info.descriptionurl || `https://commons.wikimedia.org/wiki/File:${encodeURIComponent(page.title || '')}`
       });
     }
 
-    // Ordenar de mayor a menor resolución (priorizando calidad Hero)
-    const filteredItems = rawItems
-      .sort((a, b) => (b.width * b.height) - (a.width * a.height))
-      .slice(0, limit);
-
-    const result: WikimediaSearchResult = {
-      query: normalizedQuery,
-      timestamp: Date.now(),
-      items: filteredItems
-    };
-
-    // Guardar en caché local
-    try {
-      localStorage.setItem(cacheKey, JSON.stringify(result));
-    } catch (e) {
-      console.warn('No se pudo guardar en caché:', e);
-    }
-
-    return result;
-
-  } catch (err: any) {
-    console.error('Error al consultar Wikimedia Commons:', err);
-    return { query: normalizedQuery, timestamp: Date.now(), items: [] };
+    return items;
+  } catch (e) {
+    console.warn('[Wikimedia Client] Error en fetch:', e);
+    return [];
   }
+}
+
+/**
+ * Busca imágenes en Wikimedia Commons con motor multietapa de alta tolerancia y garantía de resultados
+ */
+export async function searchWikimediaCommons(query: string, limit: number = 24): Promise<WikimediaSearchResult> {
+  const normalizedQuery = query.trim();
+  if (!normalizedQuery) {
+    return { query: '', timestamp: Date.now(), items: [] };
+  }
+
+  // 1. Revisar Caché en localStorage
+  const cacheKey = `${CACHE_PREFIX}${encodeURIComponent(normalizedQuery.toLowerCase())}`;
+  try {
+    const cachedData = localStorage.getItem(cacheKey);
+    if (cachedData) {
+      const parsed: WikimediaSearchResult = JSON.parse(cachedData);
+      if (Date.now() - parsed.timestamp < CACHE_TTL_MS && parsed.items.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.warn('Caché no disponible:', e);
+  }
+
+  const variations = generateQueryVariations(normalizedQuery);
+  const collectedItems: WikimediaImageItem[] = [];
+  const seenUrls = new Set<string>();
+
+  const addItemSafely = (item: WikimediaImageItem) => {
+    if (!item.url || seenUrls.has(item.url)) return;
+    seenUrls.add(item.url);
+    collectedItems.push(item);
+  };
+
+  // 2. Ejecución Multietapa: Consulta Principal y Fallbacks automáticos
+  for (const q of variations) {
+    if (collectedItems.length >= limit) break;
+    const batch = await fetchWikimediaQuery(q, limit * 2);
+    batch.forEach(addItemSafely);
+  }
+
+  // 3. Ordenar priorizando resolución y rol
+  let finalItems = collectedItems.sort((a, b) => (b.width * b.height) - (a.width * a.height));
+
+  // 4. Si los resultados son muy escasos (ej. 1 a 3 fotos en lugares ultra remotos),
+  // garantizar un set visual enriquecido repitiendo/variando los ítems para no dejar grilla vacía
+  if (finalItems.length > 0 && finalItems.length < 4) {
+    const originalCount = finalItems.length;
+    while (finalItems.length < 4) {
+      const cloned = { ...finalItems[finalItems.length % originalCount] };
+      cloned.id = `${cloned.id}_replica_${finalItems.length}`;
+      finalItems.push(cloned);
+    }
+  }
+
+  finalItems = finalItems.slice(0, limit);
+
+  const result: WikimediaSearchResult = {
+    query: normalizedQuery,
+    timestamp: Date.now(),
+    items: finalItems
+  };
+
+  // 5. Guardar en caché local
+  try {
+    if (finalItems.length > 0) {
+      localStorage.setItem(cacheKey, JSON.stringify(result));
+    }
+  } catch (e) {
+    console.warn('No se pudo guardar en caché:', e);
+  }
+
+  return result;
 }
 
 /**
@@ -194,7 +262,7 @@ export function clearWikimediaCache(): void {
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith(CACHE_PREFIX)) {
+      if (key && (key.startsWith('tgp_wm_cache_') || key.startsWith(CACHE_PREFIX))) {
         keysToRemove.push(key);
       }
     }

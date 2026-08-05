@@ -20,13 +20,15 @@ import {
   splitTitleKeyword,
 } from "../../lib/content-filter";
 import { MagazineFlipGallery } from "../../components/MagazineFlipGallery";
+import { MagazineBookzineGallery } from "../../components/MagazineBookzineGallery";
 
 export const prerender = true;
 export async function getStaticPaths() {
   const essays = await getCollection("ensayos").catch(() => []);
   const georefs = await getCollection("georreferencias").catch(() => []);
+  const arquetipos = await getCollection("arquetiposGlobales").catch(() => []);
 
-  const combined = [...essays, ...georefs];
+  const combined = [...essays, ...georefs, ...arquetipos];
 
   return combined.map((item) => ({
     params: { slug: item.id.replace(/\/index$/, "") },
@@ -38,20 +40,23 @@ const { slug } = Astro.params;
 const { data } = Astro.props;
 const doc = data as any;
 
-// 1. Cargar contenido raw de .mdoc si existe en disco (ensayos y georreferencias)
+// 1. Cargar contenido raw de .mdoc si existe en disco (ensayos, georreferencias y arquetipos globales)
 const rawMdocs = import.meta.glob<string>(
-  ["/src/content/ensayos/**/content.mdoc", "/src/content/georreferencias/**/content.mdoc"],
+  ["/src/content/ensayos/**/content.mdoc", "/src/content/georreferencias/**/content.mdoc", "/src/content/arquetipos-globales/**/content.mdoc"],
   { query: '?raw', import: 'default', eager: true }
 );
 
 const mdocKey = `/src/content/ensayos/${slug}/content.mdoc`;
 const georefMdocKey = `/src/content/georreferencias/${slug}/content.mdoc`;
-const rawMdocText = rawMdocs[mdocKey] || rawMdocs[georefMdocKey] || '';
+const arquetipoMdocKey = `/src/content/arquetipos-globales/${slug}/content.mdoc`;
+const rawMdocText = rawMdocs[mdocKey] || rawMdocs[georefMdocKey] || rawMdocs[arquetipoMdocKey] || '';
 
 // 2. Carga segura del componente Markdoc si existe
 let Content: any = null;
 try {
-  const contentEntry = await getEntry("ensayosContent", `${slug}/content`);
+  const contentEntry = (await getEntry("ensayosContent", `${slug}/content`)) || 
+                       (await getEntry("georreferenciasContent", `${slug}/content`)) || 
+                       (await getEntry("arquetiposGlobalesContent", `${slug}/content`));
   if (contentEntry) {
     const rendered = await render(contentEntry);
     Content = rendered.Content;
@@ -61,13 +66,52 @@ try {
 }
 
 // 3. Resolución universal y resiliente del texto del ensayo
-let finalMarkdownText = '';
+let rawSourceText = '';
 if (rawMdocText && rawMdocText.trim().length > 0) {
-  finalMarkdownText = rawMdocText.trim();
+  rawSourceText = rawMdocText.trim();
+} else if (doc.generadorGeoref && doc.generadorGeoref.trim().length > 0) {
+  rawSourceText = doc.generadorGeoref.trim();
 } else if (doc.generadorTexto && doc.generadorTexto.trim().length > 0) {
-  finalMarkdownText = doc.generadorTexto.trim();
+  rawSourceText = doc.generadorTexto.trim();
 } else if (doc.generador && doc.generador.length > 50) {
-  finalMarkdownText = doc.generador.trim();
+  rawSourceText = doc.generador.trim();
+}
+
+// Desanidado universal si el texto almacenado contenía un payload JSON de Gemini
+let finalMarkdownText = rawSourceText;
+if (rawSourceText.startsWith('{') && (rawSourceText.includes('"informeMarkdown"') || rawSourceText.includes('"content"') || rawSourceText.includes('"volantaHook"'))) {
+  try {
+    const unnested = JSON.parse(rawSourceText);
+    if (unnested.informeMarkdown || unnested.content) {
+      finalMarkdownText = unnested.informeMarkdown || unnested.content;
+    }
+    if (!doc.volantaHook && unnested.volantaHook) {
+      doc.volantaHook = unnested.volantaHook;
+    }
+    if (!doc.volanta && unnested.volanta) {
+      doc.volanta = unnested.volanta;
+    }
+    if (!doc.saberMasDato && unnested.saberMasDato) {
+      doc.saberMasDato = unnested.saberMasDato;
+    }
+    if (!doc.excerpt && unnested.excerpt) {
+      doc.excerpt = unnested.excerpt;
+    }
+    if (!doc.sitioGeohistorico && unnested.sitioGeohistorico) {
+      doc.sitioGeohistorico = unnested.sitioGeohistorico;
+    }
+  } catch (e) {
+    // Regex fallback
+    const extract = (field: string) => {
+      const match = rawSourceText.match(new RegExp(`"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*})`));
+      return match ? match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : null;
+    };
+    const extractedContent = extract('informeMarkdown') || extract('content');
+    if (extractedContent) finalMarkdownText = extractedContent;
+    if (!doc.volantaHook) doc.volantaHook = extract('volantaHook') || '';
+    if (!doc.saberMasDato) doc.saberMasDato = extract('saberMasDato') || '';
+    if (!doc.excerpt) doc.excerpt = extract('excerpt') || '';
+  }
 }
 
 // 4. Procesar HTML y vincular imágenes relativas a los assets procesados de Vite
@@ -401,11 +445,6 @@ const { prefix: heroTitlePrefix, keyword: heroTitleKeyword } = splitTitleKeyword
         })()}
         </div>
 
-        {/* ─── VISOR DE REVISTA / FLIPBOOK AMPLIO Y LUMINOSO ─── */}
-        {allGalleryImages.length > 1 && (
-          <MagazineFlipGallery client:load images={allGalleryImages} title={doc.title} accentColor={activeAccent} />
-        )}
-
         {/* Bento Nota del Autor / Saber Más en Relieve de Papel Pergamino */}
         {doc.saberMasDato && (
           <div class="my-12 p-6 md:p-8 rounded-2xl bg-linear-to-br from-stone-50 via-[#EBE9E1] to-stone-200 border border-stone-300/80 shadow-md dark:from-stone-900 dark:to-stone-950 dark:border-white/10 lg:hidden">
@@ -520,6 +559,11 @@ const { prefix: heroTitlePrefix, keyword: heroTitleKeyword } = splitTitleKeyword
       </aside>
 
     </div>
+
+    {/* ─── MAGAZINEBOOK / BOOKZINE FULL BLEED AL FINALIZAR EL POST Y LAS NOTAS ─── */}
+    {allGalleryImages.length > 0 && (
+      <MagazineBookzineGallery client:load images={allGalleryImages} title={doc.title} accentColor={activeAccent} />
+    )}
 
     <ExploreMore currentSlug={slug!} category={data.category ?? undefined} />
 

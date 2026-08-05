@@ -5,16 +5,21 @@ export const prerender = true;
 
 export const GET: APIRoute = async () => {
   try {
-    const ensayos = await getCollection('ensayos');
-    const items = ensayos.map(e => ({
+    const ensayos = await getCollection('ensayos').catch(() => []);
+    const arquetipos = await getCollection('arquetiposGlobales').catch(() => []);
+    const georefs = await getCollection('georreferencias').catch(() => []);
+
+    const allCombined = [...ensayos, ...arquetipos, ...georefs];
+
+    const items = allCombined.map(e => ({
       id: e.id,
       slug: e.id.replace(/\/index$/, ''),
       title: e.data.title || 'Sin Título',
-      category: e.data.category || 'Historia',
+      category: e.data.category || 'Arquetipos Globales',
       date: e.data.date || '',
       excerpt: e.data.excerpt || '',
       coverImage: e.data.coverImage || null,
-      type: 'Ensayo / Post'
+      type: 'Post / Archivo'
     }));
 
     return new Response(JSON.stringify(items), {

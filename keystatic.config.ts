@@ -1,6 +1,7 @@
 import { config, fields, collection } from '@keystatic/core';
 import { 
   GeneradorTextoTGP, 
+  GeneradorArquetiposTGP,
   MotorArteTGP, 
   ProbadorArteTGP, 
   BuscadorWikimediaTGP,
@@ -138,6 +139,130 @@ export default config({
           images: {
             directory: 'src/assets/ensayos',
             publicPath: '/src/assets/ensayos/'
+          },
+          tables: true,
+          componentBlocks
+        }),
+      },
+    }),
+
+    // Colección: Arquetipos Globales (Clonada de Ensayos con Motor Unificado TGP & Galería Wikimedia)
+    arquetiposGlobales: collection({
+      label: 'Arquetipos Globales',
+      slugField: 'title',
+      path: 'src/content/arquetipos-globales/*/',
+      format: { data: 'json' },
+      schema: {
+        title: fields.slug({ name: { label: 'Título del Arquetipo' } }),
+        
+        volanta: fields.text({
+          label: 'Volanta (Subtítulo o contexto de lectura)',
+          description: 'Aparecerá en tipografía Mono por encima del título principal.',
+        }),
+
+        generador: fields.text({ 
+          label: 'Motor de Generación', 
+          description: 'Identificador del motor de IA utilizado para este post.'
+        }),
+
+        notasInvestigador: fields.text({
+          label: 'Notas del Investigador',
+          description: 'Espacio privado para ideas y borradores antes de la publicación final.',
+          multiline: true
+        }),
+        
+        // FASE 1: Motor de Arquetipos Globales (100% Texto & Sugerencias - Sin Visuales ni Georreferencias)
+        generadorTexto: {
+          kind: 'form',
+          label: '1. Motor de Arquetipos Globales TGP (Informe & Contenido)',
+          Input: GeneradorArquetiposTGP,
+          defaultValue: () => '',
+          parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || '') }),
+          validate: (v: any) => v,
+          reader: {
+            parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          },
+        } as any,
+
+        // FASE 2: Buscador y Selector de Imágenes Wikimedia Commons TGP
+        bancoImagenesWikimedia: {
+          kind: 'form',
+          label: '2. Buscador & Galería de Archivo Wikimedia Commons',
+          Input: BuscadorWikimediaTGP,
+          defaultValue: () => '',
+          parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || '') }),
+          validate: (v: any) => v,
+          reader: {
+            parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          },
+        } as any,
+
+        date: fields.date({ label: 'Fecha' }),
+        
+        category: {
+          kind: 'form',
+          label: 'Categoría / Campo Disciplinar TGP',
+          Input: SelectorCategoriaTGP,
+          defaultValue: () => 'Arquetipos Globales',
+          parse: (v: any) => (typeof v === 'string' ? v : (v?.value || 'Arquetipos Globales')),
+          serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || 'Arquetipos Globales') }),
+          validate: (v: any) => v,
+          reader: {
+            parse: (v: any) => (typeof v === 'string' ? v : (v?.value || 'Arquetipos Globales')),
+          },
+        } as any,
+
+        themeColor: fields.select({
+          label: 'Theme Color',
+          options: [
+            { label: 'British Green', value: 'british-green' },
+            { label: 'Bordeaux', value: 'bordeaux' },
+            { label: 'Old Navy', value: 'old-navy' },
+            { label: 'Bus Red', value: 'bus-red' },
+            { label: 'Vintage Yellow', value: 'vintage-yellow' },
+            { label: 'Rust Orange', value: 'rust-orange' },
+          ],
+          defaultValue: 'rust-orange',
+        }),
+
+        sitioGeohistorico: fields.text({
+          label: 'Lugar Geohistórico / Origen Mitológico',
+          description: 'Ej: Eleusis (Grecia), Alejandría (Egipto), Babilonia (Mesopotamia)',
+        }),
+
+        publicarConImagen: fields.checkbox({
+          label: 'Publicar con Imagen de Portada (Toggle)',
+          description: 'Marca este casillero para publicar con imagen. Desmárcalo para publicar en modo puramente textual.',
+          defaultValue: true
+        }),
+
+        draft: fields.checkbox({ 
+          label: 'Borrador', 
+          description: 'Si está marcado, no se publicará en producción',
+          defaultValue: false 
+        }),
+
+        coverImage: fields.image({ 
+          label: 'Imagen de Portada (Opcional)', 
+          directory: 'src/assets/arquetipos-globales', 
+          publicPath: '/src/assets/arquetipos-globales/' 
+        }),
+
+        videoBg: fields.text({ label: 'URL del Video Cinemagraph' }),
+        spotifyLink: fields.url({ label: 'Link de Spotify Podcast (Opcional)' }),
+        youtubeLink: fields.url({ label: 'Link de YouTube Podcast (Opcional)' }),
+        excerpt: fields.text({ label: 'Excerpt (Sinopsis / Cita Filosofica 2-4 Renglones)', multiline: true }),
+
+        content: fields.document({
+          label: 'Contenido',
+          formatting: true,
+          dividers: true,
+          links: true,
+          images: {
+            directory: 'src/assets/arquetipos-globales',
+            publicPath: '/src/assets/arquetipos-globales/'
           },
           tables: true,
           componentBlocks

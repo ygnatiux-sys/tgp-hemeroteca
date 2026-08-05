@@ -30,6 +30,7 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
     options: [
       'Deep History',
       'Arqueosemiótica',
+      'Arquetipos Globales',
       'Neurognosis',
       'Palimpsesto',
       'Convergencias Simbólicas',
