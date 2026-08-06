@@ -1,0 +1,57 @@
+---
+// src/components/VisorPanoramico.astro
+
+interface ImageRecord {
+  url: string;
+  alt: string;
+  metadata: string;
+}
+
+interface Props {
+  images: ImageRecord[];
+}
+
+const { images } = Astro.props;
+---
+
+<div class="w-full flex flex-col">
+  {/* Contenedor del Visor - Full Bleed */}
+  <div class="relative w-full h-[70vh] md:h-[85vh] bg-black">
+    <div class="flex w-full h-full overflow-x-auto snap-x snap-mandatory scrollbar-hide">
+      {images.map((image, index) => (
+        <div class="relative flex-none w-full h-full snap-center bg-zinc-900">
+          <img 
+            src={image.url} 
+            alt={image.alt} 
+            loading="lazy"
+            class="w-full h-full object-cover"
+          />
+          {/* Metadata superpuesta sutilmente abajo */}
+          <div class="absolute bottom-4 left-6 pointer-events-none">
+             <span class="font-sans text-[10px] md:text-xs text-white/40 tracking-widest font-thin uppercase">
+               {index + 1} / {images.length} — {image.metadata}
+             </span>
+          </div>
+        </div>
+      ))}
+    </div>
+    
+    {/* Indicadores visuales sutiles de scroll */}
+    <div class="absolute top-1/2 left-4 -translate-y-1/2 pointer-events-none opacity-20">
+      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 19l-7-7 7-7"></path></svg>
+    </div>
+    <div class="absolute top-1/2 right-4 -translate-y-1/2 pointer-events-none opacity-20">
+      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5l7 7-7 7"></path></svg>
+    </div>
+  </div>
+</div>
+
+<style>
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>

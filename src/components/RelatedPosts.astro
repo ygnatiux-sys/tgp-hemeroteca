@@ -1,0 +1,60 @@
+---
+// src/components/RelatedPosts.astro
+import type { CollectionEntry } from 'astro:content';
+
+/**
+ * A utility function to truncate text to a specified length,
+ * preserving whole words.
+ * @param text The string to truncate.
+ * @param length The approximate maximum length of the string.
+ * @returns The truncated string with an ellipsis if it was shortened.
+ */
+function truncate(text: string | null | undefined, length: number = 120): string {
+  if (!text) {
+    return '';
+  }
+  if (text.length <= length) {
+    return text;
+  }
+  // Trim to the last space before the character limit
+  const trimmedString = text.substring(0, length);
+  return trimmedString.substring(0, Math.min(trimmedString.length, trimmedString.lastIndexOf(" "))) + "...";
+}
+
+interface Props {
+  posts: CollectionEntry<'ensayos'>[];
+}
+
+const { posts } = Astro.props;
+---
+<!-- Only render the section if there are posts to display -->
+{posts && posts.length > 0 && (
+  <aside class="mt-16 md:mt-24 border-t border-white/10 pt-8">
+    <h2 class="font-mono text-sm uppercase tracking-widest text-white/50 mb-8">
+      Continuar Explorando
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {posts.map((post: CollectionEntry<'ensayos'>) => (
+        <a href={`/hemeroteca/${post.id.replace(/\/index$/, '')}`} class="group block p-4 -m-4 rounded-lg transition-colors duration-300 hover:bg-white/5">
+          <div class="flex flex-col h-full">
+            {post.data.coverImage && (
+              <div class="aspect-video w-full overflow-hidden rounded-md mb-4 border border-white/10">
+                <img 
+                  src={post.data.coverImage} 
+                  alt={`Cover image for ${post.data.title}`}
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                />
+              </div>
+            )}
+            <p class="font-mono text-xs text-white/40 tracking-wider uppercase">{post.data.category || 'Ensayo'}</p>
+            <h3 class="font-serif text-2xl mt-2 text-white/80 group-hover:text-white transition-colors duration-300">{post.data.title}</h3>
+            <p class="font-sans text-sm text-white/60 mt-3 grow">{truncate(post.data.excerpt)}</p>
+            <div class="mt-4 font-mono text-xs text-white/50 group-hover:text-white transition-colors duration-300">
+              Leer más →
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </aside>
+)}
