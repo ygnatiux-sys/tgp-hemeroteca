@@ -2,9 +2,25 @@
 // Header Component Institucional (Dark Academia Premium)
 import { BuscadorModal } from './BuscadorModal';
 import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  /** En home: fondo transparente al tope; sólido + blur tras 50px */
+  transparentUntilScroll?: boolean;
+}
+
+const { transparentUntilScroll = false } = Astro.props;
 ---
 
-<header class="fixed top-0 w-full z-100 bg-(--header-bg) backdrop-blur-xl border-b border-(--header-border) transition-all duration-700 shadow-xs">
+<header
+  id="site-header"
+  data-transparent-until-scroll={transparentUntilScroll ? 'true' : 'false'}
+  class:list={[
+    'fixed top-0 w-full z-50 transition-all duration-700',
+    transparentUntilScroll
+      ? 'bg-transparent border-b border-transparent'
+      : 'bg-(--header-bg) backdrop-blur-xl border-b border-(--header-border) shadow-xs',
+  ]}
+>
   <div class="max-w-400 mx-auto px-6 md:px-10 lg:px-14 py-4 md:py-5 lg:py-5.5 flex justify-between items-center gap-8 md:gap-16 lg:gap-24 xl:gap-32">
     <div class="flex items-center shrink-0">
       <a href="/" class="group flex flex-row items-center gap-4" title="The Great Puzzle Project">
@@ -69,3 +85,65 @@ import ThemeToggle from './ThemeToggle.astro';
     </div>
   </div>
 </header>
+
+{transparentUntilScroll && (
+  <script>
+    const SCROLLED_CLASSES = ['is-scrolled', 'backdrop-blur-md', 'bg-black/90', 'border-white/10'];
+    const TOP_CLASSES = ['bg-transparent', 'border-transparent'];
+
+    let headerScrollHandler: (() => void) | null = null;
+
+    const setupHeaderScroll = () => {
+      const header = document.getElementById('site-header');
+      if (!header || header.dataset.transparentUntilScroll !== 'true') return;
+
+      if (headerScrollHandler) {
+        window.removeEventListener('scroll', headerScrollHandler);
+      }
+
+      headerScrollHandler = () => {
+        if (window.scrollY > 50) {
+          header.classList.add(...SCROLLED_CLASSES);
+          header.classList.remove(...TOP_CLASSES);
+        } else {
+          header.classList.remove(...SCROLLED_CLASSES);
+          header.classList.add(...TOP_CLASSES);
+        }
+      };
+
+      window.addEventListener('scroll', headerScrollHandler, { passive: true });
+      headerScrollHandler();
+    };
+
+    document.addEventListener('DOMContentLoaded', setupHeaderScroll);
+    document.addEventListener('astro:page-load', setupHeaderScroll);
+  </script>
+)}
+
+<style>
+  /* Sobre el hero cinemático: forzar tipografía clara aunque el tema sea light */
+  #site-header[data-transparent-until-scroll='true'] {
+    background-color: transparent !important;
+    border-bottom-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #site-header[data-transparent-until-scroll='true'].is-scrolled {
+    background-color: rgba(0, 0, 0, 0.9) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  [data-theme='light'] #site-header[data-transparent-until-scroll='true'] .header-brand-title,
+  [data-theme='light'] #site-header[data-transparent-until-scroll='true'] .header-nav-link,
+  [data-theme='light'] #site-header[data-transparent-until-scroll='true'] .header-btn-codice,
+  [data-theme='light'] #site-header[data-transparent-until-scroll='true'] .header-action-btn {
+    color: #F5F5F7 !important;
+  }
+
+  [data-theme='light'] #site-header[data-transparent-until-scroll='true'] .header-action-btn svg {
+    stroke: #F5F5F7 !important;
+    color: #F5F5F7 !important;
+  }
+</style>

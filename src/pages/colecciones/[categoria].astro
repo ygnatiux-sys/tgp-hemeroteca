@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
+import InteriorHero from '../../components/InteriorHero.astro';
 import {
   getPublishableEssays,
   groupByCategory,
@@ -35,6 +36,12 @@ const resolvedEssays = essays.map((e: typeof essays[0]) => ({
   img: resolveEssayImage(e.entry.coverImage, e.slug),
 }));
 
+const coverImage = resolvedEssays[0]?.img ?? null;
+const coverPosition =
+  (resolvedEssays[0]?.entry as any)?.coverImagePosition
+  || (resolvedEssays[0]?.entry as any)?.imagePosition
+  || 'center center';
+
 // ─── HELPER PARA SECUENCIAS CINE PREMIER (1 HERO FULL + DÚO 60/40) ──────────
 function createPremierSequences(items: typeof resolvedEssays) {
   const sequences: Array<{
@@ -55,35 +62,32 @@ const sequences = createPremierSequences(resolvedEssays);
 ---
 
 <Layout title={`${label} | Colecciones TGP`}>
-  <div class="bg-theme-dark text-white min-h-screen pb-32">
+  <div class="bg-black text-white min-h-screen pb-32">
 
-    {/* ═══════════════════════════════════════════════════════════════════
-        HERO INSTITUCIONAL DE COLECCIÓN
-    ═══════════════════════════════════════════════════════════════════ */}
-    <header class="relative w-full pt-28 pb-10 px-6 md:px-12 lg:px-24 overflow-hidden border-b border-white/10">
-      <div class="max-w-360 mx-auto">
-        <nav class="mb-4 flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
-          <a href="/" class="hover:text-white transition-colors">Hemeroteca</a>
-          <span>/</span>
-          <a href="/colecciones" class="hover:text-white transition-colors">Colecciones</a>
-          <span>/</span>
-          <span class="text-[#C8A98B]">{label}</span>
-        </nav>
-
-        <h1 class="text-5xl md:text-7xl lg:text-8xl font-cinzel font-extrabold tracking-tight leading-none mb-4 gradient-acero-ios drop-shadow-2xl">
-          {label}
-        </h1>
-
-        <div class="flex items-center gap-4 flex-wrap">
-          <span class="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/15 font-mono text-[10px] uppercase tracking-[0.3em] text-[#C8A98B] font-bold">
-            {essays.length} {essays.length === 1 ? 'investigación documentada' : 'investigaciones documentadas'}
-          </span>
-          <span class="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40">
-            Cartografía Epistémica · Archivo Especializado
-          </span>
-        </div>
+    <InteriorHero
+      title={label}
+      image={coverImage}
+      imageAlt={`Colección ${label}`}
+      imagePosition={coverPosition}
+      eyebrow="Colección temática"
+      titleClass="text-5xl md:text-6xl lg:text-7xl font-cinzel font-extrabold tracking-tight leading-none gradient-acero-ios"
+    >
+      <nav slot="breadcrumb" class="flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
+        <a href="/" class="hover:text-white transition-colors">Hemeroteca</a>
+        <span>/</span>
+        <a href="/colecciones" class="hover:text-white transition-colors">Colecciones</a>
+        <span>/</span>
+        <span class="text-[#C8A98B]">{label}</span>
+      </nav>
+      <div slot="meta" class="flex items-center gap-4 flex-wrap">
+        <span class="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/15 font-mono text-[10px] uppercase tracking-[0.3em] text-[#C8A98B] font-bold">
+          {essays.length} {essays.length === 1 ? 'investigación documentada' : 'investigaciones documentadas'}
+        </span>
+        <span class="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40">
+          Cartografía Epistémica · Archivo Especializado
+        </span>
       </div>
-    </header>
+    </InteriorHero>
 
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-16 pt-12 md:pt-16">
 

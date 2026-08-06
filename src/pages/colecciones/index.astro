@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
+import InteriorHero from '../../components/InteriorHero.astro';
 import {
   getPublishableEssays,
   groupByCategory,
@@ -39,6 +40,12 @@ const collections = Array.from(categoryGroups.entries())
   })
   .sort((a, b) => b.count - a.count);
 
+const indexCover = collections[0]?.coverEssay?.img ?? null;
+const indexCoverPosition =
+  (collections[0]?.coverEssay?.entry as any)?.coverImagePosition
+  || (collections[0]?.coverEssay?.entry as any)?.imagePosition
+  || 'center center';
+
 // ─── HELPER PARA SECUENCIAS CINE PREMIER (1 HERO FULL + DÚO 60/40) ──────────
 function createPremierSequences(essays: any[]) {
   const sequences: Array<{
@@ -57,27 +64,23 @@ function createPremierSequences(essays: any[]) {
 ---
 
 <Layout title="Colecciones | The Great Puzzle Project">
-  <div class="bg-theme-dark text-white min-h-screen pt-28 pb-32">
-    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16">
+  <div class="bg-black text-white min-h-screen pb-32">
 
-      {/* ═══════════════════════════════════════════════════════════════════
-          CABECERA
-      ═══════════════════════════════════════════════════════════════════ */}
-      <header class="border-l border-[#C8A98B]/40 pl-6 md:pl-10">
-        <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-2">The Great Puzzle Project</span>
-        <h1 class="text-5xl md:text-6xl lg:text-7xl font-cinzel font-extrabold tracking-tight leading-none bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-md">
-          Colecciones
-        </h1>
-        <div class="reveal-item flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 mt-4">
-          <p class="h2-thin-hook font-outfit uppercase tracking-[0.15em] text-white/60 text-xs md:text-sm">
-            Organización temática del archivo de investigaciones
-          </p>
-          <div class="h-px w-12 bg-white/15 hidden sm:block" />
-          <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-[#C8A98B] font-bold">
-            {collections.length} {collections.length === 1 ? 'colección' : 'colecciones'} · {publishable.length} dossiers
-          </p>
-        </div>
-      </header>
+    <InteriorHero
+      title="Colecciones"
+      image={indexCover}
+      imageAlt="Colecciones del archivo TGP"
+      imagePosition={indexCoverPosition}
+      eyebrow="The Great Puzzle Project"
+      subtitle="Organización temática del archivo de investigaciones"
+      titleClass="text-5xl md:text-6xl lg:text-7xl font-cinzel font-extrabold tracking-tight leading-none gradient-acero-ios"
+    >
+      <div slot="meta" class="font-mono text-[10px] uppercase tracking-[0.3em] text-[#C8A98B] font-bold">
+        {collections.length} {collections.length === 1 ? 'colección' : 'colecciones'} · {publishable.length} dossiers
+      </div>
+    </InteriorHero>
+
+    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">
 
       {/* BANNER DESTACADO: SITIOS GEOHISTÓRICOS */}
       <section class="reveal-item">

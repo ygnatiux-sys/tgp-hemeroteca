@@ -7,9 +7,16 @@ interface Props {
 	title?: string;
 	hideHeader?: boolean;
 	footerVariant?: 'full' | 'minimal';
+	/** Home cinematográfico: nav transparente al tope, sólido tras 50px de scroll */
+	headerTransparentUntilScroll?: boolean;
 }
 
-const { title = "Hemeroteca TGP", hideHeader = false, footerVariant = 'full' } = Astro.props;
+const {
+	title = "Hemeroteca TGP",
+	hideHeader = false,
+	footerVariant = 'full',
+	headerTransparentUntilScroll = false,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -41,7 +48,7 @@ const { title = "Hemeroteca TGP", hideHeader = false, footerVariant = 'full' } =
 		<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Gloock&family=Inter:wght@400;500;600;700;800;900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 	</head>
 	<body class="bg-(--bg-main) text-(--text-body) antialiased transition-colors duration-400 flex flex-col min-h-screen">
-		{!hideHeader && <Header />}
+		{!hideHeader && <Header transparentUntilScroll={headerTransparentUntilScroll} />}
 		<main class="grow relative">
 			<slot />
 		</main>

@@ -1,0 +1,135 @@
+---
+/**
+ * Hero secundario widescreen para páginas interiores (colecciones / posts).
+ * Diferenciado del Hero 100vh de home: banda panorámica nítida + tipografía sobre fondo sólido.
+ */
+import { Image } from 'astro:assets';
+
+interface Props {
+  title: string;
+  image?: ImageMetadata | null;
+  imageAlt?: string;
+  imagePosition?: string;
+  /** Kicker mono (categoría, sección) */
+  eyebrow?: string;
+  /** Subtítulo / volanta / excerpt */
+  subtitle?: string;
+  /** Clase extra del H1 (p. ej. tamaño) */
+  titleClass?: string;
+}
+
+const {
+  title,
+  image = null,
+  imageAlt,
+  imagePosition = 'center center',
+  eyebrow,
+  subtitle,
+  titleClass = 'text-4xl md:text-5xl lg:text-6xl font-cinzel font-extrabold tracking-tight leading-[1.05] gradient-acero-ios',
+} = Astro.props;
+---
+
+<header class="interior-hero w-full bg-black text-white">
+  {/* 1. Banda panorámica — sin fade-to-black */}
+  <div
+    class="interior-hero-mask relative w-full h-[55vh] md:h-[60vh] overflow-hidden border-b border-[#C8A98B]/40 bg-black"
+  >
+    {image ? (
+      <Image
+        src={image}
+        alt={imageAlt || title}
+        class="interior-hero-image w-full h-full object-cover"
+        style={`object-position: ${imagePosition};`}
+      />
+    ) : (
+      <div class="interior-hero-image w-full h-full bg-white/5" aria-hidden="true" />
+    )}
+  </div>
+
+  {/* 2. Tipografía sobre fondo sólido (fuera de la imagen) */}
+  <div class="interior-hero-copy bg-black max-w-prose mx-auto px-4 py-12 flex flex-col gap-4">
+    <slot name="breadcrumb" />
+
+    {eyebrow && (
+      <span class="interior-hero-reveal font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B]">
+        {eyebrow}
+      </span>
+    )}
+
+    <h1 class:list={['interior-hero-reveal', titleClass]}>
+      {title}
+    </h1>
+
+    {subtitle && (
+      <p class="interior-hero-reveal font-serif text-base md:text-lg lg:text-xl text-white/75 leading-relaxed italic">
+        {subtitle}
+      </p>
+    )}
+
+    <div class="interior-hero-reveal flex flex-col gap-4">
+      <slot name="meta" />
+      <slot />
+    </div>
+  </div>
+</header>
+
+<script>
+  import gsap from 'gsap';
+
+  const setupInteriorHeroReveal = () => {
+    const hero = document.querySelector('.interior-hero');
+    if (!hero || hero.hasAttribute('data-reveal-done')) return;
+    hero.setAttribute('data-reveal-done', 'true');
+
+    const image = hero.querySelector('.interior-hero-image');
+    const reveals = hero.querySelectorAll('.interior-hero-reveal');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (reduceMotion) {
+      if (image) {
+        gsap.set(image, { clearProps: 'clipPath,scale' });
+      }
+      gsap.set(reveals, { clearProps: 'opacity,y' });
+      return;
+    }
+
+    if (image) {
+      gsap.fromTo(
+        image,
+        { scale: 1.1, clipPath: 'inset(0 0 100% 0)' },
+        { scale: 1, clipPath: 'inset(0 0 0% 0)', duration: 1.5, ease: 'power3.out' }
+      );
+    }
+
+    if (reveals.length > 0) {
+      gsap.fromTo(
+        reveals,
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.9, delay: 0.5, stagger: 0.12, ease: 'power3.out' }
+      );
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', setupInteriorHeroReveal);
+  document.addEventListener('astro:page-load', setupInteriorHeroReveal);
+</script>
+
+<style>
+  .interior-hero-image {
+    will-change: transform, clip-path;
+  }
+  .interior-hero-reveal {
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .interior-hero-image {
+      will-change: auto;
+      clip-path: none !important;
+      transform: none !important;
+    }
+    .interior-hero-reveal {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
