@@ -3,4 +3,6 @@
 .env.local
 .env.*
 !.env.example
-node_modules
+node_modules/
+.history/
+dist/
