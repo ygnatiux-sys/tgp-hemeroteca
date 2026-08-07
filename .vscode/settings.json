@@ -3,5 +3,6 @@
   "tailwindCSS.includeLanguages": {
     "astro": "html",
     "css": "css"
-  }
+  },
+  "workbench.commandPalette.preserveInput": true
 }
