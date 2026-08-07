@@ -1,78 +1,102 @@
 ---
-import '../styles/global.css';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import LightboxGlobal from "../components/LightboxGlobal.astro";
 
 interface Props {
-	title?: string;
-	hideHeader?: boolean;
-	footerVariant?: 'full' | 'minimal';
-	/** Home cinematográfico: nav transparente al tope, sólido tras 50px de scroll */
-	headerTransparentUntilScroll?: boolean;
+  title?: string;
+  hideHeader?: boolean;
+  footerVariant?: "full" | "minimal";
+  /** Home cinematográfico: nav transparente al tope, sólido tras 50px de scroll */
+  headerTransparentUntilScroll?: boolean;
 }
 
 const {
-	title = "Hemeroteca TGP",
-	hideHeader = false,
-	footerVariant = 'full',
-	headerTransparentUntilScroll = false,
+  title = "Hemeroteca TGP",
+  hideHeader = false,
+  footerVariant = "full",
+  headerTransparentUntilScroll = false,
 } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="es">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/png" href="/favicon.png" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
 
-		{/* Script Antiflash (FOUC): Inicializa el tema inmediatamente antes de renderizar */}
-		<script is:inline>
-			(function() {
-				const savedTheme = localStorage.getItem('tgp-theme');
-				const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-				if (savedTheme === 'light' || (!savedTheme && prefersLight)) {
-					document.documentElement.setAttribute('data-theme', 'light');
-				} else {
-					document.documentElement.removeAttribute('data-theme');
-				}
-			})();
-		</script>
+    {
+      /* Script Antiflash (FOUC): Inicializa el tema inmediatamente antes de renderizar */
+    }
+    <script is:inline>
+      (function () {
+        const savedTheme = localStorage.getItem("tgp-theme");
+        const prefersLight = window.matchMedia(
+          "(prefers-color-scheme: light)",
+        ).matches;
+        if (savedTheme === "light" || (!savedTheme && prefersLight)) {
+          document.documentElement.setAttribute("data-theme", "light");
+        } else {
+          document.documentElement.removeAttribute("data-theme");
+        }
+      })();
+    </script>
 
-		<!-- Preconnect to Google Fonts -->
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<!-- Import Gloock, Newsreader, Space Mono, Plus Jakarta Sans, Cinzel, Outfit and Inter -->
-		<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Gloock&family=Inter:wght@400;500;600;700;800;900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-	</head>
-	<body class="bg-(--bg-main) text-(--text-body) antialiased transition-colors duration-400 flex flex-col min-h-screen">
-		{!hideHeader && <Header transparentUntilScroll={headerTransparentUntilScroll} />}
-		<main class="grow relative">
-			<slot />
-		</main>
-		<Footer variant={footerVariant} />
+    <!-- Preconnect to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Import Gloock, Newsreader, Space Mono, Plus Jakarta Sans, Cinzel, Outfit and Inter -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Gloock&family=Inter:wght@400;500;600;700;800;900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="bg-(--bg-main) text-(--text-body) antialiased transition-colors duration-400 flex flex-col min-h-screen"
+  >
+    {
+      !hideHeader && (
+        <Header transparentUntilScroll={headerTransparentUntilScroll} />
+      )
+    }
 
-		<script>
-			const setupGlobalReveal = () => {
-				const observer = new IntersectionObserver((entries) => {
-					entries.forEach(entry => {
-						if (entry.isIntersecting) {
-							entry.target.classList.add('revealed');
-							observer.unobserve(entry.target);
-						}
-					});
-				}, { 
-					threshold: 0.1,
-					rootMargin: '0px 0px -10% 0px' // Se activa un poco antes de llegar
-				});
+    <main class="grow relative">
+      <slot />
+    </main>
 
-				document.querySelectorAll('h1, h2, .reveal-item').forEach(el => observer.observe(el));
-			};
+    <Footer variant={footerVariant} />
 
-			document.addEventListener('DOMContentLoaded', setupGlobalReveal);
-			document.addEventListener('astro:page-load', setupGlobalReveal);
-		</script>
-	</body>
+    {/* Visor Inmersivo Global */}
+    <LightboxGlobal />
+
+    <script>
+      const setupGlobalReveal = () => {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("revealed");
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            threshold: 0.1,
+            rootMargin: "0px 0px -10% 0px", // Se activa un poco antes de llegar
+          },
+        );
+
+        document
+          .querySelectorAll("h1, h2, .reveal-item")
+          .forEach((el) => observer.observe(el));
+      };
+
+      document.addEventListener("DOMContentLoaded", setupGlobalReveal);
+      document.addEventListener("astro:page-load", setupGlobalReveal);
+    </script>
+  </body>
 </html>

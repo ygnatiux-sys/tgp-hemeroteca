@@ -1,0 +1,225 @@
+---
+// Componente de Lightbox Inmersivo Global para Astro (Soporte Táctil y Teclado)
+---
+
+<div
+  id="tgp-lightbox"
+  class="fixed inset-0 z-999999 bg-black/95 backdrop-blur-md hidden items-center justify-center transition-opacity duration-300 touch-none"
+>
+  <!-- Botón cerrar (casi invisible) -->
+  <button
+    id="tgp-lightbox-close"
+    class="absolute top-4 right-4 md:top-6 md:right-8 text-white/30 hover:text-white text-3xl font-light z-1000000 p-3 transition-colors"
+    aria-label="Cerrar visor"
+  >
+    ✕
+  </button>
+
+  <!-- Flecha Anterior (Oculta en móviles, se usa swipe) -->
+  <button
+    id="tgp-lightbox-prev"
+    class="hidden md:block absolute left-4 text-white/20 hover:text-white text-5xl font-light z-1000000 p-4 transition-colors select-none"
+    aria-label="Imagen anterior"
+  >
+    ❮
+  </button>
+
+  <!-- Contenedor de la Imagen Fullscreen -->
+  <!-- touch-action-none previene el scroll vertical del navegador al hacer swipe -->
+  <div
+    id="tgp-lightbox-img-container"
+    class="relative w-full h-full flex items-center justify-center overflow-hidden touch-none"
+  >
+    <img
+      id="tgp-lightbox-img"
+      src=""
+      alt=""
+      class="max-w-[96vw] max-h-[94vh] object-contain select-none transition-transform duration-200 pointer-events-none"
+    />
+  </div>
+
+  <!-- Flecha Siguiente (Oculta en móviles, se usa swipe) -->
+  <button
+    id="tgp-lightbox-next"
+    class="hidden md:block absolute right-4 text-white/20 hover:text-white text-5xl font-light z-1000000 p-4 transition-colors select-none"
+    aria-label="Siguiente imagen"
+  >
+    ❯
+  </button>
+
+  <!-- Indicador visual sutil en móviles (opcional) -->
+  <div
+    id="tgp-lightbox-counter"
+    class="md:hidden absolute bottom-4 text-white/40 text-xs font-mono tracking-widest z-1000000 select-none"
+  >
+    <!-- Se llena vía JS -->
+  </div>
+</div>
+
+<script>
+  let images: HTMLImageElement[] = [];
+  let currentIndex = 0;
+
+  const lightbox = document.getElementById("tgp-lightbox");
+  const lightboxImg = document.getElementById(
+    "tgp-lightbox-img",
+  ) as HTMLImageElement;
+  const container = document.getElementById("tgp-lightbox-img-container");
+  const closeBtn = document.getElementById("tgp-lightbox-close");
+  const prevBtn = document.getElementById("tgp-lightbox-prev");
+  const nextBtn = document.getElementById("tgp-lightbox-next");
+  const counter = document.getElementById("tgp-lightbox-counter");
+
+  // Variables para gestos táctiles (Swipe)
+  let touchStartX = 0;
+  let touchEndX = 0;
+  const minSwipeDistance = 50; // Distancia mínima para considerar un swipe válido
+
+  function updateCounter() {
+    if (counter && images.length > 1) {
+      counter.textContent = `${currentIndex + 1} / ${images.length}`;
+    } else if (counter) {
+      counter.textContent = "";
+    }
+  }
+
+  function openLightbox(index: number) {
+    if (!lightbox || !lightboxImg || images.length === 0) return;
+    currentIndex = index;
+    lightboxImg.src = images[currentIndex].src;
+    lightbox.classList.remove("hidden");
+    lightbox.classList.add("flex");
+    document.body.style.overflow = "hidden"; // Evita el scroll de fondo
+    updateCounter();
+  }
+
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.classList.add("hidden");
+    lightbox.classList.remove("flex");
+    document.body.style.overflow = "";
+  }
+
+  function showNext() {
+    if (images.length <= 1) return;
+    // Efecto sutil de transición
+    if (lightboxImg) lightboxImg.style.opacity = "0";
+    setTimeout(() => {
+      currentIndex = (currentIndex + 1) % images.length;
+      if (lightboxImg) {
+        lightboxImg.src = images[currentIndex].src;
+        lightboxImg.style.opacity = "1";
+      }
+      updateCounter();
+    }, 150);
+  }
+
+  function showPrev() {
+    if (images.length <= 1) return;
+    // Efecto sutil de transición
+    if (lightboxImg) lightboxImg.style.opacity = "0";
+    setTimeout(() => {
+      currentIndex = (currentIndex - 1 + images.length) % images.length;
+      if (lightboxImg) {
+        lightboxImg.src = images[currentIndex].src;
+        lightboxImg.style.opacity = "1";
+      }
+      updateCounter();
+    }, 150);
+  }
+
+  // --- LÓGICA DE SWIPE TÁCTIL ---
+  function handleTouchStart(e: TouchEvent) {
+    touchStartX = e.changedTouches[0].screenX;
+  }
+
+  function handleTouchEnd(e: TouchEvent) {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipeGesture();
+  }
+
+  function handleSwipeGesture() {
+    if (images.length <= 1) return;
+
+    const swipeDistance = touchEndX - touchStartX;
+
+    if (Math.abs(swipeDistance) > minSwipeDistance) {
+      if (swipeDistance > 0) {
+        // Swipe de izquierda a derecha -> Anterior
+        showPrev();
+      } else {
+        // Swipe de derecha a izquierda -> Siguiente
+        showNext();
+      }
+    }
+  }
+
+  function initLightbox() {
+    // Detecta todas las imágenes relevantes dentro del contenido, adaptado para Wiki y artículos normales
+    images = Array.from(
+      document.querySelectorAll(
+        ".prose img, article img, main img, #wiki-article-body img",
+      ),
+    ) as HTMLImageElement[];
+
+    images.forEach((img, idx) => {
+      img.style.cursor = "zoom-in";
+      // Remover event listeners previos si existen clonando el nodo o previniendo múltiples bindeos (Astro ViewTransitions)
+      img.onclick = (e) => {
+        e.preventDefault();
+        openLightbox(idx);
+      };
+    });
+  }
+
+  // Event Listeners de Cierre y Navegación
+  closeBtn?.addEventListener("click", closeLightbox);
+  lightbox?.addEventListener("click", (e) => {
+    // Cierra solo si haces clic fuera de la imagen (en el fondo)
+    if (e.target === lightbox || e.target === container) {
+      closeLightbox();
+    }
+  });
+  nextBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    showNext();
+  });
+  prevBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    showPrev();
+  });
+
+  // Event Listeners para Teclado
+  window.addEventListener("keydown", (e) => {
+    if (lightbox && !lightbox.classList.contains("hidden")) {
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowRight") showNext();
+      if (e.key === "ArrowLeft") showPrev();
+    }
+  });
+
+  // Event Listeners para Swipe (solo en el contenedor de la imagen)
+  container?.addEventListener("touchstart", handleTouchStart, {
+    passive: true,
+  });
+  container?.addEventListener("touchend", handleTouchEnd, { passive: true });
+
+  // Inicializar al cargar la página (Soporte para Astro ViewTransitions)
+  document.addEventListener("astro:page-load", initLightbox);
+  // Inicialización de respaldo
+  if (
+    document.readyState === "complete" ||
+    document.readyState === "interactive"
+  ) {
+    initLightbox();
+  } else {
+    document.addEventListener("DOMContentLoaded", initLightbox);
+  }
+</script>
+
+<style>
+  /* Suaviza la transición de opacidad al cambiar de foto */
+  #tgp-lightbox-img {
+    transition: opacity 0.15s ease-in-out;
+  }
+</style>
