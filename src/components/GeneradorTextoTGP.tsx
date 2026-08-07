@@ -450,7 +450,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         text: pendingRef.current.text ?? ensayo,
         excerpt: pendingRef.current.excerpt ?? excerptIA,
         category: pendingRef.current.category ?? categoryIA,
-        image: pendingRef.current.imageUrl ?? arteResult?.imageUrl
+        image: pendingRef.current.imageUrl ?? arteResult?.imageUrl ?? undefined
       });
       alert('ENSAYO, EXCERPT, CATEGORÍA Y PORTADA GUARDADOS EXITOSAMENTE!');
     } else {

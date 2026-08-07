@@ -56,7 +56,6 @@ body, header, footer, article, section, nav, div, aside, p, span, h1, h2, h3, h4
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
-  text-fill-color: transparent !important;
   transition: all 0.3s ease !important;
 }
 
@@ -65,7 +64,6 @@ body, header, footer, article, section, nav, div, aside, p, span, h1, h2, h3, h4
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
-  text-fill-color: transparent !important;
   transition: all 0.3s ease !important;
 }
 
@@ -74,7 +72,6 @@ body, header, footer, article, section, nav, div, aside, p, span, h1, h2, h3, h4
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
-  text-fill-color: transparent !important;
   transition: all 0.3s ease !important;
 }
 
@@ -83,7 +80,6 @@ body, header, footer, article, section, nav, div, aside, p, span, h1, h2, h3, h4
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
-  text-fill-color: transparent !important;
   transition: all 0.3s ease !important;
 }
 
@@ -96,7 +92,6 @@ body, header, footer, article, section, nav, div, aside, p, span, h1, h2, h3, h4
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
-  text-fill-color: transparent !important;
 }
 
 header .header-brand-title {
