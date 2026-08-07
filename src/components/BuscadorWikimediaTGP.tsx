@@ -81,23 +81,26 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
     onChange(payload);
   };
 
-  // Filtro semántico para búsquedas históricas limpias
-  const enhanceQueryForTGP = (rawQuery: string): string => {
-    let q = rawQuery.toLowerCase();
-    q = q.replace(/\bestatua\b/g, 'statue');
-    q = q.replace(/\bbusto\b/g, 'bust');
-    q = q.replace(/\bmural(es)?\b/g, 'fresco OR mural');
-    q = q.replace(/\bcuadro(s)?\b|\bpintura(s)?\b/g, 'painting');
-    
-    if (q.includes('hermes') || q.includes('mercurio')) {
-      q = q.replace(/\bhermes\b|\bmercurio\b/g, '(Hermes OR Mercury)');
-      q += ' (mythology OR god OR deity)';
-    }
+  /**
+   * Módulo de Búsqueda Semántica Abierta para Wikimedia
+   * Permite lugares, etnias, vistas panorámicas y antropológicas.
+   * Filtra automáticamente formatos no deseados y resultados de baja calidad.
+   */
+  const construirQueryWikimedia = (terminoUsuario: string): string => {
+    if (!terminoUsuario) return "";
 
-    const noiseFilters = ' -vogue -fashion -calle -street -edificio -building -modern -hotel -company -brand';
-    const historyBoost = ' (museum OR antiquity OR archaeological OR sculpture OR classical)';
+    const queryBase = terminoUsuario.trim();
 
-    return `${q}${historyBoost}${noiseFilters}`;
+    // 1. Exclusiones lógicas (limpieza de ruido cartográfico y documental)
+    const exclusiones = "-pdf -logo -flag -icon -selfie -poster";
+
+    // 2. Modificadores semánticos abiertos (Amplía la red de captura)
+    const modificadores = "(landscape OR aerial OR ethnographic OR culture OR historical OR people OR ruins OR nature OR village)";
+
+    // 3. Filtro de tipo de archivo (Solo resoluciones gráficas nativas)
+    const filtrosTecnicos = "filetype:bitmap";
+
+    return `${queryBase} ${modificadores} ${exclusiones} ${filtrosTecnicos}`;
   };
 
   const handleBuscar = async () => {
@@ -106,11 +109,12 @@ export function BuscadorWikimediaTGP({ value, onChange }: any) {
     setErrorMsg(null);
 
     try {
-      const smartQuery = enhanceQueryForTGP(query);
-      const result = await searchWikimediaCommons(smartQuery, 30);
+      const smartQuery = construirQueryWikimedia(query);
+      // Ajustado el límite a 15 para priorizar calidad y material de apoyo (B-roll)
+      const result = await searchWikimediaCommons(smartQuery, 15);
       setItems(result.items);
       if (result.items.length === 0) {
-        setErrorMsg('No se encontraron imágenes históricas que cumplan con el filtro.');
+        setErrorMsg('No se encontraron imágenes históricas o geográficas que cumplan con el filtro.');
       }
     } catch (err: any) {
       setErrorMsg(`Error al consultar Wikimedia: ${err.message}`);
