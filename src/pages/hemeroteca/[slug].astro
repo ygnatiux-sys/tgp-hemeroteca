@@ -4,7 +4,7 @@ import Layout from "../../layouts/Layout.astro";
 import { Image } from "astro:assets";
 import SpotifyIcon from "../../components/icons/Spotify.astro";
 import YouTubeIcon from "../../components/icons/YouTube.astro";
-import { marked } from 'marked';
+import { marked } from "marked";
 import { StickyReaderHeader } from "../../components/StickyReaderHeader";
 import { QuickReturnButton } from "../../components/QuickReturnButton";
 import SubstackPrefooter from "../../components/SubstackPrefooter.astro";
@@ -42,21 +42,30 @@ const doc = data as any;
 
 // 1. Cargar contenido raw de .mdoc si existe en disco (ensayos, georreferencias y arquetipos globales)
 const rawMdocs = import.meta.glob<string>(
-  ["/src/content/ensayos/**/content.mdoc", "/src/content/georreferencias/**/content.mdoc", "/src/content/arquetipos-globales/**/content.mdoc"],
-  { query: '?raw', import: 'default', eager: true }
+  [
+    "/src/content/ensayos/**/content.mdoc",
+    "/src/content/georreferencias/**/content.mdoc",
+    "/src/content/arquetipos-globales/**/content.mdoc",
+  ],
+  { query: "?raw", import: "default", eager: true },
 );
 
 const mdocKey = `/src/content/ensayos/${slug}/content.mdoc`;
 const georefMdocKey = `/src/content/georreferencias/${slug}/content.mdoc`;
 const arquetipoMdocKey = `/src/content/arquetipos-globales/${slug}/content.mdoc`;
-const rawMdocText = rawMdocs[mdocKey] || rawMdocs[georefMdocKey] || rawMdocs[arquetipoMdocKey] || '';
+const rawMdocText =
+  rawMdocs[mdocKey] ||
+  rawMdocs[georefMdocKey] ||
+  rawMdocs[arquetipoMdocKey] ||
+  "";
 
 // 2. Carga segura del componente Markdoc si existe
 let Content: any = null;
 try {
-  const contentEntry = (await getEntry("ensayosContent", `${slug}/content`)) || 
-                       (await getEntry("georreferenciasContent", `${slug}/content`)) || 
-                       (await getEntry("arquetiposGlobalesContent", `${slug}/content`));
+  const contentEntry =
+    (await getEntry("ensayosContent", `${slug}/content`)) ||
+    (await getEntry("georreferenciasContent", `${slug}/content`)) ||
+    (await getEntry("arquetiposGlobalesContent", `${slug}/content`));
   if (contentEntry) {
     const rendered = await render(contentEntry);
     Content = rendered.Content;
@@ -66,7 +75,7 @@ try {
 }
 
 // 3. Resolución universal y resiliente del texto del ensayo
-let rawSourceText = '';
+let rawSourceText = "";
 if (rawMdocText && rawMdocText.trim().length > 0) {
   rawSourceText = rawMdocText.trim();
 } else if (doc.generadorGeoref && doc.generadorGeoref.trim().length > 0) {
@@ -79,7 +88,12 @@ if (rawMdocText && rawMdocText.trim().length > 0) {
 
 // Desanidado universal si el texto almacenado contenía un payload JSON de Gemini
 let finalMarkdownText = rawSourceText;
-if (rawSourceText.startsWith('{') && (rawSourceText.includes('"informeMarkdown"') || rawSourceText.includes('"content"') || rawSourceText.includes('"volantaHook"'))) {
+if (
+  rawSourceText.startsWith("{") &&
+  (rawSourceText.includes('"informeMarkdown"') ||
+    rawSourceText.includes('"content"') ||
+    rawSourceText.includes('"volantaHook"'))
+) {
   try {
     const unnested = JSON.parse(rawSourceText);
     if (unnested.informeMarkdown || unnested.content) {
@@ -103,19 +117,21 @@ if (rawSourceText.startsWith('{') && (rawSourceText.includes('"informeMarkdown"'
   } catch (e) {
     // Regex fallback
     const extract = (field: string) => {
-      const match = rawSourceText.match(new RegExp(`"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*})`));
-      return match ? match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : null;
+      const match = rawSourceText.match(
+        new RegExp(`"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*})`),
+      );
+      return match ? match[1].replace(/\\n/g, "\n").replace(/\\"/g, '"') : null;
     };
-    const extractedContent = extract('informeMarkdown') || extract('content');
+    const extractedContent = extract("informeMarkdown") || extract("content");
     if (extractedContent) finalMarkdownText = extractedContent;
-    if (!doc.volantaHook) doc.volantaHook = extract('volantaHook') || '';
-    if (!doc.saberMasDato) doc.saberMasDato = extract('saberMasDato') || '';
-    if (!doc.excerpt) doc.excerpt = extract('excerpt') || '';
+    if (!doc.volantaHook) doc.volantaHook = extract("volantaHook") || "";
+    if (!doc.saberMasDato) doc.saberMasDato = extract("saberMasDato") || "";
+    if (!doc.excerpt) doc.excerpt = extract("excerpt") || "";
   }
 }
 
 // 4. Procesar HTML y vincular imágenes relativas a los assets procesados de Vite
-let renderedHtml = '';
+let renderedHtml = "";
 if (finalMarkdownText) {
   renderedHtml = marked.parse(finalMarkdownText) as string;
   for (const [imgKey, imgModule] of Object.entries(essayImages)) {
@@ -142,51 +158,76 @@ const sidebarCollections = Array.from(collectionsMap.entries())
     label: formatCategory(list[0].entry.category),
     count: list.length,
   }))
-  .filter(c => c.key !== (doc.category || '').toLowerCase())
+  .filter((c) => c.key !== (doc.category || "").toLowerCase())
   .slice(0, 6);
 
 // 8. Cita Histórica Contextualizada al Post
 function getContextualCitation(item: any) {
-  if (item.citaHistorica) return { text: item.citaHistorica, source: item.citaFuente || "Fuente Historiográfica" };
-  if (item.epigrafe) return { text: item.epigrafe, source: item.epigrafeFuente || "Epígrafe del Documento" };
-  if (item.quote) return { text: item.quote, source: item.quoteSource || "Registro Documental" };
+  if (item.citaHistorica)
+    return {
+      text: item.citaHistorica,
+      source: item.citaFuente || "Fuente Historiográfica",
+    };
+  if (item.epigrafe)
+    return {
+      text: item.epigrafe,
+      source: item.epigrafeFuente || "Epígrafe del Documento",
+    };
+  if (item.quote)
+    return {
+      text: item.quote,
+      source: item.quoteSource || "Registro Documental",
+    };
 
-  const cat = (item.category || '').toLowerCase();
-  const title = (item.title || '').toLowerCase();
+  const cat = (item.category || "").toLowerCase();
+  const title = (item.title || "").toLowerCase();
 
-  if (title.includes('tikal') || title.includes('maya') || cat.includes('arqueolog')) {
+  if (
+    title.includes("tikal") ||
+    title.includes("maya") ||
+    cat.includes("arqueolog")
+  ) {
     return {
       text: "Las piedras silenciosas de las selvas guardan la memoria de civilizaciones que miraron al cielo antes de desvanecerse en el tiempo.",
-      source: "Crónica Arqueológica del Nuevo Mundo"
+      source: "Crónica Arqueológica del Nuevo Mundo",
     };
   }
-  if (title.includes('homero') || cat.includes('historia-ideas') || cat.includes('filosof')) {
+  if (
+    title.includes("homero") ||
+    cat.includes("historia-ideas") ||
+    cat.includes("filosof")
+  ) {
     return {
       text: "Cantar es recordar aquello que los dioses otorgaron a los mortales para no olvidar el origen de las cosas.",
-      source: "Tradición Clásica & Filosofía Epistémica"
+      source: "Tradición Clásica & Filosofía Epistémica",
     };
   }
-  if (title.includes('atila') || title.includes('roma') || title.includes('papa') || cat.includes('historia')) {
+  if (
+    title.includes("atila") ||
+    title.includes("roma") ||
+    title.includes("papa") ||
+    cat.includes("historia")
+  ) {
     return {
       text: "Los imperios no caen por la fuerza de las espadas que los asedian, sino por el agotamiento del espíritu que los sostenía.",
-      source: "Anales de la Antigüedad Tardía"
+      source: "Anales de la Antigüedad Tardía",
     };
   }
-  if (cat.includes('cahiers') || cat.includes('semiotica')) {
+  if (cat.includes("cahiers") || cat.includes("semiotica")) {
     return {
       text: "El signo no sustituye a la realidad: la funda en el entendimiento humano y preserva su código a través de las edades.",
-      source: "Cahiers Épistémiques · Cuaderno de Semiótica"
+      source: "Cahiers Épistémiques · Cuaderno de Semiótica",
     };
   }
-  if (cat.includes('georreferencia') || cat.includes('sitio')) {
+  if (cat.includes("georreferencia") || cat.includes("sitio")) {
     return {
       text: "La geografía es la partitura sobre la cual la historia escribe su marcha inexorable.",
-      source: "Cartografía Histórica & Territorial"
+      source: "Cartografía Histórica & Territorial",
     };
   }
   return {
     text: "El documento histórico no es un vestigio inerte, sino una conversación abierta con aquellos que nos precedieron.",
-    source: "Archivo Historiográfico TGP"
+    source: "Archivo Historiográfico TGP",
   };
 }
 
@@ -203,11 +244,20 @@ const roomColors: Record<string, string> = {
 const activeAccent = doc.themeColor
   ? roomColors[doc.themeColor] || "#ffffff"
   : "#ffffff";
-const imagePosition = doc.coverImagePosition || doc.imagePosition || 'center center';
+const imagePosition =
+  doc.coverImagePosition || doc.imagePosition || "center center";
 ---
 
-<Layout hideHeader={true} footerVariant="minimal" title={`${doc.title} | Hemeroteca TGP`}>
-  <StickyReaderHeader client:load title={doc.title || "Ensayo TGP"} accentColor={activeAccent} />
+<Layout
+  hideHeader={true}
+  footerVariant="minimal"
+  title={`${doc.title} | Hemeroteca TGP`}
+>
+  <StickyReaderHeader
+    client:load
+    title={doc.title || "Ensayo TGP"}
+    accentColor={activeAccent}
+  />
   <QuickReturnButton client:load accentColor={activeAccent} />
 
   <InteriorHero
@@ -220,46 +270,62 @@ const imagePosition = doc.coverImagePosition || doc.imagePosition || 'center cen
     titleClass="text-[clamp(2.25rem,5vw,4.5rem)] font-cinzel font-extrabold tracking-tight leading-[1.05] gradient-acero-ios"
   >
     <div slot="meta" class="flex flex-col gap-4">
-      <div class="flex items-center gap-3 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-[#C8A98B] flex-wrap">
-        {doc.sitioGeohistorico && <span class="text-white/80">{doc.sitioGeohistorico}</span>}
+      <div
+        class="flex items-center gap-3 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-[#C8A98B] flex-wrap"
+      >
+        {
+          doc.sitioGeohistorico && (
+            <span class="text-white/80">{doc.sitioGeohistorico}</span>
+          )
+        }
         {doc.sitioGeohistorico && <span class="opacity-40">—</span>}
-        <span class="text-white/60">{data.date ? new Date(data.date).getFullYear() : "S/F"}</span>
+        <span class="text-white/60"
+          >{data.date ? new Date(data.date).getFullYear() : "S/F"}</span
+        >
       </div>
 
-      {(doc.spotifyLink || doc.youtubeLink) && (
-        <div class="flex items-center gap-5 text-white">
-          {doc.spotifyLink && (
-            <a
-              href={doc.spotifyLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="group/pod flex items-center gap-2"
-            >
-              <div class="p-2 rounded-full border border-transparent bg-transparent group-hover/pod:border-[#C8A98B] group-hover/pod:bg-[#C8A98B]/20 group-hover/pod:shadow-[0_0_14px_rgba(200,169,139,0.35)] transition-all duration-500">
-                <SpotifyIcon class="w-4 h-4 opacity-40 group-hover/pod:opacity-100 transition-all duration-500" />
-              </div>
-              <span class="text-[7.5px] tracking-[0.35em] opacity-40 group-hover/pod:opacity-100 transition-all duration-500 font-mono">SPOTIFY</span>
-            </a>
-          )}
-          {doc.youtubeLink && (
-            <a
-              href={doc.youtubeLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="group/pod flex items-center gap-2"
-            >
-              <div class="p-2 rounded-full border border-transparent bg-transparent group-hover/pod:border-[#C8A98B] group-hover/pod:bg-[#C8A98B]/20 group-hover/pod:shadow-[0_0_14px_rgba(200,169,139,0.35)] transition-all duration-500">
-                <YouTubeIcon class="w-4 h-4 opacity-40 group-hover/pod:opacity-100 transition-all duration-500" />
-              </div>
-              <span class="text-[7.5px] tracking-[0.35em] opacity-40 group-hover/pod:opacity-100 transition-all duration-500 font-mono">YOUTUBE</span>
-            </a>
-          )}
-        </div>
-      )}
+      {
+        (doc.spotifyLink || doc.youtubeLink) && (
+          <div class="flex items-center gap-5 text-white">
+            {doc.spotifyLink && (
+              <a
+                href={doc.spotifyLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group/pod flex items-center gap-2"
+              >
+                <div class="p-2 rounded-full border border-transparent bg-transparent group-hover/pod:border-[#C8A98B] group-hover/pod:bg-[#C8A98B]/20 group-hover/pod:shadow-[0_0_14px_rgba(200,169,139,0.35)] transition-all duration-500">
+                  <SpotifyIcon class="w-4 h-4 opacity-40 group-hover/pod:opacity-100 transition-all duration-500" />
+                </div>
+                <span class="text-[7.5px] tracking-[0.35em] opacity-40 group-hover/pod:opacity-100 transition-all duration-500 font-mono">
+                  SPOTIFY
+                </span>
+              </a>
+            )}
+            {doc.youtubeLink && (
+              <a
+                href={doc.youtubeLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group/pod flex items-center gap-2"
+              >
+                <div class="p-2 rounded-full border border-transparent bg-transparent group-hover/pod:border-[#C8A98B] group-hover/pod:bg-[#C8A98B]/20 group-hover/pod:shadow-[0_0_14px_rgba(200,169,139,0.35)] transition-all duration-500">
+                  <YouTubeIcon class="w-4 h-4 opacity-40 group-hover/pod:opacity-100 transition-all duration-500" />
+                </div>
+                <span class="text-[7.5px] tracking-[0.35em] opacity-40 group-hover/pod:opacity-100 transition-all duration-500 font-mono">
+                  YOUTUBE
+                </span>
+              </a>
+            )}
+          </div>
+        )
+      }
     </div>
   </InteriorHero>
 
-  {/* 3. Área Editorial con Proporción 80/20 (Lecturabilidad Suiza Premium & Espacio Negativo) */}
+  {
+    /* 3. Área Editorial con Proporción 80/20 (Lecturabilidad Suiza Premium & Espacio Negativo) */
+  }
   <article
     class="w-full bg-theme-dark relative z-20 pt-16 md:pt-20 pb-32 px-5 md:px-10 lg:px-14 xl:px-20"
     style={`--theme-accent: ${activeAccent};`}
@@ -271,9 +337,12 @@ const imagePosition = doc.coverImagePosition || doc.imagePosition || 'center cen
     >
     </div>
 
-    <div class="flex flex-col lg:flex-row items-start justify-between gap-14 lg:gap-24 xl:gap-32 2xl:gap-40 max-w-360 mx-auto relative z-10">
-      
-      {/* ─── COLUMNA PRINCIPAL DE LECTURA (Cuerpo Editorial Holgado & Calidad Tipográfica) ─── */}
+    <div
+      class="flex flex-col lg:flex-row items-start justify-between gap-14 lg:gap-24 xl:gap-32 2xl:gap-40 max-w-360 mx-auto relative z-10"
+    >
+      {
+        /* ─── COLUMNA PRINCIPAL DE LECTURA (Cuerpo Editorial Holgado & Calidad Tipográfica) ─── */
+      }
       <div class="w-full lg:flex-1 min-w-0 max-w-3xl xl:max-w-4xl">
         {
           data.excerpt && (
@@ -300,185 +369,235 @@ const imagePosition = doc.coverImagePosition || doc.imagePosition || 'center cen
           prose-p:first-of-type:first-letter:text-7xl md:prose-p:first-of-type:first-letter:text-8xl prose-p:first-of-type:first-letter:font-bold prose-p:first-of-type:first-letter:text-[#6E2424] dark:prose-p:first-of-type:first-letter:text-[#C8A98B] prose-p:first-of-type:first-letter:mr-4 prose-p:first-of-type:first-letter:float-left prose-p:first-of-type:first-letter:leading-none prose-p:first-of-type:first-letter:mt-1
           prose-hr:border-none prose-hr:text-center prose-hr:text-[#6E2424] dark:prose-hr:text-[#C8A98B] prose-hr:tracking-[1em] prose-hr:py-10 prose-hr:after:content-['***']"
         >
-        {(() => {
-          if (renderedHtml) {
-            const paragraphs = renderedHtml.split('</p>');
-            if (paragraphs.length > 4) {
-              const middle = Math.floor(paragraphs.length / 2);
-              const part1 = paragraphs.slice(0, middle).join('</p>') + '</p>';
-              const part2 = paragraphs.slice(middle).join('</p>');
-              return (
-                <>
-                  <div class="essay-content" set:html={part1} />
-                  <RelatedReading currentSlug={slug!} category={data.category ?? undefined} />
-                  <div class="essay-content" set:html={part2} />
-                  {Content && (
+          {
+            (() => {
+              if (renderedHtml) {
+                const paragraphs = renderedHtml.split("</p>");
+                if (paragraphs.length > 4) {
+                  const middle = Math.floor(paragraphs.length / 2);
+                  const part1 =
+                    paragraphs.slice(0, middle).join("</p>") + "</p>";
+                  const part2 = paragraphs.slice(middle).join("</p>");
+                  return (
+                    <>
+                      <div class="essay-content" set:html={part1} />
+                      <RelatedReading
+                        currentSlug={slug!}
+                        category={data.category ?? undefined}
+                      />
+                      <div class="essay-content" set:html={part2} />
+                      {Content && (
+                        <div class="essay-content">
+                          <Content />
+                        </div>
+                      )}
+                    </>
+                  );
+                }
+                return (
+                  <>
+                    <div class="essay-content" set:html={renderedHtml} />
+                    {Content && (
+                      <div class="essay-content">
+                        <Content />
+                      </div>
+                    )}
+                    <RelatedReading
+                      currentSlug={slug!}
+                      category={data.category ?? undefined}
+                    />
+                  </>
+                );
+              }
+
+              if (Content) {
+                return (
+                  <>
                     <div class="essay-content">
                       <Content />
                     </div>
-                  )}
-                </>
-              );
-            }
-            return (
-              <>
-                <div class="essay-content" set:html={renderedHtml} />
-                {Content && (
-                  <div class="essay-content">
-                    <Content />
-                  </div>
-                )}
-                <RelatedReading currentSlug={slug!} category={data.category ?? undefined} />
-              </>
-            );
-          }
+                    <RelatedReading
+                      currentSlug={slug!}
+                      category={data.category ?? undefined}
+                    />
+                  </>
+                );
+              }
 
-          if (Content) {
-            return (
-              <>
-                <div class="essay-content">
-                  <Content />
+              return (
+                <div class="py-12 text-stone-500 dark:text-white/50 font-serif italic text-lg text-center">
+                  Documento en proceso de catalogación en el archivo
+                  hemerográfico.
                 </div>
-                <RelatedReading currentSlug={slug!} category={data.category ?? undefined} />
-              </>
-            );
+              );
+            })()
           }
-
-          return (
-            <div class="py-12 text-stone-500 dark:text-white/50 font-serif italic text-lg text-center">
-              Documento en proceso de catalogación en el archivo hemerográfico.
-            </div>
-          );
-        })()}
         </div>
 
         {/* Bento Nota del Autor / Saber Más en Relieve de Papel Pergamino */}
-        {doc.saberMasDato && (
-          <div class="my-12 p-6 md:p-8 rounded-2xl bg-linear-to-br from-stone-50 via-[#EBE9E1] to-stone-200 border border-stone-300/80 shadow-md dark:from-stone-900 dark:to-stone-950 dark:border-white/10 lg:hidden">
-            <span class="font-mono text-[9.5px] uppercase tracking-[0.3em] text-[#6E2424] dark:text-[#C8A98B] font-bold block mb-3">
-              Nota del Autor · Saber Más
-            </span>
-            <p class="font-serif italic font-medium text-stone-800 dark:text-white/95 text-base md:text-lg leading-relaxed">
-              {doc.saberMasDato}
-            </p>
-          </div>
-        )}
+        {
+          doc.saberMasDato && (
+            <div class="my-12 p-6 md:p-8 rounded-2xl bg-linear-to-br from-stone-50 via-[#EBE9E1] to-stone-200 border border-stone-300/80 shadow-md dark:from-stone-900 dark:to-stone-950 dark:border-white/10 lg:hidden">
+              <span class="font-mono text-[9.5px] uppercase tracking-[0.3em] text-[#6E2424] dark:text-[#C8A98B] font-bold block mb-3">
+                Nota del Autor · Saber Más
+              </span>
+              <p class="font-serif italic font-medium text-stone-800 dark:text-white/95 text-base md:text-lg leading-relaxed">
+                {doc.saberMasDato}
+              </p>
+            </div>
+          )
+        }
       </div>
 
-      {/* ─── COLUMNA LATERAL SUSPENDIDA (AZUL TINTÓREO & MORADO EXPEDICIÓN NATGEO) ─── */}
-      <aside class="w-full lg:w-72 xl:w-80 shrink-0 hidden lg:flex flex-col gap-6 sticky top-24 h-fit self-start ml-auto">
-        
-        {/* 1. Cita Histórica Contextualizada con Degradado Azul Tintóreo -> Morado */}
-        <div class="p-6 rounded-2xl bg-linear-to-b from-old-navy via-[#2B1A35] to-theme-dark dark:from-[#181d1a] dark:to-[#0d0f0e] text-stone-100 border border-stone-300/30 dark:border-white/10 shadow-2xl flex flex-col gap-3 group">
-          <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-[#C8A98B] font-bold border-b border-purple-400/30 pb-2">
+      {
+        /* ─── COLUMNA LATERAL SUSPENDIDA (AZUL TINTÓREO & MORADO EXPEDICIÓN NATGEO) ─── */
+      }
+      <aside
+        class="w-full lg:w-72 xl:w-80 shrink-0 hidden lg:flex flex-col gap-6 sticky top-24 h-fit self-start ml-auto"
+      >
+        {
+          /* 1. Cita Histórica Contextualizada con Degradado Azul Tintóreo -> Morado */
+        }
+        <div
+          class="p-6 rounded-2xl bg-linear-to-b from-old-navy via-[#2B1A35] to-theme-dark dark:from-[#181d1a] dark:to-[#0d0f0e] text-stone-100 border border-stone-300/30 dark:border-white/10 shadow-2xl flex flex-col gap-3 group"
+        >
+          <span
+            class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-[#C8A98B] font-bold border-b border-purple-400/30 pb-2"
+          >
             Contexto Histórico
           </span>
-          <p class="font-serif italic font-light text-purple-100 text-[13px] leading-relaxed text-pretty group-hover:text-white transition-colors duration-500">
+          <p
+            class="font-serif italic font-light text-purple-100 text-[13px] leading-relaxed text-pretty group-hover:text-white transition-colors duration-500"
+          >
             "{contextualCitation.text}"
           </p>
-          <div class="flex items-center justify-between font-mono text-[8px] uppercase tracking-[0.22em] text-[#C8A98B] border-t border-purple-400/20 pt-2.5">
+          <div
+            class="flex items-center justify-between font-mono text-[8px] uppercase tracking-[0.22em] text-[#C8A98B] border-t border-purple-400/20 pt-2.5"
+          >
             <span>{contextualCitation.source}</span>
           </div>
         </div>
 
         {/* 2. Saber Más: Bento Nota del Autor */}
-        {doc.saberMasDato && (
-          <div class="p-6 rounded-2xl bg-linear-to-br from-stone-50 via-[#EBE9E1] to-stone-200 border border-stone-300/80 shadow-md dark:from-stone-900 dark:to-stone-950 dark:border-white/10 flex flex-col gap-2.5 group">
-            <div class="flex items-center gap-2 pb-2 border-b border-stone-300/60 dark:border-white/10">
-              <span class="w-2 h-2 rounded-full bg-[#6E2424] dark:bg-[#C8A98B] animate-pulse"></span>
-              <span class="font-mono text-[8.5px] uppercase tracking-[0.28em] text-[#6E2424] dark:text-[#C8A98B] font-bold">
-                SABER MÁS · NOTA DEL AUTOR
-              </span>
+        {
+          doc.saberMasDato && (
+            <div class="p-6 rounded-2xl bg-linear-to-br from-stone-50 via-[#EBE9E1] to-stone-200 border border-stone-300/80 shadow-md dark:from-stone-900 dark:to-stone-950 dark:border-white/10 flex flex-col gap-2.5 group">
+              <div class="flex items-center gap-2 pb-2 border-b border-stone-300/60 dark:border-white/10">
+                <span class="w-2 h-2 rounded-full bg-[#6E2424] dark:bg-[#C8A98B] animate-pulse" />
+                <span class="font-mono text-[8.5px] uppercase tracking-[0.28em] text-[#6E2424] dark:text-[#C8A98B] font-bold">
+                  SABER MÁS · NOTA DEL AUTOR
+                </span>
+              </div>
+              <p class="font-serif italic font-medium text-stone-800 dark:text-white/85 text-[12.5px] leading-relaxed text-pretty">
+                {doc.saberMasDato}
+              </p>
             </div>
-            <p class="font-serif italic font-medium text-stone-800 dark:text-white/85 text-[12.5px] leading-relaxed text-pretty">
-              {doc.saberMasDato}
-            </p>
-          </div>
-        )}
+          )
+        }
 
-        {/* 3. Links a Otras Colecciones (Grid Compacto UI/UX con Iluminación Hover) */}
-        {sidebarCollections.length > 0 && (
-          <div class="cinematic-card-lantern p-5.5 rounded-2xl flex flex-col gap-3 group">
-            <div class="flex items-center justify-between border-b border-white/5 pb-2">
-              <span class="font-mono text-[8.5px] uppercase tracking-[0.28em] text-[#C8A98B] font-bold group-hover:drop-shadow-[0_0_8px_rgba(200,169,139,0.6)] transition-all">
-                COLECCIONES
-              </span>
-              <a href="/colecciones" class="font-mono text-[8px] uppercase tracking-widest text-white/40 hover:text-[#C8A98B] hover:drop-shadow-[0_0_8px_rgba(200,169,139,0.6)] transition-all">
-                VER TODAS →
-              </a>
-            </div>
-            
-            <div class="flex flex-col gap-1">
-              {sidebarCollections.map((col) => (
+        {
+          /* 3. Links a Otras Colecciones (Grid Compacto UI/UX con Iluminación Hover) */
+        }
+        {
+          sidebarCollections.length > 0 && (
+            <div class="cinematic-card-lantern p-5.5 rounded-2xl flex flex-col gap-3 group">
+              <div class="flex items-center justify-between border-b border-white/5 pb-2">
+                <span class="font-mono text-[8.5px] uppercase tracking-[0.28em] text-[#C8A98B] font-bold group-hover:drop-shadow-[0_0_8px_rgba(200,169,139,0.6)] transition-all">
+                  COLECCIONES
+                </span>
                 <a
-                  href={`/colecciones/${encodeURIComponent(col.key)}`}
-                  class="group/item flex items-center justify-between py-1.5 px-2.5 rounded-lg border border-transparent hover:border-[#C8A98B]/30 hover:bg-[#C8A98B]/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.18)] transition-all duration-400 text-xs"
+                  href="/colecciones"
+                  class="font-mono text-[8px] uppercase tracking-widest text-white/40 hover:text-[#C8A98B] hover:drop-shadow-[0_0_8px_rgba(200,169,139,0.6)] transition-all"
                 >
-                  <span class="font-mono text-[9.5px] text-white/60 group-hover/item:text-white group-hover/item:drop-shadow-[0_0_6px_rgba(255,255,255,0.6)] transition-all truncate">
-                    {col.label}
-                  </span>
-                  <span class="font-mono text-[8px] text-[#C8A98B]/70 group-hover/item:text-[#C8A98B] group-hover/item:drop-shadow-[0_0_6px_rgba(200,169,139,0.8)] shrink-0 font-bold transition-all">
-                    {col.count}
-                  </span>
+                  VER TODAS →
                 </a>
-              ))}
+              </div>
+
+              <div class="flex flex-col gap-1">
+                {sidebarCollections.map((col) => (
+                  <a
+                    href={`/colecciones/${encodeURIComponent(col.key)}`}
+                    class="group/item flex items-center justify-between py-1.5 px-2.5 rounded-lg border border-transparent hover:border-[#C8A98B]/30 hover:bg-[#C8A98B]/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.18)] transition-all duration-400 text-xs"
+                  >
+                    <span class="font-mono text-[9.5px] text-white/60 group-hover/item:text-white group-hover/item:drop-shadow-[0_0_6px_rgba(255,255,255,0.6)] transition-all truncate">
+                      {col.label}
+                    </span>
+                    <span class="font-mono text-[8px] text-[#C8A98B]/70 group-hover/item:text-[#C8A98B] group-hover/item:drop-shadow-[0_0_6px_rgba(200,169,139,0.8)] shrink-0 font-bold transition-all">
+                      {col.count}
+                    </span>
+                  </a>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )
+        }
 
         {/* 4. Visor de Registros Visuales Seleccionados */}
-        {wikimediaImages.length > 0 ? (
-          <div class="cinematic-card-lantern p-4.5 rounded-2xl flex flex-col gap-3 group">
-            <span class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-[#C8A98B] block border-b border-white/5 pb-2 font-bold group-hover:drop-shadow-[0_0_8px_rgba(200,169,139,0.6)] transition-all">
-              REGISTROS VISUALES ({wikimediaImages.length})
-            </span>
-            <div class="grid grid-cols-2 gap-2">
-              {wikimediaImages.slice(0, 4).map((wmItem: any, idx: number) => (
-                <a
-                  href={wmItem.pageUrl || wmItem.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="group/img relative aspect-4/3 rounded-lg overflow-hidden border border-white/10 bg-white/5 hover:border-[#C8A98B]/70 hover:shadow-[0_0_18px_rgba(200,169,139,0.25)] transition-all duration-500"
-                  title={wmItem.title}
-                >
-                  <img
-                    src={wmItem.thumbUrl || wmItem.url}
-                    alt={wmItem.title}
-                    class="w-full h-full object-cover group-hover/img:scale-108 transition-transform duration-700 opacity-80 group-hover/img:opacity-100"
-                    loading="lazy"
-                  />
-                  <span class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 backdrop-blur-md text-[7.5px] font-mono text-white/70 rounded border border-white/10 group-hover/img:border-[#C8A98B]/50 group-hover/img:text-[#C8A98B] transition-all">
-                    #{idx + 1}
-                  </span>
-                </a>
-              ))}
+        {
+          wikimediaImages.length > 0 ? (
+            <div class="cinematic-card-lantern p-4.5 rounded-2xl flex flex-col gap-3 group">
+              <span class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-[#C8A98B] block border-b border-white/5 pb-2 font-bold group-hover:drop-shadow-[0_0_8px_rgba(200,169,139,0.6)] transition-all">
+                REGISTROS VISUALES ({wikimediaImages.length})
+              </span>
+              <div class="grid grid-cols-2 gap-2">
+                {wikimediaImages.slice(0, 4).map((wmItem: any, idx: number) => (
+                  <a
+                    href={wmItem.pageUrl || wmItem.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="group/img relative aspect-4/3 rounded-lg overflow-hidden border border-white/10 bg-white/5 hover:border-[#C8A98B]/70 hover:shadow-[0_0_18px_rgba(200,169,139,0.25)] transition-all duration-500"
+                    title={wmItem.title}
+                  >
+                    <img
+                      src={wmItem.thumbUrl || wmItem.url}
+                      alt={wmItem.title}
+                      class="w-full h-full object-cover group-hover/img:scale-108 transition-transform duration-700 opacity-80 group-hover/img:opacity-100"
+                      loading="lazy"
+                    />
+                    <span class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 backdrop-blur-md text-[7.5px] font-mono text-white/70 rounded border border-white/10 group-hover/img:border-[#C8A98B]/50 group-hover/img:text-[#C8A98B] transition-all">
+                      #{idx + 1}
+                    </span>
+                  </a>
+                ))}
+              </div>
             </div>
-          </div>
-        ) : optimizedImage ? (
-          <div class="cinematic-card-lantern overflow-hidden rounded-2xl aspect-4/5 relative group shadow-xl">
-            <Image src={optimizedImage} alt={`Registro visual`} class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out" />
-            <div class="absolute bottom-0 inset-x-0 p-3 bg-linear-to-t from-black/90 via-black/40 to-transparent">
-              <p class="font-mono text-[8px] text-white/70 tracking-wider uppercase">FIG I. Portada de archivo.</p>
+          ) : optimizedImage ? (
+            <div class="cinematic-card-lantern overflow-hidden rounded-2xl aspect-4/5 relative group shadow-xl">
+              <Image
+                src={optimizedImage}
+                alt={`Registro visual`}
+                class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out"
+              />
+              <div class="absolute bottom-0 inset-x-0 p-3 bg-linear-to-t from-black/90 via-black/40 to-transparent">
+                <p class="font-mono text-[8px] text-white/70 tracking-wider uppercase">
+                  FIG I. Portada de archivo.
+                </p>
+              </div>
             </div>
-          </div>
-        ) : null}
-
+          ) : null
+        }
       </aside>
-
     </div>
 
-    {/* ─── MAGAZINEBOOK / BOOKZINE FULL BLEED AL FINALIZAR EL POST Y LAS NOTAS ─── */}
-    {allGalleryImages.length > 0 && (
-      <MagazineBookzineGallery client:load images={allGalleryImages} title={doc.title} accentColor={activeAccent} />
-    )}
+    {
+      /* ─── MAGAZINEBOOK / BOOKZINE FULL BLEED AL FINALIZAR EL POST Y LAS NOTAS ─── */
+    }
+    {
+      allGalleryImages.length > 0 && (
+        <MagazineBookzineGallery
+          client:load
+          images={allGalleryImages}
+          title={doc.title}
+          accentColor={activeAccent}
+        />
+      )
+    }
 
     <ExploreMore currentSlug={slug!} category={data.category ?? undefined} />
 
     <SubstackPrefooter />
 
-    <div
-      class="max-w-2xl mx-auto relative z-10 pt-20 pb-28 text-center"
-    >
+    <div class="max-w-2xl mx-auto relative z-10 pt-20 pb-28 text-center">
       <a
         href="/archivo"
         class="inline-block font-mono text-[10px] bg-transparent border border-transparent px-10 py-4 uppercase tracking-[0.3em] text-white/50 cta-stacked-primary hover:bg-white/10 hover:border-[#C8A98B] hover:text-white hover:shadow-[0_0_16px_rgba(200,169,139,0.35)] transition-all duration-500 rounded-full"
@@ -489,30 +608,32 @@ const imagePosition = doc.coverImagePosition || doc.imagePosition || 'center cen
   </article>
 
   {/* Floating Action Bar: Podcast links */}
-  {(doc.spotifyLink || doc.youtubeLink) && (
-    <div class="fixed bottom-8 right-8 z-50 flex flex-col gap-4">
-      {doc.spotifyLink && (
-        <a 
-          href={doc.spotifyLink} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="w-12 h-12 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white/40 hover:text-white hover:border-white/30 hover:scale-110 transition-all duration-700 group shadow-2xl"
-          title="Escuchar en Spotify"
-        >
-          <SpotifyIcon class="w-5 h-5 blur-[0.5px] group-hover:blur-0 transition-all duration-700" />
-        </a>
-      )}
-      {doc.youtubeLink && (
-        <a 
-          href={doc.youtubeLink} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="w-12 h-12 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white/40 hover:text-white hover:border-white/30 hover:scale-110 transition-all duration-700 group shadow-2xl"
-          title="Ver en YouTube"
-        >
-          <YouTubeIcon class="w-5 h-5 blur-[0.5px] group-hover:blur-0 transition-all duration-700" />
-        </a>
-      )}
-    </div>
-  )}
+  {
+    (doc.spotifyLink || doc.youtubeLink) && (
+      <div class="fixed bottom-8 right-8 z-50 flex flex-col gap-4">
+        {doc.spotifyLink && (
+          <a
+            href={doc.spotifyLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="w-12 h-12 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white/40 hover:text-white hover:border-white/30 hover:scale-110 transition-all duration-700 group shadow-2xl"
+            title="Escuchar en Spotify"
+          >
+            <SpotifyIcon class="w-5 h-5 blur-[0.5px] group-hover:blur-0 transition-all duration-700" />
+          </a>
+        )}
+        {doc.youtubeLink && (
+          <a
+            href={doc.youtubeLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="w-12 h-12 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white/40 hover:text-white hover:border-white/30 hover:scale-110 transition-all duration-700 group shadow-2xl"
+            title="Ver en YouTube"
+          >
+            <YouTubeIcon class="w-5 h-5 blur-[0.5px] group-hover:blur-0 transition-all duration-700" />
+          </a>
+        )}
+      </div>
+    )
+  }
 </Layout>

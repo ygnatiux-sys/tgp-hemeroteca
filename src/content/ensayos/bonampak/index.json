@@ -1,12 +1,13 @@
 {
   "title": "Bonampak: La Sinfonía del Cinabrio y la Selva",
+  "generadorTexto": "",
+  "bancoImagenesWikimedia": "{\n  \"query\": \"bonampak mayan\",\n  \"count\": 2,\n  \"selectedItems\": [\n    {\n      \"id\": \"32799891\",\n      \"title\": \"Bonampak, Chiapas. 03.JPG\",\n      \"url\": \"https://upload.wikimedia.org/wikipedia/commons/0/09/Bonampak%2C_Chiapas._03.JPG\",\n      \"thumbUrl\": \"https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Bonampak%2C_Chiapas._03.JPG/960px-Bonampak%2C_Chiapas._03.JPG\",\n      \"role\": \"HERO\"\n    },\n    {\n      \"id\": \"66976482\",\n      \"title\": \"Mexico-2347 - Mayan Music Time in 770AD (4285760560).jpg\",\n      \"url\": \"https://upload.wikimedia.org/wikipedia/commons/5/56/Mexico-2347_-_Mayan_Music_Time_in_770AD_%284285760560%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original\",\n      \"thumbUrl\": \"https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Mexico-2347_-_Mayan_Music_Time_in_770AD_%284285760560%29.jpg/960px-Mexico-2347_-_Mayan_Music_Time_in_770AD_%284285760560%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail\",\n      \"width\": 3396,\n      \"height\": 2622,\n      \"aspectRatio\": 1.3,\n      \"mime\": \"image/jpeg\",\n      \"role\": \"HERO\",\n      \"roleLabel\": \"Hero Image (Encabezado Panorámico)\",\n      \"author\": \"Dennis G. Jarvis\",\n      \"license\": \"CC BY-SA 2.0\",\n      \"licenseUrl\": \"https://creativecommons.org/licenses/by-sa/2.0\",\n      \"description\": \"Bonampak means \\\"painted walls\\\" and it is the highly detailed frescoes and drawings, painted on the inside of the walls and roofs of three buildings, which make Bonampak a true delight and major attraction for archaeologists and visitors alike. The frescoes are incredibly well preserved and a highlig\",\n      \"credit\": \"<a rel=\\\"nofollow\\\" class=\\\"external text\\\" href=\\\"https://www.flickr.com/photos/archer10/4285760560/\\\">Mexico-2347 - Mayan Music Time in 770AD</a>\",\n      \"pageUrl\": \"https://commons.wikimedia.org/wiki/File:Mexico-2347_-_Mayan_Music_Time_in_770AD_(4285760560).jpg\"\n    }\n  ]\n}",
+  "generadorImagen": "",
   "date": "2026-08-03",
   "category": "Arqueología",
+  "themeColor": "british-green",
   "sitioGeohistorico": "Bonampak, Chiapas (México)",
   "publicarConImagen": true,
-  "themeColor": "british-green",
   "draft": false,
-  "excerpt": "Oculto bajo el dosel asfixiante de la selva lacandona, Bonampak representa la revelación de la sangre y la tumba definitiva del mito pacífico maya.",
-  "bancoImagenesWikimedia": "{\n  \"query\": \"bonampak\",\n  \"count\": 1,\n  \"selectedItems\": [\n    {\n      \"id\": \"32799891\",\n      \"title\": \"Bonampak, Chiapas. 03.JPG\",\n      \"url\": \"https://upload.wikimedia.org/wikipedia/commons/0/09/Bonampak%2C_Chiapas._03.JPG\",\n      \"thumbUrl\": \"https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Bonampak%2C_Chiapas._03.JPG/960px-Bonampak%2C_Chiapas._03.JPG\",\n      \"role\": \"HERO\"\n    }\n  ]\n}",
-  "coverImage": "/src/assets/ensayos/bonampak-1/coverImage.jpeg"
+  "excerpt": "Oculto bajo el dosel asfixiante de la selva lacandona, Bonampak representa la revelación de la sangre y la tumba definitiva del mito pacífico maya."
 }
