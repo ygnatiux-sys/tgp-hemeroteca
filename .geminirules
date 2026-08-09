@@ -1,0 +1,4 @@
+# Gemini Agent Rules
+
+- Aplica los cambios directamente en el código.
+- No generes archivos de walkthrough (`walkthrough.md`), ni `task.md`, ni planes de verificación, a menos que se esté explícitamente en el modo de plan de implementación (Planning Mode) donde sea estrictamente requerido por el sistema.

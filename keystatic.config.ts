@@ -127,6 +127,19 @@ export default config({
           directory: 'src/assets/ensayos', 
           publicPath: '/src/assets/ensayos/' 
         }),
+        isCinematic: fields.checkbox({
+          label: 'Renderizar como Dossier Cinemático',
+          description: 'Transforma el texto y la galería de imágenes de este post en una experiencia inmersiva GSAP a pantalla completa.',
+          defaultValue: false
+        }),
+        gallery: fields.array(fields.image({
+          label: 'Imagen de Galería',
+          directory: 'src/assets/ensayos',
+          publicPath: '/src/assets/ensayos/'
+        }), {
+          label: 'Galería de Imágenes Cinemáticas (Opcional)',
+          itemLabel: props => 'Imagen'
+        }),
         videoBg: fields.text({ label: 'URL del Video Cinemagraph' }),
         spotifyLink: fields.url({ label: 'Link de Spotify Podcast (Opcional)' }),
         youtubeLink: fields.url({ label: 'Link de YouTube Podcast (Opcional)' }),
@@ -249,7 +262,19 @@ export default config({
           directory: 'src/assets/arquetipos-globales', 
           publicPath: '/src/assets/arquetipos-globales/' 
         }),
-
+        isCinematic: fields.checkbox({
+          label: 'Renderizar como Dossier Cinemático',
+          description: 'Transforma el texto y la galería de imágenes de este post en una experiencia inmersiva GSAP a pantalla completa.',
+          defaultValue: false
+        }),
+        gallery: fields.array(fields.image({
+          label: 'Imagen de Galería',
+          directory: 'src/assets/arquetipos-globales',
+          publicPath: '/src/assets/arquetipos-globales/'
+        }), {
+          label: 'Galería de Imágenes Cinemáticas (Opcional)',
+          itemLabel: props => 'Imagen'
+        }),
         videoBg: fields.text({ label: 'URL del Video Cinemagraph' }),
         spotifyLink: fields.url({ label: 'Link de Spotify Podcast (Opcional)' }),
         youtubeLink: fields.url({ label: 'Link de YouTube Podcast (Opcional)' }),

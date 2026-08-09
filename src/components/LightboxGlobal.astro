@@ -6,22 +6,22 @@
   id="tgp-lightbox"
   class="fixed inset-0 z-999999 bg-black/95 backdrop-blur-md hidden items-center justify-center transition-opacity duration-300 touch-none"
 >
-  <!-- Botón cerrar (casi invisible) -->
+  <!-- Botón cerrar (Oculto por defecto, brilla al inicio y en hover) -->
   <button
     id="tgp-lightbox-close"
-    class="absolute top-4 right-4 md:top-6 md:right-8 text-white/30 hover:text-white text-3xl font-light z-1000000 p-3 transition-colors"
+    class="absolute top-4 right-4 md:top-6 md:right-8 w-14 h-14 rounded-full flex items-center justify-center text-transparent hover:text-[#C8A98B] bg-transparent hover:bg-black/30 hover:backdrop-blur-md opacity-0 hover:opacity-100 z-1000000 transition-all duration-700 tgp-ui-control"
     aria-label="Cerrar visor"
   >
-    ✕
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
   </button>
 
-  <!-- Flecha Anterior (Oculta en móviles, se usa swipe) -->
+  <!-- Flecha Anterior -->
   <button
     id="tgp-lightbox-prev"
-    class="hidden md:block absolute left-4 text-white/20 hover:text-white text-5xl font-light z-1000000 p-4 transition-colors select-none"
+    class="absolute left-0 inset-y-0 w-20 md:w-32 flex items-center justify-center text-transparent hover:text-[#C8A98B] bg-transparent hover:bg-linear-to-r hover:from-black/50 hover:to-transparent text-5xl md:text-7xl font-light z-1000000 transition-all duration-700 select-none opacity-0 hover:opacity-100 tgp-ui-control"
     aria-label="Imagen anterior"
   >
-    ❮
+    <span class="drop-shadow-2xl">❮</span>
   </button>
 
   <!-- Contenedor de la Imagen Fullscreen -->
@@ -30,21 +30,25 @@
     id="tgp-lightbox-img-container"
     class="relative w-full h-full flex items-center justify-center overflow-hidden touch-none"
   >
-    <img
-      id="tgp-lightbox-img"
-      src=""
-      alt=""
-      class="max-w-[96vw] max-h-[94vh] object-contain select-none transition-transform duration-200 pointer-events-none"
-    />
+    <div class="absolute inset-4 md:inset-8 overflow-hidden rounded-3xl md:rounded-[2.5rem] shadow-2xl bg-black">
+      <img
+        id="tgp-lightbox-img"
+        src=""
+        alt=""
+        class="w-full h-full object-cover select-none transition-all duration-1000 pointer-events-none scale-100"
+      />
+    <!-- Vignette oscura para el marco inmersivo -->
+    <div class="pointer-events-none absolute inset-0 z-50 rounded-2xl md:rounded-4xl shadow-[inset_0_0_180px_20px_rgba(0,0,0,1)] mix-blend-multiply"></div>
+  </div>
   </div>
 
-  <!-- Flecha Siguiente (Oculta en móviles, se usa swipe) -->
+  <!-- Flecha Siguiente -->
   <button
     id="tgp-lightbox-next"
-    class="hidden md:block absolute right-4 text-white/20 hover:text-white text-5xl font-light z-1000000 p-4 transition-colors select-none"
+    class="absolute right-0 inset-y-0 w-20 md:w-32 flex items-center justify-center text-transparent hover:text-[#C8A98B] bg-transparent hover:bg-linear-to-l hover:from-black/50 hover:to-transparent text-5xl md:text-7xl font-light z-1000000 transition-all duration-700 select-none opacity-0 hover:opacity-100 tgp-ui-control"
     aria-label="Siguiente imagen"
   >
-    ❯
+    <span class="drop-shadow-2xl">❯</span>
   </button>
 
   <!-- Indicador visual sutil en móviles (opcional) -->
@@ -54,11 +58,31 @@
   >
     <!-- Se llena vía JS -->
   </div>
+  <!-- Pantalla de Intro (solo al abrir) -->
+  <div id="tgp-lightbox-intro" class="absolute inset-0 z-50 flex items-center justify-center bg-black opacity-0 pointer-events-none">
+    <div class="text-center px-8">
+      <div id="tgp-lightbox-intro-label" class="font-mono text-[9px] uppercase tracking-[0.5em] text-[#C8A98B] mb-4 opacity-0">Archivo Historiográfico</div>
+      <h2 id="tgp-lightbox-intro-title" class="font-cinzel text-3xl md:text-5xl text-white font-bold opacity-0 max-w-3xl mx-auto leading-tight"></h2>
+    </div>
+  </div>
+
+  <!-- Pantalla de Outro (al llegar al final) -->
+  <div id="tgp-lightbox-outro" class="absolute inset-0 z-50 flex items-center justify-center bg-black opacity-0 pointer-events-none">
+    <div id="tgp-lightbox-outro-title" class="font-cinzel text-2xl md:text-4xl text-white/80 font-bold opacity-0 text-center px-8 max-w-4xl tracking-wide"></div>
+    <div id="tgp-lightbox-outro-brand" class="absolute inset-0 flex flex-col items-center justify-center opacity-0" style="transform: scale(0.6)">
+      <div class="font-cinzel text-4xl md:text-6xl text-[#C8A98B] font-bold drop-shadow-[0_0_30px_rgba(200,169,139,0.6)] tracking-wide text-center">The Great Puzzle</div>
+    </div>
+    <div id="tgp-lightbox-outro-sub" class="absolute inset-0 flex flex-col items-center justify-center pt-28 md:pt-32 opacity-0">
+      <div class="font-mono text-xs md:text-sm tracking-[0.6em] text-white/40 uppercase">— project —</div>
+    </div>
+  </div>
 </div>
 
 <script>
   let images: HTMLImageElement[] = [];
   let currentIndex = 0;
+  let isOutroPlaying = false;
+  let postTitle = ''; // Se rellena al abrir por primera vez
 
   const lightbox = document.getElementById("tgp-lightbox");
   const lightboxImg = document.getElementById(
@@ -75,6 +99,9 @@
   let touchEndX = 0;
   const minSwipeDistance = 50; // Distancia mínima para considerar un swipe válido
 
+  let autoplayInterval: ReturnType<typeof setInterval>;
+  let isPaused = false;
+
   function updateCounter() {
     if (counter && images.length > 1) {
       counter.textContent = `${currentIndex + 1} / ${images.length}`;
@@ -83,50 +110,212 @@
     }
   }
 
+  function startAutoplay() {
+    clearInterval(autoplayInterval);
+    autoplayInterval = setInterval(() => {
+      if (!isPaused && !lightbox?.classList.contains("hidden")) {
+        showNext(true);
+      }
+    }, 3000);
+  }
+
+  function stopAutoplay() {
+    clearInterval(autoplayInterval);
+  }
+
   function openLightbox(index: number) {
     if (!lightbox || !lightboxImg || images.length === 0) return;
     currentIndex = index;
     lightboxImg.src = images[currentIndex].src;
+    lightboxImg.style.opacity = "1";
+    lightboxImg.style.transform = "scale(1)";
     lightbox.classList.remove("hidden");
     lightbox.classList.add("flex");
-    document.body.style.overflow = "hidden"; // Evita el scroll de fondo
+    document.body.style.overflow = "hidden";
     updateCounter();
+    startAutoplay();
+
+    // Trigger flash presence for UI controls
+    const controls = document.querySelectorAll('.tgp-ui-control');
+    controls.forEach(c => {
+      c.classList.remove('flash-presence');
+      void (c as HTMLElement).offsetWidth;
+      c.classList.add('flash-presence');
+    });
+    
+    // Solo lanzar intro en la primera apertura (index 0)
+    if (index === 0) playIntroSequence();
   }
 
   function closeLightbox() {
     if (!lightbox) return;
+    isOutroPlaying = false;
     lightbox.classList.add("hidden");
     lightbox.classList.remove("flex");
     document.body.style.overflow = "";
+    stopAutoplay();
+    // Ocultar pantallas de outro/intro si están visibles
+    const intro = document.getElementById('tgp-lightbox-intro');
+    const outro = document.getElementById('tgp-lightbox-outro');
+    if (intro) intro.style.opacity = '0';
+    if (outro) outro.style.opacity = '0';
   }
 
-  function showNext() {
+  function showNext(auto = false) {
     if (images.length <= 1) return;
-    // Efecto sutil de transición
-    if (lightboxImg) lightboxImg.style.opacity = "0";
+    if (isOutroPlaying) return;
+    if (!auto) stopAutoplay(); 
+    
+    // Si estamos en la última imagen, lanzar outro en vez de hacer loop
+    if (currentIndex === images.length - 1 && !auto) {
+      playOutroSequence();
+      return;
+    }
+    
+    // Efecto Fade to Black + Shrink pausado
+    if (lightboxImg) {
+      lightboxImg.style.opacity = "0";
+      lightboxImg.style.transform = "scale(0.985) translateX(-1%)";
+    }
+    
     setTimeout(() => {
       currentIndex = (currentIndex + 1) % images.length;
       if (lightboxImg) {
         lightboxImg.src = images[currentIndex].src;
+        lightboxImg.style.transform = "scale(1.015) translateX(1%)";
+        void lightboxImg.offsetWidth;
         lightboxImg.style.opacity = "1";
+        lightboxImg.style.transform = "scale(1) translateX(0)";
       }
       updateCounter();
-    }, 150);
+      if (!auto) startAutoplay(); 
+    }, 1200);
   }
 
-  function showPrev() {
+  function showPrev(auto = false) {
     if (images.length <= 1) return;
-    // Efecto sutil de transición
-    if (lightboxImg) lightboxImg.style.opacity = "0";
+    if (!auto) stopAutoplay();
+    
+    // Efecto Fade to Black + Shrink pausado
+    if (lightboxImg) {
+      lightboxImg.style.opacity = "0";
+      lightboxImg.style.transform = "scale(0.985) translateX(1%)";
+    }
+    
     setTimeout(() => {
       currentIndex = (currentIndex - 1 + images.length) % images.length;
       if (lightboxImg) {
         lightboxImg.src = images[currentIndex].src;
+        lightboxImg.style.transform = "scale(1.015) translateX(-1%)";
+        
+        void lightboxImg.offsetWidth;
+        
         lightboxImg.style.opacity = "1";
+        lightboxImg.style.transform = "scale(1) translateX(0)";
       }
       updateCounter();
-    }, 150);
+      if (!auto) startAutoplay();
+    }, 1200);
   }
+
+  // Secuencia de Intro (al abrir la galería)
+  function playIntroSequence() {
+    const intro = document.getElementById('tgp-lightbox-intro') as HTMLElement;
+    const introTitle = document.getElementById('tgp-lightbox-intro-title') as HTMLElement;
+    const introLabel = document.getElementById('tgp-lightbox-intro-label') as HTMLElement;
+    if (!intro || !introTitle) return;
+
+    // Llenar el título con el nombre del post
+    if (introTitle) introTitle.textContent = postTitle || document.querySelector('h1')?.textContent || 'Registro Visual';
+    
+    intro.style.transition = '';
+    intro.style.opacity = '1';
+    intro.style.pointerEvents = 'none';
+    introLabel.style.transition = 'opacity 1s ease';
+    introTitle.style.transition = 'opacity 1.2s ease';
+    introLabel.style.opacity = '0';
+    introTitle.style.opacity = '0';
+    
+    setTimeout(() => { introLabel.style.opacity = '1'; }, 200);
+    setTimeout(() => { introTitle.style.opacity = '1'; }, 600);
+    // Desvanecer intro después de 2 segundos
+    setTimeout(() => {
+      intro.style.transition = 'opacity 1.5s ease';
+      intro.style.opacity = '0';
+      setTimeout(() => { intro.style.pointerEvents = 'none'; }, 1500);
+    }, 2500);
+  }
+
+  // Secuencia de Outro (al pasar de la última foto)
+  function playOutroSequence() {
+    isOutroPlaying = true;
+    stopAutoplay();
+    
+    const outro = document.getElementById('tgp-lightbox-outro') as HTMLElement;
+    const outroTitle = document.getElementById('tgp-lightbox-outro-title') as HTMLElement;
+    const outroBrand = document.getElementById('tgp-lightbox-outro-brand') as HTMLElement;
+    const outroSub = document.getElementById('tgp-lightbox-outro-sub') as HTMLElement;
+    if (!outro || !outroTitle || !outroBrand || !outroSub) return;
+    
+    outroTitle.textContent = postTitle || document.querySelector('h1')?.textContent || 'Registro Visual';
+    
+    // Init states
+    outro.style.opacity = '0';
+    outroTitle.style.opacity = '0';
+    outroBrand.style.opacity = '0';
+    outroBrand.style.transform = 'scale(0.6)';
+    outroSub.style.opacity = '0';
+    outro.style.pointerEvents = 'auto';
+    outro.style.transition = 'opacity 1.5s ease';
+    
+    setTimeout(() => { outro.style.opacity = '1'; }, 50);
+    // 1ª tanda: Título del post, 2 segundos
+    setTimeout(() => {
+      outroTitle.style.transition = 'opacity 1s ease';
+      outroTitle.style.opacity = '1';
+    }, 1800);
+    setTimeout(() => { outroTitle.style.opacity = '0'; }, 4000);
+    // 2ª tanda: The Great Puzzle surge
+    setTimeout(() => {
+      outroBrand.style.transition = 'opacity 2s ease, transform 2s cubic-bezier(0.2, 0.8, 0.2, 1)';
+      outroBrand.style.opacity = '1';
+      outroBrand.style.transform = 'scale(1)';
+    }, 5200);
+    // -project- aparece 0.5s después
+    setTimeout(() => {
+      outroSub.style.transition = 'opacity 1.5s ease';
+      outroSub.style.opacity = '1';
+    }, 5700);
+    // Ambos desaparecen juntos tras 2 segundos
+    setTimeout(() => {
+      outroBrand.style.transition = 'opacity 1.5s ease, transform 1.5s ease';
+      outroBrand.style.opacity = '0';
+      outroBrand.style.transform = 'scale(1.05)';
+      outroSub.style.transition = 'opacity 1.5s ease';
+      outroSub.style.opacity = '0';
+    }, 7300);
+    // Cerrar el outro y volver al inicio
+    setTimeout(() => {
+      outro.style.opacity = '0';
+      outro.style.pointerEvents = 'none';
+      isOutroPlaying = false;
+      currentIndex = 0;
+      if (lightboxImg) {
+        lightboxImg.src = images[0].src;
+        lightboxImg.style.opacity = '1';
+        lightboxImg.style.transform = 'scale(1) translateX(0)';
+      }
+      updateCounter();
+    }, 9500);
+  }
+
+  // Pausar autoplay al hacer hover
+  lightbox?.addEventListener("mouseenter", () => isPaused = true);
+  lightbox?.addEventListener("mouseleave", () => isPaused = false);
+  lightbox?.addEventListener("touchstart", () => isPaused = true, { passive: true });
+  lightbox?.addEventListener("touchend", () => {
+    setTimeout(() => isPaused = false, 2000);
+  });
 
   // --- LÓGICA DE SWIPE TÁCTIL ---
   function handleTouchStart(e: TouchEvent) {
@@ -155,6 +344,9 @@
   }
 
   function initLightbox() {
+    // Capturar título del post para el intro/outro
+    postTitle = document.querySelector('h1')?.textContent?.trim() || '';
+    
     // Detecta todas las imágenes relevantes dentro del contenido, adaptado para Wiki y artículos normales
     images = Array.from(
       document.querySelectorAll(
@@ -163,7 +355,7 @@
     ) as HTMLImageElement[];
 
     images.forEach((img, idx) => {
-      img.style.cursor = "zoom-in";
+      img.style.cursor = "pointer";
       // Remover event listeners previos si existen clonando el nodo o previniendo múltiples bindeos (Astro ViewTransitions)
       img.onclick = (e) => {
         e.preventDefault();
@@ -218,8 +410,20 @@
 </script>
 
 <style>
-  /* Suaviza la transición de opacidad al cambiar de foto */
+  /* Suaviza la transición de opacidad y escala al cambiar de foto, mucho más lento y cinemático */
   #tgp-lightbox-img {
-    transition: opacity 0.15s ease-in-out;
+    transition: opacity 1.8s ease-in-out, transform 2.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Animación para que los controles brillen al inicio y luego se apaguen */
+  @keyframes presenceFlash {
+    0% { opacity: 0; color: transparent; }
+    20% { opacity: 1; color: #C8A98B; }
+    70% { opacity: 1; color: #C8A98B; }
+    100% { opacity: 0; color: transparent; }
+  }
+  
+  .flash-presence {
+    animation: presenceFlash 2.5s ease-in-out forwards;
   }
 </style>

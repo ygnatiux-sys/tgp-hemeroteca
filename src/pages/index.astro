@@ -5,6 +5,7 @@ import { Image } from 'astro:assets';
 import SpotifyIcon from '../components/icons/Spotify.astro';
 import YouTubeIcon from '../components/icons/YouTube.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
+import CinematicDossier from '../components/CinematicDossier.astro';
 import {
   getPublishableEssays,
   groupByCategory,
@@ -107,6 +108,21 @@ function createPremierSequences(essays: typeof resolvedArchiveRows) {
 }
 
 const archiveSequences = createPremierSequences(resolvedArchiveRows);
+
+const heroFragments = latestPost ? [
+  {
+    image: heroImage || '',
+    text: latestPost.entry.excerpt || '',
+    highlight: latestPost.entry.title || '',
+    link: `/hemeroteca/${latestPost.slug}`,
+    category: formatCategory(latestPost.entry.category),
+    year: formatYear(latestPost.entry.date),
+    position: heroImagePosition,
+    origin: heroOrigin,
+    spotifyLink: latestPost.entry.spotifyLink,
+    youtubeLink: latestPost.entry.youtubeLink
+  }
+] : [];
 ---
 
 <Layout
@@ -116,62 +132,12 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
   <div class="w-full bg-black text-[#F5F5F7] pb-20">
 
     {/* ═══════════════════════════════════════════════════════════════════════
-        BLOQUE 1: HERO CINEMÁTICO 100vh — latestPost = publishable[0]
+        BLOQUE 1: HERO CINEMÁTICO (NUEVO COMPONENTE CinematicDossier)
     ═══════════════════════════════════════════════════════════════════════ */}
     {latestPost && (
-      <section
-        id="hero-cinematic"
-        class="hero-home sticky top-0 w-full h-screen flex flex-col justify-end overflow-hidden"
-        style={`--hero-origin: ${heroOrigin};`}
-      >
-        {/* Fondo dinámico: portada de latestPost */}
-        {heroImage ? (
-          <Image
-            src={heroImage}
-            alt={`Portada de ${latestPost.entry.title}`}
-            class="hero-bg-image object-cover w-full h-full absolute inset-0 -z-10 opacity-90"
-            style={`object-position: ${heroImagePosition}; transform-origin: ${heroOrigin};`}
-          />
-        ) : (
-          <div class="hero-bg-image absolute inset-0 -z-10 bg-white/5 opacity-40" />
-        )}
-
-        {/* Fade a negro (El Abismo) */}
-        <div class="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent pointer-events-none" />
-
-        {/* Contenido heredado (tarjeta / CTA sin alterar clases) */}
-        <div class="relative z-10 w-full max-w-5xl mb-12 md:mb-24 px-6 md:px-12 lg:px-24">
-          <div class="hero-content flex flex-col gap-4">
-            <div class="reveal-item flex items-center gap-3 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-[#C8A98B]">
-              <span class="px-2.5 py-0.5 bg-white/10 backdrop-blur-md rounded-full border border-white/10 text-white font-bold text-[9px]">Destacado</span>
-              <span class="opacity-40">•</span>
-              <span>{formatCategory(latestPost.entry.category)}</span>
-              <span class="opacity-40">•</span>
-              <span class="text-white/60">{formatYear(latestPost.entry.date)}</span>
-            </div>
-
-            <h1 class="text-[clamp(3.25rem,7.5vw,8.5rem)] leading-[0.98] font-serif tracking-tight antialiased max-w-5xl pt-1 pb-2 bg-linear-to-b from-white via-white/95 to-white/70 bg-clip-text text-transparent drop-shadow-2xl">
-              {latestPost.entry.title}
-            </h1>
-
-            {latestPost.entry.excerpt && (
-              <p class="font-serif text-base md:text-lg lg:text-xl text-white/80 leading-relaxed max-w-2xl lg:max-w-3xl line-clamp-2 italic">
-                "{latestPost.entry.excerpt}"
-              </p>
-            )}
-
-            <div class="reveal-item mt-2">
-              <a
-                href={`/hemeroteca/${latestPost.slug}`}
-                class="group inline-flex items-center gap-4 border border-white/20 bg-white/10 backdrop-blur-md px-7 py-3.5 rounded-full hover:bg-[#C8A98B] hover:border-[#C8A98B] hover:text-theme-dark transition-all duration-500"
-              >
-                <span class="font-mono text-[10px] uppercase tracking-[0.3em] font-bold">Leer Investigación</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform duration-300"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      <div id="hero-cinematic" class="sticky top-0 w-full h-screen overflow-hidden">
+        <CinematicDossier fragments={heroFragments} />
+      </div>
     )}
 
     {/* Lienzo / grilla: se desliza sobre el Hero ya oscurecido */}
@@ -551,7 +517,7 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
 
   const setupHomeScrollytelling = () => {
     const hero = document.getElementById('hero-cinematic');
-    const bg = hero?.querySelector('.hero-bg-image');
+    const bg = hero?.querySelector('img');
     if (!hero || !bg) return;
 
     ScrollTrigger.getAll().forEach((t) => {
@@ -574,7 +540,7 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
       },
     });
 
-    const content = hero.querySelector('.hero-content');
+    const content = hero.querySelector('.content-layer');
     if (content) {
       gsap.to(content, {
         opacity: 0,
@@ -587,10 +553,7 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
           scrub: true,
         },
       });
-      content.classList.add('opacity-100', 'translate-y-0');
     }
-    const h1 = hero.querySelector('h1');
-    if (h1) h1.classList.add('revealed');
   };
 
   document.addEventListener('DOMContentLoaded', setupHomeScrollytelling);
@@ -598,15 +561,7 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
 </script>
 
 <style>
-  .hero-content {
-    transition: all 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-    transition-delay: 0.2s;
-  }
-  .hero-bg-image {
-    will-change: transform, opacity;
-  }
   @media (prefers-reduced-motion: reduce) {
-    .hero-content, .reveal-item { transition: none !important; opacity: 1 !important; transform: none !important; }
-    .hero-bg-image { will-change: auto; }
+    .reveal-item { transition: none !important; opacity: 1 !important; transform: none !important; }
   }
 </style>
