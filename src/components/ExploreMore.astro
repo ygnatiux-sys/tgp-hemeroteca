@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
-import { resolveEssayImage } from "../lib/content-filter";
-import CinematicArchiveCard from "./CinematicArchiveCard.astro";
+import { Image } from "astro:assets";
+import { resolveEssayImage, formatCategory, formatDate } from "../lib/content-filter";
 
 interface Props {
   currentSlug: string;
@@ -12,44 +12,191 @@ const { currentSlug, category } = Astro.props;
 
 const allEssays = await getCollection("ensayos");
 
-// Preferir ensayos de la misma categoría si están disponibles, y completar con otros ensayos
 let candidateEssays = allEssays.filter(essay => essay.id.replace(/\/index$/, "") !== currentSlug);
-
 if (category) {
   const sameCat = candidateEssays.filter(e => e.data.category === category);
   const diffCat = candidateEssays.filter(e => e.data.category !== category);
   candidateEssays = [...sameCat, ...diffCat];
 }
 
-const exploreEssays = candidateEssays.slice(0, 3);
+const exploreEssays = candidateEssays.slice(0, 3).map(essay => {
+  const slug = essay.id.replace(/\/index$/, "");
+  return {
+    slug,
+    entry: essay.data,
+    img: resolveEssayImage(essay.data.coverImage, slug),
+  };
+});
+
+const lead    = exploreEssays[0] ?? null;
+const secondA = exploreEssays[1] ?? null;
+const secondB = exploreEssays[2] ?? null;
 ---
 
-<section class="max-w-7xl mx-auto px-6 py-24 md:py-32 border-t border-white/5">
-  <div class="flex flex-col gap-10 md:gap-12">
-    <div class="flex justify-between items-end">
+<section class="w-full border-t border-white/5 pt-20 pb-8 mt-8">
+  <div class="max-w-7xl mx-auto px-6 md:px-10 flex flex-col gap-10">
+
+    {/* ── ENCABEZADO ── */}
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
       <div>
-        <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] font-bold">[ SIGUE EXPLORANDO ]</span>
-        <h3 class="text-3xl md:text-4xl font-cinzel text-white/95 mt-2 font-extrabold tracking-tight">Continuar la lectura</h3>
+        <span class="font-mono text-[9px] uppercase tracking-[0.45em] text-rust-orange block mb-1">[ Sigue Explorando ]</span>
+        <h3 class="font-cinzel font-extrabold text-2xl sm:text-3xl md:text-4xl tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent">
+          Continuar la Lectura
+        </h3>
       </div>
-      <a href="/archivo" class="hidden md:block font-mono text-[10px] uppercase tracking-widest text-white/50 hover:text-[#C8A98B] transition-colors border-b border-white/10 pb-1">Ver todo el archivo →</a>
+      <a href="/archivo" class="font-mono text-[9px] uppercase tracking-[0.3em] text-white/40 hover:text-rust-orange transition-colors shrink-0 pb-1">
+        Ver todo el Archivo →
+      </a>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-      {exploreEssays.map((essay) => {
-        const slug = essay.id.replace(/\/index$/, "");
-        const optimizedImg = resolveEssayImage(essay.data.coverImage, slug);
+    {/* ── GRID: 1 GRANDE + 2 MENORES + CTA SUBSTACK ── */}
+    {lead && (
+      <div class="flex flex-col gap-5">
 
-        return (
-          <CinematicArchiveCard
-            slug={slug}
-            entry={essay.data}
-            img={optimizedImg}
-            variant="standard"
-            enableCinemagraph={true}
-          />
-        );
-      })}
-    </div>
+        {/* ── POST GRANDE CENTRAL ── */}
+        <article class="group w-full relative overflow-hidden rounded-2xl border border-white/8 bg-white/2 hover:border-rust-orange/30 transition-all duration-700">
+          <div class="flex flex-col lg:flex-row lg:min-h-90">
+            {lead.img && (
+              <div class="relative overflow-hidden lg:w-[52%] shrink-0 aspect-video lg:aspect-auto">
+                <Image
+                  src={lead.img}
+                  alt={lead.entry.title || "Dossier"}
+                  class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03] brightness-85"
+                />
+                <div class="absolute inset-0 bg-linear-to-r from-transparent via-transparent to-(--bg-main)/85 hidden lg:block pointer-events-none" />
+                <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/75 via-transparent to-transparent lg:hidden pointer-events-none" />
+              </div>
+            )}
+            <div class="flex flex-col justify-between p-6 md:p-9 lg:p-10 flex-1">
+              <div class="flex flex-col gap-3 md:gap-5">
+                <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-rust-orange/75">
+                  {formatCategory(lead.entry.category)}
+                </span>
+                <h4 class="font-cinzel font-bold text-xl sm:text-2xl md:text-3xl leading-tight group-hover:text-rust-orange/90 transition-colors duration-300">
+                  <a href={`/hemeroteca/${lead.slug}`}>{lead.entry.title}</a>
+                </h4>
+                {lead.entry.excerpt && (
+                  <p class="font-serif italic text-[#E0E0E0]/55 text-sm md:text-base leading-relaxed line-clamp-2 max-w-prose">
+                    "{lead.entry.excerpt}"
+                  </p>
+                )}
+              </div>
+              <div class="mt-6 pt-5 border-t border-white/5 flex items-center gap-4">
+                <a
+                  href={`/hemeroteca/${lead.slug}`}
+                  class="inline-flex items-center gap-2 px-4 py-2 bg-[#151718]/90 backdrop-blur-sm border border-white/10 text-[#E0E0E0]/70 font-mono font-bold text-[8.5px] tracking-[0.25em] uppercase rounded-lg hover:bg-rust-orange/10 hover:border-rust-orange/45 hover:text-rust-orange transition-all duration-400"
+                >
+                  <span>Leer Dossier</span><span class="opacity-50 group-hover:translate-x-0.5 transition-transform">▸</span>
+                </a>
+                {lead.entry.date && (
+                  <span class="font-mono text-[8px] uppercase tracking-[0.2em] text-white/25">{formatDate(lead.entry.date)}</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </article>
+
+        {/* ── DOS MENORES + CTA SUBSTACK ── */}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+
+          {/* Card Secundaria A */}
+          {secondA && (
+            <article class="group relative overflow-hidden rounded-xl border border-white/8 bg-white/2 hover:border-rust-orange/30 transition-all duration-500 flex flex-col">
+              {secondA.img && (
+                <div class="relative overflow-hidden aspect-video">
+                  <Image
+                    src={secondA.img}
+                    alt={secondA.entry.title || "Dossier"}
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04] brightness-80"
+                  />
+                  <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/75 via-transparent to-transparent pointer-events-none" />
+                </div>
+              )}
+              <div class="flex flex-col justify-between p-5 flex-1">
+                <div class="flex flex-col gap-2">
+                  <span class="font-mono text-[8px] uppercase tracking-[0.3em] text-rust-orange/65">{formatCategory(secondA.entry.category)}</span>
+                  <h4 class="font-cinzel font-bold text-base leading-snug group-hover:text-rust-orange/80 transition-colors line-clamp-2">
+                    <a href={`/hemeroteca/${secondA.slug}`}>{secondA.entry.title}</a>
+                  </h4>
+                </div>
+                <div class="mt-4 pt-3 border-t border-white/5 font-mono text-[8px] uppercase tracking-[0.25em]">
+                  <a href={`/hemeroteca/${secondA.slug}`} class="text-white/30 hover:text-rust-orange transition-colors">Ver Dossier ▸</a>
+                </div>
+              </div>
+            </article>
+          )}
+
+          {/* Card Secundaria B */}
+          {secondB && (
+            <article class="group relative overflow-hidden rounded-xl border border-white/8 bg-white/2 hover:border-rust-orange/30 transition-all duration-500 flex flex-col">
+              {secondB.img && (
+                <div class="relative overflow-hidden aspect-video">
+                  <Image
+                    src={secondB.img}
+                    alt={secondB.entry.title || "Dossier"}
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04] brightness-80"
+                  />
+                  <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/75 via-transparent to-transparent pointer-events-none" />
+                </div>
+              )}
+              <div class="flex flex-col justify-between p-5 flex-1">
+                <div class="flex flex-col gap-2">
+                  <span class="font-mono text-[8px] uppercase tracking-[0.3em] text-rust-orange/65">{formatCategory(secondB.entry.category)}</span>
+                  <h4 class="font-cinzel font-bold text-base leading-snug group-hover:text-rust-orange/80 transition-colors line-clamp-2">
+                    <a href={`/hemeroteca/${secondB.slug}`}>{secondB.entry.title}</a>
+                  </h4>
+                </div>
+                <div class="mt-4 pt-3 border-t border-white/5 font-mono text-[8px] uppercase tracking-[0.25em]">
+                  <a href={`/hemeroteca/${secondB.slug}`} class="text-white/30 hover:text-rust-orange transition-colors">Ver Dossier ▸</a>
+                </div>
+              </div>
+            </article>
+          )}
+
+          {/* ── SUBSTACK CTA CARD — en la tercera posición, integrado naturalmente ── */}
+          <div class="group relative overflow-hidden rounded-xl border border-white/8 bg-white/2 hover:border-rust-orange/25 transition-all duration-500 flex flex-col p-5 gap-4 justify-between">
+            {/* Ícono */}
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-rust-orange/10 border border-rust-orange/20 flex items-center justify-center rounded-lg shrink-0">
+                <svg viewBox="0 0 24 24" class="w-4 h-4 fill-rust-orange" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22.539 8.242H1.46V5.406h21.078v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.078V0z"/>
+                </svg>
+              </div>
+              <span class="font-mono text-[8px] uppercase tracking-[0.35em] text-rust-orange/60">Bitácora TGP</span>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <p class="font-serif italic text-[#E0E0E0]/70 text-sm leading-snug">
+                "Pensamiento crítico en tu buzón"
+              </p>
+              <p class="font-mono text-[8px] uppercase tracking-[0.2em] text-white/30 leading-relaxed">
+                Ensayos exclusivos · Substack
+              </p>
+            </div>
+
+            <form
+              action="https://thegreatpuzzleproject.substack.com/subscribe"
+              method="get"
+              target="_blank"
+              class="flex flex-col gap-2"
+            >
+              <input
+                type="email"
+                name="email"
+                placeholder="tu@correo.com"
+                required
+                class="bg-white/4 border border-white/10 rounded-lg px-3.5 py-2.5 text-[#E0E0E0] font-mono text-[10px] focus:border-rust-orange/40 focus:bg-white/6 outline-none w-full transition-all placeholder:text-white/20"
+              />
+              <button
+                type="submit"
+                class="w-full px-4 py-2.5 bg-[#151718]/90 border border-white/10 text-[#E0E0E0]/70 font-mono font-bold text-[8.5px] tracking-[0.25em] uppercase rounded-lg hover:bg-rust-orange/10 hover:border-rust-orange/45 hover:text-rust-orange transition-all duration-400 cursor-pointer"
+              >
+                Suscribirse ▸
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    )}
   </div>
 </section>
-

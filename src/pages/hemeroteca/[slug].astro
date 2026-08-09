@@ -7,7 +7,7 @@ import YouTubeIcon from "../../components/icons/YouTube.astro";
 import { marked } from "marked";
 import { StickyReaderHeader } from "../../components/StickyReaderHeader";
 import { QuickReturnButton } from "../../components/QuickReturnButton";
-import SubstackPrefooter from "../../components/SubstackPrefooter.astro";
+
 import RelatedReading from "../../components/RelatedReading.astro";
 import ExploreMore from "../../components/ExploreMore.astro";
 import InteriorHero from "../../components/InteriorHero.astro";
@@ -276,6 +276,10 @@ function getContextualCitation(item: any) {
 
 const contextualCitation = getContextualCitation(doc);
 
+const metadataLabels = ["TGP", "RESEARCH", "ESSAYS", "COLLECTION", "SEASON"];
+const metaLabelIndex = slug.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % metadataLabels.length;
+const dynamicMetaLabel = metadataLabels[metaLabelIndex];
+
 const roomColors: Record<string, string> = {
   "british-green": "#1B382A",
   bordeaux: "#5B2326",
@@ -321,55 +325,45 @@ const imagePosition =
   >
     <div slot="meta" class="flex flex-col gap-4">
       <div
-        class="flex items-center gap-3 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-[#C8A98B] flex-wrap"
+        class="flex items-center gap-3 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-rust-orange flex-wrap"
       >
-        {
-          doc.sitioGeohistorico && (
-            <span class="text-white/80">{doc.sitioGeohistorico}</span>
-          )
-        }
-        {doc.sitioGeohistorico && <span class="opacity-40">—</span>}
+        <span class="text-white/80">{dynamicMetaLabel}</span>
+        <span class="opacity-40">—</span>
         <span class="text-white/60"
           >{data.date ? new Date(data.date).getFullYear() : "S/F"}</span
         >
       </div>
 
-      {
-        (doc.spotifyLink || doc.youtubeLink) && (
-          <div class="flex items-center gap-5 text-white">
-            {doc.spotifyLink && (
-              <a
-                href={doc.spotifyLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="group/pod flex items-center gap-2"
-              >
-                <div class="p-2 rounded-full border border-transparent bg-transparent group-hover/pod:border-[#C8A98B] group-hover/pod:bg-[#C8A98B]/20 group-hover/pod:shadow-[0_0_14px_rgba(200,169,139,0.35)] transition-all duration-500">
-                  <SpotifyIcon class="w-4 h-4 opacity-40 group-hover/pod:opacity-100 transition-all duration-500" />
-                </div>
-                <span class="text-[7.5px] tracking-[0.35em] opacity-40 group-hover/pod:opacity-100 transition-all duration-500 font-mono">
-                  SPOTIFY
-                </span>
-              </a>
-            )}
-            {doc.youtubeLink && (
-              <a
-                href={doc.youtubeLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="group/pod flex items-center gap-2"
-              >
-                <div class="p-2 rounded-full border border-transparent bg-transparent group-hover/pod:border-[#C8A98B] group-hover/pod:bg-[#C8A98B]/20 group-hover/pod:shadow-[0_0_14px_rgba(200,169,139,0.35)] transition-all duration-500">
-                  <YouTubeIcon class="w-4 h-4 opacity-40 group-hover/pod:opacity-100 transition-all duration-500" />
-                </div>
-                <span class="text-[7.5px] tracking-[0.35em] opacity-40 group-hover/pod:opacity-100 transition-all duration-500 font-mono">
-                  YOUTUBE
-                </span>
-              </a>
-            )}
+      {/* LINKS DE SPOTIFY Y YOUTUBE CENTRADOS CON EFECTO ESTRELLAS TITILANTES MATE */}
+      <div class="hero-meta-socials flex items-center justify-start gap-6 mt-4 text-white">
+        <a
+          href={doc.spotifyLink || "https://open.spotify.com"}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-sp-star group/sp flex items-center gap-2"
+        >
+          <div class="sp-badge p-2.5 rounded-full border border-white/20 bg-black/40 group-hover/sp:border-[#1DB954] group-hover/sp:bg-[#1DB954]/15 transition-all duration-500">
+            <SpotifyIcon class="sp-icon w-4 h-4 text-white/70 group-hover/sp:text-[#1DB954] transition-all duration-500" />
           </div>
-        )
-      }
+          <span class="sp-text text-[8px] tracking-[0.35em] text-white/60 group-hover/sp:text-[#1DB954] transition-all duration-500 font-mono">
+            SPOTIFY
+          </span>
+        </a>
+
+        <a
+          href={doc.youtubeLink || "https://youtube.com/@thegreatpuzzleproject"}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-yt-star group/yt flex items-center gap-2"
+        >
+          <div class="yt-badge p-2.5 rounded-full border border-white/20 bg-black/40 group-hover/yt:border-[#E52D27] group-hover/yt:bg-[#E52D27]/15 transition-all duration-500">
+            <YouTubeIcon class="yt-icon w-4 h-4 text-white/70 group-hover/yt:text-[#E52D27] transition-all duration-500" />
+          </div>
+          <span class="yt-text text-[8px] tracking-[0.35em] text-white/60 group-hover/yt:text-[#E52D27] transition-all duration-500 font-mono">
+            YOUTUBE
+          </span>
+        </a>
+      </div>
     </div>
   </InteriorHero>
 
@@ -377,7 +371,7 @@ const imagePosition =
     /* 3. Área Editorial con Proporción 80/20 (Lecturabilidad Suiza Premium & Espacio Negativo) */
   }
   <article
-    class="w-full bg-theme-dark relative z-20 pt-16 md:pt-20 pb-32 px-5 md:px-10 lg:px-14 xl:px-20"
+    class="w-full bg-(--bg-main) relative z-20 pt-16 md:pt-20 pb-32 px-5 md:px-10 lg:px-14 xl:px-20"
     style={`--theme-accent: ${activeAccent};`}
   >
     {/* Capas FX: Aura Atmosférica sutil */}
@@ -396,8 +390,8 @@ const imagePosition =
       <div class="w-full lg:flex-1 min-w-0 max-w-3xl xl:max-w-4xl">
         {
           data.excerpt && (
-            <div class="border-l-3 border-[#6E2424] dark:border-[#C8A98B] pl-6 md:pl-8 mb-12 py-3 bg-linear-to-r from-[#6E2424]/10 via-[#6E2424]/5 to-transparent dark:from-[#C8A98B]/10 rounded-r-xl">
-              <p class="text-xl md:text-2xl font-serif font-light text-[#6E2424] dark:text-[#C8A98B] leading-relaxed tracking-tight italic">
+            <div class="border-l-3 border-[#6E2424] dark:border-rust-orange pl-6 md:pl-8 mb-12 py-3 bg-linear-to-r from-[#6E2424]/10 via-[#6E2424]/5 to-transparent dark:from-rust-orange/10 rounded-r-xl">
+              <p class="text-xl md:text-2xl font-serif font-light text-[#6E2424] dark:text-rust-orange leading-relaxed tracking-tight italic">
                 "{data.excerpt}"
               </p>
             </div>
@@ -409,15 +403,15 @@ const imagePosition =
           class="prose prose-invert max-w-none
           prose-p:font-body prose-p:font-light prose-p:not-italic prose-p:text-[1.2rem] md:prose-p:text-[1.28rem] prose-p:leading-snug md:prose-p:leading-[1.85] prose-p:tracking-tight prose-p:mb-8 prose-p:text-left prose-p:text-pretty
           prose-h1:hidden
-          prose-h2:font-sans prose-h2:font-extrabold prose-h2:text-2xl md:prose-h2:text-3xl prose-h2:tracking-tight prose-h2:mt-14 prose-h2:mb-5 prose-h2:leading-snug prose-h2:text-[#1C1E21] dark:prose-h2:text-[#F5F4F0] prose-h2:border-b-2 prose-h2:border-[#6E2424]/40 dark:prose-h2:border-[#C8A98B]/40 prose-h2:pb-2.5
-          prose-h3:font-sans prose-h3:font-extrabold prose-h3:text-xl md:prose-h3:text-2xl prose-h3:text-[#6E2424] dark:prose-h3:text-[#C8A98B] prose-h3:leading-snug prose-h3:mt-10 prose-h3:mb-3.5
-          prose-h4:font-mono prose-h4:font-black prose-h4:tracking-widest prose-h4:uppercase prose-h4:text-xs md:prose-h4:text-sm prose-h4:text-[#6E2424] dark:prose-h4:text-[#C8A98B] prose-h4:leading-normal prose-h4:mt-8 prose-h4:mb-3
+          prose-h2:font-sans prose-h2:font-extrabold prose-h2:text-2xl md:prose-h2:text-3xl prose-h2:tracking-tight prose-h2:mt-14 prose-h2:mb-5 prose-h2:leading-snug prose-h2:text-[#1C1E21] dark:prose-h2:text-[#F5F4F0] prose-h2:border-b-2 prose-h2:border-[#6E2424]/40 dark:prose-h2:border-rust-orange/40 prose-h2:pb-2.5
+          prose-h3:font-sans prose-h3:font-extrabold prose-h3:text-xl md:prose-h3:text-2xl prose-h3:text-[#6E2424] dark:prose-h3:text-rust-orange prose-h3:leading-snug prose-h3:mt-10 prose-h3:mb-3.5
+          prose-h4:font-mono prose-h4:font-black prose-h4:tracking-widest prose-h4:uppercase prose-h4:text-xs md:prose-h4:text-sm prose-h4:text-[#6E2424] dark:prose-h4:text-rust-orange prose-h4:leading-normal prose-h4:mt-8 prose-h4:mb-3
           prose-strong:font-bold prose-strong:text-[#1C1E21] dark:prose-strong:text-white
-          prose-blockquote:border-l-3 prose-blockquote:border-[#6E2424] dark:prose-blockquote:border-[#C8A98B] prose-blockquote:bg-stone-200/60 dark:prose-blockquote:bg-white/5 prose-blockquote:p-6 prose-blockquote:md:p-8 prose-blockquote:my-10 prose-blockquote:rounded-r-xl prose-blockquote:shadow-lg prose-blockquote:text-xl prose-blockquote:md:text-2xl prose-blockquote:leading-relaxed prose-blockquote:font-serif prose-blockquote:font-light prose-blockquote:italic
-          prose-a:border-b prose-a:border-[#6E2424]/50 dark:prose-a:border-[#C8A98B]/50 prose-a:text-[#6E2424] dark:prose-a:text-[#C8A98B] prose-a:font-semibold transition-colors
+          prose-blockquote:border-l-3 prose-blockquote:border-[#6E2424] dark:prose-blockquote:border-rust-orange prose-blockquote:bg-stone-200/60 dark:prose-blockquote:bg-white/5 prose-blockquote:p-6 prose-blockquote:md:p-8 prose-blockquote:my-10 prose-blockquote:rounded-r-xl prose-blockquote:shadow-lg prose-blockquote:text-xl prose-blockquote:md:text-2xl prose-blockquote:leading-relaxed prose-blockquote:font-serif prose-blockquote:font-light prose-blockquote:italic
+          prose-a:border-b prose-a:border-[#6E2424]/50 dark:prose-a:border-rust-orange/50 prose-a:text-[#6E2424] dark:prose-a:text-rust-orange prose-a:font-semibold transition-colors
           prose-img:rounded-2xl prose-img:border prose-img:border-stone-300 dark:prose-img:border-white/10 prose-img:shadow-2xl prose-img:my-12 prose-img:w-full prose-img:object-cover
-          prose-p:first-of-type:first-letter:text-7xl md:prose-p:first-of-type:first-letter:text-8xl prose-p:first-of-type:first-letter:font-bold prose-p:first-of-type:first-letter:text-[#6E2424] dark:prose-p:first-of-type:first-letter:text-[#C8A98B] prose-p:first-of-type:first-letter:mr-4 prose-p:first-of-type:first-letter:float-left prose-p:first-of-type:first-letter:leading-none prose-p:first-of-type:first-letter:mt-1
-          prose-hr:border-none prose-hr:text-center prose-hr:text-[#6E2424] dark:prose-hr:text-[#C8A98B] prose-hr:tracking-[1em] prose-hr:py-10 prose-hr:after:content-['***']"
+          prose-p:first-of-type:first-letter:text-7xl md:prose-p:first-of-type:first-letter:text-8xl prose-p:first-of-type:first-letter:font-bold prose-p:first-of-type:first-letter:text-[#6E2424] dark:prose-p:first-of-type:first-letter:text-rust-orange prose-p:first-of-type:first-letter:mr-4 prose-p:first-of-type:first-letter:float-left prose-p:first-of-type:first-letter:leading-none prose-p:first-of-type:first-letter:mt-1
+          prose-hr:border-none prose-hr:text-center prose-hr:text-[#6E2424] dark:prose-hr:text-rust-orange prose-hr:tracking-[1em] prose-hr:py-10 prose-hr:after:content-['***']"
         >
           {
             (() => {
@@ -488,7 +482,7 @@ const imagePosition =
         {
           doc.saberMasDato && (
             <div class="my-12 p-6 md:p-8 rounded-2xl bg-linear-to-br from-stone-50 via-[#EBE9E1] to-stone-200 border border-stone-300/80 shadow-md dark:from-stone-900 dark:to-stone-950 dark:border-white/10 lg:hidden">
-              <span class="font-mono text-[9.5px] uppercase tracking-[0.3em] text-[#6E2424] dark:text-[#C8A98B] font-bold block mb-3">
+              <span class="font-mono text-[9.5px] uppercase tracking-[0.3em] text-[#6E2424] dark:text-rust-orange font-bold block mb-3">
                 Nota del Autor · Saber Más
               </span>
               <p class="font-serif italic font-medium text-stone-800 dark:text-white/95 text-base md:text-lg leading-relaxed">
@@ -512,7 +506,7 @@ const imagePosition =
           class="p-6 rounded-2xl bg-linear-to-b from-old-navy via-[#2B1A35] to-theme-dark dark:from-[#181d1a] dark:to-[#0d0f0e] text-stone-100 border border-stone-300/30 dark:border-white/10 shadow-2xl flex flex-col gap-3 group"
         >
           <span
-            class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-[#C8A98B] font-bold border-b border-purple-400/30 pb-2"
+            class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-rust-orange font-bold border-b border-purple-400/30 pb-2"
           >
             Contexto Histórico
           </span>
@@ -522,7 +516,7 @@ const imagePosition =
             "{contextualCitation.text}"
           </p>
           <div
-            class="flex items-center justify-between font-mono text-[8px] uppercase tracking-[0.22em] text-[#C8A98B] border-t border-purple-400/20 pt-2.5"
+            class="flex items-center justify-between font-mono text-[8px] uppercase tracking-[0.22em] text-rust-orange border-t border-purple-400/20 pt-2.5"
           >
             <span>{contextualCitation.source}</span>
           </div>
@@ -533,8 +527,8 @@ const imagePosition =
           doc.saberMasDato && (
             <div class="p-6 rounded-2xl bg-linear-to-br from-stone-50 via-[#EBE9E1] to-stone-200 border border-stone-300/80 shadow-md dark:from-stone-900 dark:to-stone-950 dark:border-white/10 flex flex-col gap-2.5 group">
               <div class="flex items-center gap-2 pb-2 border-b border-stone-300/60 dark:border-white/10">
-                <span class="w-2 h-2 rounded-full bg-[#6E2424] dark:bg-[#C8A98B] animate-pulse" />
-                <span class="font-mono text-[8.5px] uppercase tracking-[0.28em] text-[#6E2424] dark:text-[#C8A98B] font-bold">
+                <span class="w-2 h-2 rounded-full bg-[#6E2424] dark:bg-rust-orange animate-pulse" />
+                <span class="font-mono text-[8.5px] uppercase tracking-[0.28em] text-[#6E2424] dark:text-rust-orange font-bold">
                   SABER MÁS · NOTA DEL AUTOR
                 </span>
               </div>
@@ -552,12 +546,12 @@ const imagePosition =
           sidebarCollections.length > 0 && (
             <div class="cinematic-card-lantern p-5.5 rounded-2xl flex flex-col gap-3 group">
               <div class="flex items-center justify-between border-b border-white/5 pb-2">
-                <span class="font-mono text-[8.5px] uppercase tracking-[0.28em] text-[#C8A98B] font-bold group-hover:drop-shadow-[0_0_8px_rgba(200,169,139,0.6)] transition-all">
+                <span class="font-mono text-[8.5px] uppercase tracking-[0.28em] text-rust-orange font-bold group-hover:drop-shadow-[0_0_8px_rgba(200,169,139,0.6)] transition-all">
                   COLECCIONES
                 </span>
                 <a
                   href="/colecciones"
-                  class="font-mono text-[8px] uppercase tracking-widest text-white/40 hover:text-[#C8A98B] hover:drop-shadow-[0_0_8px_rgba(200,169,139,0.6)] transition-all"
+                  class="font-mono text-[8px] uppercase tracking-widest text-white/40 hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(200,169,139,0.6)] transition-all"
                 >
                   VER TODAS →
                 </a>
@@ -567,12 +561,12 @@ const imagePosition =
                 {sidebarCollections.map((col) => (
                   <a
                     href={`/colecciones/${encodeURIComponent(col.key)}`}
-                    class="group/item flex items-center justify-between py-1.5 px-2.5 rounded-lg border border-transparent hover:border-[#C8A98B]/30 hover:bg-[#C8A98B]/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.18)] transition-all duration-400 text-xs"
+                    class="group/item flex items-center justify-between py-1.5 px-2.5 rounded-lg border border-transparent hover:border-rust-orange/30 hover:bg-rust-orange/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.18)] transition-all duration-400 text-xs"
                   >
                     <span class="font-mono text-[9.5px] text-white/60 group-hover/item:text-white group-hover/item:drop-shadow-[0_0_6px_rgba(255,255,255,0.6)] transition-all truncate">
                       {col.label}
                     </span>
-                    <span class="font-mono text-[8px] text-[#C8A98B]/70 group-hover/item:text-[#C8A98B] group-hover/item:drop-shadow-[0_0_6px_rgba(200,169,139,0.8)] shrink-0 font-bold transition-all">
+                    <span class="font-mono text-[8px] text-rust-orange/70 group-hover/item:text-rust-orange group-hover/item:drop-shadow-[0_0_6px_rgba(200,169,139,0.8)] shrink-0 font-bold transition-all">
                       {col.count}
                     </span>
                   </a>
@@ -586,7 +580,7 @@ const imagePosition =
         {
           wikimediaImages.length > 0 ? (
             <div class="cinematic-card-lantern p-4.5 rounded-2xl flex flex-col gap-3 group">
-              <span class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-[#C8A98B] block border-b border-white/5 pb-2 font-bold group-hover:drop-shadow-[0_0_8px_rgba(200,169,139,0.6)] transition-all">
+              <span class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-rust-orange block border-b border-white/5 pb-2 font-bold group-hover:drop-shadow-[0_0_8px_rgba(200,169,139,0.6)] transition-all">
                 REGISTROS VISUALES ({wikimediaImages.length})
               </span>
               <div class="grid grid-cols-2 gap-2">
@@ -595,7 +589,7 @@ const imagePosition =
                     href={wmItem.pageUrl || wmItem.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="group/img relative aspect-4/3 rounded-lg overflow-hidden border border-white/10 bg-white/5 hover:border-[#C8A98B]/70 hover:shadow-[0_0_18px_rgba(200,169,139,0.25)] transition-all duration-500"
+                    class="group/img relative aspect-4/3 rounded-lg overflow-hidden border border-white/10 bg-white/5 hover:border-rust-orange/70 hover:shadow-[0_0_18px_rgba(200,169,139,0.25)] transition-all duration-500"
                     title={wmItem.title}
                   >
                     <img
@@ -604,7 +598,7 @@ const imagePosition =
                       class="w-full h-full object-cover group-hover/img:scale-108 transition-transform duration-700 opacity-80 group-hover/img:opacity-100"
                       loading="lazy"
                     />
-                    <span class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 backdrop-blur-md text-[7.5px] font-mono text-white/70 rounded border border-white/10 group-hover/img:border-[#C8A98B]/50 group-hover/img:text-[#C8A98B] transition-all">
+                    <span class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 backdrop-blur-md text-[7.5px] font-mono text-white/70 rounded border border-white/10 group-hover/img:border-rust-orange/50 group-hover/img:text-rust-orange transition-all">
                       #{idx + 1}
                     </span>
                   </a>
@@ -647,9 +641,9 @@ const imagePosition =
             <div class="absolute inset-0 bg-linear-to-t from-theme-dark/90 via-theme-dark/50 to-transparent pointer-events-none"></div>
           </div>
           <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 pointer-events-none">
-            <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] mb-4 font-bold border-b border-[#C8A98B]/30 pb-2">Archivo Historiográfico</span>
+            <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-rust-orange mb-4 font-bold pb-2">Archivo Historiográfico</span>
             <h3 class="font-cinzel text-4xl md:text-6xl lg:text-7xl text-white font-bold mb-8 drop-shadow-2xl">Registro Visual Completo</h3>
-            <button class="pointer-events-none inline-flex items-center gap-4 border border-white/30 bg-black/40 backdrop-blur-md px-10 py-4 rounded-full group-hover:bg-[#C8A98B] group-hover:border-[#C8A98B] group-hover:text-theme-dark text-white transition-all duration-500 shadow-2xl scale-110">
+            <button class="pointer-events-none inline-flex items-center gap-4 border border-white/30 bg-[#151718] backdrop-blur-md px-10 py-4 rounded-full group-hover:bg-rust-orange group-hover:border-rust-orange group-hover:text-theme-dark text-white transition-all duration-500 shadow-2xl scale-110">
               <span class="font-mono text-[11px] uppercase tracking-[0.3em] font-bold">Abrir Galería ({allGalleryImages.length} Imágenes)</span>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-2 transition-transform"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </button>
@@ -663,47 +657,17 @@ const imagePosition =
 
     <ExploreMore currentSlug={slug!} category={data.category ?? undefined} />
 
-    <SubstackPrefooter />
 
-    <div class="max-w-2xl mx-auto relative z-10 pt-20 pb-28 text-center">
+    <div class="max-w-2xl mx-auto relative z-10 pt-16 pb-24 text-center">
       <a
         href="/archivo"
-        class="inline-block font-mono text-[10px] bg-transparent border border-transparent px-10 py-4 uppercase tracking-[0.3em] text-white/50 cta-stacked-primary hover:bg-white/10 hover:border-[#C8A98B] hover:text-white hover:shadow-[0_0_16px_rgba(200,169,139,0.35)] transition-all duration-500 rounded-full"
+        class="inline-flex items-center gap-3 font-mono text-[9px] bg-[#151718]/90 backdrop-blur-sm border border-white/10 px-8 py-3.5 uppercase tracking-[0.3em] text-white/50 hover:bg-rust-orange/10 hover:border-rust-orange/45 hover:text-rust-orange transition-all duration-500 rounded-full"
       >
         Cerrar Archivo
       </a>
     </div>
   </article>
 
-  {/* Floating Action Bar: Podcast links */}
-  {
-    (doc.spotifyLink || doc.youtubeLink) && (
-      <div class="fixed bottom-8 right-8 z-50 flex flex-col gap-4">
-        {doc.spotifyLink && (
-          <a
-            href={doc.spotifyLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="w-12 h-12 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white/40 hover:text-white hover:border-white/30 hover:scale-110 transition-all duration-700 group shadow-2xl"
-            title="Escuchar en Spotify"
-          >
-            <SpotifyIcon class="w-5 h-5 blur-[0.5px] group-hover:blur-0 transition-all duration-700" />
-          </a>
-        )}
-        {doc.youtubeLink && (
-          <a
-            href={doc.youtubeLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="w-12 h-12 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white/40 hover:text-white hover:border-white/30 hover:scale-110 transition-all duration-700 group shadow-2xl"
-            title="Ver en YouTube"
-          >
-            <YouTubeIcon class="w-5 h-5 blur-[0.5px] group-hover:blur-0 transition-all duration-700" />
-          </a>
-        )}
-      </div>
-    )
-  }
       </>
     )
   }

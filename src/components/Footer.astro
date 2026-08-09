@@ -11,101 +11,47 @@ const { variant = 'full' } = Astro.props;
   /* =========================================================================
      VARIANTE MINIMALISTA (Interiores de Post / Ensayos)
      ========================================================================= */
-  <footer class="w-full bg-(--bg-main) text-stone-200 border-t border-white/10 dark:border-white/10 py-8 md:py-10 px-6 md:px-12 lg:px-16 mt-20 relative z-40 transition-colors duration-500">
-    <div class="max-w-400 mx-auto flex flex-col gap-6">
-      
-      {/* ─── FILA SUPERIOR: MARCA COMPACTA TGP / ENLACES / REDES / BOTÓN COMPARTIR ─── */}
-      <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-white/10 dark:border-white/10">
-        
-        {/* Izquierda: Isotipo + TGP + / + Enlaces Monoespaciados */}
-        <div class="flex flex-wrap items-center gap-3 sm:gap-4">
-          <a href="/" class="group flex items-center gap-2.5" title="The Great Puzzle Project">
-            <div class="w-8 h-8 rounded-full border border-current/30 bg-current/5 flex items-center justify-center group-hover:scale-105 transition-all shrink-0">
-              <svg class="w-4.5 h-4.5 text-current group-hover:text-rust-orange transition-colors" viewBox="0 0 100 100" fill="none">
-                <path
-                  d="M 34 28 H 42 C 41.5 21, 37 10, 50 10 C 63 10, 58.5 21, 58 28 H 66 A 6 6 0 0 1 72 34 V 66 A 6 6 0 0 1 66 72 H 58 C 58.5 79, 63 90, 50 90 C 37 90, 41.5 79, 42 72 H 34 A 6 6 0 0 1 28 66 V 58 C 35 58.5, 45 63, 45 50 C 45 37, 35 41.5, 28 42 V 34 A 6 6 0 0 1 34 28 Z"
-                  stroke="currentColor"
-                  stroke-width="5.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </div>
-            <span class="font-['Gloock'] font-black text-lg md:text-xl tracking-wider text-current group-hover:text-rust-orange transition-colors">
-              TGP
-            </span>
-          </a>
+  <footer class="w-full bg-(--bg-main) text-[#E0E0E0] border-t border-white/5 py-8 md:py-10 px-6 md:px-12 lg:px-16 mt-20 relative z-40 transition-colors duration-500 overflow-hidden">
+    <div class="max-w-400 mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
 
-          <span class="opacity-30 font-mono text-xs">/</span>
-
-          <nav class="flex flex-wrap items-center gap-2.5 sm:gap-3.5 font-mono text-xs uppercase tracking-[0.2em] font-light text-white/70 dark:text-stone-300">
-            <a href="/" class="hover:text-rust-orange transition-colors">INICIO</a>
-            <span class="opacity-30">·</span>
-            <a href="/colecciones" class="hover:text-rust-orange transition-colors">COLECCIONES</a>
-            <span class="opacity-30">·</span>
-            <a href="/archivo" class="hover:text-rust-orange transition-colors">ARCHIVO</a>
-            <span class="opacity-30">·</span>
-            <a href="/manifiesto" class="hover:text-rust-orange transition-colors">MANIFIESTO</a>
-          </nav>
+      {/* ─── SELLO + NOMBRE PRINCIPAL ─── */}
+      <div class="flex items-center gap-4 shrink-0">
+        <div class="relative flex items-center justify-center w-10 h-10">
+          <svg viewBox="0 0 100 100" class="absolute inset-0 w-full h-full animate-[spin_40s_linear_infinite] opacity-50">
+            <path id="tgp-seal-curve-min" d="M 50,50 m -42,0 a 42,42 0 1,1 84,0 a 42,42 0 1,1 -84,0" fill="transparent" />
+            <text>
+              <textPath href="#tgp-seal-curve-min" startOffset="0%"><tspan font-family="monospace" font-size="8" fill="#C8A98B">TGP • ARCHIVO • TGP • ARCHIVO • TGP • ARCHIVO • </tspan></textPath>
+            </text>
+          </svg>
+          <svg class="w-4.5 h-4.5 text-rust-orange" viewBox="0 0 100 100" fill="none">
+            <path d="M 34 28 H 42 C 41.5 21, 37 10, 50 10 C 63 10, 58.5 21, 58 28 H 66 A 6 6 0 0 1 72 34 V 66 A 6 6 0 0 1 66 72 H 58 C 58.5 79, 63 90, 50 90 C 37 90, 41.5 79, 42 72 H 34 A 6 6 0 0 1 28 66 V 58 C 35 58.5, 45 63, 45 50 C 45 37, 35 41.5, 28 42 V 34 A 6 6 0 0 1 34 28 Z" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
         </div>
-
-        {/* Derecha: Redes Sociales Monocromo + Separador + Botón Compartir */}
-        <div class="flex items-center gap-4 flex-wrap justify-end">
-          <div class="flex items-center gap-3 text-white/60">
-            <a href="https://www.youtube.com/@thegreatpuzzleproject" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="hover:text-rust-orange hover:scale-110 transition-all">
-              <svg class="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 0 1-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 0 1-1.768-1.768C2 15.255 2 12 2 12s0-3.255.417-4.814a2.507 2.507 0 0 1 1.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418ZM15.194 12 10 15V9l5.194 3Z" clip-rule="evenodd"></path></svg>
-            </a>
-            <a href="https://www.instagram.com/thegreatpuzzleproject" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="hover:text-rust-orange hover:scale-110 transition-all">
-              <svg class="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd"></path></svg>
-            </a>
-            <a href="https://x.com/TheTGPProject" target="_blank" rel="noopener noreferrer" aria-label="X" class="hover:text-rust-orange hover:scale-110 transition-all">
-              <svg class="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
-            </a>
-            <a href="https://www.tiktok.com/@thegreatpuzzleproject" target="_blank" rel="noopener noreferrer" aria-label="TikTok" class="hover:text-rust-orange hover:scale-110 transition-all">
-              <svg class="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path></svg>
-            </a>
-            <a href="https://www.facebook.com/thegreatpuzzleproject" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="hover:text-rust-orange hover:scale-110 transition-all">
-              <svg class="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd"></path></svg>
-            </a>
-            <a href="https://www.linkedin.com/in/xavierignaciobenitez/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="hover:text-rust-orange hover:scale-110 transition-all">
-              <svg class="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"></path></svg>
-            </a>
-            <a href="https://wa.me/5491136395357" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" class="hover:text-rust-orange hover:scale-110 transition-all">
-              <svg class="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-            </a>
-          </div>
-
-          <span class="opacity-20 text-white/40">|</span>
-
-          {/* Botón Compartir */}
-          <button
-            id="tgp-share-btn-min"
-            type="button"
-            class="flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.18em] text-rust-orange hover:text-white transition-colors cursor-pointer"
-          >
-            <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-              <polyline points="16 6 12 2 8 6"/>
-              <line x1="12" y1="2" x2="12" y2="15"/>
-            </svg>
-            <span>COMPARTIR</span>
-          </button>
+        <div class="flex flex-col">
+          <span class="font-['Gloock'] font-black text-base md:text-lg tracking-wide text-[#E0E0E0] leading-tight">THE GREAT PUZZLE PROJECT</span>
+          <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-white/40">Dir. Xavier Benítez</span>
         </div>
-
       </div>
 
-      {/* ─── FILA INFERIOR / COLOFÓN MINIMALISTA ─── */}
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.18em] text-white/40">
-        <div>
-          © 2026 THE GREAT PUZZLE PROJECT · POR <a href="https://gravatar.com/xavierbeniteztgp" target="_blank" rel="noopener noreferrer" class="font-bold text-[#A855F7] hover:text-rust-orange transition-colors">XAVIER BENÍTEZ</a>
-        </div>
-        <div class="flex items-center gap-3 text-white/50">
-          <a href="https://share.google/2jdBPO5AZhrjplGgj" target="_blank" rel="noopener noreferrer" class="hover:text-rust-orange transition-colors">BUENOS AIRES</a>
-          <span>·</span>
-          <a href="https://share.google/2jdBPO5AZhrjplGgj" target="_blank" rel="noopener noreferrer" class="hover:text-rust-orange transition-colors">BURZACO</a>
-          <span>·</span>
-          <a href="https://share.google/2jdBPO5AZhrjplGgj" target="_blank" rel="noopener noreferrer" class="hover:text-rust-orange transition-colors">SUR GLOBAL</a>
-        </div>
+      {/* ─── NAV CENTRAL ─── */}
+      <nav class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 font-mono text-[9px] uppercase tracking-[0.22em] text-white/45">
+        <a href="/" class="hover:text-rust-orange transition-colors">Inicio</a>
+        <span class="opacity-20">·</span>
+        <a href="/colecciones" class="hover:text-rust-orange transition-colors">Colecciones</a>
+        <span class="opacity-20">·</span>
+        <a href="/archivo" class="hover:text-rust-orange transition-colors">Archivo</a>
+        <span class="opacity-20">·</span>
+        <a href="/about" class="hover:text-rust-orange transition-colors">About</a>
+      </nav>
+
+      {/* ─── ACCIONES + COPYRIGHT ─── */}
+      <div class="flex items-center gap-4 font-mono text-[9px] uppercase tracking-[0.2em] text-white/30 shrink-0">
+        <button id="tgp-share-btn-min" type="button" class="hover:text-rust-orange transition-colors cursor-pointer flex items-center gap-1.5">
+          <svg class="w-3 h-3 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          Compartir
+        </button>
+        <span class="opacity-20">·</span>
+        <span>© 2026 TGP</span>
       </div>
 
     </div>
@@ -164,7 +110,7 @@ const { variant = 'full' } = Astro.props;
             <a href="/" class="hover:text-rust-orange transition-colors">Inicio</a>
             <a href="/colecciones" class="hover:text-rust-orange transition-colors">Colecciones</a>
             <a href="/archivo" class="hover:text-rust-orange transition-colors">Archivo</a>
-            <a href="/manifiesto" class="hover:text-rust-orange transition-colors">Manifiesto</a>
+            <a href="/about" class="hover:text-rust-orange transition-colors">About</a>
             <a href="/codice" class="hover:text-rust-orange transition-colors">El Códice</a>
           </nav>
         </div>

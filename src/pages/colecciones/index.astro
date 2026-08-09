@@ -9,6 +9,7 @@ import {
   formatCategory,
   formatYear,
   resolveEssayImage,
+  sortEssaysByVisualFirst,
 } from '../../lib/content-filter';
 
 // ─── CARGA Y FILTRADO ────────────────────────────────────────────────────────
@@ -18,7 +19,7 @@ const isProd = import.meta.env.PROD;
 const publishable = [
   ...getPublishableEssays(allEssaysRaw, isProd),
   ...getPublishableEssays(allArquetiposRaw, isProd)
-];
+].sort(sortEssaysByVisualFirst);
 
 // ─── TODAS LAS COLECCIONES TEMÁTICAS (≥ 1 ARTÍCULO) ──────────────────────────
 const categoryGroups = groupByCategory(publishable, 1);
@@ -64,7 +65,7 @@ function createPremierSequences(essays: any[]) {
 ---
 
 <Layout title="Colecciones | The Great Puzzle Project">
-  <div class="bg-black text-white min-h-screen pb-32">
+  <div class="text-white min-h-screen pb-32">
 
     <InteriorHero
       title="Colecciones"

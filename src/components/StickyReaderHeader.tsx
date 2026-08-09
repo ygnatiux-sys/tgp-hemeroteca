@@ -137,7 +137,7 @@ export const StickyReaderHeader: React.FC<Props> = ({ title, accentColor = '#B55
             <span className="opacity-30 font-mono text-xs shrink-0">/</span>
 
             {/* Título del Post que abre en esa misma página AMPLIADO */}
-            <span className="font-serif italic text-base md:text-lg lg:text-[19px] text-rust-orange dark:text-rust-orange truncate font-normal leading-tight">
+            <span className="font-serif italic text-base md:text-lg lg:text-[19px] text-rust-orange truncate font-normal leading-tight">
               {title}
             </span>
 
@@ -156,7 +156,7 @@ export const StickyReaderHeader: React.FC<Props> = ({ title, accentColor = '#B55
             className="h-full transition-all duration-150 ease-out bg-rust-orange"
             style={{ 
               width: `${Math.min(100, Math.max(0, progress))}%`,
-              boxShadow: `0 0 10px rgba(181,90,48,0.7)`
+              boxShadow: `0 0 10px rgba(200,169,139,0.6)`
             }}
           />
         </div>

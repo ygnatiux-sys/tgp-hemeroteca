@@ -98,48 +98,85 @@ const { fragments = [], isModal = false } = Astro.props;
   </div>{/* end slides-container */}
 
   {/* Pantalla Intro Cinemática en Tandas */}
-  <div class="intro-screen absolute inset-0 z-50 flex flex-col items-center justify-center opacity-0 pointer-events-none bg-black">
-    {/* TANDA 1: Marca & Presenta */}
-    <div class="intro-brand-stage absolute inset-0 flex flex-col items-center justify-center opacity-0">
+  <div class="intro-screen absolute inset-0 z-50 flex flex-col items-center justify-center opacity-0 pointer-events-none bg-black/80 backdrop-blur-xs">
+    
+    {/* EFECTO TV CRT INICIAL (1ms después sobre la foto hero en semitransparente) */}
+    <div class="intro-tv-stage absolute inset-0 flex flex-col items-center justify-center opacity-0 pointer-events-none z-20">
+      <div class="intro-tv-brand flex flex-col items-center justify-center">
+        <div class="font-cinzel text-4xl md:text-6xl text-[#C8A98B] font-bold drop-shadow-[0_0_40px_rgba(200,169,139,0.9)] tracking-wider text-center px-6">
+          The Great Puzzle
+        </div>
+        <div class="font-mono text-xs md:text-sm tracking-[0.6em] text-white/70 mt-3 uppercase">
+          — project —
+        </div>
+      </div>
+    </div>
+
+    {/* TANDA 1: Marca & Presenta (Sobre fondo negro) */}
+    <div class="intro-brand-stage absolute inset-0 flex flex-col items-center justify-center opacity-0 z-10">
       <div class="intro-tgp-title font-cinzel text-4xl md:text-6xl text-[#C8A98B] font-bold drop-shadow-[0_0_35px_rgba(200,169,139,0.7)] tracking-wider text-center px-6">
         The Great Puzzle
       </div>
       <div class="intro-tgp-project font-mono text-xs md:text-sm tracking-[0.6em] text-white/50 mt-4 uppercase">
         — project —
       </div>
-      <div class="intro-tgp-presenta font-serif italic text-sm md:text-base text-white/60 tracking-widest mt-8">
+      <div class="intro-tgp-presenta font-serif italic text-base md:text-lg text-white/70 tracking-widest mt-8">
         presenta
       </div>
     </div>
 
-    {/* TANDA 2: Título Extra Bold + Registro Visual Completo */}
-    <div class="intro-post-stage absolute inset-0 flex items-center justify-center opacity-0">
-      <div class="text-center px-6 max-w-5xl">
-        <h1 class="intro-post-title font-cinzel text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight drop-shadow-2xl tracking-tight mb-6">
+    {/* TANDA 2: Título Extra Bold Titanio Documental + Registro Visual Completo + Meta Socials */}
+    <div class="intro-post-stage absolute inset-0 flex items-center justify-center opacity-0 z-10">
+      <div class="text-center px-6 max-w-6xl flex flex-col items-center">
+        <h1 class="intro-post-title font-cinzel text-5xl md:text-7xl lg:text-8xl font-extrabold leading-tight tracking-tight mb-6 bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-[0_15px_50px_rgba(0,0,0,0.95)]">
           {fragments[0]?.highlight || 'Ensayo Historiográfico'}
         </h1>
-        <h2 class="intro-post-h2 font-mono text-xs md:text-sm uppercase tracking-[0.4em] text-[#C8A98B] font-semibold border-t border-[#C8A98B]/30 pt-3 inline-block">
+        <h2 class="intro-post-h2 font-mono text-xs md:text-sm uppercase tracking-[0.4em] text-[#C8A98B] font-semibold pb-2 inline-block">
           REGISTRO VISUAL COMPLETO
         </h2>
+
+        {/* METADATOS CON ÍCONOS SPOTIFY Y YOUTUBE */}
+        <div class="intro-post-meta flex items-center justify-center gap-6 mt-6 transition-opacity duration-700 hover:opacity-100!">
+          <a
+            href={fragments[0]?.spotifyLink || "https://open.spotify.com"}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="intro-meta-item group/sp flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.3em] text-white/60 hover:text-[#1DB954] transition-all duration-500 opacity-0"
+          >
+            <div class="p-2 rounded-full border border-white/20 group-hover/sp:border-[#1DB954] group-hover/sp:bg-[#1DB954]/15 transition-all duration-500">
+              <SpotifyIcon class="w-4 h-4 text-white/70 group-hover/sp:text-[#1DB954] transition-all duration-500" />
+            </div>
+            <span>SPOTIFY</span>
+          </a>
+
+          <a
+            href={fragments[0]?.youtubeLink || "https://youtube.com/@thegreatpuzzleproject"}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="intro-meta-item group/yt flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.3em] text-white/60 hover:text-[#E52D27] transition-all duration-500 opacity-0"
+          >
+            <div class="p-2 rounded-full border border-white/20 group-hover/yt:border-[#E52D27] group-hover/yt:bg-[#E52D27]/15 transition-all duration-500">
+              <YouTubeIcon class="w-4 h-4 text-white/70 group-hover/yt:text-[#E52D27] transition-all duration-500" />
+            </div>
+            <span>YOUTUBE</span>
+          </a>
+        </div>
       </div>
     </div>
   </div>
 
   {/* Pantalla Outro (The Great Puzzle) */}
   <div class="outro-screen absolute inset-0 z-50 flex flex-col items-center justify-center opacity-0 pointer-events-none bg-black">
-    {/* 1. Título del Post - aparece primero, 2 seg, desaparece */}
-    <h2 class="outro-post-title font-cinzel text-2xl md:text-4xl text-white/80 font-bold opacity-0 text-center px-8 max-w-4xl tracking-wide">
+    {/* 1. Título del Post - idéntico en tamaño y efectos al Intro */}
+    <h2 class="outro-post-title font-cinzel text-5xl md:text-7xl lg:text-8xl font-extrabold opacity-0 text-center px-8 max-w-6xl tracking-tight leading-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-[0_15px_50px_rgba(0,0,0,0.95)]">
        {fragments[0]?.highlight || 'Registro Visual'}
     </h2>
-    {/* 2. The Great Puzzle - surge desde centro, 2 seg */}
-    <div class="outro-brand-main absolute inset-0 flex flex-col items-center justify-center opacity-0 scale-50">
-      <div class="font-cinzel text-4xl md:text-6xl text-[#C8A98B] font-bold drop-shadow-[0_0_30px_rgba(200,169,139,0.6)] tracking-wide text-center px-6">
+    {/* 2. Brand unido para efecto TV CRT */}
+    <div class="outro-tv-brand absolute inset-0 flex flex-col items-center justify-center opacity-0 pointer-events-none z-20">
+      <div class="font-cinzel text-4xl md:text-6xl text-[#C8A98B] font-bold drop-shadow-[0_0_40px_rgba(200,169,139,0.9)] tracking-wider text-center px-6">
         The Great Puzzle
       </div>
-    </div>
-    {/* 3. -project- - aparece inmediatamente después, se desvanece junto */}
-    <div class="outro-brand-sub absolute inset-0 flex flex-col items-center justify-center pt-28 md:pt-32 opacity-0">
-      <div class="font-mono text-xs md:text-sm tracking-[0.6em] text-white/40 uppercase">
+      <div class="font-mono text-xs md:text-sm tracking-[0.6em] text-white/70 mt-3 uppercase">
         — project —
       </div>
     </div>
@@ -446,9 +483,11 @@ const { fragments = [], isModal = false } = Astro.props;
       }
     }
     
-    // Secuencia de Entradas Cinemáticas en Tandas (Intro)
+    // Secuencia de Entradas Cinemáticas en Tandas con Efecto TV (Intro)
     function playIntroSequence(onCompleteCallback?: () => void) {
       const introScreen = wrapper!.querySelector('.intro-screen');
+      const tvStage = wrapper!.querySelector('.intro-tv-stage');
+      const tvBrand = wrapper!.querySelector('.intro-tv-brand');
       const brandStage = wrapper!.querySelector('.intro-brand-stage');
       const tgpTitle = wrapper!.querySelector('.intro-tgp-title');
       const tgpProject = wrapper!.querySelector('.intro-tgp-project');
@@ -457,7 +496,7 @@ const { fragments = [], isModal = false } = Astro.props;
       const postTitle = wrapper!.querySelector('.intro-post-title');
       const postH2 = wrapper!.querySelector('.intro-post-h2');
 
-      if (!introScreen || !brandStage || !postStage) {
+      if (!introScreen || !tvStage || !tvBrand || !brandStage || !postStage) {
         if (onCompleteCallback) onCompleteCallback();
         return;
       }
@@ -470,6 +509,13 @@ const { fragments = [], isModal = false } = Astro.props;
 
       isIntroPlaying = true;
 
+      // Audio cinemático Submarine Ping / Dark Braam para el Intro
+      try {
+        const audio = new Audio('/intro.cinematic.wav');
+        audio.volume = 0.85;
+        audio.play().catch(() => {});
+      } catch (e) {}
+
       const tl = gsap.timeline({
         onComplete: () => {
           gsap.set(introScreen, { opacity: 0, pointerEvents: 'none' });
@@ -478,71 +524,151 @@ const { fragments = [], isModal = false } = Astro.props;
         }
       });
 
-      gsap.set(introScreen, { opacity: 1, pointerEvents: 'auto' });
-      gsap.set([brandStage, postStage], { opacity: 0 });
-      gsap.set([tgpTitle, tgpProject, tgpPresenta, postTitle, postH2], { opacity: 0, y: 20 });
-      gsap.set(tgpTitle, { scale: 0.85, filter: 'blur(10px)' });
-      gsap.set(postTitle, { scale: 0.95, filter: 'blur(8px)' });
+      // FORZAR QUE LA PRIMERA IMAGEN VISIBLE SEA LA HERO (slide 0)
+      slides.forEach((s, idx) => {
+        gsap.set(s, { opacity: idx === 0 ? 1 : 0, zIndex: idx === 0 ? 20 : 10 });
+        if (idx === 0) s.classList.add('active');
+        else s.classList.remove('active');
+      });
+      currentIndex = 0;
+
+      // Iniciar con la foto HERO visible al fondo a través del overlay transparente
+      gsap.set(introScreen, { opacity: 1, pointerEvents: 'auto', backgroundColor: 'rgba(0,0,0,0.5)' });
+      gsap.set([tvStage, brandStage, postStage], { opacity: 0 });
+      gsap.set(tvBrand, { scaleX: 0, scaleY: 0.003, opacity: 1, filter: 'brightness(3)' });
+      gsap.set([tgpTitle, tgpProject, tgpPresenta], { opacity: 0, y: 20 });
+      gsap.set(tgpTitle, { scale: 0.9, filter: 'none' });
+      gsap.set(postTitle, { scale: 0.96, opacity: 0, filter: 'none' });
+      gsap.set(postH2, { opacity: 0, y: 15 });
 
       tl
-        // TANDA 1: The Great Puzzle > — project — > presenta
-        .to(brandStage, { opacity: 1, duration: 0.5 })
-        .to(tgpTitle, { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 1.6, ease: 'power2.out' })
+        // 1. TV TURN ON SOBRE LA FOTO HERO (1ms después)
+        .to(tvStage, { opacity: 1, duration: 0.001 }, '+=0.001')
+        .to(tvBrand, { scaleX: 1, scaleY: 0.003, filter: 'brightness(2.5)', duration: 0.25, ease: 'power4.out' })
+        .to(tvBrand, { scaleY: 1, filter: 'brightness(1)', duration: 0.35, ease: 'power2.out' })
+        
+        // Mantener 1.5 segundos encendido sobre la foto
+        .to({}, { duration: 1.5 })
+        
+        // TV TURN OFF: Apagado estilo TV analógica
+        .to(tvBrand, { scaleY: 0.003, filter: 'brightness(3)', duration: 0.2, ease: 'power2.in' })
+        .to(tvBrand, { scaleX: 0, opacity: 0, filter: 'brightness(5)', duration: 0.2, ease: 'power4.in' })
+        .to(tvStage, { opacity: 0, duration: 0.1 })
+
+        // Pausa extendida entre apagados (1.5 segundos)
+        .to({}, { duration: 1.5 })
+
+        // 2. FADE A PANTALLA NEGRA TOTAL Y TANDA "THE GREAT PUZZLE PRESENTA"
+        .to(introScreen, { backgroundColor: 'rgba(0,0,0,1)', duration: 0.8, ease: 'power2.inOut' })
+        .to(brandStage, { opacity: 1, duration: 0.4 })
+        .to(tgpTitle, { opacity: 1, scale: 1, filter: 'none', duration: 1.6, ease: 'power2.out' })
         .to(tgpProject, { opacity: 1, y: 0, duration: 1, ease: 'power2.out' }, '-=0.8')
         .to(tgpPresenta, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, '-=0.4')
-        .to(brandStage, { opacity: 0, y: -20, filter: 'blur(6px)', duration: 1, ease: 'power2.in' }, '+=1.0')
+        .to(brandStage, { opacity: 0, y: -20, filter: 'blur(6px)', duration: 1.2, ease: 'power2.in' }, '+=1.5')
 
-        // TANDA 2: Título Extra Bold > REGISTRO VISUAL COMPLETO H2
-        .to(postStage, { opacity: 1, duration: 0.5 })
-        .to(postTitle, { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 1.5, ease: 'power3.out' })
-        .to(postH2, { opacity: 1, y: 0, duration: 1, ease: 'power2.out' }, '-=0.7')
-        .to(postStage, { opacity: 0, filter: 'blur(8px)', duration: 1.2, ease: 'power2.in' }, '+=1.5')
+        // Pausa extendida antes de la presentación prioritaria del título (1.5 segundos)
+        .to({}, { duration: 1.5 })
+
+        // 3. PRESENTACIÓN CINEMÁTICA RÍTMICA DE H2 Y H1 + PALABRA ÚNICA A 1/3 SCREEN CON IRIDISCENCIA
+        .add(() => {
+          if (!postTitle) return;
+          const titleText = postTitle.textContent?.trim() || "";
+          const isSingleWord = titleText.length > 0 && titleText.split(/\s+/).length === 1;
+          if (isSingleWord) postTitle.classList.add("is-permanently-iridescent");
+          gsap.set(postStage, { opacity: 1 });
+        })
+        .to(postH2, { opacity: 1, y: 0, duration: 1.4, ease: 'power2.out' })
+        .to(postTitle, { opacity: 1, scale: (postTitle?.textContent?.trim().split(/\s+/).length === 1 ? 1.45 : 1.04), duration: 2.8, ease: 'power3.out' }, '+=0.4')
         
-        // FADE TOTAL A CONTENIDO DE IMÁGENES
-        .to(introScreen, { opacity: 0, duration: 1.2, ease: 'power2.inOut' }, '-=0.4');
+        // Presentación muy lenta uno a uno de íconos Spotify/YouTube y metadata
+        .add(() => {
+          const metaItems = wrapper!.querySelectorAll('.intro-meta-item');
+          if (metaItems.length > 0) {
+            gsap.fromTo(
+              metaItems,
+              { opacity: 0, y: 15 },
+              { opacity: 1, y: 0, duration: 1.5, stagger: 0.5, ease: 'power2.out' }
+            );
+          }
+        })
+
+        // MÁXIMA PRIORIDAD TEMÁTICA: 3.5 segundos de presencia firme
+        .to({}, { duration: 3.5 })
+
+        // PROLONGADO Y SUAVE DESVANECIMIENTO A BLACK (3.2 segundos)
+        .to(postTitle, { opacity: 0, scale: 1.09, duration: 3.2, ease: 'power2.inOut' })
+        .to(postH2, { opacity: 0, y: -10, duration: 2.0, ease: 'power2.inOut' }, '-=2.8')
+        .to(postStage, { opacity: 0, duration: 1.2 }, '-=1.2')
+        
+        // 4. FADE REVELANDO LA GALERÍA
+        .add(() => {
+          if (onCompleteCallback) onCompleteCallback();
+        })
+        .to(introScreen, { opacity: 0, duration: 1.8, ease: 'power2.inOut' });
     }
 
-    // Secuencia de Finalización (Outro)
+    // Secuencia de Finalización (Outro Documental con Prolongado Fade a Black)
     function playOutroSequence() {
       isOutroPlaying = true;
       stopAutoplay();
+
+      // Audio cinemático Deep Sucker Punch / Tail Out para el Outro
+      try {
+        const audio = new Audio('/outro.cinematic.wav');
+        audio.volume = 0.85;
+        audio.play().catch(() => {});
+      } catch (e) {}
       
       const outroScreen = wrapper!.querySelector('.outro-screen');
       const outroTitle = wrapper!.querySelector('.outro-post-title');
-      const outroBrandMain = wrapper!.querySelector('.outro-brand-main');
-      const outroBrandSub = wrapper!.querySelector('.outro-brand-sub');
-      if (!outroScreen || !outroTitle || !outroBrandMain || !outroBrandSub) return;
+      const outroTvBrand = wrapper!.querySelector('.outro-tv-brand');
+      if (!outroScreen || !outroTitle || !outroTvBrand) return;
       
       // Set initial GSAP states
-      gsap.set([outroTitle, outroBrandMain, outroBrandSub], { opacity: 0 });
-      gsap.set(outroBrandMain, { scale: 0.6 });
+      gsap.set(outroTitle, { opacity: 0, scale: 0.96 });
+      gsap.set(outroTvBrand, { scaleX: 0, scaleY: 0.003, opacity: 0, filter: 'brightness(3)' });
       
-      const tl = gsap.timeline({
-         onComplete: () => {
+      gsap.set(outroScreen, { opacity: 1, pointerEvents: 'auto', backgroundColor: 'rgba(0,0,0,1)' });
+      
+      const tl = gsap.timeline();
+
+      tl
+        // 1ª TANDA: Título del Post Titanio Documental — zoom suave, 3.5s visibilidad y prolongado desvanecimiento a black
+        .to(outroTitle, { opacity: 1, scale: 1.04, duration: 2.5, ease: 'power2.out' }, '+=0.5')
+        .to({}, { duration: 3.5 })
+        
+        // PROLONGADO Y SUAVE DESVANECIMIENTO A BLACK (3.2 segundos)
+        .to(outroTitle, { opacity: 0, scale: 1.09, duration: 3.2, ease: 'power2.inOut' })
+        .to({}, { duration: 1.8 })
+
+        // 2ª TANDA: EFECTO TV CRT del brand unido (duración 2.7s)
+        .add(() => { gsap.set(outroTvBrand, { opacity: 1 }); })
+        .to(outroTvBrand, { scaleX: 1, scaleY: 0.003, filter: 'brightness(2.5)', duration: 0.25, ease: 'power4.out' })
+        .to(outroTvBrand, { scaleY: 1, filter: 'brightness(1)', duration: 0.35, ease: 'power2.out' })
+        .to({}, { duration: 1.8 })
+        .to(outroTvBrand, { scaleY: 0.003, filter: 'brightness(3)', duration: 0.25, ease: 'power2.in' })
+        .to(outroTvBrand, { scaleX: 0, opacity: 0, filter: 'brightness(5)', duration: 0.35, ease: 'power4.in' })
+
+        // Pausa extendida de 2.0s tras el apagado antes de unir al Loop de inicio
+        .to({}, { duration: 2.0, onComplete: () => {
             gsap.set(outroScreen, { opacity: 0, pointerEvents: 'none' });
             isOutroPlaying = false;
-            goToSlide(0, 'next', true);
-         }
-      });
-      
-      gsap.set(outroScreen, { pointerEvents: 'auto' });
-      
-      tl
-        // Fade al negro total
-        .to(outroScreen, { opacity: 1, duration: 1.5, ease: 'power2.inOut' })
-        
-        // 1ª TANDA: Título del Post — aparece, dura 2 segundos, desaparece en 1 seg
-        .to(outroTitle, { opacity: 1, duration: 1, ease: 'power2.out' }, '+=0.3')
-        .to(outroTitle, { opacity: 0, duration: 1, ease: 'power2.in' }, '+=2')
-        
-        // 2ª TANDA: "The Great Puzzle" surge desde el centro
-        .to(outroBrandMain, { opacity: 1, scale: 1, duration: 2, ease: 'power2.out' }, '+=0.5')
-        
-        // "-project-" aparece inmediatamente, en segunda ola
-        .to(outroBrandSub, { opacity: 1, duration: 1.5, ease: 'power2.out' }, '-=0.5')
-        
-        // Ambos se desvanecen juntos después de 2 segundos
-        .to([outroBrandMain, outroBrandSub], { opacity: 0, scale: 1.05, duration: 1.5, ease: 'power2.in' }, '+=2');
+            
+            // Resetear slides a la posición inicial (slide 0)
+            slides.forEach((s, idx) => {
+              gsap.set(s, { opacity: idx === 0 ? 1 : 0, zIndex: idx === 0 ? 20 : 10 });
+              if (idx === 0) s.classList.add('active');
+              else s.classList.remove('active');
+            });
+            currentIndex = 0;
+
+            // Loop continuo a la presentación de Inicio
+            playIntroSequence(() => {
+              playTextAnimation(slides[0]);
+              startAutoplay();
+              updatePipAndFilmstrip(0);
+            });
+        }});
     }
 
     // Bind UI controls

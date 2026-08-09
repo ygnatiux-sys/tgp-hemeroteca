@@ -115,8 +115,8 @@ export function BuscadorModal() {
 
       {/* MENÚ EXPANDIDO / CONDENSADO (OVERLAY FLOTANTE SÁNDWICH) */}
       {isNavExpanded && (
-        <div className="fixed top-18 md:top-20 right-4 md:right-8 w-72 bg-[#F5F4F0] dark:bg-[#0d0d0e] border-2 border-black/20 dark:border-[#C8A98B]/30 rounded-2xl p-4 shadow-2xl backdrop-blur-xl z-999">
-          <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-rust-orange dark:text-[#C8A98B] mb-3 pb-2 border-b border-black/10 dark:border-white/10">
+        <div className="fixed top-18 md:top-20 right-4 md:right-8 w-72 bg-[#F5F4F0] dark:bg-[#0d0d0e] border-2 border-black/20 dark:border-rust-orange/30 rounded-2xl p-4 shadow-2xl backdrop-blur-xl z-999">
+          <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-rust-orange dark:text-rust-orange mb-3 pb-2 border-b border-black/10 dark:border-white/10">
             Navegación TGP
           </div>
           <nav className="flex flex-col gap-1.5">
@@ -124,14 +124,14 @@ export function BuscadorModal() {
               { label: 'Inicio', href: '/' },
               { label: 'Colecciones', href: '/colecciones' },
               { label: 'Archivo de Ensayos', href: '/archivo' },
-              { label: 'Manifiesto', href: '/manifiesto' },
+              { label: 'About', href: '/about' },
               { label: 'El Códice', href: '/codice' },
             ].map(link => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsNavExpanded(false)}
-                className="flex items-center px-3.5 py-2.5 rounded-xl font-mono font-light text-xs uppercase tracking-[0.18em] text-black dark:text-stone-200 hover:bg-rust-orange/15 dark:hover:bg-[#C8A98B]/15 hover:text-rust-orange dark:hover:text-[#C8A98B] transition-colors"
+                className="flex items-center px-3.5 py-2.5 rounded-xl font-mono font-light text-xs uppercase tracking-[0.18em] text-black dark:text-stone-200 hover:bg-rust-orange/15 dark:hover:bg-rust-orange/15 hover:text-rust-orange dark:hover:text-rust-orange transition-colors"
               >
                 {link.label}
               </a>

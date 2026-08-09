@@ -8,6 +8,7 @@ import {
   formatDate,
   formatYear,
   resolveEssayImage,
+  sortEssaysByVisualFirst,
 } from '../../lib/content-filter';
 
 // ─── CARGA Y FILTRADO ────────────────────────────────────────────────────────
@@ -18,7 +19,7 @@ const isProd = import.meta.env.PROD;
 const publishableEssays = getPublishableEssays(allEssaysRaw, isProd);
 const publishableGeorefs = getPublishableEssays(allGeorefsRaw, isProd);
 
-const publishable = [...publishableEssays, ...publishableGeorefs];
+const publishable = [...publishableEssays, ...publishableGeorefs].sort(sortEssaysByVisualFirst);
 
 // Filtrar artículos de la colección "Sitios Geohistóricos & Arqueohistóricos"
 const geohistoricalEssays = publishable.filter(e => {
@@ -63,7 +64,7 @@ const sequences = createPremierSequences(resolvedEssays);
 ---
 
 <Layout title="Sitios Geohistóricos & Arqueohistóricos | Hemeroteca TGP">
-  <div class="bg-black text-white min-h-screen pb-32">
+  <div class="text-white min-h-screen pb-32">
 
     <InteriorHero
       title="Sitios Geohistóricos"

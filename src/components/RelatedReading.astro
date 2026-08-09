@@ -1,64 +1,71 @@
 ---
-import { Image } from "astro:assets";
-import { getCollection } from "astro:content";
-
-interface Props {
-  currentSlug: string;
-  category?: string;
-  limit?: number;
-}
-
-const { currentSlug, category, limit = 2 } = Astro.props;
-
-const allEssays = await getCollection("ensayos");
-const relatedEssays = allEssays
-  .filter(essay => essay.id.replace(/\/index$/, "") !== currentSlug && (category ? essay.data.category === category : true))
-  .sort(() => Math.random() - 0.5)
-  .slice(0, limit);
-
-// Importar imágenes
-const images = import.meta.glob<{ default: ImageMetadata }>(
-  "/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}",
-);
 ---
 
-<div class="not-prose my-16 py-12 border-y border-white/5 bg-white/2 -mx-6 md:-mx-12 lg:-mx-24 px-6 md:px-24">
-  <div class="flex flex-col md:flex-row items-center gap-12 max-w-4xl mx-auto">
-    <div class="flex-1 space-y-4">
-      <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-[#C8A98B] block mb-2">Lectura Relacionada</span>
-      <h4 class="text-3xl font-serif text-white/90 leading-tight">Únete a la investigación</h4>
-      <p class="text-sm text-white/40 leading-relaxed max-w-sm">
-        Accede a nuestros documentos exclusivos y mantente al tanto de los nuevos descubrimientos de la colección.
+<div class="not-prose my-12 -mx-4 md:-mx-10 lg:-mx-20 xl:-mx-28 px-4 md:px-10">
+  <div class="relative overflow-hidden rounded-2xl border border-white/8 bg-white/2 p-6 md:p-8 flex flex-col sm:flex-row gap-6 sm:gap-8 items-start">
+
+    {/* Línea editorial izquierda */}
+    <div class="shrink-0 flex flex-col gap-2 sm:max-w-50">
+      <span class="font-mono text-[8.5px] uppercase tracking-[0.4em] text-rust-orange block">Lectura Relacionada</span>
+      <h4 class="font-cinzel font-bold text-lg sm:text-xl text-[#E0E0E0]/90 leading-snug">
+        Únete a la investigación
+      </h4>
+      <p class="font-mono text-[8px] uppercase tracking-[0.2em] text-white/30 leading-relaxed">
+        Documentos exclusivos y nuevos descubrimientos de la colección.
       </p>
     </div>
-    
-    <div class="flex-1 w-full grid grid-cols-1 gap-6">
-      <!-- Enlace a El Códice Fundacional -->
-      <a href="/codice" class="group flex items-center gap-4 bg-transparent p-3 rounded-xl hover:bg-white/10 transition-all border border-transparent hover:border-[#C8A98B]/50 hover:shadow-[0_0_16px_rgba(200,169,139,0.25)]">
-        <div class="w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-theme-dark relative">
-          <img src="/images/lead-magnet/book-cover.jpg" alt="El Códice Fundacional" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+
+    {/* Separador vertical en sm+ */}
+    <div class="hidden sm:block w-px self-stretch bg-white/6 shrink-0"></div>
+
+    {/* Links */}
+    <div class="flex flex-col gap-3 flex-1 w-full">
+      <!-- El Códice -->
+      <a
+        href="/codice"
+        class="group flex items-center gap-4 rounded-xl border border-white/8 bg-white/2 p-3.5 hover:border-rust-orange/35 hover:bg-rust-orange/4 transition-all duration-400"
+      >
+        <div class="w-14 h-14 rounded-lg overflow-hidden shrink-0 border border-white/10">
+          <img
+            src="/images/lead-magnet/book-cover.jpg"
+            alt="El Códice Fundacional"
+            class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+          />
         </div>
-        <div class="flex flex-col gap-1">
-          <span class="text-[9px] font-mono text-[#C8A98B] uppercase tracking-widest">DOCUMENTO EXCLUSIVO</span>
-          <h5 class="text-sm font-serif text-white/80 group-hover:text-[#C8A98B] transition-colors leading-snug line-clamp-2">
+        <div class="flex flex-col gap-0.5">
+          <span class="font-mono text-[7.5px] uppercase tracking-[0.3em] text-rust-orange/70">Documento Exclusivo</span>
+          <h5 class="font-cinzel font-bold text-sm text-[#E0E0E0]/85 group-hover:text-rust-orange transition-colors leading-snug">
             El Códice Fundacional
           </h5>
-          <p class="text-[11px] text-white/40 mt-0.5">La verdad no es algo que se encuentra, es algo que se recuerda.</p>
+          <p class="font-serif italic text-[10px] text-white/35 leading-snug line-clamp-1">
+            "La verdad no es algo que se encuentra, es algo que se recuerda."
+          </p>
         </div>
+        <span class="ml-auto text-white/20 group-hover:text-rust-orange/60 group-hover:translate-x-0.5 transition-all text-sm shrink-0">▸</span>
       </a>
 
-      <!-- Enlace a Kit (Newsletter) -->
-      <a href="#" class="group flex items-center gap-4 bg-transparent p-3 rounded-xl hover:bg-white/10 transition-all border border-transparent hover:border-[#2483EB]/50 hover:shadow-[0_0_16px_rgba(36,131,235,0.25)]">
-        <div class="w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-[#2483EB]/10 flex items-center justify-center">
-          <span class="font-sans text-3xl font-black text-[#2483EB] tracking-tighter opacity-80 group-hover:opacity-100 transition-opacity">kit</span>
+      <!-- Substack -->
+      <a
+        href="https://thegreatpuzzleproject.substack.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group flex items-center gap-4 rounded-xl border border-white/8 bg-white/2 p-3.5 hover:border-rust-orange/35 hover:bg-rust-orange/4 transition-all duration-400"
+      >
+        <div class="w-14 h-14 rounded-lg overflow-hidden shrink-0 border border-white/10 bg-white/4 flex items-center justify-center">
+          <svg viewBox="0 0 24 24" class="w-6 h-6 fill-rust-orange/70 group-hover:fill-rust-orange transition-colors" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.539 8.242H1.46V5.406h21.078v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.078V0z"/>
+          </svg>
         </div>
-        <div class="flex flex-col gap-1">
-          <span class="text-[9px] font-mono text-[#2483EB] uppercase tracking-widest">NEWSLETTER SECRETA</span>
-          <h5 class="text-sm font-serif text-white/80 group-hover:text-[#2483EB] transition-colors leading-snug line-clamp-2">
-            Suscríbete en Kit
+        <div class="flex flex-col gap-0.5">
+          <span class="font-mono text-[7.5px] uppercase tracking-[0.3em] text-rust-orange/70">Bitácora · Substack</span>
+          <h5 class="font-cinzel font-bold text-sm text-[#E0E0E0]/85 group-hover:text-rust-orange transition-colors leading-snug">
+            Pensamiento Crítico en tu Buzón
           </h5>
-          <p class="text-[11px] text-white/40 mt-0.5">Recibe el volumen digital directamente en tu buzón.</p>
+          <p class="font-mono text-[10px] text-white/35 leading-snug">
+            Ensayos exclusivos · Suscripción gratuita
+          </p>
         </div>
+        <span class="ml-auto text-white/20 group-hover:text-rust-orange/60 group-hover:translate-x-0.5 transition-all text-sm shrink-0">↗</span>
       </a>
     </div>
   </div>

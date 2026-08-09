@@ -33,6 +33,49 @@ export interface EssayEntry {
 }
 
 /**
+ * Mapa centralizado de imágenes de ensayos y georreferencias en Vite/Astro.
+ */
+export const essayImages = import.meta.glob<{ default: ImageMetadata }>(
+  ['/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}', '/src/assets/georreferencias/**/*.{jpeg,jpg,png,gif,webp,avif}'],
+  { eager: true }
+);
+
+/**
+ * Resuelve la imagen óptima de un ensayo o georreferencia:
+ * 1. Coincidencia exacta con coverImage si existe.
+ * 2. Si no, busca automáticamente cualquier imagen en la carpeta del slug (`/src/assets/ensayos/${slug}/` o `/src/assets/georreferencias/${slug}/`).
+ */
+export function resolveEssayImage(coverPath?: string | null, slug?: string): ImageMetadata | null {
+  if (coverPath && essayImages[coverPath]) {
+    return essayImages[coverPath].default;
+  }
+  if (slug) {
+    const ensayoPrefix = `/src/assets/ensayos/${slug}/`;
+    const georefPrefix = `/src/assets/georreferencias/${slug}/`;
+    for (const [key, mod] of Object.entries(essayImages)) {
+      if (key.startsWith(ensayoPrefix) || key.startsWith(georefPrefix)) {
+        return mod.default;
+      }
+    }
+  }
+  return null;
+}
+
+export function sortEssaysByVisualFirst(a: EssayEntry, b: EssayEntry): number {
+  const hasImgA = resolveEssayImage(a.entry.coverImage, a.slug) ? 1 : 0;
+  const hasImgB = resolveEssayImage(b.entry.coverImage, b.slug) ? 1 : 0;
+  
+  // Priorizar posts con imagen
+  if (hasImgA !== hasImgB) {
+    return hasImgB - hasImgA;
+  }
+
+  const dateA = a.entry.date ? new Date(a.entry.date).getTime() : 0;
+  const dateB = b.entry.date ? new Date(b.entry.date).getTime() : 0;
+  return dateB - dateA;
+}
+
+/**
  * Filtra y ordena entradas de la colección 'ensayos'.
  * Única fuente de verdad para todas las superficies editoriales.
  *
@@ -53,11 +96,7 @@ export function getPublishableEssays(
       if (isProd && entry.draft === true) return false;
       return true;
     })
-    .sort((a, b) => {
-      const dateA = a.entry.date ? new Date(a.entry.date).getTime() : 0;
-      const dateB = b.entry.date ? new Date(b.entry.date).getTime() : 0;
-      return dateB - dateA;
-    });
+    .sort(sortEssaysByVisualFirst);
 }
 
 /** Normaliza una categoría para agrupación (elimina tildes, convierte a lowercase y agrupa sinónimos). */
@@ -178,34 +217,7 @@ export function groupByCategory(
   return groups;
 }
 
-/**
- * Mapa centralizado de imágenes de ensayos y georreferencias en Vite/Astro.
- */
-export const essayImages = import.meta.glob<{ default: ImageMetadata }>(
-  ['/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}', '/src/assets/georreferencias/**/*.{jpeg,jpg,png,gif,webp,avif}'],
-  { eager: true }
-);
 
-/**
- * Resuelve la imagen óptima de un ensayo o georreferencia:
- * 1. Coincidencia exacta con coverImage si existe.
- * 2. Si no, busca automáticamente cualquier imagen en la carpeta del slug (`/src/assets/ensayos/${slug}/` o `/src/assets/georreferencias/${slug}/`).
- */
-export function resolveEssayImage(coverPath?: string | null, slug?: string): ImageMetadata | null {
-  if (coverPath && essayImages[coverPath]) {
-    return essayImages[coverPath].default;
-  }
-  if (slug) {
-    const ensayoPrefix = `/src/assets/ensayos/${slug}/`;
-    const georefPrefix = `/src/assets/georreferencias/${slug}/`;
-    for (const [key, mod] of Object.entries(essayImages)) {
-      if (key.startsWith(ensayoPrefix) || key.startsWith(georefPrefix)) {
-        return mod.default;
-      }
-    }
-  }
-  return null;
-}
 
 export interface GalleryImageItem {
   id?: string;

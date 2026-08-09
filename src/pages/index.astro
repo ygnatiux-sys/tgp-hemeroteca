@@ -14,6 +14,7 @@ import {
   formatYear,
   normalizeCategory,
   resolveEssayImage,
+  sortEssaysByVisualFirst,
 } from '../lib/content-filter';
 
 // ─── CARGA Y FILTRADO CENTRALIZADO ───────────────────────────────────────────
@@ -34,11 +35,7 @@ const publishableEssays = getPublishableEssays(allEssaysRaw, isProd);
 const publishableGeorefs = getPublishableEssays(allGeorefsRaw, isProd);
 const publishableArquetipos = getPublishableEssays(allArquetiposRaw, isProd);
 
-const publishable = [...publishableEssays, ...publishableGeorefs, ...publishableArquetipos].sort((a, b) => {
-  const dateA = a.entry.date ? new Date(a.entry.date).getTime() : 0;
-  const dateB = b.entry.date ? new Date(b.entry.date).getTime() : 0;
-  return dateB - dateA;
-});
+const publishable = [...publishableEssays, ...publishableGeorefs, ...publishableArquetipos].sort(sortEssaysByVisualFirst);
 
 // ─── SEGMENTACIÓN EDITORIAL (sin repeticiones) ────────────────────────────────
 // latestPost alimenta el Hero; el resto del array mantiene la grilla Bento existente
@@ -119,8 +116,8 @@ const heroFragments = latestPost ? [
     year: formatYear(latestPost.entry.date),
     position: heroImagePosition,
     origin: heroOrigin,
-    spotifyLink: latestPost.entry.spotifyLink,
-    youtubeLink: latestPost.entry.youtubeLink
+    spotifyLink: latestPost.entry.spotifyLink || undefined,
+    youtubeLink: latestPost.entry.youtubeLink || undefined
   }
 ] : [];
 ---
@@ -129,7 +126,7 @@ const heroFragments = latestPost ? [
   title="Hemeroteca TGP - Editorial & Cartografía Epistémica"
   headerTransparentUntilScroll={true}
 >
-  <div class="w-full bg-black text-[#F5F5F7] pb-20">
+  <div class="w-full pb-20">
 
     {/* ═══════════════════════════════════════════════════════════════════════
         BLOQUE 1: HERO CINEMÁTICO (NUEVO COMPONENTE CinematicDossier)
@@ -141,116 +138,176 @@ const heroFragments = latestPost ? [
     )}
 
     {/* Lienzo / grilla: se desliza sobre el Hero ya oscurecido */}
-    <div id="home-canvas" class="relative z-20 bg-black shadow-[0_-24px_60px_rgba(0,0,0,0.85)]">
+    <div id="home-canvas" class="relative z-20 bg-(--bg-main) shadow-[0_-24px_60px_rgba(0,0,0,0.85)]">
     <div class="container-editorial max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-20 md:gap-28 pt-16 md:pt-24">
 
       {/* ═══════════════════════════════════════════════════════════════════
-          BLOQUE 2: TRES HISTORIAS PRINCIPALES
-          Mapeo: [1] lead (8 cols) + [2] secA + [3] secB (4 cols apiladas)
+          BLOQUE 2A: DOSSIER DESTACADO — SECCIÓN AUTÓNOMA CON SOLAPA CINEMÁTICA
+          El post más reciente ocupa su propia franja editorial, separado del resto
       ═══════════════════════════════════════════════════════════════════ */}
-      {(leadStory || secondaryA) && (
-        <section class="flex flex-col gap-8">
-          <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
-            <div>
-              <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-1">Dossieres Seleccionados</span>
-              <h2 class="text-3xl md:text-5xl font-cinzel font-extrabold tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-md">
-                Historias Fundamentales
-              </h2>
+      {leadStory && (
+        <section class="flex flex-col gap-0 reveal-item">
+
+          {/* ── SOLAPA / TAB CINEMÁTICA ── */}
+          <div class="relative flex items-end gap-6 pb-0 z-10">
+            <div class="flex items-center gap-3 bg-(--bg-main) border border-white/8 border-b-0 rounded-t-2xl px-6 py-3.5 shrink-0">
+              <span class="w-1.5 h-1.5 rounded-full bg-rust-orange shadow-[0_0_8px_#C8A98B] shrink-0"></span>
+              <span class="font-mono text-[9px] uppercase tracking-[0.45em] text-rust-orange font-bold whitespace-nowrap">Último Dossier</span>
             </div>
-            <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40">Perspectivas Cruciales</span>
+            <div class="flex-1 border-b border-white/8 mb-px"></div>
+            <span class="font-mono text-[9px] uppercase tracking-[0.3em] text-white/30 pb-3.5 pr-1 shrink-0">{formatDate(leadStory.entry.date)}</span>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-            {/* Historia Principal: 8 cols */}
-            {leadStory && (
-              <article class="lg:col-span-8 group flex flex-col justify-between bg-white/5 border border-white/10 rounded-xl overflow-hidden p-6 md:p-8 hover:border-[#C8A98B]/50 transition-all duration-500">
-                <div class="flex flex-col gap-6">
-                  {leadImage && (
-                    <div class="overflow-hidden rounded-lg bg-black/40 aspect-video relative">
-                      <Image src={leadImage} alt={leadStory.entry.title || "Historia"} class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                      <div class="absolute inset-0 bg-linear-to-t from-theme-dark/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                    </div>
-                  )}
-                  <div class="flex items-center gap-3 font-mono text-[9px] text-[#C8A98B] tracking-[0.2em] uppercase">
-                    <span class="px-2.5 py-0.5 bg-white/10 rounded-full border border-white/10">{formatCategory(leadStory.entry.category)}</span>
-                    <span class="opacity-30">•</span>
-                    <span class="text-white/40">{formatDate(leadStory.entry.date)}</span>
+          {/* ── CARD DESTACADA FULL-WIDTH CINEMÁTICA ── */}
+          <article class="group w-full relative overflow-hidden rounded-b-2xl rounded-tr-2xl border border-white/8 border-t-0 bg-white/3 hover:border-rust-orange/30 transition-all duration-700">
+            <div class="flex flex-col lg:flex-row lg:min-h-105 xl:min-h-120">
+
+              {/* Imagen lateral / superior en mobile */}
+              {leadImage && (
+                <div class="relative overflow-hidden lg:w-[55%] xl:w-[58%] aspect-video lg:aspect-auto shrink-0">
+                  <Image
+                    src={leadImage}
+                    alt={leadStory.entry.title || "Dossier Destacado"}
+                    class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03] brightness-90"
+                  />
+                  <div class="absolute inset-0 bg-linear-to-r from-transparent via-transparent to-(--bg-main)/80 hidden lg:block pointer-events-none" />
+                  <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/70 via-transparent to-transparent lg:hidden pointer-events-none" />
+                </div>
+              )}
+
+              {/* Contenido Editorial */}
+              <div class={`flex flex-col justify-between p-6 md:p-10 lg:p-12 xl:p-14 ${leadImage ? 'lg:flex-1' : 'w-full'}`}>
+                <div class="flex flex-col gap-4 md:gap-6">
+                  <div class="flex items-center gap-3 font-mono text-[9px] text-rust-orange/80 tracking-[0.25em] uppercase">
+                    <span>{formatCategory(leadStory.entry.category)}</span>
                   </div>
-                  <h3 class="text-2xl md:text-4xl font-cinzel font-bold leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
-                    <a href={`/hemeroteca/${leadStory.slug}`} class="hover:underline">{leadStory.entry.title}</a>
-                  </h3>
+                  <h2 class="font-cinzel font-extrabold text-2xl sm:text-3xl md:text-4xl xl:text-5xl leading-[1.08] tracking-tight bg-linear-to-br from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent">
+                    <a href={`/hemeroteca/${leadStory.slug}`} class="hover:opacity-80 transition-opacity">
+                      {leadStory.entry.title}
+                    </a>
+                  </h2>
                   {leadStory.entry.excerpt && (
-                    <p class="font-serif text-white/70 text-base md:text-lg leading-relaxed line-clamp-3 italic">"{leadStory.entry.excerpt}"</p>
+                    <p class="font-serif text-[#E0E0E0]/65 text-base md:text-lg leading-relaxed line-clamp-3 italic max-w-prose">
+                      "{leadStory.entry.excerpt}"
+                    </p>
                   )}
                 </div>
-                <div class="mt-8 pt-4 border-t border-white/5 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
-                  <a href={`/hemeroteca/${leadStory.slug}`} class="inline-flex items-center gap-2 hover:text-[#C8A98B] transition-colors">Explorar Dossier →</a>
-                  {(leadStory.entry.spotifyLink || leadStory.entry.youtubeLink) && (
-                    <div class="flex items-center gap-3">
-                      {leadStory.entry.spotifyLink && <a href={leadStory.entry.spotifyLink} target="_blank" rel="noopener noreferrer" class="opacity-40 hover:opacity-100 hover:text-[#C8A98B] transition-all"><SpotifyIcon class="w-3.5 h-3.5" /></a>}
-                      {leadStory.entry.youtubeLink && <a href={leadStory.entry.youtubeLink} target="_blank" rel="noopener noreferrer" class="opacity-40 hover:opacity-100 hover:text-[#C8A98B] transition-all"><YouTubeIcon class="w-3.5 h-3.5" /></a>}
-                    </div>
-                  )}
-                </div>
-              </article>
-            )}
 
-            {/* Secundarias: 4 cols apiladas */}
-            <div class="lg:col-span-4 flex flex-col gap-8 justify-between">
-              {secondaryA && (
-                <article class="group flex-1 flex flex-col justify-between bg-white/5 border border-white/10 rounded-xl overflow-hidden p-6 hover:border-[#C8A98B]/50 transition-all duration-500">
-                  <div class="flex flex-col gap-4">
-                    {secAImage && (
-                      <div class="overflow-hidden rounded-lg bg-black/40 aspect-video relative">
-                        <Image src={secAImage} alt={secondaryA.entry.title || "Historia"} class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                      </div>
-                    )}
-                    <div class="flex items-center gap-3 font-mono text-[9px] text-[#C8A98B] tracking-[0.2em] uppercase">
-                      <span>{formatCategory(secondaryA.entry.category)}</span>
-                      <span class="opacity-30">•</span>
-                      <span class="text-white/40">{formatDate(secondaryA.entry.date)}</span>
+                <div class="flex items-center justify-between gap-4 mt-8 pt-5 border-t border-white/5">
+                  <a
+                    href={`/hemeroteca/${leadStory.slug}`}
+                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#151718]/90 backdrop-blur-sm border border-white/10 text-[#E0E0E0]/75 font-mono font-bold text-[9px] tracking-[0.25em] uppercase rounded-lg hover:bg-rust-orange/10 hover:border-rust-orange/50 hover:text-rust-orange transition-all duration-400"
+                  >
+                    <span>Leer Dossier</span>
+                    <span class="opacity-60 group-hover:translate-x-0.5 transition-transform">▸</span>
+                  </a>
+                  {(leadStory.entry.spotifyLink || leadStory.entry.youtubeLink) && (
+                    <div class="flex items-center gap-3 text-white/30">
+                      {leadStory.entry.spotifyLink && <a href={leadStory.entry.spotifyLink} target="_blank" rel="noopener noreferrer" class="hover:text-rust-orange transition-colors"><SpotifyIcon class="w-4 h-4" /></a>}
+                      {leadStory.entry.youtubeLink && <a href={leadStory.entry.youtubeLink} target="_blank" rel="noopener noreferrer" class="hover:text-rust-orange transition-colors"><YouTubeIcon class="w-4 h-4" /></a>}
                     </div>
-                    <h3 class="text-xl md:text-2xl font-cinzel font-bold leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
-                      <a href={`/hemeroteca/${secondaryA.slug}`} class="hover:underline">{secondaryA.entry.title}</a>
-                    </h3>
-                    {secondaryA.entry.excerpt && (
-                      <p class="font-serif text-white/60 text-sm leading-relaxed line-clamp-2 italic">"{secondaryA.entry.excerpt}"</p>
-                    )}
-                  </div>
-                  <div class="mt-6 pt-4 border-t border-white/5 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
-                    <a href={`/hemeroteca/${secondaryA.slug}`} class="hover:text-[#C8A98B] transition-colors">Explorar →</a>
-                  </div>
-                </article>
-              )}
-              {secondaryB && (
-                <article class="group flex-1 flex flex-col justify-between bg-white/5 border border-white/10 rounded-xl overflow-hidden p-6 hover:border-[#C8A98B]/50 transition-all duration-500">
-                  <div class="flex flex-col gap-4">
-                    {secBImage && (
-                      <div class="overflow-hidden rounded-lg bg-black/40 aspect-video relative">
-                        <Image src={secBImage} alt={secondaryB.entry.title || "Historia"} class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                      </div>
-                    )}
-                    <div class="flex items-center gap-3 font-mono text-[9px] text-[#C8A98B] tracking-[0.2em] uppercase">
-                      <span>{formatCategory(secondaryB.entry.category)}</span>
-                      <span class="opacity-30">•</span>
-                      <span class="text-white/40">{formatDate(secondaryB.entry.date)}</span>
-                    </div>
-                    <h3 class="text-xl md:text-2xl font-cinzel font-bold leading-tight group-hover:text-[#C8A98B] transition-colors duration-300">
-                      <a href={`/hemeroteca/${secondaryB.slug}`} class="hover:underline">{secondaryB.entry.title}</a>
-                    </h3>
-                    {secondaryB.entry.excerpt && (
-                      <p class="font-serif text-white/60 text-sm leading-relaxed line-clamp-2 italic">"{secondaryB.entry.excerpt}"</p>
-                    )}
-                  </div>
-                  <div class="mt-6 pt-4 border-t border-white/5 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
-                    <a href={`/hemeroteca/${secondaryB.slug}`} class="hover:text-[#C8A98B] transition-colors">Explorar →</a>
-                  </div>
-                </article>
-              )}
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
+          </article>
         </section>
       )}
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          BLOQUE 2B: GRID EDITORIAL 1+2 — TIPO COLECCIONES
+          1 card central principal + 2 más pequeñas debajo
+      ═══════════════════════════════════════════════════════════════════ */}
+      {(secondaryA || secondaryB) && (
+        <section class="flex flex-col gap-6 reveal-item">
+
+          {/* ENCABEZADO */}
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-4">
+            <div>
+              <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Archivo Editorial</span>
+              <h2 class="text-2xl sm:text-3xl md:text-4xl font-cinzel font-extrabold tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-md">
+                Dossieres Recientes
+              </h2>
+            </div>
+            <a href="/archivo" class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40 hover:text-rust-orange transition-colors shrink-0 pb-1">
+              Ver todo el Archivo →
+            </a>
+          </div>
+
+          {/* GRID 1 CENTRAL GRANDE */}
+          {secondaryA && (
+            <article class="group w-full relative overflow-hidden rounded-2xl border border-white/8 bg-white/3 hover:border-rust-orange/30 transition-all duration-500">
+              <div class="flex flex-col md:flex-row md:min-h-70">
+                {secAImage && (
+                  <div class="relative overflow-hidden md:w-[45%] shrink-0 aspect-video md:aspect-auto">
+                    <Image
+                      src={secAImage}
+                      alt={secondaryA.entry.title || "Dossier"}
+                      class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.04] brightness-85"
+                    />
+                    <div class="absolute inset-0 bg-linear-to-r from-transparent to-(--bg-main)/70 hidden md:block pointer-events-none" />
+                    <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/60 via-transparent to-transparent md:hidden pointer-events-none" />
+                  </div>
+                )}
+                <div class="flex flex-col justify-between p-6 md:p-8 flex-1">
+                  <div class="flex flex-col gap-3">
+                    <span class="font-mono text-[9px] uppercase tracking-[0.3em] text-rust-orange/70">{formatCategory(secondaryA.entry.category)}</span>
+                    <h3 class="font-cinzel font-bold text-xl sm:text-2xl md:text-3xl leading-tight group-hover:text-rust-orange transition-colors duration-300">
+                      <a href={`/hemeroteca/${secondaryA.slug}`}>{secondaryA.entry.title}</a>
+                    </h3>
+                    {secondaryA.entry.excerpt && (
+                      <p class="font-serif text-white/55 text-sm leading-relaxed line-clamp-2 italic">{secondaryA.entry.excerpt}</p>
+                    )}
+                  </div>
+                  <div class="mt-5 pt-4 border-t border-white/5 font-mono text-[9px] uppercase tracking-[0.3em]">
+                    <a href={`/hemeroteca/${secondaryA.slug}`} class="text-white/40 hover:text-rust-orange transition-colors inline-flex items-center gap-1.5">Ver Dossier ▸</a>
+                  </div>
+                </div>
+              </div>
+            </article>
+          )}
+
+          {/* DOS CARDS MENORES EN FILA */}
+          {secondaryB && (
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+              <article class="group relative overflow-hidden rounded-xl border border-white/8 bg-white/3 hover:border-rust-orange/30 transition-all duration-500 flex flex-col">
+                {secBImage && (
+                  <div class="relative overflow-hidden aspect-video">
+                    <Image
+                      src={secBImage}
+                      alt={secondaryB.entry.title || "Dossier"}
+                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 brightness-80"
+                    />
+                    <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/70 via-transparent to-transparent pointer-events-none" />
+                  </div>
+                )}
+                <div class="flex flex-col justify-between p-5 flex-1">
+                  <div class="flex flex-col gap-2">
+                    <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-rust-orange/70">{formatCategory(secondaryB.entry.category)}</span>
+                    <h3 class="font-cinzel font-bold text-base sm:text-lg leading-snug group-hover:text-rust-orange transition-colors">
+                      <a href={`/hemeroteca/${secondaryB.slug}`}>{secondaryB.entry.title}</a>
+                    </h3>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-white/5 font-mono text-[8.5px] uppercase tracking-[0.25em]">
+                    <a href={`/hemeroteca/${secondaryB.slug}`} class="text-white/35 hover:text-rust-orange transition-colors">Ver Dossier ▸</a>
+                  </div>
+                </div>
+              </article>
+
+              {/* Placeholder/Teaser "Ver Archivo" como tercera card si no hay más secundarias */}
+              <a
+                href="/archivo"
+                class="group relative overflow-hidden rounded-xl border border-white/6 border-dashed bg-white/1 hover:border-rust-orange/40 hover:bg-rust-orange/3 transition-all duration-500 flex flex-col items-center justify-center min-h-50 p-6 text-center gap-3"
+              >
+                <span class="font-mono text-[8.5px] uppercase tracking-[0.4em] text-white/25 group-hover:text-rust-orange/60 transition-colors">Explorar</span>
+                <span class="font-cinzel font-bold text-base text-white/40 group-hover:text-rust-orange/80 transition-colors">Todo el Archivo</span>
+                <span class="text-white/20 group-hover:text-rust-orange/50 group-hover:translate-x-1 transition-all text-sm">→</span>
+              </a>
+            </div>
+          )}
+        </section>
+      )}
+
 
       {/* ═══════════════════════════════════════════════════════════════════
           BLOQUE 3: ENSAYOS RECIENTES (Formato Cinemático Archivo General)
@@ -258,14 +315,14 @@ const heroFragments = latestPost ? [
       ═══════════════════════════════════════════════════════════════════ */}
       {resolvedRecent.length > 0 && (
         <section class="flex flex-col gap-8">
-          <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
+          <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4">
             <div>
-              <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-1">Archivo de Ensayos</span>
-              <h2 class="text-3xl md:text-5xl font-cinzel font-extrabold tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-md">
+              <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Archivo de Ensayos</span>
+              <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-cinzel font-extrabold tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-md">
                 Ensayos Recientes
               </h2>
             </div>
-            <a href="/archivo" class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-[#C8A98B] hover:drop-shadow-[0_0_8px_rgba(200,169,139,0.5)] transition-all">
+            <a href="/archivo" class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(200,169,139,0.5)] transition-all">
               Ver Catálogo Completo ({publishable.length}) →
             </a>
           </div>
@@ -290,10 +347,10 @@ const heroFragments = latestPost ? [
       ═══════════════════════════════════════════════════════════════════ */}
       {resolvedCollections.length > 0 && (
         <section class="flex flex-col gap-8">
-          <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
+          <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4">
             <div>
-              <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-1">Organización Temática</span>
-              <h2 class="text-3xl md:text-5xl font-cinzel font-extrabold tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-md">
+              <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Organización Temática</span>
+              <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-cinzel font-extrabold tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-md">
                 Colecciones
               </h2>
             </div>
@@ -304,21 +361,21 @@ const heroFragments = latestPost ? [
             {resolvedCollections.map(({ key, label, count, img, coverEssay }) => (
               <a
                 href={`/archivo?categoria=${encodeURIComponent(key)}`}
-                class="group shrink-0 w-[72vw] sm:w-[55vw] md:w-auto snap-start bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-[#C8A98B]/50 transition-all duration-500 flex flex-col"
+                class="group shrink-0 w-[72vw] sm:w-[55vw] md:w-auto snap-start bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-rust-orange/50 transition-all duration-500 flex flex-col"
               >
                 {img ? (
                   <div class="overflow-hidden aspect-video relative">
                     <Image src={img} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-70 group-hover:opacity-90" />
                     <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent" />
                     <div class="absolute bottom-0 left-0 p-4">
-                      <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-[#C8A98B] mb-1">{count} artículos</p>
-                      <h3 class="font-cinzel font-bold text-lg leading-tight text-white group-hover:text-[#C8A98B] transition-colors">{label}</h3>
+                      <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-rust-orange mb-1">{count} artículos</p>
+                      <h3 class="font-cinzel font-bold text-lg leading-tight text-white group-hover:text-rust-orange transition-colors">{label}</h3>
                     </div>
                   </div>
                 ) : (
                   <div class="p-5 flex flex-col gap-2 flex-1">
-                    <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-[#C8A98B]">{count} artículos</p>
-                    <h3 class="font-cinzel font-bold text-lg leading-tight group-hover:text-[#C8A98B] transition-colors">{label}</h3>
+                    <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-rust-orange">{count} artículos</p>
+                    <h3 class="font-cinzel font-bold text-lg leading-tight group-hover:text-rust-orange transition-colors">{label}</h3>
                   </div>
                 )}
               </a>
@@ -333,14 +390,14 @@ const heroFragments = latestPost ? [
       ═══════════════════════════════════════════════════════════════════ */}
       {archiveSequences.length > 0 && (
         <section class="flex flex-col gap-10 md:gap-14">
-          <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
+          <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4">
             <div>
-              <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-1">Hemeroteca</span>
-              <h2 class="text-3xl md:text-5xl font-cinzel font-extrabold tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-md">
+              <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Hemeroteca</span>
+              <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-cinzel font-extrabold tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-md">
                 Del Archivo
               </h2>
             </div>
-            <a href="/archivo" class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-[#C8A98B] transition-colors shrink-0">
+            <a href="/archivo" class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-rust-orange transition-colors shrink-0">
               Ver archivo completo ({publishable.length}) →
             </a>
           </div>
@@ -395,11 +452,10 @@ const heroFragments = latestPost ? [
           <div class="text-center pt-8">
             <a
               href="/archivo"
-              class="group relative inline-flex items-center gap-3.5 font-mono text-[10.5px] uppercase tracking-[0.35em] px-10 py-4.5 rounded-full border border-white/15 bg-white/4 hover:bg-white/10 hover:border-[#C8A98B]/70 text-white/70 hover:text-white transition-all duration-500 shadow-xl hover:shadow-[0_0_35px_rgba(200,169,139,0.25)] hover:scale-[1.02] active:scale-95"
+              class="group relative inline-flex items-center gap-3.5 font-mono text-[10.5px] uppercase tracking-[0.35em] px-10 py-4.5 rounded-full bg-[#151718]/90 backdrop-blur-sm border border-white/10 hover:bg-rust-orange/10 hover:border-rust-orange/50 text-[#E0E0E0]/70 hover:text-rust-orange transition-all duration-500 active:scale-95"
             >
-              <span class="w-1.5 h-1.5 rounded-full bg-[#C8A98B] group-hover:shadow-[0_0_10px_#C8A98B] group-hover:scale-125 transition-all"></span>
               <span>Ver archivo completo ({publishable.length} investigaciones)</span>
-              <span class="text-[#C8A98B] group-hover:translate-x-1.5 transition-transform duration-300">→</span>
+              <span class="text-rust-orange group-hover:translate-x-1.5 transition-transform duration-300">→</span>
             </a>
           </div>
         </section>
@@ -409,7 +465,7 @@ const heroFragments = latestPost ? [
           BLOQUE 6: FRANJA AUTORAL CINEMÁTICA & VIDU GLASSMORPHIC
       ═══════════════════════════════════════════════════════════════════ */}
       <section class="cinematic-card-lantern w-full rounded-3xl p-8 md:p-12 lg:p-14 shadow-2xl relative">
-        <div class="absolute -right-20 -top-20 w-80 h-80 bg-[#C8A98B]/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -right-20 -top-20 w-80 h-80 bg-rust-orange/5 rounded-full blur-3xl pointer-events-none"></div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
           
@@ -419,7 +475,7 @@ const heroFragments = latestPost ? [
               href="https://gravatar.com/xavierbeniteztgp"
               target="_blank"
               rel="noopener noreferrer"
-              class="group/avatar relative block w-24 h-24 md:w-28 md:h-28 rounded-2xl p-1 bg-linear-to-b from-[#C8A98B]/30 to-white/5 border border-white/15 shadow-2xl hover:border-[#c084fc] hover:shadow-[0_0_35px_rgba(192,132,252,0.65)] transition-all duration-500 shrink-0 cursor-pointer active:scale-95"
+              class="group/avatar relative block w-24 h-24 md:w-28 md:h-28 rounded-2xl p-1 bg-linear-to-b from-rust-orange/30 to-white/5 border border-white/15 shadow-2xl hover:border-[#c084fc] hover:shadow-[0_0_35px_rgba(192,132,252,0.65)] transition-all duration-500 shrink-0 cursor-pointer active:scale-95"
               title="Ver perfil de Xavier Benítez en Gravatar"
             >
               <div class="w-full h-full rounded-xl overflow-hidden relative">
@@ -433,10 +489,10 @@ const heroFragments = latestPost ? [
             </a>
 
             <div class="flex flex-col gap-1">
-              <span class="font-mono text-[9px] uppercase tracking-[0.4em] text-[#C8A98B] font-bold block">
+              <span class="font-mono text-[9px] uppercase tracking-[0.4em] text-rust-orange font-bold block">
                 [ Dirección Editorial & Autoría ]
               </span>
-              <h3 class="font-cinzel font-extrabold text-3xl md:text-4xl lg:text-5xl tracking-tight leading-none mt-1">
+              <h3 class="font-cinzel font-extrabold text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-tight leading-none mt-1">
                 <a
                   href="https://gravatar.com/xavierbeniteztgp"
                   target="_blank"
@@ -453,38 +509,38 @@ const heroFragments = latestPost ? [
           </div>
 
           {/* Columna Derecha: Reseña Biográfica & Coordenadas */}
-          <div class="lg:col-span-8 flex flex-col justify-between gap-6 border-t lg:border-t-0 lg:border-l border-white/10 pt-8 lg:pt-0 lg:pl-12">
+          <div class="lg:col-span-8 flex flex-col justify-between gap-6 border-t lg:border-t-0 lg:border-l border-white/5 pt-8 lg:pt-0 lg:pl-12">
             <p class="font-serif text-lg md:text-xl lg:text-[1.32rem] text-white/85 leading-relaxed font-normal">
-              Con <strong class="text-white font-bold tracking-tight">25 años de trayectoria educativa</strong> e investigación en semiótica y tecnología, <span class="text-white font-cinzel font-bold">Xavier Benítez</span> dirige <em class="font-serif italic text-[#C8A98B]">The Great Puzzle Project</em> como una plataforma de investigación independiente, cartografía epistémica y archivo sobre la interacción entre la cultura visual, la memoria histórica y los sistemas de información.
+              Con <strong class="text-white font-bold tracking-tight">25 años de trayectoria educativa</strong> e investigación en semiótica y tecnología, <span class="text-white font-cinzel font-bold">Xavier Benítez</span> dirige <em class="font-serif italic text-rust-orange">The Great Puzzle Project</em> como una plataforma de investigación independiente, cartografía epistémica y archivo sobre la interacción entre la cultura visual, la memoria histórica y los sistemas de información.
             </p>
 
             <div class="flex flex-wrap items-center justify-between gap-4 mt-2 pt-6 border-t border-white/10 font-mono text-[9.5px] uppercase tracking-[0.25em]">
               <div class="flex items-center gap-2 text-white/50">
-                <span class="w-2 h-2 rounded-full bg-[#C8A98B] shadow-[0_0_8px_#C8A98B] shrink-0"></span>
+                <span class="w-2 h-2 rounded-full bg-rust-orange shadow-[0_0_8px_#C8A98B] shrink-0"></span>
                 <span class="flex items-center gap-1.5 flex-wrap">
                   <a
                     href="https://share.google/2jdBPO5AZhrjplGgj"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="hover:text-[#C8A98B] hover:drop-shadow-[0_0_10px_rgba(200,169,139,0.7)] transition-all duration-300 active:scale-95"
+                    class="hover:text-rust-orange hover:drop-shadow-[0_0_10px_rgba(200,169,139,0.7)] transition-all duration-300 active:scale-95"
                   >
                     Buenos Aires
                   </a>
-                  <span class="text-[#C8A98B] font-bold mx-1">·</span>
+                  <span class="text-rust-orange font-bold mx-1">·</span>
                   <a
                     href="https://share.google/2jdBPO5AZhrjplGgj"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="hover:text-[#C8A98B] hover:drop-shadow-[0_0_10px_rgba(200,169,139,0.7)] transition-all duration-300 active:scale-95"
+                    class="hover:text-rust-orange hover:drop-shadow-[0_0_10px_rgba(200,169,139,0.7)] transition-all duration-300 active:scale-95"
                   >
                     Burzaco
                   </a>
-                  <span class="text-[#C8A98B] font-bold mx-1">·</span>
+                  <span class="text-rust-orange font-bold mx-1">·</span>
                   <a
                     href="https://share.google/2jdBPO5AZhrjplGgj"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="hover:text-[#C8A98B] hover:drop-shadow-[0_0_10px_rgba(200,169,139,0.7)] transition-all duration-300 active:scale-95"
+                    class="hover:text-rust-orange hover:drop-shadow-[0_0_10px_rgba(200,169,139,0.7)] transition-all duration-300 active:scale-95"
                   >
                     Sur Global
                   </a>
@@ -493,7 +549,7 @@ const heroFragments = latestPost ? [
 
               <a
                 href="mailto:thegreatpuzzleproject@gmail.com"
-                class="text-[#C8A98B] hover:text-[#f5d0fe] hover:drop-shadow-[0_0_12px_rgba(232,121,249,0.8)] transition-all duration-300 flex items-center gap-2 active:scale-95"
+                class="text-rust-orange hover:text-[#f5d0fe] hover:drop-shadow-[0_0_12px_rgba(232,121,249,0.8)] transition-all duration-300 flex items-center gap-2 active:scale-95"
               >
                 <span>thegreatpuzzleproject@gmail.com</span>
                 <span class="text-xs">↗</span>

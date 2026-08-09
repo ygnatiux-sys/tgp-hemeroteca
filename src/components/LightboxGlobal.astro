@@ -1,5 +1,7 @@
 ---
 // Componente de Lightbox Inmersivo Global para Astro (Soporte Táctil y Teclado)
+import SpotifyIcon from './icons/Spotify.astro';
+import YouTubeIcon from './icons/YouTube.astro';
 ---
 
 <div
@@ -58,22 +60,85 @@
   >
     <!-- Se llena vía JS -->
   </div>
-  <!-- Pantalla de Intro (solo al abrir) -->
-  <div id="tgp-lightbox-intro" class="absolute inset-0 z-50 flex items-center justify-center bg-black opacity-0 pointer-events-none">
-    <div class="text-center px-8">
-      <div id="tgp-lightbox-intro-label" class="font-mono text-[9px] uppercase tracking-[0.5em] text-[#C8A98B] mb-4 opacity-0">Archivo Historiográfico</div>
-      <h2 id="tgp-lightbox-intro-title" class="font-cinzel text-3xl md:text-5xl text-white font-bold opacity-0 max-w-3xl mx-auto leading-tight"></h2>
+  <!-- Pantalla de Intro Cinemática en Tandas (al abrir) -->
+  <div id="tgp-lightbox-intro" class="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs opacity-0 pointer-events-none">
+    {/* EFECTO TV CRT INICIAL (1ms después sobre la foto hero/inicial) */}
+    <div id="tgp-lightbox-intro-tv" class="absolute inset-0 flex flex-col items-center justify-center opacity-0 pointer-events-none z-20">
+      <div id="tgp-lightbox-intro-tv-brand" class="flex flex-col items-center justify-center">
+        <div class="font-cinzel text-4xl md:text-6xl text-[#C8A98B] font-bold drop-shadow-[0_0_40px_rgba(200,169,139,0.9)] tracking-wider text-center px-6">
+          The Great Puzzle
+        </div>
+        <div class="font-mono text-xs md:text-sm tracking-[0.6em] text-white/70 mt-3 uppercase">
+          — project —
+        </div>
+      </div>
+    </div>
+
+    {/* TANDA 1: Marca & Presenta (Sobre fondo negro) */}
+    <div id="tgp-lightbox-intro-stage1" class="absolute inset-0 flex flex-col items-center justify-center opacity-0 z-10">
+      <div class="font-cinzel text-4xl md:text-6xl text-[#C8A98B] font-bold drop-shadow-[0_0_35px_rgba(200,169,139,0.7)] tracking-wider text-center px-6">
+        The Great Puzzle
+      </div>
+      <div class="font-mono text-xs md:text-sm tracking-[0.6em] text-white/50 mt-4 uppercase">
+        — project —
+      </div>
+      <div class="font-serif italic text-base md:text-lg text-white/70 tracking-widest mt-8">
+        presenta
+      </div>
+    </div>
+
+    {/* TANDA 2: Título Extra Bold Titanio Documental + Registro Visual Completo + Meta Socials */}
+    <div id="tgp-lightbox-intro-stage2" class="absolute inset-0 flex items-center justify-center opacity-0 z-10">
+      <div class="text-center px-6 max-w-6xl flex flex-col items-center">
+        <h1 id="tgp-lightbox-intro-title" class="font-cinzel text-5xl md:text-7xl lg:text-8xl font-extrabold leading-tight tracking-tight mb-6 bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-[0_15px_50px_rgba(0,0,0,0.95)]"></h1>
+        <h2 id="tgp-lightbox-intro-h2" class="font-mono text-xs md:text-sm uppercase tracking-[0.4em] text-[#C8A98B] font-semibold pb-2 inline-block opacity-0">
+          REGISTRO VISUAL COMPLETO
+        </h2>
+        {/* METADATOS CON ÍCONOS SPOTIFY Y YOUTUBE */}
+        <div id="tgp-lightbox-intro-meta" class="flex items-center justify-center gap-6 mt-6 transition-opacity duration-700 hover:opacity-100!">
+          <a
+            href="https://open.spotify.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="tgp-lb-meta-item group/sp flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.3em] text-white/60 hover:text-[#1DB954] transition-all duration-500 opacity-0"
+          >
+            <div class="p-2 rounded-full border border-white/20 group-hover/sp:border-[#1DB954] group-hover/sp:bg-[#1DB954]/15 transition-all duration-500">
+              <SpotifyIcon class="w-4 h-4 text-white/70 group-hover/sp:text-[#1DB954] transition-all duration-500" />
+            </div>
+            <span>SPOTIFY</span>
+          </a>
+
+          <a
+            href="https://youtube.com/@thegreatpuzzleproject"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="tgp-lb-meta-item group/yt flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.3em] text-white/60 hover:text-[#E52D27] transition-all duration-500 opacity-0"
+          >
+            <div class="p-2 rounded-full border border-white/20 group-hover/yt:border-[#E52D27] group-hover/yt:bg-[#E52D27]/15 transition-all duration-500">
+              <YouTubeIcon class="w-4 h-4 text-white/70 group-hover/yt:text-[#E52D27] transition-all duration-500" />
+            </div>
+            <span>YOUTUBE</span>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Pantalla de Outro (al llegar al final) -->
-  <div id="tgp-lightbox-outro" class="absolute inset-0 z-50 flex items-center justify-center bg-black opacity-0 pointer-events-none">
-    <div id="tgp-lightbox-outro-title" class="font-cinzel text-2xl md:text-4xl text-white/80 font-bold opacity-0 text-center px-8 max-w-4xl tracking-wide"></div>
-    <div id="tgp-lightbox-outro-brand" class="absolute inset-0 flex flex-col items-center justify-center opacity-0" style="transform: scale(0.6)">
-      <div class="font-cinzel text-4xl md:text-6xl text-[#C8A98B] font-bold drop-shadow-[0_0_30px_rgba(200,169,139,0.6)] tracking-wide text-center">The Great Puzzle</div>
-    </div>
-    <div id="tgp-lightbox-outro-sub" class="absolute inset-0 flex flex-col items-center justify-center pt-28 md:pt-32 opacity-0">
-      <div class="font-mono text-xs md:text-sm tracking-[0.6em] text-white/40 uppercase">— project —</div>
+  <div id="tgp-lightbox-outro" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black opacity-0 pointer-events-none">
+    {/* 1. Título del Post - idéntico en tamaño y efectos al Intro */}
+    <h2 id="tgp-lightbox-outro-title" class="font-cinzel text-5xl md:text-7xl lg:text-8xl font-extrabold opacity-0 text-center px-8 max-w-6xl tracking-tight leading-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-[0_15px_50px_rgba(0,0,0,0.95)]"></h2>
+    
+    {/* 2. Brand unido para efecto TV CRT */}
+    <div id="tgp-lightbox-outro-tv" class="absolute inset-0 flex flex-col items-center justify-center opacity-0 pointer-events-none z-20">
+      <div id="tgp-lightbox-outro-tv-brand" class="flex flex-col items-center justify-center">
+        <div class="font-cinzel text-4xl md:text-6xl text-[#C8A98B] font-bold drop-shadow-[0_0_40px_rgba(200,169,139,0.9)] tracking-wider text-center px-6">
+          The Great Puzzle
+        </div>
+        <div class="font-mono text-xs md:text-sm tracking-[0.6em] text-white/70 mt-3 uppercase">
+          — project —
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -218,95 +283,230 @@
     }, 1200);
   }
 
-  // Secuencia de Intro (al abrir la galería)
+  // Secuencia de Intro Cinemática en Tandas con Efecto TV CRT (al abrir la galería)
   function playIntroSequence() {
     const intro = document.getElementById('tgp-lightbox-intro') as HTMLElement;
+    const tvStage = document.getElementById('tgp-lightbox-intro-tv') as HTMLElement;
+    const tvBrand = document.getElementById('tgp-lightbox-intro-tv-brand') as HTMLElement;
+    const stage1 = document.getElementById('tgp-lightbox-intro-stage1') as HTMLElement;
+    const stage2 = document.getElementById('tgp-lightbox-intro-stage2') as HTMLElement;
     const introTitle = document.getElementById('tgp-lightbox-intro-title') as HTMLElement;
-    const introLabel = document.getElementById('tgp-lightbox-intro-label') as HTMLElement;
-    if (!intro || !introTitle) return;
+    if (!intro || !tvStage || !tvBrand || !stage1 || !stage2 || !introTitle) return;
 
-    // Llenar el título con el nombre del post
-    if (introTitle) introTitle.textContent = postTitle || document.querySelector('h1')?.textContent || 'Registro Visual';
+    introTitle.textContent = postTitle || document.querySelector('h1')?.textContent || 'Registro Visual';
+
+    // Audio cinemático Submarine Ping / Dark Braam para el Intro
+    try {
+      const audio = new Audio('/intro.cinematic.wav');
+      audio.volume = 0.85;
+      audio.play().catch(() => {});
+    } catch (e) {}
     
-    intro.style.transition = '';
+    // Forzar primera imagen (Hero / index 0)
+    currentIndex = 0;
+    if (lightboxImg && images[0]) {
+      lightboxImg.src = images[0].src;
+      lightboxImg.style.opacity = '1';
+      lightboxImg.style.transform = 'scale(1.05)';
+    }
+
+    // Iniciar con la foto inicial visible detrás (overlay semitransparente)
+    intro.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    intro.style.transition = 'opacity 0.3s ease';
     intro.style.opacity = '1';
-    intro.style.pointerEvents = 'none';
-    introLabel.style.transition = 'opacity 1s ease';
-    introTitle.style.transition = 'opacity 1.2s ease';
-    introLabel.style.opacity = '0';
-    introTitle.style.opacity = '0';
-    
-    setTimeout(() => { introLabel.style.opacity = '1'; }, 200);
-    setTimeout(() => { introTitle.style.opacity = '1'; }, 600);
-    // Desvanecer intro después de 2 segundos
+    intro.style.pointerEvents = 'auto';
+
+    tvStage.style.opacity = '1';
+    tvBrand.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.3s ease, filter 0.3s ease';
+    tvBrand.style.transform = 'scaleX(0) scaleY(0.003)';
+    tvBrand.style.opacity = '1';
+    tvBrand.style.filter = 'brightness(3)';
+
+    stage1.style.opacity = '0';
+    stage2.style.opacity = '0';
+    stage2.style.transform = 'scale(0.96)';
+    stage2.style.filter = 'none';
+
+    // 1ms después: Encendido TV sobre la foto hero
     setTimeout(() => {
-      intro.style.transition = 'opacity 1.5s ease';
+      tvBrand.style.transform = 'scaleX(1) scaleY(0.003)';
+      tvBrand.style.filter = 'brightness(2.5)';
+      setTimeout(() => {
+        tvBrand.style.transform = 'scaleX(1) scaleY(1)';
+        tvBrand.style.filter = 'brightness(1)';
+      }, 250);
+    }, 1);
+
+    // Apagado TV estilo analógico (tras 1.5 segundos de exhibición)
+    setTimeout(() => {
+      tvBrand.style.transform = 'scaleX(1) scaleY(0.003)';
+      tvBrand.style.filter = 'brightness(3)';
+      setTimeout(() => {
+        tvBrand.style.transform = 'scaleX(0) scaleY(0.003)';
+        tvBrand.style.opacity = '0';
+      }, 200);
+    }, 1800);
+
+    // Pantalla negra total y Tanda "The Great Puzzle presenta" (después de 1.5s de pausa)
+    setTimeout(() => {
+      intro.style.backgroundColor = 'rgba(0, 0, 0, 1)';
+      stage1.style.transition = 'opacity 1s ease, transform 1s ease';
+      stage1.style.opacity = '1';
+      stage1.style.transform = 'translateY(0)';
+    }, 3300);
+
+    // Fade out Tanda 1
+    setTimeout(() => {
+      stage1.style.opacity = '0';
+      stage1.style.transform = 'translateY(-15px)';
+    }, 5500);
+
+    // TANDA 2: Presentación cinemática rítmica (H2 primero a 7000ms, H1 a 7600ms, Meta lento a 8400ms)
+    const introH2 = document.getElementById('tgp-lightbox-intro-h2') as HTMLElement;
+    const metaItems = document.querySelectorAll('.tgp-lb-meta-item');
+    setTimeout(() => {
+      stage2.style.opacity = '1';
+      if (introH2) {
+        introH2.style.transition = 'opacity 1.4s ease, transform 1.4s ease';
+        introH2.style.opacity = '1';
+        introH2.style.transform = 'translateY(0)';
+      }
+    }, 7000);
+
+    setTimeout(() => {
+      const introTitle = document.getElementById('tgp-lightbox-intro-title') as HTMLElement;
+      if (introTitle) {
+        const titleText = introTitle.textContent?.trim() || "";
+        const isSingleWord = titleText.length > 0 && titleText.split(/\s+/).length === 1;
+        const targetScale = isSingleWord ? 'scale(1.45)' : 'scale(1.04)';
+        if (isSingleWord) introTitle.classList.add('is-permanently-iridescent');
+
+        introTitle.style.transition = 'opacity 2.2s ease, transform 2.8s cubic-bezier(0.2, 0.8, 0.2, 1)';
+        introTitle.style.opacity = '1';
+        introTitle.style.transform = targetScale;
+      }
+    }, 7600);
+
+    // Presentación muy lenta uno a uno de íconos de metadatos (Spotify/YouTube)
+    setTimeout(() => {
+      metaItems.forEach((el, idx) => {
+        setTimeout(() => {
+          (el as HTMLElement).style.transition = 'opacity 1.5s ease, transform 1.5s ease';
+          (el as HTMLElement).style.opacity = '1';
+          (el as HTMLElement).style.transform = 'translateY(0)';
+        }, idx * 500);
+      });
+    }, 8400);
+
+    // PROLONGADO Y SUAVE DESVANECIMIENTO A BLACK (3.2s duration)
+    setTimeout(() => {
+      stage2.style.transition = 'opacity 3.2s ease-in-out, transform 3.2s ease-in-out';
+      stage2.style.opacity = '0';
+      stage2.style.transform = 'scale(1.09)';
+    }, 11000);
+
+    // Revelar la imagen totalmente
+    setTimeout(() => {
+      intro.style.transition = 'opacity 1.8s ease-in-out';
       intro.style.opacity = '0';
-      setTimeout(() => { intro.style.pointerEvents = 'none'; }, 1500);
-    }, 2500);
+      setTimeout(() => {
+        intro.style.pointerEvents = 'none';
+        if (lightboxImg) {
+          lightboxImg.style.transform = 'scale(1)';
+        }
+      }, 1800);
+    }, 13700);
   }
 
-  // Secuencia de Outro (al pasar de la última foto)
+  // Secuencia de Outro Documental (al pasar de la última foto)
   function playOutroSequence() {
     isOutroPlaying = true;
     stopAutoplay();
+
+    // Audio cinemático Deep Sucker Punch / Tail Out para el Outro
+    try {
+      const audio = new Audio('/outro.cinematic.wav');
+      audio.volume = 0.85;
+      audio.play().catch(() => {});
+    } catch (e) {}
     
     const outro = document.getElementById('tgp-lightbox-outro') as HTMLElement;
     const outroTitle = document.getElementById('tgp-lightbox-outro-title') as HTMLElement;
-    const outroBrand = document.getElementById('tgp-lightbox-outro-brand') as HTMLElement;
-    const outroSub = document.getElementById('tgp-lightbox-outro-sub') as HTMLElement;
-    if (!outro || !outroTitle || !outroBrand || !outroSub) return;
+    const outroTv = document.getElementById('tgp-lightbox-outro-tv') as HTMLElement;
+    const outroTvBrand = document.getElementById('tgp-lightbox-outro-tv-brand') as HTMLElement;
+    if (!outro || !outroTitle || !outroTv || !outroTvBrand) return;
     
     outroTitle.textContent = postTitle || document.querySelector('h1')?.textContent || 'Registro Visual';
     
     // Init states
-    outro.style.opacity = '0';
-    outroTitle.style.opacity = '0';
-    outroBrand.style.opacity = '0';
-    outroBrand.style.transform = 'scale(0.6)';
-    outroSub.style.opacity = '0';
+    outro.style.transition = 'opacity 1.2s ease';
+    outro.style.opacity = '1';
     outro.style.pointerEvents = 'auto';
-    outro.style.transition = 'opacity 1.5s ease';
-    
-    setTimeout(() => { outro.style.opacity = '1'; }, 50);
-    // 1ª tanda: Título del post, 2 segundos
+
+    outroTitle.style.transition = 'opacity 1.5s ease, transform 2.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
+    outroTitle.style.opacity = '0';
+    outroTitle.style.transform = 'scale(0.96)';
+
+    outroTv.style.opacity = '0';
+    outroTvBrand.style.transition = 'transform 0.35s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.35s ease, filter 0.35s ease';
+    outroTvBrand.style.transform = 'scaleX(0) scaleY(0.003)';
+    outroTvBrand.style.opacity = '0';
+    outroTvBrand.style.filter = 'brightness(3)';
+
+    // 1ª TANDA: Título del post con zoom suave Titanio Documental y 3.5s visibilidad
     setTimeout(() => {
-      outroTitle.style.transition = 'opacity 1s ease';
       outroTitle.style.opacity = '1';
-    }, 1800);
-    setTimeout(() => { outroTitle.style.opacity = '0'; }, 4000);
-    // 2ª tanda: The Great Puzzle surge
+      outroTitle.style.transform = 'scale(1.04)';
+    }, 500);
+
+    // PROLONGADO Y SUAVE DESVANECIMIENTO A BLACK (3.2s duration)
     setTimeout(() => {
-      outroBrand.style.transition = 'opacity 2s ease, transform 2s cubic-bezier(0.2, 0.8, 0.2, 1)';
-      outroBrand.style.opacity = '1';
-      outroBrand.style.transform = 'scale(1)';
-    }, 5200);
-    // -project- aparece 0.5s después
+      outroTitle.style.transition = 'opacity 3.2s ease-in-out, transform 3.2s ease-in-out';
+      outroTitle.style.opacity = '0';
+      outroTitle.style.transform = 'scale(1.09)';
+    }, 4000);
+
+    // 2ª TANDA: EFECTO TV CRT del brand unido (duración total 2.7s)
     setTimeout(() => {
-      outroSub.style.transition = 'opacity 1.5s ease';
-      outroSub.style.opacity = '1';
-    }, 5700);
-    // Ambos desaparecen juntos tras 2 segundos
-    setTimeout(() => {
-      outroBrand.style.transition = 'opacity 1.5s ease, transform 1.5s ease';
-      outroBrand.style.opacity = '0';
-      outroBrand.style.transform = 'scale(1.05)';
-      outroSub.style.transition = 'opacity 1.5s ease';
-      outroSub.style.opacity = '0';
-    }, 7300);
-    // Cerrar el outro y volver al inicio
+      outroTv.style.opacity = '1';
+      outroTvBrand.style.opacity = '1';
+      
+      // TV Turn ON (0.6s)
+      outroTvBrand.style.transform = 'scaleX(1) scaleY(0.003)';
+      outroTvBrand.style.filter = 'brightness(2.5)';
+      setTimeout(() => {
+        outroTvBrand.style.transform = 'scaleX(1) scaleY(1)';
+        outroTvBrand.style.filter = 'brightness(1)';
+      }, 300);
+
+      // TV Turn OFF (0.6s) -> 0.6 + 1.8 + 0.6 = 3.0s total!
+      setTimeout(() => {
+        outroTvBrand.style.transform = 'scaleX(1) scaleY(0.003)';
+        outroTvBrand.style.filter = 'brightness(3)';
+        setTimeout(() => {
+          outroTvBrand.style.transform = 'scaleX(0) scaleY(0.003)';
+          outroTvBrand.style.opacity = '0';
+        }, 250);
+      }, 2100);
+
+    }, 7400);
+
+    // Pausa extendida de 2.0s tras el apagado antes de unir al Loop de inicio
     setTimeout(() => {
       outro.style.opacity = '0';
       outro.style.pointerEvents = 'none';
       isOutroPlaying = false;
       currentIndex = 0;
-      if (lightboxImg) {
+      if (lightboxImg && images[0]) {
         lightboxImg.src = images[0].src;
         lightboxImg.style.opacity = '1';
         lightboxImg.style.transform = 'scale(1) translateX(0)';
       }
       updateCounter();
-    }, 9500);
+
+      // Loop de unión a la Intro dramática en tandas
+      playIntroSequence();
+    }, 12500);
   }
 
   // Pausar autoplay al hacer hover

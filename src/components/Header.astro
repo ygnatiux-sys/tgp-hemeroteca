@@ -68,7 +68,7 @@ const { transparentUntilScroll = false } = Astro.props;
         <a href="/" class="header-nav-link transition-colors">Inicio</a>
         <a href="/colecciones" class="header-nav-link transition-colors">Colecciones</a>
         <a href="/archivo" class="header-nav-link transition-colors">Archivo</a>
-        <a href="/manifiesto" class="header-nav-link transition-colors">Manifiesto</a>
+        <a href="/about" class="header-nav-link transition-colors">About</a>
         <a href="/codice" class="header-btn-codice px-3.5 py-1.5 rounded-xl font-mono font-light text-xs uppercase tracking-[0.28em] transition-all whitespace-nowrap">
           El Códice
         </a>
@@ -88,7 +88,7 @@ const { transparentUntilScroll = false } = Astro.props;
 
 {transparentUntilScroll && (
   <script>
-    const SCROLLED_CLASSES = ['is-scrolled', 'backdrop-blur-md', 'bg-black/90', 'border-white/10'];
+    const SCROLLED_CLASSES = ['is-scrolled', 'backdrop-blur-md', 'bg-[#1A1C1D]/85', 'border-white/10'];
     const TOP_CLASSES = ['bg-transparent', 'border-transparent'];
 
     let headerScrollHandler: (() => void) | null = null;
@@ -129,10 +129,10 @@ const { transparentUntilScroll = false } = Astro.props;
   }
 
   #site-header[data-transparent-until-scroll='true'].is-scrolled {
-    background-color: rgba(0, 0, 0, 0.9) !important;
-    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background-color: rgba(26, 28, 29, 0.88) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
   }
 
   [data-theme='light'] #site-header[data-transparent-until-scroll='true'] .header-brand-title,

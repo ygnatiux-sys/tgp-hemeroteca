@@ -1,0 +1,354 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import m1 from '../assets/manifiesto/m1.png';
+import m2 from '../assets/manifiesto/m2.png';
+import m3 from '../assets/manifiesto/m3.png';
+import KitLeadMagnet from '../components/KitLeadMagnet.astro';
+---
+
+<Layout title="About | The Great Puzzle Project">
+  <div class="min-h-screen pb-32 pt-28">
+    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16">
+
+      {/* ══════════════════════════════════════════════════════════════════
+          ENCABEZADO EDITORIAL
+      ══════════════════════════════════════════════════════════════════ */}
+      <header class="relative w-full flex flex-col justify-end pt-8 pb-4">
+        <nav class="mb-4 flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
+          <a href="/" class="hover:text-white transition-colors">Hemeroteca</a>
+          <span>/</span>
+          <span class="text-rust-orange">About</span>
+        </nav>
+
+        <h1 class="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-cinzel font-extrabold tracking-tight leading-none mb-4 gradient-acero-ios drop-shadow-2xl">
+          ABOUT
+        </h1>
+
+        <h2 class="text-xl md:text-2xl lg:text-3xl h2-thin-hook text-white/70 max-w-4xl leading-relaxed">
+          DIRECCIÓN, MANIFIESTO & CÓDICE FUNDACIONAL
+        </h2>
+      </header>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          SISTEMA DE SOLAPAS (TABS)
+      ══════════════════════════════════════════════════════════════════ */}
+      <div class="flex items-center gap-2 sm:gap-3 border-b border-white/5 pb-5" role="tablist" aria-label="Secciones About">
+        <button
+          type="button"
+          role="tab"
+          aria-selected="true"
+          aria-controls="panel-autor"
+          id="tab-autor"
+          data-about-tab="autor"
+          class="about-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-rust-orange text-rust-orange bg-rust-orange/15 shadow-[0_0_18px_rgba(200,169,139,0.3)] font-bold cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
+        >
+          <span class="tab-dot w-2 h-2 rounded-full bg-rust-orange"></span>
+          Autor
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="panel-manifiesto"
+          id="tab-manifiesto"
+          data-about-tab="manifiesto"
+          class="about-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-white/10 text-white/50 bg-white/3 hover:border-rust-orange/60 hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.25)] cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
+        >
+          <span class="tab-dot w-2 h-2 rounded-full bg-white/30"></span>
+          Manifiesto
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="panel-codice"
+          id="tab-codice"
+          data-about-tab="codice"
+          class="about-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-white/10 text-white/50 bg-white/3 hover:border-rust-orange/60 hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.25)] cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
+        >
+          <span class="tab-dot w-2 h-2 rounded-full bg-white/30"></span>
+          El Códice
+        </button>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          PANEL 1: AUTOR
+      ══════════════════════════════════════════════════════════════════ */}
+      <div id="panel-autor" role="tabpanel" aria-labelledby="tab-autor" class="about-panel flex flex-col gap-16">
+
+        {/* Hero Autoral — Foto Grande + Identidad */}
+        <section class="flex flex-col lg:flex-row items-center lg:items-start gap-10 lg:gap-16">
+
+          {/* Avatar Grande */}
+          <div class="shrink-0 flex flex-col items-center gap-6">
+            <a
+              href="https://gravatar.com/xavierbeniteztgp"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group/avatar relative block w-52 h-52 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-3xl p-1.5 bg-linear-to-br from-rust-orange/30 via-white/5 to-rust-orange/10 border border-white/15 shadow-2xl hover:border-[#c084fc] hover:shadow-[0_0_50px_rgba(192,132,252,0.5)] transition-all duration-700 cursor-pointer active:scale-95"
+              title="Ver perfil en Gravatar"
+            >
+              <div class="w-full h-full rounded-2xl overflow-hidden relative">
+                <img
+                  src="/perfil.webp"
+                  alt="Xavier Benítez"
+                  class="w-full h-full object-cover transition-transform duration-1000 group-hover/avatar:scale-110"
+                />
+                <div class="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-50 group-hover/avatar:opacity-10 transition-opacity duration-700"></div>
+              </div>
+            </a>
+
+            {/* Badge Ubicación */}
+            <div class="flex items-center gap-2 font-mono text-[8.5px] uppercase tracking-[0.3em] text-white/40">
+              <span class="w-2 h-2 rounded-full bg-rust-orange shadow-[0_0_8px_#C8A98B] shrink-0"></span>
+              <a href="https://share.google/2jdBPO5AZhrjplGgj" target="_blank" rel="noopener noreferrer" class="hover:text-rust-orange transition-colors">Buenos Aires</a>
+              <span class="text-rust-orange font-bold">·</span>
+              <span>Sur Global</span>
+            </div>
+          </div>
+
+          {/* Identidad + Bio */}
+          <div class="flex-1 flex flex-col gap-6 text-center lg:text-left">
+            <div class="flex flex-col gap-2">
+              <span class="font-mono text-[10px] uppercase tracking-[0.5em] text-rust-orange font-bold">
+                [ Dirección Editorial & Autoría ]
+              </span>
+              <h2 class="font-cinzel font-extrabold text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[0.95]">
+                <a
+                  href="https://gravatar.com/xavierbeniteztgp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="gradient-acero-ios hover:text-[#f5d0fe] hover:drop-shadow-[0_0_20px_rgba(232,121,249,1)] transition-all duration-300 inline-block active:scale-95"
+                >
+                  Xavier Benítez
+                </a>
+              </h2>
+              <p class="font-mono text-[11px] uppercase tracking-[0.3em] text-white/45 mt-1">
+                Investigador & Editor General
+              </p>
+            </div>
+
+            {/* Bio Expandida */}
+            <div class="flex flex-col gap-5 max-w-3xl">
+              <p class="font-serif text-lg md:text-xl lg:text-[1.35rem] text-white/85 leading-relaxed font-normal">
+                Con <strong class="text-white font-bold tracking-tight">25 años de trayectoria educativa</strong> e investigación en semiótica y tecnología, <span class="text-white font-cinzel font-bold">Xavier Benítez</span> dirige <em class="font-serif italic text-rust-orange">The Great Puzzle Project</em> como una plataforma de investigación independiente, cartografía epistémica y archivo sobre la interacción entre la cultura visual, la memoria histórica y los sistemas de información.
+              </p>
+
+              <p class="font-serif text-base md:text-lg text-white/65 leading-relaxed">
+                Su trabajo combina la rigurosidad documental con la sensibilidad estética del ensayo visual. Cada investigación publicada en esta hemeroteca es el resultado de un proceso editorial que cruza disciplinas como la arqueología, la semiótica, la filosofía y la historia de las religiones, generando un espacio donde el conocimiento se cartografía y se comparte como una experiencia completa.
+              </p>
+
+              <blockquote class="border-l-3 border-rust-orange/50 pl-6 py-2 mt-2">
+                <p class="font-serif italic text-white/70 text-lg md:text-xl leading-relaxed">
+                  "La verdad no es algo que se encuentra, es algo que se recuerda."
+                </p>
+                <cite class="font-mono text-[9px] uppercase tracking-[0.3em] text-rust-orange/60 mt-3 block not-italic">
+                  — Principio fundacional de TGP
+                </cite>
+              </blockquote>
+            </div>
+
+            {/* Redes Sociales & Contacto */}
+            <div class="flex flex-col gap-6 mt-4 pt-6 border-t border-white/8">
+
+              {/* Links Corporativos */}
+              <div class="flex flex-wrap items-center gap-3">
+                {/* Substack */}
+                <a
+                  href="https://thegreatpuzzleproject.substack.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-white/8 bg-white/2 hover:border-rust-orange/40 hover:bg-rust-orange/5 transition-all duration-400"
+                >
+                  <svg viewBox="0 0 24 24" class="w-4 h-4 fill-white/50 group-hover:fill-rust-orange transition-colors" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.539 8.242H1.46V5.406h21.078v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.078V0z"/>
+                  </svg>
+                  <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-white/50 group-hover:text-rust-orange transition-colors">Substack</span>
+                </a>
+
+                {/* Spotify */}
+                <a
+                  href="https://open.spotify.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-white/8 bg-white/2 hover:border-[#1DB954]/40 hover:bg-[#1DB954]/5 transition-all duration-400"
+                >
+                  <svg viewBox="0 0 24 24" class="w-4 h-4 fill-white/50 group-hover:fill-[#1DB954] transition-colors" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                  </svg>
+                  <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-white/50 group-hover:text-[#1DB954] transition-colors">Spotify</span>
+                </a>
+
+                {/* YouTube */}
+                <a
+                  href="https://youtube.com/@thegreatpuzzleproject"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-white/8 bg-white/2 hover:border-[#E52D27]/40 hover:bg-[#E52D27]/5 transition-all duration-400"
+                >
+                  <svg viewBox="0 0 24 24" class="w-4 h-4 fill-white/50 group-hover:fill-[#E52D27] transition-colors" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                  <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-white/50 group-hover:text-[#E52D27] transition-colors">YouTube</span>
+                </a>
+
+                {/* Gravatar */}
+                <a
+                  href="https://gravatar.com/xavierbeniteztgp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-white/8 bg-white/2 hover:border-[#c084fc]/40 hover:bg-[#c084fc]/5 transition-all duration-400"
+                >
+                  <svg viewBox="0 0 24 24" class="w-4 h-4 fill-white/50 group-hover:fill-[#c084fc] transition-colors" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                  </svg>
+                  <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-white/50 group-hover:text-[#c084fc] transition-colors">Gravatar</span>
+                </a>
+              </div>
+
+              {/* CTA Contactar */}
+              <a
+                href="mailto:thegreatpuzzleproject@gmail.com"
+                class="group inline-flex items-center gap-3 px-6 py-3.5 bg-[#151718]/90 backdrop-blur-sm border border-white/10 rounded-xl hover:bg-rust-orange/10 hover:border-rust-orange/50 transition-all duration-500 w-fit"
+              >
+                <svg viewBox="0 0 24 24" class="w-5 h-5 fill-none stroke-white/50 group-hover:stroke-rust-orange transition-colors" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="flex flex-col">
+                  <span class="font-mono text-[9px] uppercase tracking-[0.25em] text-white/35 group-hover:text-rust-orange/60 transition-colors">Contactar</span>
+                  <span class="font-mono text-[11px] text-rust-orange group-hover:text-rust-orange transition-colors">thegreatpuzzleproject@gmail.com</span>
+                </div>
+                <span class="text-white/20 group-hover:text-rust-orange/60 group-hover:translate-x-1 transition-all ml-2">↗</span>
+              </a>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          PANEL 2: MANIFIESTO
+      ══════════════════════════════════════════════════════════════════ */}
+      <div id="panel-manifiesto" role="tabpanel" aria-labelledby="tab-manifiesto" class="about-panel hidden flex-col gap-0">
+        <div class="bg-[#050505] rounded-3xl overflow-hidden border border-white/5">
+          {/* Fragmento I */}
+          <section class="relative min-h-[70vh] w-full flex items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 z-0">
+              <Image src={m1} alt="Signals" class="w-full h-full object-cover opacity-40" />
+              <div class="absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/80"></div>
+            </div>
+            <div class="relative z-10 text-center px-8 max-w-5xl py-20">
+              <header class="mb-10 opacity-30 font-mono text-[9px] uppercase tracking-[0.8em]">Fragmento I</header>
+              <p class="font-serif text-3xl md:text-5xl lg:text-6xl leading-[1.1] bg-linear-to-b from-[#e0e0e0] to-[#e0e0e0]/20 bg-clip-text text-transparent drop-shadow-2xl">
+                La historia no es una narrativa lineal, sino un archivo de señales esperando ser decodificadas.
+              </p>
+            </div>
+          </section>
+
+          {/* Fragmento II */}
+          <section class="relative min-h-[70vh] w-full flex items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 z-0">
+              <Image src={m2} alt="Stone & Algorithm" class="w-full h-full object-cover opacity-40" />
+              <div class="absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/80"></div>
+            </div>
+            <div class="relative z-10 text-center px-8 max-w-5xl py-20">
+              <header class="mb-10 opacity-30 font-mono text-[9px] uppercase tracking-[0.8em]">Fragmento II</header>
+              <p class="font-serif text-3xl md:text-5xl lg:text-6xl leading-[1.1] bg-linear-to-b from-[#e0e0e0] to-[#e0e0e0]/20 bg-clip-text text-transparent drop-shadow-2xl">
+                Buscamos la arqueosemiótica de lo cotidiano, el lenguaje oculto tras la piedra y el algoritmo.
+              </p>
+            </div>
+          </section>
+
+          {/* Fragmento III */}
+          <section class="relative min-h-[70vh] w-full flex items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 z-0">
+              <Image src={m3} alt="The Puzzle" class="w-full h-full object-cover opacity-40" />
+              <div class="absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/80"></div>
+            </div>
+            <div class="relative z-10 text-center px-8 max-w-5xl py-20">
+              <header class="mb-10 opacity-30 font-mono text-[9px] uppercase tracking-[0.8em]">Fragmento III</header>
+              <p class="font-serif text-3xl md:text-5xl lg:text-6xl leading-[1.1] bg-linear-to-b from-[#e0e0e0] to-[#e0e0e0]/20 bg-clip-text text-transparent drop-shadow-2xl mb-12">
+                Bienvenido al gran rompecabezas. Aquí el silencio tiene su propia frecuencia.
+              </p>
+              <a href="/archivo" class="inline-flex items-center gap-3 font-mono text-[10px] tracking-[0.35em] uppercase border border-white/10 bg-white/5 backdrop-blur-xl px-12 py-5 rounded-full transition-all duration-500 hover:border-rust-orange/40 text-white/40 hover:text-white">
+                Explorar Archivo →
+              </a>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          PANEL 3: EL CÓDICE
+      ══════════════════════════════════════════════════════════════════ */}
+      <div id="panel-codice" role="tabpanel" aria-labelledby="tab-codice" class="about-panel hidden flex-col gap-8">
+        <div class="flex flex-col items-center justify-center py-12">
+          {/* Fondo Radial */}
+          <div class="absolute inset-0 pointer-events-none -z-10">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[50vh] bg-sky-950/15 rounded-full blur-[180px] opacity-30"></div>
+          </div>
+
+          <div class="w-full flex items-center justify-center">
+            <KitLeadMagnet />
+          </div>
+
+          <div class="mt-12 text-center max-w-lg px-6">
+            <p class="font-serif italic text-white/20 text-sm leading-relaxed">
+              "La verdad no es algo que se encuentra, es algo que se recuerda."
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const initAboutTabs = () => {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.about-tab-btn');
+    const panels = document.querySelectorAll<HTMLDivElement>('.about-panel');
+
+    const ACTIVE_CLASSES = ['border-rust-orange', 'text-rust-orange', 'bg-rust-orange/15', 'shadow-[0_0_18px_rgba(200,169,139,0.3)]', 'font-bold'];
+    const INACTIVE_CLASSES = ['border-white/10', 'text-white/50', 'bg-white/3'];
+
+    const activate = (tabName: string) => {
+      buttons.forEach(btn => {
+        const isActive = btn.dataset.aboutTab === tabName;
+        btn.setAttribute('aria-selected', String(isActive));
+
+        ACTIVE_CLASSES.forEach(c => btn.classList.toggle(c, isActive));
+        INACTIVE_CLASSES.forEach(c => btn.classList.toggle(c, !isActive));
+
+        const dot = btn.querySelector('.tab-dot');
+        if (dot) {
+          dot.classList.toggle('bg-rust-orange', isActive);
+          dot.classList.toggle('bg-white/30', !isActive);
+        }
+      });
+
+      panels.forEach(panel => {
+        const panelTab = panel.id.replace('panel-', '');
+        if (panelTab === tabName) {
+          panel.classList.remove('hidden');
+          panel.classList.add('flex');
+        } else {
+          panel.classList.add('hidden');
+          panel.classList.remove('flex');
+        }
+      });
+    };
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.aboutTab;
+        if (tab) activate(tab);
+      });
+    });
+  };
+
+  document.addEventListener('DOMContentLoaded', initAboutTabs);
+  document.addEventListener('astro:page-load', initAboutTabs);
+</script>

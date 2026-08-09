@@ -9,6 +9,7 @@ import {
   formatYear,
   normalizeCategory,
   resolveEssayImage,
+  sortEssaysByVisualFirst,
 } from '../lib/content-filter';
 
 // ─── CARGA Y FILTRADO CENTRALIZADO ───────────────────────────────────────────
@@ -23,11 +24,7 @@ const isProd = import.meta.env.PROD;
 const publishableEssays = getPublishableEssays(allEssaysRaw, isProd);
 const publishableArquetipos = getPublishableEssays(allArquetiposRaw, isProd);
 
-const publishable = [...publishableEssays, ...publishableArquetipos].sort((a, b) => {
-  const dateA = a.entry.date ? new Date(a.entry.date).getTime() : 0;
-  const dateB = b.entry.date ? new Date(b.entry.date).getTime() : 0;
-  return dateB - dateA;
-});
+const publishable = [...publishableEssays, ...publishableArquetipos].sort(sortEssaysByVisualFirst);
 
 // ─── CATEGORÍAS Y AÑOS REALES PARA FILTROS ───────────────────────────────────
 const categories = [...new Set(
@@ -86,26 +83,21 @@ function createPremierSequences(essays: typeof resolvedEssays) {
 ---
 
 <Layout title="Archivo General | The Great Puzzle Project">
-  <div class="bg-theme-dark text-white min-h-screen selection:bg-[#C8A98B] selection:text-black pt-28 pb-32">
+  <div class="min-h-screen pb-32 pt-28">
 
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16">
 
-      {/* ══════════════════════════════════════════════════════════════════
-          CABECERA HERO CINEMATOGRÁFICA DEL ARCHIVO GENERAL (MINIMALISTA)
-      ══════════════════════════════════════════════════════════════════ */}
-      <header class="relative w-full flex flex-col justify-end pt-8 pb-8 border-b border-white/10">
+      <header class="relative w-full flex flex-col justify-end pt-8 pb-8">
         <nav class="mb-4 flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
           <a href="/" class="hover:text-white transition-colors">Hemeroteca</a>
           <span>/</span>
-          <span class="text-[#C8A98B]">Archivo General</span>
+          <span class="text-rust-orange">Archivo General</span>
         </nav>
 
-        {/* H1 CON CINZEL EXTRABOLD Y GRADIENTE ACERO iOS STYLE */}
-        <h1 class="text-5xl md:text-7xl lg:text-8xl font-cinzel font-extrabold tracking-tight leading-none mb-4 gradient-acero-ios drop-shadow-2xl">
+        <h1 class="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-cinzel font-extrabold tracking-tight leading-none mb-4 gradient-acero-ios drop-shadow-2xl">
           ARCHIVO GENERAL
         </h1>
 
-        {/* H2 CON SANS OUTFIT / JAKARTA THIN Y LETTER-SPACING AMPLIO */}
         <h2 class="text-xl md:text-2xl lg:text-3xl h2-thin-hook text-white/70 max-w-4xl leading-relaxed">
           CARTOGRAFÍA EPISTÉMICA & ANÁLISIS MULTIDISCIPLINARIO DE INVESTIGACIONES
         </h2>
@@ -114,7 +106,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
       {/* ══════════════════════════════════════════════════════════════════
           SISTEMA DE SOLAPAS PRINCIPALES (TABS MINIMALISTAS)
       ══════════════════════════════════════════════════════════════════ */}
-      <div class="flex items-center justify-between gap-4 border-b border-white/10 pb-5">
+      <div class="flex items-center justify-between gap-4 border-b border-white/5 pb-5">
         <div class="flex items-center gap-2 sm:gap-3" role="tablist" aria-label="Modo de visualización del archivo">
           <button
             type="button"
@@ -123,9 +115,9 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             aria-controls="view-categories"
             id="tab-btn-categories"
             data-main-tab="categories"
-            class="archive-main-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-[#C8A98B] text-[#C8A98B] bg-[#C8A98B]/15 shadow-[0_0_18px_rgba(200,169,139,0.3)] font-bold cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
+            class="archive-main-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-rust-orange text-rust-orange bg-rust-orange/15 shadow-[0_0_18px_rgba(200,169,139,0.3)] font-bold cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
           >
-            <span class="tab-indicator w-2 h-2 rounded-full bg-[#C8A98B]"></span>
+            <span class="tab-indicator w-2 h-2 rounded-full bg-rust-orange"></span>
             Por Categoría
           </button>
           
@@ -136,7 +128,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             aria-controls="view-years"
             id="tab-btn-years"
             data-main-tab="years"
-            class="archive-main-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-white/10 text-white/50 bg-white/3 hover:border-[#C8A98B]/60 hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.25)] cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
+            class="archive-main-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-white/10 text-white/50 bg-white/3 hover:border-rust-orange/60 hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.25)] cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
           >
             <span class="tab-indicator w-2 h-2 rounded-full bg-white/30"></span>
             Por Año
@@ -155,7 +147,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
           <button
             type="button"
             data-cat-filter-btn="all"
-            class="cat-filter-btn font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 rounded-xl border border-transparent text-white/60 bg-transparent hover:border-[#C8A98B] hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.3)] cursor-pointer transition-all duration-300"
+            class="cat-filter-btn font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 rounded-xl border border-transparent text-white/60 bg-transparent hover:border-rust-orange hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.3)] cursor-pointer transition-all duration-300"
           >
             Todas ({publishable.length})
           </button>
@@ -165,16 +157,16 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             <select
               id="cat-linter-select"
               aria-label="Seleccionar categoría de investigación"
-              class="appearance-none font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 pr-9 rounded-xl border border-transparent text-[#C8A98B] bg-transparent hover:bg-white/10 hover:border-[#C8A98B] hover:shadow-[0_0_16px_rgba(200,169,139,0.35)] cursor-pointer transition-all duration-300 outline-none font-bold"
+              class="appearance-none font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 pr-9 rounded-xl border border-transparent text-rust-orange bg-transparent hover:bg-white/10 hover:border-rust-orange hover:shadow-[0_0_16px_rgba(200,169,139,0.35)] cursor-pointer transition-all duration-300 outline-none font-bold"
             >
               <option value="all" class="bg-[#0a0a0a] text-white">CATEGORÍAS ▾</option>
               {categories.map(cat => (
-                <option value={cat} class="bg-[#0a0a0a] text-[#C8A98B]">
+                <option value={cat} class="bg-(--bg-main) text-rust-orange">
                   • {formatCategory(cat).toUpperCase()}
                 </option>
               ))}
             </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#C8A98B]">
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-rust-orange">
               <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
                 <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
               </svg>
@@ -182,34 +174,116 @@ function createPremierSequences(essays: typeof resolvedEssays) {
           </div>
         </div>
 
-        {/* Lista de Categorías en Grilla 2 Columnas */}
-        <section class="flex flex-col gap-16" id="archive-list">
-          {essaysByCategory.map(group => (
-            <div class="category-block flex flex-col gap-6" data-category-group={group.catKey}>
-              {/* Barra Editorial de Categoría */}
-              <div class="editorial-bar flex items-center justify-between border-b border-[#C8A98B]/20 pb-3">
-                <div class="flex items-center gap-3">
-                  <span class="w-2 h-2 rounded-full bg-[#C8A98B] shadow-[0_0_8px_#C8A98B]" />
-                  <h2 class="font-cinzel font-bold text-lg md:text-2xl tracking-wider bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-md">
-                    {group.catLabel}
-                  </h2>
-                </div>
-              </div>
+        {/* Lista de Categorías con estructura cinemática 1+2+Ver más */}
+        <section class="flex flex-col gap-20" id="archive-list">
+          {essaysByCategory.map(group => {
+            const heroEssay  = group.essays[0];
+            const secondA    = group.essays[1] ?? null;
+            const secondB    = group.essays[2] ?? null;
+            const remaining  = group.essays.length - 3;
 
-              {/* Grilla de 2 Columnas con Formato Cinemático */}
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {group.essays.map(({ slug, entry, img }) => (
-                  <CinematicArchiveCard
-                    slug={slug}
-                    entry={entry}
-                    img={img}
-                    variant="standard"
-                    enableCinemagraph={false}
-                  />
-                ))}
+            return (
+              <div class="category-block flex flex-col gap-6" data-category-group={group.catKey}>
+                {/* Barra Editorial de Categoría */}
+                <div class="editorial-bar flex items-center justify-between pb-3">
+                  <div class="flex items-center gap-3">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rust-orange shadow-[0_0_6px_#C8A98B]" />
+                    <h2 class="font-cinzel font-bold text-lg md:text-xl tracking-wider bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent">
+                      {group.catLabel}
+                    </h2>
+                  </div>
+                  {remaining > 0 && (
+                    <a
+                      href={`/archivo?categoria=${encodeURIComponent(group.catKey)}`}
+                      class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-white/35 hover:text-rust-orange transition-colors"
+                    >
+                      +{remaining} más →
+                    </a>
+                  )}
+                </div>
+
+                {/* Hero Principal */}
+                <article class="group w-full relative overflow-hidden rounded-2xl border border-white/8 bg-white/2 hover:border-rust-orange/30 transition-all duration-700">
+                  <div class="flex flex-col lg:flex-row lg:min-h-80">
+                    {heroEssay.img && (
+                      <div class="relative overflow-hidden lg:w-[50%] shrink-0 aspect-video lg:aspect-auto">
+                        <img
+                          src={(heroEssay.img as any)?.src ?? heroEssay.img}
+                          alt={heroEssay.entry.title || 'Dossier'}
+                          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03] brightness-85"
+                          loading="lazy"
+                        />
+                        <div class="absolute inset-0 bg-linear-to-r from-transparent to-(--bg-main)/80 hidden lg:block pointer-events-none" />
+                        <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/70 via-transparent to-transparent lg:hidden pointer-events-none" />
+                      </div>
+                    )}
+                    <div class="flex flex-col justify-between p-6 md:p-8 lg:p-10 flex-1">
+                      <div class="flex flex-col gap-3">
+                        <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-rust-orange/70">{heroEssay.entry.category}</span>
+                        <h3 class="font-cinzel font-bold text-xl sm:text-2xl md:text-3xl leading-tight group-hover:text-rust-orange/85 transition-colors">
+                          <a href={`/hemeroteca/${heroEssay.slug}`}>{heroEssay.entry.title}</a>
+                        </h3>
+                        {heroEssay.entry.excerpt && (
+                          <p class="font-serif italic text-[#E0E0E0]/50 text-sm leading-relaxed line-clamp-2">
+                            "{heroEssay.entry.excerpt}"
+                          </p>
+                        )}
+                      </div>
+                      <div class="mt-6 pt-4 border-t border-white/5">
+                        <a href={`/hemeroteca/${heroEssay.slug}`} class="inline-flex items-center gap-2 px-4 py-2 bg-[#151718]/90 border border-white/10 text-[#E0E0E0]/65 font-mono font-bold text-[8.5px] tracking-[0.25em] uppercase rounded-lg hover:bg-rust-orange/10 hover:border-rust-orange/45 hover:text-rust-orange transition-all">
+                          Ver Registro ▸
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+
+                {/* Dos Menores */}
+                {(secondA || secondB) && (
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+                    {[secondA, secondB].filter(Boolean).map(e => e && (
+                      <article class="group relative overflow-hidden rounded-xl border border-white/8 bg-white/2 hover:border-rust-orange/30 transition-all duration-500 flex flex-col">
+                        {e.img && (
+                          <div class="relative overflow-hidden aspect-video">
+                            <img
+                              src={(e.img as any)?.src ?? e.img}
+                              alt={e.entry.title || 'Dossier'}
+                              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04] brightness-80"
+                              loading="lazy"
+                            />
+                            <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/70 via-transparent to-transparent pointer-events-none" />
+                          </div>
+                        )}
+                        <div class="flex flex-col justify-between p-5 flex-1">
+                          <div class="flex flex-col gap-2">
+                            <span class="font-mono text-[8px] uppercase tracking-[0.3em] text-rust-orange/65">{e.entry.category}</span>
+                            <h4 class="font-cinzel font-bold text-base leading-snug group-hover:text-rust-orange/80 transition-colors line-clamp-2">
+                              <a href={`/hemeroteca/${e.slug}`}>{e.entry.title}</a>
+                            </h4>
+                          </div>
+                          <div class="mt-4 pt-3 border-t border-white/5">
+                            <a href={`/hemeroteca/${e.slug}`} class="font-mono text-[8px] uppercase tracking-[0.25em] text-white/30 hover:text-rust-orange transition-colors">Ver Registro ▸</a>
+                          </div>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                )}
+
+                {/* Ver más si hay más de 3 */}
+                {remaining > 0 && (
+                  <div class="text-center pt-2">
+                    <a
+                      href={`/archivo?categoria=${encodeURIComponent(group.catKey)}`}
+                      class="inline-flex items-center gap-2 font-mono text-[8.5px] uppercase tracking-[0.3em] px-6 py-2.5 rounded-lg bg-[#151718]/90 border border-white/8 text-white/40 hover:border-rust-orange/40 hover:text-rust-orange transition-all"
+                    >
+                      Ver {remaining} dossieres más en {group.catLabel} →
+                    </a>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </section>
       </div>
 
@@ -226,7 +300,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
               <button
                 type="button"
                 data-year-filter-btn="all"
-                class="year-filter-btn font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 rounded-xl border border-transparent text-white/60 bg-transparent hover:border-[#C8A98B] hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.3)] cursor-pointer transition-all duration-300"
+                class="year-filter-btn font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 rounded-xl border border-transparent text-white/60 bg-transparent hover:border-rust-orange hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.3)] cursor-pointer transition-all duration-300"
               >
                 Todos los Años
               </button>
@@ -235,16 +309,16 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                 <select
                   id="year-linter-select"
                   aria-label="Seleccionar año de archivo"
-                  class="appearance-none font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 pr-9 rounded-xl border border-transparent text-[#C8A98B] bg-transparent hover:bg-white/10 hover:border-[#C8A98B] hover:shadow-[0_0_16px_rgba(200,169,139,0.35)] cursor-pointer transition-all duration-300 outline-none font-bold"
+                  class="appearance-none font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 pr-9 rounded-xl border border-transparent text-rust-orange bg-transparent hover:bg-white/10 hover:border-rust-orange hover:shadow-[0_0_16px_rgba(200,169,139,0.35)] cursor-pointer transition-all duration-300 outline-none font-bold"
                 >
                   <option value="all" class="bg-[#0a0a0a] text-white">AÑOS ▾</option>
                   {years.map(year => (
-                    <option value={year} class="bg-[#0a0a0a] text-[#C8A98B]">
+                    <option value={year} class="bg-(--bg-main) text-rust-orange">
                       • AÑO {year}
                     </option>
                   ))}
                 </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#C8A98B]">
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-rust-orange">
                   <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
                     <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                   </svg>
@@ -264,9 +338,9 @@ function createPremierSequences(essays: typeof resolvedEssays) {
               return (
                 <div class="archive-year-cinematic-group flex flex-col gap-10 md:gap-14" data-year-group={year}>
                   {/* Divisor de Año Editorial con Amplio Tracking y Espacio Negativo */}
-                  <div class="flex items-center justify-between border-b border-[#C8A98B]/20 pb-4 pt-2">
+                  <div class="flex items-center justify-between border-b border-rust-orange/20 pb-4 pt-2">
                     <div class="flex items-center gap-3.5">
-                      <span class="w-2 h-2 rounded-full bg-[#C8A98B] shadow-[0_0_8px_#C8A98B]" />
+                      <span class="w-2 h-2 rounded-full bg-rust-orange shadow-[0_0_8px_#C8A98B]" />
                       <h2 class="font-cinzel font-bold text-2xl md:text-3xl tracking-[0.15em] text-white">
                         AÑO {year}
                       </h2>

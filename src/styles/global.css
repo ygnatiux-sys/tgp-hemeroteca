@@ -5,17 +5,17 @@
    PALETA Y VARIABLES DE TEMA (DARK ACADEMIA / MODO DÍA PAPIRO FRÍO)
 ═════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* Modo Oscuro Base (Preserva la estética actual intacta) */
-  --bg-main: #121413;
-  --bg-alt: #181d1a;
+  /* Modo Oscuro Base (Color Ahumado) */
+  --bg-main: #1A1C1D; /* Ahumado oscuro de fondo */
+  --bg-alt: #222527;  /* Ahumado un tono más claro para contraste sutil */
   --bg-surface: rgba(255, 255, 255, 0.04);
-  --text-main: #FFFFFF;
-  --text-body: #F5F5F7;
+  --text-main: #E0E0E0;
+  --text-body: #E0E0E0;
   --accent-primary: #C8A98B;
   --accent-secondary: #D4A352;
   --accent-silver: #94A3B8;
   --border-subtle: rgba(255, 255, 255, 0.1);
-  --header-bg: rgba(18, 20, 19, 0.85); /* Coincidencia exacta con --bg-main #121413 */
+  --header-bg: rgba(26, 28, 29, 0.85); /* Coincidencia exacta con --bg-main #1A1C1D */
   --header-border: rgba(255, 255, 255, 0.08);
   --theme-transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out, border-color 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
 }
@@ -126,7 +126,7 @@ header .header-btn-codice {
 }
 
 [data-theme='light'] header a:hover .header-brand-title {
-  color: #B55A30 !important; /* Rojo Óxido / Lantern Glow */
+  color: #C8A98B !important; /* Dorado Lantern Glow */
 }
 
 [data-theme='light'] header nav a,
@@ -136,8 +136,8 @@ header .header-btn-codice {
 
 [data-theme='light'] header nav a:hover,
 [data-theme='light'] header .header-nav-link:hover {
-  color: #B55A30 !important;
-  text-shadow: 0 0 12px rgba(181, 90, 48, 0.35) !important; /* Lantern Hover Glow */
+  color: #C8A98B !important;
+  text-shadow: 0 0 12px rgba(200, 169, 139, 0.4) !important; /* Lantern Hover Glow */
 }
 
 [data-theme='light'] header .header-btn-codice {
@@ -146,8 +146,8 @@ header .header-btn-codice {
 }
 
 [data-theme='light'] header .header-btn-codice:hover {
-  color: #B55A30 !important;
-  background-color: rgba(181, 90, 48, 0.1) !important; /* Lantern Hover */
+  color: #C8A98B !important;
+  background-color: rgba(200, 169, 139, 0.1) !important; /* Lantern Hover */
 }
 
 [data-theme='light'] header .header-action-btn {
@@ -155,8 +155,8 @@ header .header-btn-codice {
 }
 
 [data-theme='light'] header .header-action-btn:hover {
-  color: #B55A30 !important;
-  background-color: rgba(181, 90, 48, 0.1) !important; /* Lantern Hover */
+  color: #C8A98B !important;
+  background-color: rgba(200, 169, 139, 0.1) !important; /* Lantern Hover */
 }
 
 [data-theme='light'] header .header-action-btn svg {
@@ -181,7 +181,7 @@ header .header-btn-codice {
 }
 
 :root:not([data-theme='light']) header a:hover .header-brand-title {
-  color: #B55A30 !important; /* Rojo Óxido / Lantern Glow */
+  color: #C8A98B !important; /* Dorado Lantern Glow */
 }
 
 :root:not([data-theme='light']) header nav a,
@@ -191,8 +191,8 @@ header .header-btn-codice {
 
 :root:not([data-theme='light']) header nav a:hover,
 :root:not([data-theme='light']) header .header-nav-link:hover {
-  color: #B55A30 !important;
-  text-shadow: 0 0 14px rgba(181, 90, 48, 0.5) !important; /* Lantern Hover Glow */
+  color: #C8A98B !important;
+  text-shadow: 0 0 14px rgba(200, 169, 139, 0.5) !important; /* Lantern Hover Glow */
 }
 
 :root:not([data-theme='light']) header .header-btn-codice {
@@ -201,8 +201,8 @@ header .header-btn-codice {
 }
 
 :root:not([data-theme='light']) header .header-btn-codice:hover {
-  color: #B55A30 !important;
-  background-color: rgba(181, 90, 48, 0.15) !important; /* Lantern Hover */
+  color: #C8A98B !important;
+  background-color: rgba(200, 169, 139, 0.1) !important; /* Lantern Hover */
 }
 
 :root:not([data-theme='light']) header .header-action-btn {
@@ -444,7 +444,7 @@ header .header-btn-codice {
   --color-old-navy: #1E2C3A;
   --color-bus-red: #8B3A36;
   --color-vintage-yellow: #D4A352;
-  --color-rust-orange: #B55A30;
+  --color-rust-orange: #C8A98B;
 
   --ease-cinematic: cubic-bezier(0.2, 0.8, 0.2, 1);
   --font-serif: "Gloock", serif;
@@ -893,4 +893,53 @@ header .header-btn-codice {
     transform: none !important;
     pointer-events: auto !important;
   }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   ESTÉTICA CINEMÁTICA GLOBAL PARA FOTOS Y FIGURAS DE TODOS LOS POSTS
+═════════════════════════════════════════════════════════════════════════ */
+article figure, 
+.prose figure, 
+#wiki-article-body figure,
+.cinematic-img-frame {
+  position: relative;
+  border-radius: 1.75rem;
+  overflow: hidden;
+  background-color: #000;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8);
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+article figure::after, 
+.prose figure::after, 
+#wiki-article-body figure::after,
+.cinematic-img-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1.75rem;
+  box-shadow: inset 0 0 150px 30px rgba(0, 0, 0, 0.95);
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  z-index: 10;
+}
+
+article img, 
+.prose img, 
+#wiki-article-body img,
+.cinematic-img {
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.7s ease, opacity 0.5s ease;
+  will-change: transform, filter;
+}
+
+article img:hover, 
+.prose img:hover, 
+#wiki-article-body img:hover,
+.cinematic-img:hover {
+  transform: scale(1.025);
+  filter: brightness(1.06);
 }
