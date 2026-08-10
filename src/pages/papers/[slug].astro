@@ -156,25 +156,63 @@ const pageTitle = `${title} — Papers · TGP`;
 
         <div class="paper-action-bar">
           <div class="action-left">
-            <button class="action-btn" aria-label="Claps">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 20H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5"/><path d="M10 11.5a1.5 1.5 0 0 0 1.5-1.5 2 2 0 0 1 2-2h1.5a1 1 0 0 0 1-1V5.5a2 2 0 0 1 2-2h.5a2 2 0 0 1 2 2v10.5a6 6 0 0 1-6 6h-1.5a2 2 0 0 1-2-2v-4.5Z"/></svg>
-              <span>135</span>
+            <!-- Claps / Me gusta -->
+            <button class="action-btn btn-like" data-slug={slug} aria-label="Claps">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="action-icon icon-clap"><path d="M10 20H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5"/><path d="M10 11.5a1.5 1.5 0 0 0 1.5-1.5 2 2 0 0 1 2-2h1.5a1 1 0 0 0 1-1V5.5a2 2 0 0 1 2-2h.5a2 2 0 0 1 2 2v10.5a6 6 0 0 1-6 6h-1.5a2 2 0 0 1-2-2v-4.5Z"/></svg>
+              <span class="like-count">135</span>
             </button>
-            <button class="action-btn" aria-label="Comentarios">
+            <!-- Comentarios -->
+            <button class="action-btn btn-comment trigger-subscribe" aria-label="Comentarios">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
               <span>1</span>
             </button>
+            <!-- Repost -->
+            <button class="action-btn btn-repost trigger-subscribe" aria-label="Republicar">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>
+            </button>
           </div>
           <div class="action-right">
-            <button class="action-btn" aria-label="Añadir a la biblioteca">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+            <!-- Bookmark / Biblioteca -->
+            <button class="action-btn btn-bookmark" data-slug={slug} aria-label="Añadir a la biblioteca">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="action-icon icon-bookmark"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
             </button>
-            <button class="action-btn" aria-label="Compartir">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+            <!-- Audio -->
+            <button class="action-btn btn-audio trigger-subscribe" aria-label="Escuchar artículo">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
             </button>
-            <button class="action-btn" aria-label="Más opciones">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            <!-- Compartir -->
+            <button class="action-btn btn-share" aria-label="Compartir">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
             </button>
+            <!-- Menú desplegable ... -->
+            <div class="action-more-wrapper">
+              <button class="action-btn btn-more" aria-label="Más opciones" aria-expanded="false">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+              </button>
+              <div class="paper-more-menu" role="menu">
+                <button class="menu-item trigger-subscribe" role="menuitem">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4.3v7a2.31 2.31 0 0 1-2.33 2.3H17"/></svg>
+                  <span>Mostrar menos como esto</span>
+                </button>
+                <div class="menu-divider"></div>
+                <button class="menu-item trigger-subscribe" role="menuitem">
+                  <span>Seguir autor (Xavier Benítez)</span>
+                </button>
+                <button class="menu-item trigger-subscribe" role="menuitem">
+                  <span>Seguir publicación (TGP Papers)</span>
+                </button>
+                <div class="menu-divider"></div>
+                <button class="menu-item trigger-subscribe" role="menuitem">
+                  <span>Silenciar autor</span>
+                </button>
+                <button class="menu-item trigger-subscribe" role="menuitem">
+                  <span>Silenciar publicación</span>
+                </button>
+                <button class="menu-item trigger-subscribe danger" role="menuitem">
+                  <span>Reportar paper...</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -295,7 +333,7 @@ const pageTitle = `${title} — Papers · TGP`;
           para comprender la condición humana. Arqueología del sentido en TGP Project.
         </p>
         <div class="author-card-actions">
-          <a href="/papers/perfil" class="btn-follow">Ver perfil</a>
+          <button type="button" class="btn-follow trigger-subscribe">Seguir autor</button>
           <a href="/papers/historias" class="btn-follow btn-follow--ghost">Historias</a>
         </div>
       </div>
@@ -304,51 +342,112 @@ const pageTitle = `${title} — Papers · TGP`;
 
 
   <!-- ═══════════════════════════════════════════════════════════════
-       ZONA 6: MÁS PAPERS DEL MISMO AUTOR / CATEGORÍA
-       Fondo blanco-página para no romper el ritmo
+       ZONA 6: MÁS PAPERS DEL MISMO AUTOR / CATEGORÍA (Explore More style)
   ══════════════════════════════════════════════════════════════════ -->
   {relatedPosts.length > 0 && (
     <section class="paper-more-zone">
       <div class="paper-more-inner">
-        <h2 class="more-section-title">Más del archivo epistémico</h2>
-        <div class="more-grid">
-          {relatedPosts.map((post) => {
-            const postImg = resolveEssayImage(post.entry.coverImage, post.slug);
-            const postDate = post.entry.date ? formatDate(post.entry.date) : null;
+        <div class="more-header">
+          <span class="more-kicker">[ Sigue Explorando ]</span>
+          <div class="more-header-row">
+            <h2 class="more-section-title">Continuar la lectura</h2>
+            <a href="/archivo" class="more-archive-link">Ver todo el Archivo →</a>
+          </div>
+        </div>
+        
+        <div class="more-explore-layout">
+          {/* Lead Post (Grande) */}
+          {relatedPosts[0] && (() => {
+            const lead = relatedPosts[0];
+            const leadImg = resolveEssayImage(lead.entry.coverImage, lead.slug);
+            const leadCat = formatCategory(lead.entry.category);
+            const leadDate = lead.entry.date ? formatDate(lead.entry.date) : null;
             return (
-              <a href={`/papers/${post.slug}`} class="more-card">
-                {postImg && (
-                  <div class="more-card-img-wrap">
-                    <img
-                      src={postImg.src}
-                      alt={post.entry.title || post.slug}
-                      class="more-card-img"
-                      loading="lazy"
-                    />
-                  </div>
-                )}
-                <div class="more-card-body">
-                  <p class="more-card-meta">
-                    TGP
-                    {postDate && <span class="meta-sep">·</span>}
-                    {postDate && <time>{postDate}</time>}
-                  </p>
-                  <h3 class="more-card-title">{post.entry.title}</h3>
-                  {post.entry.excerpt && (
-                    <p class="more-card-excerpt">{post.entry.excerpt}</p>
+              <article class="explore-lead-card">
+                <div class="explore-lead-inner">
+                  {leadImg && (
+                    <div class="explore-lead-img-wrap">
+                      <img src={leadImg.src} alt="" class="explore-lead-img" loading="lazy" />
+                    </div>
                   )}
-                  <span class="more-card-cta">Leer paper →</span>
+                  <div class="explore-lead-body">
+                    <div class="explore-lead-content">
+                      {leadCat && <span class="explore-cat">{leadCat}</span>}
+                      <h3 class="explore-lead-title">
+                        <a href={`/papers/${lead.slug}`}>{lead.entry.title}</a>
+                      </h3>
+                      {lead.entry.excerpt && (
+                        <p class="explore-lead-excerpt">"{lead.entry.excerpt}"</p>
+                      )}
+                    </div>
+                    <div class="explore-lead-footer">
+                      <a href={`/papers/${lead.slug}`} class="explore-read-btn"><span>Leer Dossier</span> <span class="arrow">▸</span></a>
+                      {leadDate && <span class="explore-date">{leadDate}</span>}
+                    </div>
+                  </div>
                 </div>
-              </a>
+              </article>
             );
-          })}
+          })()}
+
+          {/* Grid secundario: 2 menores + Substack */}
+          <div class="explore-secondary-grid">
+            {relatedPosts.slice(1, 3).map(post => {
+              const secImg = resolveEssayImage(post.entry.coverImage, post.slug);
+              const secCat = formatCategory(post.entry.category);
+              return (
+                <article class="explore-secondary-card">
+                  <a href={`/papers/${post.slug}`} class="explore-sec-link">
+                    {secImg && (
+                      <div class="explore-sec-img-wrap">
+                        <img src={secImg.src} alt="" class="explore-sec-img" loading="lazy" />
+                      </div>
+                    )}
+                    <div class="explore-sec-body">
+                      <div class="explore-sec-content">
+                        {secCat && <span class="explore-cat">{secCat}</span>}
+                        <h4 class="explore-sec-title">{post.entry.title}</h4>
+                      </div>
+                      <div class="explore-sec-footer">
+                        <span class="explore-sec-read">Ver Dossier ▸</span>
+                      </div>
+                    </div>
+                  </a>
+                </article>
+              );
+            })}
+
+            <!-- Medium CTA Card — Transición Estacional a Medium en Grafito -->
+            <div class="explore-medium-card">
+              <div class="medium-header">
+                <div class="medium-icon-wrap">
+                  <svg viewBox="0 0 1043.63 592.71" class="medium-icon" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M588.67 296.36c0 163.67-131.78 296.35-294.33 296.35S0 460.03 0 296.36 131.78 0 294.34 0s294.33 132.69 294.33 296.36M911.56 296.36c0 154.06-65.89 279-147.17 279s-147.17-124.94-147.17-279 65.88-279 147.17-279 147.17 124.94 147.17 279M1043.63 296.36c0 138-20.88 249.88-46.64 249.88s-46.64-111.88-46.64-249.88 20.88-249.88 46.64-249.88 46.64 111.88 46.64 249.88"/>
+                  </svg>
+                </div>
+                <span class="medium-label">Edición Medium · TGP</span>
+              </div>
+              <div class="medium-body">
+                <p class="medium-quote">"Apoya la investigación epistémica en Medium"</p>
+                <p class="medium-desc">Dossieres exclusivos &amp; publicaciones directas</p>
+              </div>
+              <a
+                href="https://medium.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="medium-submit-btn"
+              >
+                Apoyar / Suscribirse en Medium ↗
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
   )}
 
   <!-- Nav pie de artículo enriquecido -->
-  <nav class="paper-footer-rich-nav" aria-label="Navegación de artículo">
+  <nav class="paper-footer-rich-nav" aria-label="Navegación de artículo" style="position: relative; z-index: 20;">
     <div class="footer-rich-inner">
       <a href="/papers" class="btn-rich-ghost">
         ← Volver al Índice
@@ -358,6 +457,93 @@ const pageTitle = `${title} — Papers · TGP`;
       </a>
     </div>
   </nav>
+  <!-- Modal Dual de Suscripción TGP Papers & Dossiers (Slider de 4s: ES Grafito <-> EN Welcome Offer) -->
+  <div id="tgp-subscribe-modal" class="tgp-modal-backdrop" aria-hidden="true">
+    <div class="tgp-modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button type="button" class="tgp-modal-close" aria-label="Cerrar modal">&times;</button>
+      
+      <div class="tgp-modal-slider">
+        <!-- Slide 1: Español (Grafito Dual) -->
+        <div class="tgp-modal-slide slide-es active">
+          <div class="tgp-modal-header">
+            <img src="/perfil.webp" alt="Xavier Benítez" class="tgp-modal-avatar" />
+            <div class="tgp-modal-header-text">
+              <span class="tgp-modal-badge">TGP · Medium &amp; Substack</span>
+              <span class="tgp-modal-author-name">Xavier Benítez | TGP Project</span>
+            </div>
+          </div>
+
+          <h3 id="modal-title" class="tgp-modal-title">Únete y Apoya TGP Papers</h3>
+          <p class="tgp-modal-desc">
+            Recibe los últimos ensayos de investigación profunda, cartografía epistémica y publicaciones de <strong>Xavier Benítez</strong> en tu correo o en tu feed preferido.
+          </p>
+
+          <!-- Opción 1: Formulario Substack -->
+          <div class="modal-section-block">
+            <span class="modal-section-label">Suscripción por Correo (Substack)</span>
+            <form action="https://thegreatpuzzleproject.substack.com/subscribe" method="get" target="_blank" class="tgp-modal-form">
+              <div class="tgp-input-group">
+                <input type="email" name="email" placeholder="Ingresa tu correo electrónico..." required class="tgp-modal-input" />
+                <button type="submit" class="tgp-modal-btn-submit">
+                  Suscribirse via Substack ▸
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-divider-or"><span>O TAMBIÉN</span></div>
+
+          <!-- Opción 2: Botón Medium -->
+          <div class="modal-section-block">
+            <span class="modal-section-label">Feed &amp; Apoyo Directo (Medium)</span>
+            <div class="tgp-modal-actions-group">
+              <a
+                href="https://medium.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="tgp-modal-btn-graphite"
+              >
+                <svg viewBox="0 0 1043.63 592.71" class="btn-medium-svg" fill="currentColor">
+                  <path d="M588.67 296.36c0 163.67-131.78 296.35-294.33 296.35S0 460.03 0 296.36 131.78 0 294.34 0s294.33 132.69 294.33 296.36M911.56 296.36c0 154.06-65.89 279-147.17 279s-147.17-124.94-147.17-279 65.88-279 147.17-279 147.17 124.94 147.17 279M1043.63 296.36c0 138-20.88 249.88-46.64 249.88s-46.64-111.88-46.64-249.88 20.88-249.88 46.64-249.88 46.64 111.88 46.64 249.88"/>
+                </svg>
+                Seguir y Apoyar en Medium ↗
+              </a>
+            </div>
+          </div>
+
+          <div class="tgp-modal-footer">
+            <div class="tgp-modal-links" style="margin-bottom: 0.6rem;">
+              <a href="https://thegreatpuzzleproject.substack.com" target="_blank" rel="noopener noreferrer" class="tgp-modal-link">Bitácora Substack ↗</a>
+              <span class="sep" style="opacity: 0.4;">·</span>
+              <a href="https://medium.com/@TheGreatPuzzleProject" target="_blank" rel="noopener noreferrer" class="tgp-modal-link">Medium ↗</a>
+            </div>
+            <div class="tgp-modal-links">
+              <a href="/papers/perfil" class="tgp-modal-link">Perfil de Autor ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2: Inglés (Welcome Offer) -->
+        <div class="tgp-modal-slide slide-en">
+          <span class="medium-en-badge">Welcome Offer</span>
+          <h2 class="medium-en-title">
+            Access to everything. Now 30% off.
+            <span>Unlock every single story.</span>
+          </h2>
+          <ul class="medium-en-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="check-icon"><polyline points="20 6 9 17 4 12"></polyline></svg> Read member-only stories</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="check-icon"><polyline points="20 6 9 17 4 12"></polyline></svg> Support writers you read most</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="check-icon"><polyline points="20 6 9 17 4 12"></polyline></svg> Listen to audio narrations</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="check-icon"><polyline points="20 6 9 17 4 12"></polyline></svg> Read offline with the Medium app</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="check-icon"><polyline points="20 6 9 17 4 12"></polyline></svg> Access our Mastodon community</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="check-icon"><polyline points="20 6 9 17 4 12"></polyline></svg> Connect your custom domain</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="check-icon"><polyline points="20 6 9 17 4 12"></polyline></svg> Create your own publications</li>
+          </ul>
+          <a href="https://medium.com/membership" target="_blank" rel="noopener noreferrer" class="medium-en-btn">Upgrade now</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </AcademicLayout>
 
@@ -443,6 +629,124 @@ const pageTitle = `${title} — Papers · TGP`;
         headings.forEach(h => observer.observe(h));
       }
     }
+
+    // 4. Interacciones de la barra de acciones (Claps, Bookmark, Popover ... y Modal)
+    const likeBtns = document.querySelectorAll(".btn-like");
+    const bookmarkBtns = document.querySelectorAll(".btn-bookmark");
+    const moreBtns = document.querySelectorAll(".btn-more");
+    const subscribeTriggers = document.querySelectorAll(".trigger-subscribe");
+    const modal = document.getElementById("tgp-subscribe-modal");
+    const modalClose = modal?.querySelector(".tgp-modal-close");
+
+    // Like / Claps toggle con localStorage
+    likeBtns.forEach(btn => {
+      const slug = btn.getAttribute("data-slug");
+      if (!slug) return;
+      const countEl = btn.querySelector(".like-count");
+      const baseLikes = parseInt(countEl?.textContent || "135", 10);
+      const isLiked = localStorage.getItem(`tgp_like_${slug}`) === "true";
+
+      if (isLiked) {
+        btn.classList.add("active");
+        if (countEl) countEl.textContent = String(baseLikes + 1);
+      }
+
+      btn.addEventListener("click", () => {
+        const currentlyLiked = btn.classList.contains("active");
+        if (currentlyLiked) {
+          btn.classList.remove("active");
+          localStorage.setItem(`tgp_like_${slug}`, "false");
+          if (countEl) countEl.textContent = String(baseLikes);
+        } else {
+          btn.classList.add("active");
+          localStorage.setItem(`tgp_like_${slug}`, "true");
+          if (countEl) countEl.textContent = String(baseLikes + 1);
+        }
+      });
+    });
+
+    // Bookmark toggle con localStorage
+    bookmarkBtns.forEach(btn => {
+      const slug = btn.getAttribute("data-slug");
+      if (!slug) return;
+      const isBookmarked = localStorage.getItem(`tgp_bookmark_${slug}`) === "true";
+      if (isBookmarked) btn.classList.add("active");
+
+      btn.addEventListener("click", () => {
+        const currentlyBookmarked = btn.classList.contains("active");
+        if (currentlyBookmarked) {
+          btn.classList.remove("active");
+          localStorage.setItem(`tgp_bookmark_${slug}`, "false");
+        } else {
+          btn.classList.add("active");
+          localStorage.setItem(`tgp_bookmark_${slug}`, "true");
+        }
+      });
+    });
+
+    // Menú desplegable ...
+    moreBtns.forEach(btn => {
+      const wrapper = btn.closest(".action-more-wrapper");
+      const menu = wrapper?.querySelector(".paper-more-menu");
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        menu?.classList.toggle("open");
+      });
+    });
+
+    document.addEventListener("click", () => {
+      document.querySelectorAll(".paper-more-menu").forEach(m => m.classList.remove("open"));
+    });
+
+    // Modal de suscripción / reacción con transición de 4s
+    let sliderInterval;
+    const openModal = () => {
+      modal?.classList.add("open");
+      modal?.setAttribute("aria-hidden", "false");
+      
+      const box = modal?.querySelector(".tgp-modal-box");
+      const slideEs = modal?.querySelector(".slide-es");
+      const slideEn = modal?.querySelector(".slide-en");
+      let isEs = true;
+      
+      clearInterval(sliderInterval);
+      
+      // Estado inicial (ES Grafito)
+      box?.classList.remove("tgp-modal-box--english");
+      slideEs?.classList.add("active");
+      slideEn?.classList.remove("active");
+      
+      sliderInterval = setInterval(() => {
+        isEs = !isEs;
+        if (isEs) {
+          box?.classList.remove("tgp-modal-box--english");
+          slideEn?.classList.remove("active");
+          slideEs?.classList.add("active");
+        } else {
+          box?.classList.add("tgp-modal-box--english");
+          slideEs?.classList.remove("active");
+          slideEn?.classList.add("active");
+        }
+      }, 4000);
+    };
+    
+    const closeModal = () => {
+      modal?.classList.remove("open");
+      modal?.setAttribute("aria-hidden", "true");
+      clearInterval(sliderInterval);
+    };
+
+    subscribeTriggers.forEach(trigger => {
+      trigger.addEventListener("click", (e) => {
+        e.preventDefault();
+        openModal();
+      });
+    });
+
+    modalClose?.addEventListener("click", closeModal);
+    modal?.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
   });
 </script>
 
@@ -550,14 +854,463 @@ const pageTitle = `${title} — Papers · TGP`;
     color: var(--ac-text-soft, #8A8278);
     font-family: var(--font-ui, 'Inter', sans-serif);
     font-size: 0.8rem;
-    transition: color 0.15s ease;
+    transition: color 0.15s ease, transform 0.15s ease;
   }
   .action-btn:hover {
     color: var(--ac-text, #191918);
   }
   .action-btn svg {
     stroke-width: 1.2;
-    transition: stroke 0.15s ease;
+    transition: stroke 0.15s ease, fill 0.15s ease;
+  }
+
+  /* Estados activos de botones */
+  .action-btn.btn-like.active {
+    color: var(--ac-gold, #8C6D2F);
+    font-weight: 600;
+  }
+  .action-btn.btn-like.active svg {
+    fill: var(--ac-gold, #8C6D2F);
+    stroke: var(--ac-gold, #8C6D2F);
+  }
+  .action-btn.btn-bookmark.active {
+    color: var(--ac-gold, #8C6D2F);
+  }
+  .action-btn.btn-bookmark.active svg {
+    fill: var(--ac-gold, #8C6D2F);
+    stroke: var(--ac-gold, #8C6D2F);
+  }
+
+  /* Popover Menú desplegable ... */
+  .action-more-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .paper-more-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5rem);
+    width: 220px;
+    background-color: var(--white-broken, #F5F2ED);
+    border: 1px solid var(--white-silver, #E4E1DB);
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(30, 25, 15, 0.12);
+    padding: 0.5rem 0;
+    z-index: 50;
+    display: none;
+    flex-direction: column;
+  }
+  .paper-more-menu.open {
+    display: flex;
+  }
+
+  .paper-more-menu .menu-item {
+    background: none;
+    border: none;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    text-align: left;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.78rem;
+    color: var(--ac-text-muted, #575043);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .paper-more-menu .menu-item:hover {
+    background-color: var(--white-bone, #EDE9E1);
+    color: var(--ac-text, #191918);
+  }
+  .paper-more-menu .menu-item.danger {
+    color: #B91C1C;
+  }
+  .paper-more-menu .menu-item.danger:hover {
+    background-color: #FEE2E2;
+  }
+
+  .paper-more-menu .menu-divider {
+    height: 1px;
+    background-color: var(--white-silver, #E4E1DB);
+    margin: 0.3rem 0;
+  }
+
+  /* Box Modal Grafito Centrado Armónicamente */
+  .tgp-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(25, 25, 24, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .tgp-modal-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .tgp-modal-box {
+    background-color: var(--color-medium-graphite, #242424);
+    border: 1px solid #333333;
+    color: #FAFAF9;
+    border-radius: 16px;
+    max-width: 440px;
+    width: 100%;
+    padding: 2.5rem 2rem 2rem;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    transform: translateY(10px);
+    transition: transform 0.25s ease, background-color 0.8s ease, border-color 0.8s ease;
+    text-align: center;
+    overflow: hidden;
+  }
+  .tgp-modal-box--english {
+    background-color: #FFFFFF !important;
+    border-color: #EAEAEA !important;
+    color: #191919 !important;
+  }
+  .tgp-modal-backdrop.open .tgp-modal-box {
+    transform: translateY(0);
+  }
+
+  .tgp-modal-slider {
+    position: relative;
+    width: 100%;
+    display: grid;
+  }
+  .tgp-modal-slide {
+    grid-area: 1 / 1;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .tgp-modal-slide.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    z-index: 2;
+  }
+
+  .tgp-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    line-height: 1;
+    color: rgba(250, 250, 249, 0.5);
+    cursor: pointer;
+    transition: color 0.3s ease;
+    z-index: 10;
+  }
+  .tgp-modal-close:hover { color: #FAFAF9; }
+  .tgp-modal-box--english .tgp-modal-close { color: #A0A0A0; }
+  .tgp-modal-box--english .tgp-modal-close:hover { color: #191919; }
+
+
+  .tgp-modal-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    width: 100%;
+  }
+  .tgp-modal-header-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .tgp-modal-avatar {
+    width: 3.2rem;
+    height: 3.2rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--ac-gold-light, #C9A86C);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  .tgp-modal-badge {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ac-gold-light, #C9A86C);
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(201, 168, 108, 0.25);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+  }
+
+  .tgp-modal-author-name {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: rgba(250, 250, 249, 0.7);
+    display: block;
+  }
+
+  .tgp-modal-title {
+    font-family: var(--font-editorial, 'Cormorant Garamond', serif);
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: #FAFAF9 !important;
+    margin: 0 0 0.5rem;
+    line-height: 1.15;
+    text-align: center;
+  }
+
+  .tgp-modal-desc {
+    font-family: var(--font-body, 'Lora', serif);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: rgba(250, 250, 249, 0.75) !important;
+    margin: 0 0 1.5rem;
+    text-align: center;
+  }
+
+  .modal-section-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+  }
+  .modal-section-label {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ac-gold-light, #C9A86C);
+    text-align: center;
+  }
+
+  .tgp-modal-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .tgp-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: 100%;
+  }
+
+  .tgp-modal-input {
+    box-sizing: border-box;
+    width: 100%;
+    background-color: var(--white-page, #FAFAF9);
+    border: 1px solid var(--white-silver, #E4E1DB);
+    border-radius: 999px;
+    padding: 0.75rem 1.25rem;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.85rem;
+    color: var(--ac-text, #191918);
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .tgp-modal-input::placeholder {
+    color: var(--ac-text-soft, #8A8278);
+    text-align: center;
+  }
+  .tgp-modal-input:focus {
+    border-color: var(--ac-gold, #8C6D2F);
+    box-shadow: 0 0 0 3px rgba(140, 109, 47, 0.2);
+  }
+
+  .tgp-modal-btn-submit {
+    box-sizing: border-box;
+    width: 100%;
+    background-color: var(--ac-gold, #8C6D2F);
+    color: #FAFAF9;
+    border: none;
+    border-radius: 999px;
+    padding: 0.85rem 1.5rem;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(140, 109, 47, 0.3);
+  }
+  .tgp-modal-btn-submit:hover {
+    background-color: #A38038;
+    transform: translateY(-1px);
+  }
+
+  .modal-divider-or {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 1.25rem 0;
+    position: relative;
+    width: 100%;
+  }
+  .modal-divider-or::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    top: 50%;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+  .modal-divider-or span {
+    position: relative;
+    background-color: var(--color-medium-graphite, #242424);
+    padding: 0 0.8rem;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: rgba(250, 250, 249, 0.45);
+  }
+
+  .tgp-modal-actions-group {
+    width: 100%;
+  }
+
+  .tgp-modal-btn-graphite {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    width: 100%;
+    background-color: #FAFAF9;
+    color: #191919;
+    border: none;
+    border-radius: 999px;
+    padding: 0.85rem 1.5rem;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  }
+  .tgp-modal-btn-graphite:hover {
+    background-color: var(--ac-gold-light, #C9A86C);
+    color: #191919;
+    transform: translateY(-1px);
+  }
+  .btn-medium-svg {
+    width: 1.2rem;
+    height: 0.7rem;
+  }
+
+  .tgp-modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding-top: 1.25rem;
+    margin-top: 1.25rem;
+    width: 100%;
+    text-align: center;
+  }
+  .tgp-modal-links {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+  }
+  .tgp-modal-link {
+    color: var(--ac-gold-light, #C9A86C);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .tgp-modal-link:hover {
+    text-decoration: underline;
+  }
+
+  /* English Medium Welcome Style */
+  .medium-en-badge {
+    background-color: #F5C518;
+    color: #000;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.35rem 0.85rem;
+    border-radius: 6px;
+    margin-bottom: 1.25rem;
+  }
+  .medium-en-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 500;
+    color: #191919;
+    line-height: 1.1;
+    margin: 0 0 1.5rem;
+    letter-spacing: -0.02em;
+    text-align: center;
+  }
+  .medium-en-title span {
+    display: block;
+    font-size: 1.8rem;
+  }
+  .medium-en-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    text-align: left;
+  }
+  .medium-en-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 0.95rem;
+    color: #191919;
+    line-height: 1.4;
+  }
+  .check-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: #191919;
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+  .medium-en-btn {
+    box-sizing: border-box;
+    width: 100%;
+    background-color: #191919;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 999px;
+    padding: 0.85rem 1.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+  .medium-en-btn:hover {
+    background-color: #000000;
   }
 
   .paper-author-name {
@@ -1092,104 +1845,450 @@ const pageTitle = `${title} — Papers · TGP`;
 
 
   /* ═══════════════════════════════════════════════════════════════════
-     ZONA 6 — MÁS PAPERS (grid 2 col tipo Medium)
-     Fondo blanco-página — sin ruido de color
+     ZONA 6 — MÁS PAPERS (Explore More local style)
   ═══════════════════════════════════════════════════════════════════ */
   .paper-more-zone {
-    padding: 4rem 1.5rem;
+    padding: 5rem 1.5rem;
     border-top: 1px solid var(--white-silver, #E4E1DB);
+    background-color: var(--white-page, #FAFAF9);
   }
 
   .paper-more-inner {
-    max-width: 860px;
+    max-width: 960px;
     margin: 0 auto;
-  }
-
-  .more-section-title {
-    font-family: var(--font-editorial, 'Cormorant Garamond', serif);
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--ac-text, #191918);
-    margin: 0 0 2rem;
-    letter-spacing: -0.01em;
-  }
-
-  .more-grid {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 2.5rem;
   }
 
-  @media (min-width: 640px) {
-    .more-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-
-  .more-card {
-    text-decoration: none;
+  /* Encabezado del Explore More */
+  .more-header {
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
-    transition: opacity 0.2s ease;
   }
-  .more-card:hover { opacity: 0.85; }
+  .more-kicker {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ac-gold, #8C6D2F);
+    margin-bottom: 0.25rem;
+  }
+  .more-header-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  @media (min-width: 640px) {
+    .more-header-row {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+  }
+  .more-section-title {
+    font-family: var(--font-editorial, 'Cormorant Garamond', serif);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    color: var(--ac-text, #191918);
+    margin: 0;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .more-archive-link {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ac-text-soft, #8A8278);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    padding-bottom: 0.25rem;
+  }
+  .more-archive-link:hover {
+    color: var(--ac-gold, #8C6D2F);
+  }
 
-  .more-card-img-wrap {
-    width: 100%;
-    height: 10rem;
+  /* Layout principal */
+  .more-explore-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* Componentes compartidos */
+  .explore-cat {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ac-gold, #8C6D2F);
+  }
+
+  /* Lead Card */
+  .explore-lead-card {
+    border: 1px solid var(--white-silver, #E4E1DB);
+    border-radius: 8px;
+    background-color: var(--white-broken, #F5F2ED);
     overflow: hidden;
-    border-radius: 3px;
+    transition: border-color 0.4s ease;
+  }
+  .explore-lead-card:hover { border-color: var(--ac-gold-light, #C9A86C); }
+  
+  .explore-lead-inner {
+    display: flex;
+    flex-direction: column;
+  }
+  @media (min-width: 900px) {
+    .explore-lead-inner {
+      flex-direction: row;
+      min-height: 22rem;
+    }
+  }
+
+  .explore-lead-img-wrap {
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
     background-color: var(--white-bone, #EDE9E1);
   }
-
-  .more-card-img {
+  @media (min-width: 900px) {
+    .explore-lead-img-wrap {
+      width: 52%;
+      aspect-ratio: auto;
+    }
+  }
+  .explore-lead-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
-    transition: transform 0.4s ease;
+    transition: transform 0.6s ease;
   }
-  .more-card:hover .more-card-img { transform: scale(1.02); }
+  .explore-lead-card:hover .explore-lead-img { transform: scale(1.03); }
 
-  .more-card-body { display: flex; flex-direction: column; gap: 0.4rem; }
-
-  .more-card-meta {
-    font-family: var(--font-ui, 'Inter', sans-serif);
-    font-size: 0.75rem;
-    color: var(--ac-text-soft, #8A8278);
+  .explore-lead-body {
+    flex: 1;
     display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin: 0;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2rem;
+    gap: 2rem;
   }
-
-  .more-card-title {
+  .explore-lead-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .explore-lead-title {
     font-family: var(--font-editorial, 'Cormorant Garamond', serif);
-    font-size: 1.2rem;
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
     font-weight: 700;
-    line-height: 1.25;
-    color: var(--ac-text, #191918);
+    line-height: 1.15;
     margin: 0;
   }
-
-  .more-card-excerpt {
+  .explore-lead-title a {
+    color: var(--ac-text, #191918);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .explore-lead-card:hover .explore-lead-title a { color: var(--ac-accent, #3B2A14); }
+  
+  .explore-lead-excerpt {
     font-family: var(--font-body, 'Lora', serif);
-    font-size: 0.85rem;
-    line-height: 1.5;
+    font-size: 0.95rem;
+    font-style: italic;
     color: var(--ac-text-muted, #575043);
+    line-height: 1.6;
     margin: 0;
-    /* Limitar a 2 líneas */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+  
+  .explore-lead-footer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-top: 1px solid var(--white-silver, #E4E1DB);
+    padding-top: 1.25rem;
+  }
+  .explore-read-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--ac-accent, #3B2A14);
+    color: var(--white-page, #FAFAF9);
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+  .explore-read-btn:hover { background-color: var(--ac-gold, #8C6D2F); }
+  .explore-read-btn .arrow { transition: transform 0.2s ease; opacity: 0.7; }
+  .explore-read-btn:hover .arrow { transform: translateX(3px); opacity: 1; }
+  
+  .explore-date {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ac-text-soft, #8A8278);
+  }
 
-  .more-card-cta {
+  /* Grid Secundario */
+  .explore-secondary-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  @media (min-width: 640px) {
+    .explore-secondary-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 900px) {
+    .explore-secondary-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  /* Secondary Cards */
+  .explore-secondary-card {
+    border: 1px solid var(--white-silver, #E4E1DB);
+    border-radius: 8px;
+    background-color: var(--white-broken, #F5F2ED);
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+  }
+  .explore-secondary-card:hover { border-color: var(--ac-gold-light, #C9A86C); }
+  
+  .explore-sec-link {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .explore-sec-img-wrap {
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    background-color: var(--white-bone, #EDE9E1);
+  }
+  .explore-sec-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .explore-secondary-card:hover .explore-sec-img { transform: scale(1.04); }
+  
+  .explore-sec-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    gap: 1.5rem;
+  }
+  .explore-sec-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .explore-sec-title {
+    font-family: var(--font-editorial, 'Cormorant Garamond', serif);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ac-text, #191918);
+    margin: 0;
+    line-height: 1.25;
+    transition: color 0.2s ease;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .explore-secondary-card:hover .explore-sec-title { color: var(--ac-accent, #3B2A14); }
+  
+  .explore-sec-footer {
+    border-top: 1px solid var(--white-silver, #E4E1DB);
+    padding-top: 0.75rem;
+  }
+  .explore-sec-read {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ac-text-soft, #8A8278);
+    transition: color 0.2s ease;
+  }
+  .explore-secondary-card:hover .explore-sec-read { color: var(--ac-gold, #8C6D2F); }
+
+  /* Medium Graphite Color Tokens & Card Styling */
+  :root {
+    --color-medium-graphite: #242424;
+    --color-medium-graphite-dark: #191919;
+    --color-medium-graphite-light: #2E2E2E;
+  }
+
+  .explore-medium-card {
+    border: 1px solid var(--color-medium-graphite, #242424);
+    border-radius: 8px;
+    background-color: var(--color-medium-graphite, #242424);
+    color: #FAFAF9;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  }
+  .explore-medium-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+
+  .medium-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .medium-icon-wrap {
+    width: 2rem;
+    height: 2rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .medium-icon {
+    width: 1.2rem;
+    height: 0.7rem;
+    fill: #FAFAF9;
+  }
+  .medium-label {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ac-gold-light, #C9A86C);
+  }
+
+  .medium-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .medium-quote {
+    font-family: var(--font-body, 'Lora', serif);
+    font-size: 0.95rem;
+    font-style: italic;
+    color: #FAFAF9;
+    margin: 0;
+  }
+  .medium-desc {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 249, 0.6);
+    margin: 0;
+  }
+
+  .medium-submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: var(--ac-gold, #8C6D2F);
+    color: #FAFAF9;
+    border: none;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+  }
+  .medium-submit-btn:hover {
+    background-color: #A38038;
+    transform: translateY(-1px);
+  }
+
+  /* Box Modal Grafito */
+  .tgp-modal-box--graphite {
+    background-color: var(--color-medium-graphite, #242424) !important;
+    border-color: #333333 !important;
+    color: #FAFAF9 !important;
+  }
+  .tgp-modal-box--graphite .tgp-modal-title {
+    color: #FAFAF9 !important;
+  }
+  .tgp-modal-box--graphite .tgp-modal-desc {
+    color: rgba(250, 250, 249, 0.75) !important;
+  }
+  .tgp-modal-box--graphite .tgp-modal-close {
+    color: rgba(250, 250, 249, 0.5) !important;
+  }
+  .tgp-modal-box--graphite .tgp-modal-close:hover {
+    color: #FAFAF9 !important;
+  }
+
+  .tgp-modal-author-name {
     font-family: var(--font-ui, 'Inter', sans-serif);
     font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--ac-gold, #8C6D2F);
+    font-weight: 600;
+    color: #FAFAF9;
+    display: block;
     margin-top: 0.2rem;
+  }
+
+  .tgp-modal-actions-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .tgp-modal-btn-graphite {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    background-color: #FAFAF9;
+    color: var(--color-medium-graphite, #242424);
+    border: none;
+    border-radius: 999px;
+    padding: 0.9rem 1.5rem;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  }
+  .tgp-modal-btn-graphite:hover {
+    background-color: var(--ac-gold-light, #C9A86C);
+    color: #191919;
+    transform: translateY(-1px);
+  }
+  .btn-medium-svg {
+    width: 1.4rem;
+    height: 0.8rem;
   }
 
   /* ═══════════════════════════════════════════════════════════════════

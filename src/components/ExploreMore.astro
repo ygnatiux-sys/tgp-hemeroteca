@@ -83,7 +83,7 @@ const secondB = exploreEssays[2] ?? null;
               </div>
               <div class="mt-6 pt-5 border-t border-white/5 flex items-center gap-4">
                 <a
-                  href={`/hemeroteca/${lead.slug}`}
+                  href={`/papers/${lead.slug}`}
                   class="inline-flex items-center gap-2 px-4 py-2 bg-[#151718]/90 backdrop-blur-sm border border-white/10 text-[#E0E0E0]/70 font-mono font-bold text-[8.5px] tracking-[0.25em] uppercase rounded-lg hover:bg-rust-orange/10 hover:border-rust-orange/45 hover:text-rust-orange transition-all duration-400"
                 >
                   <span>Leer Dossier</span><span class="opacity-50 group-hover:translate-x-0.5 transition-transform">▸</span>
@@ -153,47 +153,35 @@ const secondB = exploreEssays[2] ?? null;
             </article>
           )}
 
-          {/* ── SUBSTACK CTA CARD — en la tercera posición, integrado naturalmente ── */}
-          <div class="group relative overflow-hidden rounded-xl border border-white/8 bg-white/2 hover:border-rust-orange/25 transition-all duration-500 flex flex-col p-5 gap-4 justify-between">
-            {/* Ícono */}
+          {/* ── MEDIUM CTA CARD — Transición Estacional en Grafito ── */}
+          <div class="group relative overflow-hidden rounded-xl border border-[#242424] bg-[#242424] hover:border-rust-orange/50 transition-all duration-500 flex flex-col p-5 gap-4 justify-between shadow-lg">
+            {/* Ícono de Medium */}
             <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-rust-orange/10 border border-rust-orange/20 flex items-center justify-center rounded-lg shrink-0">
-                <svg viewBox="0 0 24 24" class="w-4 h-4 fill-rust-orange" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M22.539 8.242H1.46V5.406h21.078v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.078V0z"/>
+              <div class="w-8 h-8 bg-white/10 border border-white/15 flex items-center justify-center rounded-lg shrink-0">
+                <svg viewBox="0 0 1043.63 592.71" class="w-4 h-3 fill-[#FAFAF9]" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M588.67 296.36c0 163.67-131.78 296.35-294.33 296.35S0 460.03 0 296.36 131.78 0 294.34 0s294.33 132.69 294.33 296.36M911.56 296.36c0 154.06-65.89 279-147.17 279s-147.17-124.94-147.17-279 65.88-279 147.17-279 147.17 124.94 147.17 279M1043.63 296.36c0 138-20.88 249.88-46.64 249.88s-46.64-111.88-46.64-249.88 20.88-249.88 46.64-249.88 46.64 111.88 46.64 249.88"/>
                 </svg>
               </div>
-              <span class="font-mono text-[8px] uppercase tracking-[0.35em] text-rust-orange/60">Bitácora TGP</span>
+              <span class="font-mono text-[8px] uppercase tracking-[0.35em] text-[#C9A86C]">Edición Medium · TGP</span>
             </div>
 
             <div class="flex flex-col gap-1.5">
-              <p class="font-serif italic text-[#E0E0E0]/70 text-sm leading-snug">
-                "Pensamiento crítico en tu buzón"
+              <p class="font-serif italic text-[#FAFAF9]/90 text-sm leading-snug">
+                "Apoya la investigación epistémica en Medium"
               </p>
-              <p class="font-mono text-[8px] uppercase tracking-[0.2em] text-white/30 leading-relaxed">
-                Ensayos exclusivos · Substack
+              <p class="font-mono text-[8px] uppercase tracking-[0.2em] text-[#FAFAF9]/50 leading-relaxed">
+                Dossieres exclusivos &amp; publicaciones directas
               </p>
             </div>
 
-            <form
-              action="https://thegreatpuzzleproject.substack.com/subscribe"
-              method="get"
+            <a
+              href="https://medium.com"
               target="_blank"
-              class="flex flex-col gap-2"
+              rel="noopener noreferrer"
+              class="w-full px-4 py-2.5 bg-[#8C6D2F] border border-transparent text-[#FAFAF9] font-mono font-bold text-[8.5px] tracking-[0.2em] uppercase rounded-lg hover:bg-[#A38038] transition-all duration-300 text-center text-decoration-none block"
             >
-              <input
-                type="email"
-                name="email"
-                placeholder="tu@correo.com"
-                required
-                class="bg-white/4 border border-white/10 rounded-lg px-3.5 py-2.5 text-[#E0E0E0] font-mono text-[10px] focus:border-rust-orange/40 focus:bg-white/6 outline-none w-full transition-all placeholder:text-white/20"
-              />
-              <button
-                type="submit"
-                class="w-full px-4 py-2.5 bg-[#151718]/90 border border-white/10 text-[#E0E0E0]/70 font-mono font-bold text-[8.5px] tracking-[0.25em] uppercase rounded-lg hover:bg-rust-orange/10 hover:border-rust-orange/45 hover:text-rust-orange transition-all duration-400 cursor-pointer"
-              >
-                Suscribirse ▸
-              </button>
-            </form>
+              Apoyar / Suscribirse en Medium ↗
+            </a>
           </div>
         </div>
       </div>

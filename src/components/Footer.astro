@@ -15,7 +15,7 @@ const { variant = 'full' } = Astro.props;
     <div class="max-w-400 mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
 
       {/* ─── SELLO + NOMBRE PRINCIPAL ─── */}
-      <div class="flex items-center gap-4 shrink-0">
+      <a href="/" class="flex items-center gap-4 shrink-0 hover:opacity-90 transition-opacity" title="The Great Puzzle Project">
         <div class="relative flex items-center justify-center w-10 h-10">
           <svg viewBox="0 0 100 100" class="absolute inset-0 w-full h-full animate-[spin_40s_linear_infinite] opacity-50">
             <path id="tgp-seal-curve-min" d="M 50,50 m -42,0 a 42,42 0 1,1 84,0 a 42,42 0 1,1 -84,0" fill="transparent" />
@@ -27,11 +27,11 @@ const { variant = 'full' } = Astro.props;
             <path d="M 34 28 H 42 C 41.5 21, 37 10, 50 10 C 63 10, 58.5 21, 58 28 H 66 A 6 6 0 0 1 72 34 V 66 A 6 6 0 0 1 66 72 H 58 C 58.5 79, 63 90, 50 90 C 37 90, 41.5 79, 42 72 H 34 A 6 6 0 0 1 28 66 V 58 C 35 58.5, 45 63, 45 50 C 45 37, 35 41.5, 28 42 V 34 A 6 6 0 0 1 34 28 Z" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </div>
-        <div class="flex flex-col">
+        <div class="flex flex-col text-left">
           <span class="font-['Gloock'] font-black text-base md:text-lg tracking-wide text-[#E0E0E0] leading-tight">THE GREAT PUZZLE PROJECT</span>
           <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-white/40">Dir. Xavier Benítez</span>
         </div>
-      </div>
+      </a>
 
       {/* ─── NAV CENTRAL ─── */}
       <nav class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 font-mono text-[9px] uppercase tracking-[0.22em] text-white/45">
@@ -45,13 +45,15 @@ const { variant = 'full' } = Astro.props;
       </nav>
 
       {/* ─── ACCIONES + COPYRIGHT ─── */}
-      <div class="flex items-center gap-4 font-mono text-[9px] uppercase tracking-[0.2em] text-white/30 shrink-0">
+      <div class="flex flex-wrap justify-center items-center gap-2 sm:gap-4 font-mono text-[9px] uppercase tracking-[0.2em] text-white/30 shrink-0 mt-4 md:mt-0">
         <button id="tgp-share-btn-min" type="button" class="hover:text-rust-orange transition-colors cursor-pointer flex items-center gap-1.5">
           <svg class="w-3 h-3 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
           Compartir
         </button>
-        <span class="opacity-20">·</span>
+        <span class="opacity-20 hidden sm:inline">·</span>
         <span>© 2026 TGP</span>
+        <span class="opacity-20 hidden sm:inline">·</span>
+        <a href="https://about.thegreatpuzzleproject.com/" target="_blank" rel="noopener noreferrer" class="hover:text-rust-orange transition-colors font-bold w-full sm:w-auto text-center mt-2 sm:mt-0">ABOUT ME</a>
       </div>
 
     </div>
@@ -218,12 +220,14 @@ const { variant = 'full' } = Astro.props;
 
       {/* ─── BARRA INFERIOR / COLOPHON ─── */}
       <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.16em] text-white/40">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-4">
           <span>© 2026 THE GREAT PUZZLE PROJECT · INVESTIGACIÓN Y CARTOGRAFÍA</span>
           <span class="hidden sm:inline text-white/20">|</span>
           <span>
             POR <a href="https://gravatar.com/xavierbeniteztgp" target="_blank" rel="noopener noreferrer" class="font-bold text-[#A855F7] hover:text-rust-orange transition-colors">XAVIER BENÍTEZ</a>
           </span>
+          <span class="hidden sm:inline text-white/20">|</span>
+          <a href="https://about.thegreatpuzzleproject.com/" target="_blank" rel="noopener noreferrer" class="hover:text-rust-orange transition-colors font-bold w-full sm:w-auto mt-2 sm:mt-0">ABOUT ME</a>
         </div>
 
         <div class="flex items-center gap-3 text-white/50">

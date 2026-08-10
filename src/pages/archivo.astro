@@ -221,7 +221,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                       <div class="flex flex-col gap-3">
                         <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-rust-orange/70">{heroEssay.entry.category}</span>
                         <h3 class="font-cinzel font-bold text-xl sm:text-2xl md:text-3xl leading-tight group-hover:text-rust-orange/85 transition-colors">
-                          <a href={`/hemeroteca/${heroEssay.slug}`}>{heroEssay.entry.title}</a>
+                          <a href={`/papers/${heroEssay.slug}`}>{heroEssay.entry.title}</a>
                         </h3>
                         {heroEssay.entry.excerpt && (
                           <p class="font-serif italic text-[#E0E0E0]/50 text-sm leading-relaxed line-clamp-2">
@@ -230,7 +230,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                         )}
                       </div>
                       <div class="mt-6 pt-4 border-t border-white/5">
-                        <a href={`/hemeroteca/${heroEssay.slug}`} class="inline-flex items-center gap-2 px-4 py-2 bg-[#151718]/90 border border-white/10 text-[#E0E0E0]/65 font-mono font-bold text-[8.5px] tracking-[0.25em] uppercase rounded-lg hover:bg-rust-orange/10 hover:border-rust-orange/45 hover:text-rust-orange transition-all">
+                        <a href={`/papers/${heroEssay.slug}`} class="inline-flex items-center gap-2 px-4 py-2 bg-[#151718]/90 border border-white/10 text-[#E0E0E0]/65 font-mono font-bold text-[8.5px] tracking-[0.25em] uppercase rounded-lg hover:bg-rust-orange/10 hover:border-rust-orange/45 hover:text-rust-orange transition-all">
                           Ver Registro ▸
                         </a>
                       </div>
@@ -258,11 +258,11 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                           <div class="flex flex-col gap-2">
                             <span class="font-mono text-[8px] uppercase tracking-[0.3em] text-rust-orange/65">{e.entry.category}</span>
                             <h4 class="font-cinzel font-bold text-base leading-snug group-hover:text-rust-orange/80 transition-colors line-clamp-2">
-                              <a href={`/hemeroteca/${e.slug}`}>{e.entry.title}</a>
+                              <a href={`/papers/${e.slug}`}>{e.entry.title}</a>
                             </h4>
                           </div>
                           <div class="mt-4 pt-3 border-t border-white/5">
-                            <a href={`/hemeroteca/${e.slug}`} class="font-mono text-[8px] uppercase tracking-[0.25em] text-white/30 hover:text-rust-orange transition-colors">Ver Registro ▸</a>
+                            <a href={`/papers/${e.slug}`} class="font-mono text-[8px] uppercase tracking-[0.25em] text-white/30 hover:text-rust-orange transition-colors">Ver Registro ▸</a>
                           </div>
                         </div>
                       </article>

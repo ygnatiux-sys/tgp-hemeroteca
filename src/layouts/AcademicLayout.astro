@@ -35,7 +35,7 @@ const {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Gloock&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
 
@@ -44,6 +44,9 @@ const {
       *, *::before, *::after { box-sizing: border-box; }
 
       :root {
+        --bg-main:       #151718;
+        --rust-orange:   #C8A98B;
+
         /* Escala de blancos */
         --white-page:    #FAFAF9;
         --white-broken:  #F5F2ED;
@@ -246,21 +249,151 @@ const {
       .nav-item:hover .nav-item__label-es { display: none; }
       .nav-item:hover .nav-item__label-en { display: block; }
 
-      /* ─── Footer mínimo ─── */
+      /* ════════════════════════════════════════════════════
+         FOOTER INFERIOR — Franja delgada, simple y elegante
+      ════════════════════════════════════════════════════ */
       main { flex: 1; width: 100%; }
 
-      .ac-footer {
+      .ac-site-footer {
         background-color: var(--white-broken);
-        border-top: 1px solid var(--ac-rule);
-        padding: 2.5rem 1.5rem;
-        text-align: center;
+        border-top: 1px solid var(--white-silver);
+        padding: 1.2rem 1.5rem;
+        margin-top: 4rem;
+        width: 100%;
+      }
+
+      .ac-site-footer__inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      @media (min-width: 768px) {
+        .ac-site-footer__inner {
+          flex-direction: row;
+          gap: 1.5rem;
+        }
+      }
+
+      /* Brand / Sello */
+      .ac-site-footer__brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+        color: var(--ac-text);
+        transition: opacity 0.2s ease;
+      }
+      .ac-site-footer__brand:hover { opacity: 0.85; }
+
+      .ac-site-footer__seal {
+        position: relative;
+        width: 2.2rem;
+        height: 2.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .seal-spin {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        animation: spin-seal 40s linear infinite;
+        opacity: 0.6;
+      }
+      @keyframes spin-seal { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      .seal-icon {
+        width: 0.9rem;
+        height: 0.9rem;
+        color: var(--ac-gold);
+      }
+
+      .ac-site-footer__title-group {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+      }
+
+      .ac-site-footer__name {
+        font-family: 'Gloock', var(--font-brand), serif;
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        color: var(--ac-text);
+        line-height: 1.1;
+      }
+      .ac-site-footer__dir {
         font-family: var(--font-ui);
-        font-size: 0.7rem;
-        letter-spacing: 0.08em;
+        font-size: 0.58rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
         color: var(--ac-text-soft);
       }
-      .ac-footer a { color: var(--ac-gold); text-decoration: none; }
-      .ac-footer a:hover { text-decoration: underline; }
+
+      /* Nav Central */
+      .ac-site-footer__nav {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        font-family: var(--font-ui);
+        font-size: 0.68rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+      .ac-site-footer__nav a {
+        color: var(--ac-text-muted);
+        text-decoration: none;
+        transition: color 0.15s ease;
+      }
+      .ac-site-footer__nav a:hover {
+        color: var(--ac-gold);
+      }
+      .ac-site-footer__nav .dot, .ac-site-footer__meta .dot {
+        color: var(--ac-text-soft);
+        opacity: 0.4;
+      }
+
+      /* Meta derechas */
+      .ac-site-footer__meta {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-family: var(--font-ui);
+        font-size: 0.68rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--ac-text-soft);
+      }
+      .ac-site-footer__share {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-family: var(--font-ui);
+        font-size: 0.68rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--ac-text-soft);
+        transition: color 0.15s ease;
+      }
+      .ac-site-footer__share:hover {
+        color: var(--ac-gold);
+      }
+      .ac-site-footer__share svg {
+        width: 0.8rem;
+        height: 0.8rem;
+      }
 
       /* Google Translate widget overrides */
       .goog-te-gadget {
@@ -360,10 +493,80 @@ const {
       <slot />
     </main>
 
-    <footer class="ac-footer">
-      <a href="/">The Great Puzzle Project</a>
-      &nbsp;·&nbsp; Papers & Dossiers &nbsp;·&nbsp; Scriptorium Epistémico
+    <!-- Footer inferior nativo -->
+    <footer class="ac-site-footer">
+      <div class="ac-site-footer__inner">
+        
+        <!-- Brand / Sello -->
+        <a href="/" class="ac-site-footer__brand" title="The Great Puzzle Project">
+          <div class="ac-site-footer__seal" aria-hidden="true">
+            <svg viewBox="0 0 100 100" class="seal-spin">
+              <path id="ac-seal-curve" d="M 50,50 m -42,0 a 42,42 0 1,1 84,0 a 42,42 0 1,1 -84,0" fill="transparent" />
+              <text>
+                <textPath href="#ac-seal-curve" startOffset="0%"><tspan font-family="monospace" font-size="8" fill="var(--ac-gold)">TGP • ARCHIVO • TGP • ARCHIVO • </tspan></textPath>
+              </text>
+            </svg>
+            <svg class="seal-icon" viewBox="0 0 100 100" fill="none">
+              <path d="M 34 28 H 42 C 41.5 21, 37 10, 50 10 C 63 10, 58.5 21, 58 28 H 66 A 6 6 0 0 1 72 34 V 66 A 6 6 0 0 1 66 72 H 58 C 58.5 79, 63 90, 50 90 C 37 90, 41.5 79, 42 72 H 34 A 6 6 0 0 1 28 66 V 58 C 35 58.5, 45 63, 45 50 C 45 37, 35 41.5, 28 42 V 34 A 6 6 0 0 1 34 28 Z" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="ac-site-footer__title-group">
+            <span class="ac-site-footer__name">THE GREAT PUZZLE PROJECT</span>
+            <span class="ac-site-footer__dir">Dir. Xavier Benítez</span>
+          </div>
+        </a>
+
+        <!-- Enlaces centrales -->
+        <nav class="ac-site-footer__nav" aria-label="Navegación pie de página">
+          <a href="/">Inicio</a>
+          <span class="dot">·</span>
+          <a href="/papers">Papers</a>
+          <span class="dot">·</span>
+          <a href="/colecciones">Colecciones</a>
+          <span class="dot">·</span>
+          <a href="/archivo">Archivo</a>
+          <span class="dot">·</span>
+          <a href="/about">About</a>
+        </nav>
+
+        <!-- Acciones y Copyright -->
+        <div class="ac-site-footer__meta" style="flex-wrap: wrap; justify-content: center;">
+          <button type="button" id="ac-share-btn" class="ac-site-footer__share">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            <span>Compartir</span>
+          </button>
+          <span class="dot">·</span>
+          <span>© 2026 TGP</span>
+          <span class="dot">·</span>
+          <a href="https://about.thegreatpuzzleproject.com/" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none; font-weight: 700; transition: color 0.2s;" onmouseover="this.style.color='var(--ac-gold)'" onmouseout="this.style.color='inherit'">ABOUT ME</a>
+        </div>
+
+      </div>
     </footer>
+
+    <script>
+      const setupShareBtn = () => {
+        const btn = document.getElementById('ac-share-btn');
+        if (!btn) return;
+        btn.addEventListener('click', async () => {
+          if (navigator.share && /mobile|android|iphone/i.test(navigator.userAgent)) {
+            try { await navigator.share({ title: document.title, url: window.location.href }); } catch {}
+          } else {
+            try {
+              await navigator.clipboard.writeText(window.location.href);
+              const label = btn.querySelector('span');
+              if (label) {
+                const orig = label.innerText;
+                label.innerText = '¡COPIADO!';
+                setTimeout(() => { label.innerText = orig; }, 2000);
+              }
+            } catch {}
+          }
+        });
+      };
+      document.addEventListener('DOMContentLoaded', setupShareBtn);
+      document.addEventListener('astro:page-load', setupShareBtn);
+    </script>
 
     <!-- Google Translate Widget -->
     <script>

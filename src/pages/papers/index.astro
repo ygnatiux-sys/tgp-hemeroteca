@@ -19,6 +19,8 @@ const publishable = getPublishableEssays(allRaw, import.meta.env.PROD);
 const sorted      = publishable.sort((a, b) =>
   (a.entry.title || "").localeCompare(b.entry.title || "")
 );
+
+const allCategories = [...new Set(publishable.map(item => formatCategory(item.entry.category)).filter(Boolean))].sort();
 ---
 
 <AcademicLayout title="Papers Index — The Great Puzzle Project" description="Índice epistémico de papers y dossieres académicos.">
@@ -35,6 +37,16 @@ const sorted      = publishable.sort((a, b) =>
       </div>
     </header>
 
+    <!-- Botonera de Categorías (Medium style) -->
+    <div class="index-category-nav-wrapper">
+      <nav class="index-category-nav" aria-label="Filtro de categorías">
+        <button class="cat-btn active" data-cat="all">Todos</button>
+        {allCategories.map(cat => (
+          <button class="cat-btn" data-cat={cat}>{cat}</button>
+        ))}
+      </nav>
+    </div>
+
     <!-- Grid de cards estilo Medium -->
     <section class="index-grid-section">
       <div class="index-grid-inner">
@@ -44,34 +56,74 @@ const sorted      = publishable.sort((a, b) =>
               const img    = resolveEssayImage(item.entry.coverImage, item.slug);
               const cat    = formatCategory(item.entry.category);
               const date   = item.entry.date ? formatDate(item.entry.date) : null;
+              const initialLikes = (item.slug.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 70) + 14;
               return (
-                <li>
-                  <a href={`/papers/${item.slug}`} class="index-card">
-                    {img && (
-                      <div class="index-card-img-wrap">
-                        <img
-                          src={img.src}
-                          alt={item.entry.title || item.slug}
-                          class="index-card-img"
-                          loading="lazy"
-                        />
-                      </div>
-                    )}
-                    <div class="index-card-body">
-                      <p class="index-card-meta">
-                        TGP
-                        {date && <span class="idx-sep">·</span>}
-                        {date && <time>{date}</time>}
-                      </p>
-                      <h2 class="index-card-title">
-                        {item.entry.title || item.slug.replace(/-/g, " ")}
-                      </h2>
-                      {item.entry.excerpt && (
-                        <p class="index-card-excerpt">{item.entry.excerpt}</p>
+                <li class="index-card-item" data-cat={cat || ""}>
+                  <article class="index-card-article">
+                    <a href={`/papers/${item.slug}`} class="index-card">
+                      {img && (
+                        <div class="index-card-img-wrap">
+                          <img
+                            src={img.src}
+                            alt={item.entry.title || item.slug}
+                            class="index-card-img"
+                            loading="lazy"
+                          />
+                        </div>
                       )}
-                      {cat && <span class="index-card-tag">{cat}</span>}
+                      <div class="index-card-body">
+                        <p class="index-card-meta">
+                          TGP
+                          {date && <span class="idx-sep">·</span>}
+                          {date && <time>{date}</time>}
+                        </p>
+                        <h2 class="index-card-title">
+                          {item.entry.title || item.slug.replace(/-/g, " ")}
+                        </h2>
+                        {item.entry.excerpt && (
+                          <p class="index-card-excerpt">{item.entry.excerpt}</p>
+                        )}
+                      </div>
+                    </a>
+
+                    <!-- Footer de acciones: Tag a la izq, Me gusta & Biblioteca a la der -->
+                    <div class="index-card-footer">
+                      <div class="index-card-footer-left">
+                        {cat && <span class="index-card-tag">{cat}</span>}
+                      </div>
+
+                      <div class="index-card-footer-actions">
+                        <!-- Me gusta (Clap / Like) -->
+                        <button
+                          type="button"
+                          class="card-action-btn btn-like"
+                          data-slug={item.slug}
+                          data-initial-likes={String(initialLikes)}
+                          aria-label="Me gusta"
+                          title="Me gusta"
+                        >
+                          <svg class="action-icon icon-clap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M10 20H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5"/>
+                            <path d="M10 11.5a1.5 1.5 0 0 0 1.5-1.5 2 2 0 0 1 2-2h1.5a1 1 0 0 0 1-1V5.5a2 2 0 0 1 2-2h.5a2 2 0 0 1 2 2v10.5a6 6 0 0 1-6 6h-1.5a2 2 0 0 1-2-2v-4.5Z"/>
+                          </svg>
+                          <span class="like-count">{initialLikes}</span>
+                        </button>
+
+                        <!-- Añadir a la biblioteca preferida (Bookmark) -->
+                        <button
+                          type="button"
+                          class="card-action-btn btn-bookmark"
+                          data-slug={item.slug}
+                          aria-label="Guardar en mi biblioteca"
+                          title="Añadir a mi biblioteca preferida"
+                        >
+                          <svg class="action-icon icon-bookmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+                          </svg>
+                        </button>
+                      </div>
                     </div>
-                  </a>
+                  </article>
                 </li>
               );
             })}
@@ -84,6 +136,91 @@ const sorted      = publishable.sort((a, b) =>
 
   </div>
 </AcademicLayout>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // 1. Filtro de categorías
+    const btns = document.querySelectorAll(".cat-btn");
+    const items = document.querySelectorAll(".index-card-item");
+
+    btns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        btns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const selectedCat = btn.getAttribute("data-cat");
+
+        items.forEach(item => {
+          if (selectedCat === "all" || item.getAttribute("data-cat") === selectedCat) {
+            (item as HTMLElement).style.display = "block";
+          } else {
+            (item as HTMLElement).style.display = "none";
+          }
+        });
+      });
+    });
+
+    // 2. Interacciones de Like (Claps) y Bookmark con persistencia en localStorage
+    const likeBtns = document.querySelectorAll(".btn-like");
+    const bookmarkBtns = document.querySelectorAll(".btn-bookmark");
+
+    likeBtns.forEach(btn => {
+      const slug = btn.getAttribute("data-slug");
+      if (!slug) return;
+
+      const baseLikes = parseInt(btn.getAttribute("data-initial-likes") || "14", 10);
+      const isLiked = localStorage.getItem(`tgp_like_${slug}`) === "true";
+      const countEl = btn.querySelector(".like-count");
+
+      if (isLiked) {
+        btn.classList.add("active");
+        if (countEl) countEl.textContent = String(baseLikes + 1);
+      } else {
+        if (countEl) countEl.textContent = String(baseLikes);
+      }
+
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentlyLiked = btn.classList.contains("active");
+        if (currentlyLiked) {
+          btn.classList.remove("active");
+          localStorage.setItem(`tgp_like_${slug}`, "false");
+          if (countEl) countEl.textContent = String(baseLikes);
+        } else {
+          btn.classList.add("active");
+          localStorage.setItem(`tgp_like_${slug}`, "true");
+          if (countEl) countEl.textContent = String(baseLikes + 1);
+        }
+      });
+    });
+
+    bookmarkBtns.forEach(btn => {
+      const slug = btn.getAttribute("data-slug");
+      if (!slug) return;
+
+      const isBookmarked = localStorage.getItem(`tgp_bookmark_${slug}`) === "true";
+      if (isBookmarked) {
+        btn.classList.add("active");
+      }
+
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentlyBookmarked = btn.classList.contains("active");
+        if (currentlyBookmarked) {
+          btn.classList.remove("active");
+          localStorage.setItem(`tgp_bookmark_${slug}`, "false");
+        } else {
+          btn.classList.add("active");
+          localStorage.setItem(`tgp_bookmark_${slug}`, "true");
+        }
+      });
+    });
+  });
+</script>
 
 <style is:global>
   /* Cabecera del índice — fondo roto suave */
@@ -123,9 +260,51 @@ const sorted      = publishable.sort((a, b) =>
     line-height: 1.55;
   }
 
+  /* Navegación de categorías */
+  .index-category-nav-wrapper {
+    border-bottom: 1px solid var(--white-silver, #E4E1DB);
+    background-color: var(--white-page, #FAFAF9);
+    position: sticky;
+    top: 4rem; /* Asumiendo que hay un nav arriba, ajusta si es necesario */
+    z-index: 10;
+  }
+  .index-category-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+  }
+  .index-category-nav::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+  .cat-btn {
+    background: none;
+    border: none;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.82rem;
+    color: var(--ac-text-soft, #8A8278);
+    padding: 1rem 0;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+  }
+  .cat-btn:hover {
+    color: var(--ac-text, #191918);
+  }
+  .cat-btn.active {
+    color: var(--ac-text, #191918);
+    border-bottom-color: var(--ac-text, #191918);
+    font-weight: 500;
+  }
+
   /* Grid de cards */
   .index-grid-section {
-    padding: 3rem 1.5rem;
+    padding: 2rem 1.5rem 4rem;
   }
   .index-grid-inner {
     max-width: 860px;
@@ -139,13 +318,20 @@ const sorted      = publishable.sort((a, b) =>
     flex-direction: column;
     gap: 0;
   }
+  /* Card article wrapper */
+  .index-card-article {
+    padding: 1.75rem 0;
+    border-bottom: 1px solid var(--white-silver, #E4E1DB);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
   .index-card {
     text-decoration: none;
     display: flex;
     align-items: flex-start;
     gap: 1.5rem;
-    padding: 2rem 0;
-    border-bottom: 1px solid var(--white-silver, #E4E1DB);
     transition: opacity 0.2s ease;
   }
   .index-card:hover { opacity: 0.8; }
@@ -217,8 +403,72 @@ const sorted      = publishable.sort((a, b) =>
     border: 1px solid transparent;
     border-radius: 999px;
     padding: 0.2rem 0.7rem;
-    margin-top: 0.15rem;
     width: fit-content;
+  }
+
+  /* Footer de acciones en la card */
+  .index-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.4rem;
+  }
+
+  .index-card-footer-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .index-card-footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .card-action-btn {
+    background: none;
+    border: none;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.78rem;
+    color: var(--ac-text-soft, #8A8278);
+    transition: all 0.18s ease;
+  }
+
+  .card-action-btn:hover {
+    color: var(--ac-text, #191918);
+    background-color: var(--white-broken, #F5F2ED);
+  }
+
+  .card-action-btn .action-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+    transition: all 0.2s ease;
+  }
+
+  /* Estado Activo: Like (Dorado TGP) */
+  .btn-like.active {
+    color: var(--ac-gold, #8C6D2F);
+    font-weight: 600;
+  }
+  .btn-like.active .action-icon {
+    fill: var(--ac-gold, #8C6D2F);
+    stroke: var(--ac-gold, #8C6D2F);
+  }
+
+  /* Estado Activo: Bookmark / Biblioteca Preferida (Dorado TGP) */
+  .btn-bookmark.active {
+    color: var(--ac-gold, #8C6D2F);
+  }
+  .btn-bookmark.active .action-icon {
+    fill: var(--ac-gold, #8C6D2F);
+    stroke: var(--ac-gold, #8C6D2F);
   }
 
   .index-empty {
