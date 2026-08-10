@@ -11,7 +11,7 @@
   --bg-surface: rgba(255, 255, 255, 0.04);
   --text-main: #E0E0E0;
   --text-body: #E0E0E0;
-  --accent-primary: #C8A98B;
+  --accent-primary: #D4A352;
   --accent-secondary: #D4A352;
   --accent-silver: #94A3B8;
   --border-subtle: rgba(255, 255, 255, 0.1);
@@ -88,7 +88,7 @@ body, header, footer, article, section, nav, div, aside, p, span, h1, h2, h3, h4
 .group:hover .gradient-steel-line-2,
 .group:hover .gradient-steel-line-3,
 .gradient-steel-brand:hover {
-  background: linear-gradient(180deg, #D47545 0%, #B55A30 100%) !important;
+  background: linear-gradient(180deg, #D4A352 0%, #D4A352 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
@@ -126,7 +126,7 @@ header .header-btn-codice {
 }
 
 [data-theme='light'] header a:hover .header-brand-title {
-  color: #C8A98B !important; /* Dorado Lantern Glow */
+  color: #D4A352 !important; /* Dorado Lantern Glow */
 }
 
 [data-theme='light'] header nav a,
@@ -136,8 +136,8 @@ header .header-btn-codice {
 
 [data-theme='light'] header nav a:hover,
 [data-theme='light'] header .header-nav-link:hover {
-  color: #C8A98B !important;
-  text-shadow: 0 0 12px rgba(200, 169, 139, 0.4) !important; /* Lantern Hover Glow */
+  color: #D4A352 !important;
+  text-shadow: 0 0 12px rgba(212, 163, 82, 0.4) !important; /* Lantern Hover Glow */
 }
 
 [data-theme='light'] header .header-btn-codice {
@@ -146,8 +146,8 @@ header .header-btn-codice {
 }
 
 [data-theme='light'] header .header-btn-codice:hover {
-  color: #C8A98B !important;
-  background-color: rgba(200, 169, 139, 0.1) !important; /* Lantern Hover */
+  color: #D4A352 !important;
+  background-color: rgba(212, 163, 82, 0.1) !important; /* Lantern Hover */
 }
 
 [data-theme='light'] header .header-action-btn {
@@ -155,8 +155,8 @@ header .header-btn-codice {
 }
 
 [data-theme='light'] header .header-action-btn:hover {
-  color: #C8A98B !important;
-  background-color: rgba(200, 169, 139, 0.1) !important; /* Lantern Hover */
+  color: #D4A352 !important;
+  background-color: rgba(212, 163, 82, 0.1) !important; /* Lantern Hover */
 }
 
 [data-theme='light'] header .header-action-btn svg {
@@ -165,8 +165,8 @@ header .header-btn-codice {
 }
 
 [data-theme='light'] header .header-action-btn:hover svg {
-  stroke: #B55A30 !important;
-  color: #B55A30 !important;
+  stroke: #D4A352 !important;
+  color: #D4A352 !important;
 }
 
 [data-theme='light'] header .header-action-btn kbd {
@@ -181,7 +181,7 @@ header .header-btn-codice {
 }
 
 :root:not([data-theme='light']) header a:hover .header-brand-title {
-  color: #C8A98B !important; /* Dorado Lantern Glow */
+  color: #D4A352 !important; /* Dorado Lantern Glow */
 }
 
 :root:not([data-theme='light']) header nav a,
@@ -191,8 +191,8 @@ header .header-btn-codice {
 
 :root:not([data-theme='light']) header nav a:hover,
 :root:not([data-theme='light']) header .header-nav-link:hover {
-  color: #C8A98B !important;
-  text-shadow: 0 0 14px rgba(200, 169, 139, 0.5) !important; /* Lantern Hover Glow */
+  color: #D4A352 !important;
+  text-shadow: 0 0 14px rgba(212, 163, 82, 0.5) !important; /* Lantern Hover Glow */
 }
 
 :root:not([data-theme='light']) header .header-btn-codice {
@@ -201,8 +201,8 @@ header .header-btn-codice {
 }
 
 :root:not([data-theme='light']) header .header-btn-codice:hover {
-  color: #C8A98B !important;
-  background-color: rgba(200, 169, 139, 0.1) !important; /* Lantern Hover */
+  color: #D4A352 !important;
+  background-color: rgba(212, 163, 82, 0.1) !important; /* Lantern Hover */
 }
 
 :root:not([data-theme='light']) header .header-action-btn {
@@ -210,8 +210,8 @@ header .header-btn-codice {
 }
 
 :root:not([data-theme='light']) header .header-action-btn:hover {
-  color: #B55A30 !important;
-  background-color: rgba(181, 90, 48, 0.15) !important; /* Lantern Hover */
+  color: #D4A352 !important;
+  background-color: rgba(212, 163, 82, 0.15) !important; /* Lantern Hover */
 }
 
 :root:not([data-theme='light']) header .header-action-btn svg {
@@ -220,8 +220,8 @@ header .header-btn-codice {
 }
 
 :root:not([data-theme='light']) header .header-action-btn:hover svg {
-  stroke: #B55A30 !important;
-  color: #B55A30 !important;
+  stroke: #D4A352 !important;
+  color: #D4A352 !important;
 }
 
 /* ─── 1. ESCALA DE TEXTO PRINCIPAL Y MATICES (CARBÓN & PLOMO OSCURO) ─────── */
@@ -279,7 +279,7 @@ header .header-btn-codice {
 .prose h3,
 .prose h4,
 .prose h5 {
-  color: #C8A98B;
+  color: #D4A352;
 }
 
 [data-theme='light'] .prose h2 {
@@ -302,11 +302,20 @@ header .header-btn-codice {
   color: #6E2424 !important;
 }
 
-[data-theme='light'] .hover\:text-\[\#C8A98B\]:hover {
+[data-theme='light'] .hover\:text-\[\#D4A352\]:hover {
   color: #6E2424 !important;
 }
 
-/* ─── 2. SELECCIÓN DE TEXTO (LACRE / SANGRE DE BUEY CON TEXTO ALABASTRO) ─── */
+/* ─── 2. SELECCIÓN DE TEXTO GLOBAL (DORADO HEREDADO) Y MODO CLARO ─── */
+::selection {
+  background-color: #D4A352 !important;
+  color: #1A1C1D !important;
+}
+::-moz-selection {
+  background-color: #D4A352 !important;
+  color: #1A1C1D !important;
+}
+
 [data-theme='light'] ::selection {
   background-color: #6E2424 !important;
   color: #F5F4F0 !important;
@@ -444,7 +453,7 @@ header .header-btn-codice {
   --color-old-navy: #1E2C3A;
   --color-bus-red: #8B3A36;
   --color-vintage-yellow: #D4A352;
-  --color-rust-orange: #C8A98B;
+  --color-rust-orange: #D4A352;
 
   --ease-cinematic: cubic-bezier(0.2, 0.8, 0.2, 1);
   --font-serif: "Gloock", serif;
@@ -568,16 +577,16 @@ header .header-btn-codice {
 
 .cinematic-card-lantern:hover {
   background: rgba(18, 22, 20, 0.8);
-  border-color: rgba(200, 169, 139, 0.4);
+  border-color: rgba(212, 163, 82, 0.4);
   box-shadow: 
-    0 0 32px -4px rgba(200, 169, 139, 0.2),
-    inset 0 0 24px rgba(200, 169, 139, 0.06),
+    0 0 32px -4px rgba(212, 163, 82, 0.2),
+    inset 0 0 24px rgba(212, 163, 82, 0.06),
     0 20px 40px -12px rgba(0, 0, 0, 0.8);
   transform: translateY(-2px);
 }
 
 .cinematic-card-lantern:hover::before {
-  background: linear-gradient(90deg, transparent, rgba(200, 169, 139, 0.75), transparent);
+  background: linear-gradient(90deg, transparent, rgba(212, 163, 82, 0.75), transparent);
 }
 
 /* ═════════════════════════════════════════════════════════════════════════
@@ -595,7 +604,7 @@ header .header-btn-codice {
   }
   15%, 28% {
     opacity: 1;
-    text-shadow: 0 0 10px rgba(200, 169, 139, 0.65);
+    text-shadow: 0 0 10px rgba(212, 163, 82, 0.65);
   }
 }
 
@@ -608,7 +617,7 @@ header .header-btn-codice {
   }
   15%, 28% {
     opacity: 0.90;
-    text-shadow: 0 0 8px rgba(200, 169, 139, 0.5);
+    text-shadow: 0 0 8px rgba(212, 163, 82, 0.5);
   }
 }
 
@@ -619,7 +628,7 @@ header .header-btn-codice {
   }
   50% {
     opacity: 0.94;
-    filter: drop-shadow(0 0 4px rgba(200, 169, 139, 0.35));
+    filter: drop-shadow(0 0 4px rgba(212, 163, 82, 0.35));
   }
 }
 
@@ -629,7 +638,7 @@ header .header-btn-codice {
   }
   50% {
     opacity: 1;
-    text-shadow: 0 0 8px rgba(200, 169, 139, 0.45);
+    text-shadow: 0 0 8px rgba(212, 163, 82, 0.45);
   }
 }
 
@@ -644,7 +653,7 @@ header .header-btn-codice {
   }
   60% {
     background-position: 100% 50%;
-    filter: drop-shadow(0 2px 18px rgba(200, 169, 139, 0.45)) drop-shadow(0 8px 28px rgba(0, 0, 0, 0.95));
+    filter: drop-shadow(0 2px 18px rgba(212, 163, 82, 0.45)) drop-shadow(0 8px 28px rgba(0, 0, 0, 0.95));
   }
   100% {
     background-position: 0% 50%;
@@ -690,7 +699,7 @@ header .header-btn-codice {
   }
   50%, 95% {
     opacity: 0.75;
-    text-shadow: 0 0 8px rgba(200, 169, 139, 0.5);
+    text-shadow: 0 0 8px rgba(212, 163, 82, 0.5);
     pointer-events: auto;
   }
   100% {
@@ -742,7 +751,7 @@ header .header-btn-codice {
   20% {
     /* Destello Hype de Brillo Metálico Especular */
     opacity: 1;
-    filter: brightness(1.25) drop-shadow(0 0 22px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 34px rgba(200, 169, 139, 0.85));
+    filter: brightness(1.25) drop-shadow(0 0 22px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 34px rgba(212, 163, 82, 0.85));
   }
   45% {
     /* Umbral de Oscurecimiento Total: se apaga y oscurece completamente */

@@ -1,0 +1,196 @@
+---
+/**
+ * /papers/home — Portada del Scriptorium (datos de la colección principal)
+ */
+import { getCollection } from "astro:content";
+import AcademicLayout from "../../layouts/AcademicLayout.astro";
+import { getPublishableEssays, formatCategory, formatDate, resolveEssayImage } from "../../lib/content-filter";
+
+export const prerender = true;
+
+const essays     = await getCollection("ensayos").catch(() => []);
+const georefs    = await getCollection("georreferencias").catch(() => []);
+const arquetipos = await getCollection("arquetiposGlobales").catch(() => []);
+const all = getPublishableEssays([...essays, ...georefs, ...arquetipos], import.meta.env.PROD);
+
+const featured = all.slice(0, 1)[0];
+const rest      = all.slice(1, 9);
+---
+
+<AcademicLayout title="Home — TGP Papers & Dossiers" description="Scriptorium Epistémico. Los papers más recientes del archivo TGP.">
+  <div class="home-page">
+
+    <!-- Hero destacado -->
+    {featured && (() => {
+      const img  = resolveEssayImage(featured.entry.coverImage, featured.slug);
+      const cat  = formatCategory(featured.entry.category);
+      const date = featured.entry.date ? formatDate(featured.entry.date) : null;
+      return (
+        <section class="home-featured">
+          <a href={`/papers/${featured.slug}`} class="featured-card">
+            {img && (
+              <div class="featured-card-img-wrap">
+                <img src={img.src} alt={featured.entry.title || ""} class="featured-card-img" loading="eager" />
+              </div>
+            )}
+            <div class="featured-card-body">
+              <p class="featured-kicker">{cat}</p>
+              <h2 class="featured-title">{featured.entry.title}</h2>
+              {featured.entry.excerpt && <p class="featured-excerpt">{featured.entry.excerpt}</p>}
+              <div class="featured-meta">
+                <span class="featured-avatar">XB</span>
+                <span>Xavier Benítez</span>
+                {date && <span class="meta-sep">·</span>}
+                {date && <time>{date}</time>}
+              </div>
+            </div>
+          </a>
+        </section>
+      );
+    })()}
+
+    <!-- Grid de papers recientes -->
+    <section class="home-grid-section">
+      <div class="home-grid-inner">
+        <h2 class="home-section-label">Recientes</h2>
+        <div class="home-grid">
+          {rest.map((item) => {
+            const img  = resolveEssayImage(item.entry.coverImage, item.slug);
+            const cat  = formatCategory(item.entry.category);
+            const date = item.entry.date ? formatDate(item.entry.date) : null;
+            return (
+              <a href={`/papers/${item.slug}`} class="home-card">
+                {img && (
+                  <div class="home-card-img-wrap">
+                    <img src={img.src} alt={item.entry.title || ""} class="home-card-img" loading="lazy" />
+                  </div>
+                )}
+                <div class="home-card-body">
+                  <p class="home-card-meta">
+                    <span class="home-avatar-sm">XB</span>
+                    Xavier B. {date && <><span class="meta-sep">·</span><time>{date}</time></>}
+                  </p>
+                  <h3 class="home-card-title">{item.entry.title}</h3>
+                  {cat && <span class="home-card-tag">{cat}</span>}
+                </div>
+              </a>
+            );
+          })}
+        </div>
+        <div class="home-see-all">
+          <a href="/papers" class="see-all-link">Ver índice completo →</a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</AcademicLayout>
+
+<style is:global>
+  .home-featured {
+    background-color: var(--white-broken, #F5F2ED);
+    border-bottom: 1px solid var(--white-silver, #E4E1DB);
+    padding: 3rem 1.5rem;
+  }
+  .featured-card {
+    max-width: 860px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-decoration: none;
+  }
+  @media (min-width: 640px) {
+    .featured-card { grid-template-columns: 1fr 1fr; align-items: center; }
+  }
+  .featured-card-img-wrap { overflow: hidden; border-radius: 4px; }
+  .featured-card-img { width: 100%; height: 18rem; object-fit: cover; display: block; transition: transform 0.4s ease; }
+  .featured-card:hover .featured-card-img { transform: scale(1.02); }
+  .featured-kicker {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.7rem; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ac-gold, #8C6D2F); margin: 0 0 0.75rem;
+  }
+  .featured-title {
+    font-family: var(--font-brand, 'Cormorant Garamond', serif);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 800; line-height: 1.1;
+    letter-spacing: -0.02em; color: var(--ac-text, #191918);
+    margin: 0 0 0.75rem;
+  }
+  .featured-excerpt {
+    font-family: var(--font-body, 'Lora', serif);
+    font-size: 0.95rem; line-height: 1.6;
+    color: var(--ac-text-muted, #575043); margin: 0 0 1rem;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .featured-meta {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.78rem; color: var(--ac-text-soft, #8A8278);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .featured-avatar, .home-avatar-sm {
+    width: 1.5rem; height: 1.5rem; border-radius: 50%;
+    background-color: var(--ac-accent, #3B2A14);
+    color: var(--white-page, #FAFAF9);
+    font-family: var(--font-brand, serif); font-size: 0.45rem; font-weight: 800;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .meta-sep { opacity: 0.4; }
+  .home-grid-section { padding: 3rem 1.5rem; }
+  .home-grid-inner { max-width: 860px; margin: 0 auto; }
+  .home-section-label {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.7rem; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ac-text-soft, #8A8278);
+    margin: 0 0 1.5rem; padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--white-silver, #E4E1DB);
+  }
+  .home-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  @media (min-width: 640px) { .home-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 960px) { .home-grid { grid-template-columns: repeat(3, 1fr); } }
+  .home-card {
+    text-decoration: none;
+    display: flex; flex-direction: column; gap: 0.75rem;
+    transition: opacity 0.2s ease;
+  }
+  .home-card:hover { opacity: 0.82; }
+  .home-card-img-wrap { width: 100%; height: 7rem; overflow: hidden; border-radius: 3px; background-color: var(--white-bone, #EDE9E1); }
+  .home-card-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
+  .home-card:hover .home-card-img { transform: scale(1.03); }
+  .home-card-body { display: flex; flex-direction: column; gap: 0.35rem; }
+  .home-card-meta {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.72rem; color: var(--ac-text-soft, #8A8278);
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .home-card-title {
+    font-family: var(--font-brand, 'Cormorant Garamond', serif);
+    font-size: 1.1rem; font-weight: 700;
+    line-height: 1.25; color: var(--ac-text, #191918); margin: 0;
+  }
+  .home-card-tag {
+    display: inline-block;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.68rem; font-weight: 500;
+    color: var(--ac-gold, #8C6D2F);
+    background-color: var(--white-bone, #EDE9E1);
+    border-radius: 999px; padding: 0.18rem 0.65rem;
+    width: fit-content; margin-top: 0.1rem;
+  }
+  .home-see-all { margin-top: 2.5rem; text-align: center; }
+  .see-all-link {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.82rem; font-weight: 500;
+    color: var(--ac-gold, #8C6D2F); text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .see-all-link:hover { color: var(--ac-accent, #3B2A14); }
+</style>

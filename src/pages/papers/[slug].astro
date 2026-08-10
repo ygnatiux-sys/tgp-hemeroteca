@@ -1,0 +1,1154 @@
+---
+/**
+ * src/pages/papers/[slug].astro — Entorno de lectura tipo Medium (TGP)
+ *
+ * Layout 3-columnas Desktop:
+ *   TOC archipiélago (izq.) | Contenido max-w-2xl (centro) | Contexto sticky (der.)
+ *
+ * Zonas de blancos:
+ *   - Página principal:   --white-page  (#FAFAF9)
+ *   - Cabecera del paper: --white-broken (#F5F2ED) con borde inferior sutil
+ *   - Sección "Autor":    --white-bone  (#EDE9E1)
+ *   - Tags/TOC:           --white-ice   (#F8F8F7) al hover
+ */
+
+import { getCollection, getEntry, render } from "astro:content";
+import { marked } from "marked";
+import AcademicLayout from "../../layouts/AcademicLayout.astro";
+import {
+  resolveEssayImage,
+  essayImages,
+  formatCategory,
+  formatDate,
+  getPublishableEssays,
+} from "../../lib/content-filter";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const essays     = await getCollection("ensayos").catch(() => []);
+  const georefs    = await getCollection("georreferencias").catch(() => []);
+  const arquetipos = await getCollection("arquetiposGlobales").catch(() => []);
+  const combined   = [...essays, ...georefs, ...arquetipos];
+
+  return combined.map((item) => ({
+    params: { slug: item.id.replace(/\/index$/, "") },
+    props:  { data: item.data, collectionId: item.id },
+  }));
+}
+
+// ─── DATOS DE LA RUTA ────────────────────────────────────────────────────────
+const { slug }  = Astro.params;
+const { data }  = Astro.props;
+const doc       = data as any;
+
+// ─── CONTENIDO MARKDOC (.mdoc) ───────────────────────────────────────────────
+const rawMdocs = import.meta.glob<string>(
+  [
+    "/src/content/ensayos/**/content.mdoc",
+    "/src/content/georreferencias/**/content.mdoc",
+    "/src/content/arquetipos-globales/**/content.mdoc",
+  ],
+  { query: "?raw", import: "default", eager: true }
+);
+
+const mdocKey          = `/src/content/ensayos/${slug}/content.mdoc`;
+const georefMdocKey    = `/src/content/georreferencias/${slug}/content.mdoc`;
+const arquetipoMdocKey = `/src/content/arquetipos-globales/${slug}/content.mdoc`;
+
+const rawMdocText =
+  rawMdocs[mdocKey] ||
+  rawMdocs[georefMdocKey] ||
+  rawMdocs[arquetipoMdocKey] ||
+  "";
+
+let Content: any = null;
+const hasRealMdoc = rawMdocText && rawMdocText.trim().length > 10;
+
+if (hasRealMdoc) {
+  try {
+    const col =
+      mdocKey in rawMdocs ? "ensayosContent" :
+      georefMdocKey in rawMdocs ? "georreferenciasContent" :
+      "arquetiposGlobalesContent";
+    const entry = await getEntry(col as any, `${slug}/content`);
+    if (entry) { const r = await render(entry); Content = r.Content; }
+  } catch (_) {}
+}
+
+// ─── FALLBACK: marked ────────────────────────────────────────────────────────
+let renderedHtml = "";
+if (!Content) {
+  let raw = hasRealMdoc ? rawMdocText.trim()
+    : doc.generadorGeoref?.trim() || doc.generadorTexto?.trim() || doc.generador?.trim() || "";
+
+  if (raw.startsWith("{") && (raw.includes('"informeMarkdown"') || raw.includes('"content"'))) {
+    try {
+      const p = JSON.parse(raw);
+      raw = p.informeMarkdown || p.content || raw;
+    } catch {
+      const m = raw.match(/"(?:informeMarkdown|content)"\s*:\s*"([\s\S]*?)"(?=\s*,\s*"|\s*})/);
+      if (m) raw = m[1].replace(/\\n/g, "\n").replace(/\\"/g, '"');
+    }
+  }
+  if (raw) {
+    renderedHtml = marked.parse(raw) as string;
+    for (const [k, mod] of Object.entries(essayImages)) {
+      if (renderedHtml.includes(k)) renderedHtml = renderedHtml.replaceAll(k, (mod as any).default.src);
+    }
+  }
+}
+
+// ─── METADATOS ───────────────────────────────────────────────────────────────
+const title        = doc.title || slug?.replace(/-/g, " ") || "Paper";
+const category     = formatCategory(doc.category);
+const dateStr      = doc.date ? formatDate(doc.date) : null;
+const excerpt      = doc.excerpt || null;
+const optimizedImg = resolveEssayImage(doc.coverImage, slug);
+const hasContent   = !!Content || !!renderedHtml;
+
+// ─── POSTS RELACIONADOS (misma categoría del autor) ──────────────────────────
+const allEssaysRaw = await getCollection("ensayos").catch(() => []);
+const publishable  = getPublishableEssays(allEssaysRaw, import.meta.env.PROD);
+const relatedPosts = publishable
+  .filter(p => p.slug !== slug)
+  .filter(p => {
+    if (doc.category) {
+      return (p.entry.category || "").toLowerCase().trim() ===
+             (doc.category || "").toLowerCase().trim();
+    }
+    return true;
+  })
+  .slice(0, 4);
+
+const pageTitle = `${title} — Papers · TGP`;
+---
+
+<AcademicLayout title={pageTitle} description={excerpt ?? undefined} slug={slug}>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       ZONA 1: CABECERA DEL PAPER — fondo roto (#F5F2ED)
+       Separación muy sutil de la zona de lectura
+  ══════════════════════════════════════════════════════════════════ -->
+  <section class="paper-hero-zone">
+    <div class="paper-hero-inner">
+      {category && <p class="paper-kicker">{category}</p>}
+      <h1 class="paper-title">{title}</h1>
+      {excerpt && <p class="paper-deck">{excerpt}</p>}
+      
+      <!-- Firma del autor — estilo Medium (Xavier Benítez) -->
+      <div class="paper-author-row">
+        <a href="/papers/perfil" class="paper-author-avatar-link" aria-label="Perfil de Xavier Benítez">
+          <div class="paper-author-avatar" aria-hidden="true">XB</div>
+        </a>
+        <div class="paper-author-info">
+          <a href="/papers/perfil" class="paper-author-name-link">
+            <span class="paper-author-name">Xavier Benítez | TGP Project</span>
+          </a>
+          <div class="paper-author-meta">
+            {dateStr && <time datetime={doc.date ?? ""}>{dateStr}</time>}
+            {dateStr && <span class="meta-sep" aria-hidden="true">·</span>}
+            <span id="reading-time-inline">Calculando...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       ZONA 2: IMAGEN DE PORTADA — span completo al ancho del contenido
+  ══════════════════════════════════════════════════════════════════ -->
+  {optimizedImg && (
+    <div class="paper-cover-zone">
+      <figure class="paper-cover-figure">
+        <img
+          src={optimizedImg.src}
+          width={optimizedImg.width}
+          height={optimizedImg.height}
+          alt={`Imagen de portada: ${title}`}
+          class="paper-cover-img"
+          loading="eager"
+          decoding="async"
+        />
+      </figure>
+    </div>
+  )}
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       ZONA 3: ÁREA DE LECTURA — Grid 3 columnas
+  ══════════════════════════════════════════════════════════════════ -->
+  <div class="paper-reading-zone">
+    
+    <!-- ═══ COLUMNA TOC (Izquierda — "Archipiélago") ═══ -->
+    <aside class="paper-sidebar-toc" aria-label="Tabla de Contenidos">
+      <div class="toc-wrapper">
+        <p class="toc-label">En este paper</p>
+        <!-- Tags tipo archipiélago: generados dinámicamente por JS -->
+        <nav id="toc-archipelago" class="toc-archipelago" role="navigation" aria-label="Secciones"></nav>
+      </div>
+    </aside>
+
+    <!-- ═══ CUERPO DEL ENSAYO (Centro) ═══ -->
+    <article class="academic-prose paper-main-col" id="paper-content">
+      <div class="paper-body prose" id="paper-body">
+        {hasContent ? (
+          Content ? <Content /> : <Fragment set:html={renderedHtml} />
+        ) : (
+          <p class="paper-empty">Este ensayo no tiene contenido disponible todavía.</p>
+        )}
+      </div>
+    </article>
+
+    <!-- ═══ COLUMNA CONTEXTO (Derecha) ═══ -->
+    <aside class="paper-sidebar-context" aria-label="Metadatos del paper">
+      <div class="context-wrapper">
+        <h4 class="context-section-label">Sobre este archivo</h4>
+        <dl class="context-meta-list">
+          <div class="meta-item">
+            <dt>Categoría</dt>
+            <dd>{category}</dd>
+          </div>
+          {dateStr && (
+            <div class="meta-item">
+              <dt>Publicación</dt>
+              <dd><time datetime={doc.date ?? ""}>{dateStr}</time></dd>
+            </div>
+          )}
+          <div class="meta-item">
+            <dt>Autoría</dt>
+            <dd>TGP · Archivo Epistémico</dd>
+          </div>
+          <div class="meta-item">
+            <dt>Lectura est.</dt>
+            <dd id="reading-time-sidebar">—</dd>
+          </div>
+        </dl>
+
+        <hr class="context-divider" />
+
+        <a href={`/hemeroteca/${slug}`} class="context-hemeroteca-link">
+          Ver en Hemeroteca ↗
+        </a>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       ZONA 4: TAGS (archipiélago de categorías) — fondo hueso medio
+  ══════════════════════════════════════════════════════════════════ -->
+  {category && (
+    <section class="paper-tags-zone">
+      <div class="paper-tags-inner">
+        <span class="tag-pill tag-pill--primary">{category}</span>
+        <span class="tag-pill">Epistémica</span>
+        <span class="tag-pill">The Great Puzzle Project</span>
+        <span class="tag-pill">Archivo</span>
+      </div>
+    </section>
+  )}
+
+  <!-- ZONA 5: BLOQUE AUTOR — Xavier Benítez | TGP Project -->
+  <section class="paper-author-zone">
+    <div class="paper-author-card">
+      <a href="/papers/perfil" class="author-card-avatar-link">
+        <div class="author-card-avatar" aria-label="Ver perfil de Xavier Benítez">XB</div>
+      </a>
+      <div class="author-card-body">
+        <p class="author-card-written-by">Escrito por</p>
+        <a href="/papers/perfil" class="author-card-name-link">
+          <h3 class="author-card-name">Xavier Benítez | TGP Project</h3>
+        </a>
+        <div class="author-card-stats">
+          <span>0 seguidores</span>
+          <span class="meta-sep">·</span>
+          <span>1 seguido</span>
+        </div>
+        <p class="author-card-bio">
+          Profesor &amp; Historiador. Investigando las piezas ocultas de nuestro pasado
+          para comprender la condición humana. Arqueología del sentido en TGP Project.
+        </p>
+        <div class="author-card-actions">
+          <a href="/papers/perfil" class="btn-follow">Ver perfil</a>
+          <a href="/papers/historias" class="btn-follow btn-follow--ghost">Historias</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       ZONA 6: MÁS PAPERS DEL MISMO AUTOR / CATEGORÍA
+       Fondo blanco-página para no romper el ritmo
+  ══════════════════════════════════════════════════════════════════ -->
+  {relatedPosts.length > 0 && (
+    <section class="paper-more-zone">
+      <div class="paper-more-inner">
+        <h2 class="more-section-title">Más del archivo epistémico</h2>
+        <div class="more-grid">
+          {relatedPosts.map((post) => {
+            const postImg = resolveEssayImage(post.entry.coverImage, post.slug);
+            const postDate = post.entry.date ? formatDate(post.entry.date) : null;
+            return (
+              <a href={`/papers/${post.slug}`} class="more-card">
+                {postImg && (
+                  <div class="more-card-img-wrap">
+                    <img
+                      src={postImg.src}
+                      alt={post.entry.title || post.slug}
+                      class="more-card-img"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+                <div class="more-card-body">
+                  <p class="more-card-meta">
+                    TGP
+                    {postDate && <span class="meta-sep">·</span>}
+                    {postDate && <time>{postDate}</time>}
+                  </p>
+                  <h3 class="more-card-title">{post.entry.title}</h3>
+                  {post.entry.excerpt && (
+                    <p class="more-card-excerpt">{post.entry.excerpt}</p>
+                  )}
+                  <span class="more-card-cta">Leer paper →</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Nav pie de artículo -->
+  <nav class="paper-footer-nav" aria-label="Navegación de artículo">
+    <a href="/papers" class="footer-nav-link">← Índice de Papers</a>
+    <a href="/archivo" class="footer-nav-link">Archivo completo →</a>
+  </nav>
+
+</AcademicLayout>
+
+<!-- ──────────────────────────────────────────────────────────────────
+  Script cliente: TOC Archipiélago + Scrollspy + Tiempo de lectura
+  Vanilla JS — sin dependencias externas.
+────────────────────────────────────────────────────────────────── -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const body  = document.getElementById("paper-body");
+    const rtInline  = document.getElementById("reading-time-inline");
+    const rtSidebar = document.getElementById("reading-time-sidebar");
+    const tocEl     = document.getElementById("toc-archipelago");
+
+    if (!body) return;
+
+    // 1. Tiempo de lectura
+    const wordCount = (body.textContent || "").trim().split(/\s+/).length;
+    const mins      = Math.max(1, Math.ceil(wordCount / 225));
+    const rtText    = `${mins} min de lectura`;
+    if (rtInline)  rtInline.textContent  = rtText;
+    if (rtSidebar) rtSidebar.textContent = rtText;
+
+    // 2. TOC Archipiélago
+    if (tocEl) {
+      const headings = Array.from(body.querySelectorAll("h2, h3"));
+
+      if (headings.length === 0) {
+        tocEl.innerHTML = '<span class="toc-empty">Sin secciones</span>';
+      } else {
+        // Asignar IDs semánticos si no los tienen
+        headings.forEach((h, i) => {
+          if (!h.id) {
+            h.id = `s${i}-${(h.textContent || "")
+              .trim()
+              .toLowerCase()
+              .replace(/\s+/g, "-")
+              .replace(/[^a-z0-9-]/g, "")
+              .slice(0, 40)}`;
+          }
+        });
+
+        // Crear botones-píldora tipo archipiélago
+        const fragment = document.createDocumentFragment();
+        headings.forEach((h) => {
+          const btn = document.createElement("a");
+          btn.href        = `#${h.id}`;
+          btn.className   = `toc-pill toc-${h.tagName.toLowerCase()}`;
+          btn.textContent = h.textContent || "";
+          btn.setAttribute("data-heading-id", h.id);
+
+          // Smooth scroll
+          btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            document.getElementById(h.id)?.scrollIntoView({
+              behavior: "smooth",
+              block: "start"
+            });
+          });
+
+          fragment.appendChild(btn);
+        });
+        tocEl.appendChild(fragment);
+
+        // 3. Scrollspy con IntersectionObserver
+        const pills: NodeListOf<HTMLElement> = document.querySelectorAll(".toc-pill");
+
+        const markActive = (id: string) => {
+          pills.forEach(p => {
+            p.classList.toggle("active", p.dataset.headingId === id);
+          });
+        };
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) markActive(entry.target.id);
+            });
+          },
+          { rootMargin: "-5% 0px -80% 0px", threshold: 0 }
+        );
+
+        headings.forEach(h => observer.observe(h));
+      }
+    }
+  });
+</script>
+
+<style is:global>
+
+  /* ═══════════════════════════════════════════════════════════════════
+     ZONA 1 — CABECERA DEL PAPER
+     Fondo ligeramente roto para separación visual suave
+  ═══════════════════════════════════════════════════════════════════ */
+  .paper-hero-zone {
+    background-color: var(--white-broken, #F5F2ED);
+    border-bottom: 1px solid var(--white-silver, #E4E1DB);
+    padding: 4rem 1.5rem 3rem;
+  }
+
+  .paper-hero-inner {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .paper-kicker {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ac-gold, #8C6D2F);
+    margin: 0 0 1.1rem;
+  }
+
+  .paper-title {
+    font-family: var(--font-editorial, 'Cormorant Garamond', serif);
+    font-size: clamp(2rem, 5vw + 0.8rem, 3.6rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ac-text, #191918);
+    margin: 0 0 1.2rem;
+    background: none;
+    -webkit-text-fill-color: unset;
+  }
+
+  .paper-deck {
+    font-family: var(--font-editorial, 'Cormorant Garamond', serif);
+    font-size: clamp(1.05rem, 1.8vw + 0.5rem, 1.3rem);
+    font-style: italic;
+    color: var(--ac-text-muted, #575043);
+    line-height: 1.55;
+    margin: 0 0 2rem;
+  }
+
+  /* Fila del autor (estilo Medium) */
+  .paper-author-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 0.25rem;
+  }
+
+  .paper-author-avatar {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background-color: var(--ac-accent, #3B2A14);
+    color: var(--white-page, #FAFAF9);
+    font-family: var(--font-editorial, serif);
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .paper-author-name {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--ac-text, #191918);
+    display: block;
+  }
+
+  .paper-author-meta {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.78rem;
+    color: var(--ac-text-soft, #8A8278);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .meta-sep { opacity: 0.5; }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     ZONA 2 — IMAGEN DE PORTADA
+     Sangre controlada al ancho máximo del contenido central
+  ═══════════════════════════════════════════════════════════════════ */
+  .paper-cover-zone {
+    padding: 2rem 1.5rem;
+    background-color: var(--white-page, #FAFAF9);
+    max-width: calc(680px + 3rem);
+    margin: 0 auto;
+  }
+
+  .paper-cover-figure {
+    margin: 0;
+    padding: 0;
+  }
+
+  .paper-cover-img {
+    width: 100%;
+    height: auto;
+    max-height: 26rem;
+    object-fit: cover;
+    border-radius: 3px;
+    display: block;
+    /* Sombra editorial sobria — sin efectos cinemáticos */
+    box-shadow: 0 1px 8px rgba(30,25,15,0.08);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     ZONA 3 — ÁREA DE LECTURA (Grid 3 columnas)
+  ═══════════════════════════════════════════════════════════════════ */
+  .paper-reading-zone {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 0;
+    gap: 0;
+  }
+
+  /* En desktop, 3 columnas: TOC | Contenido | Contexto */
+  @media (min-width: 1100px) {
+    .paper-reading-zone {
+      grid-template-columns: 200px minmax(auto, 680px) 200px;
+      max-width: 1200px;
+      padding: 3.5rem 2rem 0;
+      gap: 4rem;
+      align-items: start;
+    }
+  }
+
+  @media (min-width: 1400px) {
+    .paper-reading-zone {
+      grid-template-columns: 230px minmax(auto, 680px) 230px;
+      gap: 5rem;
+      padding: 3.5rem 3rem 0;
+    }
+  }
+
+  /* TOC sidebar: oculto en móvil */
+  .paper-sidebar-toc {
+    display: none;
+  }
+  @media (min-width: 1100px) {
+    .paper-sidebar-toc { display: block; }
+  }
+
+  /* Contexto sidebar: oculto en móvil */
+  .paper-sidebar-context {
+    display: none;
+  }
+  @media (min-width: 1100px) {
+    .paper-sidebar-context { display: block; }
+  }
+
+  /* ─── TOC Archipiélago ─── */
+  .toc-wrapper {
+    position: sticky;
+    top: 5.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .toc-label {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.67rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ac-text-soft, #8A8278);
+    margin: 0 0 0.25rem;
+  }
+
+  /* "Archipiélago": botones-píldora apilados — no grid, sino flujo natural */
+  .toc-archipelago {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    align-items: flex-start;
+  }
+
+  .toc-pill {
+    display: inline-block;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1.35;
+    color: var(--ac-text-muted, #575043);
+    background-color: var(--white-bone, #EDE9E1);
+    border: 1px solid transparent;
+    border-radius: 999px; /* píldora */
+    padding: 0.3rem 0.85rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .toc-pill:hover {
+    background-color: var(--white-ice, #F8F8F7);
+    border-color: var(--ac-gold-light, #C9A86C);
+    color: var(--ac-accent, #3B2A14);
+  }
+
+  /* H3: más pequeños y desplazados para crear el efecto de "profundidad" */
+  .toc-pill.toc-h3 {
+    font-size: 0.7rem;
+    background-color: var(--white-page, #FAFAF9);
+    border-color: var(--white-silver, #E4E1DB);
+    padding: 0.22rem 0.7rem;
+    max-width: 185px;
+  }
+
+  /* Archipiélago activo: píldora iluminada con dorado TGP */
+  .toc-pill.active {
+    background-color: var(--ac-accent, #3B2A14);
+    border-color: var(--ac-accent, #3B2A14);
+    color: #FAFAF9;
+    font-weight: 500;
+  }
+
+  .toc-empty {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--ac-text-soft, #8A8278);
+  }
+
+  /* ─── Cuerpo del ensayo ─── */
+  .academic-prose.paper-main-col {
+    width: 100%;
+  }
+
+  .paper-body {
+    width: 100%;
+    padding-bottom: 4rem;
+    font-family: var(--font-body, 'Lora', serif);
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: var(--ac-text, #191918);
+    /* Borde irregular (ragged right) */
+    text-align: left !important;
+  }
+
+  /* Prose tailwind overrides */
+  .paper-body.prose {
+    --tw-prose-body:          var(--ac-text, #191918);
+    --tw-prose-headings:      var(--ac-text, #191918);
+    --tw-prose-lead:          var(--ac-text-muted, #575043);
+    --tw-prose-links:         var(--ac-accent, #3B2A14);
+    --tw-prose-bold:          var(--ac-text, #191918);
+    --tw-prose-counters:      var(--ac-text-muted, #575043);
+    --tw-prose-bullets:       var(--ac-gold, #8C6D2F);
+    --tw-prose-hr:            var(--white-silver, #E4E1DB);
+    --tw-prose-quotes:        var(--ac-accent, #3B2A14);
+    --tw-prose-quote-borders: var(--ac-gold, #8C6D2F);
+    --tw-prose-captions:      var(--ac-text-soft, #8A8278);
+    --tw-prose-code:          var(--ac-accent, #3B2A14);
+    --tw-prose-pre-code:      var(--white-page, #FAFAF9);
+    --tw-prose-pre-bg:        var(--ac-accent, #3B2A14);
+    --tw-prose-th-borders:    var(--white-silver, #E4E1DB);
+    --tw-prose-td-borders:    var(--white-bone, #EDE9E1);
+    max-width: none;
+  }
+
+  /* Headings editoriales */
+  .paper-body.prose h1,
+  .paper-body.prose h2,
+  .paper-body.prose h3,
+  .paper-body.prose h4 {
+    font-family: var(--font-editorial, 'Cormorant Garamond', serif);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    color: var(--ac-text, #191918) !important;
+    -webkit-text-fill-color: var(--ac-text, #191918) !important;
+    filter: none !important;
+    scroll-margin-top: 6rem; /* espacio para nav sticky */
+  }
+
+  .paper-body.prose h2 { margin-top: 2.5em; margin-bottom: 0.75em; font-size: 1.85rem; }
+  .paper-body.prose h3 { margin-top: 2em;   margin-bottom: 0.5em;  font-size: 1.45rem; }
+  .paper-body.prose h4 { margin-top: 1.5em; margin-bottom: 0.25em; font-size: 1.15rem; }
+
+  /* Blockquote editorial */
+  .paper-body.prose blockquote {
+    border-left: 2.5px solid var(--ac-gold, #8C6D2F);
+    font-style: italic;
+    color: var(--ac-text-muted, #575043);
+    background-color: var(--white-broken, #F5F2ED);
+    padding: 1rem 1.5rem;
+    border-radius: 0 4px 4px 0;
+    margin: 2rem 0;
+  }
+
+  /* Links */
+  .paper-body.prose a {
+    color: var(--ac-accent, #3B2A14);
+    text-decoration: underline;
+    text-decoration-color: var(--ac-gold-light, #C9A86C);
+    text-underline-offset: 3px;
+    transition: color 0.15s ease;
+  }
+  .paper-body.prose a:hover { color: var(--ac-gold, #8C6D2F); }
+
+  /* Drop Cap */
+  .paper-body.prose > p:first-of-type::first-letter {
+    font-family: var(--font-editorial, 'Cormorant Garamond', serif);
+    font-size: 4em;
+    font-weight: 700;
+    line-height: 0.85;
+    float: left;
+    margin-right: 0.07em;
+    margin-top: 0.05em;
+    color: var(--ac-gold, #8C6D2F);
+    padding-bottom: 0.05em;
+    font-feature-settings: "liga" 1, "kern" 1;
+  }
+  .paper-body.prose > p:first-of-type::after {
+    content: ''; display: table; clear: both;
+  }
+
+  /* Versalitas */
+  .paper-body .versalitas {
+    font-variant-caps: small-caps;
+    font-variant-numeric: oldstyle-nums;
+    letter-spacing: 0.06em;
+  }
+
+  /* Vacío */
+  .paper-empty {
+    font-style: italic;
+    color: var(--ac-text-soft, #8A8278);
+    text-align: center;
+    padding: 3rem 0;
+    font-family: var(--font-editorial, serif);
+    font-size: 1.2rem;
+  }
+
+  /* ─── Contexto sidebar ─── */
+  .context-wrapper {
+    position: sticky;
+    top: 5.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .context-section-label {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.67rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ac-text-soft, #8A8278);
+    margin: 0 0 0.5rem;
+  }
+
+  .context-meta-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  .meta-item { margin: 0; }
+
+  .meta-item dt {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ac-text-soft, #8A8278);
+    margin-bottom: 0.15rem;
+  }
+
+  .meta-item dd {
+    font-family: var(--font-body, 'Lora', serif);
+    font-size: 0.88rem;
+    color: var(--ac-text, #191918);
+    margin: 0;
+  }
+
+  .context-divider {
+    border: none;
+    border-top: 1px solid var(--white-silver, #E4E1DB);
+    margin: 0.5rem 0;
+  }
+
+  .context-hemeroteca-link {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.78rem;
+    color: var(--ac-gold, #8C6D2F);
+    text-decoration: none;
+    transition: color 0.15s ease;
+    display: inline-block;
+  }
+  .context-hemeroteca-link:hover { color: var(--ac-accent, #3B2A14); }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     ZONA 4 — TAGS (Archipiélago de etiquetas)
+     Fondo hueso medio — separación visual suave
+  ═══════════════════════════════════════════════════════════════════ */
+  .paper-tags-zone {
+    background-color: var(--white-bone, #EDE9E1);
+    border-top: 1px solid var(--white-silver, #E4E1DB);
+    border-bottom: 1px solid var(--white-silver, #E4E1DB);
+    padding: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .paper-tags-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /* Píldoras de tags — mismo sistema visual que el TOC */
+  .tag-pill {
+    display: inline-block;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: var(--ac-text-muted, #575043);
+    background-color: var(--white-page, #FAFAF9);
+    border: 1px solid var(--white-silver, #E4E1DB);
+    border-radius: 999px;
+    padding: 0.35rem 1rem;
+    cursor: default;
+    transition: all 0.18s ease;
+    user-select: none;
+  }
+  .tag-pill:hover {
+    background-color: var(--white-ice, #F8F8F7);
+    border-color: var(--ac-gold-light, #C9A86C);
+    color: var(--ac-accent, #3B2A14);
+  }
+
+  /* Tag primario: resaltado dorado */
+  .tag-pill--primary {
+    background-color: var(--white-page, #FAFAF9);
+    border-color: var(--ac-gold, #8C6D2F);
+    color: var(--ac-gold, #8C6D2F);
+    font-weight: 500;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     ZONA 5 — BLOQUE AUTOR (estilo Medium)
+     Fondo roto sutil — diferencia discreta de tono
+  ═══════════════════════════════════════════════════════════════════ */
+  .paper-author-zone {
+    background-color: var(--white-broken, #F5F2ED);
+    border-top: 1px solid var(--white-silver, #E4E1DB);
+    padding: 3rem 1.5rem;
+  }
+
+  .paper-author-card {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+
+  .author-card-avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    min-width: 3.5rem;
+    border-radius: 50%;
+    background-color: var(--ac-accent, #3B2A14);
+    color: var(--white-page, #FAFAF9);
+    font-family: var(--font-editorial, serif);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .author-card-body { flex: 1; }
+
+  .author-card-written-by {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ac-text-soft, #8A8278);
+    margin: 0 0 0.25rem;
+  }
+
+  .author-card-name {
+    font-family: var(--font-editorial, 'Cormorant Garamond', serif);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--ac-text, #191918);
+    margin: 0 0 0.6rem;
+  }
+
+  .author-card-bio {
+    font-family: var(--font-body, 'Lora', serif);
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--ac-text-muted, #575043);
+    margin: 0 0 1rem;
+  }
+
+  .author-card-actions { display: flex; gap: 0.75rem; align-items: center; }
+
+  .btn-follow {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--white-page, #FAFAF9);
+    background-color: var(--ac-accent, #3B2A14);
+    border: none;
+    border-radius: 999px;
+    padding: 0.5rem 1.2rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  .btn-follow:hover { background-color: var(--ac-gold, #8C6D2F); }
+
+  /* Variante ghost (borde, sin fondo) */
+  .btn-follow--ghost {
+    background-color: transparent;
+    color: var(--ac-accent, #3B2A14);
+    border: 1.5px solid var(--ac-accent, #3B2A14);
+  }
+  .btn-follow--ghost:hover {
+    background-color: var(--white-bone, #EDE9E1);
+    border-color: var(--ac-gold, #8C6D2F);
+    color: var(--ac-gold, #8C6D2F);
+  }
+
+  /* Avatar con link */
+  .author-card-avatar-link {
+    display: block;
+    flex-shrink: 0;
+    text-decoration: none;
+    transition: opacity 0.15s ease;
+  }
+  .author-card-avatar-link:hover { opacity: 0.85; }
+
+  /* Nombre del autor como link */
+  .author-card-name-link {
+    text-decoration: none;
+  }
+  .author-card-name-link:hover .author-card-name {
+    color: var(--ac-gold, #8C6D2F);
+  }
+
+  /* Stats de seguidores */
+  .author-card-stats {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.78rem;
+    color: var(--ac-text-soft, #8A8278);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Link del avatar inline (en la firma del título) */
+  .paper-author-avatar-link {
+    display: block;
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: opacity 0.15s ease;
+  }
+  .paper-author-avatar-link:hover { opacity: 0.8; }
+
+  .paper-author-name-link {
+    text-decoration: none;
+  }
+  .paper-author-name-link:hover .paper-author-name {
+    color: var(--ac-gold, #8C6D2F);
+  }
+
+
+
+  /* ═══════════════════════════════════════════════════════════════════
+     ZONA 6 — MÁS PAPERS (grid 2 col tipo Medium)
+     Fondo blanco-página — sin ruido de color
+  ═══════════════════════════════════════════════════════════════════ */
+  .paper-more-zone {
+    padding: 4rem 1.5rem;
+    border-top: 1px solid var(--white-silver, #E4E1DB);
+  }
+
+  .paper-more-inner {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .more-section-title {
+    font-family: var(--font-editorial, 'Cormorant Garamond', serif);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ac-text, #191918);
+    margin: 0 0 2rem;
+    letter-spacing: -0.01em;
+  }
+
+  .more-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .more-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .more-card {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    transition: opacity 0.2s ease;
+  }
+  .more-card:hover { opacity: 0.85; }
+
+  .more-card-img-wrap {
+    width: 100%;
+    height: 10rem;
+    overflow: hidden;
+    border-radius: 3px;
+    background-color: var(--white-bone, #EDE9E1);
+  }
+
+  .more-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .more-card:hover .more-card-img { transform: scale(1.02); }
+
+  .more-card-body { display: flex; flex-direction: column; gap: 0.4rem; }
+
+  .more-card-meta {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    color: var(--ac-text-soft, #8A8278);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+  }
+
+  .more-card-title {
+    font-family: var(--font-editorial, 'Cormorant Garamond', serif);
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--ac-text, #191918);
+    margin: 0;
+  }
+
+  .more-card-excerpt {
+    font-family: var(--font-body, 'Lora', serif);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--ac-text-muted, #575043);
+    margin: 0;
+    /* Limitar a 2 líneas */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .more-card-cta {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--ac-gold, #8C6D2F);
+    margin-top: 0.2rem;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     PIE DE NAVEGACIÓN DEL ARTÍCULO
+  ═══════════════════════════════════════════════════════════════════ */
+  .paper-footer-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--white-silver, #E4E1DB);
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .footer-nav-link {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.78rem;
+    color: var(--ac-text-soft, #8A8278);
+    text-decoration: none;
+    transition: color 0.15s ease;
+    letter-spacing: 0.02em;
+  }
+  .footer-nav-link:hover { color: var(--ac-gold, #8C6D2F); }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     RESPONSIVE — Móvil: todo en una columna, apacible
+  ═══════════════════════════════════════════════════════════════════ */
+  @media (max-width: 640px) {
+    .paper-hero-zone { padding: 2.5rem 1.2rem 2rem; }
+    .paper-cover-zone { padding: 1.5rem 1.2rem; }
+    .paper-more-zone { padding: 2.5rem 1.2rem; }
+    .paper-author-zone { padding: 2rem 1.2rem; }
+    .paper-author-card { flex-direction: column; gap: 1rem; }
+    .paper-footer-nav { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>

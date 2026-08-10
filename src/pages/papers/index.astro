@@ -1,0 +1,237 @@
+---
+import { getCollection } from "astro:content";
+import AcademicLayout from "../../layouts/AcademicLayout.astro";
+import {
+  getPublishableEssays,
+  formatCategory,
+  formatDate,
+  resolveEssayImage,
+} from "../../lib/content-filter";
+
+export const prerender = true;
+
+const essays     = await getCollection("ensayos").catch(() => []);
+const georefs    = await getCollection("georreferencias").catch(() => []);
+const arquetipos = await getCollection("arquetiposGlobales").catch(() => []);
+
+const allRaw     = [...essays, ...georefs, ...arquetipos];
+const publishable = getPublishableEssays(allRaw, import.meta.env.PROD);
+const sorted      = publishable.sort((a, b) =>
+  (a.entry.title || "").localeCompare(b.entry.title || "")
+);
+---
+
+<AcademicLayout title="Papers Index — The Great Puzzle Project" description="Índice epistémico de papers y dossieres académicos.">
+  <div class="papers-index-page">
+
+    <!-- Encabezado -->
+    <header class="index-hero">
+      <div class="index-hero-inner">
+        <p class="index-kicker">Archivo</p>
+        <h1 class="index-title">Papers Epistémicos</h1>
+        <p class="index-subtitle">
+          Dossieres y ensayos de investigación profunda. Lectura sin distracciones.
+        </p>
+      </div>
+    </header>
+
+    <!-- Grid de cards estilo Medium -->
+    <section class="index-grid-section">
+      <div class="index-grid-inner">
+        {sorted.length > 0 ? (
+          <ul class="index-card-list">
+            {sorted.map((item) => {
+              const img    = resolveEssayImage(item.entry.coverImage, item.slug);
+              const cat    = formatCategory(item.entry.category);
+              const date   = item.entry.date ? formatDate(item.entry.date) : null;
+              return (
+                <li>
+                  <a href={`/papers/${item.slug}`} class="index-card">
+                    {img && (
+                      <div class="index-card-img-wrap">
+                        <img
+                          src={img.src}
+                          alt={item.entry.title || item.slug}
+                          class="index-card-img"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
+                    <div class="index-card-body">
+                      <p class="index-card-meta">
+                        TGP
+                        {date && <span class="idx-sep">·</span>}
+                        {date && <time>{date}</time>}
+                      </p>
+                      <h2 class="index-card-title">
+                        {item.entry.title || item.slug.replace(/-/g, " ")}
+                      </h2>
+                      {item.entry.excerpt && (
+                        <p class="index-card-excerpt">{item.entry.excerpt}</p>
+                      )}
+                      {cat && <span class="index-card-tag">{cat}</span>}
+                    </div>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p class="index-empty">No hay papers disponibles aún.</p>
+        )}
+      </div>
+    </section>
+
+  </div>
+</AcademicLayout>
+
+<style is:global>
+  /* Cabecera del índice — fondo roto suave */
+  .index-hero {
+    background-color: var(--white-broken, #F5F2ED);
+    border-bottom: 1px solid var(--white-silver, #E4E1DB);
+    padding: 4rem 1.5rem 3rem;
+  }
+  .index-hero-inner {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .index-kicker {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ac-gold, #8C6D2F);
+    margin: 0 0 0.75rem;
+  }
+  .index-title {
+    font-family: var(--font-editorial, 'Cormorant Garamond', serif);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    color: var(--ac-text, #191918);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0 0 1rem;
+  }
+  .index-subtitle {
+    font-family: var(--font-editorial, serif);
+    font-size: 1.15rem;
+    font-style: italic;
+    color: var(--ac-text-muted, #575043);
+    margin: 0;
+    line-height: 1.55;
+  }
+
+  /* Grid de cards */
+  .index-grid-section {
+    padding: 3rem 1.5rem;
+  }
+  .index-grid-inner {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .index-card-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .index-card {
+    text-decoration: none;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--white-silver, #E4E1DB);
+    transition: opacity 0.2s ease;
+  }
+  .index-card:hover { opacity: 0.8; }
+
+  .index-card-img-wrap {
+    flex-shrink: 0;
+    width: 7rem;
+    height: 5rem;
+    overflow: hidden;
+    border-radius: 2px;
+    background-color: var(--white-bone, #EDE9E1);
+  }
+  .index-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .index-card:hover .index-card-img { transform: scale(1.04); }
+
+  .index-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .index-card-meta {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    color: var(--ac-text-soft, #8A8278);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .idx-sep { opacity: 0.5; }
+
+  .index-card-title {
+    font-family: var(--font-editorial, 'Cormorant Garamond', serif);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ac-text, #191918);
+    line-height: 1.25;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .index-card-excerpt {
+    font-family: var(--font-body, 'Lora', serif);
+    font-size: 0.88rem;
+    color: var(--ac-text-muted, #575043);
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .index-card-tag {
+    display: inline-block;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--ac-gold, #8C6D2F);
+    background-color: var(--white-bone, #EDE9E1);
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 0.2rem 0.7rem;
+    margin-top: 0.15rem;
+    width: fit-content;
+  }
+
+  .index-empty {
+    font-style: italic;
+    color: var(--ac-text-soft, #8A8278);
+    padding: 3rem 0;
+    text-align: center;
+    font-family: var(--font-editorial, serif);
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 480px) {
+    .index-card { flex-direction: column; }
+    .index-card-img-wrap { width: 100%; height: 8rem; }
+  }
+</style>

@@ -1,0 +1,234 @@
+---
+/**
+ * /papers/perfil — Perfil del autor Xavier Benítez
+ * Estilo Medium: foto, bio, stats, posts recientes
+ */
+import { getCollection } from "astro:content";
+import AcademicLayout from "../../layouts/AcademicLayout.astro";
+import { getPublishableEssays, formatCategory, formatDate, resolveEssayImage } from "../../lib/content-filter";
+
+export const prerender = true;
+
+const essays  = await getCollection("ensayos").catch(() => []);
+const georefs = await getCollection("georreferencias").catch(() => []);
+const arquetipos = await getCollection("arquetiposGlobales").catch(() => []);
+
+const all = getPublishableEssays([...essays, ...georefs, ...arquetipos], import.meta.env.PROD);
+const recent = all.slice(0, 6);
+---
+
+<AcademicLayout title="Xavier Benítez | TGP Project — Perfil" description="Profesor & Historiador. Investigando las piezas ocultas de nuestro pasado.">
+  <div class="profile-page">
+
+    <section class="profile-hero">
+      <div class="profile-hero-inner">
+        <div class="profile-avatar">XB</div>
+        <div class="profile-info">
+          <h1 class="profile-name">Xavier Benítez | TGP Project</h1>
+          <p class="profile-handle">@tgp-project</p>
+          <p class="profile-bio">
+            Profesor & Historiador. Investigando las piezas ocultas de nuestro pasado
+            para comprender la condición humana. Arqueología del sentido en The Great Puzzle Project.
+          </p>
+          <div class="profile-stats">
+            <span><strong>{all.length}</strong> papers</span>
+            <span class="stat-sep">·</span>
+            <span><strong>0</strong> seguidores</span>
+            <span class="stat-sep">·</span>
+            <span><strong>1</strong> seguido</span>
+          </div>
+          <div class="profile-actions">
+            <a href="/about" class="btn-primary">Sobre el Proyecto</a>
+            <a href="/papers" class="btn-ghost">Ver todos los papers</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="profile-posts-section">
+      <div class="profile-posts-inner">
+        <h2 class="section-label">Papers recientes</h2>
+        <div class="profile-posts-list">
+          {recent.map((item) => {
+            const img  = resolveEssayImage(item.entry.coverImage, item.slug);
+            const cat  = formatCategory(item.entry.category);
+            const date = item.entry.date ? formatDate(item.entry.date) : null;
+            return (
+              <a href={`/papers/${item.slug}`} class="profile-post-row">
+                <div class="post-row-body">
+                  <p class="post-row-meta">
+                    {cat}
+                    {date && <span class="meta-sep">·</span>}
+                    {date && <time>{date}</time>}
+                  </p>
+                  <h3 class="post-row-title">{item.entry.title}</h3>
+                  {item.entry.excerpt && (
+                    <p class="post-row-excerpt">{item.entry.excerpt}</p>
+                  )}
+                </div>
+                {img && (
+                  <div class="post-row-img-wrap">
+                    <img src={img.src} alt={item.entry.title || ""} class="post-row-img" loading="lazy" />
+                  </div>
+                )}
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+
+  </div>
+</AcademicLayout>
+
+<style is:global>
+  .profile-hero {
+    background-color: var(--white-broken, #F5F2ED);
+    border-bottom: 1px solid var(--white-silver, #E4E1DB);
+    padding: 4rem 1.5rem 3rem;
+  }
+  .profile-hero-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+  .profile-avatar {
+    width: 5rem;
+    height: 5rem;
+    min-width: 5rem;
+    border-radius: 50%;
+    background-color: var(--ac-accent, #3B2A14);
+    color: var(--white-page, #FAFAF9);
+    font-family: var(--font-brand, 'Cormorant Garamond', serif);
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .profile-name {
+    font-family: var(--font-brand, 'Cormorant Garamond', serif);
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ac-text, #191918);
+    margin: 0 0 0.2rem;
+  }
+  .profile-handle {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.8rem;
+    color: var(--ac-text-soft, #8A8278);
+    margin: 0 0 0.8rem;
+  }
+  .profile-bio {
+    font-family: var(--font-body, 'Lora', serif);
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--ac-text-muted, #575043);
+    margin: 0 0 1rem;
+  }
+  .profile-stats {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.82rem;
+    color: var(--ac-text-soft, #8A8278);
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .profile-stats strong { color: var(--ac-text, #191918); }
+  .stat-sep { opacity: 0.4; }
+  .profile-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .btn-primary {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--white-page, #FAFAF9);
+    background-color: var(--ac-accent, #3B2A14);
+    border-radius: 999px;
+    padding: 0.5rem 1.2rem;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+  .btn-primary:hover { background-color: var(--ac-gold, #8C6D2F); }
+  .btn-ghost {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--ac-accent, #3B2A14);
+    background-color: transparent;
+    border: 1.5px solid var(--ac-accent, #3B2A14);
+    border-radius: 999px;
+    padding: 0.5rem 1.2rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  .btn-ghost:hover { background-color: var(--white-bone, #EDE9E1); border-color: var(--ac-gold, #8C6D2F); color: var(--ac-gold, #8C6D2F); }
+
+  .profile-posts-section { padding: 3rem 1.5rem; }
+  .profile-posts-inner { max-width: 680px; margin: 0 auto; }
+  .section-label {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ac-text-soft, #8A8278);
+    margin: 0 0 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--white-silver, #E4E1DB);
+  }
+  .profile-posts-list { display: flex; flex-direction: column; }
+  .profile-post-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--white-silver, #E4E1DB);
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+  .profile-post-row:hover { opacity: 0.75; }
+  .post-row-body { flex: 1; }
+  .post-row-meta {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.72rem;
+    color: var(--ac-text-soft, #8A8278);
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+    margin: 0 0 0.35rem;
+  }
+  .meta-sep { opacity: 0.4; }
+  .post-row-title {
+    font-family: var(--font-brand, 'Cormorant Garamond', serif);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ac-text, #191918);
+    margin: 0 0 0.35rem;
+    line-height: 1.25;
+  }
+  .post-row-excerpt {
+    font-family: var(--font-body, 'Lora', serif);
+    font-size: 0.85rem;
+    color: var(--ac-text-muted, #575043);
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .post-row-img-wrap { width: 5rem; height: 5rem; min-width: 5rem; overflow: hidden; border-radius: 3px; }
+  .post-row-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  @media (max-width: 560px) {
+    .profile-hero-inner { flex-direction: column; }
+    .post-row-img-wrap { display: none; }
+  }
+</style>

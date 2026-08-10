@@ -1,0 +1,159 @@
+---
+/**
+ * /papers/historias — Papers destacados / "Stories"
+ */
+import { getCollection } from "astro:content";
+import AcademicLayout from "../../layouts/AcademicLayout.astro";
+import { getPublishableEssays, formatCategory, formatDate, resolveEssayImage } from "../../lib/content-filter";
+
+export const prerender = true;
+
+const essays     = await getCollection("ensayos").catch(() => []);
+const georefs    = await getCollection("georreferencias").catch(() => []);
+const arquetipos = await getCollection("arquetiposGlobales").catch(() => []);
+const all        = getPublishableEssays([...essays, ...georefs, ...arquetipos], import.meta.env.PROD);
+
+// Priorizamos posts con imagen y excerpt (los más "narrativos")
+const stories = all.filter(p => p.entry.excerpt).slice(0, 12);
+---
+
+<AcademicLayout title="Historias — TGP Papers & Dossiers" description="Papers con mayor narrativa epistémica del archivo TGP.">
+  <div class="stories-page">
+
+    <header class="stories-hero">
+      <div class="stories-hero-inner">
+        <p class="stories-kicker">Historias</p>
+        <h1 class="stories-title">Papers Narrativos</h1>
+        <p class="stories-sub">
+          Los dossieres con mayor profundidad narrativa del Scriptorium.
+        </p>
+      </div>
+    </header>
+
+    <section class="stories-feed">
+      <div class="stories-feed-inner">
+        {stories.length > 0 ? (
+          stories.map((item) => {
+            const img  = resolveEssayImage(item.entry.coverImage, item.slug);
+            const cat  = formatCategory(item.entry.category);
+            const date = item.entry.date ? formatDate(item.entry.date) : null;
+            return (
+              <a href={`/papers/${item.slug}`} class="story-row">
+                <div class="story-body">
+                  <div class="story-author-row">
+                    <span class="story-avatar">XB</span>
+                    <span class="story-author-name">Xavier Benítez</span>
+                    {date && <span class="story-meta-sep">·</span>}
+                    {date && <time class="story-date">{date}</time>}
+                  </div>
+                  <h2 class="story-title">{item.entry.title}</h2>
+                  <p class="story-excerpt">{item.entry.excerpt}</p>
+                  <div class="story-footer">
+                    {cat && <span class="story-tag">{cat}</span>}
+                    <span class="story-cta">Leer →</span>
+                  </div>
+                </div>
+                {img && (
+                  <div class="story-img-wrap">
+                    <img src={img.src} alt={item.entry.title || ""} class="story-img" loading="lazy" />
+                  </div>
+                )}
+              </a>
+            );
+          })
+        ) : (
+          <p class="stories-empty">No hay historias disponibles aún.</p>
+        )}
+      </div>
+    </section>
+
+  </div>
+</AcademicLayout>
+
+<style is:global>
+  .stories-hero {
+    background-color: var(--white-broken, #F5F2ED);
+    border-bottom: 1px solid var(--white-silver, #E4E1DB);
+    padding: 4rem 1.5rem 3rem;
+  }
+  .stories-hero-inner { max-width: 680px; margin: 0 auto; }
+  .stories-kicker {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--ac-gold, #8C6D2F); margin: 0 0 0.75rem;
+  }
+  .stories-title {
+    font-family: var(--font-brand, 'Cormorant Garamond', serif);
+    font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800;
+    letter-spacing: -0.02em; color: var(--ac-text, #191918);
+    margin: 0 0 0.6rem; line-height: 1.1;
+  }
+  .stories-sub {
+    font-family: var(--font-body, 'Lora', serif);
+    font-size: 1rem; font-style: italic;
+    color: var(--ac-text-muted, #575043); margin: 0;
+  }
+  .stories-feed { padding: 3rem 1.5rem; }
+  .stories-feed-inner { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; }
+  .story-row {
+    display: flex; align-items: flex-start; gap: 1.5rem;
+    padding: 2rem 0; border-bottom: 1px solid var(--white-silver, #E4E1DB);
+    text-decoration: none; transition: opacity 0.2s ease;
+  }
+  .story-row:hover { opacity: 0.78; }
+  .story-body { flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+  .story-author-row {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.75rem; color: var(--ac-text-soft, #8A8278);
+    display: flex; align-items: center; gap: 0.45rem;
+  }
+  .story-avatar {
+    width: 1.5rem; height: 1.5rem; border-radius: 50%;
+    background-color: var(--ac-accent, #3B2A14);
+    color: var(--white-page, #FAFAF9);
+    font-family: var(--font-brand, serif); font-size: 0.42rem; font-weight: 800;
+    display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .story-author-name { font-weight: 500; color: var(--ac-text-muted, #575043); }
+  .story-meta-sep { opacity: 0.4; }
+  .story-title {
+    font-family: var(--font-brand, 'Cormorant Garamond', serif);
+    font-size: 1.3rem; font-weight: 700; line-height: 1.2;
+    color: var(--ac-text, #191918); margin: 0;
+  }
+  .story-excerpt {
+    font-family: var(--font-body, 'Lora', serif);
+    font-size: 0.88rem; line-height: 1.55;
+    color: var(--ac-text-muted, #575043); margin: 0;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .story-footer {
+    display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+  }
+  .story-tag {
+    display: inline-block;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.68rem; font-weight: 500;
+    color: var(--ac-gold, #8C6D2F);
+    background-color: var(--white-bone, #EDE9E1);
+    border-radius: 999px; padding: 0.18rem 0.65rem;
+  }
+  .story-cta {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.72rem; font-weight: 500;
+    color: var(--ac-text-soft, #8A8278);
+  }
+  .story-img-wrap {
+    width: 6rem; height: 5rem; min-width: 6rem;
+    overflow: hidden; border-radius: 3px;
+    background-color: var(--white-bone, #EDE9E1);
+  }
+  .story-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .stories-empty {
+    font-style: italic; color: var(--ac-text-soft, #8A8278);
+    text-align: center; padding: 3rem; font-family: var(--font-body, 'Lora', serif);
+  }
+  @media (max-width: 480px) {
+    .story-img-wrap { display: none; }
+  }
+</style>

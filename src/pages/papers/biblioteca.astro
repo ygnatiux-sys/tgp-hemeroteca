@@ -1,0 +1,133 @@
+---
+/**
+ * /papers/biblioteca — Colecciones por categoría
+ */
+import { getCollection } from "astro:content";
+import AcademicLayout from "../../layouts/AcademicLayout.astro";
+import { getPublishableEssays, formatCategory, groupByCategory, resolveEssayImage } from "../../lib/content-filter";
+
+export const prerender = true;
+
+const essays  = await getCollection("ensayos").catch(() => []);
+const all     = getPublishableEssays(essays, import.meta.env.PROD);
+const byCategory = groupByCategory(all, 1);
+const categories = Array.from(byCategory.entries());
+---
+
+<AcademicLayout title="Biblioteca — TGP Papers & Dossiers" description="Colecciones temáticas del archivo epistémico. Exploración por categorías.">
+  <div class="library-page">
+
+    <header class="library-hero">
+      <div class="library-hero-inner">
+        <p class="library-kicker">Biblioteca</p>
+        <h1 class="library-title">Colecciones Temáticas</h1>
+        <p class="library-sub">Exploración por campos epistémicos del archivo TGP.</p>
+      </div>
+    </header>
+
+    <section class="library-grid-section">
+      <div class="library-grid-inner">
+        {categories.map(([key, posts]) => {
+          const label = formatCategory(posts[0]?.entry.category);
+          const preview = posts.slice(0, 3);
+          return (
+            <div class="library-collection">
+              <div class="collection-header">
+                <h2 class="collection-title">{label}</h2>
+                <span class="collection-count">{posts.length} papers</span>
+              </div>
+              <div class="collection-previews">
+                {preview.map((p) => {
+                  const img = resolveEssayImage(p.entry.coverImage, p.slug);
+                  return (
+                    <a href={`/papers/${p.slug}`} class="preview-row">
+                      <span class="preview-title">{p.entry.title}</span>
+                      {img && <div class="preview-thumb-wrap"><img src={img.src} alt="" class="preview-thumb" loading="lazy" /></div>}
+                    </a>
+                  );
+                })}
+              </div>
+              <a href={`/colecciones/${key}`} class="collection-see-all">Ver colección completa →</a>
+            </div>
+          );
+        })}
+        {categories.length === 0 && (
+          <p class="library-empty">No hay colecciones disponibles aún.</p>
+        )}
+      </div>
+    </section>
+
+  </div>
+</AcademicLayout>
+
+<style is:global>
+  .library-hero {
+    background-color: var(--white-broken, #F5F2ED);
+    border-bottom: 1px solid var(--white-silver, #E4E1DB);
+    padding: 4rem 1.5rem 3rem;
+  }
+  .library-hero-inner { max-width: 680px; margin: 0 auto; }
+  .library-kicker {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--ac-gold, #8C6D2F); margin: 0 0 0.75rem;
+  }
+  .library-title {
+    font-family: var(--font-brand, 'Cormorant Garamond', serif);
+    font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800;
+    letter-spacing: -0.02em; color: var(--ac-text, #191918);
+    margin: 0 0 0.6rem; line-height: 1.1;
+  }
+  .library-sub {
+    font-family: var(--font-body, 'Lora', serif);
+    font-size: 1rem; font-style: italic;
+    color: var(--ac-text-muted, #575043); margin: 0;
+  }
+  .library-grid-section { padding: 3rem 1.5rem; }
+  .library-grid-inner { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 3rem; }
+  .library-collection {
+    border-bottom: 1px solid var(--white-silver, #E4E1DB);
+    padding-bottom: 3rem;
+  }
+  .collection-header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 1rem; gap: 1rem;
+  }
+  .collection-title {
+    font-family: var(--font-brand, 'Cormorant Garamond', serif);
+    font-size: 1.4rem; font-weight: 700;
+    color: var(--ac-text, #191918); margin: 0;
+  }
+  .collection-count {
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.72rem; color: var(--ac-text-soft, #8A8278);
+    white-space: nowrap;
+  }
+  .collection-previews { display: flex; flex-direction: column; }
+  .preview-row {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 1rem; padding: 0.85rem 0;
+    border-top: 1px solid var(--white-bone, #EDE9E1);
+    text-decoration: none; transition: opacity 0.2s ease;
+  }
+  .preview-row:hover { opacity: 0.75; }
+  .preview-title {
+    font-family: var(--font-body, 'Lora', serif);
+    font-size: 0.95rem; color: var(--ac-text, #191918);
+    flex: 1;
+  }
+  .preview-thumb-wrap { width: 3.5rem; height: 2.5rem; overflow: hidden; border-radius: 2px; flex-shrink: 0; }
+  .preview-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .collection-see-all {
+    display: inline-block; margin-top: 1rem;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    font-size: 0.78rem; font-weight: 500;
+    color: var(--ac-gold, #8C6D2F); text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .collection-see-all:hover { color: var(--ac-accent, #3B2A14); }
+  .library-empty {
+    font-style: italic; color: var(--ac-text-soft, #8A8278);
+    text-align: center; padding: 3rem; font-family: var(--font-body, 'Lora', serif);
+  }
+</style>
