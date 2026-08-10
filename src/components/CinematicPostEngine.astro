@@ -1,0 +1,523 @@
+---
+/**
+ * CinematicPostEngine.astro
+ * ──────────────────────────────────────────────────────────────────────────────
+ * Motor cinemático tipo Netflix para el Hero del Home de TGP.
+ *
+ * Comportamiento:
+ *  - Auto-ciclo infinito (SLIDE_DURATION ms/slide), con animación GSAP.
+ *  - Ken Burns muy lento y sutil en la imagen de fondo (scale 1→1.06).
+ *  - Textos: fade-in desde abajo (efecto "Primicia") con stagger.
+ *  - Metadatos: pulso suave (yoyo opacidad 0.35↔1, repeat -1).
+ *  - Salida: fade-out general suave antes del siguiente slide.
+ *  - Control manual: drag/swipe (finger o cursor) → pausa auto → reinicia auto
+ *    tras 8 s de inactividad.
+ *  - Dots de paginación con transición de ancho.
+ *  - Barra de progreso en la base del hero.
+ *  - Sin fundido hacia abajo: el hero ocupa h-dvh y el contenido fluye debajo.
+ *
+ * Props:
+ *  slides: SlideData[]  — Array de posts recientes desde el servidor Astro.
+ *
+ * Hereda: paleta CSS (--bg-main, rust-orange, cinzel, mono, serif), botones y
+ * estilos globales. Nada se cambia sin autorización.
+ */
+
+export interface SlideData {
+  id: string;
+  title: string;
+  subtitle?: string;
+  category?: string;
+  date?: string;
+  readTime?: string;
+  image: any;
+  imagePosition?: string;
+  link: string;
+  papersLink?: string;
+}
+
+interface Props {
+  slides: SlideData[];
+  heightClass?: string;
+}
+
+const { slides = [], heightClass = 'h-dvh' } = Astro.props;
+const safeSlides = slides.length > 0 ? slides : [];
+---
+
+{safeSlides.length > 0 && (
+  <section
+    class={`cpe-root relative w-full ${heightClass} overflow-hidden bg-black rounded-2xl md:rounded-3xl select-none`}
+    aria-label="Cartelera Cinemática TGP"
+  >
+    {/* ── SLIDES ── */}
+    <div id="cpe-slides" class="cpe-slides absolute inset-0">
+      {safeSlides.map((slide, i) => (
+        <article
+          class={`cpe-slide absolute inset-0 flex items-end justify-start pb-24 md:pb-32 ${i === 0 ? 'z-20' : 'z-10 opacity-0 pointer-events-none'}`}
+          data-index={i}
+          {...(i !== 0 ? { 'aria-hidden': 'true' } : {})}
+        >
+          {/* Fondo: Ken Burns */}
+          <div class="cpe-bg-wrap absolute inset-0 overflow-hidden">
+            <img
+              src={typeof slide.image === 'string' ? slide.image : slide.image?.src || ''}
+              alt={slide.title}
+              class="cpe-bg-img absolute inset-0 w-full h-full object-cover scale-100"
+              style={`object-position: ${slide.imagePosition || 'center center'};`}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              decoding="async"
+            />
+            {/* Gradiente editorial: oscurece laterales y base */}
+            <div class="absolute inset-0 bg-linear-to-r from-black/80 via-black/45 to-black/15 pointer-events-none" />
+            <div class="absolute inset-0 bg-linear-to-t from-black/75 via-transparent to-black/30 pointer-events-none" />
+          </div>
+
+          {/* Contenido Editorial */}
+          <div class="cpe-content relative z-10 w-full max-w-6xl mx-auto px-6 md:px-12 lg:px-20 flex flex-col items-start gap-2.5">
+
+            {/* Metadatos superiores: Pulso suave GSAP */}
+            <div class="cpe-meta flex items-center gap-3">
+              <span class="inline-flex items-center gap-2 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-[#C8A98B]">
+                <span class="cpe-meta-dot w-1.5 h-1.5 rounded-full bg-rust-orange inline-block shadow-[0_0_6px_rgba(200,169,139,0.8)]" />
+                {slide.category || 'Investigación'}
+              </span>
+              {slide.date && (
+                <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-white/35">
+                  {slide.date}
+                </span>
+              )}
+              {slide.readTime && (
+                <>
+                  <span class="text-white/20 text-xs">·</span>
+                  <span class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-white/35">
+                    {slide.readTime} lectura
+                  </span>
+                </>
+              )}
+            </div>
+
+            {/* Título — unificado más pequeño */}
+            <h1 class="cpe-title font-cinzel font-bold text-xl md:text-2xl leading-snug tracking-wide text-pretty max-w-3xl">
+              <a
+                href={slide.link}
+                class="bg-linear-to-br from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)] hover:from-[#C8A98B] hover:via-[#E2D4B8] hover:to-white transition-all duration-500"
+              >
+                {slide.title}
+              </a>
+            </h1>
+
+            {/* Subtítulo / excerpt */}
+            {slide.subtitle && (
+              <p class="cpe-subtitle font-serif italic text-white/50 text-sm md:text-base max-w-xl leading-relaxed drop-shadow-md line-clamp-2">
+                "{slide.subtitle}"
+              </p>
+            )}
+
+            {/* CTAs */}
+            <div class="cpe-cta flex items-center gap-3 mt-2 flex-wrap">
+              <a
+                href={slide.link}
+                class="group inline-flex items-center gap-2 px-5 py-2.5 bg-[#151718]/85 backdrop-blur-sm border border-white/15 text-[#E0E0E0]/80 font-mono font-bold text-[9px] tracking-[0.25em] uppercase rounded-lg hover:bg-rust-orange/15 hover:border-rust-orange/50 hover:text-[#C8A98B] transition-all duration-400 active:scale-95"
+              >
+                <span>Ver Hemeroteca</span>
+                <span class="opacity-50 group-hover:translate-x-0.5 transition-transform">▸</span>
+              </a>
+              {slide.papersLink && (
+                <a
+                  href={slide.papersLink}
+                  class="group inline-flex items-center gap-2 px-5 py-2.5 bg-transparent border border-white/15 text-white/55 font-mono font-bold text-[9px] tracking-[0.25em] uppercase rounded-lg hover:bg-white/5 hover:border-[#C8A98B]/45 hover:text-[#C8A98B] transition-all duration-400 active:scale-95"
+                >
+                  <span>Leer Dossier</span>
+                  <span class="opacity-40 group-hover:translate-x-0.5 transition-transform">▸</span>
+                </a>
+              )}
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    {/* ── TOOLBAR / CONTROLES AUTO-HIDE (dots, flechas y barra de progreso) ── */}
+    {safeSlides.length > 1 && (
+      <div
+        id="cpe-toolbar"
+        class="cpe-toolbar absolute inset-0 z-30 pointer-events-none opacity-0 transition-opacity duration-500"
+      >
+        {/* Dots de paginación (adaptados para hasta 30 slides) */}
+        <nav
+          id="cpe-dots"
+          class="cpe-dots absolute bottom-7 md:bottom-8 left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-1.5 md:gap-2 max-w-[92vw] px-4 py-2 rounded-full bg-black/35 backdrop-blur-md border border-white/10 pointer-events-auto shadow-xl"
+          aria-label="Indicadores de slide"
+        >
+          {safeSlides.map((_, i) => (
+            <button
+              class={`cpe-dot h-1.5 rounded-full transition-all duration-500 cursor-pointer border-0 p-0 ${i === 0 ? 'w-6 md:w-8 bg-[#C8A98B]' : 'w-1.5 md:w-2 bg-white/30 hover:bg-white/60'}`}
+              data-dot={i}
+              aria-label={`Ir al slide ${i + 1}`}
+            />
+          ))}
+        </nav>
+
+        {/* Flechas prev/next (solo visibles en hover/movimiento) */}
+        <button
+          id="cpe-prev"
+          class="cpe-arrow cpe-prev absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-black/45 border border-white/15 text-white/70 hover:bg-black/75 hover:border-[#C8A98B] hover:text-[#C8A98B] transition-all duration-300 active:scale-90 pointer-events-auto shadow-lg"
+          aria-label="Slide anterior"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <button
+          id="cpe-next"
+          class="cpe-arrow cpe-next absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-black/45 border border-white/15 text-white/70 hover:bg-black/75 hover:border-[#C8A98B] hover:text-[#C8A98B] transition-all duration-300 active:scale-90 pointer-events-auto shadow-lg"
+          aria-label="Slide siguiente"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+
+      </div>
+    )}
+  </section>
+)}
+
+<script>
+  import gsap from 'gsap';
+
+  const SLIDE_DURATION  = 7000;     // ms por slide
+  const AUTO_RESUME     = 8000;     // ms de inactividad → retoma auto
+  const KB_SCALE        = 1.06;     // Ken Burns scale destino
+  const FADE_DUR        = 1.1;      // s para cross-fade entre slides
+  const SWIPE_THRESHOLD = 50;       // px mínimos para contar como swipe
+
+  function initCPE() {
+    const roots = Array.from(document.querySelectorAll<HTMLElement>('.cpe-root'));
+    if (roots.length === 0) return;
+
+    roots.forEach(root => {
+      if (root.dataset.cpeInitialized === 'true') return;
+      root.dataset.cpeInitialized = 'true';
+
+      const slideEls = Array.from(root.querySelectorAll<HTMLElement>('.cpe-slide'));
+      const dotEls   = Array.from(root.querySelectorAll<HTMLElement>('.cpe-dot'));
+      const progress = root.querySelector<HTMLElement>('.cpe-progress');
+      const prevBtn  = root.querySelector<HTMLElement>('.cpe-prev');
+      const nextBtn  = root.querySelector<HTMLElement>('.cpe-next');
+      const toolbar  = root.querySelector<HTMLElement>('.cpe-toolbar');
+      const total    = slideEls.length;
+
+      if (total === 0) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let current = 0;
+    let isAnimating = false;
+    let autoTimer: ReturnType<typeof setTimeout> | undefined;
+    let resumeTimer: ReturnType<typeof setTimeout> | undefined;
+    let toolbarTimer: ReturnType<typeof setTimeout> | undefined;
+    let progressTween: gsap.core.Tween | undefined;
+    let metaPulseTween: gsap.core.Tween | undefined;
+
+    /* ── Auto-hide de Toolbar en movimiento / hover ── */
+    function showToolbar() {
+      if (!toolbar) return;
+      toolbar.classList.remove('opacity-0');
+      toolbar.classList.add('opacity-100');
+    }
+
+    function hideToolbar() {
+      if (!toolbar) return;
+      toolbar.classList.remove('opacity-100');
+      toolbar.classList.add('opacity-0');
+    }
+
+    function resetToolbarTimer() {
+      showToolbar();
+      clearTimeout(toolbarTimer);
+      toolbarTimer = setTimeout(() => {
+        hideToolbar();
+      }, 2800);
+    }
+
+    root.addEventListener('mousemove', resetToolbarTimer);
+    root.addEventListener('mouseenter', resetToolbarTimer);
+    root.addEventListener('touchstart', resetToolbarTimer, { passive: true });
+    root.addEventListener('mouseleave', () => {
+      clearTimeout(toolbarTimer);
+      hideToolbar();
+    });
+
+    /* ── Entrada de slide ── */
+    function slideIn(slide: HTMLElement, done: (() => void) | null) {
+      const bg       = slide.querySelector<HTMLElement>('.cpe-bg-img');
+      const metaEl   = slide.querySelector<HTMLElement>('.cpe-meta');
+      const titleEl  = slide.querySelector<HTMLElement>('.cpe-title');
+      const subEl    = slide.querySelector<HTMLElement>('.cpe-subtitle');
+      const ctaEl    = slide.querySelector<HTMLElement>('.cpe-cta');
+      const dot      = slide.querySelector<HTMLElement>('.cpe-meta-dot');
+
+      slide.classList.remove('pointer-events-none');
+      slide.setAttribute('aria-hidden', 'false');
+      slide.style.zIndex = '20';
+
+      if (reduceMotion) {
+        gsap.set(slide, { opacity: 1 });
+        done?.();
+        return;
+      }
+
+      const tl = gsap.timeline({ onComplete: done ?? undefined });
+
+      /* Slide fade-in */
+      tl.fromTo(slide, { opacity: 0 }, { opacity: 1, duration: 0.85, ease: 'power2.inOut' }, 0);
+
+      /* Ken Burns: escala milimétrica y ascenso vertical suave durante el slide */
+      if (bg) {
+        gsap.set(bg, { scale: 1, yPercent: 0 });
+        gsap.to(bg, {
+          scale: 1.035,
+          yPercent: -2.5,
+          duration: SLIDE_DURATION / 1000 + FADE_DUR,
+          ease: 'none',
+        });
+      }
+
+      /* Textos: stagger desde abajo y luego fade out ("desvanecen al ms") */
+      const textEls = [metaEl, titleEl, subEl, ctaEl].filter(Boolean) as HTMLElement[];
+      if (textEls.length > 0) {
+        tl.fromTo(
+          textEls,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.65, stagger: 0.12, ease: 'power3.out', clearProps: 'transform' },
+          0.35
+        );
+
+        // Desvanecimiento rápido luego de 2.5s de permanencia
+        tl.to(
+          textEls,
+          { opacity: 0, duration: 1.2, ease: 'power2.inOut' },
+          "+=2.5"
+        );
+      }
+
+      /* Pulso del dot: yoyo opacidad */
+      if (dot) {
+        metaPulseTween?.kill();
+        metaPulseTween = gsap.to(dot, {
+          opacity: 0.35,
+          duration: 1.4,
+          ease: 'sine.inOut',
+          yoyo: true,
+          repeat: -1,
+          delay: 0.8,
+        });
+      }
+    }
+
+    /* ── Salida de slide ── */
+    function slideOut(slide: HTMLElement, done: (() => void) | null) {
+      if (reduceMotion) {
+        gsap.set(slide, { opacity: 0 });
+        slide.classList.add('pointer-events-none');
+        slide.setAttribute('aria-hidden', 'true');
+        slide.style.zIndex = '10';
+        done?.();
+        return;
+      }
+      gsap.to(slide, {
+        opacity: 0,
+        duration: FADE_DUR * 0.85,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          slide.classList.add('pointer-events-none');
+          slide.setAttribute('aria-hidden', 'true');
+          slide.style.zIndex = '10';
+          done?.();
+        },
+      });
+    }
+
+    /* ── Dots ── */
+    function updateDots(idx: number) {
+      dotEls.forEach((d, i) => {
+        const active = i === idx;
+        d.classList.toggle('w-6', active);
+        d.classList.toggle('md:w-8', active);
+        d.classList.toggle('bg-[#C8A98B]', active);
+        d.classList.toggle('w-1.5', !active);
+        d.classList.toggle('md:w-2', !active);
+        d.classList.toggle('bg-white/30', !active);
+      });
+    }
+
+    /* ── Barra de progreso ── */
+    function startProgress() {
+      progressTween?.kill();
+      if (!progress) return;
+      gsap.set(progress, { width: '0%' });
+      progressTween = gsap.to(progress, {
+        width: '100%',
+        duration: SLIDE_DURATION / 1000,
+        ease: 'none',
+      });
+    }
+
+    /* ── Ir al slide idx ── */
+    function goTo(idx: number) {
+      if (isAnimating || idx === current) return;
+      isAnimating = true;
+
+      const prevIdx = current;
+      const nextIdx = ((idx % total) + total) % total;
+      current = nextIdx;
+      updateDots(current);
+      startProgress();
+
+      slideEls[nextIdx].style.zIndex = '20';
+      slideEls[prevIdx].style.zIndex = '15';
+
+      /* Cross-fade: salida del anterior, entrada del nuevo en paralelo */
+      slideOut(slideEls[prevIdx], null);
+      slideIn(slideEls[nextIdx], () => { isAnimating = false; });
+    }
+
+    /* ── Auto-avance ── */
+    function scheduleNext() {
+      clearTimeout(autoTimer);
+      autoTimer = setTimeout(() => {
+        goTo((current + 1) % total);
+        scheduleNext();
+      }, SLIDE_DURATION);
+    }
+
+    function pauseAuto() {
+      clearTimeout(autoTimer);
+      clearTimeout(resumeTimer);
+      progressTween?.pause();
+    }
+
+    function resumeAuto() {
+      clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(() => {
+        progressTween?.play();
+        scheduleNext();
+      }, AUTO_RESUME);
+    }
+
+    /* ── Botones ── */
+    prevBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      pauseAuto();
+      goTo((current - 1 + total) % total);
+      resumeAuto();
+    });
+    nextBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      pauseAuto();
+      goTo((current + 1) % total);
+      resumeAuto();
+    });
+
+    /* ── Dots click ── */
+    dotEls.forEach(d => {
+      d.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = Number(d.dataset['dot']);
+        if (idx === current) return;
+        pauseAuto();
+        goTo(idx);
+        resumeAuto();
+      });
+    });
+
+    /* ── Swipe / drag (respetando clicks en enlaces/botones) ── */
+    let dragStartX = 0;
+    let isDragging = false;
+
+    root.addEventListener('pointerdown', (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null;
+      // No capturar pointer si el click fue sobre un enlace, botón o nav
+      if (target?.closest('a, button, nav, input, select')) {
+        return;
+      }
+      dragStartX = e.clientX;
+      isDragging = true;
+      pauseAuto();
+      (root as HTMLElement).setPointerCapture(e.pointerId);
+    });
+
+    root.addEventListener('pointerup', (e: PointerEvent) => {
+      if (!isDragging) return;
+      isDragging = false;
+      const delta = e.clientX - dragStartX;
+      if (Math.abs(delta) > SWIPE_THRESHOLD) {
+        goTo(delta < 0 ? (current + 1) % total : (current - 1 + total) % total);
+      }
+      resumeAuto();
+    });
+
+    root.addEventListener('pointercancel', () => {
+      isDragging = false;
+      resumeAuto();
+    });
+
+    /* ── Teclado ── */
+    const onKey = (e: KeyboardEvent) => {
+      if (!document.getElementById('cpe-root')) return;
+      if (e.key === 'ArrowLeft')  { pauseAuto(); goTo((current - 1 + total) % total); resumeAuto(); }
+      if (e.key === 'ArrowRight') { pauseAuto(); goTo((current + 1) % total); resumeAuto(); }
+    };
+    document.addEventListener('keydown', onKey);
+
+    /* ── Arranque ── */
+    gsap.set(slideEls[0], { opacity: 1 });
+    slideEls[0].classList.remove('pointer-events-none');
+    slideEls[0].removeAttribute('aria-hidden');
+    if (!reduceMotion) slideIn(slideEls[0], null);
+
+    updateDots(0);
+    startProgress();
+    resetToolbarTimer();
+    if (total > 1) scheduleNext();
+
+    /* ── Cleanup ── */
+    document.addEventListener('astro:before-swap', () => {
+      clearTimeout(autoTimer);
+      clearTimeout(resumeTimer);
+      clearTimeout(toolbarTimer);
+      progressTween?.kill();
+      metaPulseTween?.kill();
+      gsap.killTweensOf(slideEls);
+      gsap.killTweensOf(Array.from(root.querySelectorAll('.cpe-bg-img')));
+      document.removeEventListener('keydown', onKey);
+    }, { once: true });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initCPE);
+  document.addEventListener('astro:page-load', initCPE);
+</script>
+
+<style>
+  /* Evita drag de imagen nativo */
+  .cpe-root img { user-drag: none; -webkit-user-drag: none; pointer-events: none; }
+
+  /* Cursor grab en desktop y pointer en enlaces/botones */
+  @media (pointer: fine) {
+    .cpe-root { cursor: grab; }
+    .cpe-root:active { cursor: grabbing; }
+
+    .cpe-root a,
+    .cpe-root button,
+    .cpe-root [role="button"],
+    .cpe-arrow,
+    .cpe-dot {
+      cursor: pointer !important;
+    }
+  }
+
+  /* GPU layers para fluidez */
+  .cpe-slide { will-change: opacity; }
+  .cpe-bg-img { will-change: transform; }
+
+  /* Dots: transición de ancho fluida */
+  .cpe-dot { transition: width 0.45s cubic-bezier(0.4,0,0.2,1), background-color 0.4s ease; }
+</style>

@@ -67,7 +67,7 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(entry.t
 ---
 
 <article
-  class={`cinematic-archive-card cinematic-card-lantern group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 bg-theme-dark/80 transition-all duration-500 hover:border-[#C8A98B]/50 shadow-2xl flex flex-col justify-end w-full ${minHeightClass}`}
+  class={`cinematic-archive-card cinematic-card-lantern card-hover-cinematic group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/8 bg-theme-dark/80 shadow-2xl flex flex-col justify-end w-full ${minHeightClass}`}
   data-category={normalizeCategory(entry.category)}
   data-year={year}
 >
@@ -79,7 +79,7 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(entry.t
       class={`absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none ${
         enableCinemagraph
           ? 'cinemagraph-ken-burns'
-          : 'group-hover:scale-103 group-hover:brightness-95 transition-transform duration-700 ease-out'
+          : 'group-hover:scale-[1.018] group-hover:brightness-95 transition-transform duration-700 delay-75 ease-out'
       }`}
     />
   ) : (

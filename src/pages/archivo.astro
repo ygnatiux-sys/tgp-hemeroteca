@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
+import CinematicPostEngine from '../components/CinematicPostEngine.astro';
 import {
   getPublishableEssays,
   formatCategory,
@@ -63,6 +64,42 @@ if (uncategorized.length > 0) {
     catLabel: 'Otras Investigaciones',
     essays: uncategorized
   });
+}
+
+// 4 Tarjetas Destacadas de Categoría para el Header del Archivo
+const categoryHighlightCards = essaysByCategory.slice(0, 4).map(group => {
+  const leadEssay = group.essays[0];
+  const yearRange = group.essays
+    .map(e => e.entry.date ? new Date(e.entry.date).getFullYear() : null)
+    .filter(Boolean)
+    .sort((a, b) => (a as number) - (b as number));
+  
+  const yearLabel = yearRange.length > 0
+    ? yearRange[0] === yearRange[yearRange.length - 1]
+      ? `${yearRange[0]}`
+      : `${yearRange[0]}–${yearRange[yearRange.length - 1]}`
+    : '';
+
+  return {
+    catKey: group.catKey,
+    catLabel: group.catLabel,
+    count: group.essays.length,
+    yearLabel,
+    img: leadEssay?.img,
+  };
+});
+
+// Helper para mapear essays a SlideData de CinematicPostEngine
+function mapToSlideData(essays: typeof resolvedEssays) {
+  return essays.map(e => ({
+    id: e.slug,
+    title: e.entry.title || 'Dossier',
+    subtitle: e.entry.excerpt || '',
+    category: formatCategory(e.entry.category),
+    date: e.entry.date ? formatYear(e.entry.date) : '',
+    image: (e.img as any)?.src ?? e.img,
+    link: `/papers/${e.slug}`,
+  }));
 }
 
 // ─── HELPER PARA SECUENCIAS CINE PREMIER (1 HERO FULL + DÚO 60/40) ──────────
@@ -141,32 +178,60 @@ function createPremierSequences(essays: typeof resolvedEssays) {
       ══════════════════════════════════════════════════════════════════ */}
       <div id="view-categories" role="tabpanel" aria-labelledby="tab-btn-categories" class="archive-view-panel flex flex-col gap-10">
         
-        {/* Barra de Filtros de Categoría con Desplegable Linter Elegante */}
+        {/* ─── SERIE DE 4 CARDS DE CATEGORÍAS (CON IMÁGENES + FECHAS + CONTEO) ─── */}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 pb-4 border-b border-white/10">
+          {categoryHighlightCards.map(card => (
+            <button
+              type="button"
+              data-cat-filter-btn={card.catKey}
+              class="cat-filter-btn group card-hover-cinematic relative overflow-hidden rounded-2xl border border-white/10 bg-[#151718]/90 text-left p-4 md:p-5 flex flex-col justify-end min-h-37.5 md:min-h-42.5 cursor-pointer transition-all duration-500"
+            >
+              {card.img && (
+                <img
+                  src={(card.img as any)?.src ?? card.img}
+                  alt={card.catLabel}
+                  class="absolute inset-0 w-full h-full object-cover brightness-[0.45] group-hover:scale-105 group-hover:brightness-[0.55] transition-all duration-700"
+                />
+              )}
+              <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
+              <div class="relative z-10 flex flex-col gap-1">
+                <span class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-[#C8A98B] font-bold">
+                  {card.count} ARTÍCULO{card.count > 1 ? 'S' : ''} {card.yearLabel && `• ${card.yearLabel}`}
+                </span>
+                <h3 class="font-cinzel font-extrabold text-lg md:text-xl text-white tracking-wide uppercase group-hover:text-[#C8A98B] transition-colors">
+                  {card.catLabel}
+                </h3>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Barra de Filtros Unificada de Archivo (Categoría + Tema) */}
         <div class="flex items-center gap-3 flex-wrap relative z-30 pb-3 border-b border-white/10">
-          {/* Botón Rápido TODAS */}
+          {/* Botón TODAS */}
           <button
             type="button"
             data-cat-filter-btn="all"
-            class="cat-filter-btn font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 rounded-xl border border-transparent text-white/60 bg-transparent hover:border-rust-orange hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.3)] cursor-pointer transition-all duration-300"
+            class="cat-filter-btn font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 rounded-xl border border-transparent text-[#C8A98B] bg-transparent hover:border-[#C8A98B] hover:bg-white/5 cursor-pointer transition-all duration-300 font-bold"
           >
-            Todas ({publishable.length})
+            TODAS LAS INVESTIGACIONES ({publishable.length})
           </button>
 
-          {/* Desplegable Linter Selector de Categorías */}
+          {/* Desplegable Unificado Categoría / Tema */}
           <div class="relative inline-block text-left">
             <select
               id="cat-linter-select"
-              aria-label="Seleccionar categoría de investigación"
-              class="appearance-none font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 pr-9 rounded-xl border border-transparent text-rust-orange bg-transparent hover:bg-white/10 hover:border-rust-orange hover:shadow-[0_0_16px_rgba(200,169,139,0.35)] cursor-pointer transition-all duration-300 outline-none font-bold"
+              aria-label="Seleccionar categoría o tema de investigación"
+              class="appearance-none font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 pr-9 rounded-xl border border-white/10 text-[#C8A98B] bg-[#151718]/90 hover:bg-[#C8A98B]/10 hover:border-[#C8A98B] cursor-pointer transition-all duration-300 outline-none font-bold"
             >
-              <option value="all" class="bg-[#0a0a0a] text-white">CATEGORÍAS ▾</option>
+              <option value="all" class="bg-[#0a0a0a] text-white">POR CATEGORÍA / TEMA ▾</option>
               {categories.map(cat => (
-                <option value={cat} class="bg-(--bg-main) text-rust-orange">
+                <option value={cat} class="bg-[#151718] text-[#C8A98B]">
                   • {formatCategory(cat).toUpperCase()}
                 </option>
               ))}
             </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-rust-orange">
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#C8A98B]">
               <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
                 <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
               </svg>
@@ -174,95 +239,75 @@ function createPremierSequences(essays: typeof resolvedEssays) {
           </div>
         </div>
 
-        {/* Lista de Categorías con estructura cinemática 1+2+Ver más */}
-        <section class="flex flex-col gap-20" id="archive-list">
+        {/* Lista de Categorías con estructura cinemática: Post #1 Motor Cinemático Auto + 2 Amplias + Individuales 80/20 */}
+        <section class="flex flex-col gap-16 md:gap-24" id="archive-list">
           {essaysByCategory.map(group => {
-            const heroEssay  = group.essays[0];
-            const secondA    = group.essays[1] ?? null;
-            const secondB    = group.essays[2] ?? null;
-            const remaining  = group.essays.length - 3;
+            const slideBatch = mapToSlideData(group.essays);
+            const secondA = group.essays[1] ?? null;
+            const secondB = group.essays[2] ?? null;
+            const remainingEssays = group.essays.slice(3);
 
             return (
-              <div class="category-block flex flex-col gap-6" data-category-group={group.catKey}>
+              <div class="category-block flex flex-col gap-8" data-category-group={group.catKey}>
                 {/* Barra Editorial de Categoría */}
-                <div class="editorial-bar flex items-center justify-between pb-3">
+                <div class="editorial-bar flex items-center justify-between pb-2 border-b border-white/10">
                   <div class="flex items-center gap-3">
-                    <span class="w-1.5 h-1.5 rounded-full bg-rust-orange shadow-[0_0_6px_#C8A98B]" />
-                    <h2 class="font-cinzel font-bold text-lg md:text-xl tracking-wider bg-linear-to-b from-[#FFFFFF] via-[#8E8E93] to-[#1C1C1E] bg-clip-text text-transparent">
-                      {group.catLabel}
+                    <span class="w-2 h-2 rounded-full bg-rust-orange shadow-[0_0_8px_#C8A98B]" />
+                    <h2 class="font-cinzel font-bold text-xl md:text-2xl tracking-wider text-white">
+                      • {group.catLabel.toUpperCase()}
                     </h2>
                   </div>
-                  {remaining > 0 && (
-                    <a
-                      href={`/archivo?categoria=${encodeURIComponent(group.catKey)}`}
-                      class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-white/35 hover:text-rust-orange transition-colors"
-                    >
-                      +{remaining} más →
-                    </a>
-                  )}
+                  <span class="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40">
+                    {group.essays.length} DOSSIERES EN CATEGORÍA
+                  </span>
                 </div>
 
-                {/* Hero Principal */}
-                <article class="group w-full relative overflow-hidden rounded-2xl border border-white/8 bg-white/2 hover:border-rust-orange/30 transition-all duration-700">
-                  <div class="flex flex-col lg:flex-row lg:min-h-80">
-                    {heroEssay.img && (
-                      <div class="relative overflow-hidden lg:w-[50%] shrink-0 aspect-video lg:aspect-auto">
-                        <img
-                          src={(heroEssay.img as any)?.src ?? heroEssay.img}
-                          alt={heroEssay.entry.title || 'Dossier'}
-                          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03] brightness-85"
-                          loading="lazy"
-                        />
-                        <div class="absolute inset-0 bg-linear-to-r from-transparent to-(--bg-main)/80 hidden lg:block pointer-events-none" />
-                        <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/70 via-transparent to-transparent lg:hidden pointer-events-none" />
-                      </div>
-                    )}
-                    <div class="flex flex-col justify-between p-6 md:p-8 lg:p-10 flex-1">
-                      <div class="flex flex-col gap-3">
-                        <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-rust-orange/70">{heroEssay.entry.category}</span>
-                        <h3 class="font-cinzel font-bold text-xl sm:text-2xl md:text-3xl leading-tight group-hover:text-rust-orange/85 transition-colors">
-                          <a href={`/papers/${heroEssay.slug}`}>{heroEssay.entry.title}</a>
-                        </h3>
-                        {heroEssay.entry.excerpt && (
-                          <p class="font-serif italic text-[#E0E0E0]/50 text-sm leading-relaxed line-clamp-2">
-                            "{heroEssay.entry.excerpt}"
-                          </p>
-                        )}
-                      </div>
-                      <div class="mt-6 pt-4 border-t border-white/5">
-                        <a href={`/papers/${heroEssay.slug}`} class="inline-flex items-center gap-2 px-4 py-2 bg-[#151718]/90 border border-white/10 text-[#E0E0E0]/65 font-mono font-bold text-[8.5px] tracking-[0.25em] uppercase rounded-lg hover:bg-rust-orange/10 hover:border-rust-orange/45 hover:text-rust-orange transition-all">
-                          Ver Registro ▸
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </article>
+                {/* 1. Header Motor Cinemático (CinematicPostEngine.astro): Auto-batch de la Categoría */}
+                <div class="w-full card-hover-cinematic overflow-hidden rounded-2xl md:rounded-3xl border border-white/8 shadow-2xl">
+                  <CinematicPostEngine
+                    slides={slideBatch}
+                    heightClass="h-[400px] sm:h-[460px] md:h-[500px]"
+                  />
+                </div>
 
-                {/* Dos Menores */}
+                {/* 2. Dos Cards Debajo También Amplias (Grid 2 Columnas) */}
                 {(secondA || secondB) && (
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                     {[secondA, secondB].filter(Boolean).map(e => e && (
-                      <article class="group relative overflow-hidden rounded-xl border border-white/8 bg-white/2 hover:border-rust-orange/30 transition-all duration-500 flex flex-col">
+                      <article class="card-hover-cinematic group relative overflow-hidden rounded-2xl border border-white/8 bg-[#151718]/90 flex flex-col justify-between min-h-85 md:min-h-95">
                         {e.img && (
-                          <div class="relative overflow-hidden aspect-video">
+                          <div class="relative overflow-hidden aspect-video md:aspect-16/10 w-full shrink-0">
                             <img
                               src={(e.img as any)?.src ?? e.img}
                               alt={e.entry.title || 'Dossier'}
-                              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04] brightness-80"
+                              class="w-full h-full object-cover transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-85"
                               loading="lazy"
                             />
-                            <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/70 via-transparent to-transparent pointer-events-none" />
+                            <div class="absolute inset-0 bg-linear-to-t from-[#151718]/90 via-transparent to-transparent pointer-events-none" />
                           </div>
                         )}
-                        <div class="flex flex-col justify-between p-5 flex-1">
+                        <div class="flex flex-col justify-between p-6 flex-1">
                           <div class="flex flex-col gap-2">
-                            <span class="font-mono text-[8px] uppercase tracking-[0.3em] text-rust-orange/65">{e.entry.category}</span>
-                            <h4 class="font-cinzel font-bold text-base leading-snug group-hover:text-rust-orange/80 transition-colors line-clamp-2">
+                            <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-[#C8A98B] font-bold">
+                              {e.entry.category}
+                            </span>
+                            <h3 class="font-cinzel font-bold text-xl md:text-2xl leading-snug text-white group-hover:text-[#C8A98B] transition-colors line-clamp-2">
                               <a href={`/papers/${e.slug}`}>{e.entry.title}</a>
-                            </h4>
+                            </h3>
+                            {e.entry.excerpt && (
+                              <p class="font-serif italic text-white/60 text-xs md:text-sm line-clamp-2 mt-1">
+                                "{e.entry.excerpt}"
+                              </p>
+                            )}
                           </div>
-                          <div class="mt-4 pt-3 border-t border-white/5">
-                            <a href={`/papers/${e.slug}`} class="font-mono text-[8px] uppercase tracking-[0.25em] text-white/30 hover:text-rust-orange transition-colors">Ver Registro ▸</a>
+                          <div class="mt-5 pt-3 border-t border-white/5 flex items-center justify-between">
+                            <a
+                              href={`/papers/${e.slug}`}
+                              class="inline-flex items-center gap-2 px-4 py-2 bg-[#1A1C1D]/90 border border-white/10 text-[#E0E0E0]/75 font-mono font-bold text-[8.5px] tracking-[0.25em] uppercase rounded-lg hover:bg-[#C8A98B]/10 hover:border-[#C8A98B]/45 hover:text-[#C8A98B] transition-all"
+                            >
+                              <span>VER REGISTRO</span>
+                              <span>▸</span>
+                            </a>
                           </div>
                         </div>
                       </article>
@@ -270,15 +315,45 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                   </div>
                 )}
 
-                {/* Ver más si hay más de 3 */}
-                {remaining > 0 && (
-                  <div class="text-center pt-2">
-                    <a
-                      href={`/archivo?categoria=${encodeURIComponent(group.catKey)}`}
-                      class="inline-flex items-center gap-2 font-mono text-[8.5px] uppercase tracking-[0.3em] px-6 py-2.5 rounded-lg bg-[#151718]/90 border border-white/8 text-white/40 hover:border-rust-orange/40 hover:text-rust-orange transition-all"
-                    >
-                      Ver {remaining} dossieres más en {group.catLabel} →
-                    </a>
+                {/* 3. Posts Individuales Restantes (#4, #5, etc.): Proporción Uniforme 80/20 */}
+                {remainingEssays.length > 0 && (
+                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-2">
+                    {remainingEssays.map(e => (
+                      <article class="card-hover-cinematic group relative overflow-hidden rounded-2xl border border-white/8 bg-[#151718]/80 flex flex-col justify-between">
+                        {/* 80% Viewport Imagen */}
+                        {e.img && (
+                          <div class="relative overflow-hidden aspect-video md:aspect-16/10 w-full shrink-0">
+                            <img
+                              src={(e.img as any)?.src ?? e.img}
+                              alt={e.entry.title || 'Dossier'}
+                              class="w-full h-full object-cover transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-85"
+                              loading="lazy"
+                            />
+                            <div class="absolute inset-0 bg-linear-to-t from-[#151718]/80 via-transparent to-transparent pointer-events-none" />
+                          </div>
+                        )}
+                        {/* 20% Contenido Metadata */}
+                        <div class="flex flex-col justify-between p-5 md:p-6 flex-1">
+                          <div class="flex flex-col gap-2">
+                            <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-[#C8A98B]/80 font-bold">
+                              {e.entry.category}
+                            </span>
+                            <h4 class="font-cinzel font-bold text-lg md:text-xl leading-snug text-white group-hover:text-[#C8A98B] transition-colors line-clamp-2">
+                              <a href={`/papers/${e.slug}`}>{e.entry.title}</a>
+                            </h4>
+                          </div>
+                          <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+                            <a
+                              href={`/papers/${e.slug}`}
+                              class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-white/50 hover:text-[#C8A98B] transition-colors flex items-center gap-1"
+                            >
+                              <span>VER REGISTRO</span>
+                              <span>▸</span>
+                            </a>
+                          </div>
+                        </div>
+                      </article>
+                    ))}
                   </div>
                 )}
               </div>

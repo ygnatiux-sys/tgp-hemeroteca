@@ -941,7 +941,7 @@ article img,
   border-radius: 1.5rem;
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
   cursor: pointer;
-  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.7s ease, opacity 0.5s ease;
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 80ms, filter 0.7s ease 80ms, opacity 0.5s ease;
   will-change: transform, filter;
 }
 
@@ -949,6 +949,177 @@ article img:hover,
 .prose img:hover, 
 #wiki-article-body img:hover,
 .cinematic-img:hover {
-  transform: scale(1.025);
-  filter: brightness(1.06);
+  transform: scale(1.018);
+  filter: brightness(1.03);
 }
+
+/* ═════════════════════════════════════════════════════════════════════════
+   WIDGET DE ESCAPE NUDO CINEMÁTICO 2026 (WOC) — SIN BORDE Y SIN GLASS
+═════════════════════════════════════════════════════════════════════════ */
+.woc-root {
+  perspective: 1000px;
+}
+
+.woc-button-naked {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 9999px;
+  position: relative;
+  border: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+  background-color: rgba(0, 0, 0, 0.25);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s ease, transform 0.4s ease;
+}
+
+@media (min-width: 768px) {
+  .woc-button-naked {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+}
+
+.woc-button-naked:hover {
+  background-color: rgba(26, 28, 29, 0.85);
+  transform: scale(1.05);
+}
+
+/* Contenedor interno con giro 3D rápido (0.38s) */
+.woc-inner-naked {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  transform-style: preserve-3d;
+  transition: transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.woc-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.woc-face-0 {
+  transform: rotateY(0deg);
+}
+
+.woc-face-180 {
+  transform: rotateY(180deg);
+}
+
+.woc-face-360 {
+  transform: rotateY(360deg);
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   ESTÁNDAR EDITORIAL GLOBAL DE SELECCIÓN DE TARJETAS Y HEROS
+   - INVISIBILIDAD TOTAL DE BORDE SUPERIOR E IZQUIERDO (Base y Hover)
+   - SOLO BORDE INFERIOR COMPLETO Y BORDE DERECHO HASTA LA MITAD
+   - SOMBRA PROYECTADA EXCLUSIVAMENTE EN LADO INFERIOR Y LATERAL DERECHO
+═════════════════════════════════════════════════════════════════════════ */
+.card-hover-cinematic,
+.cinematic-archive-card {
+  position: relative;
+  border-top-color: transparent !important;
+  border-left-color: transparent !important;
+  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 80ms, box-shadow 0.5s ease;
+}
+
+.card-hover-cinematic::after,
+.cinematic-archive-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  border: 0;
+  border-top: 0 !important;
+  border-left: 0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  /* Máscara lineal: el borde lateral derecho llega exactamente a la mitad (50%) difuminándose */
+  mask-image: linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 35%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 65%);
+  -webkit-mask-image: linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 35%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 65%);
+  z-index: 20;
+}
+
+.card-hover-cinematic:hover::after,
+.cinematic-archive-card:hover::after {
+  opacity: 1;
+}
+
+.card-hover-cinematic:hover,
+.cinematic-archive-card:hover {
+  border-top-color: transparent !important;
+  border-left-color: transparent !important;
+  /* Sombra proyectada exclusivamente hacia el lado inferior y lateral derecho */
+  box-shadow: 14px 22px 42px -10px rgba(0, 0, 0, 0.95) !important;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   ESTÁNDAR EDITORIAL GLOBAL DE SELECCIÓN DE BOTONES
+   - Aplica automáticamente a todo button, .btn y enlaces tipo botón.
+   - Borde superior e izquierdo: 100% invisibles.
+   - Borde inferior: completo con opacidad 0.10.
+   - Borde lateral derecho: llega hasta el 50% con opacidad 0.05.
+   - Sombra proyectada sutil al hover.
+═════════════════════════════════════════════════════════════════════════ */
+button:not(.woc-button-naked):not(.cpe-dot),
+.btn,
+a[class*="bg-"],
+a[class*="border"] {
+  position: relative;
+  border-top-color: transparent !important;
+  border-left-color: transparent !important;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+button:not(.woc-button-naked):not(.cpe-dot)::after,
+.btn::after,
+a[class*="bg-"]::after,
+a[class*="border"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border: 0;
+  border-top: 0 !important;
+  border-left: 0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  mask-image: linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 35%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 65%);
+  -webkit-mask-image: linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 35%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 65%);
+  z-index: 10;
+}
+
+button:not(.woc-button-naked):not(.cpe-dot):hover::after,
+.btn:hover::after,
+a[class*="bg-"]:hover::after,
+a[class*="border"]:hover::after {
+  opacity: 1;
+}
+
+button:not(.woc-button-naked):not(.cpe-dot):hover,
+.btn:hover,
+a[class*="bg-"]:hover,
+a[class*="border"]:hover {
+  border-top-color: transparent !important;
+  border-left-color: transparent !important;
+  box-shadow: 6px 12px 24px -4px rgba(0, 0, 0, 0.75);
+}

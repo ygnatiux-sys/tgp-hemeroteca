@@ -150,16 +150,6 @@ export const StickyReaderHeader: React.FC<Props> = ({ title, accentColor = '#B55
 
         </div>
 
-        {/* Capa de Progreso de Lectura con Color Heredado */}
-        <div className="absolute bottom-0 left-0 w-full h-0.5 bg-black/10 dark:bg-white/10">
-          <div 
-            className="h-full transition-all duration-150 ease-out bg-rust-orange"
-            style={{ 
-              width: `${Math.min(100, Math.max(0, progress))}%`,
-              boxShadow: `0 0 10px rgba(200,169,139,0.6)`
-            }}
-          />
-        </div>
       </header>
     </>
   );

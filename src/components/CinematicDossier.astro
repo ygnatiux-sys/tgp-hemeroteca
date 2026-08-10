@@ -2,6 +2,7 @@
 // src/components/CinematicDossier.astro
 import SpotifyIcon from './icons/Spotify.astro';
 import YouTubeIcon from './icons/YouTube.astro';
+import { QuickReturnButton } from './QuickReturnButton';
 
 export interface Fragment {
   image: any;
@@ -41,15 +42,21 @@ const { fragments = [], isModal = false } = Astro.props;
       <article class={`slide w-full h-full absolute inset-0 flex items-center justify-center ${index === 0 ? 'active z-20' : 'opacity-0 pointer-events-none z-10'}`} data-index={index}>
          
          <div class="absolute inset-4 md:inset-8 overflow-hidden rounded-3xl md:rounded-[2.5rem] shadow-2xl bg-black">
-           {/* Imagen de fondo con scale para el efecto Ken Burns */}
+           {/* Imagen de fondo — clase cpe-bg-img para motor Engine */}
            <img 
              src={typeof fragment.image === 'string' ? fragment.image : fragment.image?.src} 
              alt={fragment.highlight || "Registro Documental"} 
-             class="bg-image absolute inset-0 w-full h-full object-cover scale-100"
+             class="cpe-bg-img absolute inset-0 w-full h-full object-cover scale-100"
              style={`object-position: ${fragment.position || 'center center'}; transform-origin: ${fragment.origin || 'center center'};`} 
+             loading={index === 0 ? 'eager' : 'lazy'}
+             decoding="async"
            />
            
-           {/* Overlay de oscurecimiento y vignette radial para esquinas (Softens corners) */}
+           {/* Gradientes editoriales */}
+           <div class="absolute inset-0 bg-linear-to-r from-black/80 via-black/50 to-black/20 pointer-events-none" />
+           <div class="absolute inset-0 bg-linear-to-t from-black/75 via-transparent to-black/30 pointer-events-none" />
+           
+           {/* Overlay de vignette para esquinas */}
            <div class="overlay shadow-[inset_0_0_180px_20px_rgba(0,0,0,1)] mix-blend-multiply absolute inset-0 z-0 pointer-events-none"></div>
          </div>
          
@@ -92,9 +99,57 @@ const { fragments = [], isModal = false } = Astro.props;
                </a>
              </div>
            )}
+
+           {/* Íconos Spotify / YouTube */}
+           {(fragment.spotifyLink || fragment.youtubeLink) && (
+             <div class="immersive-icons flex items-center gap-4 mt-2">
+               {fragment.spotifyLink && (
+                 <a href={fragment.spotifyLink} target="_blank" rel="noopener noreferrer" class="opacity-60 hover:opacity-100 transition-opacity">
+                   <SpotifyIcon />
+                 </a>
+               )}
+               {fragment.youtubeLink && (
+                 <a href={fragment.youtubeLink} target="_blank" rel="noopener noreferrer" class="opacity-60 hover:opacity-100 transition-opacity">
+                   <YouTubeIcon />
+                 </a>
+               )}
+             </div>
+           )}
          </div>
       </article>
     ))}
+
+    {/* ── TOOLBAR CPE: Dots + Flechas (auto-hide, solo si hay más de 1 slide) ── */}
+    {fragments.length > 1 && (
+      <div class="dossier-toolbar absolute inset-0 z-30 pointer-events-none opacity-0 transition-opacity duration-500">
+        {/* Dots de paginación */}
+        <nav class="dossier-dots absolute bottom-7 md:bottom-8 left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-1.5 md:gap-2 max-w-[92vw] px-4 py-2 rounded-full bg-black/35 backdrop-blur-md border border-white/10 pointer-events-auto shadow-xl" aria-label="Indicadores de slide">
+          {fragments.map((_, i) => (
+            <button
+              class={`dossier-dot h-1.5 rounded-full transition-all duration-500 cursor-pointer border-0 p-0 ${i === 0 ? 'w-6 md:w-8 bg-[#C8A98B]' : 'w-1.5 md:w-2 bg-white/30 hover:bg-white/60'}`}
+              data-dot={i}
+              aria-label={`Ir al slide ${i + 1}`}
+            />
+          ))}
+        </nav>
+
+        {/* Flecha izquierda */}
+        <button
+          class="dossier-prev absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-black/45 border border-white/15 text-white/70 hover:bg-black/75 hover:border-[#C8A98B] hover:text-[#C8A98B] transition-all duration-300 active:scale-90 pointer-events-auto shadow-lg"
+          aria-label="Slide anterior"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+
+        {/* Flecha derecha */}
+        <button
+          class="dossier-next absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-black/45 border border-white/15 text-white/70 hover:bg-black/75 hover:border-[#C8A98B] hover:text-[#C8A98B] transition-all duration-300 active:scale-90 pointer-events-auto shadow-lg"
+          aria-label="Slide siguiente"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+    )}
   </div>{/* end slides-container */}
 
   {/* Pantalla Intro Cinemática en Tandas */}
@@ -182,26 +237,9 @@ const { fragments = [], isModal = false } = Astro.props;
     </div>
   </div>
 
-  {/* Controles de Navegación UI */}
-  {fragments.length > 1 && (
-    <div class="dossier-controls absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-between px-4 md:px-8 z-40 pointer-events-none">
-      <button class="dossier-prev tgp-ui-control pointer-events-auto w-16 h-24 md:w-24 md:h-32 flex items-center justify-center rounded-xl text-transparent hover:text-[#C8A98B] bg-transparent hover:bg-linear-to-r hover:from-black/50 hover:to-transparent opacity-0 hover:opacity-100 transition-all duration-700 cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-      </button>
-      <button class="dossier-next tgp-ui-control pointer-events-auto w-16 h-24 md:w-24 md:h-32 flex items-center justify-center rounded-xl text-transparent hover:text-[#C8A98B] bg-transparent hover:bg-linear-to-l hover:from-black/50 hover:to-transparent opacity-0 hover:opacity-100 transition-all duration-700 cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-      </button>
-    </div>
-  )}
+
   
-  {/* Indicador de Progreso */}
-  {fragments.length > 1 && (
-    <div class="dossier-progress absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 z-40">
-      {fragments.map((_, i) => (
-        <div class={`progress-dot w-2 h-2 rounded-full transition-all duration-500 ${i === 0 ? 'bg-[#C8A98B] w-6' : 'bg-white/30'}`} data-target={i}></div>
-      ))}
-    </div>
-  )}
+
 
   {/* PIP Thumbnail (cuadro dentro de cuadro) */}
   <div class="dossier-pip absolute bottom-28 right-4 md:right-10 z-40 opacity-0 transition-opacity duration-1000 pointer-events-none">
@@ -229,6 +267,9 @@ const { fragments = [], isModal = false } = Astro.props;
       </div>
     </div>
   )}
+
+  {/* Widget Orbital Cinemático (WOC 2026) para cerrar diapositivas */}
+  <QuickReturnButton client:load fallbackUrl="/archivo" forceVisible={true} />
 </section>
 
 <script>
@@ -236,16 +277,13 @@ const { fragments = [], isModal = false } = Astro.props;
   import SplitType from 'split-type';
 
   function initCinematicDossier() {
-    const wrapper = document.querySelector('.cinematic-dossier-wrapper');
+    const wrapper = document.querySelector<HTMLElement>('.cinematic-dossier-wrapper');
     if (!wrapper) return;
 
     const slides = Array.from(wrapper.querySelectorAll('.slide')) as HTMLElement[];
     if (slides.length === 0) return;
 
-    const prevBtn = wrapper.querySelector('.dossier-prev');
-    const nextBtn = wrapper.querySelector('.dossier-next');
     const closeBtn = wrapper.querySelector('.dossier-close-btn');
-    const dots = wrapper.querySelectorAll('.progress-dot');
 
     // Datos de imágenes para PIP y filmstrip
     const imageUrls: string[] = JSON.parse((wrapper as HTMLElement).dataset.images || '[]');
@@ -263,7 +301,6 @@ const { fragments = [], isModal = false } = Astro.props;
     let currentIndex = 0;
     let isAnimating = false;
     let isOutroPlaying = false;
-    let touchStartX = 0;
 
     // Inicializar SplitType en todas las slides
     slides.forEach(slide => {
@@ -338,92 +375,224 @@ const { fragments = [], isModal = false } = Astro.props;
           gsap.to(title, { opacity: 0, duration: 1.5, delay: 2, ease: 'power2.inOut' });
         });
       }
-      
-      // Ken Burns en la imagen de fondo
-      const bgImage = slide.querySelector('.bg-image');
-      if (bgImage) {
-         gsap.fromTo(bgImage, 
-           { scale: 1.05, filter: 'brightness(0.6)' },
-           { scale: 1, filter: 'brightness(1)', duration: 10, ease: 'power1.out' }
-         );
-      }
     }
 
-    function goToSlide(index: number, direction: 'next' | 'prev', isAuto = false) {
-      if (isAnimating || index === currentIndex || isOutroPlaying) return;
-      
-      // Si llegamos al final y vamos hacia adelante, activamos el OUTRO
-      if (currentIndex === slides.length - 1 && direction === 'next' && !isOutroPlaying) {
+    // ─── MOTOR DE FOTOS CPE ────────────────────────────────────────────────────
+    const PHOTO_DURATION = 7000;   // ms por foto
+    const AUTO_RESUME   = 8000;    // ms de inactividad → retoma auto
+    const FADE_DUR      = 1.1;     // s cross-fade
+    const SWIPE_THR     = 50;      // px mínimos swipe
+
+    const dotEls   = Array.from(wrapper.querySelectorAll<HTMLElement>('.dossier-dot'));
+    const toolbar  = wrapper.querySelector<HTMLElement>('.dossier-toolbar');
+    const prevBtn2 = wrapper.querySelector<HTMLElement>('.dossier-prev');
+    const nextBtn2 = wrapper.querySelector<HTMLElement>('.dossier-next');
+
+    let photoAutoTimer: ReturnType<typeof setTimeout> | undefined;
+    let photoResumeTimer: ReturnType<typeof setTimeout> | undefined;
+    let toolbarTimer: ReturnType<typeof setTimeout> | undefined;
+
+    /* Toolbar auto-hide */
+    function showToolbar() {
+      if (!toolbar) return;
+      toolbar.classList.remove('opacity-0');
+      toolbar.classList.add('opacity-100');
+    }
+    function hideToolbar() {
+      if (!toolbar) return;
+      toolbar.classList.remove('opacity-100');
+      toolbar.classList.add('opacity-0');
+    }
+    function resetToolbarTimer() {
+      showToolbar();
+      clearTimeout(toolbarTimer);
+      toolbarTimer = setTimeout(hideToolbar, 2800);
+    }
+    wrapper.addEventListener('mousemove', resetToolbarTimer);
+    wrapper.addEventListener('mouseenter', resetToolbarTimer);
+    wrapper.addEventListener('touchstart', resetToolbarTimer, { passive: true });
+    wrapper.addEventListener('mouseleave', () => { clearTimeout(toolbarTimer); hideToolbar(); });
+
+    /* Dots */
+    function updateDots(idx: number) {
+      dotEls.forEach((d, i) => {
+        const active = i === idx;
+        d.classList.toggle('w-6', active);
+        d.classList.toggle('md:w-8', active);
+        d.classList.toggle('bg-[#C8A98B]', active);
+        d.classList.toggle('w-1.5', !active);
+        d.classList.toggle('md:w-2', !active);
+        d.classList.toggle('bg-white/30', !active);
+      });
+    }
+
+    /* slideIn — foto entra con Ken Burns + fade + texto */
+    function slideIn(slide: HTMLElement, onDone: (() => void) | null) {
+      const bg = slide.querySelector<HTMLElement>('.cpe-bg-img');
+
+      slide.classList.remove('pointer-events-none');
+      slide.style.zIndex = '20';
+
+      const tl = gsap.timeline({ onComplete: onDone ?? undefined });
+      tl.fromTo(slide, { opacity: 0 }, { opacity: 1, duration: FADE_DUR, ease: 'power2.inOut' }, 0);
+
+      if (bg) {
+        gsap.set(bg, { scale: 1, yPercent: 0 });
+        gsap.to(bg, {
+          scale: 1.035,
+          yPercent: -2.5,
+          duration: PHOTO_DURATION / 1000 + FADE_DUR,
+          ease: 'none',
+        });
+      }
+      playTextAnimation(slide);
+    }
+
+    /* slideOut — foto sale con fade */
+    function slideOut(slide: HTMLElement, onDone: (() => void) | null) {
+      gsap.to(slide, {
+        opacity: 0,
+        duration: FADE_DUR * 0.85,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          slide.classList.add('pointer-events-none');
+          slide.style.zIndex = '10';
+          onDone?.();
+        },
+      });
+    }
+
+    /* goTo — motor principal de paso entre fotos */
+    function goTo(idx: number) {
+      if (isAnimating || idx === currentIndex || isOutroPlaying) return;
+
+      // En la última foto, al avanzar → Outro + WOC
+      if (currentIndex === slides.length - 1 && idx > currentIndex) {
         playOutroSequence();
         return;
       }
-      
-      if (!isAuto) {
-        stopAutoplay();
-        startAutoplay(); // Reinicia el ciclo si fue manual
-      }
+
       isAnimating = true;
+      const prevIdx = currentIndex;
+      const nextIdx = ((idx % slides.length) + slides.length) % slides.length;
+      currentIndex = nextIdx;
 
-      const currentSlide = slides[currentIndex];
-      const nextSlide = slides[index];
+      updateDots(currentIndex);
+      slides[nextIdx].style.zIndex = '20';
+      slides[prevIdx].style.zIndex = '15';
 
-      // Update dots
-      if (dots.length) {
-        dots[currentIndex].classList.replace('w-6', 'w-2');
-        dots[currentIndex].classList.replace('bg-[#C8A98B]', 'bg-white/30');
-        dots[index].classList.replace('w-2', 'w-6');
-        dots[index].classList.replace('bg-white/30', 'bg-[#C8A98B]');
-      }
-
-      // Animación GSAP de transición
-      const tl = gsap.timeline({
-        onComplete: () => {
-          gsap.set(currentSlide, { opacity: 0, pointerEvents: 'none', zIndex: 10 });
-          gsap.set(nextSlide, { pointerEvents: 'auto', zIndex: 20 });
-          currentSlide.classList.remove('active');
-          nextSlide.classList.add('active');
-          currentIndex = index;
-          isAnimating = false;
-        }
-      });
-
-      const currentImg = currentSlide.querySelector('img');
-      const nextImg = nextSlide.querySelector('img');
-
-      gsap.set(nextSlide, { opacity: 0, zIndex: 15 });
-      
-      // Cruzamos los fades en paralelo - menos oscurecimiento, más fluido
-      tl.to(currentSlide, { opacity: 0, duration: 2, ease: 'power1.inOut' }, 0);
-      if (currentImg) {
-         tl.to(currentImg, { scale: 0.98, xPercent: direction === 'next' ? -2 : 2, filter: 'brightness(0.75)', duration: 2, ease: 'power2.inOut' }, 0);
-      }
-      
-      tl.to(nextSlide, { opacity: 1, duration: 2, ease: 'power1.inOut' }, 0);
-      if (nextImg) {
-         // "Linterna": la nueva imagen amanece desde penumbra, no desde negro total
-         tl.fromTo(nextImg, 
-            { scale: 1.02, xPercent: direction === 'next' ? 2 : -2, filter: 'brightness(0.65)' }, 
-            { scale: 1, xPercent: 0, filter: 'brightness(1)', duration: 2.5, ease: 'power2.out' }, 
-         0);
-      }
-
-      playTextAnimation(nextSlide);
+      slideOut(slides[prevIdx], null);
+      slideIn(slides[nextIdx], () => { isAnimating = false; });
       playPageSound();
-      updatePipAndFilmstrip(index);
+      updatePipAndFilmstrip(currentIndex);
     }
 
-    function next() {
-      if (slides.length <= 1) return;
-      goToSlide(currentIndex === slides.length - 1 ? 0 : currentIndex + 1, 'next');
+    /* Auto-cycle */
+    function scheduleNext() {
+      clearTimeout(photoAutoTimer);
+      photoAutoTimer = setTimeout(() => {
+        if (!isOutroPlaying) {
+          const nextIdx = currentIndex + 1;
+          if (nextIdx >= slides.length) {
+            playOutroSequence();
+          } else {
+            goTo(nextIdx);
+            scheduleNext();
+          }
+        }
+      }, PHOTO_DURATION);
     }
 
-    function prev() {
-      if (slides.length <= 1) return;
-      const prevIdx = (currentIndex - 1 + slides.length) % slides.length;
-      goToSlide(prevIdx, 'prev');
+    function pauseAuto() {
+      clearTimeout(photoAutoTimer);
+      clearTimeout(photoResumeTimer);
     }
-    
-    // Sonido sutil de pase de hoja (Web Audio API)
+
+    function resumeAuto() {
+      clearTimeout(photoResumeTimer);
+      photoResumeTimer = setTimeout(scheduleNext, AUTO_RESUME);
+    }
+
+    function startAutoplay() {
+      if (slides.length > 1) scheduleNext();
+    }
+
+    function stopAutoplay() {
+      clearTimeout(photoAutoTimer);
+      clearTimeout(photoResumeTimer);
+    }
+
+    /* Botones prev/next */
+    prevBtn2?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      pauseAuto();
+      goTo((currentIndex - 1 + slides.length) % slides.length);
+      resumeAuto();
+    });
+    nextBtn2?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      pauseAuto();
+      goTo(currentIndex + 1);
+      resumeAuto();
+    });
+
+    /* Dots click */
+    dotEls.forEach(d => {
+      d.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = Number(d.dataset['dot']);
+        if (idx === currentIndex) return;
+        pauseAuto();
+        goTo(idx);
+        resumeAuto();
+      });
+    });
+
+    /* Drag / swipe (pointer events) */
+    let dragStartX = 0;
+    let isDragging = false;
+
+    wrapper.addEventListener('pointerdown', (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest('a, button, nav, input, select')) return;
+      dragStartX = e.clientX;
+      isDragging = true;
+      pauseAuto();
+      (wrapper as HTMLElement).setPointerCapture(e.pointerId);
+    });
+
+    wrapper.addEventListener('pointerup', (e: PointerEvent) => {
+      if (!isDragging) return;
+      isDragging = false;
+      const delta = e.clientX - dragStartX;
+      if (Math.abs(delta) > SWIPE_THR) {
+        goTo(delta < 0 ? currentIndex + 1 : (currentIndex - 1 + slides.length) % slides.length);
+      }
+      resumeAuto();
+    });
+
+    wrapper.addEventListener('pointercancel', () => { isDragging = false; resumeAuto(); });
+
+    /* Keyboard */
+    window.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (window.getComputedStyle(wrapper as Element).opacity === '0') return;
+      if (e.key === 'ArrowRight') { pauseAuto(); goTo(currentIndex + 1); resumeAuto(); }
+      if (e.key === 'ArrowLeft')  { pauseAuto(); goTo((currentIndex - 1 + slides.length) % slides.length); resumeAuto(); }
+      if (e.key === 'Escape' && closeBtn) closeBtn.dispatchEvent(new Event('click'));
+    });
+
+    /* Wheel scroll */
+    let wheelTimeout: ReturnType<typeof setTimeout> | undefined;
+    wrapper.addEventListener('wheel', (e: WheelEvent) => {
+      if (window.getComputedStyle(wrapper as Element).opacity === '0') return;
+      e.preventDefault();
+      if (isAnimating) return;
+      clearTimeout(wheelTimeout);
+      wheelTimeout = setTimeout(() => {
+        if (e.deltaY > 50) goTo(currentIndex + 1);
+        else if (e.deltaY < -50) goTo((currentIndex - 1 + slides.length) % slides.length);
+      }, 50);
+    }, { passive: false });
     function playPageSound() {
       try {
         const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -671,47 +840,6 @@ const { fragments = [], isModal = false } = Astro.props;
         }});
     }
 
-    // Bind UI controls
-    if (nextBtn) nextBtn.addEventListener('click', next);
-    if (prevBtn) prevBtn.addEventListener('click', prev);
-
-    // Keyboard support
-    window.addEventListener('keydown', (e) => {
-      // Only process keys if dossier is visible
-      if (window.getComputedStyle(wrapper).opacity === '0') return;
-      if (e.key === 'ArrowRight') next();
-      if (e.key === 'ArrowLeft') prev();
-      if (e.key === 'Escape' && closeBtn) closeBtn.dispatchEvent(new Event('click'));
-    });
-
-    // Touch support (Swipe)
-    wrapper.addEventListener('touchstart', (e: any) => {
-      touchStartX = e.changedTouches[0].screenX;
-    }, { passive: true });
-
-    wrapper.addEventListener('touchend', (e: any) => {
-      const touchEndX = e.changedTouches[0].screenX;
-      if (touchEndX < touchStartX - 50) next();
-      if (touchEndX > touchStartX + 50) prev();
-    }, { passive: true });
-
-    // Wheel support (Scroll)
-    let wheelTimeout: any;
-    wrapper.addEventListener('wheel', (e: any) => {
-      if (window.getComputedStyle(wrapper).opacity === '0') return;
-      
-      // Bloquear scroll de la página base
-      e.preventDefault();
-
-      if (isAnimating) return;
-      
-      clearTimeout(wheelTimeout);
-      wheelTimeout = setTimeout(() => {
-        if (e.deltaY > 50) next();
-        else if (e.deltaY < -50) prev();
-      }, 50);
-    }, { passive: false });
-
     // Close Modal Logic
     if (closeBtn) {
       closeBtn.addEventListener('click', () => {
@@ -726,30 +854,6 @@ const { fragments = [], isModal = false } = Astro.props;
       });
     }
 
-    // --- LÓGICA DE AUTOPLAY ---
-    let autoplayTimer: ReturnType<typeof setInterval>;
-    let isPaused = false;
-
-    function startAutoplay() {
-      clearInterval(autoplayTimer);
-      autoplayTimer = setInterval(() => {
-        if (!isPaused && slides.length > 1) {
-          goToSlide(currentIndex === slides.length - 1 ? 0 : currentIndex + 1, 'next', true);
-        }
-      }, 3000);
-    }
-
-    function stopAutoplay() {
-      clearInterval(autoplayTimer);
-    }
-
-    // Pausar con interacción
-    wrapper.addEventListener('mouseenter', () => isPaused = true);
-    wrapper.addEventListener('mouseleave', () => isPaused = false);
-    wrapper.addEventListener('touchstart', () => isPaused = true, { passive: true });
-    wrapper.addEventListener('touchend', () => {
-      setTimeout(() => isPaused = false, 2000);
-    });
 
     // Función para activar destello inicial en controles
     function flashControls() {

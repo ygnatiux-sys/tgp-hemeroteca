@@ -15,6 +15,7 @@
 import { getCollection, getEntry, render } from "astro:content";
 import { marked } from "marked";
 import AcademicLayout from "../../layouts/AcademicLayout.astro";
+import { QuickReturnButton } from "../../components/QuickReturnButton";
 import {
   resolveEssayImage,
   essayImages,
@@ -125,6 +126,7 @@ const pageTitle = `${title} — Papers · TGP`;
 ---
 
 <AcademicLayout title={pageTitle} description={excerpt ?? undefined} slug={slug}>
+  <QuickReturnButton client:load accentColor="#C8A98B" fallbackUrl="/papers" />
 
   <!-- ═══════════════════════════════════════════════════════════════
        ZONA 1: CABECERA DEL PAPER — fondo roto (#F5F2ED)
@@ -365,9 +367,13 @@ const pageTitle = `${title} — Papers · TGP`;
             return (
               <article class="explore-lead-card">
                 <div class="explore-lead-inner">
-                  {leadImg && (
+                  {leadImg ? (
                     <div class="explore-lead-img-wrap">
                       <img src={leadImg.src} alt="" class="explore-lead-img" loading="lazy" />
+                    </div>
+                  ) : (
+                    <div class="explore-lead-img-wrap explore-lead-fallback flex items-center justify-center bg-linear-to-br from-[#8C6D2F]/15 via-[#242424] to-[#151718] p-6 text-center">
+                      <span class="font-mono text-[9px] uppercase tracking-[0.4em] text-[#C9A86C]/50">[ TGP Archivo ]</span>
                     </div>
                   )}
                   <div class="explore-lead-body">
@@ -380,9 +386,10 @@ const pageTitle = `${title} — Papers · TGP`;
                         <p class="explore-lead-excerpt">"{lead.entry.excerpt}"</p>
                       )}
                     </div>
-                    <div class="explore-lead-footer">
+                    <div class="explore-lead-footer flex items-center flex-wrap gap-3">
                       <a href={`/papers/${lead.slug}`} class="explore-read-btn"><span>Leer Dossier</span> <span class="arrow">▸</span></a>
-                      {leadDate && <span class="explore-date">{leadDate}</span>}
+                      <a href={`/hemeroteca/${lead.slug}`} class="explore-read-btn explore-read-btn-ghost"><span>Ver Hemeroteca</span> <span class="arrow">▸</span></a>
+                      {leadDate && <span class="explore-date ml-auto hidden sm:inline">{leadDate}</span>}
                     </div>
                   </div>
                 </div>
@@ -398,9 +405,13 @@ const pageTitle = `${title} — Papers · TGP`;
               return (
                 <article class="explore-secondary-card">
                   <a href={`/papers/${post.slug}`} class="explore-sec-link">
-                    {secImg && (
+                    {secImg ? (
                       <div class="explore-sec-img-wrap">
                         <img src={secImg.src} alt="" class="explore-sec-img" loading="lazy" />
+                      </div>
+                    ) : (
+                      <div class="explore-sec-img-wrap flex items-center justify-center bg-linear-to-br from-[#8C6D2F]/10 via-[#1e1e1e] to-[#151718]">
+                        <span class="font-mono text-[8px] uppercase tracking-[0.3em] text-[#C9A86C]/40">[ TGP ]</span>
                       </div>
                     )}
                     <div class="explore-sec-body">
@@ -408,8 +419,9 @@ const pageTitle = `${title} — Papers · TGP`;
                         {secCat && <span class="explore-cat">{secCat}</span>}
                         <h4 class="explore-sec-title">{post.entry.title}</h4>
                       </div>
-                      <div class="explore-sec-footer">
-                        <span class="explore-sec-read">Ver Dossier ▸</span>
+                      <div class="explore-sec-footer flex items-center justify-between gap-2">
+                        <a href={`/papers/${post.slug}`} class="explore-sec-read hover:text-rust-orange transition-colors">Dossier ▸</a>
+                        <a href={`/hemeroteca/${post.slug}`} class="explore-sec-read opacity-60 hover:opacity-100 hover:text-rust-orange transition-colors">Hemeroteca ▸</a>
                       </div>
                     </div>
                   </a>
@@ -699,7 +711,7 @@ const pageTitle = `${title} — Papers · TGP`;
     });
 
     // Modal de suscripción / reacción con transición de 4s
-    let sliderInterval;
+    let sliderInterval: ReturnType<typeof setInterval> | undefined;
     const openModal = () => {
       modal?.classList.add("open");
       modal?.setAttribute("aria-hidden", "false");
@@ -1339,7 +1351,7 @@ const pageTitle = `${title} — Papers · TGP`;
   .paper-cover-zone {
     padding: 2rem 1.5rem;
     background-color: var(--white-page, #FAFAF9);
-    max-width: calc(680px + 3rem);
+    max-width: calc(75ch + 3rem);
     margin: 0 auto;
   }
 
@@ -1365,7 +1377,8 @@ const pageTitle = `${title} — Papers · TGP`;
   .paper-reading-zone {
     display: grid;
     grid-template-columns: 1fr;
-    max-width: 680px;
+    grid-template-areas: "body";
+    max-width: 75ch;
     margin: 0 auto;
     padding: 2.5rem 1.5rem 0;
     gap: 0;
@@ -1374,18 +1387,20 @@ const pageTitle = `${title} — Papers · TGP`;
   /* En desktop, 3 columnas: TOC | Contenido | Contexto */
   @media (min-width: 1100px) {
     .paper-reading-zone {
-      grid-template-columns: 200px minmax(auto, 680px) 200px;
-      max-width: 1200px;
+      grid-template-columns: 256px minmax(0, 75ch) 288px;
+      grid-template-areas: "toc body context";
+      max-width: 80rem; /* max-w-7xl */
+      justify-content: center;
       padding: 3.5rem 2rem 0;
-      gap: 4rem;
+      gap: 0 3rem;
       align-items: start;
     }
   }
 
   @media (min-width: 1400px) {
     .paper-reading-zone {
-      grid-template-columns: 230px minmax(auto, 680px) 230px;
-      gap: 5rem;
+      grid-template-columns: 256px minmax(0, 75ch) 320px;
+      gap: 0 4rem;
       padding: 3.5rem 3rem 0;
     }
   }
@@ -1413,6 +1428,16 @@ const pageTitle = `${title} — Papers · TGP`;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    max-height: calc(100vh - 7rem);
+    overflow-y: auto;
+    scrollbar-width: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .toc-wrapper > * {
+    flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .toc-label {
@@ -1492,7 +1517,7 @@ const pageTitle = `${title} — Papers · TGP`;
     padding-bottom: 4rem;
     font-family: var(--font-body, 'Lora', serif);
     font-size: 1.05rem;
-    line-height: 1.9;
+    line-height: 1.8;
     color: var(--ac-text, #191918);
     /* Borde irregular (ragged right) */
     text-align: left !important;
@@ -1602,6 +1627,16 @@ const pageTitle = `${title} — Papers · TGP`;
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    max-height: calc(100vh - 7rem);
+    overflow-y: auto;
+    scrollbar-width: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .context-wrapper > * {
+    flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .context-section-label {
@@ -1945,7 +1980,8 @@ const pageTitle = `${title} — Papers · TGP`;
   @media (min-width: 900px) {
     .explore-lead-inner {
       flex-direction: row;
-      min-height: 22rem;
+      max-height: 20rem;
+      align-items: stretch;
     }
   }
 
@@ -1957,7 +1993,8 @@ const pageTitle = `${title} — Papers · TGP`;
   }
   @media (min-width: 900px) {
     .explore-lead-img-wrap {
-      width: 52%;
+      width: 45%;
+      max-height: 20rem;
       aspect-ratio: auto;
     }
   }
@@ -2035,6 +2072,17 @@ const pageTitle = `${title} — Papers · TGP`;
   .explore-read-btn:hover { background-color: var(--ac-gold, #8C6D2F); }
   .explore-read-btn .arrow { transition: transform 0.2s ease; opacity: 0.7; }
   .explore-read-btn:hover .arrow { transform: translateX(3px); opacity: 1; }
+
+  .explore-read-btn-ghost {
+    background-color: transparent !important;
+    border: 1px solid var(--white-silver, #E4E1DB) !important;
+    color: var(--ac-text-muted, #575043) !important;
+  }
+  .explore-read-btn-ghost:hover {
+    background-color: var(--white-broken, #F5F2ED) !important;
+    color: var(--ac-accent, #3B2A14) !important;
+    border-color: var(--ac-gold, #8C6D2F) !important;
+  }
   
   .explore-date {
     font-family: var(--font-ui, 'Inter', sans-serif);
@@ -2137,32 +2185,41 @@ const pageTitle = `${title} — Papers · TGP`;
     --color-medium-graphite-light: #2E2E2E;
   }
 
-  .explore-medium-card {
+  .explore-medium-strip {
     border: 1px solid var(--color-medium-graphite, #242424);
     border-radius: 8px;
     background-color: var(--color-medium-graphite, #242424);
     color: #FAFAF9;
-    padding: 1.5rem;
+    padding: 1.25rem 1.75rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 1.5rem;
+    align-items: flex-start;
+    gap: 1.25rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    width: 100%;
   }
-  .explore-medium-card:hover {
+  @media (min-width: 640px) {
+    .explore-medium-strip {
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+  .explore-medium-strip:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   }
 
-  .medium-header {
+  .medium-strip-left {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1.25rem;
   }
+
   .medium-icon-wrap {
-    width: 2rem;
-    height: 2rem;
+    width: 2.2rem;
+    height: 2.2rem;
     background-color: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 6px;
@@ -2172,13 +2229,13 @@ const pageTitle = `${title} — Papers · TGP`;
     flex-shrink: 0;
   }
   .medium-icon {
-    width: 1.2rem;
-    height: 0.7rem;
+    width: 1.3rem;
+    height: 0.8rem;
     fill: #FAFAF9;
   }
   .medium-label {
     font-family: var(--font-ui, 'Inter', sans-serif);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -2188,7 +2245,7 @@ const pageTitle = `${title} — Papers · TGP`;
   .medium-body {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.15rem;
   }
   .medium-quote {
     font-family: var(--font-body, 'Lora', serif);
@@ -2215,13 +2272,14 @@ const pageTitle = `${title} — Papers · TGP`;
     color: #FAFAF9;
     border: none;
     border-radius: 6px;
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 1.25rem;
     font-family: var(--font-ui, 'Inter', sans-serif);
     font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     text-decoration: none;
+    white-space: nowrap;
     transition: background-color 0.2s ease, transform 0.15s ease;
   }
   .medium-submit-btn:hover {

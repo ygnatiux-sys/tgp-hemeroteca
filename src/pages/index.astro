@@ -5,14 +5,12 @@ import { Image } from 'astro:assets';
 import SpotifyIcon from '../components/icons/Spotify.astro';
 import YouTubeIcon from '../components/icons/YouTube.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
-import CinematicDossier from '../components/CinematicDossier.astro';
+import CinematicPostEngine from '../components/CinematicPostEngine.astro';
 import {
   getPublishableEssays,
   groupByCategory,
   formatCategory,
   formatDate,
-  formatYear,
-  normalizeCategory,
   resolveEssayImage,
   sortEssaysByVisualFirst,
 } from '../lib/content-filter';
@@ -37,18 +35,33 @@ const publishableArquetipos = getPublishableEssays(allArquetiposRaw, isProd);
 
 const publishable = [...publishableEssays, ...publishableGeorefs, ...publishableArquetipos].sort(sortEssaysByVisualFirst);
 
-// ─── SEGMENTACIÓN EDITORIAL (sin repeticiones) ────────────────────────────────
-// latestPost alimenta el Hero; el resto del array mantiene la grilla Bento existente
-const latestPost   = publishable[0] ?? null;
-const heroEssay    = latestPost;
-const leadStory    = publishable[1] ?? null;
-const secondaryA   = publishable[2] ?? null;
-const secondaryB   = publishable[3] ?? null;
-const recentEssays = publishable.slice(4, 10);           // 4–6 artículos
-const archiveRows  = publishable.slice(10, 20);          // índice compacto (§5.5)
+// ─── SEGMENTACIÓN EDITORIAL ───────────────────────────────────────────────────
+// Los primeros 30 posts (o los disponibles) alimentan el Motor Cinemático Hero (slider).
+// Se eligen preferentemente los que tienen imágenes gracias a sortEssaysByVisualFirst.
+// El resto del array mantiene la grilla Bento existente (sin repeticiones).
+
+const HERO_COUNT   = Math.min(30, publishable.length);
+const heroSlides   = publishable.slice(0, HERO_COUNT).map(e => ({
+  id: e.slug,
+  title: e.entry.title || '',
+  subtitle: e.entry.excerpt || undefined,
+  category: formatCategory(e.entry.category),
+  date: formatDate(e.entry.date),
+  readTime: undefined as string | undefined,
+  image: resolveEssayImage(e.entry.coverImage, e.slug) || '',
+  imagePosition: (e.entry as any).coverImagePosition || (e.entry as any).imagePosition || 'center center',
+  link: `/hemeroteca/${e.slug}`,
+  papersLink: (e.entry as any).papersSlug ? `/papers/${(e.entry as any).papersSlug}` : undefined,
+}));
+
+// Bloques editoriales a continuación del Hero (offset 5)
+const leadStory    = publishable[HERO_COUNT]     ?? null;
+const secondaryA   = publishable[HERO_COUNT + 1] ?? null;
+const secondaryB   = publishable[HERO_COUNT + 2] ?? null;
+const recentEssays = publishable.slice(HERO_COUNT + 3, HERO_COUNT + 9);   // hasta 6
+const archiveRows  = publishable.slice(HERO_COUNT + 9, HERO_COUNT + 19);  // hasta 10
 
 // ─── COLECCIONES DESTACADAS (§5.4) ────────────────────────────────────────────
-// Solo categorías con ≥ 2 artículos publicables. Sin inventar descripciones.
 const categoryGroups = groupByCategory(publishable, 2);
 const collections = Array.from(categoryGroups.entries())
   .map(([key, essays]) => ({
@@ -57,18 +70,9 @@ const collections = Array.from(categoryGroups.entries())
     count: essays.length,
     coverEssay: essays[0],
   }))
-  .slice(0, 4); // máx 4 colecciones en portada
+  .slice(0, 4);
 
-// ─── IMAGEN HERO OBJECT-POSITION ──────────────────────────────────────────────
-const heroImagePosition = (heroEssay?.entry as any)?.coverImagePosition
-  || (heroEssay?.entry as any)?.imagePosition
-  || 'center center';
-const heroOrigin = (heroEssay?.entry as any)?.heroOrigin
-  || (heroEssay?.entry as any)?.transformOrigin
-  || 'center center';
-
-// ─── CARGA DE IMÁGENES CON RESOLUCIÓN INTELIGENTE ─────────────────────────────
-const heroImage  = resolveEssayImage(heroEssay?.entry.coverImage, heroEssay?.slug);
+// ─── CARGA DE IMÁGENES EDITORIAL ──────────────────────────────────────────────
 const leadImage  = resolveEssayImage(leadStory?.entry.coverImage, leadStory?.slug);
 const secAImage  = resolveEssayImage(secondaryA?.entry.coverImage, secondaryA?.slug);
 const secBImage  = resolveEssayImage(secondaryB?.entry.coverImage, secondaryB?.slug);
@@ -94,32 +98,12 @@ function createPremierSequences(essays: typeof resolvedArchiveRows) {
     hero: typeof resolvedArchiveRows[0];
     duo: typeof resolvedArchiveRows;
   }> = [];
-  
   for (let i = 0; i < essays.length; i += 3) {
-    sequences.push({
-      hero: essays[i],
-      duo: essays.slice(i + 1, i + 3),
-    });
+    sequences.push({ hero: essays[i], duo: essays.slice(i + 1, i + 3) });
   }
   return sequences;
 }
-
 const archiveSequences = createPremierSequences(resolvedArchiveRows);
-
-const heroFragments = latestPost ? [
-  {
-    image: heroImage || '',
-    text: latestPost.entry.excerpt || '',
-    highlight: latestPost.entry.title || '',
-    link: `/hemeroteca/${latestPost.slug}`,
-    category: formatCategory(latestPost.entry.category),
-    year: formatYear(latestPost.entry.date),
-    position: heroImagePosition,
-    origin: heroOrigin,
-    spotifyLink: latestPost.entry.spotifyLink || undefined,
-    youtubeLink: latestPost.entry.youtubeLink || undefined
-  }
-] : [];
 ---
 
 <Layout
@@ -129,11 +113,11 @@ const heroFragments = latestPost ? [
   <div class="w-full pb-20">
 
     {/* ═══════════════════════════════════════════════════════════════════════
-        BLOQUE 1: HERO CINEMÁTICO (NUEVO COMPONENTE CinematicDossier)
+        BLOQUE 1: MOTOR CINEMÁTICO HERO — Slider multi-post tipo Netflix
     ═══════════════════════════════════════════════════════════════════════ */}
-    {latestPost && (
-      <div id="hero-cinematic" class="sticky top-0 w-full h-screen overflow-hidden">
-        <CinematicDossier fragments={heroFragments} />
+    {heroSlides.length > 0 && (
+      <div id="hero-cinematic" class="sticky top-0 w-full h-dvh overflow-hidden">
+        <CinematicPostEngine slides={heroSlides} />
       </div>
     )}
 
@@ -159,7 +143,7 @@ const heroFragments = latestPost ? [
           </div>
 
           {/* ── CARD DESTACADA FULL-WIDTH CINEMÁTICA ── */}
-          <article class="group w-full relative overflow-hidden rounded-b-2xl rounded-tr-2xl border border-white/8 border-t-0 bg-white/3 hover:border-rust-orange/30 transition-all duration-700">
+          <article class="card-hover-cinematic group w-full relative overflow-hidden rounded-b-2xl rounded-tr-2xl border border-white/8 border-t-0 bg-white/3 transition-all duration-700">
             <div class="flex flex-col lg:flex-row lg:min-h-105 xl:min-h-120">
 
               {/* Imagen lateral / superior en mobile */}
@@ -168,7 +152,7 @@ const heroFragments = latestPost ? [
                   <Image
                     src={leadImage}
                     alt={leadStory.entry.title || "Dossier Destacado"}
-                    class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03] brightness-90"
+                    class="w-full h-full object-cover object-center transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-90"
                   />
                   <div class="absolute inset-0 bg-linear-to-r from-transparent via-transparent to-(--bg-main)/80 hidden lg:block pointer-events-none" />
                   <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/70 via-transparent to-transparent lg:hidden pointer-events-none" />
@@ -236,14 +220,14 @@ const heroFragments = latestPost ? [
 
           {/* GRID 1 CENTRAL GRANDE */}
           {secondaryA && (
-            <article class="group w-full relative overflow-hidden rounded-2xl border border-white/8 bg-white/3 hover:border-rust-orange/30 transition-all duration-500">
+            <article class="card-hover-cinematic group w-full relative overflow-hidden rounded-2xl border border-white/8 bg-white/3 transition-all duration-500">
               <div class="flex flex-col md:flex-row md:min-h-70">
                 {secAImage && (
                   <div class="relative overflow-hidden md:w-[45%] shrink-0 aspect-video md:aspect-auto">
                     <Image
                       src={secAImage}
                       alt={secondaryA.entry.title || "Dossier"}
-                      class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.04] brightness-85"
+                      class="w-full h-full object-cover object-center transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-85"
                     />
                     <div class="absolute inset-0 bg-linear-to-r from-transparent to-(--bg-main)/70 hidden md:block pointer-events-none" />
                     <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/60 via-transparent to-transparent md:hidden pointer-events-none" />
@@ -270,13 +254,13 @@ const heroFragments = latestPost ? [
           {/* DOS CARDS MENORES EN FILA */}
           {secondaryB && (
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-              <article class="group relative overflow-hidden rounded-xl border border-white/8 bg-white/3 hover:border-rust-orange/30 transition-all duration-500 flex flex-col">
+              <article class="card-hover-cinematic group relative overflow-hidden rounded-xl border border-white/8 bg-white/3 transition-all duration-500 flex flex-col">
                 {secBImage && (
                   <div class="relative overflow-hidden aspect-video">
                     <Image
                       src={secBImage}
                       alt={secondaryB.entry.title || "Dossier"}
-                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 brightness-80"
+                      class="w-full h-full object-cover transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-80"
                     />
                     <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/70 via-transparent to-transparent pointer-events-none" />
                   </div>
