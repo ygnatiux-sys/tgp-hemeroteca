@@ -43,8 +43,8 @@
   color: #2A2927;
 }
 
-/* Transición suave global entre temas */
-body, header, footer, article, section, nav, div, aside, p, span, h1, h2, h3, h4, a, button {
+/* Transición suave global entre temas — solo elementos semánticos de texto y layout */
+body, header, footer, article, section, nav, aside, p, span, h1, h2, h3, h4, a {
   transition: var(--theme-transition);
 }
 
@@ -52,35 +52,35 @@ body, header, footer, article, section, nav, div, aside, p, span, h1, h2, h3, h4
    NAVBAR / HEADER & FOOTER: MARCA GRADIENTE ACERO/PLATA EXACTO
 ═════════════════════════════════════════════════════════════════════════ */
 .gradient-steel-brand {
-  background: linear-gradient(180deg, #FFFFFF 0%, #B0B8C1 50%, #5B6574 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-  transition: all 0.3s ease !important;
+  background: linear-gradient(180deg, #FFFFFF 0%, #B0B8C1 50%, #5B6574 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: all 0.3s ease;
 }
 
 .gradient-steel-line-1 {
-  background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-  transition: all 0.3s ease !important;
+  background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: all 0.3s ease;
 }
 
 .gradient-steel-line-2 {
-  background: linear-gradient(180deg, #CBD5E1 0%, #718096 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-  transition: all 0.3s ease !important;
+  background: linear-gradient(180deg, #CBD5E1 0%, #718096 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: all 0.3s ease;
 }
 
 .gradient-steel-line-3 {
-  background: linear-gradient(180deg, #718096 0%, #334155 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-  transition: all 0.3s ease !important;
+  background: linear-gradient(180deg, #718096 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: all 0.3s ease;
 }
 
 .group:hover .gradient-steel-brand,
@@ -88,10 +88,10 @@ body, header, footer, article, section, nav, div, aside, p, span, h1, h2, h3, h4
 .group:hover .gradient-steel-line-2,
 .group:hover .gradient-steel-line-3,
 .gradient-steel-brand:hover {
-  background: linear-gradient(180deg, #D4A352 0%, #D4A352 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
+  background: linear-gradient(180deg, #D4A352 0%, #D4A352 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 header .header-brand-title {
@@ -440,8 +440,8 @@ header .header-btn-codice {
 
 [data-theme='light'] .cinematic-card-lantern:hover {
   background: rgba(235, 233, 225, 0.98);
-  border-color: rgba(110, 36, 36, 0.45);
-  box-shadow: 0 0 32px -4px rgba(110, 36, 36, 0.18), 0 20px 40px -12px rgba(42, 41, 39, 0.12);
+  border-color: rgba(42, 41, 39, 0.25);
+  box-shadow: 0 20px 40px -12px rgba(42, 41, 39, 0.12);
 }
 
 @theme {
@@ -484,12 +484,12 @@ header .header-btn-codice {
       #E2E8F0 68%,
       #64748B 82%,
       #FFFFFF 100%
-    ) !important;
-    background-size: 260% 100% !important;
-    -webkit-background-clip: text !important;
-    background-clip: text !important;
-    color: transparent !important;
-    animation: titaniumMetallicSweep 16s ease-in-out infinite !important;
+    );
+    background-size: 260% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: titaniumMetallicSweep 16s ease-in-out infinite;
     will-change: background-position, filter;
   }
 
@@ -577,16 +577,13 @@ header .header-btn-codice {
 
 .cinematic-card-lantern:hover {
   background: rgba(18, 22, 20, 0.8);
-  border-color: rgba(212, 163, 82, 0.4);
-  box-shadow: 
-    0 0 32px -4px rgba(212, 163, 82, 0.2),
-    inset 0 0 24px rgba(212, 163, 82, 0.06),
-    0 20px 40px -12px rgba(0, 0, 0, 0.8);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.8);
   transform: translateY(-2px);
 }
 
 .cinematic-card-lantern:hover::before {
-  background: linear-gradient(90deg, transparent, rgba(212, 163, 82, 0.75), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
 }
 
 /* ═════════════════════════════════════════════════════════════════════════
@@ -604,7 +601,7 @@ header .header-btn-codice {
   }
   15%, 28% {
     opacity: 1;
-    text-shadow: 0 0 10px rgba(212, 163, 82, 0.65);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
   }
 }
 
@@ -617,7 +614,7 @@ header .header-btn-codice {
   }
   15%, 28% {
     opacity: 0.90;
-    text-shadow: 0 0 8px rgba(212, 163, 82, 0.5);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
   }
 }
 
@@ -628,7 +625,7 @@ header .header-btn-codice {
   }
   50% {
     opacity: 0.94;
-    filter: drop-shadow(0 0 4px rgba(212, 163, 82, 0.35));
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.25));
   }
 }
 
@@ -638,7 +635,7 @@ header .header-btn-codice {
   }
   50% {
     opacity: 1;
-    text-shadow: 0 0 8px rgba(212, 163, 82, 0.45);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
   }
 }
 
@@ -905,9 +902,8 @@ header .header-btn-codice {
 }
 
 /* ═════════════════════════════════════════════════════════════════════════
-   ESTÉTICA CINEMÁTICA GLOBAL PARA FOTOS Y FIGURAS DE TODOS LOS POSTS
+   ESTÉTICA CINEMÁTICA PARA FOTOS Y FIGURAS EN EL CUERPO DE ARTÍCULOS/ENSAYOS
 ═════════════════════════════════════════════════════════════════════════ */
-article figure, 
 .prose figure, 
 #wiki-article-body figure,
 .cinematic-img-frame {
@@ -920,13 +916,13 @@ article figure,
   margin-bottom: 2rem;
 }
 
-article figure::after, 
 .prose figure::after, 
 #wiki-article-body figure::after,
 .cinematic-img-frame::after {
   content: '';
   position: absolute;
   inset: 0;
+  box-sizing: border-box;
   border-radius: 1.75rem;
   box-shadow: inset 0 0 150px 30px rgba(0, 0, 0, 0.95);
   pointer-events: none;
@@ -934,7 +930,6 @@ article figure::after,
   z-index: 10;
 }
 
-article img, 
 .prose img, 
 #wiki-article-body img,
 .cinematic-img {
@@ -945,7 +940,6 @@ article img,
   will-change: transform, filter;
 }
 
-article img:hover, 
 .prose img:hover, 
 #wiki-article-body img:hover,
 .cinematic-img:hover {
@@ -1022,104 +1016,4 @@ article img:hover,
   transform: rotateY(360deg);
 }
 
-/* ═════════════════════════════════════════════════════════════════════════
-   ESTÁNDAR EDITORIAL GLOBAL DE SELECCIÓN DE TARJETAS Y HEROS
-   - INVISIBILIDAD TOTAL DE BORDE SUPERIOR E IZQUIERDO (Base y Hover)
-   - SOLO BORDE INFERIOR COMPLETO Y BORDE DERECHO HASTA LA MITAD
-   - SOMBRA PROYECTADA EXCLUSIVAMENTE EN LADO INFERIOR Y LATERAL DERECHO
-═════════════════════════════════════════════════════════════════════════ */
-.card-hover-cinematic,
-.cinematic-archive-card {
-  position: relative;
-  border-top-color: transparent !important;
-  border-left-color: transparent !important;
-  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 80ms, box-shadow 0.5s ease;
-}
-
-.card-hover-cinematic::after,
-.cinematic-archive-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  border: 0;
-  border-top: 0 !important;
-  border-left: 0 !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
-  /* Máscara lineal: el borde lateral derecho llega exactamente a la mitad (50%) difuminándose */
-  mask-image: linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 35%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 65%);
-  -webkit-mask-image: linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 35%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 65%);
-  z-index: 20;
-}
-
-.card-hover-cinematic:hover::after,
-.cinematic-archive-card:hover::after {
-  opacity: 1;
-}
-
-.card-hover-cinematic:hover,
-.cinematic-archive-card:hover {
-  border-top-color: transparent !important;
-  border-left-color: transparent !important;
-  /* Sombra proyectada exclusivamente hacia el lado inferior y lateral derecho */
-  box-shadow: 14px 22px 42px -10px rgba(0, 0, 0, 0.95) !important;
-}
-
-/* ═════════════════════════════════════════════════════════════════════════
-   ESTÁNDAR EDITORIAL GLOBAL DE SELECCIÓN DE BOTONES
-   - Aplica automáticamente a todo button, .btn y enlaces tipo botón.
-   - Borde superior e izquierdo: 100% invisibles.
-   - Borde inferior: completo con opacidad 0.10.
-   - Borde lateral derecho: llega hasta el 50% con opacidad 0.05.
-   - Sombra proyectada sutil al hover.
-═════════════════════════════════════════════════════════════════════════ */
-button:not(.woc-button-naked):not(.cpe-dot),
-.btn,
-a[class*="bg-"],
-a[class*="border"] {
-  position: relative;
-  border-top-color: transparent !important;
-  border-left-color: transparent !important;
-  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, border-color 0.4s ease;
-}
-
-button:not(.woc-button-naked):not(.cpe-dot)::after,
-.btn::after,
-a[class*="bg-"]::after,
-a[class*="border"]::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  border: 0;
-  border-top: 0 !important;
-  border-left: 0 !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
-  mask-image: linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 35%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 65%);
-  -webkit-mask-image: linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 35%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 65%);
-  z-index: 10;
-}
-
-button:not(.woc-button-naked):not(.cpe-dot):hover::after,
-.btn:hover::after,
-a[class*="bg-"]:hover::after,
-a[class*="border"]:hover::after {
-  opacity: 1;
-}
-
-button:not(.woc-button-naked):not(.cpe-dot):hover,
-.btn:hover,
-a[class*="bg-"]:hover,
-a[class*="border"]:hover {
-  border-top-color: transparent !important;
-  border-left-color: transparent !important;
-  box-shadow: 6px 12px 24px -4px rgba(0, 0, 0, 0.75);
-}
+

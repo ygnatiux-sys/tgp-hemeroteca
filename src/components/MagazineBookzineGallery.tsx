@@ -106,7 +106,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
         <div className="max-w-7xl mx-auto">
           
           {/* CABECERA EDITORIAL TIPO BOOKZINE / MAGAZINE */}
-          <div className="border-t border-b border-white/10 py-6 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 bg-linear-to-r from-white/2 via-transparent to-white/2">
+          <div className="border-t border-b border-white/10 py-6 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 bg-linear-to-r from-white/5 via-transparent to-white/5">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#C8A98B] shadow-[0_0_10px_rgba(200,169,139,0.8)] animate-pulse"></span>
@@ -170,7 +170,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
                 <div
                   key={item.id || idx}
                   onClick={() => openLightboxAt(idx)}
-                  className="group relative bg-theme-dark border border-white/10 hover:border-[#C8A98B]/60 rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 hover:shadow-[0_0_30px_rgba(200,169,139,0.2)] flex flex-col cursor-zoom-in"
+                  className="group relative bg-stone-900 border border-white/10 hover:border-[#C8A98B]/60 rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 hover:shadow-[0_0_30px_rgba(200,169,139,0.2)] flex flex-col cursor-zoom-in"
                 >
                   {/* Contenedor de la Imagen */}
                   <div className="relative aspect-4/3 w-full overflow-hidden bg-black/60">
@@ -195,18 +195,18 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
                     </div>
 
                     {/* Gradiente Inferior de Sombra */}
-                    <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-theme-dark to-transparent"></div>
+                    <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-stone-900 to-transparent"></div>
                   </div>
 
                   {/* Metadatos y Epígrafe */}
-                  <div className="p-4.5 flex-1 flex flex-col justify-between">
+                  <div className="p-5 flex-1 flex flex-col justify-between">
                     <div>
                       <h4 className="font-serif text-sm font-semibold text-stone-100 group-hover:text-[#C8A98B] transition-colors line-clamp-2 leading-snug">
                         {item.title}
                       </h4>
                       {item.caption && item.caption !== item.title && (
-                        <p className="font-sans text-[11px] text-stone-400 mt-2 line-clamp-2 leading-relaxed">
-                          {item.caption}
+                        <p className="font-sans text-xs text-stone-400 leading-relaxed font-medium line-clamp-3 md:line-clamp-none max-w-35 md:max-w-none">
+                          {item.caption || (item as any).description || "Registro Documental"}
                         </p>
                       )}
                     </div>
@@ -341,12 +341,12 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════════════════════════════════════
+      {/* ═══════════════════════════════════════════════════════════════════
          MODAL LIGHTBOX DE ALTA PRECISIÓN & ZOOM MULTIESCALA (100% VISIÓN WIKI)
-      ═══════════════════════════════════════════════════════════════════════ */}
+      ═══════════════════════════════════════════════════════════════════ */}
       {isLightboxOpen && (
         <div
-          className="fixed inset-0 z-100 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-between p-4 sm:p-6 select-none animate-fade-in"
+          className="fixed inset-0 z-99999 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-between p-4 sm:p-6 select-none animate-fade-in"
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
         >

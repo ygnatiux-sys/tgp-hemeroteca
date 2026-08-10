@@ -121,12 +121,12 @@ const { fragments = [], isModal = false } = Astro.props;
 
     {/* ── TOOLBAR CPE: Dots + Flechas (auto-hide, solo si hay más de 1 slide) ── */}
     {fragments.length > 1 && (
-      <div class="dossier-toolbar absolute inset-0 z-30 pointer-events-none opacity-0 transition-opacity duration-500">
+      <div class="dossier-toolbar absolute inset-0 w-full z-30 pointer-events-none opacity-0 transition-opacity duration-500">
         {/* Dots de paginación */}
         <nav class="dossier-dots absolute bottom-7 md:bottom-8 left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-1.5 md:gap-2 max-w-[92vw] px-4 py-2 rounded-full bg-black/35 backdrop-blur-md border border-white/10 pointer-events-auto shadow-xl" aria-label="Indicadores de slide">
           {fragments.map((_, i) => (
             <button
-              class={`dossier-dot h-1.5 rounded-full transition-all duration-500 cursor-pointer border-0 p-0 ${i === 0 ? 'w-6 md:w-8 bg-[#C8A98B]' : 'w-1.5 md:w-2 bg-white/30 hover:bg-white/60'}`}
+              class={`dossier-dot h-1.5 rounded-full transition-all duration-500 cursor-pointer border-0 p-0 ${i === 0 ? 'w-6 md:w-8 bg-white' : 'w-1.5 md:w-2 bg-white/30 hover:bg-white/60'}`}
               data-dot={i}
               aria-label={`Ir al slide ${i + 1}`}
             />
@@ -135,7 +135,7 @@ const { fragments = [], isModal = false } = Astro.props;
 
         {/* Flecha izquierda */}
         <button
-          class="dossier-prev absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-black/45 border border-white/15 text-white/70 hover:bg-black/75 hover:border-[#C8A98B] hover:text-[#C8A98B] transition-all duration-300 active:scale-90 pointer-events-auto shadow-lg"
+          class="dossier-prev absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-black/45 border border-white/15 text-white/70 hover:bg-black/75 hover:border-white/40 hover:text-white transition-all duration-300 active:scale-90 pointer-events-auto shadow-lg"
           aria-label="Slide anterior"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -143,7 +143,7 @@ const { fragments = [], isModal = false } = Astro.props;
 
         {/* Flecha derecha */}
         <button
-          class="dossier-next absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-black/45 border border-white/15 text-white/70 hover:bg-black/75 hover:border-[#C8A98B] hover:text-[#C8A98B] transition-all duration-300 active:scale-90 pointer-events-auto shadow-lg"
+          class="dossier-next absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-black/45 border border-white/15 text-white/70 hover:bg-black/75 hover:border-white/40 hover:text-white transition-all duration-300 active:scale-90 pointer-events-auto shadow-lg"
           aria-label="Slide siguiente"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>

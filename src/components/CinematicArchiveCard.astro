@@ -1,158 +1,203 @@
 ---
-import { Image } from 'astro:assets';
-import { getRelatedCategories, formatYear, normalizeCategory, splitTitleKeyword } from '../lib/content-filter';
+import { Image } from "astro:assets";
+import {
+  getRelatedCategories,
+  formatYear,
+  normalizeCategory,
+  splitTitleKeyword,
+} from "../lib/content-filter";
 
 interface Props {
   slug: string;
   entry: any;
   img?: ImageMetadata | null;
-  variant?: 'hero' | 'duo-60' | 'duo-40' | 'standard';
+  variant?: "hero" | "duo-60" | "duo-40" | "standard";
   enableCinemagraph?: boolean;
 }
 
-const { slug, entry, img, variant = 'standard', enableCinemagraph = false } = Astro.props;
+const {
+  slug,
+  entry,
+  img,
+  variant = "standard",
+  enableCinemagraph = false,
+} = Astro.props;
 
 const sitio = entry.sitioGeohistorico || null;
 const relatedTags = getRelatedCategories(entry.category, sitio, entry.title);
 const year = formatYear(entry.date);
-const excerpt = entry.excerpt || '';
+const excerpt = entry.excerpt || "";
 const href = `/hemeroteca/${slug}`;
 
-// Determinar botón secundario (media o registro)
-let secondaryLabel = 'VER REGISTRO ▸';
+// Lógica de ruteo y CTA limpia
+let secondaryLabel = "VER REGISTRO";
 let secondaryHref = href;
 let isExternal = false;
 
 if (entry.youtubeLink) {
-  secondaryLabel = 'WATCH TRAILER ▸';
+  secondaryLabel = "WATCH TRAILER";
   secondaryHref = entry.youtubeLink;
   isExternal = true;
 } else if (entry.spotifyLink) {
-  secondaryLabel = 'AUDIO PODCAST ▸';
+  secondaryLabel = "AUDIO PODCAST";
   secondaryHref = entry.spotifyLink;
   isExternal = true;
 } else if (sitio) {
-  secondaryLabel = `${sitio.toUpperCase()} ▸`;
+  secondaryLabel = sitio.toUpperCase();
   secondaryHref = href;
 }
 
 // Configuración visual por variante
-const isHero = variant === 'hero';
-const isDuo40 = variant === 'duo-40';
+const isHero = variant === "hero";
+const isDuo40 = variant === "duo-40";
 
 const minHeightClass = isHero
-  ? 'min-h-[460px] sm:min-h-[520px] md:min-h-[560px] lg:min-h-[600px]'
+  ? "min-h-[460px] sm:min-h-[520px] md:min-h-[560px] lg:min-h-[600px]"
   : isDuo40
-  ? 'min-h-[380px] sm:min-h-[420px] md:min-h-[450px]'
-  : 'min-h-[400px] sm:min-h-[440px] md:min-h-[480px]';
+    ? "min-h-[380px] sm:min-h-[420px] md:min-h-[450px]"
+    : "min-h-[400px] sm:min-h-[440px] md:min-h-[480px]";
 
 const paddingClass = isHero
-  ? 'p-6 sm:p-8 md:p-12 lg:p-14'
+  ? "p-6 sm:p-8 md:p-12 lg:p-14"
   : isDuo40
-  ? 'p-5 sm:p-6 md:p-7'
-  : 'p-5 sm:p-7 md:p-8';
+    ? "p-5 sm:p-6 md:p-7"
+    : "p-5 sm:p-7 md:p-8";
 
 const titleClass = isHero
-  ? 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black leading-[1.12]'
+  ? "text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black leading-[1.12]"
   : isDuo40
-  ? 'text-lg sm:text-xl md:text-2xl font-extrabold leading-[1.2]'
-  : 'text-xl sm:text-2xl md:text-3xl font-extrabold leading-[1.16]';
+    ? "text-lg sm:text-xl md:text-2xl font-extrabold leading-[1.2]"
+    : "text-xl sm:text-2xl md:text-3xl font-extrabold leading-[1.16]";
 
 const excerptClass = isHero
-  ? 'text-xs sm:text-sm md:text-base text-white/80 line-clamp-2 max-w-3xl font-light'
+  ? "text-xs sm:text-sm md:text-base text-white/80 line-clamp-2 max-w-3xl font-light"
   : isDuo40
-  ? 'text-[11px] sm:text-xs text-white/70 line-clamp-1 max-w-xl font-light'
-  : 'text-xs sm:text-sm text-white/75 line-clamp-2 max-w-2xl font-light';
-const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(entry.title || '');
+    ? "text-[11px] sm:text-xs text-white/70 line-clamp-1 max-w-xl font-light"
+    : "text-xs sm:text-sm text-white/75 line-clamp-2 max-w-2xl font-light";
+
+const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
+  entry.title || "",
+);
 ---
 
 <article
-  class={`cinematic-archive-card cinematic-card-lantern card-hover-cinematic group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/8 bg-theme-dark/80 shadow-2xl flex flex-col justify-end w-full ${minHeightClass}`}
+  class={`cinematic-archive-card cinematic-card-lantern card-hover-cinematic group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/8 bg-theme-dark/80 shadow-2xl flex flex-col justify-end w-full transform-gpu isolate ${minHeightClass}`}
   data-category={normalizeCategory(entry.category)}
   data-year={year}
 >
-  {/* 1. Imagen de fondo cinematográfica con alta visibilidad y cinemagraph */}
-  {img ? (
-    <Image
-      src={img}
-      alt={entry.title || "Dossier del Archivo"}
-      class={`absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none ${
-        enableCinemagraph
-          ? 'cinemagraph-ken-burns'
-          : 'group-hover:scale-[1.018] group-hover:brightness-95 transition-transform duration-700 delay-75 ease-out'
-      }`}
-    />
-  ) : (
-    <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1c242b] via-theme-dark to-[#0a0b0b]" />
-  )}
+  {/* 1. Imagen de fondo */}
+  {
+    img ? (
+      <Image
+        src={img}
+        alt={entry.title || "Dossier del Archivo"}
+        class={`absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none -z-10 ${
+          enableCinemagraph
+            ? "cinemagraph-ken-burns"
+            : "group-hover:scale-[1.018] group-hover:brightness-95 transition-transform duration-700 delay-75 ease-out"
+        }`}
+      />
+    ) : (
+      <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1c242b] via-theme-dark to-[#0a0b0b] -z-10" />
+    )
+  }
 
-  {/* 2. Efecto Dynamis en Loop sutil */}
-  {enableCinemagraph && (
-    <div class="absolute inset-0 pointer-events-none cinemagraph-dynamis z-1" />
-  )}
+  {/* 2. Efecto Dynamis (Solo si está habilitado) */}
+  {
+    enableCinemagraph && (
+      <div class="absolute inset-0 pointer-events-none cinemagraph-dynamis z-0" />
+    )
+  }
 
-  {/* 3. Gradiente inferior suave (deja la imagen superior 100% visible) */}
+  {/* 3. Gradiente inferior suave (Solución de capas z-index) */}
   <div
-    class={`absolute inset-0 bg-linear-to-t from-theme-dark/95 via-theme-dark/50 via-45% to-transparent pointer-events-none z-2 ${
-      enableCinemagraph ? 'cinemagraph-museum-fade' : ''
+    class={`absolute inset-0 bg-linear-to-t from-theme-dark/95 via-theme-dark/50 via-45% to-transparent pointer-events-none z-10 ${
+      enableCinemagraph ? "cinemagraph-museum-fade" : ""
     }`}
-  />
+  >
+  </div>
 
-  {/* 4. Contenido Editorial con Ley 60/40 (Título a la izq 60%, Subtítulo + Botones + Metadata a la der 40%) */}
-  <div class={`relative z-10 ${paddingClass} w-full max-w-7xl`}>
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-end w-full">
-      
-      {/* Columna Izquierda: 60% (lg:col-span-7) -> Título Principal Extra Bold */}
+  {/* 4. Contenido Editorial con z-index superior */}
+  <div class={`relative z-20 ${paddingClass} w-full max-w-7xl`}>
+    <div
+      class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-end w-full"
+    >
+      {/* Columna Izquierda */}
       <div class="lg:col-span-7 flex flex-col justify-end">
-        <h2 class={`font-cinzel tracking-tight drop-shadow-lg transition-all duration-300 ${titleClass}`}>
-          <a href={href} class="gradient-acero-ios hover:opacity-90 transition-opacity block">
-            {titlePrefix}<span class="title-keyword-shine-fade">{titleKeyword}</span>
+        <h2
+          class={`font-cinzel tracking-tight drop-shadow-lg transition-all duration-300 ${titleClass}`}
+        >
+          <a
+            href={href}
+            class="gradient-acero-ios hover:opacity-90 transition-opacity block"
+          >
+            {titlePrefix}<span class="title-keyword-shine-fade"
+              >{titleKeyword}</span
+            >
           </a>
         </h2>
       </div>
 
-      {/* Columna Derecha: 40% (lg:col-span-5) -> Excerpt / Subtítulo + Botones + Metadata */}
-      <div class="lg:col-span-5 flex flex-col gap-2.5 justify-end lg:translate-y-2 lg:pb-0.5">
-        {/* Excerpt / Subtítulo con Titileo Suave que Desaparece Hasta Hover */}
-        {excerpt && (
-          <p class={`font-sans leading-relaxed h2-soft-breathe-fade ${excerptClass}`}>
-            {excerpt}
-          </p>
-        )}
+      {/* Columna Derecha */}
+      <div
+        class="lg:col-span-5 flex flex-col gap-2.5 justify-end lg:translate-y-2 lg:pb-0.5"
+      >
+        {
+          excerpt && (
+            <p
+              class={`font-sans leading-relaxed h2-soft-breathe-fade ${excerptClass}`}
+            >
+              {excerpt}
+            </p>
+          )
+        }
 
-        {/* Único CTA: VER REGISTRO con vidrio suave */}
+        {/* CTA Interconectado a las variables superiores */}
         <div class="relative min-h-10 flex items-center pt-1">
           <a
-            href={href}
-            class="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-[#151718]/90 backdrop-blur-sm border border-white/10 text-[#E0E0E0]/75 font-mono font-bold text-[9px] sm:text-[10px] tracking-[0.25em] uppercase rounded-lg hover:bg-[#C8A98B]/10 hover:border-[#C8A98B]/50 hover:text-[#C8A98B] transition-all duration-400 active:translate-y-0.5"
+            href={secondaryHref}
+            target={isExternal ? "_blank" : undefined}
+            rel={isExternal ? "noopener noreferrer" : undefined}
+            class="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-[#151718]/90 backdrop-blur-sm border border-white/10 text-[#E0E0E0]/75 font-mono font-bold text-[9px] sm:text-[10px] tracking-[0.25em] uppercase rounded-lg hover:bg-white/10 hover:border-white/30 hover:text-white transition-all duration-400 active:translate-y-0.5"
           >
-            <span>VER REGISTRO</span>
-            <span class="text-[10px] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">▸</span>
+            <span>{secondaryLabel}</span>
+            <span
+              class="text-[10px] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300"
+              >▸</span
+            >
           </a>
         </div>
 
-        {/* Tags de Categorías Relacionadas y Metadata: Solo Visibles en Hover */}
-        <div class="flex flex-wrap items-center gap-2 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.25em] text-[#C8A98B]/70 font-bold pt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-700">
-          {relatedTags.map((tag, idx) => (
-            <>
-              <span>{tag}</span>
-              {idx < relatedTags.length - 1 && <span class="text-white/20 font-normal">·</span>}
-            </>
-          ))}
-          {year && (
-            <>
-              <span class="text-white/20 font-normal">·</span>
-              <span class="text-white/50">{year}</span>
-            </>
-          )}
+        {/* Tags de Categorías Relacionadas y Metadata */}
+        <div
+          class="flex flex-wrap items-center gap-2 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.25em] text-[#C8A98B]/70 font-bold pt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-700"
+        >
+          {
+            relatedTags.map((tag, idx) => (
+              <>
+                <span>{tag}</span>
+                {idx < relatedTags.length - 1 && (
+                  <span class="text-white/20 font-normal">·</span>
+                )}
+              </>
+            ))
+          }
+          {
+            year && (
+              <>
+                <span class="text-white/20 font-normal">·</span>
+                <span class="text-white/50">{year}</span>
+              </>
+            )
+          }
         </div>
       </div>
-
     </div>
   </div>
 </article>
 
 <style>
+  /* Se conservan las animaciones intactas */
   @keyframes kenBurnsAscent {
     0% {
       transform: scale(1.02) translateY(2.5%) translateZ(0);
@@ -167,10 +212,10 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(entry.t
 
   @keyframes museumFade {
     0% {
-      opacity: 0.70;
+      opacity: 0.7;
     }
     50% {
-      opacity: 0.90;
+      opacity: 0.9;
     }
     100% {
       opacity: 0.65;
@@ -196,7 +241,8 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(entry.t
   }
 
   .cinemagraph-ken-burns {
-    animation: kenBurnsAscent 24s cubic-bezier(0.4, 0, 0.6, 1) infinite alternate;
+    animation: kenBurnsAscent 24s cubic-bezier(0.4, 0, 0.6, 1) infinite
+      alternate;
     will-change: transform;
     transform-origin: center center;
   }
@@ -206,7 +252,12 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(entry.t
   }
 
   .cinemagraph-dynamis {
-    background: radial-gradient(circle at 45% 45%, rgba(200, 169, 139, 0.25) 0%, rgba(74, 59, 50, 0.12) 45%, transparent 70%);
+    background: radial-gradient(
+      circle at 45% 45%,
+      rgba(200, 169, 139, 0.25) 0%,
+      rgba(74, 59, 50, 0.12) 45%,
+      transparent 70%
+    );
     mix-blend-mode: screen;
     animation: dynamisLoop 16s ease-in-out infinite alternate;
     will-change: transform, opacity, filter;
@@ -220,4 +271,3 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(entry.t
     }
   }
 </style>
-

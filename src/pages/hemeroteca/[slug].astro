@@ -20,7 +20,7 @@ import {
   getPublishableEssays,
 } from "../../lib/content-filter";
 import CinematicDossier from "../../components/CinematicDossier.astro"; // reservado para uso futuro
-import CinematicPostEngine from "../../components/CinematicPostEngine.astro";
+import CinematicGalleryEngine from "../../components/CinematicGalleryEngine.astro";
 
 export const prerender = true;
 export async function getStaticPaths() {
@@ -630,20 +630,19 @@ const imagePosition =
       </aside>
     </div>
 
-    {/* ── GALERÍA NATIVA — CinematicPostEngine (batch de fotos del post) ── */}
+    {/* ── GALERÍA NATIVA — CinematicGalleryEngine (batch de fotos del post) ── */}
     {allGalleryImages.length > 0 && (
-      <CinematicPostEngine
+      <CinematicGalleryEngine
         slides={allGalleryImages.map((img: any, i: number) => ({
           id: `${slug}-photo-${i}`,
           title: img.title || doc.title || 'Registro Visual',
-          subtitle: img.caption || img.description || undefined,
-          category: formatCategory(doc.category) || 'Archivo',
-          date: doc.date ? new Date(doc.date).getFullYear().toString() : undefined,
+          subtitle: img.description || img.caption || undefined,
+          author: img.author || undefined,
+          license: img.license || undefined,
           image: img.url || img.thumbUrl || img.src || img,
           imagePosition: img.position || doc.coverImagePosition || 'center center',
-          link: `/hemeroteca/${slug}`,
         }))}
-        heightClass="h-dvh"
+        heightClass="h-[80vh] md:h-dvh max-w-7xl mx-auto rounded-3xl my-16"
       />
     )}
 

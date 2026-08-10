@@ -61,6 +61,7 @@ const {
   {/* 2. Escenario Tipográfico (Flotando sobre la imagen) */}
   <div
     class="relative z-20 w-full max-w-5xl mx-auto px-6 md:px-12 pb-24 md:pb-32 flex flex-col gap-5 text-left"
+  >
     <slot name="breadcrumb" />
 
     {
@@ -151,7 +152,7 @@ const {
           left: "50%",
           xPercent: -50,
           yPercent: -50,
-          width: "100vw",
+          width: "100%",
           textAlign: "center",
           zIndex: 50,
           pointerEvents: "none"
@@ -237,6 +238,8 @@ const {
           ease: "power2.out",
           onComplete: () => {
             h1.classList.add("is-permanently-iridescent");
+            // Habilitamos las transiciones CSS SOLO cuando GSAP termina
+            h1.classList.add("is-interactive-ready"); 
           }
         },
         "+=0.3"
@@ -262,12 +265,16 @@ const {
     will-change: transform, opacity;
   }
 
-  /* EFECTO FINAL Y HOVER EN H1: Se ensancha como franja central y emite brillos titanios iridiscentes con flares dorados */
+  /* El H1 base NO tiene transition de transform para no pelear con GSAP */
   .interior-hero-h1 {
+    /* Mantenemos solo el clip-text base */
+  }
+
+  /* Esta clase se añade vía JS cuando termina la timeline */
+  .interior-hero-h1.is-interactive-ready {
     transition: letter-spacing 0.6s cubic-bezier(0.16, 1, 0.3, 1),
                 transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-                filter 0.6s ease,
-                background-position 3.0s ease;
+                filter 0.6s ease;
   }
 
   .interior-hero-h1.is-permanently-iridescent {
@@ -283,12 +290,15 @@ const {
     );
     background-size: 220% auto;
     animation: shineGoldTitanium 4.0s linear infinite;
+    /* Optimización GPU obligatoria para evitar glitches de repintado */
+    transform: translateZ(0);
+    will-change: filter, background-position;
     filter: drop-shadow(0 0 25px rgba(253, 224, 71, 0.35)) drop-shadow(0 15px 50px rgba(0,0,0,0.95));
   }
 
-  .interior-hero-h1:hover {
+  .interior-hero-h1.is-interactive-ready:hover {
     letter-spacing: 0.04em;
-    transform: scaleX(1.03);
+    transform: scaleX(1.03) translateZ(0);
     filter: drop-shadow(0 0 45px rgba(253, 224, 71, 0.6)) drop-shadow(0 15px 50px rgba(0,0,0,0.95));
   }
 

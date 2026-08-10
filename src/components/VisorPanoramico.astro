@@ -14,35 +14,66 @@ interface Props {
 const { images } = Astro.props;
 ---
 
-<div class="w-full flex flex-col">
+<div class="w-full flex flex-col" id="visor-panoramico-wrapper">
   {/* Contenedor del Visor - Full Bleed */}
-  <div class="relative w-full h-[70vh] md:h-[85vh] bg-black">
-    <div class="flex w-full h-full overflow-x-auto snap-x snap-mandatory scrollbar-hide">
-      {images.map((image, index) => (
-        <div class="relative flex-none w-full h-full snap-center bg-zinc-900">
-          <img 
-            src={image.url} 
-            alt={image.alt} 
-            loading="lazy"
-            class="w-full h-full object-cover"
-          />
-          {/* Metadata superpuesta sutilmente abajo */}
-          <div class="absolute bottom-4 left-6 pointer-events-none">
-             <span class="font-sans text-[10px] md:text-xs text-white/40 tracking-widest font-thin uppercase">
-               {index + 1} / {images.length} — {image.metadata}
-             </span>
+  <div
+    class="relative w-full h-[70vh] md:h-[85vh] bg-black group overflow-hidden"
+  >
+    {/* Contenedor de Scroll (Se añadió scroll-smooth) */}
+    <div
+      id="visor-scroll-container"
+      class="flex w-full h-full overflow-x-auto snap-x snap-mandatory scrollbar-hide isolate scroll-smooth"
+    >
+      {
+        images.map((image, index) => (
+          <div class="relative flex-none w-full h-full snap-center bg-zinc-900 transform-gpu">
+            <img
+              src={image.url}
+              alt={image.alt}
+              loading={index === 0 ? "eager" : "lazy"}
+              decoding={index === 0 ? "sync" : "async"}
+              class="w-full h-full object-cover transform-gpu"
+            />
+            {/* Metadata superpuesta sutilmente abajo */}
+            <div class="absolute bottom-4 left-6 pointer-events-none ui-fade-element transition-opacity duration-700">
+              <span class="font-sans text-[10px] md:text-xs text-white/50 tracking-widest font-thin uppercase drop-shadow-md">
+                {index + 1} / {images.length} — {image.metadata}
+              </span>
+            </div>
           </div>
-        </div>
-      ))}
+        ))
+      }
     </div>
-    
-    {/* Indicadores visuales sutiles de scroll */}
-    <div class="absolute top-1/2 left-4 -translate-y-1/2 pointer-events-none opacity-20">
-      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 19l-7-7 7-7"></path></svg>
-    </div>
-    <div class="absolute top-1/2 right-4 -translate-y-1/2 pointer-events-none opacity-20">
-      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5l7 7-7 7"></path></svg>
-    </div>
+
+    {/* Flecha Anterior (Botón interactivo con background blur sutil) */}
+    <button
+      id="btn-visor-prev"
+      class="absolute top-1/2 left-4 -translate-y-1/2 z-10 w-12 h-12 flex items-center justify-center text-white/50 hover:text-white bg-black/20 hover:bg-black/50 backdrop-blur-sm rounded-full transition-all duration-500 ui-fade-element cursor-pointer active:scale-95 opacity-0"
+      aria-label="Imagen anterior"
+    >
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+        ><path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M15 19l-7-7 7-7"></path></svg
+      >
+    </button>
+
+    {/* Flecha Siguiente */}
+    <button
+      id="btn-visor-next"
+      class="absolute top-1/2 right-4 -translate-y-1/2 z-10 w-12 h-12 flex items-center justify-center text-white/50 hover:text-white bg-black/20 hover:bg-black/50 backdrop-blur-sm rounded-full transition-all duration-500 ui-fade-element cursor-pointer active:scale-95 opacity-0"
+      aria-label="Siguiente imagen"
+    >
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+        ><path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M9 5l7 7-7 7"></path></svg
+      >
+    </button>
   </div>
 </div>
 
@@ -55,3 +86,67 @@ const { images } = Astro.props;
     scrollbar-width: none;
   }
 </style>
+
+<script>
+  function initVisorPanoramico() {
+    const wrapper = document.getElementById("visor-panoramico-wrapper");
+    const container = document.getElementById("visor-scroll-container");
+    const btnPrev = document.getElementById("btn-visor-prev");
+    const btnNext = document.getElementById("btn-visor-next");
+    const fadeElements = document.querySelectorAll(".ui-fade-element");
+
+    if (!wrapper || !container || !btnPrev || !btnNext) return;
+
+    // --- LÓGICA DE NAVEGACIÓN ---
+    // Calcula el ancho exacto del contenedor visible para avanzar una foto entera
+    const getScrollAmount = () => container.clientWidth;
+
+    btnPrev.addEventListener("click", () => {
+      container.scrollBy({ left: -getScrollAmount(), behavior: "smooth" });
+    });
+
+    btnNext.addEventListener("click", () => {
+      container.scrollBy({ left: getScrollAmount(), behavior: "smooth" });
+    });
+
+    // --- LÓGICA DE AUTO-OCULTAMIENTO (IDLE STATE) ---
+    let idleTimer: ReturnType<typeof setTimeout>;
+
+    const showUI = () => {
+      fadeElements.forEach((el) => {
+        el.classList.remove("opacity-0");
+        el.classList.add("opacity-100");
+      });
+
+      clearTimeout(idleTimer);
+
+      // Ocultar las flechas y la metadata después de 2.5 segundos de inactividad
+      idleTimer = setTimeout(() => {
+        fadeElements.forEach((el) => {
+          el.classList.remove("opacity-100");
+          el.classList.add("opacity-0");
+        });
+      }, 2500);
+    };
+
+    // Despertar la UI cuando hay movimiento, scroll o toques en móviles
+    wrapper.addEventListener("mousemove", showUI);
+    wrapper.addEventListener("touchstart", showUI, { passive: true });
+    container.addEventListener("scroll", showUI, { passive: true });
+
+    // Estado inicial: mostrar la UI un momento al cargar
+    showUI();
+  }
+
+  // Soporte nativo para Astro ViewTransitions
+  document.addEventListener("astro:page-load", initVisorPanoramico);
+
+  if (
+    document.readyState === "complete" ||
+    document.readyState === "interactive"
+  ) {
+    initVisorPanoramico();
+  } else {
+    document.addEventListener("DOMContentLoaded", initVisorPanoramico);
+  }
+</script>

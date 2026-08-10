@@ -1,66 +1,45 @@
 ---
 /**
- * CinematicPostEngine.astro
+ * CinematicGalleryEngine.astro
  * ──────────────────────────────────────────────────────────────────────────────
- * Motor cinemático tipo Netflix para el Hero del Home de TGP.
- *
- * Comportamiento:
- *  - Auto-ciclo infinito (SLIDE_DURATION ms/slide), con animación GSAP.
- *  - Ken Burns muy lento y sutil en la imagen de fondo (scale 1→1.06).
- *  - Textos: fade-in desde abajo (efecto "Primicia") con stagger.
- *  - Metadatos: pulso suave (yoyo opacidad 0.35↔1, repeat -1).
- *  - Salida: fade-out general suave antes del siguiente slide.
- *  - Control manual: drag/swipe (finger o cursor) → pausa auto → reinicia auto
- *    tras 8 s de inactividad.
- *  - Dots de paginación con transición de ancho.
- *  - Barra de progreso en la base del hero.
- *  - Sin fundido hacia abajo: el hero ocupa h-dvh y el contenido fluye debajo.
- *
- * Props:
- *  slides: SlideData[]  — Array de posts recientes desde el servidor Astro.
- *
- * Hereda: paleta CSS (--bg-main, rust-orange, cinzel, mono, serif), botones y
- * estilos globales. Nada se cambia sin autorización.
+ * Motor cinemático adaptado para funcionar como Galería Inmersiva dentro de posts.
  */
 
-export interface SlideData {
+export interface GallerySlideData {
   id: string;
   title: string;
   subtitle?: string;
-  category?: string;
-  date?: string;
-  readTime?: string;
+  author?: string;
+  license?: string;
   image: any;
   imagePosition?: string;
-  link: string;
-  papersLink?: string;
 }
 
 interface Props {
-  slides: SlideData[];
+  slides: GallerySlideData[];
   heightClass?: string;
 }
 
-const { slides = [], heightClass = "h-dvh" } = Astro.props;
+const { slides = [], heightClass = "h-[85vh] md:h-dvh" } = Astro.props;
 const safeSlides = slides.length > 0 ? slides : [];
 ---
 
 {
   safeSlides.length > 0 && (
     <section
-      class={`cpe-root relative w-full ${heightClass} overflow-hidden bg-black rounded-2xl md:rounded-3xl select-none`}
-      aria-label="Cartelera Cinemática TGP"
+      class={`cge-root relative w-full ${heightClass} overflow-hidden bg-[#0a0a0a] rounded-2xl select-none my-12 shadow-2xl border border-white/5`}
+      aria-label="Galería Cinemática"
     >
       {/* ── SLIDES ── */}
-      <div class="cpe-slides absolute inset-0">
+      <div class="cge-slides absolute inset-0">
         {safeSlides.map((slide, i) => (
           <article
-            class={`cpe-slide absolute inset-0 flex items-end justify-start pb-24 md:pb-32 ${i === 0 ? "z-20" : "z-10 opacity-0 pointer-events-none"}`}
+            class={`cge-slide absolute inset-0 flex items-end justify-start pb-20 md:pb-24 ${i === 0 ? "z-20" : "z-10 opacity-0 pointer-events-none"}`}
             data-index={i}
             {...(i !== 0 ? { "aria-hidden": "true" } : {})}
           >
             {/* Fondo: Ken Burns */}
-            <div class="cpe-bg-wrap absolute inset-0 overflow-hidden">
+            <div class="cge-bg-wrap absolute inset-0 overflow-hidden bg-black/80">
               <img
                 src={
                   typeof slide.image === "string"
@@ -68,79 +47,49 @@ const safeSlides = slides.length > 0 ? slides : [];
                     : slide.image?.src || ""
                 }
                 alt={slide.title}
-                class="cpe-bg-img absolute inset-0 w-full h-full object-cover scale-100"
+                class="cge-bg-img absolute inset-0 w-full h-full object-contain scale-100 opacity-95"
                 style={`object-position: ${slide.imagePosition || "center center"};`}
                 loading={i === 0 ? "eager" : "lazy"}
                 decoding="async"
               />
-              {/* Gradiente editorial: oscurece laterales y base */}
-              <div class="absolute inset-0 bg-linear-to-r from-black/80 via-black/45 to-black/15 pointer-events-none" />
-              <div class="absolute inset-0 bg-linear-to-t from-black/75 via-transparent to-black/30 pointer-events-none" />
+              {/* Gradiente editorial: oscurece base */}
+              <div class="absolute inset-0 bg-linear-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent pointer-events-none" />
             </div>
 
             {/* Contenido Editorial */}
-            <div class="cpe-content relative z-10 w-full max-w-6xl mx-auto px-6 md:px-12 lg:px-20 flex flex-col items-start gap-2.5">
+            <div class="cge-content relative z-10 w-full max-w-5xl mx-auto px-6 md:px-12 flex flex-col items-start gap-2.5">
               {/* Metadatos superiores: Pulso suave GSAP */}
-              <div class="cpe-meta flex items-center gap-3">
+              <div class="cge-meta flex items-center gap-3">
                 <span class="inline-flex items-center gap-2 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-[#C8A98B]">
-                  <span class="cpe-meta-dot w-1.5 h-1.5 rounded-full bg-rust-orange inline-block shadow-[0_0_6px_rgba(200,169,139,0.8)]" />
-                  {slide.category || "Investigación"}
+                  <span class="cge-meta-dot w-1.5 h-1.5 rounded-full bg-[#C8A98B] inline-block shadow-[0_0_6px_rgba(200,169,139,0.8)]" />
+                  LÁMINA {String(i + 1).padStart(2, '0')} / {String(safeSlides.length).padStart(2, '0')}
                 </span>
-                {slide.date && (
-                  <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-white/35">
-                    {slide.date}
+                {slide.author && (
+                  <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-white/40 border-l border-white/20 pl-3">
+                    {slide.author}
                   </span>
                 )}
-                {slide.readTime && (
+                {slide.license && (
                   <>
                     <span class="text-white/20 text-xs">·</span>
-                    <span class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-white/35">
-                      {slide.readTime} lectura
+                    <span class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-[#C8A98B]/60">
+                      {slide.license}
                     </span>
                   </>
                 )}
               </div>
 
-              {/* Título — unificado más pequeño */}
-              <h1 class="cpe-title font-cinzel font-bold text-xl md:text-2xl leading-snug tracking-wide text-pretty max-w-3xl">
-                <a
-                  href={slide.link}
-                  class="bg-linear-to-br from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)] hover:from-[#C8A98B] hover:via-[#E2D4B8] hover:to-white transition-all duration-500"
-                >
-                  {slide.title}
-                </a>
-              </h1>
+              {/* Título estático */}
+              <h3 class="cge-title font-serif font-bold text-xl md:text-3xl leading-snug tracking-tight text-stone-100 max-w-3xl drop-shadow-xl mt-1">
+                {slide.title}
+              </h3>
 
               {/* Subtítulo / excerpt */}
               {slide.subtitle && (
-                <p class="cpe-subtitle font-serif italic text-white/50 text-sm md:text-base max-w-xl leading-relaxed drop-shadow-md line-clamp-2">
+                <p class="cge-subtitle font-serif italic text-stone-300 text-sm md:text-base max-w-2xl leading-relaxed drop-shadow-md border-l-2 border-[#C8A98B]/50 pl-4 mt-2">
                   "{slide.subtitle}"
                 </p>
               )}
-
-              {/* CTAs */}
-              <div class="cpe-cta flex items-center gap-3 mt-2 flex-wrap">
-                <a
-                  href={slide.link}
-                  class="group inline-flex items-center gap-2 px-5 py-2.5 bg-[#151718]/85 backdrop-blur-sm border border-white/15 text-[#E0E0E0]/80 font-mono font-bold text-[9px] tracking-[0.25em] uppercase rounded-lg hover:bg-white/10 hover:border-white/40 hover:text-white transition-all duration-400 active:scale-95"
-                >
-                  <span>Ver Hemeroteca</span>
-                  <span class="opacity-50 group-hover:translate-x-0.5 transition-transform">
-                    ▸
-                  </span>
-                </a>
-                {slide.papersLink && (
-                  <a
-                    href={slide.papersLink}
-                    class="group inline-flex items-center gap-2 px-5 py-2.5 bg-transparent border border-white/15 text-white/55 font-mono font-bold text-[9px] tracking-[0.25em] uppercase rounded-lg hover:bg-white/5 hover:border-white/30 hover:text-white transition-all duration-400 active:scale-95"
-                  >
-                    <span>Leer Dossier</span>
-                    <span class="opacity-40 group-hover:translate-x-0.5 transition-transform">
-                      ▸
-                    </span>
-                  </a>
-                )}
-              </div>
             </div>
           </article>
         ))}
@@ -149,16 +98,16 @@ const safeSlides = slides.length > 0 ? slides : [];
       {/* ── TOOLBAR / CONTROLES AUTO-HIDE (dots, flechas) ── */}
       {safeSlides.length > 1 && (
         <div
-          class="cpe-toolbar absolute inset-0 w-full z-30 pointer-events-none opacity-0 transition-opacity duration-500"
+          class="cge-toolbar absolute inset-0 w-full z-30 pointer-events-none opacity-0 transition-opacity duration-500"
         >
           {/* Dots de paginación */}
           <nav
-            class="cpe-dots absolute bottom-7 md:bottom-8 left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-1.5 md:gap-2 max-w-[92vw] px-4 py-2 rounded-full bg-black/35 backdrop-blur-md border border-white/10 pointer-events-auto shadow-xl z-50"
+            class="cge-dots absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-1.5 md:gap-2 max-w-[92vw] px-4 py-2 rounded-full bg-black/45 backdrop-blur-md border border-white/10 pointer-events-auto shadow-xl z-50"
             aria-label="Indicadores de slide"
           >
             {safeSlides.map((_, i) => (
               <button
-                class={`cpe-dot h-1.5 rounded-full transition-all duration-500 cursor-pointer border-0 p-0 ${i === 0 ? 'w-6 md:w-8 bg-white' : 'w-1.5 md:w-2 bg-white/30 hover:bg-white/60'}`}
+                class={`cge-dot h-1.5 rounded-full transition-all duration-500 cursor-pointer border-0 p-0 ${i === 0 ? 'w-6 md:w-8 bg-[#C8A98B]' : 'w-1.5 md:w-2 bg-white/30 hover:bg-white/60'}`}
                 data-dot={i}
                 aria-label={`Ir al slide ${i + 1}`}
               />
@@ -167,7 +116,7 @@ const safeSlides = slides.length > 0 ? slides : [];
 
           {/* Flecha Anterior (Izquierda) */}
           <button
-            class="cpe-arrow cpe-prev absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-black/45 border border-white/15 text-white/70 hover:bg-black/75 hover:border-white/40 hover:text-white transition-all duration-300 active:scale-90 pointer-events-auto shadow-lg z-50"
+            class="cge-arrow cge-prev absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-black/45 backdrop-blur-sm border border-white/15 text-white/70 hover:bg-black/75 hover:border-[#C8A98B] hover:text-[#C8A98B] transition-all duration-300 active:scale-90 pointer-events-auto shadow-lg z-50"
             aria-label="Slide anterior"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -175,13 +124,16 @@ const safeSlides = slides.length > 0 ? slides : [];
 
           {/* Flecha Siguiente (Derecha) */}
           <button
-            class="cpe-arrow cpe-next absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-black/45 border border-white/15 text-white/70 hover:bg-black/75 hover:border-white/40 hover:text-white transition-all duration-300 active:scale-90 pointer-events-auto shadow-lg z-50"
+            class="cge-arrow cge-next absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-black/45 backdrop-blur-sm border border-white/15 text-white/70 hover:bg-black/75 hover:border-[#C8A98B] hover:text-[#C8A98B] transition-all duration-300 active:scale-90 pointer-events-auto shadow-lg z-50"
             aria-label="Slide siguiente"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
           </button>
         </div>
       )}
+      
+      {/* Barra de progreso */}
+      <div class="absolute bottom-0 left-0 h-0.75 bg-[#C8A98B]/60 cge-progress z-30 shadow-[0_0_10px_rgba(200,169,139,0.5)]" style="width: 0%"></div>
     </section>
   )
 }
@@ -189,30 +141,30 @@ const safeSlides = slides.length > 0 ? slides : [];
 <script>
   import gsap from "gsap";
 
-  const SLIDE_DURATION = 7000; // ms por slide
-  const AUTO_RESUME = 8000; // ms de inactividad → retoma auto
-  const KB_SCALE = 1.06; // Ken Burns scale destino
-  const FADE_DUR = 1.1; // s para cross-fade entre slides
+  const SLIDE_DURATION = 8000; // ms por slide
+  const AUTO_RESUME = 10000; // ms de inactividad → retoma auto
+  const KB_SCALE = 1.05; // Ken Burns scale destino
+  const FADE_DUR = 1.2; // s para cross-fade entre slides
   const SWIPE_THRESHOLD = 50; // px mínimos para contar como swipe
 
-  function initCPE() {
+  function initCGE() {
     const roots = Array.from(
-      document.querySelectorAll<HTMLElement>(".cpe-root"),
+      document.querySelectorAll<HTMLElement>(".cge-root"),
     );
     if (roots.length === 0) return;
 
     roots.forEach((root) => {
-      if (root.dataset.cpeInitialized === "true") return;
-      root.dataset.cpeInitialized = "true";
+      if (root.dataset.cgeInitialized === "true") return;
+      root.dataset.cgeInitialized = "true";
 
       const slideEls = Array.from(
-        root.querySelectorAll<HTMLElement>(".cpe-slide"),
+        root.querySelectorAll<HTMLElement>(".cge-slide"),
       );
-      const dotEls = Array.from(root.querySelectorAll<HTMLElement>(".cpe-dot"));
-      const progress = root.querySelector<HTMLElement>(".cpe-progress");
-      const prevBtn = root.querySelector<HTMLElement>(".cpe-prev");
-      const nextBtn = root.querySelector<HTMLElement>(".cpe-next");
-      const toolbar = root.querySelector<HTMLElement>(".cpe-toolbar");
+      const dotEls = Array.from(root.querySelectorAll<HTMLElement>(".cge-dot"));
+      const progress = root.querySelector<HTMLElement>(".cge-progress");
+      const prevBtn = root.querySelector<HTMLElement>(".cge-prev");
+      const nextBtn = root.querySelector<HTMLElement>(".cge-next");
+      const toolbar = root.querySelector<HTMLElement>(".cge-toolbar");
       const total = slideEls.length;
 
       if (total === 0) return;
@@ -259,12 +211,11 @@ const safeSlides = slides.length > 0 ? slides : [];
 
       /* ── Entrada de slide ── */
       function slideIn(slide: HTMLElement, done: (() => void) | null) {
-        const bg = slide.querySelector<HTMLElement>(".cpe-bg-img");
-        const metaEl = slide.querySelector<HTMLElement>(".cpe-meta");
-        const titleEl = slide.querySelector<HTMLElement>(".cpe-title");
-        const subEl = slide.querySelector<HTMLElement>(".cpe-subtitle");
-        const ctaEl = slide.querySelector<HTMLElement>(".cpe-cta");
-        const dot = slide.querySelector<HTMLElement>(".cpe-meta-dot");
+        const bg = slide.querySelector<HTMLElement>(".cge-bg-img");
+        const metaEl = slide.querySelector<HTMLElement>(".cge-meta");
+        const titleEl = slide.querySelector<HTMLElement>(".cge-title");
+        const subEl = slide.querySelector<HTMLElement>(".cge-subtitle");
+        const dot = slide.querySelector<HTMLElement>(".cge-meta-dot");
 
         slide.classList.remove("pointer-events-none");
         slide.setAttribute("aria-hidden", "false");
@@ -291,41 +242,33 @@ const safeSlides = slides.length > 0 ? slides : [];
           0,
         );
 
-        /* Ken Burns: escala milimétrica y ascenso vertical suave durante el slide */
+        /* Ken Burns: escala milimétrica */
         if (bg) {
-          gsap.set(bg, { scale: 1, yPercent: 0 });
+          gsap.set(bg, { scale: 1 });
           gsap.to(bg, {
-            scale: 1.035,
-            yPercent: -2.5,
+            scale: KB_SCALE,
             duration: SLIDE_DURATION / 1000 + FADE_DUR,
             ease: "none",
           });
         }
 
-        /* Textos: stagger desde abajo y luego fade out ("desvanecen al ms") */
-        const textEls = [metaEl, titleEl, subEl, ctaEl].filter(
+        /* Textos: stagger desde abajo */
+        const textEls = [metaEl, titleEl, subEl].filter(
           Boolean,
         ) as HTMLElement[];
         if (textEls.length > 0) {
           tl.fromTo(
             textEls,
-            { opacity: 0, y: 20 },
+            { opacity: 0, y: 15 },
             {
               opacity: 1,
               y: 0,
               duration: 0.65,
-              stagger: 0.12,
+              stagger: 0.15,
               ease: "power3.out",
               clearProps: "transform",
             },
             0.35,
-          );
-
-          // Desvanecimiento rápido luego de 2.5s de permanencia
-          tl.to(
-            textEls,
-            { opacity: 0, duration: 1.2, ease: "power2.inOut" },
-            "+=2.5",
           );
         }
 
@@ -405,7 +348,7 @@ const safeSlides = slides.length > 0 ? slides : [];
         slideEls[nextIdx].style.zIndex = "20";
         slideEls[prevIdx].style.zIndex = "15";
 
-        /* Cross-fade: salida del anterior, entrada del nuevo en paralelo */
+        /* Cross-fade */
         slideOut(slideEls[prevIdx], null);
         slideIn(slideEls[nextIdx], () => {
           isAnimating = false;
@@ -467,7 +410,6 @@ const safeSlides = slides.length > 0 ? slides : [];
 
       root.addEventListener("pointerdown", (e: PointerEvent) => {
         const target = e.target as HTMLElement | null;
-        // No capturar pointer si el click fue sobre un enlace, botón o nav
         if (target?.closest("a, button, nav, input, select")) {
           return;
         }
@@ -494,22 +436,6 @@ const safeSlides = slides.length > 0 ? slides : [];
         resumeAuto();
       });
 
-      /* ── Teclado (solo responde si este root está visible) ── */
-      const onKey = (e: KeyboardEvent) => {
-        if (!root.isConnected || root.offsetParent === null) return;
-        if (e.key === "ArrowLeft") {
-          pauseAuto();
-          goTo((current - 1 + total) % total);
-          resumeAuto();
-        }
-        if (e.key === "ArrowRight") {
-          pauseAuto();
-          goTo((current + 1) % total);
-          resumeAuto();
-        }
-      };
-      document.addEventListener("keydown", onKey);
-
       /* ── Arranque ── */
       gsap.set(slideEls[0], { opacity: 1 });
       slideEls[0].classList.remove("pointer-events-none");
@@ -531,21 +457,20 @@ const safeSlides = slides.length > 0 ? slides : [];
           progressTween?.kill();
           metaPulseTween?.kill();
           gsap.killTweensOf(slideEls);
-          gsap.killTweensOf(Array.from(root.querySelectorAll(".cpe-bg-img")));
-          document.removeEventListener("keydown", onKey);
+          gsap.killTweensOf(Array.from(root.querySelectorAll(".cge-bg-img")));
         },
         { once: true },
       );
     });
   }
 
-  document.addEventListener("DOMContentLoaded", initCPE);
-  document.addEventListener("astro:page-load", initCPE);
+  document.addEventListener("DOMContentLoaded", initCGE);
+  document.addEventListener("astro:page-load", initCGE);
 </script>
 
 <style>
   /* Evita drag de imagen nativo */
-  .cpe-root img {
+  .cge-root img {
     user-drag: none;
     -webkit-user-drag: none;
     pointer-events: none;
@@ -553,32 +478,32 @@ const safeSlides = slides.length > 0 ? slides : [];
 
   /* Cursor grab en desktop y pointer en enlaces/botones */
   @media (pointer: fine) {
-    .cpe-root {
+    .cge-root {
       cursor: grab;
     }
-    .cpe-root:active {
+    .cge-root:active {
       cursor: grabbing;
     }
 
-    .cpe-root a,
-    .cpe-root button,
-    .cpe-root [role="button"],
-    .cpe-arrow,
-    .cpe-dot {
+    .cge-root a,
+    .cge-root button,
+    .cge-root [role="button"],
+    .cge-arrow,
+    .cge-dot {
       cursor: pointer !important;
     }
   }
 
   /* GPU layers para fluidez */
-  .cpe-slide {
+  .cge-slide {
     will-change: opacity;
   }
-  .cpe-bg-img {
+  .cge-bg-img {
     will-change: transform;
   }
 
   /* Dots: transición de ancho fluida */
-  .cpe-dot {
+  .cge-dot {
     transition:
       width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
       background-color 0.4s ease;
