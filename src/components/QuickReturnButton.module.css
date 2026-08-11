@@ -1,0 +1,188 @@
+/**
+ * Estilos del Widget de Escape (WOC) — autocontenidos.
+ * AcademicLayout (Papers) no importa global.css ni Tailwind; sin esto
+ * el botón pierde `fixed`/`position:absolute` y explota en el flujo del documento.
+ */
+
+.wocRoot {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 90;
+  perspective: 1000px;
+  /* Estado fantasma inicial: evita flash y define la aparición etérea */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  filter: blur(10px);
+  transform: scale(0.86) translateY(8px);
+  transition:
+    opacity 1.15s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 1.15s cubic-bezier(0.22, 0.61, 0.36, 1),
+    filter 1.15s cubic-bezier(0.22, 0.61, 0.36, 1),
+    visibility 1.15s linear;
+}
+
+@media (min-width: 768px) {
+  .wocRoot {
+    bottom: 2rem;
+    right: 2rem;
+  }
+}
+
+.wocRootVisible {
+  opacity: 0.94;
+  visibility: visible;
+  filter: blur(0);
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+}
+
+.wocRootHidden {
+  opacity: 0;
+  visibility: hidden;
+  filter: blur(12px);
+  transform: scale(0.88) translateY(6px);
+  pointer-events: none;
+}
+
+/* Variante Papers: más chico; misma aparición/desaparición fantasmal */
+.wocRootPapers {
+  bottom: 1rem;
+  right: 1rem;
+}
+
+@media (min-width: 768px) {
+  .wocRootPapers {
+    bottom: 1.25rem;
+    right: 1.25rem;
+  }
+}
+
+.wocButton {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 9999px;
+  position: relative;
+  border: 0;
+  outline: none;
+  background-color: rgba(0, 0, 0, 0.25);
+  box-shadow: none;
+  cursor: pointer;
+  padding: 0;
+  display: block;
+  overflow: hidden;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .wocButton {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+}
+
+.wocButtonPapers {
+  width: 2.35rem;
+  height: 2.35rem;
+  background-color: rgba(26, 28, 29, 0.55);
+}
+
+@media (min-width: 768px) {
+  .wocButtonPapers {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}
+
+.wocButton:hover {
+  background-color: rgba(26, 28, 29, 0.85);
+  transform: scale(1.05);
+}
+
+.wocInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  transform-style: preserve-3d;
+  /* Giro lento para leer bien ESC / BACK */
+  transition: transform 1.05s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.wocFace {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  overflow: hidden;
+}
+
+.wocFace0 {
+  transform: rotateY(0deg);
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.wocFace180 {
+  transform: rotateY(180deg);
+  background-color: #1a1c1d;
+}
+
+.wocFace360 {
+  transform: rotateY(360deg);
+  background-color: #1a1c1d;
+}
+
+.wocIcon {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  padding: 0.2rem;
+  border-radius: 9999px;
+  filter: brightness(1.1);
+  opacity: 0.9;
+  display: block;
+}
+
+.wocButtonPapers .wocIcon {
+  padding: 0.15rem;
+}
+
+.wocButton:hover .wocIcon {
+  opacity: 1;
+}
+
+.wocLabelEsc {
+  color: #c8a98b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.wocButtonPapers .wocLabelEsc {
+  font-size: 8px;
+  letter-spacing: 0.04em;
+}
+
+.wocLabelBack {
+  color: #ffffff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.wocButtonPapers .wocLabelBack {
+  font-size: 7.5px;
+}

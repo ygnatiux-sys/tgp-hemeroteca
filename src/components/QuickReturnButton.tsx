@@ -1,156 +1,167 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import styles from './QuickReturnButton.module.css';
 
 interface Props {
   accentColor?: string;
   fallbackUrl?: string;
   forceVisible?: boolean;
+  /** `papers`: más chico + oculta más rápido por inactividad */
+  variant?: 'default' | 'papers';
 }
 
 /**
- * QuickReturnButton — Widget de Escape Nudo Cinemático (Edición 2026)
- * ──────────────────────────────────────────────────────────────────────────────
- *  - Sin Borde (solo ícono TGP y fill que se desvanece suavemente).
- *  - Con Selección (Hover): Gira 180° una sola vez a '← ESC' y queda fijo ahí.
- *  - En Click: Gira a 360° 'BACK' y ejecuta el retorno inteligente.
- *  - Sin Selección (Mouse Leave): Vuelve inmediatamente a 'iconTGP default' (0°)
- *    y se desvanece suavemente (fill fade out).
+ * QuickReturnButton — Widget de Escape Nudo Cinemático (WOC)
+ * Botón flotante fijo para cerrar / volver (ESC / BACK).
+ * Estilos autocontenidos: válido en Layout oscuro y AcademicLayout / Papers.
  */
 export const QuickReturnButton: React.FC<Props> = ({
   fallbackUrl = '/archivo',
   forceVisible = false,
+  variant = 'default',
 }) => {
-  const [isVisible, setIsVisible] = useState(forceVisible);
-  const [isHovered, setIsHovered] = useState(false);
-  const [spinDegree, setSpinDegree] = useState(0); // 0° = Icon TGP Default, 180° = ESC, 360° = BACK
-  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isPapers = variant === 'papers';
+  const hideDelayMs = isPapers ? 900 : 3200;
+  const leaveDelayMs = isPapers ? 550 : 2200;
 
-  // Retorno contextual inteligente (En Click muestra BACK y ejecuta retorno)
+  // No pintar nada hasta montar en cliente → evita flash SSR del logo
+  const [mounted, setMounted] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [spinDegree, setSpinDegree] = useState(0);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isHoveredRef = useRef(false);
+
+  const clearHideTimer = useCallback(() => {
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+  }, []);
+
+  const scheduleHide = useCallback(
+    (delay: number) => {
+      clearHideTimer();
+      hideTimerRef.current = setTimeout(() => {
+        if (!isHoveredRef.current) setIsVisible(false);
+      }, delay);
+    },
+    [clearHideTimer]
+  );
+
   const handleSmartReturn = useCallback(() => {
     setSpinDegree(360);
 
+    // Espera al giro lento hacia BACK antes de navegar
     setTimeout(() => {
       if (typeof window !== 'undefined') {
-        const hasPreviousHistory = window.history.length > 1 && document.referrer.includes(window.location.host);
+        const hasPreviousHistory =
+          window.history.length > 1 && document.referrer.includes(window.location.host);
         if (hasPreviousHistory) {
           window.history.back();
         } else {
           window.location.href = fallbackUrl;
         }
       }
-    }, 260);
+    }, 1100);
   }, [fallbackUrl]);
 
-  // Visibilidad en hitos clave (3/4 partes de la nota) o forzada por prop (slides)
   useEffect(() => {
-    if (forceVisible) {
-      setIsVisible(true);
-      return;
-    }
+    setMounted(true);
+    if (forceVisible) setIsVisible(true);
+  }, [forceVisible]);
+
+  useEffect(() => {
+    if (!mounted || forceVisible) return;
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       const windowHeight = document.documentElement.scrollHeight - window.innerHeight;
       const scrollProgress = windowHeight > 0 ? (currentScrollY / windowHeight) * 100 : 0;
-
-      // Hitos clave: ≥72% del post
       const isAtMilestone = scrollProgress >= 72;
 
       if (isAtMilestone) {
         setIsVisible(true);
-
-        if (!isHovered) {
-          if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-          hideTimerRef.current = setTimeout(() => {
-            setIsVisible(false);
-          }, 3200);
-        }
-      } else {
-        if (!isHovered) {
-          setIsVisible(false);
-        }
+        if (!isHoveredRef.current) scheduleHide(hideDelayMs);
+      } else if (!isHoveredRef.current) {
+        setIsVisible(false);
+        clearHideTimer();
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+      clearHideTimer();
     };
-  }, [isHovered]);
+  }, [mounted, forceVisible, hideDelayMs, scheduleHide, clearHideTimer]);
 
-  // Tecla 'Escape' (Esc) siempre activa el retorno inteligente
   useEffect(() => {
+    if (!mounted) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        handleSmartReturn();
-      }
+      if (e.key === 'Escape') handleSmartReturn();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleSmartReturn]);
+  }, [mounted, handleSmartReturn]);
 
-  // CON SELECCIÓN (Hover): Gira a ESC (180°) y se queda fijo (no gira más)
   const handleMouseEnter = () => {
-    setIsHovered(true);
+    isHoveredRef.current = true;
     setIsVisible(true);
-    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-
-    setSpinDegree(180); // Queda fijo en ESC mientras se mantenga la selección
+    clearHideTimer();
+    setSpinDegree(180);
   };
 
-  // SIN SELECCIÓN (Mouse Leave): Vuelve inmediatamente a Icon TGP Default (0°) y desvanece
   const handleMouseLeave = () => {
-    setIsHovered(false);
-
-    // Vuelve al Favicon TGP Default (0°)
+    isHoveredRef.current = false;
     setSpinDegree(0);
-
-    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-    hideTimerRef.current = setTimeout(() => {
-      setIsVisible(false);
-    }, 2200);
+    scheduleHide(leaveDelayMs);
   };
+
+  if (!mounted) return null;
 
   return (
     <div
-      className={`woc-root fixed bottom-6 right-6 md:bottom-8 md:right-8 z-90 transition-opacity duration-1000 ease-in-out ${
-        isVisible ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'
-      }`}
+      className={[
+        styles.wocRoot,
+        isPapers ? styles.wocRootPapers : '',
+        isVisible ? styles.wocRootVisible : styles.wocRootHidden,
+      ]
+        .filter(Boolean)
+        .join(' ')}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      aria-hidden={!isVisible}
     >
       <button
+        type="button"
         onClick={handleSmartReturn}
-        className="woc-button-naked group border-0 outline-none shadow-none"
+        className={[styles.wocButton, isPapers ? styles.wocButtonPapers : '']
+          .filter(Boolean)
+          .join(' ')}
         title="Volver al sector anterior (Tecla ESC)"
         aria-label="Volver al sector anterior"
       >
-        {/* Contenedor interno con giro 3D (0° = Icon TGP Default, 180° = ESC, 360° = BACK) */}
         <div
-          className="woc-inner-naked"
+          className={styles.wocInner}
           style={{ transform: `rotateY(${spinDegree}deg)` }}
         >
-          {/* Cara 0° (Sin selección / Default): Favicon Logo TGP en relleno ahumado sutil */}
-          <div className="woc-face woc-face-0 overflow-hidden bg-black/25">
+          <div className={`${styles.wocFace} ${styles.wocFace0}`}>
             <img
               src="/images/favicon.TGP.webp"
-              alt="TGP"
-              className="w-full h-full object-cover p-1 rounded-full brightness-110 opacity-90 transition-opacity duration-300 group-hover:opacity-100"
+              alt=""
+              className={styles.wocIcon}
+              width={40}
+              height={40}
+              decoding="async"
+              fetchPriority="low"
             />
           </div>
 
-          {/* Cara 180° (Con selección / Hover): Queda fijo en ESC */}
-          <div className="woc-face woc-face-180 flex items-center justify-center bg-[#1A1C1D]">
-            <span className="text-[#C8A98B] font-mono text-[11px] font-bold tracking-wider">
-              ← ESC
-            </span>
+          <div className={`${styles.wocFace} ${styles.wocFace180}`}>
+            <span className={styles.wocLabelEsc}>← ESC</span>
           </div>
 
-          {/* Cara 360° (En Click): Muestra BACK */}
-          <div className="woc-face woc-face-360 flex items-center justify-center bg-[#1A1C1D]">
-            <span className="text-white font-mono text-[10px] font-bold tracking-widest uppercase">
-              BACK
-            </span>
+          <div className={`${styles.wocFace} ${styles.wocFace360}`}>
+            <span className={styles.wocLabelBack}>BACK</span>
           </div>
         </div>
       </button>

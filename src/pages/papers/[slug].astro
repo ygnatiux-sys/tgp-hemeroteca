@@ -126,7 +126,7 @@ const pageTitle = `${title} — Papers · TGP`;
 ---
 
 <AcademicLayout title={pageTitle} description={excerpt ?? undefined} slug={slug}>
-  <QuickReturnButton client:load accentColor="#C8A98B" fallbackUrl="/papers" />
+  <QuickReturnButton client:only="react" variant="papers" accentColor="#C8A98B" fallbackUrl="/papers" />
 
   <!-- ═══════════════════════════════════════════════════════════════
        ZONA 1: CABECERA DEL PAPER — fondo roto (#F5F2ED)
