@@ -5,7 +5,7 @@ import { Image } from "astro:assets";
 import SpotifyIcon from "../../components/icons/Spotify.astro";
 import YouTubeIcon from "../../components/icons/YouTube.astro";
 import { marked } from "marked";
-import { StickyReaderHeader } from "../../components/StickyReaderHeader";
+import Header from "../../components/Header.astro";
 import { QuickReturnButton } from "../../components/QuickReturnButton";
 
 import RelatedReading from "../../components/RelatedReading.astro";
@@ -308,11 +308,7 @@ const imagePosition =
       </div>
     ) : (
       <>
-        <StickyReaderHeader
-    client:load
-    title={doc.title || "Ensayo TGP"}
-    accentColor={activeAccent}
-  />
+        <Header isInternal={true} />
   <QuickReturnButton client:load accentColor={activeAccent} fallbackUrl="/archivo" />
 
   <InteriorHero
@@ -322,47 +318,35 @@ const imagePosition =
     imagePosition={imagePosition}
     eyebrow={data.category || "Archivo clasificado"}
     subtitle={doc.volantaHook || (doc.excerpt ? `"${doc.excerpt}"` : undefined)}
-    titleClass="text-[clamp(2.25rem,5vw,4.5rem)] font-cinzel font-extrabold tracking-tight leading-[1.05] gradient-acero-ios"
+    titleClass="text-[clamp(2.25rem,5vw,4.5rem)] font-cinzel font-extrabold tracking-tight leading-[1.05] gradient-acero-ios text-center mx-auto"
   >
-    <div slot="meta" class="flex flex-col gap-4">
+    <div slot="meta" class="flex flex-col items-center justify-center gap-2.5 w-full">
       <div
-        class="flex items-center gap-3 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-rust-orange flex-wrap"
+        class="flex items-center justify-center gap-3 font-mono text-[9.5px] md:text-[10.5px] uppercase tracking-[0.3em] text-[#EFEBE3]/50 flex-wrap"
       >
-        <span class="text-white/80">{dynamicMetaLabel}</span>
-        <span class="opacity-40">—</span>
-        <span class="text-white/60"
-          >{data.date ? new Date(data.date).getFullYear() : "S/F"}</span
-        >
+        <span class="text-[#EFEBE3]/60">{dynamicMetaLabel}</span>
       </div>
 
-      {/* LINKS DE SPOTIFY Y YOUTUBE CENTRADOS CON EFECTO ESTRELLAS TITILANTES MATE */}
-      <div class="hero-meta-socials flex items-center justify-start gap-6 mt-4 text-white">
+      {/* LINKS DE SPOTIFY Y YOUTUBE — ÍCONOS DESNUDOS APAGADOS CON LANTERN SOFT GLOW */}
+      <div class="hero-meta-socials flex items-center justify-center gap-6 mt-1.5 font-mono text-[8px] md:text-[8.5px] uppercase tracking-[0.3em]">
         <a
           href={doc.spotifyLink || "https://open.spotify.com"}
           target="_blank"
           rel="noopener noreferrer"
-          class="social-sp-star group/sp flex items-center gap-2"
+          class="lantern-hover text-[#EFEBE3]/50 hover:text-[#EFEBE3] flex items-center gap-2 transition-all duration-300"
         >
-          <div class="sp-badge p-2.5 rounded-full border border-white/20 bg-black/40 group-hover/sp:border-[#1DB954] group-hover/sp:bg-[#1DB954]/15 transition-all duration-500">
-            <SpotifyIcon class="sp-icon w-4 h-4 text-white/70 group-hover/sp:text-[#1DB954] transition-all duration-500" />
-          </div>
-          <span class="sp-text text-[8px] tracking-[0.35em] text-white/60 group-hover/sp:text-[#1DB954] transition-all duration-500 font-mono">
-            SPOTIFY
-          </span>
+          <SpotifyIcon class="w-3.5 h-3.5 opacity-60" />
+          <span>SPOTIFY</span>
         </a>
 
         <a
           href={doc.youtubeLink || "https://youtube.com/@thegreatpuzzleproject"}
           target="_blank"
           rel="noopener noreferrer"
-          class="social-yt-star group/yt flex items-center gap-2"
+          class="lantern-hover text-[#EFEBE3]/50 hover:text-[#EFEBE3] flex items-center gap-2 transition-all duration-300"
         >
-          <div class="yt-badge p-2.5 rounded-full border border-white/20 bg-black/40 group-hover/yt:border-[#E52D27] group-hover/yt:bg-[#E52D27]/15 transition-all duration-500">
-            <YouTubeIcon class="yt-icon w-4 h-4 text-white/70 group-hover/yt:text-[#E52D27] transition-all duration-500" />
-          </div>
-          <span class="yt-text text-[8px] tracking-[0.35em] text-white/60 group-hover/yt:text-[#E52D27] transition-all duration-500 font-mono">
-            YOUTUBE
-          </span>
+          <YouTubeIcon class="w-3.5 h-3.5 opacity-60" />
+          <span>YOUTUBE</span>
         </a>
       </div>
     </div>
@@ -375,6 +359,7 @@ const imagePosition =
     id="post-article"
     class="w-full bg-(--bg-main) relative z-20 pt-16 md:pt-20 pb-32"
     style={`--theme-accent: ${activeAccent};`}
+    data-sitio-geo={data.sitioGeohistorico || doc.sitioGeohistorico || ""}
   >
     {/* FX: Aura Atmosférica sutil */}
     <div

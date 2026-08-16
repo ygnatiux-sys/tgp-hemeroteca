@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../components/CinematicPostEngine.astro';
+import InteriorHero from '../components/InteriorHero.astro';
 import {
   getPublishableEssays,
   formatCategory,
@@ -89,6 +90,34 @@ const categoryHighlightCards = essaysByCategory.slice(0, 4).map(group => {
   };
 });
 
+// ─── PORTADA DEL HERO: primer arquetipoGlobal con imagen ────────────────────
+const arquetiposConImg = publishableArquetipos
+  .map(e => ({ ...e, img: resolveEssayImage(e.entry.coverImage, e.slug) }))
+  .filter(e => e.img);
+const archiveCoverEssay = arquetiposConImg[0] ?? resolvedEssays.find(e => e.img);
+const archiveCover = archiveCoverEssay
+  ? {
+      src: (archiveCoverEssay.img as any)?.src ?? archiveCoverEssay.img,
+      position: (archiveCoverEssay.entry as any).coverImagePosition ||
+                (archiveCoverEssay.entry as any).imagePosition ||
+                'center center',
+    }
+  : null;
+
+// ─── SLIDES PARA EL ENGINE: todos los posts en orden de categoría ─────────────
+const archiveSlides = essaysByCategory.flatMap(group =>
+  group.essays.map(e => ({
+    id: e.slug,
+    title: e.entry.title || 'Dossier',
+    subtitle: e.entry.excerpt || '',
+    category: group.catLabel,
+    date: e.entry.date ? formatYear(e.entry.date) : '',
+    image: (e.img as any)?.src ?? e.img,
+    imagePosition: (e.entry as any).coverImagePosition || (e.entry as any).imagePosition || 'center center',
+    link: `/hemeroteca/${e.slug}`,
+  }))
+).filter(s => s.image);
+
 // Helper para mapear essays a SlideData de CinematicPostEngine
 function mapToSlideData(essays: typeof resolvedEssays) {
   return essays.map(e => ({
@@ -98,7 +127,9 @@ function mapToSlideData(essays: typeof resolvedEssays) {
     category: formatCategory(e.entry.category),
     date: e.entry.date ? formatYear(e.entry.date) : '',
     image: (e.img as any)?.src ?? e.img,
-    link: `/papers/${e.slug}`,
+    imagePosition: (e.entry as any).coverImagePosition || (e.entry as any).imagePosition || 'center center',
+    link: `/hemeroteca/${e.slug}`,
+    papersLink: (e.entry as any).papersSlug ? `/papers/${(e.entry as any).papersSlug}` : undefined,
   }));
 }
 
@@ -117,28 +148,31 @@ function createPremierSequences(essays: typeof resolvedEssays) {
   }
   return sequences;
 }
+
 ---
 
 <Layout title="Archivo General | The Great Puzzle Project">
-  <div class="min-h-screen pb-32 pt-28">
+  <InteriorHero
+    title="ARCHIVO GENERAL"
+    image={archiveCoverEssay?.img ?? null}
+    imageAlt="Archivo General — The Great Puzzle Project"
+    imagePosition={archiveCover?.position ?? 'center center'}
+    eyebrow="Cartografía Epistémica · TGP"
+    subtitle="Análisis multidisciplinario de investigaciones"
+    titleClass="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-cinzel font-extrabold tracking-tight leading-none gradient-acero-ios drop-shadow-2xl"
+  >
+    <div slot="meta" class="font-mono text-[10px] uppercase tracking-[0.3em] text-[#EFEBE3] font-bold">
+      {publishable.length} DOSSIERS · {categories.length} CATEGORÍAS
+    </div>
+  </InteriorHero>
 
+  {archiveSlides.length > 0 && (
+    <CinematicPostEngine slides={archiveSlides} />
+  )}
+
+  <div class="min-h-screen pb-32 pt-12">
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16">
 
-      <header class="relative w-full flex flex-col justify-end pt-8 pb-8">
-        <nav class="mb-4 flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
-          <a href="/" class="hover:text-white transition-colors">Hemeroteca</a>
-          <span>/</span>
-          <span class="text-rust-orange">Archivo General</span>
-        </nav>
-
-        <h1 class="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-cinzel font-extrabold tracking-tight leading-none mb-4 gradient-acero-ios drop-shadow-2xl">
-          ARCHIVO GENERAL
-        </h1>
-
-        <h2 class="text-xl md:text-2xl lg:text-3xl h2-thin-hook text-white/70 max-w-4xl leading-relaxed">
-          CARTOGRAFÍA EPISTÉMICA & ANÁLISIS MULTIDISCIPLINARIO DE INVESTIGACIONES
-        </h2>
-      </header>
 
       {/* ══════════════════════════════════════════════════════════════════
           SISTEMA DE SOLAPAS PRINCIPALES (TABS MINIMALISTAS)

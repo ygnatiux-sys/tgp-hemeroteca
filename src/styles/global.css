@@ -84,7 +84,6 @@ body, header, footer, article, section, nav, aside, p, span, h1, h2, h3, h4, a {
 }
 
 .group:hover .gradient-steel-brand,
-.group:hover .gradient-steel-line-1,
 .group:hover .gradient-steel-line-2,
 .group:hover .gradient-steel-line-3,
 .gradient-steel-brand:hover {
@@ -92,6 +91,16 @@ body, header, footer, article, section, nav, aside, p, span, h1, h2, h3, h4, a {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  filter: drop-shadow(0 0 10px rgba(239, 235, 227, 0.35));
+}
+
+/* THE GREAT PUZZLE (line-1) permanece en su tono metálico acero default al hacer hover */
+.group:hover .gradient-steel-line-1 {
+  background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: none;
 }
 
 header .header-brand-title {
@@ -293,13 +302,51 @@ header .header-btn-codice {
   100% { left: 200%; }
 }
 
-/* Ocultar toolbar cuando hamburguesa está activa */
+/* Ocultar toolbar cuando hamburguesa está activa (estado 2 = desplegable) */
 html.nav-is-expanded header .toolbar-element {
   opacity: 0 !important;
   pointer-events: none !important;
   visibility: hidden !important;
   transition: all 0.3s ease;
 }
+
+/* Estado 1: modo cinemático — solo queda HEMEROTECA. Se ocultan brand-element y toolbar */
+html[data-nav-state="1"] header .toolbar-element,
+html[data-nav-state="1"] header .brand-element {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+html[data-nav-state="1"] header .brand-hemeroteca {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Estado 2: desplegable abierto — también oculta brand y toolbar */
+html[data-nav-state="2"] header .toolbar-element,
+html[data-nav-state="2"] header .brand-element {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+html[data-nav-state="2"] header .brand-hemeroteca {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Hover sobre header: revela el brand cuando está oculto (estados 1 y 2) */
+html[data-nav-state="1"] header:hover .brand-element,
+html[data-nav-state="2"] header:hover .brand-element {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
 
 [data-theme='light'] header .header-btn-codice {
   color: #1C1E21 !important;
@@ -474,24 +521,26 @@ html.nav-is-expanded header .toolbar-element {
   color: #6E2424 !important;
 }
 
-/* ─── 2. SELECCIÓN DE TEXTO GLOBAL (ASH WHITE) ─── */
+/* ─── 2. SELECCIÓN DE TEXTO GLOBAL (ASH WHITE ATENUADO CINEMÁTICO) ─── */
 ::selection {
-  background-color: #EFEBE3 !important;
-  color: #1A1C1D !important;
+  background-color: rgba(239, 235, 227, 0.16) !important;
+  color: #EFEBE3 !important;
+  text-shadow: 0 0 6px rgba(239, 235, 227, 0.35);
 }
 ::-moz-selection {
-  background-color: #EFEBE3 !important;
-  color: #1A1C1D !important;
+  background-color: rgba(239, 235, 227, 0.16) !important;
+  color: #EFEBE3 !important;
+  text-shadow: 0 0 6px rgba(239, 235, 227, 0.35);
 }
 
 [data-theme='light'] ::selection {
-  background-color: #EFEBE3 !important;
-  color: #1A1C1D !important;
+  background-color: rgba(110, 36, 36, 0.12) !important;
+  color: #6E2424 !important;
 }
 
 [data-theme='light'] ::-moz-selection {
-  background-color: #EFEBE3 !important;
-  color: #1A1C1D !important;
+  background-color: rgba(110, 36, 36, 0.12) !important;
+  color: #6E2424 !important;
 }
 
 /* ─── 3. TITULARES & ENCABEZADOS LIMPIDOS Y NATURALES EN MODO CLARO ───────── */
@@ -640,25 +689,29 @@ html.nav-is-expanded header .toolbar-element {
     font-family: "Outfit", "Plus Jakarta Sans", sans-serif;
   }
 
-  /* Gradiente Acero Cepillado / Titanium iOS Style con Barrido Especular Metálico Secuencial */
+  /* Gradiente Acero Cepillado / Titanium iOS Style con la paleta exacta de Hemeroteca (#718096 a #334155) */
   .gradient-acero-ios {
     background-image: linear-gradient(
       110deg,
-      #FFFFFF 0%,
-      #F1F5F9 14%,
-      #CBD5E1 28%,
-      #94A3B8 42%,
-      #FFFFFF 55%,
-      #E2E8F0 68%,
-      #64748B 82%,
-      #FFFFFF 100%
+      #718096 0%,
+      #94A3B8 22%,
+      #64748B 45%,
+      #475569 68%,
+      #334155 88%,
+      #718096 100%
     );
-    background-size: 260% 100%;
+    background-size: 220% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     animation: titaniumMetallicSweep 16s ease-in-out infinite;
-    will-change: background-position, filter;
+    will-change: background-position;
+  }
+
+  @keyframes titaniumMetallicSweep {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
   /* H2 Hook Inteligente Sans Outfit / Jakarta (Conciso de 2 renglones, elegante y equilibrado) */

@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
+import CinematicPostEngine from '../../components/CinematicPostEngine.astro';
 import InteriorHero from '../../components/InteriorHero.astro';
 import {
   getPublishableEssays,
@@ -47,6 +48,20 @@ const indexCoverPosition =
   || (collections[0]?.coverEssay?.entry as any)?.imagePosition
   || 'center center';
 
+// ─── SLIDES PARA EL ENGINE: una slide por coleccion en orden de tamaño ────────
+const coleccionesSlides = collections
+  .filter(col => col.coverEssay?.img)
+  .map(col => ({
+    id: col.key,
+    title: col.label,
+    subtitle: `${col.count} artículo${col.count > 1 ? 's' : ''}`,
+    category: 'Colección TGP',
+    image: (col.coverEssay.img as any)?.src ?? col.coverEssay.img,
+    imagePosition: (col.coverEssay.entry as any).coverImagePosition ||
+                   (col.coverEssay.entry as any).imagePosition ||
+                   'center center',
+    link: `/colecciones/${col.key}`,
+  }));
 // ─── HELPER PARA SECUENCIAS CINE PREMIER (1 HERO FULL + DÚO 60/40) ──────────
 function createPremierSequences(essays: any[]) {
   const sequences: Array<{
@@ -80,6 +95,11 @@ function createPremierSequences(essays: any[]) {
         {collections.length} {collections.length === 1 ? 'colección' : 'colecciones'} · {publishable.length} dossiers
       </div>
     </InteriorHero>
+
+    {/* ── ENGINE AUTO CINEMÁTICO: cicla colecciones full-viewport ── */}
+    {coleccionesSlides.length > 0 && (
+      <CinematicPostEngine slides={coleccionesSlides} />
+    )}
 
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">
 

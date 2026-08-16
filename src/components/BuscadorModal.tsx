@@ -13,7 +13,8 @@ export interface SearchItem {
 
 export function BuscadorModal() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isNavExpanded, setIsNavExpanded] = useState(false);
+  const [navState, setNavState] = useState<0 | 1 | 2>(0);
+  const isNavExpanded = navState === 2;
   const [query, setQuery] = useState('');
   const [items, setItems] = useState<SearchItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +48,7 @@ export function BuscadorModal() {
           setIsOpen(false);
           setQuery('');
         }
-        if (isNavExpanded) setIsNavExpanded(false);
+        if (navState !== 0) setNavState(0);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -57,7 +58,7 @@ export function BuscadorModal() {
   // Cerrar menús al hacer scroll
   useEffect(() => {
     const handleScroll = () => {
-      if (isNavExpanded) setIsNavExpanded(false);
+      if (navState !== 0) setNavState(0);
       // Opcional: ocultar barra de búsqueda si está vacía
       if (isOpen && query.trim() === '') setIsOpen(false);
     };
@@ -67,12 +68,13 @@ export function BuscadorModal() {
 
   // Actualizar estado global del documento cuando el menú hamburguesa se expande
   useEffect(() => {
+    document.documentElement.setAttribute('data-nav-state', navState.toString());
     if (isNavExpanded) {
       document.documentElement.classList.add('nav-is-expanded');
     } else {
       document.documentElement.classList.remove('nav-is-expanded');
     }
-  }, [isNavExpanded]);
+  }, [navState, isNavExpanded]);
 
   // Enfocar input al abrir
   useEffect(() => {
@@ -152,7 +154,7 @@ export function BuscadorModal() {
       <div className="relative">
         <button
           type="button"
-          onClick={() => setIsNavExpanded(prev => !prev)}
+          onClick={() => setNavState(prev => ((prev + 1) % 3) as 0 | 1 | 2)}
           title="Menú"
           className={`header-action-btn flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-xl transition-all duration-300 cursor-pointer ${
             isNavExpanded ? 'is-expanded text-[#EFEBE3]! drop-shadow-[0_0_5px_rgba(239,235,227,0.25)]' : ''
@@ -183,7 +185,7 @@ export function BuscadorModal() {
               <a
                 key={link.href}
                 href={link.href}
-                onClick={() => setIsNavExpanded(false)}
+                onClick={() => setNavState(0)}
                 className="font-mono font-light text-[11px] uppercase tracking-[0.2em] text-current opacity-70 hover:opacity-100 hover:text-rust-orange dark:hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(239,235,227,0.06)] transition-all"
               >
                 {link.label}

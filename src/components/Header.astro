@@ -25,7 +25,7 @@ const { transparentUntilScroll = false } = Astro.props;
     {/* Izquierda: Marca */}
     <div class="flex items-center shrink-0 z-10">
       <a href="/" class="group flex flex-row items-center gap-3 md:gap-4" title="The Great Puzzle Project">
-        {/* Logo Imagen (Favicon TGP) Circular sin borde con animación 'soft pulse' */}
+        {/* Logo: favicon, siempre visible */}
         <div class="brand-element w-10 h-10 md:w-11 md:h-11 rounded-full border-0 bg-current/5 flex items-center justify-center transition-all duration-300 shrink-0 relative overflow-hidden shadow-xl">
           <img 
             src="/images/favicon.TGP.webp" 
@@ -34,7 +34,7 @@ const { transparentUntilScroll = false } = Astro.props;
           />
         </div>
         
-        {/* Textos: Brand en 2 líneas compactas + Hemeroteca al lado */}
+        {/* Textos: Brand en 2 líneas compactas (se ocultan en estado 2) */}
         <div class="brand-element flex items-center gap-2 md:gap-3">
           <div class="flex flex-col text-left justify-center mt-0.5">
             <span class="header-brand-title font-['Gloock'] font-black text-[13px] md:text-[15px] lg:text-[17px] tracking-wide uppercase leading-[1.05] transition-colors gradient-steel-line-1">
@@ -47,11 +47,12 @@ const { transparentUntilScroll = false } = Astro.props;
           
           {/* Separador vertical sutil */}
           <div class="w-px h-6 md:h-8 bg-white/15 mx-0.5 rounded-full"></div>
-          
-          <span class="header-subtitle-hemeroteca font-['Gloock'] font-black text-lg md:text-xl lg:text-[23px] tracking-wide uppercase px-2 py-0.5 rounded-lg transition-all duration-500 border border-transparent leading-none gradient-steel-line-3">
-            HEMEROTECA
-          </span>
         </div>
+
+        {/* HEMEROTECA: siempre queda visible (incluso en estado 2 cinemático) */}
+        <span class="brand-hemeroteca header-subtitle-hemeroteca font-['Gloock'] font-black text-lg md:text-xl lg:text-[23px] tracking-wide uppercase px-2 py-0.5 rounded-lg transition-all duration-500 border border-transparent leading-none gradient-steel-line-3">
+          HEMEROTECA
+        </span>
       </a>
     </div>
     
@@ -77,39 +78,42 @@ const { transparentUntilScroll = false } = Astro.props;
   </div>
 </header>
 
-{transparentUntilScroll && (
-  <script>
-    const SCROLLED_CLASSES = ['is-scrolled', 'backdrop-blur-md', 'bg-[#1A1C1D]/75', 'border-white/10'];
-    const TOP_CLASSES = ['bg-transparent', 'border-transparent'];
+<script>
+  const SCROLLED_CLASSES = ['is-scrolled', 'backdrop-blur-md', 'bg-[#1A1C1D]/75', 'border-white/10'];
+  const TOP_CLASSES = ['bg-transparent', 'border-transparent'];
 
-    let headerScrollHandler: (() => void) | null = null;
+  let headerScrollHandler: (() => void) | null = null;
 
-    const setupHeaderScroll = () => {
-      const header = document.getElementById('site-header');
-      if (!header || header.dataset.transparentUntilScroll !== 'true') return;
+  const setupHeaderScroll = () => {
+    const header = document.getElementById('site-header');
+    if (!header) return;
 
-      if (headerScrollHandler) {
-        window.removeEventListener('scroll', headerScrollHandler);
-      }
+    if (headerScrollHandler) {
+      window.removeEventListener('scroll', headerScrollHandler);
+    }
 
-      headerScrollHandler = () => {
-        if (window.scrollY > 50) {
-          header.classList.add(...SCROLLED_CLASSES);
+    headerScrollHandler = () => {
+      if (window.scrollY > 50) {
+        header.classList.add(...SCROLLED_CLASSES);
+        // Solo quitar top-classes si es transparentUntilScroll
+        if (header.dataset.transparentUntilScroll === 'true') {
           header.classList.remove(...TOP_CLASSES);
-        } else {
-          header.classList.remove(...SCROLLED_CLASSES);
+        }
+      } else {
+        header.classList.remove(...SCROLLED_CLASSES);
+        if (header.dataset.transparentUntilScroll === 'true') {
           header.classList.add(...TOP_CLASSES);
         }
-      };
-
-      window.addEventListener('scroll', headerScrollHandler, { passive: true });
-      headerScrollHandler();
+      }
     };
 
-    document.addEventListener('DOMContentLoaded', setupHeaderScroll);
-    document.addEventListener('astro:page-load', setupHeaderScroll);
-  </script>
-)}
+    window.addEventListener('scroll', headerScrollHandler, { passive: true });
+    headerScrollHandler();
+  };
+
+  document.addEventListener('DOMContentLoaded', setupHeaderScroll);
+  document.addEventListener('astro:page-load', setupHeaderScroll);
+</script>
 
 <style>
   /* Sobre el hero cinemático: fade desde el comienzo a opacidad cercana a 1% (~0.02), reaparece lento al hover */

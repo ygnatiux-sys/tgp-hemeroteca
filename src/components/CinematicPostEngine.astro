@@ -104,11 +104,10 @@ const safeSlides = slides.length > 0 ? slides : [];
                   )}
                 </div>
 
-                {/* Título — legible alineado a la izquierda */}
                 <h1 class="cpe-title font-cinzel font-bold text-xl md:text-3xl leading-snug tracking-wide text-pretty">
                   <a
                     href={slide.link}
-                    class="bg-linear-to-br from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)] hover:from-[#EFEBE3] hover:via-[#E2D4B8] hover:to-white transition-all duration-500"
+                    class="gradient-acero-ios inline-block drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)] transition-all duration-500"
                   >
                     {slide.title}
                   </a>
@@ -177,7 +176,7 @@ const safeSlides = slides.length > 0 ? slides : [];
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
           </button>
 
-          {/* Flecha Next */}
+           {/* Flecha Next */}
           <button
             class="cpe-arrow cpe-next absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center lantern-hover transition-all duration-300 active:scale-90 pointer-events-auto shadow-lg z-50"
             aria-label="Siguiente"
@@ -186,6 +185,9 @@ const safeSlides = slides.length > 0 ? slides : [];
           </button>
         </div>
       )}
+      
+      {/* Barra de progreso — Línea punteada estática */}
+      <div class="absolute bottom-0 left-0 w-full h-0.5 border-b border-dotted border-[#EFEBE3]/25 cpe-progress z-30"></div>
     </section>
   )
 }
@@ -386,13 +388,7 @@ const safeSlides = slides.length > 0 ? slides : [];
       /* ── Barra de progreso ── */
       function startProgress() {
         progressTween?.kill();
-        if (!progress) return;
-        gsap.set(progress, { width: "0%" });
-        progressTween = gsap.to(progress, {
-          width: "100%",
-          duration: SLIDE_DURATION / 1000,
-          ease: "none",
-        });
+        // Dejar línea punteada estática
       }
 
       /* ── Ir al slide idx ── */
@@ -586,5 +582,14 @@ const safeSlides = slides.length > 0 ? slides : [];
     transition:
       width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
       background-color 0.4s ease;
+  }
+
+  /* Título: Hover en degradado de titanio (Ash White con brillo suave) */
+  .cpe-title a.gradient-acero-ios:hover {
+    background: none !important;
+    -webkit-text-fill-color: #EFEBE3 !important;
+    color: #EFEBE3 !important;
+    text-shadow: 0 0 10px rgba(239, 235, 227, 0.45);
+    filter: drop-shadow(0 0 8px rgba(239, 235, 227, 0.35));
   }
 </style>

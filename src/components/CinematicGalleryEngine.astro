@@ -27,7 +27,7 @@ const safeSlides = slides.length > 0 ? slides : [];
 {
   safeSlides.length > 0 && (
     <section
-      class={`cge-root relative w-full ${heightClass} overflow-hidden bg-[#0a0a0a] rounded-2xl select-none my-12 shadow-2xl border border-white/5`}
+      class={`cge-root relative w-full ${heightClass} overflow-hidden bg-[#0a0a0a] rounded-2xl select-none my-12 shadow-2xl border border-white/5 cursor-zoom-in`}
       aria-label="Galería Cinemática"
     >
       {/* ── SLIDES ── */}
@@ -56,37 +56,36 @@ const safeSlides = slides.length > 0 ? slides : [];
               <div class="absolute inset-0 bg-linear-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent pointer-events-none" />
             </div>
 
-            {/* Contenido Editorial */}
-            <div class="cge-content relative z-10 w-full max-w-5xl mx-auto px-6 md:px-12 flex flex-col items-start gap-2.5">
-              {/* Metadatos superiores: Pulso suave GSAP */}
-              <div class="cge-meta flex items-center gap-3">
-                <span class="inline-flex items-center gap-2 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-[#EFEBE3]">
-                  <span class="cge-meta-dot w-1.5 h-1.5 rounded-full bg-[#EFEBE3] inline-block shadow-[0_0_6px_rgba(239, 235, 227,0.8)]" />
+            {/* Contenido Editorial Minimalista & Thin */}
+            <div class="cge-content relative z-10 w-full max-w-4xl mx-auto px-6 md:px-12 flex flex-col items-center text-center gap-2 transition-opacity duration-700 pointer-events-none">
+              {/* Metadatos superiores Thin */}
+              <div class="cge-meta flex items-center justify-center gap-3 font-mono font-light text-[8px] md:text-[9px] uppercase tracking-[0.35em] text-[#EFEBE3]/45">
+                <span class="inline-flex items-center gap-2">
+                  <span class="cge-meta-dot w-1 h-1 rounded-full bg-[#EFEBE3]/60 inline-block" />
                   LÁMINA {String(i + 1).padStart(2, '0')} / {String(safeSlides.length).padStart(2, '0')}
                 </span>
                 {slide.author && (
-                  <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-white/40 border-l border-white/20 pl-3">
-                    {slide.author}
-                  </span>
+                  <>
+                    <span class="opacity-25">·</span>
+                    <span class="text-white/40">{slide.author}</span>
+                  </>
                 )}
                 {slide.license && (
                   <>
-                    <span class="text-white/20 text-xs">·</span>
-                    <span class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-[#EFEBE3]/60">
-                      {slide.license}
-                    </span>
+                    <span class="opacity-25">·</span>
+                    <span class="text-[#EFEBE3]/40">{slide.license}</span>
                   </>
                 )}
               </div>
 
-              {/* Título estático */}
-              <h3 class="cge-title font-serif font-bold text-xl md:text-3xl leading-snug tracking-tight text-stone-100 max-w-3xl drop-shadow-xl mt-1">
+              {/* Título estático Thin / Minimal */}
+              <h3 class="cge-title font-cinzel font-light text-lg md:text-2xl leading-snug tracking-wider text-[#EFEBE3]/90 max-w-2xl drop-shadow-md">
                 {slide.title}
               </h3>
 
-              {/* Subtítulo / excerpt */}
+              {/* Subtítulo / excerpt minimalista */}
               {slide.subtitle && (
-                <p class="cge-subtitle font-serif italic text-stone-300 text-sm md:text-base max-w-2xl leading-relaxed drop-shadow-md border-l-2 border-[#EFEBE3]/50 pl-4 mt-2">
+                <p class="cge-subtitle font-serif font-light italic text-[#EFEBE3]/60 text-xs md:text-sm max-w-xl leading-relaxed">
                   "{slide.subtitle}"
                 </p>
               )}
@@ -102,12 +101,12 @@ const safeSlides = slides.length > 0 ? slides : [];
         >
           {/* Dots de paginación */}
           <nav
-            class="cge-dots absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-1.5 md:gap-2 max-w-[92vw] px-4 py-2 rounded-full bg-black/45 backdrop-blur-md border border-white/10 pointer-events-auto shadow-xl z-50"
+            class="cge-dots absolute bottom-5 md:bottom-6 left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-1.5 md:gap-2 max-w-[92vw] px-3.5 py-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/10 pointer-events-auto shadow-xl z-50"
             aria-label="Indicadores de slide"
           >
             {safeSlides.map((_, i) => (
               <button
-                class={`cge-dot h-1.5 rounded-full transition-all duration-500 cursor-pointer border-0 p-0 ${i === 0 ? 'w-6 md:w-8 bg-[#EFEBE3]' : 'w-1.5 md:w-2 bg-white/30 hover:bg-white/60'}`}
+                class={`cge-dot h-1 rounded-full transition-all duration-500 cursor-pointer border-0 p-0 ${i === 0 ? 'w-5 md:w-7 bg-[#EFEBE3]' : 'w-1 md:w-1.5 bg-white/30 hover:bg-white/60'}`}
                 data-dot={i}
                 aria-label={`Ir al slide ${i + 1}`}
               />
@@ -132,8 +131,8 @@ const safeSlides = slides.length > 0 ? slides : [];
         </div>
       )}
       
-      {/* Barra de progreso */}
-      <div class="absolute bottom-0 left-0 h-0.75 bg-[#EFEBE3]/60 cge-progress z-30 shadow-[0_0_10px_rgba(239, 235, 227,0.5)]" style="width: 0%"></div>
+      {/* Barra de progreso — Línea punteada estática */}
+      <div class="absolute bottom-0 left-0 w-full h-0.5 border-b border-dotted border-[#EFEBE3]/25 cge-progress z-30"></div>
     </section>
   )
 }
@@ -325,13 +324,7 @@ const safeSlides = slides.length > 0 ? slides : [];
       /* ── Barra de progreso ── */
       function startProgress() {
         progressTween?.kill();
-        if (!progress) return;
-        gsap.set(progress, { width: "0%" });
-        progressTween = gsap.to(progress, {
-          width: "100%",
-          duration: SLIDE_DURATION / 1000,
-          ease: "none",
-        });
+        // Dejar línea punteada estática
       }
 
       /* ── Ir al slide idx ── */
@@ -429,6 +422,16 @@ const safeSlides = slides.length > 0 ? slides : [];
           );
         }
         resumeAuto();
+      });
+
+      /* ── Clic para abrir en Modo Viewport ── */
+      root.addEventListener("click", (e: MouseEvent) => {
+        const target = e.target as HTMLElement | null;
+        if (target?.closest("button, nav, a, input, select")) return;
+        const currentImg = slideEls[current]?.querySelector(".cge-bg-img") as HTMLImageElement;
+        if (currentImg && (window as any).tgpOpenLightboxForSrc) {
+          (window as any).tgpOpenLightboxForSrc(currentImg.src);
+        }
       });
 
       root.addEventListener("pointercancel", () => {
