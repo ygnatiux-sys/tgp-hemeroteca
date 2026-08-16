@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
+import CinematicPostEngine from '../../components/CinematicPostEngine.astro';
 import InteriorHero from '../../components/InteriorHero.astro';
 import {
   getPublishableEssays,
@@ -61,6 +62,21 @@ function createPremierSequences(items: typeof resolvedEssays) {
 }
 
 const sequences = createPremierSequences(resolvedEssays);
+
+// ─── SLIDES PARA EL ENGINE: georreferencias en orden visual-first ────────────
+const geoSlides = resolvedEssays
+  .filter(e => e.img)
+  .map(e => ({
+    id: e.slug,
+    title: e.entry.title || 'Sitio',
+    subtitle: e.entry.excerpt || '',
+    category: (e.entry as any).sitioGeohistorico ? 'Sitio Geohistórico' : 'Georreferencia',
+    date: e.entry.date ? formatYear(e.entry.date) : '',
+    image: (e.img as any)?.src ?? e.img,
+    imagePosition: (e.entry as any).coverImagePosition || (e.entry as any).imagePosition || 'center center',
+    link: `/hemeroteca/${e.slug}`,
+    papersLink: (e.entry as any).papersSlug ? `/papers/${(e.entry as any).papersSlug}` : undefined,
+  }));
 ---
 
 <Layout title="Sitios Geohistóricos & Arqueohistóricos | Hemeroteca TGP">
@@ -89,6 +105,11 @@ const sequences = createPremierSequences(resolvedEssays);
         </span>
       </div>
     </InteriorHero>
+
+    {/* ── ENGINE AUTO CINEMÁTICO: georreferencias full-viewport ── */}
+    {geoSlides.length > 0 && (
+      <CinematicPostEngine slides={geoSlides} />
+    )}
 
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-16 pt-12 md:pt-16">
 

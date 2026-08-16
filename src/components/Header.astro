@@ -190,4 +190,10 @@ const { transparentUntilScroll = false } = Astro.props;
   .header-nav-link:hover {
     text-shadow: 0 0 10px rgba(239, 235, 227, 0.04); /* glow 4% sutil para menús */
   }
+
+  @media (max-width: 1440px) {
+    nav.toolbar-element {
+      display: none !important;
+    }
+  }
 </style>

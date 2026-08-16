@@ -1,7 +1,7 @@
 ---
 /**
- * NavAcademic.astro — Barra superior cinemática para /papers
- * Preserva la identidad académica + hamburguer 3-state + retorno limpio al inicio
+ * NavAcademic.astro - Barra superior cinematica para /papers
+ * Preserva la identidad academica + hamburguer 3-state + retorno limpio al inicio
  */
 import { BuscadorModal } from './BuscadorModal';
 import ThemeToggle from './ThemeToggle.astro';
@@ -18,7 +18,7 @@ import ThemeToggle from './ThemeToggle.astro';
     <a
       href="/"
       class="ac-back-home group flex items-center gap-2 text-current opacity-60 hover:opacity-100 transition-all duration-300"
-      title="Volver al inicio — Hemeroteca TGP"
+      title="Volver al inicio - Hemeroteca TGP"
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-hover:-translate-x-0.5">
         <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
@@ -26,12 +26,12 @@ import ThemeToggle from './ThemeToggle.astro';
       <span class="font-mono text-[9px] lg:text-[10px] tracking-[0.18em] uppercase">Hemeroteca</span>
     </a>
 
-    <!-- Centro: Brand académico -->
+    <!-- Centro: Brand academico -->
     <a href="/papers" class="ac-brand absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5 text-center no-underline transition-opacity duration-300">
       <span class="font-['Cormorant_Garamond'] font-extrabold text-[15px] md:text-[17px] lg:text-[19px] tracking-[-0.02em] leading-none text-current whitespace-nowrap">
-        TGP <em class="not-italic ac-gold-dot">·</em> Papers
+        TGP <em class="not-italic ac-gold-dot">â€¢</em> Papers
       </span>
-      <span class="font-mono font-light text-[8px] tracking-[0.22em] uppercase opacity-50">Scriptorium Epistémico</span>
+      <span class="font-mono font-light text-[8px] tracking-[0.22em] uppercase opacity-50">Scriptorium Epistemico</span>
     </a>
 
     <!-- Derecha: Acciones -->
@@ -70,7 +70,7 @@ import ThemeToggle from './ThemeToggle.astro';
 </script>
 
 <style>
-  /* -- Variables académicas -- */
+  /* -- Variables academicas -- */
   :root {
     --ac-gold: #8C6D2F;
   }
@@ -85,7 +85,7 @@ import ThemeToggle from './ThemeToggle.astro';
     border-bottom-color: transparent;
   }
 
-  /* -- Al scrollear: atenuado cinemático idéntico al Header.astro -- */
+  /* -- Al scrollear: atenuado cinematico identico al Header.astro -- */
   #ac-site-header.ac-is-scrolled {
     opacity: 0.02;
     background-color: transparent !important;

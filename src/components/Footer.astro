@@ -21,23 +21,6 @@ const { variant = "full" } = Astro.props;
           title="The Great Puzzle Project"
         >
           <div class="relative flex items-center justify-center w-10 h-10">
-            <svg
-              viewBox="0 0 100 100"
-              class="absolute inset-0 w-full h-full animate-[spin_40s_linear_infinite] opacity-50"
-            >
-              <path
-                id="tgp-seal-curve-min"
-                d="M 50,50 m -42,0 a 42,42 0 1,1 84,0 a 42,42 0 1,1 -84,0"
-                fill="transparent"
-              />
-              <text>
-                <textPath href="#tgp-seal-curve-min" startOffset="0%">
-                  <tspan font-family="monospace" font-size="8" fill="#EFEBE3">
-                    TGP • ARCHIVO • TGP • ARCHIVO • TGP • ARCHIVO •{" "}
-                  </tspan>
-                </textPath>
-              </text>
-            </svg>
             <div class="w-5 h-5 md:w-6 md:h-6 rounded-full overflow-hidden flex items-center justify-center relative border-0 bg-white/5">
               <img
                 src="/images/favicon.TGP.webp"
@@ -118,7 +101,7 @@ const { variant = "full" } = Astro.props;
     /* =========================================================================
      VARIANTE COMPLETA (Página de Inicio / Landing)
      ========================================================================= */
-    <footer class="w-full bg-(--bg-main) text-stone-200 border-t border-white/10 dark:border-white/10 py-14 md:py-18 px-6 md:px-12 lg:px-16 mt-20 relative z-40 transition-colors duration-500">
+    <footer class="w-full bg-(--bg-main) text-stone-200 border-t border-white/10 dark:border-white/10 py-8 md:py-10 px-6 md:px-12 lg:px-16 mt-20 relative z-40 transition-colors duration-500">
       <div class="max-w-360 mx-auto flex flex-col">
         {/* ─── GRID PRINCIPAL: 4 COLUMNAS EDITORIALES ─── */}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 items-start pb-12">
@@ -126,29 +109,29 @@ const { variant = "full" } = Astro.props;
           <div class="lg:col-span-5 flex flex-col items-start">
             <a href="/" class="group block" title="The Great Puzzle Project">
               <div class="flex flex-col">
-                <span class="font-['Gloock'] font-black text-2xl md:text-3xl lg:text-[32px] tracking-tight leading-none gradient-steel-line-1">
+                <span class="font-['Gloock'] font-black text-base md:text-lg lg:text-xl tracking-tight leading-none gradient-steel-line-1">
                   THE GREAT
                 </span>
-                <div class="flex items-center gap-2.5 my-1">
+                <div class="flex items-center gap-2 my-0.5">
                   {/* Logo Imagen (Favicon TGP) Circular sin borde con animación 'soft pulse' y 5% más grande */}
-                  <div class="w-7 h-7 md:w-8 md:h-8 rounded-full border-0 bg-white/5 flex items-center justify-center transition-all shrink-0 relative overflow-hidden">
+                  <div class="w-5 h-5 md:w-6 md:h-6 rounded-full border-0 bg-white/5 flex items-center justify-center transition-all shrink-0 relative overflow-hidden">
                     <img
                       src="/images/favicon.TGP.webp"
                       alt="TGP Logo"
                       class="w-full h-full object-cover scale-[1.05] animate-soft-pulse group-hover:scale-[1.10] transition-transform duration-500"
                     />
                   </div>
-                  <span class="font-['Gloock'] font-black text-2xl md:text-3xl lg:text-[32px] tracking-tight leading-none gradient-steel-line-2">
+                  <span class="font-['Gloock'] font-black text-base md:text-lg lg:text-xl tracking-tight leading-none gradient-steel-line-2">
                     PUZZLE
                   </span>
                 </div>
-                <span class="font-['Gloock'] font-black text-2xl md:text-3xl lg:text-[32px] tracking-tight leading-none gradient-steel-line-3">
+                <span class="font-['Gloock'] font-black text-base md:text-lg lg:text-xl tracking-tight leading-none gradient-steel-line-3">
                   PROJECT
                 </span>
               </div>
             </a>
 
-            <p class="font-mono text-[10px] md:text-[11px] text-white/40 uppercase tracking-[0.18em] leading-relaxed max-w-sm mt-5">
+            <p class="font-mono text-[9px] md:text-[10px] text-white/40 uppercase tracking-[0.18em] leading-relaxed max-w-xs mt-3">
               Cartografía epistémica y memoria profunda. Archivo clasificado de
               interacciones semióticas.
             </p>
@@ -159,7 +142,7 @@ const { variant = "full" } = Astro.props;
             <h3 class="font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-white/40 font-bold mb-4">
               Navegación
             </h3>
-            <nav class="flex flex-col space-y-2.5 font-mono text-xs md:text-[13px] uppercase tracking-[0.15em] font-bold">
+            <nav class="flex flex-col space-y-2 font-mono text-[10px] md:text-xs uppercase tracking-[0.15em] font-bold">
               <a href="/" class="lantern-hover">
                 Inicio
               </a>
@@ -310,7 +293,7 @@ const { variant = "full" } = Astro.props;
             </h3>
             <a
               href="mailto:thegreatpuzzleproject@gmail.com"
-              class="font-mono text-xs md:text-[13px] uppercase tracking-[0.12em] font-bold text-white/80 hover:text-rust-orange transition-colors break-all block"
+              class="font-mono text-[10px] md:text-xs uppercase tracking-widest font-bold text-white/80 hover:text-rust-orange transition-colors block truncate"
             >
               THEGREATPUZZLEPROJECT@GMAIL.COM
             </a>
@@ -318,7 +301,7 @@ const { variant = "full" } = Astro.props;
         </div>
 
         {/* ─── BARRA INFERIOR / COLOPHON ─── */}
-        <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.16em] text-white/40">
+        <div class="border-t border-white/10 pt-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.16em] text-white/40">
           <div class="flex flex-wrap items-center gap-2 sm:gap-4">
             <span>
               © 2026 THE GREAT PUZZLE PROJECT · INVESTIGACIÓN Y CARTOGRAFÍA
