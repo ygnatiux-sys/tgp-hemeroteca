@@ -41,7 +41,7 @@ import KitLeadMagnet from '../components/KitLeadMagnet.astro';
           aria-controls="panel-autor"
           id="tab-autor"
           data-about-tab="autor"
-          class="about-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-rust-orange text-rust-orange bg-rust-orange/15 shadow-[0_0_18px_rgba(200,169,139,0.3)] font-bold cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
+          class="about-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-rust-orange text-rust-orange bg-rust-orange/15 shadow-[0_0_18px_rgba(239, 235, 227,0.3)] font-bold cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
         >
           <span class="tab-dot w-2 h-2 rounded-full bg-rust-orange"></span>
           Autor
@@ -54,7 +54,7 @@ import KitLeadMagnet from '../components/KitLeadMagnet.astro';
           aria-controls="panel-manifiesto"
           id="tab-manifiesto"
           data-about-tab="manifiesto"
-          class="about-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-white/10 text-white/50 bg-white/3 hover:border-rust-orange/60 hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.25)] cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
+          class="about-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-white/10 text-white/50 bg-white/3 hover:border-rust-orange/60 hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(239, 235, 227,0.25)] cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
         >
           <span class="tab-dot w-2 h-2 rounded-full bg-white/30"></span>
           Manifiesto
@@ -67,7 +67,7 @@ import KitLeadMagnet from '../components/KitLeadMagnet.astro';
           aria-controls="panel-codice"
           id="tab-codice"
           data-about-tab="codice"
-          class="about-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-white/10 text-white/50 bg-white/3 hover:border-rust-orange/60 hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.25)] cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
+          class="about-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-white/10 text-white/50 bg-white/3 hover:border-rust-orange/60 hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(239, 235, 227,0.25)] cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
         >
           <span class="tab-dot w-2 h-2 rounded-full bg-white/30"></span>
           El Códice
@@ -103,7 +103,7 @@ import KitLeadMagnet from '../components/KitLeadMagnet.astro';
 
             {/* Badge Ubicación */}
             <div class="flex items-center gap-2 font-mono text-[8.5px] uppercase tracking-[0.3em] text-white/40">
-              <span class="w-2 h-2 rounded-full bg-rust-orange shadow-[0_0_8px_#C8A98B] shrink-0"></span>
+              <span class="w-2 h-2 rounded-full bg-rust-orange shadow-[0_0_8px_#EFEBE3] shrink-0"></span>
               <a href="https://share.google/2jdBPO5AZhrjplGgj" target="_blank" rel="noopener noreferrer" class="hover:text-rust-orange transition-colors">Buenos Aires</a>
               <span class="text-rust-orange font-bold">·</span>
               <span>Sur Global</span>
@@ -311,7 +311,7 @@ import KitLeadMagnet from '../components/KitLeadMagnet.astro';
     const buttons = document.querySelectorAll<HTMLButtonElement>('.about-tab-btn');
     const panels = document.querySelectorAll<HTMLDivElement>('.about-panel');
 
-    const ACTIVE_CLASSES = ['border-rust-orange', 'text-rust-orange', 'bg-rust-orange/15', 'shadow-[0_0_18px_rgba(200,169,139,0.3)]', 'font-bold'];
+    const ACTIVE_CLASSES = ['border-rust-orange', 'text-rust-orange', 'bg-rust-orange/15', 'shadow-[0_0_18px_rgba(239, 235, 227,0.3)]', 'font-bold'];
     const INACTIVE_CLASSES = ['border-white/10', 'text-white/50', 'bg-white/3'];
 
     const activate = (tabName: string) => {

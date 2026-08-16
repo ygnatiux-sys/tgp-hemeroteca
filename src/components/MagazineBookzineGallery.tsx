@@ -7,7 +7,7 @@ interface Props {
   accentColor?: string;
 }
 
-export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B' }: Props) {
+export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3' }: Props) {
   if (!images || images.length === 0) return null;
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -109,8 +109,8 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
           <div className="border-t border-b border-white/10 py-6 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 bg-linear-to-r from-white/5 via-transparent to-white/5">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#C8A98B] shadow-[0_0_10px_rgba(200,169,139,0.8)] animate-pulse"></span>
-                <span className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.35em] text-[#C8A98B] font-bold">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#EFEBE3] shadow-[0_0_10px_rgba(239, 235, 227,0.8)] animate-pulse"></span>
+                <span className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.35em] text-[#EFEBE3] font-bold">
                   MAGAZINEBOOK · DOSSIER VISUAL DE ARCHIVO
                 </span>
               </div>
@@ -129,7 +129,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
                 onClick={() => setViewMode('grid')}
                 className={`px-4 py-2 rounded-full border font-mono text-[10px] uppercase tracking-widest transition-all cursor-pointer flex items-center gap-2 ${
                   viewMode === 'grid'
-                    ? 'border-[#C8A98B] bg-[#C8A98B]/20 text-[#C8A98B] font-bold shadow-[0_0_15px_rgba(200,169,139,0.2)]'
+                    ? 'border-[#EFEBE3] bg-[#EFEBE3]/20 text-[#EFEBE3] font-bold shadow-[0_0_15px_rgba(239, 235, 227,0.2)]'
                     : 'border-white/15 bg-white/5 hover:bg-white/10 text-white/70'
                 }`}
               >
@@ -147,7 +147,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
                 onClick={() => setViewMode('bookzine')}
                 className={`px-4 py-2 rounded-full border font-mono text-[10px] uppercase tracking-widest transition-all cursor-pointer flex items-center gap-2 ${
                   viewMode === 'bookzine'
-                    ? 'border-[#C8A98B] bg-[#C8A98B]/20 text-[#C8A98B] font-bold shadow-[0_0_15px_rgba(200,169,139,0.2)]'
+                    ? 'border-[#EFEBE3] bg-[#EFEBE3]/20 text-[#EFEBE3] font-bold shadow-[0_0_15px_rgba(239, 235, 227,0.2)]'
                     : 'border-white/15 bg-white/5 hover:bg-white/10 text-white/70'
                 }`}
               >
@@ -170,7 +170,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
                 <div
                   key={item.id || idx}
                   onClick={() => openLightboxAt(idx)}
-                  className="group relative bg-stone-900 border border-white/10 hover:border-[#C8A98B]/60 rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 hover:shadow-[0_0_30px_rgba(200,169,139,0.2)] flex flex-col cursor-zoom-in"
+                  className="group relative bg-stone-900 border border-white/10 hover:border-[#EFEBE3]/60 rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 hover:shadow-[0_0_30px_rgba(239, 235, 227,0.2)] flex flex-col cursor-zoom-in"
                 >
                   {/* Contenedor de la Imagen */}
                   <div className="relative aspect-4/3 w-full overflow-hidden bg-black/60">
@@ -182,7 +182,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
                     />
                     
                     {/* Badge de Lámina */}
-                    <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/80 backdrop-blur-md rounded-md border border-white/15 font-mono text-[9px] text-[#C8A98B] font-bold">
+                    <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/80 backdrop-blur-md rounded-md border border-white/15 font-mono text-[9px] text-[#EFEBE3] font-bold">
                       #{String(idx + 1).padStart(2, '0')}
                     </div>
 
@@ -201,7 +201,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
                   {/* Metadatos y Epígrafe */}
                   <div className="p-5 flex-1 flex flex-col justify-between">
                     <div>
-                      <h4 className="font-serif text-sm font-semibold text-stone-100 group-hover:text-[#C8A98B] transition-colors line-clamp-2 leading-snug">
+                      <h4 className="font-serif text-sm font-semibold text-stone-100 group-hover:text-[#EFEBE3] transition-colors line-clamp-2 leading-snug">
                         {item.title}
                       </h4>
                       {item.caption && item.caption !== item.title && (
@@ -213,7 +213,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
 
                     <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between font-mono text-[9px] text-white/40">
                       <span className="truncate max-w-35">{item.author || 'Wikimedia Commons'}</span>
-                      <span className="text-[#C8A98B]/70 font-semibold">{item.license || 'Public Domain'}</span>
+                      <span className="text-[#EFEBE3]/70 font-semibold">{item.license || 'Public Domain'}</span>
                     </div>
                   </div>
                 </div>
@@ -243,7 +243,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
                   <button
                     type="button"
                     onClick={handlePrev}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/80 hover:bg-[#C8A98B] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 backdrop-blur-md shadow-2xl cursor-pointer"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/80 hover:bg-[#EFEBE3] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 backdrop-blur-md shadow-2xl cursor-pointer"
                     title="Lámina anterior"
                   >
                     ❮
@@ -252,7 +252,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
                   <button
                     type="button"
                     onClick={handleNext}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/80 hover:bg-[#C8A98B] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 backdrop-blur-md shadow-2xl cursor-pointer"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/80 hover:bg-[#EFEBE3] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 backdrop-blur-md shadow-2xl cursor-pointer"
                     title="Lámina siguiente"
                   >
                     ❯
@@ -265,7 +265,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
                       e.stopPropagation();
                       setIsLightboxOpen(true);
                     }}
-                    className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md text-[#C8A98B] hover:bg-[#C8A98B] hover:text-black border border-white/20 font-mono text-[9px] uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
+                    className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md text-[#EFEBE3] hover:bg-[#EFEBE3] hover:text-black border border-white/20 font-mono text-[9px] uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <circle cx="11" cy="11" r="8" />
@@ -279,7 +279,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
                 <div className="lg:col-span-4 flex flex-col justify-between h-full space-y-6">
                   <div>
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="px-3 py-1 bg-[#C8A98B]/10 border border-[#C8A98B]/30 rounded-full font-mono text-[9px] uppercase tracking-[0.2em] text-[#C8A98B] font-bold">
+                      <span className="px-3 py-1 bg-[#EFEBE3]/10 border border-[#EFEBE3]/30 rounded-full font-mono text-[9px] uppercase tracking-[0.2em] text-[#EFEBE3] font-bold">
                         LÁMINA {String(currentIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
                       </span>
                     </div>
@@ -289,7 +289,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
                     </h3>
 
                     {currentItem.caption && (
-                      <p className="font-serif italic text-sm text-stone-300 mt-4 leading-relaxed border-l-2 border-[#C8A98B]/40 pl-4">
+                      <p className="font-serif italic text-sm text-stone-300 mt-4 leading-relaxed border-l-2 border-[#EFEBE3]/40 pl-4">
                         "{currentItem.caption}"
                       </p>
                     )}
@@ -302,7 +302,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
                     </div>
                     <div className="flex justify-between border-b border-white/5 pb-1">
                       <span className="text-white/40 uppercase">Licencia:</span>
-                      <span className="text-[#C8A98B]">{currentItem.license || 'Licencia Libre'}</span>
+                      <span className="text-[#EFEBE3]">{currentItem.license || 'Licencia Libre'}</span>
                     </div>
                     {currentItem.width && currentItem.height && (
                       <div className="flex justify-between">
@@ -324,7 +324,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
                         }}
                         className={`relative w-16 h-12 shrink-0 rounded-lg overflow-hidden border transition-all cursor-pointer ${
                           idx === currentIndex
-                            ? 'border-[#C8A98B] ring-2 ring-[#C8A98B]/50 scale-105'
+                            ? 'border-[#EFEBE3] ring-2 ring-[#EFEBE3]/50 scale-105'
                             : 'border-white/20 opacity-60 hover:opacity-100'
                         }`}
                       >
@@ -353,7 +353,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
           {/* Barra Superior de Herramientas del Lightbox */}
           <div className="w-full max-w-7xl flex items-center justify-between border-b border-white/10 pb-4 z-20">
             <div className="flex items-center gap-3">
-              <span className="font-mono text-xs text-[#C8A98B] font-bold tracking-widest">
+              <span className="font-mono text-xs text-[#EFEBE3] font-bold tracking-widest">
                 LÁMINA {String(currentIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
               </span>
               <span className="text-white/30">|</span>
@@ -391,7 +391,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
               <button
                 type="button"
                 onClick={handleZoom100}
-                className="px-3 py-1.5 rounded-full bg-[#C8A98B]/20 hover:bg-[#C8A98B]/30 border border-[#C8A98B]/40 text-[#C8A98B] font-mono text-[10px] uppercase tracking-wider transition-all cursor-pointer ml-1"
+                className="px-3 py-1.5 rounded-full bg-[#EFEBE3]/20 hover:bg-[#EFEBE3]/30 border border-[#EFEBE3]/40 text-[#EFEBE3] font-mono text-[10px] uppercase tracking-wider transition-all cursor-pointer ml-1"
                 title="Alternar escala 1:1"
               >
                 {zoomLevel > 1 ? 'Reset (1x)' : '100% HD'}
@@ -447,7 +447,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
             <button
               type="button"
               onClick={handlePrev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-black/60 hover:bg-[#C8A98B] text-white hover:text-black border border-white/20 flex items-center justify-center text-xl transition-all duration-300 cursor-pointer shadow-2xl"
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-black/60 hover:bg-[#EFEBE3] text-white hover:text-black border border-white/20 flex items-center justify-center text-xl transition-all duration-300 cursor-pointer shadow-2xl"
               title="Anterior (←)"
             >
               ❮
@@ -456,7 +456,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#C8A98B'
             <button
               type="button"
               onClick={handleNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-black/60 hover:bg-[#C8A98B] text-white hover:text-black border border-white/20 flex items-center justify-center text-xl transition-all duration-300 cursor-pointer shadow-2xl"
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-black/60 hover:bg-[#EFEBE3] text-white hover:text-black border border-white/20 flex items-center justify-center text-xl transition-all duration-300 cursor-pointer shadow-2xl"
               title="Siguiente (→)"
             >
               ❯

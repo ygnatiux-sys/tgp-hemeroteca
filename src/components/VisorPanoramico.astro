@@ -45,10 +45,10 @@ const { images } = Astro.props;
       }
     </div>
 
-    {/* Flecha Anterior (Botón interactivo con background blur sutil) */}
+    {/* Flecha Anterior (Botón minimalista lantern) */}
     <button
       id="btn-visor-prev"
-      class="absolute top-1/2 left-4 -translate-y-1/2 z-10 w-12 h-12 flex items-center justify-center text-white/50 hover:text-white bg-black/20 hover:bg-black/50 backdrop-blur-sm rounded-full transition-all duration-500 ui-fade-element cursor-pointer active:scale-95 opacity-0"
+      class="absolute top-1/2 left-4 -translate-y-1/2 z-10 w-12 h-12 flex items-center justify-center lantern-hover transition-all duration-500 cursor-pointer active:scale-95"
       aria-label="Imagen anterior"
     >
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -63,7 +63,7 @@ const { images } = Astro.props;
     {/* Flecha Siguiente */}
     <button
       id="btn-visor-next"
-      class="absolute top-1/2 right-4 -translate-y-1/2 z-10 w-12 h-12 flex items-center justify-center text-white/50 hover:text-white bg-black/20 hover:bg-black/50 backdrop-blur-sm rounded-full transition-all duration-500 ui-fade-element cursor-pointer active:scale-95 opacity-0"
+      class="absolute top-1/2 right-4 -translate-y-1/2 z-10 w-12 h-12 flex items-center justify-center lantern-hover transition-all duration-500 cursor-pointer active:scale-95"
       aria-label="Siguiente imagen"
     >
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"

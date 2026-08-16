@@ -6,6 +6,7 @@ import {
   formatCategory,
   formatDate,
   resolveEssayImage,
+  sortEssaysByVisualFirst,
 } from "../../lib/content-filter";
 
 export const prerender = true;
@@ -16,9 +17,7 @@ const arquetipos = await getCollection("arquetiposGlobales").catch(() => []);
 
 const allRaw     = [...essays, ...georefs, ...arquetipos];
 const publishable = getPublishableEssays(allRaw, import.meta.env.PROD);
-const sorted      = publishable.sort((a, b) =>
-  (a.entry.title || "").localeCompare(b.entry.title || "")
-);
+const sorted      = publishable.sort(sortEssaysByVisualFirst);
 
 const allCategories = [...new Set(publishable.map(item => formatCategory(item.entry.category)).filter(Boolean))].sort();
 ---

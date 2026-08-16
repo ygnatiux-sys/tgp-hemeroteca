@@ -11,8 +11,8 @@
   --bg-surface: rgba(255, 255, 255, 0.04);
   --text-main: #E0E0E0;
   --text-body: #E0E0E0;
-  --accent-primary: #D4A352;
-  --accent-secondary: #D4A352;
+  --accent-primary: #EFEBE3;
+  --accent-secondary: #EFEBE3;
   --accent-silver: #94A3B8;
   --border-subtle: rgba(255, 255, 255, 0.1);
   --header-bg: rgba(26, 28, 29, 0.85); /* Coincidencia exacta con --bg-main #1A1C1D */
@@ -88,7 +88,7 @@ body, header, footer, article, section, nav, aside, p, span, h1, h2, h3, h4, a {
 .group:hover .gradient-steel-line-2,
 .group:hover .gradient-steel-line-3,
 .gradient-steel-brand:hover {
-  background: linear-gradient(180deg, #D4A352 0%, #D4A352 100%);
+  background: linear-gradient(180deg, #EFEBE3 0%, #EFEBE3 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -121,23 +121,52 @@ header .header-btn-codice {
   border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 
-[data-theme='light'] header .header-brand-title {
-  color: #000000 !important;
+[data-theme='light'] header .header-brand-title,
+[data-theme='light'] header .header-brand-subtitle,
+[data-theme='light'] header .header-subtitle-hemeroteca {
+  color: #1C1E21 !important;
+  background: none !important;
+  -webkit-text-fill-color: initial !important;
 }
 
-[data-theme='light'] header a:hover .header-brand-title {
-  color: #D4A352 !important; /* Dorado Lantern Glow */
+[data-theme='light'] header a:hover .header-brand-title,
+[data-theme='light'] header a:hover .header-brand-subtitle,
+[data-theme='light'] header a:hover .header-subtitle-hemeroteca {
+  color: #EFEBE3 !important; /* Dorado Lantern Glow */
+  background: none !important;
+  -webkit-text-fill-color: initial !important;
 }
 
 [data-theme='light'] header nav a,
 [data-theme='light'] header .header-nav-link {
-  color: #1C1E21 !important;
+  color: rgba(28, 30, 33, 0.3) !important;
 }
 
 [data-theme='light'] header nav a:hover,
 [data-theme='light'] header .header-nav-link:hover {
-  color: #D4A352 !important;
-  text-shadow: 0 0 12px rgba(212, 163, 82, 0.4) !important; /* Lantern Hover Glow */
+  color: #EFEBE3 !important;
+  text-shadow: 0 0 8px rgba(239, 235, 227, 0.25) !important; /* Lantern Hover Glow Sutil */
+}
+
+/* Efecto Lantern Universal para Footer y Sliders */
+.lantern-hover {
+  color: rgba(226, 223, 216, 0.3) !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  transition: all 0.3s ease !important;
+}
+
+.lantern-hover:hover {
+  color: #EFEBE3 !important;
+  filter: drop-shadow(0 0 5px rgba(239, 235, 227, 0.25)) !important;
+}
+
+/* Ocultar toolbar cuando hamburguesa está activa */
+html.nav-is-expanded header .toolbar-element {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transition: all 0.3s ease;
 }
 
 [data-theme='light'] header .header-btn-codice {
@@ -146,27 +175,30 @@ header .header-btn-codice {
 }
 
 [data-theme='light'] header .header-btn-codice:hover {
-  color: #D4A352 !important;
-  background-color: rgba(212, 163, 82, 0.1) !important; /* Lantern Hover */
+  color: #EFEBE3 !important;
+  background-color: rgba(239, 235, 227, 0.1) !important; /* Lantern Hover */
 }
 
 [data-theme='light'] header .header-action-btn {
-  color: #1C1E21 !important;
+  color: rgba(28, 30, 33, 0.3) !important;
+  background-color: transparent !important;
 }
 
 [data-theme='light'] header .header-action-btn:hover {
-  color: #D4A352 !important;
-  background-color: rgba(212, 163, 82, 0.1) !important; /* Lantern Hover */
+  color: #EFEBE3 !important;
+  background-color: transparent !important;
+  filter: drop-shadow(0 0 5px rgba(239, 235, 227, 0.25));
 }
 
 [data-theme='light'] header .header-action-btn svg {
-  stroke: #1C1E21 !important;
-  color: #1C1E21 !important;
+  stroke: rgba(28, 30, 33, 0.3) !important;
+  color: rgba(28, 30, 33, 0.3) !important;
+  transition: all 0.3s ease;
 }
 
 [data-theme='light'] header .header-action-btn:hover svg {
-  stroke: #D4A352 !important;
-  color: #D4A352 !important;
+  stroke: #EFEBE3 !important;
+  color: #EFEBE3 !important;
 }
 
 [data-theme='light'] header .header-action-btn kbd {
@@ -181,47 +213,51 @@ header .header-btn-codice {
 }
 
 :root:not([data-theme='light']) header a:hover .header-brand-title {
-  color: #D4A352 !important; /* Dorado Lantern Glow */
+  color: #EFEBE3 !important; /* Dorado Lantern Glow */
 }
 
 :root:not([data-theme='light']) header nav a,
 :root:not([data-theme='light']) header .header-nav-link {
-  color: #E2DFD8 !important;
+  color: rgba(226, 223, 216, 0.3) !important;
+  transition: all 0.3s ease;
 }
 
 :root:not([data-theme='light']) header nav a:hover,
 :root:not([data-theme='light']) header .header-nav-link:hover {
-  color: #D4A352 !important;
-  text-shadow: 0 0 14px rgba(212, 163, 82, 0.5) !important; /* Lantern Hover Glow */
+  color: #EFEBE3 !important;
+  text-shadow: 0 0 8px rgba(239, 235, 227, 0.25) !important; /* Lantern Hover Glow Sutil */
 }
 
 :root:not([data-theme='light']) header .header-btn-codice {
-  color: #E2DFD8 !important;
+  color: rgba(226, 223, 216, 0.3) !important;
   font-weight: 300 !important;
 }
 
 :root:not([data-theme='light']) header .header-btn-codice:hover {
-  color: #D4A352 !important;
-  background-color: rgba(212, 163, 82, 0.1) !important; /* Lantern Hover */
+  color: #EFEBE3 !important;
+  background-color: rgba(239, 235, 227, 0.1) !important; /* Lantern Hover */
 }
 
 :root:not([data-theme='light']) header .header-action-btn {
-  color: #E2DFD8 !important;
+  color: rgba(226, 223, 216, 0.3) !important;
+  background-color: transparent !important;
 }
 
 :root:not([data-theme='light']) header .header-action-btn:hover {
-  color: #D4A352 !important;
-  background-color: rgba(212, 163, 82, 0.15) !important; /* Lantern Hover */
+  color: #EFEBE3 !important;
+  background-color: transparent !important;
+  filter: drop-shadow(0 0 5px rgba(239, 235, 227, 0.25));
 }
 
 :root:not([data-theme='light']) header .header-action-btn svg {
-  stroke: #E2DFD8 !important;
-  color: #E2DFD8 !important;
+  stroke: rgba(226, 223, 216, 0.3) !important;
+  color: rgba(226, 223, 216, 0.3) !important;
+  transition: all 0.3s ease;
 }
 
 :root:not([data-theme='light']) header .header-action-btn:hover svg {
-  stroke: #D4A352 !important;
-  color: #D4A352 !important;
+  stroke: #EFEBE3 !important;
+  color: #EFEBE3 !important;
 }
 
 /* ─── 1. ESCALA DE TEXTO PRINCIPAL Y MATICES (CARBÓN & PLOMO OSCURO) ─────── */
@@ -279,7 +315,7 @@ header .header-btn-codice {
 .prose h3,
 .prose h4,
 .prose h5 {
-  color: #D4A352;
+  color: #EFEBE3;
 }
 
 [data-theme='light'] .prose h2 {
@@ -302,28 +338,28 @@ header .header-btn-codice {
   color: #6E2424 !important;
 }
 
-[data-theme='light'] .hover\:text-\[\#D4A352\]:hover {
+[data-theme='light'] .hover\:text-\[\#EFEBE3\]:hover {
   color: #6E2424 !important;
 }
 
-/* ─── 2. SELECCIÓN DE TEXTO GLOBAL (DORADO HEREDADO) Y MODO CLARO ─── */
+/* ─── 2. SELECCIÓN DE TEXTO GLOBAL (ASH WHITE) ─── */
 ::selection {
-  background-color: #D4A352 !important;
+  background-color: #EFEBE3 !important;
   color: #1A1C1D !important;
 }
 ::-moz-selection {
-  background-color: #D4A352 !important;
+  background-color: #EFEBE3 !important;
   color: #1A1C1D !important;
 }
 
 [data-theme='light'] ::selection {
-  background-color: #6E2424 !important;
-  color: #F5F4F0 !important;
+  background-color: #EFEBE3 !important;
+  color: #1A1C1D !important;
 }
 
 [data-theme='light'] ::-moz-selection {
-  background-color: #6E2424 !important;
-  color: #F5F4F0 !important;
+  background-color: #EFEBE3 !important;
+  color: #1A1C1D !important;
 }
 
 /* ─── 3. TITULARES & ENCABEZADOS LIMPIDOS Y NATURALES EN MODO CLARO ───────── */
@@ -452,8 +488,8 @@ header .header-btn-codice {
   --color-bordeaux: #5B2326;
   --color-old-navy: #1E2C3A;
   --color-bus-red: #8B3A36;
-  --color-vintage-yellow: #D4A352;
-  --color-rust-orange: #D4A352;
+  --color-vintage-yellow: #EFEBE3;
+  --color-rust-orange: #EFEBE3;
 
   --ease-cinematic: cubic-bezier(0.2, 0.8, 0.2, 1);
   --font-serif: "Gloock", serif;
@@ -650,7 +686,7 @@ header .header-btn-codice {
   }
   60% {
     background-position: 100% 50%;
-    filter: drop-shadow(0 2px 18px rgba(212, 163, 82, 0.45)) drop-shadow(0 8px 28px rgba(0, 0, 0, 0.95));
+    filter: drop-shadow(0 2px 18px rgba(239, 235, 227, 0.45)) drop-shadow(0 8px 28px rgba(0, 0, 0, 0.95));
   }
   100% {
     background-position: 0% 50%;
@@ -696,7 +732,7 @@ header .header-btn-codice {
   }
   50%, 95% {
     opacity: 0.75;
-    text-shadow: 0 0 8px rgba(212, 163, 82, 0.5);
+    text-shadow: 0 0 8px rgba(239, 235, 227, 0.5);
     pointer-events: auto;
   }
   100% {
@@ -748,7 +784,7 @@ header .header-btn-codice {
   20% {
     /* Destello Hype de Brillo Metálico Especular */
     opacity: 1;
-    filter: brightness(1.25) drop-shadow(0 0 22px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 34px rgba(212, 163, 82, 0.85));
+    filter: brightness(1.25) drop-shadow(0 0 22px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 34px rgba(239, 235, 227, 0.85));
   }
   45% {
     /* Umbral de Oscurecimiento Total: se apaga y oscurece completamente */

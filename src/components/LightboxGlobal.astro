@@ -11,7 +11,7 @@ import YouTubeIcon from './icons/YouTube.astro';
   <!-- Botón cerrar (Oculto por defecto, brilla al inicio y en hover) -->
   <button
     id="tgp-lightbox-close"
-    class="absolute top-4 right-4 md:top-6 md:right-8 w-14 h-14 rounded-full flex items-center justify-center text-transparent hover:text-[#C8A98B] bg-transparent hover:bg-black/30 hover:backdrop-blur-md opacity-0 hover:opacity-100 z-100000 transition-all duration-700 tgp-ui-control"
+    class="absolute top-4 right-4 md:top-6 md:right-8 w-14 h-14 rounded-full flex items-center justify-center text-transparent hover:text-[#EFEBE3] bg-transparent hover:bg-black/30 hover:backdrop-blur-md opacity-0 hover:opacity-100 z-100000 transition-all duration-700 tgp-ui-control"
     aria-label="Cerrar visor"
   >
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -20,7 +20,7 @@ import YouTubeIcon from './icons/YouTube.astro';
   <!-- Flecha Anterior -->
   <button
     id="tgp-lightbox-prev"
-    class="absolute left-0 inset-y-0 w-20 md:w-32 flex items-center justify-center text-transparent hover:text-[#C8A98B] bg-transparent hover:bg-linear-to-r hover:from-black/50 hover:to-transparent text-5xl md:text-7xl font-light z-100000 transition-all duration-700 select-none opacity-0 hover:opacity-100 tgp-ui-control"
+    class="absolute left-0 inset-y-0 w-20 md:w-32 flex items-center justify-center text-transparent hover:text-[#EFEBE3] bg-transparent hover:bg-linear-to-r hover:from-black/50 hover:to-transparent text-5xl md:text-7xl font-light z-100000 transition-all duration-700 select-none opacity-0 hover:opacity-100 tgp-ui-control"
     aria-label="Imagen anterior"
   >
     <span class="drop-shadow-2xl">❮</span>
@@ -48,7 +48,7 @@ import YouTubeIcon from './icons/YouTube.astro';
   <!-- Flecha Siguiente -->
   <button
     id="tgp-lightbox-next"
-    class="absolute right-0 inset-y-0 w-20 md:w-32 flex items-center justify-center text-transparent hover:text-[#C8A98B] bg-transparent hover:bg-linear-to-l hover:from-black/50 hover:to-transparent text-5xl md:text-7xl font-light z-100000 transition-all duration-700 select-none opacity-0 hover:opacity-100 tgp-ui-control"
+    class="absolute right-0 inset-y-0 w-20 md:w-32 flex items-center justify-center text-transparent hover:text-[#EFEBE3] bg-transparent hover:bg-linear-to-l hover:from-black/50 hover:to-transparent text-5xl md:text-7xl font-light z-100000 transition-all duration-700 select-none opacity-0 hover:opacity-100 tgp-ui-control"
     aria-label="Siguiente imagen"
   >
     <span class="drop-shadow-2xl">❯</span>
@@ -66,7 +66,7 @@ import YouTubeIcon from './icons/YouTube.astro';
     {/* EFECTO TV CRT INICIAL (1ms después sobre la foto hero/inicial) */}
     <div id="tgp-lightbox-intro-tv" class="absolute inset-0 flex flex-col items-center justify-center opacity-0 pointer-events-none z-20">
       <div id="tgp-lightbox-intro-tv-brand" class="flex flex-col items-center justify-center">
-        <div class="font-cinzel text-4xl md:text-6xl text-[#C8A98B] font-bold drop-shadow-[0_0_40px_rgba(200,169,139,0.9)] tracking-wider text-center px-6">
+        <div class="font-cinzel text-4xl md:text-6xl text-[#EFEBE3] font-bold drop-shadow-[0_0_40px_rgba(239, 235, 227,0.9)] tracking-wider text-center px-6">
           The Great Puzzle
         </div>
         <div class="font-mono text-xs md:text-sm tracking-[0.6em] text-white/70 mt-3 uppercase">
@@ -77,7 +77,7 @@ import YouTubeIcon from './icons/YouTube.astro';
 
     {/* TANDA 1: Marca & Presenta (Sobre fondo negro) */}
     <div id="tgp-lightbox-intro-stage1" class="absolute inset-0 flex flex-col items-center justify-center opacity-0 z-10">
-      <div class="font-cinzel text-4xl md:text-6xl text-[#C8A98B] font-bold drop-shadow-[0_0_35px_rgba(200,169,139,0.7)] tracking-wider text-center px-6">
+      <div class="font-cinzel text-4xl md:text-6xl text-[#EFEBE3] font-bold drop-shadow-[0_0_35px_rgba(239, 235, 227,0.7)] tracking-wider text-center px-6">
         The Great Puzzle
       </div>
       <div class="font-mono text-xs md:text-sm tracking-[0.6em] text-white/50 mt-4 uppercase">
@@ -92,7 +92,7 @@ import YouTubeIcon from './icons/YouTube.astro';
     <div id="tgp-lightbox-intro-stage2" class="absolute inset-0 flex items-center justify-center opacity-0 z-10">
       <div class="text-center px-6 max-w-6xl flex flex-col items-center">
         <h1 id="tgp-lightbox-intro-title" class="font-cinzel text-5xl md:text-7xl lg:text-8xl font-extrabold leading-tight tracking-tight mb-6 bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-[0_15px_50px_rgba(0,0,0,0.95)]"></h1>
-        <h2 id="tgp-lightbox-intro-h2" class="font-mono text-xs md:text-sm uppercase tracking-[0.4em] text-[#C8A98B] font-semibold pb-2 inline-block opacity-0">
+        <h2 id="tgp-lightbox-intro-h2" class="font-mono text-xs md:text-sm uppercase tracking-[0.4em] text-[#EFEBE3] font-semibold pb-2 inline-block opacity-0">
           REGISTRO VISUAL COMPLETO
         </h2>
         {/* METADATOS CON ÍCONOS SPOTIFY Y YOUTUBE */}
@@ -133,7 +133,7 @@ import YouTubeIcon from './icons/YouTube.astro';
     {/* 2. Brand unido para efecto TV CRT */}
     <div id="tgp-lightbox-outro-tv" class="absolute inset-0 flex flex-col items-center justify-center opacity-0 pointer-events-none z-20">
       <div id="tgp-lightbox-outro-tv-brand" class="flex flex-col items-center justify-center">
-        <div class="font-cinzel text-4xl md:text-6xl text-[#C8A98B] font-bold drop-shadow-[0_0_40px_rgba(200,169,139,0.9)] tracking-wider text-center px-6">
+        <div class="font-cinzel text-4xl md:text-6xl text-[#EFEBE3] font-bold drop-shadow-[0_0_40px_rgba(239, 235, 227,0.9)] tracking-wider text-center px-6">
           The Great Puzzle
         </div>
         <div class="font-mono text-xs md:text-sm tracking-[0.6em] text-white/70 mt-3 uppercase">
@@ -619,8 +619,8 @@ import YouTubeIcon from './icons/YouTube.astro';
   /* Animación para que los controles brillen al inicio y luego se apaguen */
   @keyframes presenceFlash {
     0% { opacity: 0; color: transparent; }
-    20% { opacity: 1; color: #C8A98B; }
-    70% { opacity: 1; color: #C8A98B; }
+    20% { opacity: 1; color: #EFEBE3; }
+    70% { opacity: 1; color: #EFEBE3; }
     100% { opacity: 0; color: transparent; }
   }
   

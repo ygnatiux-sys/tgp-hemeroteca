@@ -77,10 +77,10 @@ const sequences = createPremierSequences(resolvedEssays);
         <span>/</span>
         <a href="/colecciones" class="hover:text-white transition-colors">Colecciones</a>
         <span>/</span>
-        <span class="text-[#C8A98B]">{label}</span>
+        <span class="text-[#EFEBE3]">{label}</span>
       </nav>
       <div slot="meta" class="flex items-center gap-4 flex-wrap">
-        <span class="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/15 font-mono text-[10px] uppercase tracking-[0.3em] text-[#C8A98B] font-bold">
+        <span class="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/15 font-mono text-[10px] uppercase tracking-[0.3em] text-[#EFEBE3] font-bold">
           {essays.length} {essays.length === 1 ? 'investigación documentada' : 'investigaciones documentadas'}
         </span>
         <span class="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40">
@@ -144,7 +144,7 @@ const sequences = createPremierSequences(resolvedEssays);
       ═══════════════════════════════════════════════════════════════════ */}
       <section class="flex flex-col gap-6 border-t border-white/10 pt-10">
         <div class="reveal-item">
-          <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#C8A98B] block mb-2">Índice</span>
+          <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#EFEBE3] block mb-2">Índice</span>
           <h2 class="text-2xl md:text-3xl font-cinzel font-bold text-white/90">{label} — Catálogo Completo</h2>
         </div>
 
@@ -153,18 +153,18 @@ const sequences = createPremierSequences(resolvedEssays);
             <li>
               <a
                 href={`/hemeroteca/${slug}`}
-                class="group flex items-baseline gap-4 md:gap-6 py-3.5 hover:text-[#C8A98B] transition-colors duration-300"
+                class="group flex items-baseline gap-4 md:gap-6 py-3.5 hover:text-[#EFEBE3] transition-colors duration-300"
               >
                 <span class="font-mono text-[10px] text-white/30 tracking-[0.2em] tabular-nums shrink-0 w-6 text-right">
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <span class="font-mono text-[9px] text-[#C8A98B]/70 tracking-[0.2em] shrink-0 hidden sm:inline">
+                <span class="font-mono text-[9px] text-[#EFEBE3]/70 tracking-[0.2em] shrink-0 hidden sm:inline">
                   {formatYear(entry.date)}
                 </span>
-                <span class="font-cinzel text-sm md:text-base text-white/80 group-hover:text-[#C8A98B] transition-colors leading-snug line-clamp-1 flex-1 font-bold">
+                <span class="font-cinzel text-sm md:text-base text-white/80 group-hover:text-[#EFEBE3] transition-colors leading-snug line-clamp-1 flex-1 font-bold">
                   {entry.title}
                 </span>
-                <span class="font-mono text-[9px] text-white/20 shrink-0 group-hover:text-[#C8A98B]/60 group-hover:translate-x-1 transition-all">→</span>
+                <span class="font-mono text-[9px] text-white/20 shrink-0 group-hover:text-[#EFEBE3]/60 group-hover:translate-x-1 transition-all">→</span>
               </a>
             </li>
           ))}
@@ -173,14 +173,14 @@ const sequences = createPremierSequences(resolvedEssays);
         <div class="pt-6 flex items-center justify-between border-t border-white/5 font-mono text-[10px] uppercase tracking-[0.3em]">
           <a
             href="/colecciones"
-            class="text-white/40 hover:text-[#C8A98B] transition-colors flex items-center gap-2"
+            class="text-white/40 hover:text-[#EFEBE3] transition-colors flex items-center gap-2"
           >
             <span>←</span>
             <span>Todas las colecciones</span>
           </a>
           <a
             href="/archivo"
-            class="text-white/40 hover:text-[#C8A98B] transition-colors flex items-center gap-2"
+            class="text-white/40 hover:text-[#EFEBE3] transition-colors flex items-center gap-2"
           >
             <span>Archivo general</span>
             <span>→</span>

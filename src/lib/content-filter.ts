@@ -36,42 +36,78 @@ export interface EssayEntry {
  * Mapa centralizado de imágenes de ensayos y georreferencias en Vite/Astro.
  */
 export const essayImages = import.meta.glob<{ default: ImageMetadata }>(
-  ['/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif}', '/src/assets/georreferencias/**/*.{jpeg,jpg,png,gif,webp,avif}'],
+  [
+    '/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif,svg}',
+    '/src/assets/georreferencias/**/*.{jpeg,jpg,png,gif,webp,avif,svg}',
+    '/src/assets/arquetipos-globales/**/*.{jpeg,jpg,png,gif,webp,avif,svg}'
+  ],
   { eager: true }
 );
 
 /**
- * Resuelve la imagen óptima de un ensayo o georreferencia:
- * 1. Coincidencia exacta con coverImage si existe.
- * 2. Si no, busca automáticamente cualquier imagen en la carpeta del slug (`/src/assets/ensayos/${slug}/` o `/src/assets/georreferencias/${slug}/`).
+ * Resuelve la imagen óptima de un ensayo, georreferencia o arquetipo:
+ * 1. Coincidencia exacta con coverImage en import.meta.glob.
+ * 2. Si es URL remota HTTP/HTTPS, retorna objeto ImageMetadata sintético.
+ * 3. Si no, busca automáticamente cualquier imagen en la carpeta del slug.
  */
 export function resolveEssayImage(coverPath?: string | null, slug?: string): ImageMetadata | null {
   if (coverPath && essayImages[coverPath]) {
     return essayImages[coverPath].default;
   }
+
+  if (coverPath && (coverPath.startsWith('http://') || coverPath.startsWith('https://'))) {
+    return { src: coverPath, width: 1920, height: 1080, format: 'jpg' } as any;
+  }
+
   if (slug) {
     const ensayoPrefix = `/src/assets/ensayos/${slug}/`;
     const georefPrefix = `/src/assets/georreferencias/${slug}/`;
+    const arquetipoPrefix = `/src/assets/arquetipos-globales/${slug}/`;
     for (const [key, mod] of Object.entries(essayImages)) {
-      if (key.startsWith(ensayoPrefix) || key.startsWith(georefPrefix)) {
+      if (key.startsWith(ensayoPrefix) || key.startsWith(georefPrefix) || key.startsWith(arquetipoPrefix)) {
         return mod.default;
       }
     }
   }
+
+  if (coverPath && typeof coverPath === 'string' && coverPath.trim().length > 0) {
+    return { src: coverPath, width: 1920, height: 1080, format: 'jpg' } as any;
+  }
+
   return null;
 }
 
+/**
+ * Determina si una entrada carece de foto y su título o slug indica que es un post de prueba ('Test' / 'Prueba').
+ */
+export function isNoPhotoTestPost(entry: EssayEntry): boolean {
+  const hasImg = resolveEssayImage(entry.entry?.coverImage, entry.slug) !== null;
+  if (hasImg) return false;
+
+  const title = (entry.entry?.title || '').toLowerCase();
+  const slug = (entry.slug || '').toLowerCase();
+  return title.includes('test') || title.includes('prueba') || slug.includes('test') || slug.includes('prueba');
+}
+
 export function sortEssaysByVisualFirst(a: EssayEntry, b: EssayEntry): number {
-  const hasImgA = resolveEssayImage(a.entry.coverImage, a.slug) ? 1 : 0;
-  const hasImgB = resolveEssayImage(b.entry.coverImage, b.slug) ? 1 : 0;
+  const isTestA = isNoPhotoTestPost(a);
+  const isTestB = isNoPhotoTestPost(b);
+
+  // Posts de prueba sin foto van al final de todo el archivo/listado
+  if (isTestA !== isTestB) {
+    return isTestA ? 1 : -1;
+  }
+
+  const hasImgA = resolveEssayImage(a.entry?.coverImage, a.slug) ? 1 : 0;
+  const hasImgB = resolveEssayImage(b.entry?.coverImage, b.slug) ? 1 : 0;
   
   // Priorizar posts con imagen
   if (hasImgA !== hasImgB) {
     return hasImgB - hasImgA;
   }
 
-  const dateA = a.entry.date ? new Date(a.entry.date).getTime() : 0;
-  const dateB = b.entry.date ? new Date(b.entry.date).getTime() : 0;
+  const dateA = a.entry?.date ? new Date(a.entry.date).getTime() : 0;
+  const dateB = b.entry?.date ? new Date(b.entry.date).getTime() : 0;
   return dateB - dateA;
 }
 
@@ -92,8 +128,8 @@ export function getPublishableEssays(
       entry: item.data,
     }))
     .filter(({ entry }) => {
-      // En producción, solo ocultar los marcados explícitamente como borrador
-      if (isProd && entry.draft === true) return false;
+      // Ocultar siempre los marcados explícitamente como borrador/eliminados
+      if (entry.draft === true) return false;
       return true;
     })
     .sort(sortEssaysByVisualFirst);

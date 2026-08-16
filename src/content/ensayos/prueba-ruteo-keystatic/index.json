@@ -4,10 +4,10 @@
   "date": "2026-08-02",
   "category": "Ensayos",
   "themeColor": "british-green",
-  "draft": false,
+  "draft": true,
   "coverImage": null,
   "excerpt": "Este post verifica que el pipeline Keystatic → Astro Content Layer → getStaticPaths → renderizado Markdoc funcione correctamente de extremo a extremo.",
   "generador": "Manual",
   "generadorTexto": "",
-  "notasInvestigador": "Post de auditoría técnica. Puede eliminarse una vez confirmado el funcionamiento."
+  "notasInvestigador": "Post de auditoría técnica eliminada."
 }

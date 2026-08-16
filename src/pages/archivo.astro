@@ -152,7 +152,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             aria-controls="view-categories"
             id="tab-btn-categories"
             data-main-tab="categories"
-            class="archive-main-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-rust-orange text-rust-orange bg-rust-orange/15 shadow-[0_0_18px_rgba(200,169,139,0.3)] font-bold cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
+            class="archive-main-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-rust-orange text-rust-orange bg-rust-orange/15 shadow-[0_0_18px_rgba(239, 235, 227,0.3)] font-bold cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
           >
             <span class="tab-indicator w-2 h-2 rounded-full bg-rust-orange"></span>
             Por Categoría
@@ -165,7 +165,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             aria-controls="view-years"
             id="tab-btn-years"
             data-main-tab="years"
-            class="archive-main-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-white/10 text-white/50 bg-white/3 hover:border-rust-orange/60 hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.25)] cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
+            class="archive-main-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-white/10 text-white/50 bg-white/3 hover:border-rust-orange/60 hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(239, 235, 227,0.25)] cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
           >
             <span class="tab-indicator w-2 h-2 rounded-full bg-white/30"></span>
             Por Año
@@ -195,10 +195,10 @@ function createPremierSequences(essays: typeof resolvedEssays) {
               )}
               <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
               <div class="relative z-10 flex flex-col gap-1">
-                <span class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-[#C8A98B] font-bold">
+                <span class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-[#EFEBE3] font-bold">
                   {card.count} ARTÍCULO{card.count > 1 ? 'S' : ''} {card.yearLabel && `• ${card.yearLabel}`}
                 </span>
-                <h3 class="font-cinzel font-extrabold text-lg md:text-xl text-white tracking-wide uppercase group-hover:text-[#C8A98B] transition-colors">
+                <h3 class="font-cinzel font-extrabold text-lg md:text-xl text-white tracking-wide uppercase group-hover:text-[#EFEBE3] transition-colors">
                   {card.catLabel}
                 </h3>
               </div>
@@ -212,7 +212,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
           <button
             type="button"
             data-cat-filter-btn="all"
-            class="cat-filter-btn font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 rounded-xl border border-transparent text-[#C8A98B] bg-transparent hover:border-[#C8A98B] hover:bg-white/5 cursor-pointer transition-all duration-300 font-bold"
+            class="cat-filter-btn font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 rounded-xl border border-transparent text-[#EFEBE3] bg-transparent hover:border-[#EFEBE3] hover:bg-white/5 cursor-pointer transition-all duration-300 font-bold"
           >
             TODAS LAS INVESTIGACIONES ({publishable.length})
           </button>
@@ -222,16 +222,16 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             <select
               id="cat-linter-select"
               aria-label="Seleccionar categoría o tema de investigación"
-              class="appearance-none font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 pr-9 rounded-xl border border-white/10 text-[#C8A98B] bg-[#151718]/90 hover:bg-[#C8A98B]/10 hover:border-[#C8A98B] cursor-pointer transition-all duration-300 outline-none font-bold"
+              class="appearance-none font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 pr-9 rounded-xl border border-white/10 text-[#EFEBE3] bg-[#151718]/90 hover:bg-[#EFEBE3]/10 hover:border-[#EFEBE3] cursor-pointer transition-all duration-300 outline-none font-bold"
             >
               <option value="all" class="bg-[#0a0a0a] text-white">POR CATEGORÍA / TEMA ▾</option>
               {categories.map(cat => (
-                <option value={cat} class="bg-[#151718] text-[#C8A98B]">
+                <option value={cat} class="bg-[#151718] text-[#EFEBE3]">
                   • {formatCategory(cat).toUpperCase()}
                 </option>
               ))}
             </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#C8A98B]">
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#EFEBE3]">
               <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
                 <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
               </svg>
@@ -252,7 +252,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                 {/* Barra Editorial de Categoría */}
                 <div class="editorial-bar flex items-center justify-between pb-2 border-b border-white/10">
                   <div class="flex items-center gap-3">
-                    <span class="w-2 h-2 rounded-full bg-rust-orange shadow-[0_0_8px_#C8A98B]" />
+                    <span class="w-2 h-2 rounded-full bg-rust-orange shadow-[0_0_8px_#EFEBE3]" />
                     <h2 class="font-cinzel font-bold text-xl md:text-2xl tracking-wider text-white">
                       • {group.catLabel.toUpperCase()}
                     </h2>
@@ -288,10 +288,10 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                         )}
                         <div class="flex flex-col justify-between p-6 flex-1">
                           <div class="flex flex-col gap-2">
-                            <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-[#C8A98B] font-bold">
+                            <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-[#EFEBE3] font-bold">
                               {e.entry.category}
                             </span>
-                            <h3 class="font-cinzel font-bold text-xl md:text-2xl leading-snug text-white group-hover:text-[#C8A98B] transition-colors line-clamp-2">
+                            <h3 class="font-cinzel font-bold text-xl md:text-2xl leading-snug text-white group-hover:text-[#EFEBE3] transition-colors line-clamp-2">
                               <a href={`/papers/${e.slug}`}>{e.entry.title}</a>
                             </h3>
                             {e.entry.excerpt && (
@@ -303,7 +303,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                           <div class="mt-5 pt-3 border-t border-white/5 flex items-center justify-between">
                             <a
                               href={`/papers/${e.slug}`}
-                              class="inline-flex items-center gap-2 px-4 py-2 bg-[#1A1C1D]/90 border border-white/10 text-[#E0E0E0]/75 font-mono font-bold text-[8.5px] tracking-[0.25em] uppercase rounded-lg hover:bg-[#C8A98B]/10 hover:border-[#C8A98B]/45 hover:text-[#C8A98B] transition-all"
+                              class="inline-flex items-center gap-2 px-4 py-2 bg-[#1A1C1D]/90 border border-white/10 text-[#E0E0E0]/75 font-mono font-bold text-[8.5px] tracking-[0.25em] uppercase rounded-lg hover:bg-[#EFEBE3]/10 hover:border-[#EFEBE3]/45 hover:text-[#EFEBE3] transition-all"
                             >
                               <span>VER REGISTRO</span>
                               <span>▸</span>
@@ -335,17 +335,17 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                         {/* 20% Contenido Metadata */}
                         <div class="flex flex-col justify-between p-5 md:p-6 flex-1">
                           <div class="flex flex-col gap-2">
-                            <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-[#C8A98B]/80 font-bold">
+                            <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-[#EFEBE3]/80 font-bold">
                               {e.entry.category}
                             </span>
-                            <h4 class="font-cinzel font-bold text-lg md:text-xl leading-snug text-white group-hover:text-[#C8A98B] transition-colors line-clamp-2">
+                            <h4 class="font-cinzel font-bold text-lg md:text-xl leading-snug text-white group-hover:text-[#EFEBE3] transition-colors line-clamp-2">
                               <a href={`/papers/${e.slug}`}>{e.entry.title}</a>
                             </h4>
                           </div>
                           <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
                             <a
                               href={`/papers/${e.slug}`}
-                              class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-white/50 hover:text-[#C8A98B] transition-colors flex items-center gap-1"
+                              class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-white/50 hover:text-[#EFEBE3] transition-colors flex items-center gap-1"
                             >
                               <span>VER REGISTRO</span>
                               <span>▸</span>
@@ -375,7 +375,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
               <button
                 type="button"
                 data-year-filter-btn="all"
-                class="year-filter-btn font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 rounded-xl border border-transparent text-white/60 bg-transparent hover:border-rust-orange hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(200,169,139,0.3)] cursor-pointer transition-all duration-300"
+                class="year-filter-btn font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 rounded-xl border border-transparent text-white/60 bg-transparent hover:border-rust-orange hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(239, 235, 227,0.3)] cursor-pointer transition-all duration-300"
               >
                 Todos los Años
               </button>
@@ -384,7 +384,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                 <select
                   id="year-linter-select"
                   aria-label="Seleccionar año de archivo"
-                  class="appearance-none font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 pr-9 rounded-xl border border-transparent text-rust-orange bg-transparent hover:bg-white/10 hover:border-rust-orange hover:shadow-[0_0_16px_rgba(200,169,139,0.35)] cursor-pointer transition-all duration-300 outline-none font-bold"
+                  class="appearance-none font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 pr-9 rounded-xl border border-transparent text-rust-orange bg-transparent hover:bg-white/10 hover:border-rust-orange hover:shadow-[0_0_16px_rgba(239, 235, 227,0.35)] cursor-pointer transition-all duration-300 outline-none font-bold"
                 >
                   <option value="all" class="bg-[#0a0a0a] text-white">AÑOS ▾</option>
                   {years.map(year => (
@@ -415,7 +415,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                   {/* Divisor de Año Editorial con Amplio Tracking y Espacio Negativo */}
                   <div class="flex items-center justify-between border-b border-rust-orange/20 pb-4 pt-2">
                     <div class="flex items-center gap-3.5">
-                      <span class="w-2 h-2 rounded-full bg-rust-orange shadow-[0_0_8px_#C8A98B]" />
+                      <span class="w-2 h-2 rounded-full bg-rust-orange shadow-[0_0_8px_#EFEBE3]" />
                       <h2 class="font-cinzel font-bold text-2xl md:text-3xl tracking-[0.15em] text-white">
                         AÑO {year}
                       </h2>
@@ -493,7 +493,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
       const yearFilterButtons = document.querySelectorAll<HTMLButtonElement>('.year-filter-btn');
       const yearGroups = document.querySelectorAll<HTMLElement>('.archive-year-cinematic-group');
 
-      const activeBtnClasses = ['border-[#C8A98B]', 'text-[#C8A98B]', 'bg-[#C8A98B]/15', 'shadow-[0_0_18px_rgba(200,169,139,0.3)]', 'font-bold'];
+      const activeBtnClasses = ['border-[#EFEBE3]', 'text-[#EFEBE3]', 'bg-[#EFEBE3]/15', 'shadow-[0_0_18px_rgba(239, 235, 227,0.3)]', 'font-bold'];
       const inactiveBtnClasses = ['border-white/10', 'text-white/50', 'bg-white/3'];
 
       // Función para cambiar de solapa principal
@@ -509,14 +509,14 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             btn.setAttribute('aria-selected', 'true');
             if (indicator) {
               indicator.classList.remove('bg-white/30');
-              indicator.classList.add('bg-[#C8A98B]');
+              indicator.classList.add('bg-[#EFEBE3]');
             }
           } else {
             btn.classList.remove(...activeBtnClasses);
             btn.classList.add(...inactiveBtnClasses);
             btn.setAttribute('aria-selected', 'false');
             if (indicator) {
-              indicator.classList.remove('bg-[#C8A98B]');
+              indicator.classList.remove('bg-[#EFEBE3]');
               indicator.classList.add('bg-white/30');
             }
           }

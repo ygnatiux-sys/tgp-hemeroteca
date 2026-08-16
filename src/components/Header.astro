@@ -21,53 +21,65 @@ const { transparentUntilScroll = false } = Astro.props;
       : 'bg-(--header-bg) backdrop-blur-xl border-b border-(--header-border) shadow-xs',
   ]}
 >
-  <div class="max-w-400 mx-auto px-6 md:px-10 lg:px-14 py-4 md:py-5 lg:py-5.5 flex justify-between items-center gap-8 md:gap-16 lg:gap-24 xl:gap-32">
-    <div class="flex items-center shrink-0">
-      <a href="/" class="group flex flex-row items-center gap-4" title="The Great Puzzle Project">
-        {/* Logo Imagen (Favicon TGP) Circular sin borde con animación 'soft pulse' y 5% más grande */}
-        <div class="brand-element w-11 h-11 md:w-12 md:h-12 rounded-full border-0 bg-current/5 flex items-center justify-center transition-all duration-300 shrink-0 relative overflow-hidden">
+  <div class="w-full px-4 md:px-8 lg:px-12 xl:px-16 py-4 md:py-5 lg:py-5.5 flex justify-between items-center relative">
+    {/* Izquierda: Marca */}
+    <div class="flex items-center shrink-0 z-10">
+      <a href="/" class="group flex flex-row items-center gap-3 md:gap-4" title="The Great Puzzle Project">
+        {/* Logo Imagen (Favicon TGP) Circular sin borde con animación 'soft pulse' */}
+        <div class="brand-element w-10 h-10 md:w-11 md:h-11 rounded-full border-0 bg-current/5 flex items-center justify-center transition-all duration-300 shrink-0 relative overflow-hidden shadow-xl">
           <img 
             src="/images/favicon.TGP.webp" 
             alt="The Great Puzzle Project Logo" 
             class="w-full h-full object-cover scale-[1.05] animate-soft-pulse group-hover:scale-[1.10] transition-transform duration-500"
           />
         </div>
-        <div class="brand-element flex flex-col">
-          <span class="header-brand-title gradient-steel-brand text-base md:text-lg lg:text-[20px] leading-tight transition-colors">
-            The Great Puzzle Project
+        
+        {/* Textos: Brand en 2 líneas compactas + Hemeroteca al lado */}
+        <div class="brand-element flex items-center gap-2 md:gap-3">
+          <div class="flex flex-col text-left justify-center mt-0.5">
+            <span class="header-brand-title font-['Gloock'] font-black text-[13px] md:text-[15px] lg:text-[17px] tracking-wide uppercase leading-[1.05] transition-colors gradient-steel-line-1">
+              THE GREAT PUZZLE
+            </span>
+            <span class="header-brand-subtitle font-['Gloock'] font-black text-[13px] md:text-[15px] lg:text-[17px] tracking-[0.27em] uppercase leading-[1.05] transition-colors gradient-steel-line-3">
+              PROJECT
+            </span>
+          </div>
+          
+          {/* Separador vertical sutil */}
+          <div class="w-px h-6 md:h-8 bg-white/15 mx-0.5 rounded-full"></div>
+          
+          <span class="header-subtitle-hemeroteca font-['Gloock'] font-black text-lg md:text-xl lg:text-[23px] tracking-wide uppercase px-2 py-0.5 rounded-lg transition-all duration-500 border border-transparent leading-none gradient-steel-line-3">
+            HEMEROTECA
           </span>
         </div>
       </a>
     </div>
     
-    <div class="flex items-center gap-6 md:gap-10 lg:gap-14 ml-auto">
-      {/* Navegación Tradicional Fina en Monoespaciado con Tracking Amplio (Aireado y Desplazado a la Derecha) */}
-      <nav class="hidden md:flex items-center gap-7 lg:gap-10 xl:gap-12 shrink-0 font-mono font-light text-xs md:text-[13px] uppercase tracking-[0.28em]">
-        <a href="/" class="header-nav-link transition-colors">Inicio</a>
-        <a href="/colecciones" class="header-nav-link transition-colors">Colecciones</a>
-        <a href="/archivo" class="header-nav-link transition-colors">Archivo</a>
-        <a href="/papers" class="header-nav-link transition-colors">Papers</a>
-        <a href="/about" class="header-nav-link transition-colors">About</a>
-        <a href="/codice" class="header-btn-codice px-3.5 py-1.5 rounded-xl font-mono font-light text-xs uppercase tracking-[0.28em] transition-all whitespace-nowrap">
-          El Códice
-        </a>
-      </nav>
+    {/* Centro: Navegación Compacta Absoluta */}
+    <nav class="toolbar-element hidden xl:flex absolute left-1/2 -translate-x-1/2 items-center gap-5 lg:gap-6 shrink-0 font-mono font-light text-[9px] lg:text-[10px] uppercase tracking-[0.15em] whitespace-nowrap z-0 transition-all duration-500">
+      <a href="https://thegreatpuzzleproject.com" class="header-nav-link transition-colors flex items-center gap-1.5 opacity-75 hover:opacity-100" title="Volver al sitio principal de The Great Puzzle Project">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        Volver
+      </a>
+      <a href="/" class="header-nav-link transition-colors">Inicio</a>
+      <a href="/colecciones" class="header-nav-link transition-colors">Colecciones</a>
+      <a href="/archivo" class="header-nav-link transition-colors">Archivo</a>
+      <a href="/papers" class="header-nav-link transition-colors">Papers</a>
+      <a href="/about" class="header-nav-link transition-colors">About</a>
+      <a href="/codice" class="header-nav-link transition-colors font-medium text-rust-orange">El Códice</a>
+    </nav>
 
-      {/* Botonera de Acción Simétrica y Coherente */}
-      <div class="flex items-center gap-2.5 md:gap-3">
-        {/* Toggle Sol / Luna */}
-        <ThemeToggle />
-
-        {/* Lupa de Búsqueda + Menú Sándwich 3 Guiones ≡ */}
-        <BuscadorModal client:load />
-      </div>
+    {/* Derecha: Acciones (Tema, Lupa, Menú) */}
+    <div class="flex items-center gap-2.5 md:gap-3 ml-auto z-10">
+      <ThemeToggle />
+      <BuscadorModal client:load />
     </div>
   </div>
 </header>
 
 {transparentUntilScroll && (
   <script>
-    const SCROLLED_CLASSES = ['is-scrolled', 'backdrop-blur-md', 'bg-[#1A1C1D]/85', 'border-white/10'];
+    const SCROLLED_CLASSES = ['is-scrolled', 'backdrop-blur-md', 'bg-[#1A1C1D]/75', 'border-white/10'];
     const TOP_CLASSES = ['bg-transparent', 'border-transparent'];
 
     let headerScrollHandler: (() => void) | null = null;
@@ -108,24 +120,28 @@ const { transparentUntilScroll = false } = Astro.props;
   }
 
   #site-header[data-transparent-until-scroll='true']:not(.is-scrolled) {
-    opacity: 0.02;
+    opacity: 1;
     transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.7s ease, border-color 0.7s ease;
-  }
-
-  #site-header[data-transparent-until-scroll='true']:not(.is-scrolled):hover,
-  #site-header[data-transparent-until-scroll='true']:not(.is-scrolled):focus-within {
-    opacity: 1 !important;
-    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   #site-header[data-transparent-until-scroll='true'].is-scrolled,
   #site-header.is-scrolled {
+    opacity: 0.02 !important;
+    background-color: transparent !important;
+    border-bottom-color: transparent !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transition: opacity 0.5s ease, background-color 0.5s ease;
+  }
+
+  #site-header.is-scrolled:hover,
+  #site-header.is-scrolled:focus-within {
     opacity: 1 !important;
-    background-color: rgba(26, 28, 29, 0.88) !important;
+    background-color: rgba(26, 28, 29, 0.75) !important;
     border-bottom-color: rgba(255, 255, 255, 0.06) !important;
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    transition: opacity 0.4s ease, background-color 0.5s ease;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
   }
 
   [data-theme='light'] #site-header[data-transparent-until-scroll='true'] .header-brand-title,
@@ -146,5 +162,28 @@ const { transparentUntilScroll = false } = Astro.props;
   }
   .animate-soft-pulse {
     animation: soft-pulse 3.5s ease-in-out infinite;
+  }
+
+  .header-subtitle-hemeroteca {
+    /* lantern solo al hover: transparente por defecto */
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  .header-subtitle-hemeroteca:hover {
+    /* comporta con lantern simple, con glow 4%, con los colores del favicon */
+    background-color: rgba(239, 235, 227, 0.04); /* color relleno soft */
+    border-color: rgba(26, 28, 29, 0.8); /* borde dark */
+    box-shadow: 0 0 12px rgba(239, 235, 227, 0.04); /* glow 4% */
+  }
+
+  [data-theme='light'] .header-subtitle-hemeroteca:hover {
+    border-color: rgba(239, 235, 227, 0.3);
+    background-color: rgba(239, 235, 227, 0.08);
+  }
+
+  .header-nav-link:hover {
+    text-shadow: 0 0 10px rgba(239, 235, 227, 0.04); /* glow 4% sutil para menús */
   }
 </style>

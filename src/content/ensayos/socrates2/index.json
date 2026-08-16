@@ -1,13 +1,13 @@
 {
   "title": "socrates2",
   "generador": "Gemini-3.1-Pro",
-  "generadorTexto": "",
-  "bancoImagenesWikimedia": "",
-  "generadorImagen": "",
   "date": "2026-08-06",
   "category": "Historia",
   "themeColor": "british-green",
-  "sitioGeohistorico": "socrates2",
+  "sitioGeohistorico": "Atenas (Grecia)",
   "publicarConImagen": true,
-  "draft": false
+  "draft": false,
+  "coverImage": "/src/assets/ensayos/socrates2/coverImage.jpg",
+  "excerpt": "La muerte de Sócrates y la mayéutica socrática: el examen de la vida, el juicio por la polis ateniense y la serenidad ante la cicuta.",
+  "bancoImagenesWikimedia": "{\n  \"query\": \"Jacques-Louis David The Death of Socrates MET\",\n  \"count\": 1,\n  \"selectedItems\": [\n    {\n      \"id\": \"40002662\",\n      \"title\": \"David_-_The_Death_of_Socrates.jpg\",\n      \"url\": \"https://upload.wikimedia.org/wikipedia/commons/8/8c/David_-_The_Death_of_Socrates.jpg\",\n      \"thumbUrl\": \"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/David_-_The_Death_of_Socrates.jpg/960px-David_-_The_Death_of_Socrates.jpg\",\n      \"width\": 4000,\n      \"height\": 2662,\n      \"aspectRatio\": 1.5,\n      \"mime\": \"image/jpeg\",\n      \"role\": \"HERO\",\n      \"roleLabel\": \"Hero Image (Encabezado Panorámico Full-Bleed 4K)\",\n      \"author\": \"Jacques-Louis David (1787), Metropolitan Museum of Art (MET)\",\n      \"license\": \"Public Domain / Wikimedia Commons\",\n      \"licenseUrl\": \"https://commons.wikimedia.org/wiki/File:David_-_The_Death_of_Socrates.jpg\",\n      \"description\": \"La muerte de Sócrates por Jacques-Louis David (1787), Museo Metropolitano de Arte de Nueva York.\",\n      \"credit\": \"Metropolitan Museum of Art / Wikimedia Commons\",\n      \"pageUrl\": \"https://commons.wikimedia.org/wiki/File:David_-_The_Death_of_Socrates.jpg\"\n    }\n  ]\n}"
 }

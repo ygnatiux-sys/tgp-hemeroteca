@@ -6,12 +6,12 @@
   id="theme-toggle-btn"
   type="button"
   aria-label="Alternar entre modo oscuro y modo claro (papiro)"
-  class="header-action-btn group relative inline-flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-rust-orange"
+  class="toolbar-element header-action-btn group relative inline-flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-rust-orange"
 >
   {/* Icono del Sol (Visible en Modo Oscuro -> Activa Modo Claro) */}
   <svg
     id="theme-icon-sun"
-    class="w-5 h-5 text-stone-200 group-hover:text-[#C8A98B] transition-transform duration-500 rotate-0 scale-100 dark-icon"
+    class="w-5 h-5 text-stone-200 group-hover:text-[#EFEBE3] transition-transform duration-500 rotate-0 scale-100 dark-icon"
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
@@ -46,8 +46,6 @@
     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
   </svg>
 
-  {/* Micro-resplandor Especular */}
-  <span class="absolute inset-0 rounded-xl bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></span>
 </button>
 
 <script>
@@ -105,12 +103,9 @@
 </script>
 
 <style>
+  /* Sin background ni border nativos para modo light, manejado globalmente por .header-action-btn */
   [data-theme='light'] #theme-toggle-btn {
-    border-color: rgba(0, 0, 0, 0.35);
-    background-color: rgba(0, 0, 0, 0.05);
-  }
-  [data-theme='light'] #theme-toggle-btn:hover {
-    border-color: #B55A30;
-    box-shadow: 0 0 14px rgba(181, 90, 48, 0.25);
+    background-color: transparent !important;
+    border-color: transparent !important;
   }
 </style>

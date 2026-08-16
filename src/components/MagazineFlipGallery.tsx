@@ -7,7 +7,7 @@ interface Props {
   accentColor?: string;
 }
 
-export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: Props) {
+export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: Props) {
   if (!images || images.length === 0) return null;
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -56,7 +56,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
       {/* Encabezado Editorial del Visor */}
       <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6 flex-wrap gap-4">
         <div className="flex items-center gap-3">
-          <span className="w-2 h-2 rounded-full bg-[#C8A98B]"></span>
+          <span className="w-2 h-2 rounded-full bg-[#EFEBE3]"></span>
           <h3 className="font-mono text-xs uppercase tracking-[0.25em] text-white/90 font-semibold">
             Registro Visual & Documental ({images.length} {images.length === 1 ? 'lámina' : 'láminas'})
           </h3>
@@ -75,7 +75,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
           <button
             type="button"
             onClick={() => setIsZoomOpen(true)}
-            className="px-3.5 py-1.5 rounded-full border border-[#C8A98B]/40 bg-[#C8A98B]/10 hover:bg-[#C8A98B]/20 text-[#C8A98B] font-mono text-[10px] uppercase tracking-wider transition-all duration-300 flex items-center gap-1.5"
+            className="px-3.5 py-1.5 rounded-full border border-[#EFEBE3]/40 bg-[#EFEBE3]/10 hover:bg-[#EFEBE3]/20 text-[#EFEBE3] font-mono text-[10px] uppercase tracking-wider transition-all duration-300 flex items-center gap-1.5"
             title="Ampliar a pantalla completa"
           >
             Pantalla Completa
@@ -106,7 +106,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
 
             {/* Badge de Posición / Página */}
             <div className="absolute top-4 left-4 z-20">
-              <span className="px-3 py-1 bg-black/80 backdrop-blur-md rounded-full border border-white/15 font-mono text-[9px] uppercase tracking-[0.2em] text-[#C8A98B]">
+              <span className="px-3 py-1 bg-black/80 backdrop-blur-md rounded-full border border-white/15 font-mono text-[9px] uppercase tracking-[0.2em] text-[#EFEBE3]">
                 REGISTRO {String(currentIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
               </span>
             </div>
@@ -118,7 +118,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
                 e.stopPropagation();
                 setIsZoomOpen(true);
               }}
-              className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/75 hover:bg-[#C8A98B] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 shadow-xl"
+              className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/75 hover:bg-[#EFEBE3] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 shadow-xl"
               title="Ampliar imagen"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -131,7 +131,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
             <button
               type="button"
               onClick={handlePrev}
-              className="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/75 hover:bg-[#C8A98B] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 backdrop-blur-md shadow-2xl"
+              className="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/75 hover:bg-[#EFEBE3] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 backdrop-blur-md shadow-2xl"
               title="Lámina anterior (←)"
             >
               ❮
@@ -140,7 +140,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
             <button
               type="button"
               onClick={handleNext}
-              className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/75 hover:bg-[#C8A98B] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 backdrop-blur-md shadow-2xl"
+              className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/75 hover:bg-[#EFEBE3] text-white hover:text-black border border-white/20 flex items-center justify-center transition-all duration-300 backdrop-blur-md shadow-2xl"
               title="Lámina siguiente (→)"
             >
               ❯
@@ -164,7 +164,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
               {currentItem.author ? (
                 <span className="text-white/70">Atribución / Autor: {currentItem.author}</span>
               ) : null}
-              <span className="text-[#C8A98B]/70 tracking-wider">
+              <span className="text-[#EFEBE3]/70 tracking-wider">
                 Documentación fotográfica original del archivo
               </span>
             </div>
@@ -179,7 +179,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
                 onClick={() => setCurrentIndex(idx)}
                 className={`relative shrink-0 w-18 md:w-22 aspect-4/3 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
                   currentIndex === idx
-                    ? 'border-[#C8A98B] scale-105 shadow-lg opacity-100'
+                    ? 'border-[#EFEBE3] scale-105 shadow-lg opacity-100'
                     : 'border-white/10 opacity-50 hover:opacity-90 hover:border-white/30'
                 }`}
                 title={`Ver registro #${idx + 1}: ${item.title}`}
@@ -200,7 +200,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
           {images.map((item, idx) => (
             <div
               key={idx}
-              className="group relative bg-[#101216] border border-white/10 rounded-xl overflow-hidden hover:border-[#C8A98B]/60 transition-all duration-500 cursor-pointer shadow-xl"
+              className="group relative bg-[#101216] border border-white/10 rounded-xl overflow-hidden hover:border-[#EFEBE3]/60 transition-all duration-500 cursor-pointer shadow-xl"
               onClick={() => {
                 setCurrentIndex(idx);
                 setIsZoomOpen(true);
@@ -221,7 +221,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
                 </div>
               </div>
               <div className="p-4 flex flex-col gap-1.5">
-                <h5 className="font-serif italic text-sm text-white/90 line-clamp-1 group-hover:text-[#C8A98B] transition-colors">
+                <h5 className="font-serif italic text-sm text-white/90 line-clamp-1 group-hover:text-[#EFEBE3] transition-colors">
                   {item.title}
                 </h5>
                 <div className="flex items-center justify-between font-mono text-[9px] text-white/40 uppercase">
@@ -249,7 +249,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
             {/* Barra de Control Superior */}
             <div className="p-4 bg-black/70 border-b border-white/10 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <span className="px-2.5 py-0.5 rounded-full bg-[#C8A98B]/20 border border-[#C8A98B]/40 font-mono text-[10px] text-[#C8A98B] uppercase tracking-wider">
+                <span className="px-2.5 py-0.5 rounded-full bg-[#EFEBE3]/20 border border-[#EFEBE3]/40 font-mono text-[10px] text-[#EFEBE3] uppercase tracking-wider">
                   Lámina {currentIndex + 1} / {images.length}
                 </span>
                 <h4 className="font-serif italic text-sm text-white/90 truncate max-w-xs md:max-w-md">
@@ -289,7 +289,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
               <button
                 type="button"
                 onClick={handlePrev}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/70 hover:bg-[#C8A98B] text-white hover:text-black border border-white/20 flex items-center justify-center text-lg font-bold transition-all duration-300 shadow-2xl"
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/70 hover:bg-[#EFEBE3] text-white hover:text-black border border-white/20 flex items-center justify-center text-lg font-bold transition-all duration-300 shadow-2xl"
                 title="Foto anterior"
               >
                 ❮
@@ -298,7 +298,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#C8A98B' }: 
               <button
                 type="button"
                 onClick={handleNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/70 hover:bg-[#C8A98B] text-white hover:text-black border border-white/20 flex items-center justify-center text-lg font-bold transition-all duration-300 shadow-2xl"
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/70 hover:bg-[#EFEBE3] text-white hover:text-black border border-white/20 flex items-center justify-center text-lg font-bold transition-all duration-300 shadow-2xl"
                 title="Foto siguiente"
               >
                 ❯
