@@ -61,60 +61,74 @@ const { fragments = [], isModal = false } = Astro.props;
          </div>
          
          <div class="content-layer relative z-10 w-full max-w-6xl px-6 md:px-12 lg:px-24 flex flex-col items-start text-left gap-5 md:gap-6">
-           {/* Etiquetas Superiores */}
-           {(fragment.category || fragment.year) && (
-             <div class="immersive-tags flex items-center gap-3 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.4em] text-[#EFEBE3]">
-               <span>{fragment.category}</span>
-               {fragment.year && (
-                 <>
-                   <span class="opacity-40">•</span>
-                   <span class="text-white/60">{fragment.year}</span>
-                 </>
-               )}
-             </div>
-           )}
+           <div class="immersive-content absolute bottom-0 left-0 w-full p-6 md:p-12 lg:p-20 z-20 flex flex-col md:flex-row md:items-end md:justify-between gap-8 transition-opacity duration-1000">
+            
+            {/* Bloque Izquierdo: Meta, Titulo, Descripción */}
+            <div class="flex flex-col items-start max-w-4xl">
+              {/* Metadatos superiores */}
+              {(fragment.category || fragment.year) && (
+                <div class="immersive-meta flex items-center gap-3 mb-4 font-mono text-[10px] md:text-xs uppercase tracking-[0.3em] text-[#EFEBE3] drop-shadow-md">
+                  {fragment.category && (
+                    <span class="inline-flex items-center gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-rust-orange inline-block" />
+                      {fragment.category}
+                    </span>
+                  )}
+                  {fragment.year && (
+                    <>
+                      <span class="opacity-40">•</span>
+                      <span class="text-white/60">{fragment.year}</span>
+                    </>
+                  )}
+                </div>
+              )}
 
-           {/* Título Principal Inmersivo */}
-           {fragment.highlight && (
-             <h1 class="immersive-title font-cinzel text-[clamp(3.25rem,6.5vw,8.5rem)] text-white leading-[0.95] font-bold drop-shadow-2xl antialiased max-w-4xl">
-               <span class="bg-linear-to-r from-vintage-yellow to-rust-orange bg-clip-text text-transparent inline-block pb-2 pr-2">
-                 {fragment.highlight}
-               </span>
-             </h1>
-           )}
-           
-           {/* Texto Descriptivo */}
-           {fragment.text && (
-             <p class="immersive-desc text-white/70 text-lg md:text-xl max-w-2xl font-light leading-relaxed drop-shadow-md">
-               {fragment.text}
-             </p>
-           )}
+              {/* Título Principal Inmersivo */}
+              {fragment.highlight && (
+                <h1 class="immersive-title font-cinzel text-[clamp(3.25rem,6.5vw,8.5rem)] text-white leading-[0.95] font-bold drop-shadow-2xl antialiased">
+                  <span class="bg-linear-to-r from-vintage-yellow to-rust-orange bg-clip-text text-transparent inline-block pb-2 pr-2">
+                    {fragment.highlight}
+                  </span>
+                </h1>
+              )}
+              
+              {/* Texto Descriptivo */}
+              {fragment.text && (
+                <p class="immersive-desc text-white/70 text-lg md:text-xl max-w-2xl font-light leading-relaxed drop-shadow-md mt-2">
+                  {fragment.text}
+                </p>
+              )}
+            </div>
 
-           {/* Botón CTA */}
-           {fragment.link && (
-             <div class="immersive-cta mt-4">
-               <a href={fragment.link} class="group inline-flex items-center gap-3 text-[#EFEBE3] hover:text-white transition-colors">
-                 <span class="font-mono text-[10px] uppercase tracking-[0.3em] font-bold">Leer Investigación</span>
-                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform duration-300"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-               </a>
-             </div>
-           )}
+            {/* Bloque Derecho: CTAs e Iconos */}
+            <div class="flex flex-col items-start md:items-end gap-4 shrink-0 md:pb-4">
+              {/* Botón CTA */}
+              {fragment.link && (
+                <div class="immersive-cta">
+                  <a href={fragment.link} class="group inline-flex items-center gap-3 px-6 py-3 bg-[#151718]/80 backdrop-blur-md border border-white/10 rounded-xl text-[#EFEBE3] hover:text-white hover:bg-white/10 hover:border-white/30 transition-all duration-300">
+                    <span class="font-mono text-[10px] uppercase tracking-[0.3em] font-bold">Leer Investigación</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform duration-300"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  </a>
+                </div>
+              )}
 
-           {/* Íconos Spotify / YouTube */}
-           {(fragment.spotifyLink || fragment.youtubeLink) && (
-             <div class="immersive-icons flex items-center gap-4 mt-2">
-               {fragment.spotifyLink && (
-                 <a href={fragment.spotifyLink} target="_blank" rel="noopener noreferrer" class="opacity-60 hover:opacity-100 transition-opacity">
-                   <SpotifyIcon />
-                 </a>
-               )}
-               {fragment.youtubeLink && (
-                 <a href={fragment.youtubeLink} target="_blank" rel="noopener noreferrer" class="opacity-60 hover:opacity-100 transition-opacity">
-                   <YouTubeIcon />
-                 </a>
-               )}
-             </div>
-           )}
+              {/* Íconos Spotify / YouTube */}
+              {(fragment.spotifyLink || fragment.youtubeLink) && (
+                <div class="immersive-icons flex items-center gap-4">
+                  {fragment.spotifyLink && (
+                    <a href={fragment.spotifyLink} target="_blank" rel="noopener noreferrer" class="opacity-60 hover:opacity-100 transition-opacity drop-shadow-lg">
+                      <SpotifyIcon />
+                    </a>
+                  )}
+                  {fragment.youtubeLink && (
+                    <a href={fragment.youtubeLink} target="_blank" rel="noopener noreferrer" class="opacity-60 hover:opacity-100 transition-opacity drop-shadow-lg">
+                      <YouTubeIcon />
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
          </div>
       </article>
     ))}

@@ -161,6 +161,150 @@ header .header-btn-codice {
   filter: drop-shadow(0 0 5px rgba(239, 235, 227, 0.25)) !important;
 }
 
+/* Efecto Lantern Latido (Cartel Neón) */
+@keyframes lantern-pulse {
+  0%, 100% {
+    color: rgba(226, 223, 216, 0.3);
+    text-shadow: 0 0 0 transparent;
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  50% {
+    color: #EFEBE3;
+    text-shadow: 0 0 8px rgba(239, 235, 227, 0.35);
+    filter: drop-shadow(0 0 8px rgba(239, 235, 227, 0.35));
+  }
+}
+
+.lantern-neon-pulse {
+  animation: lantern-pulse 4s ease-in-out infinite;
+  transition: all 0.3s ease;
+}
+
+.lantern-neon-pulse:hover {
+  color: #EFEBE3 !important;
+  text-shadow: 0 0 8px rgba(239, 235, 227, 0.5) !important;
+  filter: drop-shadow(0 0 8px rgba(239, 235, 227, 0.5)) !important;
+  animation-play-state: paused;
+}
+
+/* ==========================================================================
+   COREOGRAFÍA CINEMÁTICA EXTENDIDA 12.5s (Tarjetas de Archivo)
+   Secuencia activada vía Hover (.choreography-active)
+   ========================================================================== */
+
+/* 1. H1 y CTA Contenedor Principal: Ciclo de vida completo */
+.ch-h1-cta {
+  opacity: 1;
+}
+.choreography-active .ch-h1-cta {
+  animation: ch-h1-cta-cycle 12.5s forwards;
+}
+@keyframes ch-h1-cta-cycle {
+  0%, 12% { opacity: 1; } /* 0s a 1.5s: Visibles por defecto (continuidad inicial) */
+  16% { opacity: 0; } /* 2.0s: Ocultos para dar paso al excerpt */
+  83% { opacity: 0; } /* 10.4s: Siguen ocultos */
+  84% { opacity: 1; } /* 10.5s: Reaparecen para que el typewriter actúe */
+  100% { opacity: 1; }
+}
+
+/* 2. Categorías (Tags): Pulso Inicial (0s a 1.5s) */
+.ch-tag {
+  opacity: 0;
+}
+.choreography-active .ch-tag {
+  animation: ch-tag-pulse 1.5s 0s forwards;
+}
+@keyframes ch-tag-pulse {
+  0% { opacity: 0; filter: blur(2px); text-shadow: 0 0 0 transparent; }
+  30%, 70% { opacity: 1; filter: blur(0); text-shadow: 0 0 10px rgba(239, 235, 227, 0.4); }
+  100% { opacity: 0; filter: blur(2px); text-shadow: 0 0 0 transparent; }
+}
+
+/* 3. Excerpt Container y Efecto Cascada (Cuento) */
+.ch-excerpt-container {
+  opacity: 0;
+}
+.choreography-active .ch-excerpt-container {
+  opacity: 1; /* El contenedor se hace visible al instante; las palabras manejan su propia opacidad */
+}
+
+.ch-excerpt-word {
+  opacity: 0;
+  display: inline-block;
+  white-space: pre-wrap; /* Respeta los espacios al finalizar la palabra */
+}
+.choreography-active .ch-excerpt-word {
+  /* 5s de vida útil por palabra para la cascada diluyente */
+  animation: ch-excerpt-write 5s var(--word-delay) forwards;
+}
+@keyframes ch-excerpt-write {
+  0% { opacity: 0; filter: blur(4px); text-shadow: 0 0 15px rgba(239, 235, 227, 0.8); }
+  10% { opacity: 1; filter: blur(0); text-shadow: 0 0 15px rgba(239, 235, 227, 0.8); color: #FFF; } /* Brillo pico */
+  20%, 60% { opacity: 0.85; filter: blur(0); text-shadow: none; color: rgba(239, 235, 227, 0.85); } /* Legibilidad base por ~2s */
+  100% { opacity: 0; filter: blur(4px); text-shadow: none; } /* Fade out */
+}
+
+.amber-neon {
+  font-weight: 800;
+}
+.choreography-active .amber-neon {
+  animation: ch-excerpt-write-amber 5s var(--word-delay) forwards;
+}
+@keyframes ch-excerpt-write-amber {
+  0% { opacity: 0; filter: blur(4px); text-shadow: 0 0 15px rgba(255, 179, 71, 0.9); color: #FFB347; }
+  10% { opacity: 1; filter: blur(0); text-shadow: 0 0 15px rgba(255, 179, 71, 0.9); color: #FFB347; }
+  20%, 60% { opacity: 1; filter: blur(0); text-shadow: 0 0 5px rgba(255, 179, 71, 0.4); color: #FFB347; }
+  100% { opacity: 0; filter: blur(4px); text-shadow: none; color: #FFB347; }
+}
+
+/* 4. Palabras del H1 Typewriter */
+.ch-word {
+  opacity: 1;
+  display: inline-block;
+}
+.choreography-active .ch-word {
+  opacity: 0;
+  animation: ch-fade-in 0.5s var(--word-delay) forwards;
+}
+@keyframes ch-fade-in {
+  0% { opacity: 0; filter: blur(4px); transform: translateY(4px); }
+  100% { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+
+/* 5. CTA: Fade-in y Brillo Metálico (11.5s a 12.5s) */
+.ch-cta-container {
+  opacity: 1;
+}
+.choreography-active .ch-cta-container {
+  opacity: 0;
+  animation: ch-cta-in 0.5s 11.5s forwards;
+}
+@keyframes ch-cta-in {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.ch-cta-btn {
+  position: relative;
+  overflow: hidden;
+}
+.ch-cta-btn::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(to right, transparent, rgba(239, 235, 227, 0.4), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+.choreography-active .ch-cta-btn::before {
+  animation: ch-metallic-sweep 0.5s 12.0s forwards;
+}
+@keyframes ch-metallic-sweep {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
 /* Ocultar toolbar cuando hamburguesa está activa */
 html.nav-is-expanded header .toolbar-element {
   opacity: 0 !important;

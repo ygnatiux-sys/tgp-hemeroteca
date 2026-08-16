@@ -4,7 +4,7 @@
   "category": "Historia de las Religiones",
   "themeColor": "bordeaux",
   "draft": false,
-  "coverImage": "/src/assets/ensayos/los-carpocracianos/coverImage.svg",
+  "coverImage": "/src/assets/ensayos/los-carpocracianos/coverImage.jpg",
   "excerpt": "Análisis de la corriente gnóstica de Cárpocrates de Alejandría y Epífanes: la redención a través de la vivencia de todas las experiencias terrenales y la transgresión ritual del nomos.",
   "generador": "Gemini-3.1-Pro",
   "bancoImagenesWikimedia": "{\n  \"query\": \"Good Shepherd Catacomb of Priscilla Rome fresco\",\n  \"count\": 1,\n  \"selectedItems\": [\n    {\n      \"id\": \"28001860\",\n      \"title\": \"Good_Shepherd_Catacomb_of_Priscilla_Rome.jpg\",\n      \"url\": \"https://upload.wikimedia.org/wikipedia/commons/2/2a/Good_Shepherd_Catacomb_of_Priscilla_Rome.jpg\",\n      \"thumbUrl\": \"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Good_Shepherd_Catacomb_of_Priscilla_Rome.jpg/960px-Good_Shepherd_Catacomb_of_Priscilla_Rome.jpg\",\n      \"width\": 2800,\n      \"height\": 1860,\n      \"aspectRatio\": 1.5,\n      \"mime\": \"image/jpeg\",\n      \"role\": \"HERO\",\n      \"roleLabel\": \"Hero Image (Encabezado Panorámico Full-Bleed)\",\n      \"author\": \"Anónimo paleocristiano (Siglo II d.C.)\",\n      \"license\": \"Public Domain / Wikimedia Commons\",\n      \"licenseUrl\": \"https://commons.wikimedia.org/wiki/File:Good_Shepherd_Catacomb_of_Priscilla_Rome.jpg\",\n      \"description\": \"Fresco paleocristiano/gnóstico del siglo II d.C., Catacumbas de Priscila, Roma.\",\n      \"credit\": \"Wikimedia Commons / Public Domain\",\n      \"pageUrl\": \"https://commons.wikimedia.org/wiki/File:Good_Shepherd_Catacomb_of_Priscilla_Rome.jpg\"\n    }\n  ]\n}"

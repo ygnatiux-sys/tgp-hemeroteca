@@ -79,47 +79,51 @@ const safeSlides = slides.length > 0 ? slides : [];
             </div>
 
             {/* Contenido Editorial */}
-            <div class="cpe-content relative z-10 w-full max-w-6xl mx-auto px-6 md:px-12 lg:px-20 flex flex-col items-start gap-2.5">
-              {/* Metadatos superiores: Pulso suave GSAP */}
-              <div class="cpe-meta flex items-center gap-3">
-                <span class="inline-flex items-center gap-2 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-[#EFEBE3]">
-                  <span class="cpe-meta-dot w-1.5 h-1.5 rounded-full bg-rust-orange inline-block shadow-[0_0_6px_rgba(239, 235, 227,0.8)]" />
-                  {slide.category || "Investigación"}
-                </span>
-                {slide.date && (
-                  <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-white/35">
-                    {slide.date}
+            <div class="cpe-content relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-20 pb-6 md:pb-10 flex flex-col md:flex-row md:justify-between md:items-end gap-6">
+              
+              {/* Bloque Izquierdo */}
+              <div class="flex flex-col items-start gap-2.5 max-w-3xl">
+                {/* Metadatos superiores: Pulso suave GSAP */}
+                <div class="cpe-meta flex items-center gap-3">
+                  <span class="inline-flex items-center gap-2 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-[#EFEBE3]">
+                    <span class="cpe-meta-dot w-1.5 h-1.5 rounded-full bg-rust-orange inline-block shadow-[0_0_6px_rgba(239, 235, 227,0.8)]" />
+                    {slide.category || "Investigación"}
                   </span>
-                )}
-                {slide.readTime && (
-                  <>
-                    <span class="text-white/20 text-xs">·</span>
-                    <span class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-white/35">
-                      {slide.readTime} lectura
+                  {slide.date && (
+                    <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-white/35">
+                      {slide.date}
                     </span>
-                  </>
+                  )}
+                  {slide.readTime && (
+                    <>
+                      <span class="text-white/20 text-xs">·</span>
+                      <span class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-white/35">
+                        {slide.readTime} lectura
+                      </span>
+                    </>
+                  )}
+                </div>
+
+                {/* Título — legible alineado a la izquierda */}
+                <h1 class="cpe-title font-cinzel font-bold text-xl md:text-3xl leading-snug tracking-wide text-pretty">
+                  <a
+                    href={slide.link}
+                    class="bg-linear-to-br from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)] hover:from-[#EFEBE3] hover:via-[#E2D4B8] hover:to-white transition-all duration-500"
+                  >
+                    {slide.title}
+                  </a>
+                </h1>
+
+                {/* Subtítulo / excerpt */}
+                {slide.subtitle && (
+                  <p class="cpe-subtitle font-serif italic text-white/50 text-sm md:text-base max-w-xl leading-relaxed drop-shadow-md line-clamp-2">
+                    "{slide.subtitle}"
+                  </p>
                 )}
               </div>
 
-              {/* Título — unificado más pequeño */}
-              <h1 class="cpe-title font-cinzel font-bold text-xl md:text-2xl leading-snug tracking-wide text-pretty max-w-3xl">
-                <a
-                  href={slide.link}
-                  class="bg-linear-to-br from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)] hover:from-[#EFEBE3] hover:via-[#E2D4B8] hover:to-white transition-all duration-500"
-                >
-                  {slide.title}
-                </a>
-              </h1>
-
-              {/* Subtítulo / excerpt */}
-              {slide.subtitle && (
-                <p class="cpe-subtitle font-serif italic text-white/50 text-sm md:text-base max-w-xl leading-relaxed drop-shadow-md line-clamp-2">
-                  "{slide.subtitle}"
-                </p>
-              )}
-
-              {/* CTAs */}
-              <div class="cpe-cta flex items-center gap-3 mt-2 flex-wrap">
+              {/* Bloque Derecho: CTAs */}
+              <div class="cpe-cta flex items-center gap-3 md:pb-2 flex-wrap md:justify-end shrink-0">
                 <a
                   href={slide.link}
                   class="group inline-flex items-center gap-2 px-5 py-2.5 bg-[#151718]/85 backdrop-blur-sm border border-white/15 text-[#E0E0E0]/80 font-mono font-bold text-[9px] tracking-[0.25em] uppercase rounded-lg hover:bg-white/10 hover:border-white/40 hover:text-white transition-all duration-400 active:scale-95"

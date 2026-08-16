@@ -149,10 +149,9 @@ export function BuscadorModal() {
       </div>
 
       {/* BOTÓN SÁNDWICH (3 GUIONES ≡) */}
-      <div className="relative" onMouseLeave={() => setIsNavExpanded(false)}>
+      <div className="relative">
         <button
           type="button"
-          onMouseEnter={() => setIsNavExpanded(true)}
           onClick={() => setIsNavExpanded(prev => !prev)}
           title="Menú"
           className={`header-action-btn flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-xl transition-all duration-300 cursor-pointer ${
