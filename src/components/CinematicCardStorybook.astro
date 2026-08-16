@@ -81,7 +81,7 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
 ---
 
 <article
-  class={`cinematic-archive-card cinematic-card-lantern card-hover-cinematic group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/8 bg-theme-dark/80 shadow-2xl flex flex-col justify-end w-full transform-gpu isolate ${minHeightClass}`}
+  class={`storybook-card cinematic-card-lantern card-hover-cinematic group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/8 bg-theme-dark/80 shadow-2xl flex flex-col justify-end w-full transform-gpu isolate ${minHeightClass}`}
   data-category={normalizeCategory(entry.category)}
   data-year={year}
 >
@@ -121,19 +121,11 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
   <div class={`relative z-20 ${paddingClass} w-full max-w-7xl`}>
     <div class="flex flex-col w-full h-full justify-end">
       
-      {/* Excerpt (Arriba de H1, centrado) */}
+      {/* Excerpt con Efecto Storybook Scroll */}
       {excerpt && (
-        <p class={`font-sans leading-relaxed text-center max-w-[66ch] tracking-wider mx-auto mb-4 line-clamp-2 ch-excerpt-container ${excerptClass}`}>
-          {excerpt.split(' ').filter((w: string) => w.trim() !== '').map((word: string, i: number) => {
-            const isAmber = word.startsWith('**') && word.endsWith('**');
-            const cleanWord = isAmber ? word.replace(/\*\*/g, '') : word;
-            return (
-              <>
-                <span class={`ch-excerpt-word ${isAmber ? 'amber-neon' : ''}`} style={`--word-delay: ${2.5 + i * 0.4}s`}>{cleanWord}</span>{" "}
-              </>
-            );
-          })}
-        </p>
+        <div class="storybook-container mx-auto w-full max-w-[66ch] mb-4">
+          <div class="storybook-text font-serif leading-relaxed text-center text-[#f4ecd8]/90 tracking-wider" data-storybook-text={excerpt}></div>
+        </div>
       )}
 
       {/* Fila Central: H1 (izq) y CTA (der) */}
@@ -179,52 +171,92 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
 </article>
 
 <style>
-  /* Se conservan las animaciones intactas */
+  /* =========================================================
+     Efecto Storybook Scroll
+     ========================================================= */
+  .storybook-container {
+    height: 120px; /* Altura visible del texto rodante */
+    position: relative;
+    overflow: hidden;
+    /* Máscara: transparente arriba (0%), visible a partir del 45% */
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 45%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 45%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  
+  .choreography-active .storybook-container {
+    opacity: 1;
+    /* Aparece pasados los 2.5s (luego de que el H1 hace zoom out) */
+    transition-delay: 2.5s;
+  }
+
+  .storybook-text {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    font-size: 0.95rem; /* Ajustable a la vista */
+    text-shadow: 0 0 8px rgba(244, 236, 216, 0.4);
+    /* Inicia oculto / sin animar */
+    transform: translateY(100px);
+  }
+
+  .storybook-active .storybook-text {
+    /* 25s de subida matemática */
+    animation: storybookScroll 25s linear forwards;
+  }
+
+  @keyframes storybookScroll {
+    0% { transform: translateY(80px); }
+    100% { transform: translateY(-150%); }
+  }
+
+  /* Letras que aparecen individualmente */
+  .sb-letra {
+    opacity: 0;
+    animation: sbAparecer 0.3s forwards;
+  }
+  @keyframes sbAparecer {
+    to { opacity: 1; }
+  }
+
+  /* Cursor Mágico (Sparkle) Dorado */
+  .sb-cursor {
+    display: inline-block;
+    color: #FFD700;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5);
+    margin-left: 2px;
+    animation: sbSparkleTilt 1s infinite alternate;
+  }
+  @keyframes sbSparkleTilt {
+    0% { transform: scale(1) rotate(-10deg); opacity: 0.4; }
+    100% { transform: scale(1.4) rotate(15deg); opacity: 1; }
+  }
+
+  /* =========================================================
+     Animaciones previas (Cinemagraph, etc.)
+     ========================================================= */
   @keyframes kenBurnsAscent {
-    0% {
-      transform: scale(1.02) translateY(2.5%) translateZ(0);
-    }
-    50% {
-      transform: scale(1.08) translateY(0%) translateZ(0);
-    }
-    100% {
-      transform: scale(1.14) translateY(-3%) translateZ(0);
-    }
+    0% { transform: scale(1.02) translateY(2.5%) translateZ(0); }
+    50% { transform: scale(1.08) translateY(0%) translateZ(0); }
+    100% { transform: scale(1.14) translateY(-3%) translateZ(0); }
   }
 
   @keyframes museumFade {
-    0% {
-      opacity: 0.7;
-    }
-    50% {
-      opacity: 0.9;
-    }
-    100% {
-      opacity: 0.65;
-    }
+    0% { opacity: 0.7; }
+    50% { opacity: 0.9; }
+    100% { opacity: 0.65; }
   }
 
   @keyframes dynamisLoop {
-    0% {
-      opacity: 0.18;
-      transform: scale(1) translateZ(0);
-      filter: brightness(1) saturate(1);
-    }
-    50% {
-      opacity: 0.45;
-      transform: scale(1.04) translateZ(0);
-      filter: brightness(1.12) saturate(1.18);
-    }
-    100% {
-      opacity: 0.22;
-      transform: scale(1.01) translateZ(0);
-      filter: brightness(1.02) saturate(1.05);
-    }
+    0% { opacity: 0.18; filter: brightness(1) saturate(1); }
+    50% { opacity: 0.45; filter: brightness(1.12) saturate(1.18); }
+    100% { opacity: 0.22; filter: brightness(1.02) saturate(1.05); }
   }
 
   .cinemagraph-ken-burns {
-    animation: kenBurnsAscent 24s cubic-bezier(0.4, 0, 0.6, 1) infinite
-      alternate;
+    animation: kenBurnsAscent 24s cubic-bezier(0.4, 0, 0.6, 1) infinite alternate;
     will-change: transform;
     transform-origin: center center;
   }
@@ -234,47 +266,90 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
   }
 
   .cinemagraph-dynamis {
-    background: radial-gradient(
-      circle at 45% 45%,
-      rgba(239, 235, 227, 0.25) 0%,
-      rgba(74, 59, 50, 0.12) 45%,
-      transparent 70%
-    );
+    background: radial-gradient(circle at 45% 45%, rgba(239, 235, 227, 0.25) 0%, rgba(74, 59, 50, 0.12) 45%, transparent 70%);
     mix-blend-mode: screen;
     animation: dynamisLoop 16s ease-in-out infinite alternate;
     will-change: transform, opacity, filter;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cinemagraph-ken-burns,
-    .cinemagraph-museum-fade,
-    .cinemagraph-dynamis {
+    .cinemagraph-ken-burns, .cinemagraph-museum-fade, .cinemagraph-dynamis {
       animation: none !important;
     }
   }
 </style>
 
 <script>
-  const initChoreographyHover = () => {
-    document.querySelectorAll(".cinematic-archive-card").forEach((card) => {
-      // Si la tarjeta ya fue animada en esta sesión, no re-animar
+  const initStorybookHover = () => {
+    document.querySelectorAll(".storybook-card").forEach((card) => {
       if (!card.classList.contains("choreography-active")) {
         card.addEventListener(
           "mouseenter",
           () => {
             card.classList.add("choreography-active");
+            card.classList.add("storybook-active");
+
+            // Lógica del cuento
+            const container = card.querySelector(".storybook-text") as HTMLElement;
+            if (!container) return;
+
+            const textoCompleto = container.getAttribute("data-storybook-text") || "";
+            container.innerHTML = ""; // Limpiar texto original
+            
+            const cursor = document.createElement("span");
+            cursor.classList.add("sb-cursor");
+            cursor.textContent = "✧";
+            
+            let i = 0;
+            const velocidadEscritura = 50; // ms por letra
+
+            // Retraso inicial para esperar a que el H1 desaparezca (ej. 2.5s)
+            setTimeout(() => {
+              function agregarLetra() {
+                if (i < textoCompleto.length) {
+                  const char = textoCompleto[i];
+                  
+                  // Remover el cursor temporalmente
+                  if (container.contains(cursor)) {
+                    container.removeChild(cursor);
+                  }
+
+                  const span = document.createElement("span");
+                  span.classList.add("sb-letra");
+                  span.textContent = char;
+                  container.appendChild(span);
+                  
+                  // Volver a colocar el cursor al final
+                  container.appendChild(cursor);
+
+                  i++;
+                  setTimeout(agregarLetra, velocidadEscritura);
+                } else {
+                  // Si termina de escribir, podemos dejar el cursor un rato y luego borrarlo
+                  setTimeout(() => {
+                    if (container.contains(cursor)) {
+                      cursor.style.transition = "opacity 1s";
+                      cursor.style.opacity = "0";
+                      setTimeout(() => container.removeChild(cursor), 1000);
+                    }
+                  }, 2000);
+                }
+              }
+              
+              agregarLetra();
+            }, 2500); // Wait for the H1 to zoom out fade
+
           },
-          { once: true } // Ejecutar solo una vez por tarjeta
+          { once: true } // Solo una vez por tarjeta
         );
       }
     });
   };
 
-  // Soporte para Astro View Transitions
-  document.addEventListener("astro:page-load", initChoreographyHover);
+  document.addEventListener("astro:page-load", initStorybookHover);
   if (document.readyState === "complete" || document.readyState === "interactive") {
-    initChoreographyHover();
+    initStorybookHover();
   } else {
-    document.addEventListener("DOMContentLoaded", initChoreographyHover);
+    document.addEventListener("DOMContentLoaded", initStorybookHover);
   }
 </script>

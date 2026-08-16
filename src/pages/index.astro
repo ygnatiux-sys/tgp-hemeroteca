@@ -5,6 +5,7 @@ import { Image } from 'astro:assets';
 import SpotifyIcon from '../components/icons/Spotify.astro';
 import YouTubeIcon from '../components/icons/YouTube.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
+import CinematicCardStorybook from '../components/CinematicCardStorybook.astro';
 import CinematicPostEngine from '../components/CinematicPostEngine.astro';
 import {
   getPublishableEssays,
@@ -313,13 +314,23 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             {resolvedRecent.map(({ slug, entry, img }) => (
-              <CinematicArchiveCard
-                slug={slug}
-                entry={entry}
-                img={img}
-                variant="standard"
-                enableCinemagraph={false}
-              />
+              slug === 'moctezuma-y-cortez-el-ultimo-azteca' ? (
+                <CinematicCardStorybook
+                  slug={slug}
+                  entry={entry}
+                  img={img}
+                  variant="standard"
+                  enableCinemagraph={false}
+                />
+              ) : (
+                <CinematicArchiveCard
+                  slug={slug}
+                  entry={entry}
+                  img={img}
+                  variant="standard"
+                  enableCinemagraph={false}
+                />
+              )
             ))}
           </div>
         </section>

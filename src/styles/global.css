@@ -200,11 +200,21 @@ header .header-btn-codice {
   animation: ch-h1-cta-cycle 12.5s forwards;
 }
 @keyframes ch-h1-cta-cycle {
-  0%, 12% { opacity: 1; } /* 0s a 1.5s: Visibles por defecto (continuidad inicial) */
+  0%, 10% { opacity: 1; } /* 0s a 1.25s: Visibles por defecto (continuidad inicial) */
   16% { opacity: 0; } /* 2.0s: Ocultos para dar paso al excerpt */
   83% { opacity: 0; } /* 10.4s: Siguen ocultos */
-  84% { opacity: 1; } /* 10.5s: Reaparecen para que el typewriter actúe */
-  100% { opacity: 1; }
+  88%, 100% { opacity: 1; } /* 11.0s: Reaparecen con un fade-in global suave */
+}
+
+.choreography-active .ch-h1-container {
+  transform-origin: left center;
+  animation: ch-h1-zoom-out 12.5s forwards;
+}
+@keyframes ch-h1-zoom-out {
+  0%, 10% { transform: scale(1) translateZ(0); filter: blur(0); }
+  16% { transform: scale(1.15) translateZ(0); filter: blur(8px); } /* Zoom Out Fade dramático hacia la cámara */
+  83% { transform: scale(0.95); filter: blur(4px); } /* Reubicación offscreen */
+  88%, 100% { transform: scale(1); filter: blur(0); } /* Retorno natural durante el fade-in global */
 }
 
 /* 2. Categorías (Tags): Pulso Inicial (0s a 1.5s) */
@@ -257,31 +267,9 @@ header .header-btn-codice {
   100% { opacity: 0; filter: blur(4px); text-shadow: none; color: #FFB347; }
 }
 
-/* 4. Palabras del H1 Typewriter */
-.ch-word {
-  opacity: 1;
-  display: inline-block;
-}
-.choreography-active .ch-word {
-  opacity: 0;
-  animation: ch-fade-in 0.5s var(--word-delay) forwards;
-}
-@keyframes ch-fade-in {
-  0% { opacity: 0; filter: blur(4px); transform: translateY(4px); }
-  100% { opacity: 1; filter: blur(0); transform: translateY(0); }
-}
-
-/* 5. CTA: Fade-in y Brillo Metálico (11.5s a 12.5s) */
+/* 4. CTA: Brillo Metálico Final (11.5s) */
 .ch-cta-container {
-  opacity: 1;
-}
-.choreography-active .ch-cta-container {
-  opacity: 0;
-  animation: ch-cta-in 0.5s 11.5s forwards;
-}
-@keyframes ch-cta-in {
-  0% { opacity: 0; transform: translateY(8px); }
-  100% { opacity: 1; transform: translateY(0); }
+  opacity: 1; /* Su opacidad es manejada globalmente por ch-h1-cta */
 }
 
 .ch-cta-btn {
