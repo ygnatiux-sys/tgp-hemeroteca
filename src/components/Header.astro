@@ -62,12 +62,30 @@ const { transparentUntilScroll = false } = Astro.props;
         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
         Volver
       </a>
+
+      {/* Divisor */}
+      <span class="w-px h-3 bg-white/15 rounded-full"></span>
+
       <a href="/" class="header-nav-link transition-colors">Inicio</a>
       <a href="/colecciones" class="header-nav-link transition-colors">Colecciones</a>
       <a href="/archivo" class="header-nav-link transition-colors">Archivo</a>
       <a href="/papers" class="header-nav-link transition-colors">Papers</a>
       <a href="/about" class="header-nav-link transition-colors">About</a>
       <a href="/codice" class="header-nav-link transition-colors font-medium text-rust-orange">El Códice</a>
+
+      {/* Divisor */}
+      <span class="w-px h-3 bg-white/15 rounded-full"></span>
+
+      <a
+        href="https://hemeroteca.thegreatpuzzleproject.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="header-nav-link transition-colors flex items-center gap-1 opacity-75 hover:opacity-100 text-rust-orange"
+        title="Hemeroteca TGP — Archivo Editorial"
+      >
+        Hemeroteca
+        <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+      </a>
     </nav>
 
     {/* Derecha: Acciones (Tema, Lupa, Menú) */}

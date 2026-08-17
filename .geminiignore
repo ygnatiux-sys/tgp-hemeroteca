@@ -1,0 +1,41 @@
+# ==========================================
+# CORTAFUEGOS DE CONTEXTO: .geminiignore
+# ==========================================
+
+# 1. Colecciones de Contenido Masivo
+# Bloquea los artículos y producción textual para no devorar contexto.
+src/content/ensayos/
+src/content/arquetipos-globales/
+src/content/estilos-visuales/
+src/content/georreferencias/
+src/content/**/*.md
+src/content/**/*.mdx
+src/content/**/*.mdoc
+src/content/**/*.json
+
+# Excepción estratégica: Retener la estructura de datos
+# Permite que el agente lea los esquemas y la configuración.
+!src/content/config.ts
+!keystatic.config.tsx
+!keystatic.config.ts
+
+# 2. Archivos Multimedia y Assets
+# El análisis de rutas de imágenes es un sumidero innecesario de créditos.
+public/images/
+public/assets/
+public/media/
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.svg
+*.mp4
+*.mp3
+
+# 3. Artefactos de Compilación y Caché
+# Impide que el agente se pierda escaneando archivos generados por el framework.
+.astro/
+dist/
+node_modules/
+.cache/
+.vercel/

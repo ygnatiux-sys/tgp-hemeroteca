@@ -175,16 +175,19 @@ export function BuscadorModal() {
         >
           <div className="flex flex-col items-end gap-1.5 pt-2">
             {[
-              { label: 'Volver a TGP', href: 'https://thegreatpuzzleproject.com' },
+              { label: 'Volver a TGP', href: 'https://thegreatpuzzleproject.com', external: true },
               { label: 'Inicio', href: '/' },
               { label: 'Colecciones', href: '/colecciones' },
               { label: 'Archivo', href: '/archivo' },
               { label: 'About', href: '/about' },
               { label: 'El Códice', href: '/codice' },
+              { label: 'Hemeroteca ↗', href: 'https://hemeroteca.thegreatpuzzleproject.com', external: true },
             ].map(link => (
               <a
                 key={link.href}
                 href={link.href}
+                target={link.external ? '_blank' : undefined}
+                rel={link.external ? 'noopener noreferrer' : undefined}
                 onClick={() => setNavState(0)}
                 className="font-mono font-light text-[11px] uppercase tracking-[0.2em] text-current opacity-70 hover:opacity-100 hover:text-rust-orange dark:hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(239,235,227,0.06)] transition-all"
               >

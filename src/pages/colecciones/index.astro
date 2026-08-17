@@ -62,21 +62,6 @@ const coleccionesSlides = collections
                    'center center',
     link: `/colecciones/${col.key}`,
   }));
-// ─── HELPER PARA SECUENCIAS CINE PREMIER (1 HERO FULL + DÚO 60/40) ──────────
-function createPremierSequences(essays: any[]) {
-  const sequences: Array<{
-    hero: any;
-    duo: any[];
-  }> = [];
-  
-  for (let i = 0; i < essays.length; i += 3) {
-    sequences.push({
-      hero: essays[i],
-      duo: essays.slice(i + 1, i + 3),
-    });
-  }
-  return sequences;
-}
 ---
 
 <Layout title="Colecciones | The Great Puzzle Project">
@@ -137,9 +122,9 @@ function createPremierSequences(essays: any[]) {
       ═══════════════════════════════════════════════════════════════════ */}
       <section class="flex flex-col gap-16 md:gap-24">
         {collections.map(({ key, label, count, essays }) => {
-          const sequences = createPremierSequences(essays);
           return (
             <div class="reveal-item flex flex-col gap-8 md:gap-10 border-b border-white/10 pb-16 md:pb-24 last:border-b-0">
+
               {/* Barra Editorial de Categoría */}
               <div class="editorial-bar flex items-center justify-between border-b border-[#EFEBE3]/20 pb-4">
                 <div class="flex items-center gap-3 flex-wrap">
@@ -147,61 +132,71 @@ function createPremierSequences(essays: any[]) {
                   <h2 class="font-cinzel font-bold text-2xl md:text-3xl lg:text-4xl tracking-wider bg-linear-to-b from-[#FFFFFF] via-[#8E8E93] to-[#1C1C1E] bg-clip-text text-transparent drop-shadow-md">
                     {label}
                   </h2>
-                  <span class="font-mono text-[10px] text-[#EFEBE3] uppercase tracking-[0.2em] px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 font-bold ml-2">
+                  <span class="font-mono text-xs text-[#EFEBE3]/70 uppercase tracking-[0.2em] px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 font-bold ml-2">
                     {count} {count === 1 ? 'investigación' : 'investigaciones'}
                   </span>
                 </div>
                 <a
                   href={`/colecciones/${encodeURIComponent(key)}`}
-                  class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-[#EFEBE3] hover:drop-shadow-[0_0_8px_rgba(239, 235, 227,0.5)] transition-all flex items-center gap-2 shrink-0"
+                  class="font-mono text-xs uppercase tracking-[0.3em] text-white/50 hover:text-[#EFEBE3] hover:drop-shadow-[0_0_8px_rgba(239,235,227,0.5)] transition-all flex items-center gap-2 shrink-0"
                 >
                   <span>Ver Colección [{count < 10 ? `0${count}` : count}]</span>
                   <span>→</span>
                 </a>
               </div>
 
-              {/* Grilla Cinemática Premier: 1 Hero Full Bleed + Dúo 60/40 */}
-              <div class="flex flex-col gap-10 md:gap-14">
-                {sequences.map((seq) => (
-                  <div class="premier-sequence flex flex-col gap-6 md:gap-8">
-                    {/* 1. Hero Cinemático */}
-                    <div class="w-full">
-                      <CinematicArchiveCard
-                        slug={seq.hero.slug}
-                        entry={seq.hero.entry}
-                        img={seq.hero.img}
-                        variant="hero"
-                        enableCinemagraph={true}
-                      />
-                    </div>
+              {/* Bento Grid Asimétrico — Layout cinemático para todas las colecciones */}
+              <div class="bento-grid-asimetrico grid grid-cols-1 md:grid-cols-12 auto-rows-[minmax(260px,auto)] gap-6 md:gap-8">
 
-                    {/* 2. Dúo 60/40 */}
-                    {seq.duo.length > 0 && (
-                      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-                        {seq.duo[0] && (
-                          <div class={seq.duo.length > 1 ? "lg:col-span-7 flex flex-col" : "lg:col-span-12 flex flex-col"}>
-                            <CinematicArchiveCard
-                              slug={seq.duo[0].slug}
-                              entry={seq.duo[0].entry}
-                              img={seq.duo[0].img}
-                              variant={seq.duo.length > 1 ? "duo-60" : "hero"}
-                              enableCinemagraph={true}
-                            />
-                          </div>
-                        )}
-                        {seq.duo[1] && (
-                          <div class="lg:col-span-5 flex flex-col">
-                            <CinematicArchiveCard
-                              slug={seq.duo[1].slug}
-                              entry={seq.duo[1].entry}
-                              img={seq.duo[1].img}
-                              variant="duo-40"
-                              enableCinemagraph={true}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
+                {/* Celda A: Hero tall — col 1-8, row 1-2 */}
+                {essays[0] && (
+                  <div class="md:col-span-8 md:row-span-2 h-full">
+                    <CinematicArchiveCard
+                      slug={essays[0].slug}
+                      entry={essays[0].entry}
+                      img={essays[0].img}
+                      variant="hero"
+                      enableCinemagraph={true}
+                    />
+                  </div>
+                )}
+
+                {/* Celda B: Secundaria — col 9-12, row 1 */}
+                {essays[1] && (
+                  <div class="md:col-span-4 h-full">
+                    <CinematicArchiveCard
+                      slug={essays[1].slug}
+                      entry={essays[1].entry}
+                      img={essays[1].img}
+                      variant="duo-40"
+                      enableCinemagraph={false}
+                    />
+                  </div>
+                )}
+
+                {/* Celda C: Secundaria — col 9-12, row 2 */}
+                {essays[2] && (
+                  <div class="md:col-span-4 h-full">
+                    <CinematicArchiveCard
+                      slug={essays[2].slug}
+                      entry={essays[2].entry}
+                      img={essays[2].img}
+                      variant="duo-40"
+                      enableCinemagraph={false}
+                    />
+                  </div>
+                )}
+
+                {/* Celdas D+: fila base de 3 uniformes para items restantes */}
+                {essays.slice(3).map((e: typeof essays[0]) => (
+                  <div class="md:col-span-4 h-full">
+                    <CinematicArchiveCard
+                      slug={e.slug}
+                      entry={e.entry}
+                      img={e.img}
+                      variant="standard"
+                      enableCinemagraph={false}
+                    />
                   </div>
                 ))}
               </div>

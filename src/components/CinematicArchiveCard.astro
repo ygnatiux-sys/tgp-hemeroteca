@@ -13,6 +13,7 @@ interface Props {
   img?: ImageMetadata | null;
   variant?: "hero" | "duo-60" | "duo-40" | "standard";
   enableCinemagraph?: boolean;
+  isEager?: boolean;
 }
 
 const {
@@ -21,6 +22,7 @@ const {
   img,
   variant = "standard",
   enableCinemagraph = false,
+  isEager = false,
 } = Astro.props;
 
 const sitio = entry.sitioGeohistorico || null;
@@ -91,6 +93,9 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
       <Image
         src={img}
         alt={entry.title || "Dossier del Archivo"}
+        loading={isEager ? "eager" : "lazy"}
+        decoding="async"
+        quality={80}
         class={`absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none -z-10 ${
           enableCinemagraph
             ? "cinemagraph-ken-burns"
