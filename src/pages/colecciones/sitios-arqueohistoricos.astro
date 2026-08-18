@@ -4,6 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../../components/CinematicPostEngine.astro';
 import InteriorHero from '../../components/InteriorHero.astro';
+import Marquee from '../../components/Marquee.astro';
 import {
   getPublishableEssays,
   formatDate,
@@ -105,6 +106,14 @@ const geoSlides = resolvedEssays
         </span>
       </div>
     </InteriorHero>
+
+    <Marquee 
+      title="Sitios Geohistóricos" 
+      subtitle="Cartografía epistémica & análisis arqueosemiótico de lugares sagrados" 
+      imageUrl={coverImage?.src || (coverImage as any)} 
+      vibeClass="vibe-travel-senses" 
+      isH1={true} 
+    />
 
     {/* ── ENGINE AUTO CINEMÁTICO: georreferencias full-viewport ── */}
     {geoSlides.length > 0 && (

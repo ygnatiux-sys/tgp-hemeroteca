@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import InteriorHero from '../../components/InteriorHero.astro';
+import Marquee from '../../components/Marquee.astro';
 import {
   getPublishableEssays,
   groupByCategory,
@@ -88,6 +89,14 @@ const sequences = createPremierSequences(resolvedEssays);
         </span>
       </div>
     </InteriorHero>
+
+    <Marquee 
+      title={label} 
+      subtitle="Colección temática" 
+      imageUrl={coverImage?.src || (coverImage as any)} 
+      vibeClass="vibe-travel-senses" 
+      isH1={true} 
+    />
 
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-16 pt-12 md:pt-16">
 

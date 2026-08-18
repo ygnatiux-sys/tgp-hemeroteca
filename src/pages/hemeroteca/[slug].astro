@@ -1,6 +1,7 @@
----
+﻿---
 import { render, getEntry, getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
+import MarqueeColecciones from "../../components/MarqueeColecciones.astro";
 import { Image } from "astro:assets";
 import SpotifyIcon from "../../components/icons/Spotify.astro";
 import YouTubeIcon from "../../components/icons/YouTube.astro";
@@ -660,6 +661,7 @@ const articleSchema = {
       </>
     )
   }
+<MarqueeColecciones />
 </Layout>
 
 <style>

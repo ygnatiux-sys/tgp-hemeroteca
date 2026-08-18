@@ -1,0 +1,161 @@
+---
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import {
+  getPublishableEssays,
+  groupByCategory,
+  formatCategory,
+  resolveEssayImage,
+} from "../lib/content-filter";
+
+const allEssaysRaw = await getCollection('ensayos').catch(() => []);
+const publishable = getPublishableEssays(allEssaysRaw);
+
+// Reutilizamos la lógica de colecciones del home
+const categoryGroups = groupByCategory(publishable, 2);
+const collections = Array.from(categoryGroups.entries())
+  .map(([key, essays]) => ({
+    key,
+    label: formatCategory(essays[0].entry.category),
+    count: essays.length,
+    coverEssay: essays[0],
+  }));
+  
+const resolvedCollections = collections.map(c => ({
+  ...c,
+  img: resolveEssayImage(c.coverEssay.entry.coverImage, c.coverEssay.slug),
+}));
+---
+
+{resolvedCollections.length > 0 && (
+  <section class="py-12 md:py-16 overflow-hidden border-t border-white/5 relative bg-white/[0.01]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 md:mb-8">
+      <div class="flex items-end justify-between gap-4">
+        <div>
+          <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Explorar Archivo</span>
+          <h2 class="text-xl sm:text-2xl md:text-3xl font-cinzel font-bold tracking-tight text-white/90">
+            Colecciones Destacadas
+          </h2>
+        </div>
+        <a href="/archivo" class="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-rust-orange transition-colors shrink-0">
+          Ver todas <span class="hidden sm:inline">las categorías</span>
+        </a>
+      </div>
+    </div>
+    
+    {/* Contenedor principal del marquee con máscara de desvanecimiento a los lados */}
+    <div class="marquee-container w-full overflow-hidden flex relative group">
+      
+      {/* Primer track */}
+      <div class="marquee-track flex gap-4 md:gap-6 px-2 w-max animate-marquee group-hover:pause">
+        {resolvedCollections.map(({ key, label, count, img }) => (
+          <a
+            href={`/colecciones/${key}`}
+            class="group/card shrink-0 w-[72vw] sm:w-[50vw] md:w-[280px] lg:w-[340px] bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-rust-orange/50 transition-all duration-500 flex flex-col"
+          >
+            {img ? (
+              <div class="overflow-hidden aspect-video relative">
+                <Image src={img} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
+                <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent" />
+                <div class="absolute bottom-0 left-0 p-4 md:p-5 w-full">
+                  <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-rust-orange mb-1">{count} artículos</p>
+                  <h3 class="font-cinzel font-bold text-base md:text-lg leading-tight text-white group-hover/card:text-rust-orange transition-colors">{label}</h3>
+                </div>
+              </div>
+            ) : (
+              <div class="p-5 flex flex-col justify-end gap-2 flex-1 min-h-[140px] md:min-h-[190px]">
+                <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-rust-orange">{count} artículos</p>
+                <h3 class="font-cinzel font-bold text-base md:text-lg leading-tight text-white group-hover/card:text-rust-orange transition-colors">{label}</h3>
+              </div>
+            )}
+          </a>
+        ))}
+      </div>
+      
+      {/* Segundo track para infinite loop exacto */}
+      <div class="marquee-track flex gap-4 md:gap-6 px-2 w-max animate-marquee group-hover:pause" aria-hidden="true">
+        {resolvedCollections.map(({ key, label, count, img }) => (
+          <a
+            href={`/colecciones/${key}`}
+            class="group/card shrink-0 w-[72vw] sm:w-[50vw] md:w-[280px] lg:w-[340px] bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-rust-orange/50 transition-all duration-500 flex flex-col"
+            tabindex="-1"
+          >
+            {img ? (
+              <div class="overflow-hidden aspect-video relative">
+                <Image src={img} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
+                <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent" />
+                <div class="absolute bottom-0 left-0 p-4 md:p-5 w-full">
+                  <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-rust-orange mb-1">{count} artículos</p>
+                  <h3 class="font-cinzel font-bold text-base md:text-lg leading-tight text-white group-hover/card:text-rust-orange transition-colors">{label}</h3>
+                </div>
+              </div>
+            ) : (
+              <div class="p-5 flex flex-col justify-end gap-2 flex-1 min-h-[140px] md:min-h-[190px]">
+                <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-rust-orange">{count} artículos</p>
+                <h3 class="font-cinzel font-bold text-base md:text-lg leading-tight text-white group-hover/card:text-rust-orange transition-colors">{label}</h3>
+              </div>
+            )}
+          </a>
+        ))}
+      </div>
+      
+    </div>
+  </section>
+)}
+
+<style>
+  .marquee-container {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 5%,
+      black 95%,
+      transparent
+    );
+  }
+  
+  .marquee-track {
+    /* Compensa el flex gap entre los dos contenedores gemelos */
+    padding-right: 1rem;
+  }
+  @media (min-width: 768px) {
+    .marquee-track {
+      padding-right: 1.5rem; 
+    }
+  }
+
+  .animate-marquee {
+    animation: scroll-marquee 40s linear infinite;
+  }
+
+  .pause {
+    animation-play-state: paused !important;
+  }
+  
+  @keyframes scroll-marquee {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+  
+  /* Fallback de accesibilidad */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee {
+      animation: none !important;
+    }
+    .marquee-container {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      mask-image: none;
+    }
+    .marquee-track {
+      width: auto;
+    }
+    .marquee-track:nth-child(2) {
+      display: none;
+    }
+  }
+</style>
