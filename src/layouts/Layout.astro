@@ -5,6 +5,7 @@ import Footer from "../components/Footer.astro";
 import LightboxGlobal from "../components/LightboxGlobal.astro";
 
 interface Props {
+  description?: string;
   title?: string;
   hideHeader?: boolean;
   footerVariant?: "full" | "minimal";
@@ -14,10 +15,32 @@ interface Props {
 
 const {
   title = "Hemeroteca TGP",
+  description,
   hideHeader = false,
   footerVariant = "full",
   headerTransparentUntilScroll = true,
 } = Astro.props;
+
+const globalSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "The Great Puzzle Project",
+  "url": Astro.site ? new URL(Astro.url.pathname, Astro.site) : Astro.url.href,
+  "author": {
+    "@type": "Person",
+    "name": "Xavier Benítez",
+    "url": "https://gravatar.com/xavierbeniteztgp",
+    "jobTitle": "Investigador & Editor General"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "The Great Puzzle Project",
+    "logo": {
+      "@type": "ImageObject",
+      "url": Astro.site ? new URL("/favicon.png", Astro.site).href : "/favicon.png"
+    }
+  }
+};
 ---
 
 <!doctype html>
@@ -28,6 +51,14 @@ const {
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content="Xavier Benítez" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="The Great Puzzle Project" />
+    <script type="application/ld+json" set:html={JSON.stringify(globalSchema)} />
+    <slot name="head" />
 
     {
       /* Script Antiflash (FOUC): Inicializa el tema inmediatamente antes de renderizar */
@@ -65,6 +96,9 @@ const {
     }
 
     <main class="grow relative">
+      {/* F4: Único H1 semántico del sitio — sr-only para screen readers y crawlers (AOM/SEO) */}
+      {/* El logotipo visual en Header actúa como identidad; este H1 provee jerarquía accesible */}
+      <h1 class="sr-only">{title}</h1>
       <slot />
     </main>
 

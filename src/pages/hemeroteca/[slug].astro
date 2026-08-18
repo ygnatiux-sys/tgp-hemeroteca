@@ -294,6 +294,28 @@ const activeAccent = doc.themeColor
   : "#ffffff";
 const imagePosition =
   doc.coverImagePosition || doc.imagePosition || "center center";
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "ScholarlyArticle",
+  "headline": doc.title,
+  "abstract": doc.excerpt || doc.description,
+  "author": {
+    "@type": "Person",
+    "name": "Xavier Benítez"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "The Great Puzzle Project"
+  },
+  "datePublished": doc.date,
+  "dateModified": doc.updatedDate || doc.date,
+  keywords: [
+    doc.category,
+    doc.sitioGeohistorico,
+    ...(doc.tags || [])
+  ].filter(Boolean).join(", ")
+};
 ---
 
 <Layout
@@ -301,6 +323,7 @@ const imagePosition =
   footerVariant="minimal"
   title={`${doc.title} | Hemeroteca TGP`}
 >
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
   {
     isCinematicView ? (
       <div id="cinematic-override" class="w-full min-h-dvh overflow-hidden">
@@ -309,11 +332,11 @@ const imagePosition =
     ) : (
       <>
         <Header isInternal={true} />
-  <QuickReturnButton client:load accentColor={activeAccent} fallbackUrl="/archivo" />
+        <QuickReturnButton client:load accentColor={activeAccent} fallbackUrl="/archivo" />
 
-  <InteriorHero
-    title={doc.title || "Ensayo TGP"}
-    image={optimizedImage}
+        <InteriorHero
+          title={doc.title || "Ensayo TGP"}
+          image={optimizedImage}
     imageAlt={`Portada de ${data.title}`}
     imagePosition={imagePosition}
     eyebrow={data.category || "Archivo clasificado"}

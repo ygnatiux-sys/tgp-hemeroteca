@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../../components/CinematicPostEngine.astro';
@@ -76,7 +77,8 @@ const coleccionesSlides = collections
       subtitle="Organización temática del archivo de investigaciones"
       titleClass="text-5xl md:text-6xl lg:text-7xl font-cinzel font-extrabold tracking-tight leading-none gradient-acero-ios"
     >
-      <div slot="meta" class="font-mono text-[10px] uppercase tracking-[0.3em] text-[#EFEBE3] font-bold">
+      {/* F2: text-[10px] → text-xs */}
+      <div slot="meta" class="font-mono text-xs uppercase tracking-[0.3em] text-[#EFEBE3] font-bold">
         {collections.length} {collections.length === 1 ? 'colección' : 'colecciones'} · {publishable.length} dossiers
       </div>
     </InteriorHero>
@@ -96,11 +98,12 @@ const coleccionesSlides = collections
         >
           <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div class="flex flex-col gap-2 max-w-3xl">
-              <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#64b5f6]">
+              {/* F2: text-[10px] → text-xs (WCAG min 12px) */}
+              <span class="font-mono text-xs uppercase tracking-[0.4em] text-[#64b5f6]">
                 Colección Especializada
               </span>
               <h2 class="text-3xl md:text-5xl font-cinzel font-extrabold tracking-tight leading-tight gradient-acero-ios">
-                Sitios Geohistóricos & Arqueohistóricos
+                Sitios Geohistóricos &amp; Arqueohistóricos
               </h2>
               <p class="h2-thin-hook text-sm md:text-base text-white/60 tracking-[0.2em] mt-1">
                 Aramu Muru · Tikal · Bonampak · Cartago · Qapaq Ñan · Yonaguni
@@ -108,7 +111,8 @@ const coleccionesSlides = collections
             </div>
 
             <div class="shrink-0">
-              <span class="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-[#1e4976]/40 border border-[#64b5f6]/40 text-[#90caf9] font-mono text-[10px] uppercase tracking-[0.3em] font-bold group-hover:bg-[#1976d2] group-hover:text-white transition-all duration-300">
+              {/* F2: text-[10px] → text-xs */}
+              <span class="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-[#1e4976]/40 border border-[#64b5f6]/40 text-[#90caf9] font-mono text-xs uppercase tracking-[0.3em] font-bold group-hover:bg-[#1976d2] group-hover:text-white transition-all duration-300">
                 Explorar Cartografía →
               </span>
             </div>
@@ -117,97 +121,58 @@ const coleccionesSlides = collections
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════
-          COLECCIONES TEMÁTICAS GENERALES
-          Formato: Grilla Cinemática Premier por Categoría (1 Hero + Dúo 60/40)
+          COLECCIONES TEMÁTICAS GENERALES — F5: Bento Asimétrico
+          F6: grid-cols-1 en móvil, lg:grid-cols-12 en desktop
+          F6: Texto siempre visible, sin group-hover reveal en touch
       ═══════════════════════════════════════════════════════════════════ */}
-      <section class="flex flex-col gap-16 md:gap-24">
-        {collections.map(({ key, label, count, essays }) => {
-          return (
-            <div class="reveal-item flex flex-col gap-8 md:gap-10 border-b border-white/10 pb-16 md:pb-24 last:border-b-0">
+      <section class="flex flex-col gap-6 md:gap-8 w-full">
+        {/* F5: CSS Grid Bento Asimétrico — F6: cols-1 en mobile */}
+        <div class="grid grid-cols-1 lg:grid-cols-12 auto-rows-[minmax(280px,auto)] gap-6 lg:gap-8 w-full">
+          {collections.map((col, index) => {
+            // F5: distribución asimétrica según posición
+            let spanClass = "lg:col-span-4 lg:row-span-1";
+            if (index === 0) spanClass = "lg:col-span-12 lg:row-span-2";
+            else if (index === 1) spanClass = "lg:col-span-7 lg:row-span-1";
+            else if (index === 2) spanClass = "lg:col-span-5 lg:row-span-1";
 
-              {/* Barra Editorial de Categoría */}
-              <div class="editorial-bar flex items-center justify-between border-b border-[#EFEBE3]/20 pb-4">
-                <div class="flex items-center gap-3 flex-wrap">
-                  <span class="w-2.5 h-2.5 rounded-full bg-[#EFEBE3] shadow-[0_0_10px_#EFEBE3]" />
-                  <h2 class="font-cinzel font-bold text-2xl md:text-3xl lg:text-4xl tracking-wider bg-linear-to-b from-[#FFFFFF] via-[#8E8E93] to-[#1C1C1E] bg-clip-text text-transparent drop-shadow-md">
-                    {label}
-                  </h2>
-                  <span class="font-mono text-xs text-[#EFEBE3]/70 uppercase tracking-[0.2em] px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 font-bold ml-2">
-                    {count} {count === 1 ? 'investigación' : 'investigaciones'}
-                  </span>
+            return (
+              <a
+                href={`/colecciones/${col.key}`}
+                class={`group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/5 bg-theme-dark/80 shadow-2xl flex flex-col justify-end w-full isolate ${spanClass} min-h-75`}
+              >
+                {col.coverEssay?.img ? (
+                  <Image
+                    src={col.coverEssay.img}
+                    alt={col.label}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    fetchpriority={index === 0 ? "high" : undefined}
+                    decoding="async"
+                    quality={80}
+                    class="absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.018] group-hover:brightness-95"
+                  />
+                ) : (
+                  <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1c242b] via-theme-dark to-[#0a0b0b] -z-10" />
+                )}
+
+                {/* F1: Gradiente mobile CSS nativo puro (costo GPU=0). Desktop: backdrop-blur-[2px] suave */}
+                {/* F6: Texto siempre visible — NO depende de :hover para revelar contenido en touch */}
+                <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 via-45% to-transparent pointer-events-none z-10 md:backdrop-blur-[2px]"></div>
+
+                <div class="relative z-20 p-6 md:p-8 flex flex-col justify-end h-full">
+                  {/* F2: text-xs (WCAG). F6: siempre visible sin group-hover reveal */}
+                  <span class="font-mono text-xs uppercase tracking-widest text-rust-orange font-bold mb-2">Colección TGP</span>
+                  <h2 class="font-cinzel font-extrabold text-3xl md:text-4xl text-white mb-2 leading-tight drop-shadow-lg">{col.label}</h2>
+                  <p class="font-sans text-sm text-white/80">{col.count} {col.count === 1 ? 'Documento' : 'Documentos'}</p>
                 </div>
-                <a
-                  href={`/colecciones/${encodeURIComponent(key)}`}
-                  class="font-mono text-xs uppercase tracking-[0.3em] text-white/50 hover:text-[#EFEBE3] hover:drop-shadow-[0_0_8px_rgba(239,235,227,0.5)] transition-all flex items-center gap-2 shrink-0"
-                >
-                  <span>Ver Colección [{count < 10 ? `0${count}` : count}]</span>
-                  <span>→</span>
-                </a>
-              </div>
-
-              {/* Bento Grid Asimétrico — Layout cinemático para todas las colecciones */}
-              <div class="bento-grid-asimetrico grid grid-cols-1 md:grid-cols-12 auto-rows-[minmax(260px,auto)] gap-6 md:gap-8">
-
-                {/* Celda A: Hero tall — col 1-8, row 1-2 */}
-                {essays[0] && (
-                  <div class="md:col-span-8 md:row-span-2 h-full">
-                    <CinematicArchiveCard
-                      slug={essays[0].slug}
-                      entry={essays[0].entry}
-                      img={essays[0].img}
-                      variant="hero"
-                      enableCinemagraph={true}
-                    />
-                  </div>
-                )}
-
-                {/* Celda B: Secundaria — col 9-12, row 1 */}
-                {essays[1] && (
-                  <div class="md:col-span-4 h-full">
-                    <CinematicArchiveCard
-                      slug={essays[1].slug}
-                      entry={essays[1].entry}
-                      img={essays[1].img}
-                      variant="duo-40"
-                      enableCinemagraph={false}
-                    />
-                  </div>
-                )}
-
-                {/* Celda C: Secundaria — col 9-12, row 2 */}
-                {essays[2] && (
-                  <div class="md:col-span-4 h-full">
-                    <CinematicArchiveCard
-                      slug={essays[2].slug}
-                      entry={essays[2].entry}
-                      img={essays[2].img}
-                      variant="duo-40"
-                      enableCinemagraph={false}
-                    />
-                  </div>
-                )}
-
-                {/* Celdas D+: fila base de 3 uniformes para items restantes */}
-                {essays.slice(3).map((e: typeof essays[0]) => (
-                  <div class="md:col-span-4 h-full">
-                    <CinematicArchiveCard
-                      slug={e.slug}
-                      entry={e.entry}
-                      img={e.img}
-                      variant="standard"
-                      enableCinemagraph={false}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
+              </a>
+            );
+          })}
+        </div>
       </section>
 
       {/* Fallback si no hay colecciones */}
       {collections.length === 0 && (
-        <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/30 text-center py-20">
+        <p class="font-mono text-xs uppercase tracking-[0.3em] text-white/30 text-center py-20">
           No hay colecciones disponibles.
         </p>
       )}

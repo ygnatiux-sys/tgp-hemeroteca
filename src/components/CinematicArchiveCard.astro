@@ -83,7 +83,7 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
 ---
 
 <article
-  class={`cinematic-archive-card cinematic-card-lantern card-hover-cinematic group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/8 bg-theme-dark/80 shadow-2xl flex flex-col justify-end w-full transform-gpu isolate ${minHeightClass}`}
+  class={`cinematic-archive-card cinematic-card-lantern card-hover-cinematic group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/5 bg-theme-dark/80 shadow-2xl flex flex-col justify-end w-full transform-gpu isolate ${minHeightClass}`}
   data-category={normalizeCategory(entry.category)}
   data-year={year}
 >
@@ -114,9 +114,10 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
     )
   }
 
-  {/* 3. Gradiente inferior suave (Solución de capas z-index) */}
+  {/* 3. Gradiente inferior (móvil: CSS nativo puro, sin GPU cost; desktop: blur moderado) */}
+  {/* F1: Mobile-first → gradiente fuerte CSS nativo. Desktop md: backdrop-blur-md suave */}
   <div
-    class={`absolute inset-0 bg-linear-to-t from-theme-dark/95 via-theme-dark/50 via-45% to-transparent pointer-events-none z-10 ${
+    class={`absolute inset-0 bg-linear-to-t from-black/90 via-black/50 via-45% to-transparent pointer-events-none z-10 md:backdrop-blur-[2px] ${
       enableCinemagraph ? "cinemagraph-museum-fade" : ""
     }`}
   >
@@ -154,7 +155,7 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
             href={secondaryHref}
             target={isExternal ? "_blank" : undefined}
             rel={isExternal ? "noopener noreferrer" : undefined}
-            class="ch-cta-btn inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-[#151718]/90 backdrop-blur-sm border border-white/10 text-[#E0E0E0]/75 font-mono font-bold text-[9px] sm:text-[10px] tracking-[0.25em] uppercase rounded-lg hover:bg-white/10 hover:border-white/30 hover:text-white transition-all duration-400 active:translate-y-0.5"
+            class="ch-cta-btn inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-[#151718]/90 md:backdrop-blur-sm border border-white/10 text-[#E0E0E0]/75 font-mono font-medium text-xs tracking-widest uppercase rounded-lg hover:bg-white/10 hover:border-white/30 hover:text-white transition-all duration-400 active:translate-y-0.5"
           >
             <span>{secondaryLabel}</span>
             <span class="text-[10px] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">▸</span>
@@ -163,7 +164,8 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
       </div>
 
       {/* Tags de Categorías Relacionadas (Debajo del H1/CTA) */}
-      <div class="flex flex-wrap items-center gap-2 mt-3 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.4em] text-[#EFEBE3]/70 w-full justify-start">
+      {/* F2: text-xs (12px WCAG) + text-white/70. F6: siempre visible, sin hover-reveal */}
+      <div class="flex flex-wrap items-center gap-6 mt-3 font-mono text-xs uppercase tracking-[0.4em] text-white/70 w-full justify-start">
         {relatedTags.map((tag, idx) => (
           <>
             <span class="ch-tag">{tag}</span>
@@ -175,7 +177,7 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
         {year && (
           <>
             {relatedTags.length > 0 && <span class="font-bold opacity-50 ch-tag">•</span>}
-            <span class="ch-tag text-white/50">{year}</span>
+            <span class="ch-tag text-xs text-white/50">{year}</span>
           </>
         )}
       </div>
