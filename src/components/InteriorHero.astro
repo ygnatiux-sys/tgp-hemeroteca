@@ -117,10 +117,47 @@ const {
       return;
     }
 
-    // ── Ocultar menubar al abrir el hero interior ──
+    // ── Ocultar menubar inicialmente en el hero interior con desbloqueo interactivo ──
     if (header) {
       gsap.set(header, { opacity: 0, y: -25, pointerEvents: "none" });
     }
+
+    // Función de revelación y desbloqueo inmediato para permitir salir en cualquier momento
+    const unlockNavigation = () => {
+      if (header) {
+        gsap.to(header, {
+          opacity: 1,
+          y: 0,
+          pointerEvents: "auto",
+          duration: 0.4,
+          overwrite: "auto",
+          ease: "power2.out"
+        });
+      }
+      const backBtn = document.getElementById('back-slide-btn');
+      if (backBtn) {
+        backBtn.classList.add('is-visible');
+      }
+    };
+
+    // Desbloquear navegación al pasar el cursor por arriba (hover) o por el lateral
+    const onPointerMove = (e: MouseEvent | TouchEvent) => {
+      const clientY = 'clientY' in e ? e.clientY : (e.touches[0]?.clientY ?? 999);
+      const clientX = 'clientX' in e ? e.clientX : (e.touches[0]?.clientX ?? 999);
+      if (clientY < 110 || clientX < 90) {
+        unlockNavigation();
+      }
+    };
+
+    window.addEventListener("mousemove", onPointerMove, { passive: true });
+    window.addEventListener("touchstart", onPointerMove, { passive: true });
+    
+    // Desbloquear al hacer clic en cualquier parte
+    hero.addEventListener("click", unlockNavigation);
+    window.addEventListener("click", unlockNavigation);
+
+    // Desbloquear en scroll
+    window.addEventListener("scroll", unlockNavigation, { passive: true, once: true });
 
     // Zoom out majestuoso de la imagen de fondo
     if (image) {
@@ -134,9 +171,7 @@ const {
     const tl = gsap.timeline({
       onComplete: () => {
         // Garantizar que el menubar quede 100% interactivo al terminar
-        if (header) {
-          gsap.to(header, { opacity: 1, y: 0, pointerEvents: "auto", duration: 1.2, ease: "power2.out" });
-        }
+        unlockNavigation();
       }
     });
 

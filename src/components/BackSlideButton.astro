@@ -20,33 +20,21 @@ const { fallbackUrl = "/" } = Astro.props;
     const btn = document.getElementById('back-slide-btn');
     if (!btn) return;
 
-    let scrollTimer = null;
-    let revealTimer = null;
-
-    const hideBtn = () => {
-      btn.classList.remove('is-visible');
-      if (revealTimer) clearTimeout(revealTimer);
+    const showBtn = () => {
+      btn.classList.add('is-visible');
     };
 
-    const showBtnDelayed = () => {
-      if (revealTimer) clearTimeout(revealTimer);
-      // Se activa en reposo tras exactamente 1.5 segundos (1500ms)
-      revealTimer = setTimeout(() => {
-        btn.classList.add('is-visible');
-      }, 1500);
-    };
+    // Activación inmediata en carga
+    showBtn();
 
-    // Escuchador de scroll: desactiva durante desplazamiento y espera reposo de 1.5s
-    window.addEventListener('scroll', () => {
-      hideBtn();
-      if (scrollTimer) clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(() => {
-        showBtnDelayed();
-      }, 80);
+    // Activar en cualquier interacción
+    window.addEventListener('mousemove', (e) => {
+      if (e.clientX < 120) {
+        showBtn();
+      }
     }, { passive: true });
 
-    // Activación inicial tras reposo
-    showBtnDelayed();
+    window.addEventListener('scroll', showBtn, { passive: true });
 
     // Navegación de salida inteligente
     btn.onclick = () => {

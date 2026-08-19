@@ -15,7 +15,7 @@ import { Image } from "astro:assets";
 interface Props {
   title: string;
   eyebrow?: string;
-  paragraph: string;
+  paragraph?: string;
   primaryImage: ImageMetadata | string;
   secondaryImage?: ImageMetadata | string;
   primaryAlt: string;
@@ -27,7 +27,7 @@ interface Props {
 const {
   title,
   eyebrow = "Coleccion Tematica",
-  paragraph,
+  paragraph = "",
   primaryImage,
   secondaryImage,
   primaryAlt,
@@ -324,10 +324,37 @@ const secondarySrc = secondaryImage
     gsap.set(words, { y: "108%", opacity: 0 });
     if (slotEl)  gsap.set(slotEl, { opacity: 0, y: 6 });
 
+    // Función de desbloqueo interactivo inmediato
+    const unlockHeader = () => {
+      if (header) {
+        gsap.to(header, {
+          opacity: 1,
+          y: 0,
+          pointerEvents: "auto",
+          duration: 0.4,
+          overwrite: "auto",
+          ease: "power2.out"
+        });
+      }
+    };
+
+    // Desbloquear menú al pasar el cursor por arriba (hover) o al tocar la pantalla
+    const onPointer = (e: MouseEvent | TouchEvent) => {
+      const clientY = 'clientY' in e ? e.clientY : (e.touches[0]?.clientY ?? 999);
+      if (clientY < 110) {
+        unlockHeader();
+      }
+    };
+
+    window.addEventListener("mousemove", onPointer, { passive: true });
+    window.addEventListener("touchstart", onPointer, { passive: true });
+    section.addEventListener("click", unlockHeader);
+    window.addEventListener("scroll", unlockHeader, { passive: true, once: true });
+
     const tl = gsap.timeline({
       defaults: { ease: "power2.out" },
       onComplete: () => {
-        if (header) gsap.to(header, { opacity: 1, y: 0, pointerEvents: "auto", duration: 1.2, ease: "power2.out" });
+        unlockHeader();
       }
     });
 
@@ -373,14 +400,19 @@ const secondarySrc = secondaryImage
         stagger,
         ease: "power3.out",
       }, t0 + 2.0);
-    }
-    if (slotEl) {
-      tl.to(slotEl, { opacity: 1, y: 0, duration: 1.0 }, 11.4);
-    }
-
-    // Reaparicion suave del menubar al final
-    if (header) {
-      tl.to(header, { opacity: 1, y: 0, pointerEvents: "auto", duration: 1.2, ease: "power2.out" }, 11.6);
+      if (slotEl) {
+        tl.to(slotEl, { opacity: 1, y: 0, duration: 1.0 }, 11.4);
+      }
+      if (header) {
+        tl.to(header, { opacity: 1, y: 0, pointerEvents: "auto", duration: 1.2, ease: "power2.out" }, 11.6);
+      }
+    } else {
+      if (slotEl) {
+        tl.to(slotEl, { opacity: 1, y: 0, duration: 1.0 }, t0 + 2.0);
+      }
+      if (header) {
+        tl.to(header, { opacity: 1, y: 0, pointerEvents: "auto", duration: 1.2, ease: "power2.out" }, t0 + 2.2);
+      }
     }
   };
 
