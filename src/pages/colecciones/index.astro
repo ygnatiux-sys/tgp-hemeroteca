@@ -6,6 +6,7 @@ import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../../components/CinematicPostEngine.astro';
 import InteriorHero from '../../components/InteriorHero.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
+import Marquee from '../../components/Marquee.astro';
 import {
   getPublishableEssays,
   groupByCategory,
@@ -76,7 +77,7 @@ const coleccionesSlides = collections
       imagePosition={indexCoverPosition}
       eyebrow="The Great Puzzle Project"
       subtitle="Organización temática del archivo de investigaciones"
-      titleClass="text-5xl md:text-6xl lg:text-7xl font-cinzel font-extrabold tracking-tight leading-none gradient-acero-ios"
+      titleClass="text-6xl md:text-8xl gradient-general-h1 leading-[0.95] tracking-tighter"
     >
       {/* F2: text-[10px] → text-xs */}
       <div slot="meta" class="font-mono text-xs uppercase tracking-[0.3em] text-[#EFEBE3] font-bold">
@@ -86,7 +87,15 @@ const coleccionesSlides = collections
 
     {/* ── RESPIRO VISUAL / EXCERPT DESCANSO ── */}
     <CinematicExcerptRest 
-      text="Un [[archivo]] en constante expansión. **Cada colección**, un eje documental del proyecto epistémico global."
+      text="Un [[mapa de fragmentos]] desgastados por el tiempo. **Cada colección**, un intento humano de arrebatarle el sentido al olvido absoluto."
+    />
+
+    {/* ── HERO MARQUEE DE SECCIÓN ── */}
+    <Marquee
+      title="COLECCIONES DESTACADAS"
+      subtitle="The Great Puzzle Project"
+      imageUrl={(collections[0]?.coverEssay?.img as any)?.src ?? collections[0]?.coverEssay?.img ?? ''}
+      vibeClass="vibe-travel-senses"
     />
 
 
@@ -101,7 +110,7 @@ const coleccionesSlides = collections
       <section class="reveal-item">
         <a
           href="/colecciones/sitios-arqueohistoricos"
-          class="group block p-8 md:p-12 rounded-2xl border border-white/15 bg-linear-to-r from-[#0d141b] via-[#121c24] to-[#0a0f14] hover:border-[#64b5f6]/60 transition-all duration-500 shadow-2xl relative overflow-hidden"
+          class="group block p-8 md:p-12 rounded-2xl border border-white/15 bg-theme-dark hover:border-rust-orange/50 transition-all duration-500 shadow-2xl relative overflow-hidden"
         >
           <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div class="flex flex-col gap-2 max-w-3xl">
@@ -109,7 +118,7 @@ const coleccionesSlides = collections
               <span class="font-mono text-xs uppercase tracking-[0.4em] text-[#64b5f6]">
                 Colección Especializada
               </span>
-              <h2 class="text-3xl md:text-5xl font-cinzel font-extrabold tracking-tight leading-tight gradient-acero-ios">
+              <h2 class="text-3xl md:text-5xl gradient-general-h2 leading-tight">
                 Sitios Geohistóricos &amp; Arqueohistóricos
               </h2>
               <p class="h2-thin-hook text-sm md:text-base text-white/60 tracking-[0.2em] mt-1">
@@ -119,7 +128,7 @@ const coleccionesSlides = collections
 
             <div class="shrink-0">
               {/* F2: text-[10px] → text-xs */}
-              <span class="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-[#1e4976]/40 border border-[#64b5f6]/40 text-[#90caf9] font-mono text-xs uppercase tracking-[0.3em] font-bold group-hover:bg-[#1976d2] group-hover:text-white transition-all duration-300">
+              <span class="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-[#151718]/90 border border-white/10 text-[#E0E0E0]/75 font-mono text-xs uppercase tracking-[0.3em] font-bold group-hover:bg-white/10 group-hover:border-white/30 group-hover:text-white transition-all duration-300">
                 Explorar Cartografía →
               </span>
             </div>
@@ -168,7 +177,7 @@ const coleccionesSlides = collections
                 <div class="relative z-20 p-6 md:p-8 flex flex-col justify-end h-full">
                   {/* F2: text-xs (WCAG). F6: siempre visible sin group-hover reveal */}
                   <span class="font-mono text-xs uppercase tracking-widest text-rust-orange font-bold mb-2">Colección TGP</span>
-                  <h2 class="font-cinzel font-extrabold text-3xl md:text-4xl text-white mb-2 leading-tight drop-shadow-lg">{col.label}</h2>
+                  <h2 class="gradient-general-h2 text-3xl md:text-4xl mb-2 leading-tight">{col.label}</h2>
                   <p class="font-sans text-sm text-white/80">{col.count} {col.count === 1 ? 'Documento' : 'Documentos'}</p>
                 </div>
               </a>

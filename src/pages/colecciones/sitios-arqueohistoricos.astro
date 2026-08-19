@@ -91,7 +91,7 @@ const geoSlides = resolvedEssays
       imagePosition={coverPosition}
       eyebrow="Colección especializada"
       subtitle="Cartografía epistémica & análisis arqueosemiótico de lugares sagrados"
-      titleClass="text-5xl md:text-6xl lg:text-7xl font-cinzel font-extrabold tracking-tight leading-none gradient-acero-ios"
+      titleClass="text-6xl md:text-8xl gradient-general-h1 leading-[0.95] tracking-tighter"
     >
       <nav slot="breadcrumb" class="flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
         <a href="/colecciones" class="hover:text-[#EFEBE3] transition-colors">Colecciones</a>
@@ -108,23 +108,25 @@ const geoSlides = resolvedEssays
       </div>
     </InteriorHero>
 
-    <Marquee 
-      title="Sitios Geohistóricos" 
-      subtitle="Cartografía epistémica & análisis arqueosemiótico de lugares sagrados" 
-      imageUrl={coverImage?.src || (coverImage as any)} 
-      vibeClass="vibe-travel-senses" 
-      isH1={true} 
-    />
-
     {/* ── RESPIRO VISUAL / EXCERPT DESCANSO ── */}
     <CinematicExcerptRest 
-      text="Desde templos megalíticos hasta anomalías geológicas. Esta colección reúne las **ubicaciones más enigmáticas,** evaluando su relevancia histórica y su alineación con patrones globales ocultos."
+      text="Umbrales de [[piedra y silencio]]. **Hitos geohistóricos** que interrogan a la modernidad desde la profundidad de su propio misterio."
     />
 
     {/* ── ENGINE AUTO CINEMÁTICO: georreferencias full-viewport ── */}
     {geoSlides.length > 0 && (
       <CinematicPostEngine slides={geoSlides} />
     )}
+
+    {/* ── HERO MARQUEE DE SECCIÓN ── */}
+    <Marquee 
+      title="SITIOS GEOHISTÓRICOS" 
+      subtitle="Cartografía epistémica & análisis arqueosemiótico de lugares sagrados" 
+      imageUrl={coverImage?.src || (coverImage as any)} 
+      vibeClass="vibe-travel-senses" 
+      isH1={false} 
+      fontClass="font-cinzel font-extrabold"
+    />
 
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">
 

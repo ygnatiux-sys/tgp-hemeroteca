@@ -1,0 +1,327 @@
+---
+/**
+ * PolvoDorado.astro — Polvo Dorado Flotante + Texto Narrativo (4 renglones)
+ *
+ * Componente visual autónomo para espacios vacíos entre cards sin excerpt.
+ * Combina:
+ *   1. Canvas de polvo dorado abundante (55 partículas, color #C9A86C),
+ *      dispersadas por el viento en tiempo real.
+ *   2. Texto narrativo de 4 renglones con efecto TypeMagic (word-by-word).
+ *      El texto emerge a medida que el polvo se asienta en pantalla.
+ *   3. Línea divisoria dorada que se expande al finalizar el texto.
+ *   4. Timeline puro (CSS + setTimeout + IntersectionObserver) — sin GSAP.
+ *
+ * Sintaxis del prop `text`:
+ *   **palabra**   → blanco brillante (glow)
+ *   [[palabra]]   → dorado TGP (#C9A86C, accent)
+ *   texto normal  → papiro apagado
+ */
+
+interface Props {
+  text: string;
+  eyebrow?: string;
+  id?: string;
+}
+
+const {
+  text,
+  eyebrow = "",
+  id = "polvo-" + Math.random().toString(36).substring(2, 9),
+} = Astro.props;
+
+// Tokenizador en palabras para el efecto TypeMagic
+const rawWords = text.trim().split(/\s+/);
+const wordsData = rawWords.map((word, wordIdx) => {
+  let type: 'normal' | 'glow' | 'accent' = 'normal';
+  let cleanWord = word;
+  if (word.startsWith('**') && word.endsWith('**')) {
+    type = 'glow'; cleanWord = word.slice(2, -2);
+  } else if (word.startsWith('[[') && word.endsWith(']]')) {
+    type = 'accent'; cleanWord = word.slice(2, -2);
+  } else if (word.includes('**')) {
+    type = 'glow'; cleanWord = word.replace(/\*\*/g, '');
+  } else if (word.includes('[[')) {
+    type = 'accent'; cleanWord = word.replace(/\[\[/g, '').replace(/\]\]/g, '');
+  }
+  return { word: cleanWord, type, idx: wordIdx };
+});
+---
+
+<div
+  id={id}
+  class="polvo-dorado-root relative w-full overflow-hidden"
+  aria-label="Sección narrativa con polvo dorado"
+>
+  {/* Canvas de polvo dorado — ocupa todo el contenedor */}
+  <canvas
+    id={`${id}-canvas`}
+    class="absolute inset-0 w-full h-full pointer-events-none z-0"
+    aria-hidden="true"
+  ></canvas>
+
+  {/* Respiración superior */}
+  <div class="h-[8vh] md:h-[11vh]" aria-hidden="true"></div>
+
+  {/* Contenido textual centrado */}
+  <div class="relative z-10 max-w-2xl mx-auto px-6 md:px-12 text-center">
+
+    {/* Eyebrow — etiqueta de categoría */}
+    {eyebrow && (
+      <span class="polvo-eyebrow font-mono text-[10px] uppercase tracking-[0.35em] text-[#C9A86C]/60 block mb-5">
+        {eyebrow}
+      </span>
+    )}
+
+    {/* Párrafo narrativo con efecto TypeMagic */}
+    <p class="polvo-headline leading-[1.9] tracking-wide" id={`${id}-text`}>
+      {wordsData.map((wd) => (
+        <span
+          class={[
+            "polvo-word",
+            wd.type === "glow"   ? "polvo-word--glow"   : "",
+            wd.type === "accent" ? "polvo-word--accent" : "",
+          ].filter(Boolean).join(" ")}
+          data-widx={wd.idx}
+        >
+          {wd.word}{" "}
+        </span>
+      ))}
+      <span class="polvo-cursor" id={`${id}-cursor`} aria-hidden="true">|</span>
+    </p>
+
+    {/* Línea divisoria dorada sutil — se expande al final */}
+    <div class="polvo-divider mt-8 mx-auto" id={`${id}-divider`} aria-hidden="true"></div>
+  </div>
+
+  {/* Respiración inferior */}
+  <div class="h-[8vh] md:h-[11vh]" aria-hidden="true"></div>
+</div>
+
+<style>
+  /* ── Eyebrow: fade-in al aparecer ── */
+  .polvo-eyebrow {
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+  }
+  .polvo-dorado-root.pd-visible .polvo-eyebrow {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Tipografía editorial (Libre Bodoni) ── */
+  .polvo-headline {
+    font-family: 'Libre Bodoni', 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(1rem, 1.9vw, 1.45rem);
+    font-weight: 400;
+    color: rgba(212, 201, 188, 0.5);
+    letter-spacing: 0.015em;
+  }
+
+  /* ── Cada palabra: empieza invisible, emerge con blur dorado ── */
+  .polvo-word {
+    display: inline;
+    opacity: 0;
+    filter: blur(8px);
+    transition: opacity 0.9s ease-out, filter 0.9s ease-out;
+  }
+  .polvo-word.pd-emerge {
+    opacity: 1;
+    filter: blur(0);
+  }
+
+  /* ── Variante glow / negrita ── */
+  .polvo-word--glow {
+    color: rgba(255, 255, 255, 0.92);
+    font-weight: 700;
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+  }
+
+  /* ── Variante dorado TGP ── */
+  .polvo-word--accent {
+    color: #C9A86C;
+    font-weight: 600;
+    text-shadow: 0 0 14px rgba(201, 168, 108, 0.35);
+  }
+
+  /* ── Cursor dorado parpadeante ── */
+  .polvo-cursor {
+    display: inline-block;
+    color: #C9A86C;
+    font-weight: 100;
+    margin-left: 2px;
+    animation: polvo-blink 0.8s step-end infinite;
+    transition: opacity 0.6s ease;
+  }
+  @keyframes polvo-blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+  }
+
+  /* ── Línea divisoria dorada ── */
+  .polvo-divider {
+    width: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #C9A86C 30%,
+      rgba(201, 168, 108, 0.5) 70%,
+      transparent
+    );
+    transition: width 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .polvo-divider.pd-expand {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  /* ── Fallback sin JS / prefers-reduced-motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    .polvo-word { opacity: 1 !important; filter: none !important; }
+    .polvo-cursor { display: none; }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    /* ──────────────────────────────────────────────────────
+       MOTOR DE PARTÍCULAS DE POLVO DORADO
+       55 partículas, radio 0.8–3.2 px, color #C9A86C/dorado
+    ────────────────────────────────────────────────────── */
+    class PolvoDoradoCanvas {
+      constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx    = canvas.getContext('2d');
+        this.motes  = [];
+        this.raf    = null;
+        this.running = false;
+        this._resize();
+        window.addEventListener('resize', () => this._resize());
+      }
+
+      _resize() {
+        const r = this.canvas.parentElement?.getBoundingClientRect();
+        this.canvas.width  = r?.width  ?? window.innerWidth;
+        this.canvas.height = r?.height ?? 280;
+      }
+
+      _spawn(fromLeft = false) {
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+        return {
+          x:  fromLeft ? -10 : Math.random() * w,
+          y:  Math.random() * h,
+          r:  0.8 + Math.random() * 2.4,
+          op: 0.12 + Math.random() * 0.50,
+          vx: 0.20 + Math.random() * 0.55,
+          vy: (Math.random() - 0.5) * 0.13,
+          angle: Math.random() * Math.PI * 2,
+          av:    0.004 + Math.random() * 0.015,
+          osc:   0.06  + Math.random() * 0.11,
+          flickPhase: Math.random() * Math.PI * 2,
+          flickSpeed: 0.010 + Math.random() * 0.028,
+        };
+      }
+
+      start() {
+        if (this.running) return;
+        this.running = true;
+        this.motes = Array.from({ length: 55 }, () => this._spawn());
+        this._loop();
+      }
+
+      stop() {
+        this.running = false;
+        if (this.raf) cancelAnimationFrame(this.raf);
+      }
+
+      _loop() {
+        if (!this.running) return;
+        const { ctx, canvas, motes } = this;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        motes.forEach(m => {
+          m.x += m.vx;
+          m.y += m.vy + Math.sin(m.angle) * m.osc;
+          m.angle += m.av;
+          m.flickPhase += m.flickSpeed;
+
+          if (m.x > canvas.width + 14) Object.assign(m, this._spawn(true));
+
+          const flick    = 1 + 0.16 * Math.sin(m.flickPhase);
+          const finalOp  = Math.min(1, m.op * flick);
+          const grad = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r * 2.6);
+          grad.addColorStop(0,   `rgba(201, 168, 108, ${finalOp})`);
+          grad.addColorStop(0.4, `rgba(223, 202, 157, ${(finalOp * 0.6).toFixed(3)})`);
+          grad.addColorStop(1,   `rgba(201, 168, 108, 0)`);
+
+          ctx.beginPath();
+          ctx.fillStyle = grad;
+          ctx.arc(m.x, m.y, m.r * 2.6, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        this.raf = requestAnimationFrame(() => this._loop());
+      }
+    }
+
+    /* ──────────────────────────────────────────────────────
+       TIMELINE PURO
+       Polvo → Eyebrow (400ms) → Palabras (600ms + 160ms/palabra) → Divisor
+    ────────────────────────────────────────────────────── */
+    const initPolvoDorado = () => {
+      document.querySelectorAll('.polvo-dorado-root').forEach(root => {
+        if (root.dataset.pdInit === 'true') return;
+        root.dataset.pdInit = 'true';
+
+        const id      = root.id;
+        const canvas  = root.querySelector(`#${id}-canvas`);
+        const words   = Array.from(root.querySelectorAll('.polvo-word'));
+        const cursor  = root.querySelector(`#${id}-cursor`);
+        const divider = root.querySelector(`#${id}-divider`);
+
+        if (!canvas) return;
+
+        const dust = new PolvoDoradoCanvas(canvas);
+
+        const io = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            io.unobserve(root);
+
+            // 1. Arranca polvo inmediatamente
+            dust.start();
+
+            // 2. Eyebrow visible a los 400ms
+            setTimeout(() => root.classList.add('pd-visible'), 400);
+
+            // 3. Palabras emergen secuencialmente (base 600ms, 160ms por palabra)
+            words.forEach((word, i) => {
+              setTimeout(() => word.classList.add('pd-emerge'), 600 + i * 160);
+            });
+
+            // 4. Cursor off + divisor expansión al terminar
+            const lastDelay = 600 + (words.length - 1) * 160 + 950;
+            setTimeout(() => {
+              if (cursor)  cursor.style.opacity  = '0';
+              if (divider) divider.classList.add('pd-expand');
+            }, lastDelay);
+          });
+        }, { threshold: 0.15 });
+
+        io.observe(root);
+      });
+    };
+
+    document.addEventListener('astro:page-load', initPolvoDorado);
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      initPolvoDorado();
+    } else {
+      document.addEventListener('DOMContentLoaded', initPolvoDorado);
+    }
+    document.addEventListener('astro:before-swap', () => {
+      document.querySelectorAll('.polvo-dorado-root').forEach(r => { r.dataset.pdInit = ''; });
+    });
+  })();
+</script>

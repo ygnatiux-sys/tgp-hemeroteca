@@ -80,6 +80,8 @@ const excerptClass = isHero
 const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
   entry.title || "",
 );
+
+const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-card";
 ---
 
 <article
@@ -144,7 +146,7 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
       {/* Fila Central: H1 (izq) y CTA (der) */}
       <div class="flex flex-row justify-between items-end w-full border-b border-transparent pb-3 relative z-30 ch-h1-cta">
         <h2 class={`font-cinzel tracking-tight drop-shadow-lg transition-all duration-300 max-w-3xl ch-h1-container ${titleClass}`}>
-          <a href={href} class="gradient-acero-ios hover:opacity-90 transition-opacity block">
+          <a href={href} class:list={[cardGradientClass, "hover:opacity-90 transition-opacity block"]}>
             {titlePrefix}<span class="title-keyword-shine-fade">{titleKeyword}</span>
           </a>
         </h2>

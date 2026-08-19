@@ -19,31 +19,30 @@ const { transparentUntilScroll = false } = Astro.props;
     <div class="flex items-center shrink-0 z-10">
       <div class="flex items-center gap-2 md:gap-2.5">
         {/* Logo y Título principal */}
-        <a href="https://ediciones.thegreatpuzzleproject.com" class="group/brand flex flex-row items-center gap-2 md:gap-2.5" title="Ir a Ediciones de The Great Puzzle Project">
-          {/* Logo: favicon, siempre visible */}
-          <div class="brand-element w-8 h-8 md:w-9 md:h-9 rounded-full border-0 bg-current/5 flex items-center justify-center transition-all duration-300 shrink-0 relative overflow-hidden shadow-lg">
-            <img 
-              src="/images/favicon.TGP.webp" 
-              alt="The Great Puzzle Project Logo" 
-              class="w-full h-full object-cover scale-[1.05] animate-soft-pulse group-hover/brand:scale-[1.10] transition-transform duration-500"
-            />
-          </div>
-          
-          {/* Textos: Brand en 2 líneas compactas */}
-          <div class="brand-element flex items-center gap-1.5 md:gap-2">
-            <div class="flex flex-col text-left justify-center mt-0.5">
-              <span class="header-brand-title font-['Gloock'] font-black text-[11px] md:text-[12px] lg:text-[13px] tracking-wide uppercase leading-[1.05] transition-colors gradient-steel-line-1">
-                THE GREAT PUZZLE
-              </span>
-              <span class="header-brand-subtitle font-['Gloock'] font-black text-[11px] md:text-[12px] lg:text-[13px] tracking-[0.2em] uppercase leading-[1.05] transition-colors gradient-steel-line-3">
-                PROJECT
-              </span>
+        {/* Logo y Título principal unificados en formato 3 líneas idéntico al Footer */}
+        <a href="https://ediciones.thegreatpuzzleproject.com" class="group/brand flex flex-col text-left justify-center select-none" title="Ir a Ediciones de The Great Puzzle Project">
+          <span class="font-['Gloock'] font-black text-[11px] md:text-[12px] lg:text-[13px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-1">
+            THE GREAT
+          </span>
+          <div class="flex items-center gap-1.5 my-0.5">
+            <div class="brand-element w-4.5 h-4.5 md:w-5 md:h-5 rounded-full border-0 bg-current/5 flex items-center justify-center transition-all duration-300 shrink-0 relative overflow-hidden shadow-md">
+              <img 
+                src="/images/favicon.TGP.webp" 
+                alt="The Great Puzzle Project Logo" 
+                class="w-full h-full object-cover scale-[1.05] animate-soft-pulse group-hover/brand:scale-[1.10] transition-transform duration-500"
+              />
             </div>
+            <span class="font-['Gloock'] font-black text-[11px] md:text-[12px] lg:text-[13px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-2">
+              PUZZLE
+            </span>
           </div>
+          <span class="font-['Gloock'] font-black text-[11px] md:text-[12px] lg:text-[13px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-3">
+            PROJECT
+          </span>
         </a>
         
-        {/* Separador vertical sutil */}
-        <div class="w-px h-4 md:h-5 bg-white/15 mx-0.5 rounded-full"></div>
+        {/* Separador vertical sutil adaptado al alto de las 3 líneas */}
+        <div class="w-px h-8 md:h-9 bg-white/15 mx-0.5 rounded-full"></div>
 
         {/* HEMEROTECA: compacto, sin pisar la nav */}
         <a href="/" class="brand-hemeroteca header-subtitle-hemeroteca font-['Gloock'] font-black text-xs md:text-sm lg:text-[15px] tracking-widest uppercase px-1.5 py-0.5 rounded-md transition-all duration-500 border border-transparent leading-none gradient-steel-line-3" title="Volver al Inicio de la Hemeroteca">
@@ -52,15 +51,15 @@ const { transparentUntilScroll = false } = Astro.props;
       </div>
     </div>
     
-    {/* Centro: Navegación Compacta Absoluta */}
-    <nav class="toolbar-element hidden xl:flex absolute left-1/2 -translate-x-1/2 items-center gap-3.5 xl:gap-4.5 2xl:gap-5 shrink-0 font-mono font-light text-[8.5px] xl:text-[9.5px] uppercase tracking-[0.14em] whitespace-nowrap z-0 transition-all duration-500">
+    {/* Centro: Navegación Compacta Absoluta con tamaño aumentado (+2px) */}
+    <nav class="toolbar-element hidden xl:flex absolute left-1/2 -translate-x-1/2 items-center gap-4 xl:gap-5 2xl:gap-6 shrink-0 font-metadata text-sm xl:text-[15px] tracking-[-0.015em] whitespace-nowrap z-0 transition-all duration-500">
 
       <a href="/" class="header-nav-link transition-colors">Inicio</a>
       <a href="/colecciones" class="header-nav-link transition-colors">Colecciones</a>
       <a href="/archivo" class="header-nav-link transition-colors">Archivo</a>
       <a href="/papers" class="header-nav-link transition-colors">Papers</a>
       <a href="/about" class="header-nav-link transition-colors">About</a>
-      <a href="/codice" class="header-nav-link transition-colors font-medium text-rust-orange">El Códice</a>
+      <a href="/codice" class="header-nav-link transition-colors">El Códice</a>
 
       {/* Divisor */}
       <span class="w-px h-3 bg-white/15 rounded-full"></span>
@@ -69,10 +68,10 @@ const { transparentUntilScroll = false } = Astro.props;
         href="https://ediciones.thegreatpuzzleproject.com"
         target="_blank"
         rel="noopener noreferrer"
-        class="header-nav-link transition-colors flex items-center gap-1 opacity-75 hover:opacity-100 text-rust-orange"
-        title="Ediciones TGP — Archivo Editorial"
+        class="header-nav-link transition-colors flex items-center gap-1"
+        title="Editorial TGP — Archivo Editorial"
       >
-        Ediciones
+        Editorial
         <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
       </a>
     </nav>

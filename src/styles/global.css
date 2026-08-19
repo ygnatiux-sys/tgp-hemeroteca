@@ -112,8 +112,9 @@ header .header-brand-title {
 
 header nav a,
 header .header-nav-link {
-  font-weight: 300 !important; /* Thin/Light weight for category items */
-  letter-spacing: 0.25em !important; /* High tracking for spacious institutional feel */
+  font-family: "Google Sans Flex", "Google Sans", "Plus Jakarta Sans", sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.015em !important;
 }
 
 /* Botones sin bordes para Hamburger, Códice, Buscar y ThemeToggle (Page Mode) */
@@ -148,22 +149,21 @@ header .header-btn-codice {
 
 [data-theme='light'] header nav a,
 [data-theme='light'] header .header-nav-link {
-  color: rgba(28, 30, 33, 0.3) !important;
+  color: rgba(28, 30, 33, 0.55) !important;
+  transition: all 0.3s ease !important;
 }
 
 [data-theme='light'] header nav a:hover,
-[data-theme='light'] header .header-nav-link:hover {
-  color: #EFEBE3 !important;
-  text-shadow: 0 0 8px rgba(239, 235, 227, 0.25) !important; /* Lantern Hover Glow Sutil */
-}
-
-/* ─── ESTADO ACTIVO en Light Theme ─── */
+[data-theme='light'] header .header-nav-link:hover,
 [data-theme='light'] header nav a.active,
 [data-theme='light'] header .header-nav-link.active,
 [data-theme='light'] header nav a[data-active="true"],
 [data-theme='light'] header .header-nav-link[data-active="true"] {
-  color: #1C1E21 !important; /* Negro pleno sobre fondo claro */
-  font-weight: 600 !important;
+  font-weight: 700 !important;
+  background-image: linear-gradient(to bottom, #1c1e21 0%, rgba(28, 30, 33, 0.5) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
   opacity: 1 !important;
 }
 
@@ -180,29 +180,39 @@ header .header-btn-codice {
   filter: drop-shadow(0 0 5px rgba(239, 235, 227, 0.25)) !important;
 }
 
-/* Efecto Lantern Latido (Cartel Neón) */
+/* Efecto Lantern Latido (Latido Largo y Pausado de Burzaco Sur Global) */
 @keyframes lantern-pulse {
   0%, 100% {
-    color: rgba(226, 223, 216, 0.3);
+    color: rgba(226, 223, 216, 0.25);
+    text-shadow: 0 0 0 transparent;
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  30% {
+    color: rgba(226, 223, 216, 0.25);
     text-shadow: 0 0 0 transparent;
     filter: drop-shadow(0 0 0 transparent);
   }
   50% {
     color: #EFEBE3;
-    text-shadow: 0 0 8px rgba(239, 235, 227, 0.35);
-    filter: drop-shadow(0 0 8px rgba(239, 235, 227, 0.35));
+    text-shadow: 0 0 10px rgba(239, 235, 227, 0.45);
+    filter: drop-shadow(0 0 10px rgba(239, 235, 227, 0.45));
+  }
+  70% {
+    color: rgba(226, 223, 216, 0.25);
+    text-shadow: 0 0 0 transparent;
+    filter: drop-shadow(0 0 0 transparent);
   }
 }
 
 .lantern-neon-pulse {
-  animation: lantern-pulse 4s ease-in-out infinite;
-  transition: all 0.3s ease;
+  animation: lantern-pulse 8.5s ease-in-out infinite;
+  transition: all 0.4s ease;
 }
 
 .lantern-neon-pulse:hover {
   color: #EFEBE3 !important;
-  text-shadow: 0 0 8px rgba(239, 235, 227, 0.5) !important;
-  filter: drop-shadow(0 0 8px rgba(239, 235, 227, 0.5)) !important;
+  text-shadow: 0 0 10px rgba(239, 235, 227, 0.6) !important;
+  filter: drop-shadow(0 0 10px rgba(239, 235, 227, 0.6)) !important;
   animation-play-state: paused;
 }
 
@@ -445,25 +455,24 @@ html[data-nav-state="2"] header:hover .brand-element {
 
 :root:not([data-theme='light']) header nav a,
 :root:not([data-theme='light']) header .header-nav-link {
-  color: rgba(226, 223, 216, 0.3) !important;
-  transition: all 0.3s ease;
+  color: var(--color-old-silver, #8A8F8A) !important;
+  opacity: 0.75;
+  transition: all 0.3s ease !important;
 }
 
 :root:not([data-theme='light']) header nav a:hover,
-:root:not([data-theme='light']) header .header-nav-link:hover {
-  color: #EFEBE3 !important;
-  text-shadow: 0 0 8px rgba(239, 235, 227, 0.25) !important; /* Lantern Hover Glow Sutil */
-}
-
-/* ─── ESTADO ACTIVO: sección seleccionada (mismo nivel de especificidad + !important) ─── */
+:root:not([data-theme='light']) header .header-nav-link:hover,
 :root:not([data-theme='light']) header nav a.active,
 :root:not([data-theme='light']) header .header-nav-link.active,
 :root:not([data-theme='light']) header nav a[data-active="true"],
 :root:not([data-theme='light']) header .header-nav-link[data-active="true"] {
-  color: #EFEBE3 !important; /* Ash White pleno — resaltado claro sobre fondo oscuro */
-  font-weight: 500 !important;
-  text-shadow: 0 0 10px rgba(239, 235, 227, 0.3) !important;
+  font-weight: 700 !important;
+  background-image: linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.4) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
   opacity: 1 !important;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2)) !important;
 }
 
 :root:not([data-theme='light']) header .header-btn-codice {
@@ -730,6 +739,7 @@ html[data-nav-state="2"] header:hover .brand-element {
   --color-bus-red: #8B3A36;
   --color-vintage-yellow: #EFEBE3;
   --color-rust-orange: #EFEBE3;
+  --color-old-silver: #8A8F8A;
 
   --ease-cinematic: cubic-bezier(0.2, 0.8, 0.2, 1);
   --font-serif: "Gloock", serif;
@@ -771,6 +781,61 @@ html[data-nav-state="2"] header:hover .brand-element {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
+  }
+
+  /* Gradiente Elegido para H1 en Presentaciones Generales (Didone Gloock, tracking-tighter, fade vertical) */
+  .gradient-general-h1 {
+    font-family: "Gloock", serif;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    background-image: linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.3) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  [data-theme='light'] .gradient-general-h1 {
+    background-image: linear-gradient(to bottom, #1c1e21 0%, rgba(28, 30, 33, 0.4) 100%);
+  }
+
+  /* Gradiente Elegido para H2/Labels en Presentaciones Generales (Didone Gloock, tracking y spacing optimizados para legibilidad) */
+  .gradient-general-h2 {
+    font-family: "Gloock", serif;
+    font-weight: 800;
+    letter-spacing: 0.015em;
+    word-spacing: 0.08em;
+    background-image: linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.4) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  [data-theme='light'] .gradient-general-h2 {
+    background-image: linear-gradient(to bottom, #1c1e21 0%, rgba(28, 30, 33, 0.5) 100%);
+  }
+
+  /* Regla de Espaciado Global de Respiro Visual (1/2 scroll) entre Bloques Cinemáticos */
+  .dark-hero,
+  .cpe-root {
+    margin-bottom: 25vh !important;
+  }
+
+  @media (min-width: 768px) {
+    .dark-hero,
+    .cpe-root {
+      margin-bottom: 35vh !important;
+    }
+  }
+
+  /* Gradiente Metal Steel Titanio para títulos en tarjetas estándar (vertical, blanco a blanco/30) */
+  .gradient-metal-steel-card {
+    background-image: linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.35) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  [data-theme='light'] .gradient-metal-steel-card {
+    background-image: linear-gradient(to bottom, #1c1e21 0%, rgba(28, 30, 33, 0.45) 100%);
   }
 
   /* H2 Hook Inteligente Sans Outfit / Jakarta (Conciso de 2 renglones, elegante y equilibrado) */
@@ -1294,6 +1359,107 @@ html[data-nav-state="2"] header:hover .brand-element {
 
 .woc-face-360 {
   transform: rotateY(360deg);
+}
+
+/* Enlaces de Navegación del Footer (Tipografía Gloock con degradado) */
+.footer-nav-link {
+  font-family: "Gloock", serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  color: var(--color-old-silver, #8A8F8A) !important;
+  transition: all 0.3s ease !important;
+  text-decoration: none;
+  opacity: 0.75;
+}
+
+.footer-nav-link:hover,
+.footer-nav-link.is-active {
+  font-weight: 800 !important;
+  background-image: linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.4) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2)) !important;
+}
+
+[data-theme='light'] .footer-nav-link:hover,
+[data-theme='light'] .footer-nav-link.is-active {
+  background-image: linear-gradient(to bottom, #1c1e21 0%, rgba(28, 30, 33, 0.5) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+/* Iconos de Redes Sociales Unificados */
+.footer-social-icon {
+  color: var(--color-old-silver, #8A8F8A) !important;
+  opacity: 0.65;
+  transition: all 0.3s ease !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-social-icon:hover {
+  color: #EFEBE3 !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 8px rgba(239, 235, 227, 0.5)) !important;
+  transform: scale(1.12);
+}
+
+/* Enlace de Autor Xavier Benítez: Titanio Default y Gloock Gradiente en Selección */
+.xavier-benitez-link {
+  font-family: "Google Sans Flex", "Google Sans", "Plus Jakarta Sans", sans-serif;
+  font-weight: 700;
+  font-size: 10.5px;
+  color: #94A3B8 !important;
+  transition: all 0.3s ease;
+  letter-spacing: -0.015em;
+  display: inline-block;
+}
+
+.xavier-benitez-link:hover {
+  background-image: linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.4) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.25)) !important;
+}
+
+[data-theme='light'] .xavier-benitez-link:hover {
+  background-image: linear-gradient(to bottom, #1c1e21 0%, rgba(28, 30, 33, 0.5) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+/* Lema del Brand en Footer (Gloock, default old-silver, select Gloock) */
+.footer-motto-text {
+  font-family: "Gloock", serif !important;
+  color: var(--color-old-silver, #8A8F8A) !important;
+  transition: all 0.3s ease !important;
+  display: block;
+}
+
+.footer-motto-text:hover {
+  background-image: linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.4) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2)) !important;
+}
+
+[data-theme='light'] .footer-motto-text:hover {
+  background-image: linear-gradient(to bottom, #1c1e21 0%, rgba(28, 30, 33, 0.5) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+/* Clase de Utilidad para Google Sans Flex */
+.font-metadata {
+  font-family: "Google Sans Flex", "Plus Jakarta Sans", sans-serif !important;
 }
 
 

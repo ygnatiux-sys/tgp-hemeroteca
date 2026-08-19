@@ -6,6 +6,7 @@ import CinematicCollectionHero from '../../components/CinematicCollectionHero.as
 import Marquee from '../../components/Marquee.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import TypeMagic from '../../components/TypeMagic.astro';
+import PolvoDorado from '../../components/PolvoDorado.astro';
 
 import {
   getPublishableEssays,
@@ -20,8 +21,12 @@ import {
 // ─── GENERACIÓN ESTÁTICA DE RUTAS ────────────────────────────────────────────
 export async function getStaticPaths() {
   const allEssaysRaw = await getCollection('ensayos').catch(() => []);
+  const allArquetiposRaw = await getCollection('arquetiposGlobales').catch(() => []);
   const isProd = import.meta.env.PROD;
-  const publishable = getPublishableEssays(allEssaysRaw, isProd);
+  const publishable = [
+    ...getPublishableEssays(allEssaysRaw, isProd),
+    ...getPublishableEssays(allArquetiposRaw, isProd)
+  ];
   const groups = groupByCategory(publishable, 1);
 
   return Array.from(groups.entries()).map(([key, essays]) => ({
@@ -40,18 +45,39 @@ const resolvedEssays = essays.map((e: typeof essays[0]) => ({
   img: resolveEssayImage(e.entry.coverImage, e.slug),
 }));
 
-const coverImage = resolvedEssays[0]?.img ?? null;
+const coverImage = resolvedEssays[0]?.img ?? '/images/placeholder-cover.png';
 const coverPosition =
   (resolvedEssays[0]?.entry as any)?.coverImagePosition
   || (resolvedEssays[0]?.entry as any)?.imagePosition
   || 'center center';
 
 // Segunda imagen para parallax de contrapunto
-const coverImage2 = resolvedEssays[1]?.img ?? null;
+const coverImage2 = resolvedEssays[1]?.img ?? '/images/placeholder-cover.png';
 const coverPosition2 =
   (resolvedEssays[1]?.entry as any)?.coverImagePosition
   || (resolvedEssays[1]?.entry as any)?.imagePosition
   || 'center center';
+
+// ─── TEXTOS DE POLVO DORADO POR CATEGORÍA ────────────────────────────────────────────
+const categoryDustTexts: Record<string, string> = {
+  'antropologia':       '[[Anthropos]] y su memoria inscrita. **El ser humano** como primer archivo, portador de rítos, lenguas y saberes que anteceden toda escritura. Aquí cada hallazgo es un espejo roto que refleja lo que fuimos antes de saber que éramos.',
+  'arqueologia':        'La piedra **guarda más** que el papel. Cada capa de tierra es un párrafo de historia no escrita, un silencio que la [[arqueología]] aprende a leer. Los objetos hablan cuando se les da el tiempo y la atención que merecen.',
+  'arqueosemiotica':    'Los símbolos preexisten al lenguaje. [[Arqueosemiótica]] es la disciplina que rastrea cómo el sentido se depositó en formas, gestos y grafismos antes de que existieran palabras para nombrarlos.',
+  'arquetipos-globales':'Hay figuras que **trascienden culturas** y épocas. Los [[arquetipos]] son el ADN simbólico de la humanidad: patrones que emergen en mitos, ritos y sombras, repitiéndose en civilizaciones que jamás se conocieron.',
+  'historia-medieval':  'La Edad Media no fue oscura. Fue un **laboratorio de formas** donde se forjó la Europa moderna entre [[scriptorios]], catedrales y cruzadas. Sus rastros herénticos aguardan aún nuevas lecturas.',
+  'historia-moderna':   '**Ruptura y continuidad.** La [[historia moderna]] es el escenario donde el mundo occidental aprendió a mirarse a sí mismo: imprenta, Reforma, Razón. Todo comenzó aquí, en ese umbral vertiginoso.',
+  'historia-antigua':   'Las primeras ciudades, los primeros [[códigos]], las primeras guerras de registro. La historia antigua es el origen del contrato humano con el tiempo: la decisión de **no olvidar.**',
+  'lingueistica':       'El lenguaje no describe el mundo. Lo [[construye.]] Cada estructura gramatical es una forma de ver, y cada lengua perdida lleva consigo una manera irrecuperable de nombrar la realidad. **Las palabras son los últimos fósiles.**',
+  'semiotica':          'Nada es solo lo que parece. La [[semiótica]] es la ciencia del significado: estudia cómo los signos crean mundos, cómo un color puede ser una orden y cómo **el silencio también habla.**',
+  'filosofia':          '[[Filosofar]] es atreverse a no tener respuesta. Es la práctica más antigua de la humanidad consciente: dudar, preguntar, construir sistemas y destruirlos. Cada gran filósofo es un naufragio **que ilumina.**',
+  'mitologia':          'El mito no miente. **Habla de otra verdad,** una que la historia no puede tocar. Los [[mitos]] son el lenguaje del alma colectiva: relatos que explican lo que la ciencia aún no puede y que el olvido todavía no se ha llevado.',
+  'prehistoria':        'Antes de la escritura, hubo [[pintura]]. Antes de la ciudad, hubo rito. La prehistoria es el capítulo más largo del libro humano, escrito en hueso, pigmento y piedra. **Todo lo que somos nació allí.**',
+};
+
+// Texto por defecto si la categoría no está mapeada
+const defaultDustText = `La colección [[${label}]] concentra investigaciones que excavan más allá de la superficie. **Cada documento es un umbral.** Un conjunto de rastros que aguardan la mirada que los vuelva a nombrar, trazar y comprender.`;
+
+const dustText = categoryDustTexts[key] ?? defaultDustText;
 
 // ─── HELPER PARA SECUENCIAS CINE PREMIER (1 HERO FULL + DÚO 60/40) ──────────
 function createPremierSequences(items: typeof resolvedEssays) {
@@ -97,7 +123,7 @@ const sequences = createPremierSequences(resolvedEssays);
 
     {/* ── RESPIRO VISUAL / EXCERPT DESCANSO ── */}
     <CinematicExcerptRest 
-      text={`Catálogo [[${label}]]. **Cada dossier** documentado representa un nodo verificado del proyecto global.`}
+      text={`La memoria de [[${label}]]. **Rastros hermenéuticos** dejados en la piedra y el tiempo, aguardando que el espíritu los vuelva a nombrar.`}
     />
 
 
@@ -109,13 +135,22 @@ const sequences = createPremierSequences(resolvedEssays);
       ]}
     />
 
+    {/* ── HERO MARQUEE DE SECCIÓN ── */}
+    <Marquee
+      title={label.toUpperCase()}
+      subtitle="Colección Documental"
+      imageUrl={(coverImage as any)?.src ?? coverImage ?? ''}
+      vibeClass="vibe-travel-senses"
+      fontClass="font-cinzel font-extrabold"
+    />
+
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">
 
       {/* ═══════════════════════════════════════════════════════════════════
           GRILLA CINEMÁTICA PREMIER: 1 HERO + DÚO 60/40
       ═══════════════════════════════════════════════════════════════════ */}
       <section class="flex flex-col gap-12 md:gap-16">
-        {sequences.map((seq) => (
+        {sequences.map((seq, seqIdx) => (
           <div class="premier-sequence flex flex-col gap-6 md:gap-8">
             {/* 1. Hero Cinemático Full Bleed */}
             <div class="w-full">
@@ -128,7 +163,15 @@ const sequences = createPremierSequences(resolvedEssays);
               />
             </div>
 
-            {/* 2. Dúo 60/40 */}
+            {/* 2. PolvoDorado entre Hero y Dúo (solo en la primera secuencia) */}
+            {seqIdx === 0 && (
+              <PolvoDorado
+                text={dustText}
+                eyebrow={`Colección · ${label}`}
+              />
+            )}
+
+            {/* 3. Dúo 60/40 */}
             {seq.duo.length > 0 && (
               <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
                 {seq.duo[0] && (
@@ -165,7 +208,7 @@ const sequences = createPremierSequences(resolvedEssays);
       <section class="flex flex-col gap-6 border-t border-white/10 pt-10">
         <div class="reveal-item">
           <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#EFEBE3] block mb-2">Índice</span>
-          <h2 class="text-2xl md:text-3xl font-cinzel font-bold text-white/90">{label} — Catálogo Completo</h2>
+          <h2 class="text-2xl md:text-3xl gradient-general-h2">{label} — Catálogo Completo</h2>
         </div>
 
         <ol class="flex flex-col divide-y divide-white/5">

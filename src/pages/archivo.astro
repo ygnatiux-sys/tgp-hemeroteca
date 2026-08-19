@@ -5,6 +5,7 @@ import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../components/CinematicPostEngine.astro';
 import InteriorHero from '../components/InteriorHero.astro';
 import CinematicExcerptRest from '../components/CinematicExcerptRest.astro';
+import Marquee from '../components/Marquee.astro';
 import {
   getPublishableEssays,
   formatCategory,
@@ -160,7 +161,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
     imagePosition={archiveCover?.position ?? 'center center'}
     eyebrow="Cartografía Epistémica · TGP"
     subtitle="Análisis multidisciplinario de investigaciones"
-    titleClass="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-cinzel font-extrabold tracking-tight leading-none gradient-acero-ios drop-shadow-2xl"
+    titleClass="text-6xl md:text-8xl gradient-general-h1 leading-[0.95] tracking-tighter"
   >
     <div slot="meta" class="font-mono text-[10px] uppercase tracking-[0.3em] text-[#EFEBE3] font-bold">
       {publishable.length} DOSSIERS · {categories.length} CATEGORÍAS
@@ -169,13 +170,21 @@ function createPremierSequences(essays: typeof resolvedEssays) {
 
   {/* ── RESPIRO VISUAL / EXCERPT DESCANSO ── */}
   <CinematicExcerptRest 
-    text="El repositorio [[completo]] del proyecto. **Cientos de investigaciones** clasificadas, indexadas y listas para su escrutinio analítico."
+    text="El repositorio del [[tiempo transcurrido]]. **Huellas epistémicas** clasificadas y resguardadas, listas para el escrutinio del alma humana."
   />
 
 
   {archiveSlides.length > 0 && (
     <CinematicPostEngine slides={archiveSlides} />
   )}
+
+  {/* ── HERO MARQUEE DE SECCIÓN ── */}
+  <Marquee
+    title="ARCHIVO GENERAL"
+    subtitle="Registros documentales e investigaciones cartografiadas"
+    imageUrl={archiveCover?.src ?? ''}
+    vibeClass="vibe-travel-senses"
+  />
 
   <div class="min-h-screen pb-32 pt-12">
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16">
@@ -238,7 +247,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                 <span class="font-mono text-xs uppercase tracking-[0.25em] text-[#EFEBE3]/70 font-bold">
                   {card.count} ARTÍCULO{card.count > 1 ? 'S' : ''} {card.yearLabel && `• ${card.yearLabel}`}
                 </span>
-                <h3 class="font-cinzel font-extrabold text-lg md:text-xl text-white tracking-wide uppercase group-hover:text-[#EFEBE3] transition-colors">
+                <h3 class="gradient-general-h2 text-lg md:text-xl uppercase group-hover:text-[#EFEBE3] transition-colors">
                   {card.catLabel}
                 </h3>
               </div>
@@ -293,7 +302,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                 <div class="editorial-bar flex items-center justify-between pb-2 border-b border-white/10">
                   <div class="flex items-center gap-3">
                     <span class="w-2 h-2 rounded-full bg-rust-orange shadow-[0_0_8px_#EFEBE3]" />
-                    <h2 class="font-cinzel font-bold text-xl md:text-2xl tracking-wider text-white">
+                    <h2 class="gradient-general-h2 text-xl md:text-2xl">
                       • {group.catLabel.toUpperCase()}
                     </h2>
                   </div>
@@ -333,7 +342,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                               {e.entry.category}
                             </span>
                             <h3 class="font-cinzel font-bold text-xl md:text-2xl leading-snug text-white group-hover:text-[#EFEBE3] transition-colors line-clamp-2">
-                              <a href={`/papers/${e.slug}`}>{e.entry.title}</a>
+                              <a href={`/papers/${e.slug}`} class="gradient-metal-steel-card">{e.entry.title}</a>
                             </h3>
                             {e.entry.excerpt && (
                               <p class="font-serif italic text-white/60 text-xs md:text-sm line-clamp-2 mt-1">
@@ -381,7 +390,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                               {e.entry.category}
                             </span>
                             <h4 class="font-cinzel font-bold text-lg md:text-xl leading-snug text-white group-hover:text-[#EFEBE3] transition-colors line-clamp-2">
-                              <a href={`/papers/${e.slug}`}>{e.entry.title}</a>
+                              <a href={`/papers/${e.slug}`} class="gradient-metal-steel-card">{e.entry.title}</a>
                             </h4>
                           </div>
                           <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
@@ -458,7 +467,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                   <div class="flex items-center justify-between border-b border-rust-orange/20 pb-4 pt-2">
                     <div class="flex items-center gap-3.5">
                       <span class="w-2 h-2 rounded-full bg-rust-orange shadow-[0_0_8px_#EFEBE3]" />
-                      <h2 class="font-cinzel font-bold text-2xl md:text-3xl tracking-[0.15em] text-white">
+                      <h2 class="gradient-general-h2 text-2xl md:text-3xl">
                         AÑO {year}
                       </h2>
                     </div>

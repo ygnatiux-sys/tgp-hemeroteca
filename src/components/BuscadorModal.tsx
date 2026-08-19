@@ -181,7 +181,7 @@ export function BuscadorModal() {
               { label: 'Papers', href: '/papers' },
               { label: 'About', href: '/about' },
               { label: 'El Códice', href: '/codice' },
-              { label: 'Ediciones ↗', href: 'https://ediciones.thegreatpuzzleproject.com', external: true },
+              { label: 'Editorial ↗', href: 'https://ediciones.thegreatpuzzleproject.com', external: true },
             ].map(link => (
               <a
                 key={link.href}
@@ -189,7 +189,7 @@ export function BuscadorModal() {
                 target={link.external ? '_blank' : undefined}
                 rel={link.external ? 'noopener noreferrer' : undefined}
                 onClick={() => setNavState(0)}
-                className="font-mono font-light text-[11px] uppercase tracking-[0.2em] text-current opacity-70 hover:opacity-100 hover:text-rust-orange dark:hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(239,235,227,0.06)] transition-all"
+                className="font-metadata text-[13px] md:text-sm uppercase tracking-[-0.015em] text-current opacity-70 hover:opacity-100 hover:text-[#EFEBE3] hover:drop-shadow-[0_0_6px_rgba(255,255,255,0.2)] transition-all"
               >
                 {link.label}
               </a>
