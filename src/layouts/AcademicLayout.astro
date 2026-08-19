@@ -7,7 +7,9 @@
  * Google Translate: widget flotante a la derecha
  */
 
-import NavAcademic from '../components/NavAcademic.astro';
+import "../styles/global.css";
+import Header from '../components/Header.astro';
+import BackSlideButton from '../components/BackSlideButton.astro';
 
 interface Props {
   title?: string;
@@ -45,27 +47,27 @@ const {
       *, *::before, *::after { box-sizing: border-box; }
 
       :root {
-        --bg-main:       #151718;
+        --bg-main:       #211A16;
         --rust-orange:   #EFEBE3;
 
-        /* Escala de blancos */
-        --white-page:    #FAFAF9;
-        --white-broken:  #F5F2ED;
-        --white-bone:    #EDE9E1;
-        --white-silver:  #E4E1DB;
-        --white-ice:     #F8F8F7;
+        /* Escala tonal base (Old Leather & Parchment) */
+        --white-page:    #211A16;
+        --white-broken:  #28201B;
+        --white-bone:    #2E2520;
+        --white-silver:  rgba(239, 235, 227, 0.12);
+        --white-ice:     #1B1512;
 
-        /* Paleta TGP Papers */
-        --ac-bg:          var(--white-page);
-        --ac-surface:     var(--white-broken);
-        --ac-border:      var(--white-silver);
-        --ac-text:        #191918;
-        --ac-text-muted:  #575043;
-        --ac-text-soft:   #8A8278;
-        --ac-accent:      #3B2A14;
-        --ac-gold:        #8C6D2F;
-        --ac-gold-light:  #C9A86C;
-        --ac-rule:        rgba(60,50,30,0.12);
+        /* Paleta TGP Papers — Dark Old Leather #211A16 */
+        --ac-bg:          #211A16;
+        --ac-surface:     #28201B;
+        --ac-border:      rgba(239, 235, 227, 0.12);
+        --ac-text:        #EFEBE3;
+        --ac-text-muted:  #C5BFB5;
+        --ac-text-soft:   #9E9689;
+        --ac-accent:      #C9A86C;
+        --ac-gold:        #C9A86C;
+        --ac-gold-light:  #DFCA9D;
+        --ac-rule:        rgba(239, 235, 227, 0.12);
 
         --font-brand:     'Cormorant Garamond', Georgia, serif;
         --font-body:      'Lora', Georgia, serif;
@@ -82,7 +84,7 @@ const {
         text-rendering: optimizeLegibility;
       }
 
-      ::selection { background-color: var(--ac-gold); color: #FFF; }
+      ::selection { background-color: var(--ac-gold); color: #211A16; }
 
       body {
         display: flex;
@@ -91,162 +93,7 @@ const {
         margin: 0;
         padding: 0;
         background-color: var(--ac-bg);
-      }
-
-      /* ════════════════════════════════════════════════════
-         NAVBAR — Brand + faja editorial fija de secciones
-      ════════════════════════════════════════════════════ */
-      .ac-nav {
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        background-color: rgba(250,250,249,0.97);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        border-bottom: 1px solid var(--ac-rule);
-      }
-
-      /* Zona superior: brand centrado */
-      .ac-nav__top {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.75rem 1.5rem 0.55rem;
-        position: relative;
-      }
-
-      /* Botón de retorno (izquierda absoluta) */
-      .ac-nav__back {
-        position: absolute;
-        left: 1.5rem;
-        font-family: var(--font-ui);
-        font-size: 0.75rem;
-        font-weight: 400;
-        color: var(--ac-text-soft);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-        transition: color 0.15s ease;
-        letter-spacing: 0.01em;
-      }
-      .ac-nav__back:hover { color: var(--ac-gold); }
-
-      /* Bloque brand centrado */
-      .ac-nav__brand {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.1rem;
-        text-align: center;
-        text-decoration: none;
-      }
-
-      /* Wordmark principal: Cormorant ExtraBold estilo Medium */
-      .ac-nav__wordmark {
-        font-family: var(--font-brand);
-        font-size: clamp(1.3rem, 2.5vw, 1.7rem);
-        font-weight: 800;
-        letter-spacing: -0.03em;
-        line-height: 1;
         color: var(--ac-text);
-        white-space: nowrap;
-      }
-      .ac-nav__wordmark em {
-        font-style: normal;
-        color: var(--ac-gold);
-      }
-
-      /* Subtítulo metadata: Inter 300 espaciado */
-      .ac-nav__sub {
-        font-family: var(--font-ui);
-        font-size: 0.62rem;
-        font-weight: 300;
-        letter-spacing: 0.22em;
-        text-transform: uppercase;
-        color: var(--ac-text-soft);
-      }
-
-      /* Google Translate widget (derecha absoluta) */
-      .ac-nav__translate {
-        position: absolute;
-        right: 1.5rem;
-        display: flex;
-        align-items: center;
-      }
-
-      /* ── FAJA EDITORIAL FIJA (sin show/hide) ─────────────── */
-      .ac-nav__menu {
-        border-top: 1px solid var(--ac-rule);
-        background-color: rgba(248, 248, 247, 0.72);
-      }
-
-      .ac-nav__menu-inner {
-        display: flex;
-        justify-content: space-evenly;
-        align-items: center;
-        max-width: 42rem;
-        margin: 0 auto;
-        padding: 0.45rem 1.25rem 0.55rem;
-        gap: 0.5rem;
-      }
-
-      /* Ítem del menú */
-      .nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0.2rem;
-        flex: 1 1 0;
-        max-width: 7.5rem;
-        padding: 0.4rem 0.5rem;
-        border-radius: 6px;
-        text-decoration: none;
-        color: var(--ac-text-muted);
-        transition: color 0.18s ease, background-color 0.18s ease;
-      }
-
-      .nav-item:hover {
-        color: var(--ac-gold);
-        background-color: transparent;
-      }
-
-      .nav-item svg {
-        width: 1.05rem;
-        height: 1.05rem;
-        stroke: currentColor;
-        stroke-width: 1.5;
-        fill: none;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        flex-shrink: 0;
-      }
-
-      .nav-item__label {
-        font-family: var(--font-ui);
-        font-size: 0.58rem;
-        font-weight: 500;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        line-height: 1.2;
-        white-space: nowrap;
-      }
-
-      .nav-item__label-en {
-        font-family: var(--font-ui);
-        font-size: 0.5rem;
-        font-weight: 300;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--ac-text-soft);
-        line-height: 1;
-        opacity: 0.75;
-      }
-
-      .nav-item:hover .nav-item__label-en {
-        color: var(--ac-gold);
-        opacity: 1;
       }
 
       /* ════════════════════════════════════════════════════
@@ -255,8 +102,8 @@ const {
       main { flex: 1; width: 100%; }
 
       .ac-site-footer {
-        background-color: var(--white-broken);
-        border-top: 1px solid var(--white-silver);
+        background-color: #1A1411;
+        border-top: 1px solid var(--ac-rule);
         padding: 1.2rem 1.5rem;
         margin-top: 4rem;
         width: 100%;
@@ -292,25 +139,16 @@ const {
 
       .ac-site-footer__seal {
         position: relative;
-        width: 2.2rem;
-        height: 2.2rem;
+        width: 1.8rem;
+        height: 1.8rem;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
       }
-      .seal-spin {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        animation: spin-seal 40s linear infinite;
-        opacity: 0.6;
-      }
-      @keyframes spin-seal { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       .seal-icon {
-        width: 0.9rem;
-        height: 0.9rem;
+        width: 1.3rem;
+        height: 1.3rem;
         color: var(--ac-gold);
       }
 
@@ -415,10 +253,13 @@ const {
   </head>
 
   <body>
-    <!-- NavBar cinemático unificado (hamburguer 3-state + retorno al inicio) -->
-    <NavAcademic />
+    <!-- Navbar Global Estándar -->
+    <Header transparentUntilScroll={false} />
 
-    <main>
+    <!-- Botón de Retroceso Inteligente Lateral -->
+    <BackSlideButton fallbackUrl="/papers" />
+
+    <main class="pt-20 md:pt-24">
       <slot />
     </main>
 
@@ -429,12 +270,6 @@ const {
         <!-- Brand / Sello -->
         <a href="/" class="ac-site-footer__brand" title="The Great Puzzle Project">
           <div class="ac-site-footer__seal" aria-hidden="true">
-            <svg viewBox="0 0 100 100" class="seal-spin">
-              <path id="ac-seal-curve" d="M 50,50 m -42,0 a 42,42 0 1,1 84,0 a 42,42 0 1,1 -84,0" fill="transparent" />
-              <text>
-                <textPath href="#ac-seal-curve" startOffset="0%"><tspan font-family="monospace" font-size="8" fill="var(--ac-gold)">TGP • ARCHIVO • TGP • ARCHIVO • </tspan></textPath>
-              </text>
-            </svg>
             <svg class="seal-icon" viewBox="0 0 100 100" fill="none">
               <path d="M 34 28 H 42 C 41.5 21, 37 10, 50 10 C 63 10, 58.5 21, 58 28 H 66 A 6 6 0 0 1 72 34 V 66 A 6 6 0 0 1 66 72 H 58 C 58.5 79, 63 90, 50 90 C 37 90, 41.5 79, 42 72 H 34 A 6 6 0 0 1 28 66 V 58 C 35 58.5, 45 63, 45 50 C 45 37, 35 41.5, 28 42 V 34 A 6 6 0 0 1 34 28 Z" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
@@ -499,6 +334,9 @@ const {
 
     <!-- Google Translate Widget -->
     <script>
+      // @ts-ignore
+      declare var google: any;
+
       // @ts-ignore
       function googleTranslateElementInit() {
         // @ts-ignore

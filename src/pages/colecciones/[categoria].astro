@@ -4,6 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import InteriorHero from '../../components/InteriorHero.astro';
 import Marquee from '../../components/Marquee.astro';
+import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import {
   getPublishableEssays,
   groupByCategory,
@@ -90,15 +91,12 @@ const sequences = createPremierSequences(resolvedEssays);
       </div>
     </InteriorHero>
 
-    <Marquee 
-      title={label} 
-      subtitle="Colección temática" 
-      imageUrl={coverImage?.src || (coverImage as any)} 
-      vibeClass="vibe-travel-senses" 
-      isH1={true} 
+    {/* ── RESPIRO VISUAL / EXCERPT DESCANSO ── */}
+    <CinematicExcerptRest 
+      text={`Catálogo enfocado en **${label}.** Cada dossier documentado representa un nodo verificado del proyecto global.`}
     />
 
-    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-16 pt-12 md:pt-16">
+    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">
 
       {/* ═══════════════════════════════════════════════════════════════════
           GRILLA CINEMÁTICA PREMIER: 1 HERO + DÚO 60/40

@@ -175,13 +175,13 @@ export function BuscadorModal() {
         >
           <div className="flex flex-col items-end gap-1.5 pt-2">
             {[
-              { label: 'Volver a TGP', href: 'https://thegreatpuzzleproject.com', external: true },
               { label: 'Inicio', href: '/' },
               { label: 'Colecciones', href: '/colecciones' },
               { label: 'Archivo', href: '/archivo' },
+              { label: 'Papers', href: '/papers' },
               { label: 'About', href: '/about' },
               { label: 'El Códice', href: '/codice' },
-              { label: 'Hemeroteca ↗', href: 'https://hemeroteca.thegreatpuzzleproject.com', external: true },
+              { label: 'Ediciones ↗', href: 'https://ediciones.thegreatpuzzleproject.com', external: true },
             ].map(link => (
               <a
                 key={link.href}

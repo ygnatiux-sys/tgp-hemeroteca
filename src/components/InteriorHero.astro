@@ -36,7 +36,7 @@ const {
         <Image
           src={image}
           alt={imageAlt || title}
-          class="interior-hero-image w-full h-full object-cover opacity-80"
+          class="interior-hero-image w-full h-full object-cover opacity-100"
           style={`object-position: ${imagePosition};`}
         />
       ) : (
@@ -138,29 +138,47 @@ const {
       .to(h2, { opacity: 0, y: -8, duration: 0.8, ease: "power2.in" });
     }
 
-    // RITMO 2: H1 (Scale Up Ampliado y Prolongado para lucir el efecto cepillado de titanio)
+    // RITMO 2: H1 (Scale Up Ampliado) + imagen bokeh simultáneo
     if (h1) {
       gsap.set(h1, { transformOrigin: "center center" });
+
+      // Cuando el H1 entra: imagen va a bokeh suave (blur)
+      if (image) {
+        tl.to(
+          image,
+          { filter: "blur(12px) brightness(0.35)", opacity: 0.6, duration: 2.0, ease: "power2.inOut" },
+          "+=0.1" // Coincide con la entrada del H1
+        );
+      }
 
       tl.fromTo(
         h1,
         { scale: 0.88, opacity: 0, y: 15 },
         {
-          scale: 1.18, // Escala ampliada para apreciar la textura metálica
+          scale: 1.18,
           opacity: 1,
           y: 0,
-          duration: 3.8, // Duración extendida
+          duration: 3.8,
           ease: "power2.out",
           onStart: () => {
             h1.classList.add("is-permanently-iridescent");
           }
         },
-        "+=0.2"
+        "<" // Simultáneo con el bokeh de la imagen
       )
-      // Tiempo prolongado de contemplación del titanio cepillado
+      // Contemplación del titanio cepillado
       .to({}, { duration: 3.0 })
-      // Scale Up Fade Out majestuoso hacia la cámara
+      // Título hace scale-up fade out, imagen empieza a volver a foco
       .to(h1, { opacity: 0, scale: 1.50, duration: 1.4, ease: "power2.inOut" });
+
+      // Imagen vuelve a nítida con un leve blur residual en título
+      if (image) {
+        tl.to(
+          image,
+          { filter: "blur(0px) brightness(1)", opacity: 1.0, duration: 2.2, ease: "power3.out" },
+          "<0.6" // Empieza a aclarar 0.6s antes del fade del H1
+        );
+      }
     }
 
     // RITMO 3: Subtítulo entra centrado, permite lectura y FADE OUT

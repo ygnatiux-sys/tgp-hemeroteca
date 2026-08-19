@@ -5,6 +5,7 @@ import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../../components/CinematicPostEngine.astro';
 import InteriorHero from '../../components/InteriorHero.astro';
+import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import {
   getPublishableEssays,
   groupByCategory,
@@ -82,6 +83,11 @@ const coleccionesSlides = collections
         {collections.length} {collections.length === 1 ? 'colección' : 'colecciones'} · {publishable.length} dossiers
       </div>
     </InteriorHero>
+
+    {/* ── RESPIRO VISUAL / EXCERPT DESCANSO ── */}
+    <CinematicExcerptRest 
+      text="Un ecosistema documental en **constante expansión.** Explora las distintas ramificaciones del archivo, donde la cartografía epistémica y la semiótica convergen."
+    />
 
     {/* ── ENGINE AUTO CINEMÁTICO: cicla colecciones full-viewport ── */}
     {coleccionesSlides.length > 0 && (

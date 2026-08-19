@@ -157,6 +157,16 @@ header .header-btn-codice {
   text-shadow: 0 0 8px rgba(239, 235, 227, 0.25) !important; /* Lantern Hover Glow Sutil */
 }
 
+/* ─── ESTADO ACTIVO en Light Theme ─── */
+[data-theme='light'] header nav a.active,
+[data-theme='light'] header .header-nav-link.active,
+[data-theme='light'] header nav a[data-active="true"],
+[data-theme='light'] header .header-nav-link[data-active="true"] {
+  color: #1C1E21 !important; /* Negro pleno sobre fondo claro */
+  font-weight: 600 !important;
+  opacity: 1 !important;
+}
+
 /* Efecto Lantern Universal para Footer y Sliders */
 .lantern-hover {
   color: rgba(226, 223, 216, 0.3) !important;
@@ -405,6 +415,17 @@ html[data-nav-state="2"] header:hover .brand-element {
 :root:not([data-theme='light']) header .header-nav-link:hover {
   color: #EFEBE3 !important;
   text-shadow: 0 0 8px rgba(239, 235, 227, 0.25) !important; /* Lantern Hover Glow Sutil */
+}
+
+/* ─── ESTADO ACTIVO: sección seleccionada (mismo nivel de especificidad + !important) ─── */
+:root:not([data-theme='light']) header nav a.active,
+:root:not([data-theme='light']) header .header-nav-link.active,
+:root:not([data-theme='light']) header nav a[data-active="true"],
+:root:not([data-theme='light']) header .header-nav-link[data-active="true"] {
+  color: #EFEBE3 !important; /* Ash White pleno — resaltado claro sobre fondo oscuro */
+  font-weight: 500 !important;
+  text-shadow: 0 0 10px rgba(239, 235, 227, 0.3) !important;
+  opacity: 1 !important;
 }
 
 :root:not([data-theme='light']) header .header-btn-codice {

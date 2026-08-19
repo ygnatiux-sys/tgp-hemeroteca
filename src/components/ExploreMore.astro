@@ -61,10 +61,11 @@ const secondB = exploreEssays[2] ?? null;
                 <Image
                   src={lead.img}
                   alt={lead.entry.title || "Dossier"}
-                  class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03] brightness-85"
+                  class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03] brightness-75"
                 />
-                <div class="absolute inset-0 bg-linear-to-r from-transparent via-transparent to-(--bg-main)/85 hidden lg:block pointer-events-none" />
-                <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/75 via-transparent to-transparent lg:hidden pointer-events-none" />
+                <div class="absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.85)] pointer-events-none" />
+                <div class="absolute inset-0 bg-linear-to-r from-transparent via-transparent to-(--bg-main) hidden lg:block pointer-events-none" />
+                <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/85 via-transparent to-transparent lg:hidden pointer-events-none" />
               </div>
             ) : (
               <div class="relative overflow-hidden lg:w-[35%] shrink-0 bg-linear-to-br from-rust-orange/15 via-[#242424] to-[#151718] flex items-center justify-center p-8 border-b lg:border-b-0 lg:border-r border-white/5 min-h-40 lg:min-h-0">
@@ -119,9 +120,10 @@ const secondB = exploreEssays[2] ?? null;
                   <Image
                     src={secondA.img}
                     alt={secondA.entry.title || "Dossier"}
-                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04] brightness-80"
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04] brightness-75"
                   />
-                  <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/75 via-transparent to-transparent pointer-events-none" />
+                  <div class="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.8)] pointer-events-none" />
+                  <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/85 via-transparent to-transparent pointer-events-none" />
                 </div>
               ) : (
                 <div class="relative overflow-hidden aspect-video bg-linear-to-br from-rust-orange/10 via-[#1e1e1e] to-[#151718] flex items-center justify-center">
@@ -161,9 +163,10 @@ const secondB = exploreEssays[2] ?? null;
                   <Image
                     src={secondB.img}
                     alt={secondB.entry.title || "Dossier"}
-                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04] brightness-80"
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04] brightness-75"
                   />
-                  <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/75 via-transparent to-transparent pointer-events-none" />
+                  <div class="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.8)] pointer-events-none" />
+                  <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/85 via-transparent to-transparent pointer-events-none" />
                 </div>
               ) : (
                 <div class="relative overflow-hidden aspect-video bg-linear-to-br from-rust-orange/10 via-[#1e1e1e] to-[#151718] flex items-center justify-center">

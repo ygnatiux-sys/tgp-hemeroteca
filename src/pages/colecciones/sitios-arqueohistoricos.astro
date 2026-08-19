@@ -5,6 +5,7 @@ import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../../components/CinematicPostEngine.astro';
 import InteriorHero from '../../components/InteriorHero.astro';
 import Marquee from '../../components/Marquee.astro';
+import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import {
   getPublishableEssays,
   formatDate,
@@ -115,12 +116,17 @@ const geoSlides = resolvedEssays
       isH1={true} 
     />
 
+    {/* ── RESPIRO VISUAL / EXCERPT DESCANSO ── */}
+    <CinematicExcerptRest 
+      text="Desde templos megalíticos hasta anomalías geológicas. Esta colección reúne las **ubicaciones más enigmáticas,** evaluando su relevancia histórica y su alineación con patrones globales ocultos."
+    />
+
     {/* ── ENGINE AUTO CINEMÁTICO: georreferencias full-viewport ── */}
     {geoSlides.length > 0 && (
       <CinematicPostEngine slides={geoSlides} />
     )}
 
-    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-16 pt-12 md:pt-16">
+    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">
 
       {/* ═══════════════════════════════════════════════════════════════════
           GRILLA CINEMÁTICA PREMIER DE SITIOS GEOHISTÓRICOS

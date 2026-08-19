@@ -1,0 +1,192 @@
+---
+interface Props {
+  text?: string;
+  id?: string;
+}
+
+const {
+  text = "Un ecosistema documental en **constante expansión**. Explora las ramificaciones del archivo.",
+  id = "excerpt-" + Math.random().toString(36).substring(2, 9),
+} = Astro.props;
+
+// Tokeniza en palabras: normales y **destacadas**
+type Token = { word: string; isGlow: boolean };
+const tokens: Token[] = [];
+const regex = /\*\*(.*?)\*\*|(\S+)/g;
+let match;
+while ((match = regex.exec(text)) !== null) {
+  if (match[1] !== undefined) {
+    match[1].split(/\s+/).filter(Boolean).forEach(w =>
+      tokens.push({ word: w, isGlow: true })
+    );
+  } else if (match[2] !== undefined) {
+    tokens.push({ word: match[2], isGlow: false });
+  }
+}
+---
+
+<section
+  id={id}
+  class="cinematic-excerpt-rest relative w-full bg-black overflow-hidden"
+>
+  {/* Breathing room superior */}
+  <div class="h-[18vh] md:h-[24vh]" aria-hidden="true"></div>
+
+  {/* Texto centrado */}
+  <div class="excerpt-content max-w-4xl mx-auto px-6 md:px-16 text-center">
+    <p class="excerpt-headline font-light leading-[1.75] tracking-wide text-balance">
+      {tokens.map((token, i) => (
+        <span
+          class={`excerpt-word inline-block mr-[0.26em]${token.isGlow ? ' glow-word' : ''}`}
+          data-i={i}
+        >
+          {token.word}
+        </span>
+      ))}
+    </p>
+  </div>
+
+  {/* Breathing room inferior */}
+  <div class="h-[18vh] md:h-[24vh]" aria-hidden="true"></div>
+</section>
+
+<style>
+  /* ── Tipografía base ── */
+  .excerpt-headline {
+    font-family: var(--font-sans, system-ui, sans-serif);
+    font-size: clamp(1.05rem, 2vw, 1.6rem);
+    color: rgba(239, 235, 227, 0.52);
+  }
+
+  /* ── Palabras destacadas: misma fuente, algo más brillantes ── */
+  .glow-word {
+    font-family: inherit;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.88);
+    letter-spacing: 0.02em;
+  }
+
+  /* Estado inicial: invisible y desplazada — GSAP las anima */
+  .excerpt-word {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(28px);
+    will-change: transform, opacity;
+  }
+
+  /* Fallback sin JS: asegura visibilidad */
+  @media (prefers-reduced-motion: reduce) {
+    .excerpt-word {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const initExcerpts = () => {
+    document.querySelectorAll<HTMLElement>('.cinematic-excerpt-rest').forEach((section) => {
+      const content   = section.querySelector<HTMLElement>('.excerpt-content');
+      const words     = Array.from(section.querySelectorAll<HTMLElement>('.excerpt-word'));
+      const glowWords = section.querySelectorAll<HTMLElement>('.glow-word');
+
+      if (!content || !words.length) return;
+
+      // ── 1. PARALLAX SUAVE: el bloque flota con el scroll ─────────────────────
+      gsap.fromTo(content,
+        { y: 55 },
+        {
+          y: -55,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 2,
+          },
+        }
+      );
+
+      // ── 2. EMERGENCIA REAL: animación que dispara al entrar en pantalla ───────
+      // NO es scrub — se ejecuta sola, con stagger, cuando la sección es visible
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top 80%',
+        once: true,
+        onEnter: () => {
+          gsap.to(words, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: 'power2.out',
+            stagger: {
+              each: 0.04,
+              ease: 'power1.out',
+            },
+          });
+        },
+      });
+
+      // ── 3. GLOW PULSE en palabras ** — una sola vez ───────────────────────────
+      if (glowWords.length > 0) {
+        ScrollTrigger.create({
+          trigger: content,
+          start: 'top 58%',
+          once: true,
+          onEnter: () => {
+            gsap.delayedCall(0.15, () => {
+              gsap.timeline()
+                .to(glowWords, {
+                  textShadow: '0 0 36px rgba(255,255,255,0.9), 0 0 10px rgba(255,255,255,0.5)',
+                  filter: 'brightness(1.35)',
+                  duration: 0.85,
+                  ease: 'power2.out',
+                  stagger: 0.07,
+                })
+                .to(glowWords, {
+                  textShadow: '0 0 0px rgba(255,255,255,0)',
+                  filter: 'brightness(1)',
+                  duration: 0.85,
+                  ease: 'power2.inOut',
+                  stagger: 0.05,
+                });
+            });
+          },
+        });
+      }
+
+      // ── 4. FADE OUT suave al alejarse (no scrub — porcentaje fijo) ───────────
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'bottom 60%',
+        end: 'bottom top',
+        once: false,
+        onLeave: () => {
+          gsap.to(words, {
+            opacity: 0,
+            y: -22,
+            duration: 0.5,
+            ease: 'power2.in',
+            stagger: { each: 0.02, from: 'end' },
+          });
+        },
+        onEnterBack: () => {
+          gsap.to(words, {
+            opacity: 1,
+            y: 0,
+            duration: 0.4,
+            ease: 'power2.out',
+            stagger: { each: 0.025 },
+          });
+        },
+      });
+    });
+  };
+
+  document.addEventListener('astro:page-load', initExcerpts);
+</script>
