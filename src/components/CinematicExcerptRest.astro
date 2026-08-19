@@ -1,14 +1,14 @@
 ---
 /**
  * CinematicExcerptRest
- * 
+ *
  * Franja negra de respiro visual con texto cinemático carácter a carácter.
- * 
+ *
  * Sintaxis del prop `text`:
  *   **palabra**   → blanco brillante (glow)
  *   [[letra]]     → dorado TGP (acento)
  *   texto normal  → blanco tenue
- * 
+ *
  * Ejemplo:
  *   text="El [[archivo]] que nunca cierra. **Constante expansión** epistémica."
  */
@@ -24,7 +24,7 @@ const {
 } = Astro.props;
 
 // ─── Tokenizador: segmentos con tipo ───────────────────────────────────────
-type SegType = 'normal' | 'glow' | 'accent';
+type SegType = "normal" | "glow" | "accent";
 type Seg = { text: string; type: SegType };
 
 const segments: Seg[] = [];
@@ -33,11 +33,11 @@ const segRegex = /\[\[(.*?)\]\]|\*\*(.*?)\*\*|([^[*]+)/g;
 let m: RegExpExecArray | null;
 while ((m = segRegex.exec(text)) !== null) {
   if (m[1] !== undefined) {
-    segments.push({ text: m[1], type: 'accent' });
+    segments.push({ text: m[1], type: "accent" });
   } else if (m[2] !== undefined) {
-    segments.push({ text: m[2], type: 'glow' });
+    segments.push({ text: m[2], type: "glow" });
   } else if (m[3] !== undefined) {
-    segments.push({ text: m[3], type: 'normal' });
+    segments.push({ text: m[3], type: "normal" });
   }
 }
 
@@ -46,7 +46,7 @@ type Char = { char: string; type: SegType; isSpace: boolean };
 const chars: Char[] = [];
 for (const seg of segments) {
   for (const ch of seg.text) {
-    chars.push({ char: ch, type: seg.type, isSpace: ch === ' ' });
+    chars.push({ char: ch, type: seg.type, isSpace: ch === " " });
   }
 }
 ---
@@ -60,19 +60,31 @@ for (const seg of segments) {
 
   {/* Texto centrado */}
   <div class="excerpt-content max-w-3xl mx-auto px-6 md:px-16 text-center">
-    <p class="excerpt-headline font-bold leading-[1.8] tracking-wide text-balance">
-      {chars.map((c, i) => (
-        c.isSpace
-          ? <span class="excerpt-char" data-i={i} aria-hidden="true">&nbsp;</span>
-          : <span
+    <p
+      class="excerpt-headline font-bold leading-[1.8] tracking-wide text-balance"
+    >
+      {
+        chars.map((c, i) =>
+          c.isSpace ? (
+            <span class="excerpt-char" data-i={i} aria-hidden="true">
+              &nbsp;
+            </span>
+          ) : (
+            <span
               class={[
-                'excerpt-char',
-                c.type === 'glow'   ? 'char-glow'   : '',
-                c.type === 'accent' ? 'char-accent'  : '',
-              ].filter(Boolean).join(' ')}
+                "excerpt-char",
+                c.type === "glow" ? "char-glow" : "",
+                c.type === "accent" ? "char-accent" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
               data-i={i}
-            >{c.char}</span>
-      ))}
+            >
+              {c.char}
+            </span>
+          ),
+        )
+      }
       {/* Cursor parpadeante — GSAP lo desvanece al terminar */}
       <span class="excerpt-cursor" aria-hidden="true">|</span>
     </p>
@@ -108,7 +120,7 @@ for (const seg of segments) {
 
   /* ── Accent letter: dorado TGP ── */
   .char-accent {
-    color: #C9A86C;        /* --ac-gold */
+    color: #c9a86c; /* --ac-gold */
     font-weight: 800;
     letter-spacing: 0.02em;
   }
@@ -123,8 +135,13 @@ for (const seg of segments) {
   }
 
   @keyframes cursor-blink {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0; }
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
   }
 
   /* Fallback sin JS: visible inmediato */
@@ -133,7 +150,9 @@ for (const seg of segments) {
       opacity: 1 !important;
       filter: none !important;
     }
-    .excerpt-cursor { display: none; }
+    .excerpt-cursor {
+      display: none;
+    }
   }
 </style>
 
@@ -146,143 +165,183 @@ for (const seg of segments) {
   let ctx: ReturnType<typeof gsap.context> | null = null;
 
   const initExcerpts = () => {
-    if (ctx) { ctx.revert(); ctx = null; }
+    if (ctx) {
+      ctx.revert();
+      ctx = null;
+    }
 
     ctx = gsap.context(() => {
       ScrollTrigger.refresh();
 
-      document.querySelectorAll<HTMLElement>('.cinematic-excerpt-rest').forEach((section) => {
-        const content = section.querySelector<HTMLElement>('.excerpt-content');
-        const chars   = Array.from(section.querySelectorAll<HTMLElement>('.excerpt-char'));
-        const cursor  = section.querySelector<HTMLElement>('.excerpt-cursor');
+      document
+        .querySelectorAll<HTMLElement>(".cinematic-excerpt-rest")
+        .forEach((section) => {
+          const content =
+            section.querySelector<HTMLElement>(".excerpt-content");
+          const chars = Array.from(
+            section.querySelectorAll<HTMLElement>(".excerpt-char"),
+          );
+          const cursor = section.querySelector<HTMLElement>(".excerpt-cursor");
 
-        if (!content || !chars.length) return;
+          if (!content || !chars.length) return;
 
-        // ── PARALLAX SUAVE (igual que antes) ───────────────────────────
-        gsap.fromTo(content,
-          { y: 45 },
-          {
-            y: -45,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: section,
-              start: 'top bottom',
-              end: 'bottom top',
-              scrub: 1,
-            },
-          }
-        );
-
-        // ── ESTADO INICIAL: todos invisibles y borrosos ─────────────────
-        gsap.set(chars, { opacity: 0, filter: 'blur(5px)', y: 3 });
-
-        // ── TRIGGER UNIFICADO: entrada + salida ─────────────────────────
-        let typed = false;
-
-        ScrollTrigger.create({
-          trigger: section,
-          start: 'top 78%',
-          end: 'bottom 15%',
-
-          onEnter: () => {
-            if (typed) {
-              // Si ya se animó, reaparece rápido (sin efecto typewriter)
-              gsap.to(chars, {
-                opacity: 1, filter: 'blur(0px)', y: 0,
-                duration: 0.4, ease: 'power2.out',
-                stagger: 0.008, overwrite: 'auto',
-              });
-              return;
-            }
-            typed = true;
-
-            // ── TYPEWRITER: carácter a carácter con blur y cursor ───────
-            // Stagger muy ajustado para efecto "máquina de escribir mágica"
-            const tl = gsap.timeline();
-
-            tl.to(chars, {
-              opacity: 1,
-              filter: 'blur(0px)',
-              y: 0,
-              duration: 0.55,
-              ease: 'power2.out',
-              stagger: {
-                each: 0.048, // ~48ms por carácter — velocidad de escritura
-                ease: 'none',
+          // ── PARALLAX SUAVE (igual que antes) ───────────────────────────
+          gsap.fromTo(
+            content,
+            { y: 45 },
+            {
+              y: -45,
+              ease: "none",
+              scrollTrigger: {
+                trigger: section,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 1,
               },
-            });
+            },
+          );
 
-            // Cursor: desaparece suavemente cuando termina de escribir
-            if (cursor) {
-              const totalDur = 0.048 * chars.length + 0.55;
-              tl.to(cursor, {
+          // ── ESTADO INICIAL: todos invisibles y borrosos ─────────────────
+          gsap.set(chars, { opacity: 0, filter: "blur(5px)", y: 3 });
+
+          // ── TRIGGER UNIFICADO: entrada + salida ─────────────────────────
+          let typed = false;
+
+          ScrollTrigger.create({
+            trigger: section,
+            start: "top 78%",
+            end: "bottom 15%",
+
+            onEnter: () => {
+              if (typed) {
+                // Si ya se animó, reaparece rápido (sin efecto typewriter)
+                gsap.to(chars, {
+                  opacity: 1,
+                  filter: "blur(0px)",
+                  y: 0,
+                  duration: 0.4,
+                  ease: "power2.out",
+                  stagger: 0.008,
+                  overwrite: "auto",
+                });
+                return;
+              }
+              typed = true;
+
+              // ── TYPEWRITER: carácter a carácter con blur y cursor ───────
+              // Stagger muy ajustado para efecto "máquina de escribir mágica"
+              const tl = gsap.timeline();
+
+              tl.to(chars, {
+                opacity: 1,
+                filter: "blur(0px)",
+                y: 0,
+                duration: 0.55,
+                ease: "power2.out",
+                stagger: {
+                  each: 0.048, // ~48ms por carácter — velocidad de escritura
+                  ease: "none",
+                },
+              });
+
+              // Cursor: desaparece suavemente cuando termina de escribir
+              if (cursor) {
+                const totalDur = 0.048 * chars.length + 0.55;
+                tl.to(
+                  cursor,
+                  {
+                    opacity: 0,
+                    duration: 0.6,
+                    ease: "power2.in",
+                  },
+                  `+=${totalDur * 0.4}`,
+                );
+              }
+
+              // ── GLOW PULSE en chars-glow (una sola vez) ──────────────────
+              const glowChars = Array.from(
+                section.querySelectorAll<HTMLElement>(".char-glow"),
+              );
+              if (glowChars.length > 0) {
+                const glowDelay = 0.048 * chars.length + 0.7;
+                tl.add(() => {
+                  gsap
+                    .timeline()
+                    .to(glowChars, {
+                      textShadow: "0 0 28px rgba(255,255,255,0.85)",
+                      filter: "brightness(1.3)",
+                      duration: 0.7,
+                      ease: "power2.out",
+                      stagger: 0.04,
+                    })
+                    .to(glowChars, {
+                      textShadow: "0 0 0px rgba(255,255,255,0)",
+                      filter: "brightness(1)",
+                      duration: 0.8,
+                      ease: "power2.inOut",
+                      stagger: 0.03,
+                    });
+                }, glowDelay);
+              }
+            },
+
+            onLeave: () => {
+              gsap.to(chars, {
                 opacity: 0,
-                duration: 0.6,
-                ease: 'power2.in',
-              }, `+=${totalDur * 0.4}`);
-            }
+                filter: "blur(4px)",
+                y: -18,
+                duration: 0.45,
+                ease: "power2.in",
+                stagger: { each: 0.015, from: "end" },
+                overwrite: "auto",
+              });
+            },
 
-            // ── GLOW PULSE en chars-glow (una sola vez) ──────────────────
-            const glowChars = Array.from(
-              section.querySelectorAll<HTMLElement>('.char-glow')
-            );
-            if (glowChars.length > 0) {
-              const glowDelay = 0.048 * chars.length + 0.7;
-              tl.add(() => {
-                gsap.timeline()
-                  .to(glowChars, {
-                    textShadow: '0 0 28px rgba(255,255,255,0.85)',
-                    filter: 'brightness(1.3)',
-                    duration: 0.7, ease: 'power2.out', stagger: 0.04,
-                  })
-                  .to(glowChars, {
-                    textShadow: '0 0 0px rgba(255,255,255,0)',
-                    filter: 'brightness(1)',
-                    duration: 0.8, ease: 'power2.inOut', stagger: 0.03,
-                  });
-              }, glowDelay);
-            }
-          },
+            onEnterBack: () => {
+              gsap.to(chars, {
+                opacity: 1,
+                filter: "blur(0px)",
+                y: 0,
+                duration: 0.35,
+                ease: "power2.out",
+                stagger: 0.008,
+                overwrite: "auto",
+              });
+            },
 
-          onLeave: () => {
-            gsap.to(chars, {
-              opacity: 0, filter: 'blur(4px)', y: -18,
-              duration: 0.45, ease: 'power2.in',
-              stagger: { each: 0.015, from: 'end' },
-              overwrite: 'auto',
-            });
-          },
-
-          onEnterBack: () => {
-            gsap.to(chars, {
-              opacity: 1, filter: 'blur(0px)', y: 0,
-              duration: 0.35, ease: 'power2.out',
-              stagger: 0.008, overwrite: 'auto',
-            });
-          },
-
-          onLeaveBack: () => {
-            gsap.to(chars, {
-              opacity: 0, filter: 'blur(4px)', y: 22,
-              duration: 0.35, ease: 'power2.in',
-              stagger: 0.01, overwrite: 'auto',
-            });
-          },
+            onLeaveBack: () => {
+              gsap.to(chars, {
+                opacity: 0,
+                filter: "blur(4px)",
+                y: 22,
+                duration: 0.35,
+                ease: "power2.in",
+                stagger: 0.01,
+                overwrite: "auto",
+              });
+            },
+          });
         });
-      });
     });
 
-    document.addEventListener('astro:before-swap', () => {
-      ctx?.revert(); ctx = null;
-    }, { once: true });
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        ctx?.revert();
+        ctx = null;
+      },
+      { once: true },
+    );
   };
 
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener("astro:page-load", () => {
     requestAnimationFrame(initExcerpts);
   });
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(initExcerpts));
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () =>
+      requestAnimationFrame(initExcerpts),
+    );
   } else {
     requestAnimationFrame(initExcerpts);
   }
