@@ -22,27 +22,47 @@ const {
   id = "excerpt-" + Math.random().toString(36).substring(2, 9),
 } = Astro.props;
 
-// ─── Tokenizador por palabras para evitar saltos de línea a mitad de palabra ───
+// ─── Tokenizador por palabras con soporte multipalabra para ** y [[ ]] ───
 const rawWords = text.trim().split(/\s+/);
-const wordsData = rawWords.map((word, wordIdx) => {
-  let type: 'normal' | 'glow' | 'accent' = 'normal';
-  let cleanWord = word;
+let currentMode: 'normal' | 'glow' | 'accent' = 'normal';
 
-  if (word.startsWith('**') && word.endsWith('**')) {
+const wordsData = rawWords.map((rawWord, wordIdx) => {
+  let word = rawWord;
+  let type: 'normal' | 'glow' | 'accent' = currentMode;
+
+  if (word.startsWith('**')) {
+    currentMode = 'glow';
     type = 'glow';
-    cleanWord = word.slice(2, -2);
-  } else if (word.startsWith('[[') && word.endsWith(']]')) {
+    word = word.slice(2);
+  } else if (word.startsWith('[[')) {
+    currentMode = 'accent';
     type = 'accent';
-    cleanWord = word.slice(2, -2);
-  } else {
-    // Si contiene marcas internas o intermedias
-    if (word.includes('**')) {
-      type = 'glow';
-      cleanWord = word.replace(/\*\*/g, '');
-    } else if (word.includes('[[')) {
-      type = 'accent';
-      cleanWord = word.replace(/\[\[/g, '').replace(/\]\]/g, '');
-    }
+    word = word.slice(2);
+  }
+
+  let endsGlow = false;
+  let endsAccent = false;
+
+  if (word.endsWith('**')) {
+    endsGlow = true;
+    word = word.slice(0, -2);
+  } else if (word.includes('**')) {
+    word = word.replace(/\*\*/g, '');
+    endsGlow = true;
+  }
+
+  if (word.endsWith(']]') || word.includes(']].') || word.includes(']],') || word.includes(']]:') || word.includes(']];')) {
+    endsAccent = true;
+    word = word.replace(/\]\]/g, '');
+  } else if (word.includes(']]')) {
+    word = word.replace(/\]\]/g, '');
+    endsAccent = true;
+  }
+
+  const cleanWord = word.replace(/\[\[/g, '').replace(/\]\]/g, '').replace(/\*\*/g, '');
+
+  if (endsGlow || endsAccent) {
+    currentMode = 'normal';
   }
 
   // Desglosar en caracteres
@@ -54,7 +74,7 @@ const wordsData = rawWords.map((word, wordIdx) => {
   return {
     chars,
     type,
-    original: word
+    original: rawWord
   };
 });
 ---

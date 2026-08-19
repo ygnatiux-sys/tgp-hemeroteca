@@ -4,7 +4,6 @@ import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import CinematicCollectionHero from '../../components/CinematicCollectionHero.astro';
 import Marquee from '../../components/Marquee.astro';
-import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import TypeMagic from '../../components/TypeMagic.astro';
 import PolvoDorado from '../../components/PolvoDorado.astro';
 
@@ -120,12 +119,6 @@ const sequences = createPremierSequences(resolvedEssays);
         <span class="text-[#EFEBE3]">{label}</span>
       </nav>
     </CinematicCollectionHero>
-
-    {/* ── RESPIRO VISUAL / EXCERPT DESCANSO ── */}
-    <CinematicExcerptRest 
-      text={`La memoria de [[${label}]]. **Rastros hermenéuticos** dejados en la piedra y el tiempo, aguardando que el espíritu los vuelva a nombrar.`}
-    />
-
 
     {/* ── TYPEMAGIC: dos párrafos narrativos con efecto condensación líquida ── */}
     <TypeMagic
