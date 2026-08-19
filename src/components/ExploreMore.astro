@@ -39,12 +39,12 @@ const secondB = exploreEssays[2] ?? null;
     {/* ── ENCABEZADO ── */}
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
       <div>
-        <span class="font-mono text-[9px] uppercase tracking-[0.45em] text-rust-orange block mb-1">[ Sigue Explorando ]</span>
+        <span class="font-metadata text-[9px] uppercase tracking-[0.45em] text-rust-orange block mb-1">[ Sigue Explorando ]</span>
         <h3 class="font-cinzel font-extrabold text-2xl sm:text-3xl md:text-4xl tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent">
           Continuar la Lectura
         </h3>
       </div>
-      <a href="/archivo" class="font-mono text-[9px] uppercase tracking-[0.3em] text-white/40 hover:text-rust-orange transition-colors shrink-0 pb-1">
+      <a href="/archivo" class="font-metadata text-[9px] uppercase tracking-[0.3em] text-white/40 hover:text-rust-orange transition-colors shrink-0 pb-1">
         Ver todo el Archivo →
       </a>
     </div>
@@ -69,14 +69,14 @@ const secondB = exploreEssays[2] ?? null;
               </div>
             ) : (
               <div class="relative overflow-hidden lg:w-[35%] shrink-0 bg-linear-to-br from-rust-orange/15 via-[#242424] to-[#151718] flex items-center justify-center p-8 border-b lg:border-b-0 lg:border-r border-white/5 min-h-40 lg:min-h-0">
-                <div class="font-mono text-[9px] uppercase tracking-[0.4em] text-rust-orange/50 text-center">
+                <div class="font-metadata text-[9px] uppercase tracking-[0.4em] text-rust-orange/50 text-center">
                   [ TGP Archivo ]
                 </div>
               </div>
             )}
             <div class="flex flex-col justify-between p-6 md:p-8 lg:p-9 flex-1 min-w-0">
               <div class="flex flex-col gap-3 md:gap-4">
-                <span class="font-mono text-[8.5px] uppercase tracking-[0.3em] text-rust-orange/75">
+                <span class="font-metadata text-[8.5px] uppercase tracking-[0.3em] text-rust-orange/75">
                   {formatCategory(lead.entry.category)}
                 </span>
                 <h4 class="font-cinzel font-bold text-xl sm:text-2xl md:text-3xl leading-tight group-hover:text-rust-orange/90 transition-colors duration-300">
@@ -91,18 +91,18 @@ const secondB = exploreEssays[2] ?? null;
               <div class="mt-6 pt-4 border-t border-white/5 flex items-center flex-wrap gap-3">
                 <a
                   href={`/papers/${lead.slug}`}
-                  class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#151718]/90 backdrop-blur-sm border border-white/10 text-[#E0E0E0]/80 font-mono font-bold text-[8.5px] tracking-[0.2em] uppercase rounded-lg hover:bg-rust-orange/10 hover:border-rust-orange/45 hover:text-rust-orange transition-all duration-300"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#151718]/90 backdrop-blur-sm border border-white/10 text-[#E0E0E0]/80 font-metadata font-bold text-[8.5px] tracking-[0.2em] uppercase rounded-lg hover:bg-rust-orange/10 hover:border-rust-orange/45 hover:text-rust-orange transition-all duration-300"
                 >
                   <span>Leer Dossier</span><span class="opacity-50 group-hover:translate-x-0.5 transition-transform">▸</span>
                 </a>
                 <a
                   href={`/hemeroteca/${lead.slug}`}
-                  class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-transparent border border-white/15 text-[#E0E0E0]/60 font-mono font-bold text-[8.5px] tracking-[0.2em] uppercase rounded-lg hover:bg-white/5 hover:border-rust-orange/40 hover:text-rust-orange transition-all duration-300"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-transparent border border-white/15 text-[#E0E0E0]/60 font-metadata font-bold text-[8.5px] tracking-[0.2em] uppercase rounded-lg hover:bg-white/5 hover:border-rust-orange/40 hover:text-rust-orange transition-all duration-300"
                 >
                   <span>Ver Hemeroteca</span><span class="opacity-50 group-hover:translate-x-0.5 transition-transform">▸</span>
                 </a>
                 {lead.entry.date && (
-                  <span class="font-mono text-[8px] uppercase tracking-[0.2em] text-white/25 ml-auto hidden sm:inline">{formatDate(lead.entry.date)}</span>
+                  <span class="font-metadata text-[8px] uppercase tracking-[0.2em] text-white/25 ml-auto hidden sm:inline">{formatDate(lead.entry.date)}</span>
                 )}
               </div>
             </div>
@@ -127,17 +127,17 @@ const secondB = exploreEssays[2] ?? null;
                 </div>
               ) : (
                 <div class="relative overflow-hidden aspect-video bg-linear-to-br from-rust-orange/10 via-[#1e1e1e] to-[#151718] flex items-center justify-center">
-                  <span class="font-mono text-[8px] uppercase tracking-[0.3em] text-rust-orange/40">[ TGP Archivo ]</span>
+                  <span class="font-metadata text-[8px] uppercase tracking-[0.3em] text-rust-orange/40">[ TGP Archivo ]</span>
                 </div>
               )}
               <div class="flex flex-col justify-between p-5 flex-1">
                 <div class="flex flex-col gap-2">
-                  <span class="font-mono text-[8px] uppercase tracking-[0.3em] text-rust-orange/65">{formatCategory(secondA.entry.category)}</span>
+                  <span class="font-metadata text-[8px] uppercase tracking-[0.3em] text-rust-orange/65">{formatCategory(secondA.entry.category)}</span>
                   <h4 class="font-cinzel font-bold text-base leading-snug group-hover:text-rust-orange/80 transition-colors line-clamp-2">
                     <a href={`/hemeroteca/${secondA.slug}`}>{secondA.entry.title}</a>
                   </h4>
                 </div>
-                <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between gap-2 font-mono text-[8px] uppercase tracking-[0.2em] flex-wrap">
+                <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between gap-2 font-metadata text-[8px] uppercase tracking-[0.2em] flex-wrap">
                   <a
                     href={`/papers/${secondA.slug}`}
                     class="inline-flex items-center gap-1 py-1 px-2.5 rounded-md bg-[#151718] border border-white/10 text-white/70 hover:text-rust-orange hover:border-rust-orange/40 transition-all"
@@ -170,17 +170,17 @@ const secondB = exploreEssays[2] ?? null;
                 </div>
               ) : (
                 <div class="relative overflow-hidden aspect-video bg-linear-to-br from-rust-orange/10 via-[#1e1e1e] to-[#151718] flex items-center justify-center">
-                  <span class="font-mono text-[8px] uppercase tracking-[0.3em] text-rust-orange/40">[ TGP Archivo ]</span>
+                  <span class="font-metadata text-[8px] uppercase tracking-[0.3em] text-rust-orange/40">[ TGP Archivo ]</span>
                 </div>
               )}
               <div class="flex flex-col justify-between p-5 flex-1">
                 <div class="flex flex-col gap-2">
-                  <span class="font-mono text-[8px] uppercase tracking-[0.3em] text-rust-orange/65">{formatCategory(secondB.entry.category)}</span>
+                  <span class="font-metadata text-[8px] uppercase tracking-[0.3em] text-rust-orange/65">{formatCategory(secondB.entry.category)}</span>
                   <h4 class="font-cinzel font-bold text-base leading-snug group-hover:text-rust-orange/80 transition-colors line-clamp-2">
                     <a href={`/hemeroteca/${secondB.slug}`}>{secondB.entry.title}</a>
                   </h4>
                 </div>
-                <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between gap-2 font-mono text-[8px] uppercase tracking-[0.2em] flex-wrap">
+                <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between gap-2 font-metadata text-[8px] uppercase tracking-[0.2em] flex-wrap">
                   <a
                     href={`/papers/${secondB.slug}`}
                     class="inline-flex items-center gap-1 py-1 px-2.5 rounded-md bg-[#151718] border border-white/10 text-white/70 hover:text-rust-orange hover:border-rust-orange/40 transition-all"
@@ -207,14 +207,14 @@ const secondB = exploreEssays[2] ?? null;
                   <path d="M588.67 296.36c0 163.67-131.78 296.35-294.33 296.35S0 460.03 0 296.36 131.78 0 294.34 0s294.33 132.69 294.33 296.36M911.56 296.36c0 154.06-65.89 279-147.17 279s-147.17-124.94-147.17-279 65.88-279 147.17-279 147.17 124.94 147.17 279M1043.63 296.36c0 138-20.88 249.88-46.64 249.88s-46.64-111.88-46.64-249.88 20.88-249.88 46.64-249.88 46.64 111.88 46.64 249.88"/>
                 </svg>
               </div>
-              <span class="font-mono text-[8px] uppercase tracking-[0.35em] text-[#C9A86C]">Edición Medium · TGP</span>
+              <span class="font-metadata text-[8px] uppercase tracking-[0.35em] text-[#C9A86C]">Edición Medium · TGP</span>
             </div>
 
             <div class="flex flex-col gap-1.5">
               <p class="font-serif italic text-[#FAFAF9]/90 text-sm leading-snug">
                 "Apoya la investigación epistémica en Medium"
               </p>
-              <p class="font-mono text-[8px] uppercase tracking-[0.2em] text-[#FAFAF9]/50 leading-relaxed">
+              <p class="font-metadata text-[8px] uppercase tracking-[0.2em] text-[#FAFAF9]/50 leading-relaxed">
                 Dossieres exclusivos &amp; publicaciones directas
               </p>
             </div>
@@ -223,7 +223,7 @@ const secondB = exploreEssays[2] ?? null;
               href="https://medium.com"
               target="_blank"
               rel="noopener noreferrer"
-              class="w-full px-4 py-2.5 bg-[#8C6D2F] border border-transparent text-[#FAFAF9] font-mono font-bold text-[8.5px] tracking-[0.2em] uppercase rounded-lg hover:bg-[#A38038] transition-all duration-300 text-center text-decoration-none block"
+              class="w-full px-4 py-2.5 bg-[#8C6D2F] border border-transparent text-[#FAFAF9] font-metadata font-bold text-[8.5px] tracking-[0.2em] uppercase rounded-lg hover:bg-[#A38038] transition-all duration-300 text-center text-decoration-none block"
             >
               Apoyar / Suscribirse en Medium ↗
             </a>

@@ -156,7 +156,7 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
             href={secondaryHref}
             target={isExternal ? "_blank" : undefined}
             rel={isExternal ? "noopener noreferrer" : undefined}
-            class="ch-cta-btn inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-[#151718]/90 md:backdrop-blur-sm border border-white/10 text-[#E0E0E0]/75 font-mono font-medium text-xs tracking-widest uppercase rounded-lg hover:bg-white/10 hover:border-white/30 hover:text-white transition-all duration-400 active:translate-y-0.5"
+            class="ch-cta-btn inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-[#151718]/90 md:backdrop-blur-sm border border-white/10 text-[#E0E0E0]/75 font-metadata font-medium text-xs tracking-widest uppercase rounded-lg hover:bg-white/10 hover:border-white/30 hover:text-white transition-all duration-400 active:translate-y-0.5"
           >
             <span>{secondaryLabel}</span>
             <span class="text-[10px] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">▸</span>
@@ -166,7 +166,7 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
 
       {/* Tags de Categorías Relacionadas (Debajo del H1/CTA) */}
       {/* F2: text-xs (12px WCAG) + text-white/70. F6: siempre visible, sin hover-reveal */}
-      <div class="flex flex-wrap items-center gap-6 mt-3 font-mono text-xs uppercase tracking-[0.4em] text-white/70 w-full justify-start">
+      <div class="flex flex-wrap items-center gap-6 mt-3 font-metadata text-xs uppercase tracking-[0.4em] text-white/70 w-full justify-start">
         {relatedTags.map((tag, idx) => (
           <>
             <span class="ch-tag">{tag}</span>

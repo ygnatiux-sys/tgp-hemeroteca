@@ -57,7 +57,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
       <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6 flex-wrap gap-4">
         <div className="flex items-center gap-3">
           <span className="w-2 h-2 rounded-full bg-[#EFEBE3]"></span>
-          <h3 className="font-mono text-xs uppercase tracking-[0.25em] text-white/90 font-semibold">
+          <h3 className="font-metadata text-xs uppercase tracking-[0.25em] text-white/90 font-semibold">
             Registro Visual & Documental ({images.length} {images.length === 1 ? 'lámina' : 'láminas'})
           </h3>
         </div>
@@ -66,7 +66,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
           <button
             type="button"
             onClick={() => setViewMode(viewMode === 'flipbook' ? 'grid' : 'flipbook')}
-            className="px-3 py-1.5 rounded-full border border-white/15 bg-white/5 hover:bg-white/10 text-white/80 font-mono text-[10px] uppercase tracking-wider transition-all duration-300 flex items-center gap-1.5"
+            className="px-3 py-1.5 rounded-full border border-white/15 bg-white/5 hover:bg-white/10 text-white/80 font-metadata text-[10px] uppercase tracking-wider transition-all duration-300 flex items-center gap-1.5"
             title="Alternar vista"
           >
             {viewMode === 'flipbook' ? 'Mosaico' : 'Visor Amplio'}
@@ -75,7 +75,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
           <button
             type="button"
             onClick={() => setIsZoomOpen(true)}
-            className="px-3.5 py-1.5 rounded-full border border-[#EFEBE3]/40 bg-[#EFEBE3]/10 hover:bg-[#EFEBE3]/20 text-[#EFEBE3] font-mono text-[10px] uppercase tracking-wider transition-all duration-300 flex items-center gap-1.5"
+            className="px-3.5 py-1.5 rounded-full border border-[#EFEBE3]/40 bg-[#EFEBE3]/10 hover:bg-[#EFEBE3]/20 text-[#EFEBE3] font-metadata text-[10px] uppercase tracking-wider transition-all duration-300 flex items-center gap-1.5"
             title="Ampliar a pantalla completa"
           >
             Pantalla Completa
@@ -106,7 +106,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
 
             {/* Badge de Posición / Página */}
             <div className="absolute top-4 left-4 z-20">
-              <span className="px-3 py-1 bg-black/80 backdrop-blur-md rounded-full border border-white/15 font-mono text-[9px] uppercase tracking-[0.2em] text-[#EFEBE3]">
+              <span className="px-3 py-1 bg-black/80 backdrop-blur-md rounded-full border border-white/15 font-metadata text-[9px] uppercase tracking-[0.2em] text-[#EFEBE3]">
                 REGISTRO {String(currentIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
               </span>
             </div>
@@ -160,7 +160,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
               )}
             </div>
 
-            <div className="flex flex-col md:items-end gap-1 font-mono text-[10px] text-white/50">
+            <div className="flex flex-col md:items-end gap-1 font-metadata text-[10px] text-white/50">
               {currentItem.author ? (
                 <span className="text-white/70">Atribución / Autor: {currentItem.author}</span>
               ) : null}
@@ -185,7 +185,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
                 title={`Ver registro #${idx + 1}: ${item.title}`}
               >
                 <img src={item.thumbUrl || item.url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
-                <span className="absolute bottom-0.5 right-1 px-1 rounded bg-black/80 font-mono text-[8px] text-white/80">
+                <span className="absolute bottom-0.5 right-1 px-1 rounded bg-black/80 font-metadata text-[8px] text-white/80">
                   {idx + 1}
                 </span>
               </button>
@@ -213,7 +213,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
                   loading="lazy"
                 />
-                <div className="absolute top-2 right-2 p-1.5 rounded-full bg-black/70 text-white font-mono text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-2 right-2 p-1.5 rounded-full bg-black/70 text-white font-metadata text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="11" cy="11" r="8" />
                     <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -224,7 +224,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
                 <h5 className="font-serif italic text-sm text-white/90 line-clamp-1 group-hover:text-[#EFEBE3] transition-colors">
                   {item.title}
                 </h5>
-                <div className="flex items-center justify-between font-mono text-[9px] text-white/40 uppercase">
+                <div className="flex items-center justify-between font-metadata text-[9px] text-white/40 uppercase">
                   <span>Lámina #{idx + 1}</span>
                   {item.author && <span className="truncate max-w-28 text-white/60">{item.author}</span>}
                 </div>
@@ -249,7 +249,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
             {/* Barra de Control Superior */}
             <div className="p-4 bg-black/70 border-b border-white/10 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <span className="px-2.5 py-0.5 rounded-full bg-[#EFEBE3]/20 border border-[#EFEBE3]/40 font-mono text-[10px] text-[#EFEBE3] uppercase tracking-wider">
+                <span className="px-2.5 py-0.5 rounded-full bg-[#EFEBE3]/20 border border-[#EFEBE3]/40 font-metadata text-[10px] text-[#EFEBE3] uppercase tracking-wider">
                   Lámina {currentIndex + 1} / {images.length}
                 </span>
                 <h4 className="font-serif italic text-sm text-white/90 truncate max-w-xs md:max-w-md">
@@ -262,7 +262,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
                   href={currentItem.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1 rounded bg-white/10 hover:bg-white/20 text-white/80 font-mono text-[10px] uppercase tracking-wider transition-colors"
+                  className="px-3 py-1 rounded bg-white/10 hover:bg-white/20 text-white/80 font-metadata text-[10px] uppercase tracking-wider transition-colors"
                   title="Abrir imagen original"
                 >
                   ↗ Original
@@ -306,7 +306,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
             </div>
 
             {/* Pie de Visor */}
-            <div className="p-4 bg-[#0a0a0e] border-t border-white/10 flex items-center justify-between text-xs font-mono text-white/60 flex-wrap gap-2">
+            <div className="p-4 bg-[#0a0a0e] border-t border-white/10 flex items-center justify-between text-xs font-metadata text-white/60 flex-wrap gap-2">
               <div>
                 {currentItem.author ? (
                   <span>Autor / Atribución: <span className="text-white/80">{currentItem.author}</span></span>

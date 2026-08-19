@@ -32,12 +32,12 @@ const resolvedCollections = collections.map(c => ({
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 md:mb-8">
       <div class="flex items-end justify-between gap-4">
         <div>
-          <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Explorar Archivo</span>
+          <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Explorar Archivo</span>
           <h2 class="text-xl sm:text-2xl md:text-3xl font-cinzel font-bold tracking-tight text-white/90">
             Colecciones Destacadas
           </h2>
         </div>
-        <a href="/archivo" class="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-rust-orange transition-colors shrink-0">
+        <a href="/archivo" class="font-metadata text-[9px] sm:text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-rust-orange transition-colors shrink-0">
           Ver todas <span class="hidden sm:inline">las categorías</span>
         </a>
       </div>
@@ -58,13 +58,13 @@ const resolvedCollections = collections.map(c => ({
                 <Image src={img} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
                 <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent" />
                 <div class="absolute bottom-0 left-0 p-4 md:p-5 w-full">
-                  <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-rust-orange mb-1">{count} artículos</p>
+                  <p class="font-metadata text-[9px] uppercase tracking-[0.3em] text-rust-orange mb-1">{count} artículos</p>
                   <h3 class="font-cinzel font-bold text-base md:text-lg leading-tight text-white group-hover/card:text-rust-orange transition-colors">{label}</h3>
                 </div>
               </div>
             ) : (
               <div class="p-5 flex flex-col justify-end gap-2 flex-1 min-h-35 md:min-h-47.5">
-                <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-rust-orange">{count} artículos</p>
+                <p class="font-metadata text-[9px] uppercase tracking-[0.3em] text-rust-orange">{count} artículos</p>
                 <h3 class="font-cinzel font-bold text-base md:text-lg leading-tight text-white group-hover/card:text-rust-orange transition-colors">{label}</h3>
               </div>
             )}
@@ -85,13 +85,13 @@ const resolvedCollections = collections.map(c => ({
                 <Image src={img} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
                 <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent" />
                 <div class="absolute bottom-0 left-0 p-4 md:p-5 w-full">
-                  <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-rust-orange mb-1">{count} artículos</p>
+                  <p class="font-metadata text-[9px] uppercase tracking-[0.3em] text-rust-orange mb-1">{count} artículos</p>
                   <h3 class="font-cinzel font-bold text-base md:text-lg leading-tight text-white group-hover/card:text-rust-orange transition-colors">{label}</h3>
                 </div>
               </div>
             ) : (
               <div class="p-5 flex flex-col justify-end gap-2 flex-1 min-h-35 md:min-h-47.5">
-                <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-rust-orange">{count} artículos</p>
+                <p class="font-metadata text-[9px] uppercase tracking-[0.3em] text-rust-orange">{count} artículos</p>
                 <h3 class="font-cinzel font-bold text-base md:text-lg leading-tight text-white group-hover/card:text-rust-orange transition-colors">{label}</h3>
               </div>
             )}

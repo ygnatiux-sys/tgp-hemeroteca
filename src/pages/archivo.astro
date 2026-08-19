@@ -163,7 +163,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
     subtitle="Análisis multidisciplinario de investigaciones"
     titleClass="text-6xl md:text-8xl gradient-general-h1 leading-[0.95] tracking-tighter"
   >
-    <div slot="meta" class="font-mono text-[10px] uppercase tracking-[0.3em] text-[#EFEBE3] font-bold">
+    <div slot="meta" class="font-metadata text-[10px] uppercase tracking-[0.3em] text-[#EFEBE3] font-bold">
       {publishable.length} DOSSIERS · {categories.length} CATEGORÍAS
     </div>
   </InteriorHero>
@@ -192,7 +192,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
           SISTEMA DE SOLAPAS PRINCIPALES (TABS MINIMALISTAS)
       ══════════════════════════════════════════════════════════════════ */}
       <div class="flex items-center justify-between gap-4 border-b border-white/5 pb-5">
-        <div class="flex items-center gap-2 sm:gap-3" role="tablist" aria-label="Modo de visualización del archivo">
+        <div class="flex items-center gap-6 sm:gap-8" role="tablist" aria-label="Modo de visualización del archivo">
           <button
             type="button"
             role="tab"
@@ -200,9 +200,8 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             aria-controls="view-categories"
             id="tab-btn-categories"
             data-main-tab="categories"
-            class="archive-main-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-rust-orange text-rust-orange bg-rust-orange/15 shadow-[0_0_18px_rgba(239, 235, 227,0.3)] font-bold cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
+            class="archive-main-tab-btn px-2 py-1 bg-transparent border-none text-[#EFEBE3] font-gloock text-[13px] md:text-[15px] tracking-wide cursor-pointer transition-all duration-300 flex items-center hover:text-white"
           >
-            <span class="tab-indicator w-2 h-2 rounded-full bg-rust-orange"></span>
             Por Categoría
           </button>
           
@@ -213,9 +212,8 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             aria-controls="view-years"
             id="tab-btn-years"
             data-main-tab="years"
-            class="archive-main-tab-btn font-mono text-[10px] md:text-[11px] uppercase tracking-[0.25em] px-4 md:px-5 py-2 rounded-lg border border-white/10 text-white/50 bg-white/3 hover:border-rust-orange/60 hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(239, 235, 227,0.25)] cursor-pointer transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5"
+            class="archive-main-tab-btn px-2 py-1 bg-transparent border-none text-white/50 font-metadata text-[10px] md:text-[11px] uppercase tracking-[0.25em] cursor-pointer transition-all duration-300 flex items-center hover:text-white/80"
           >
-            <span class="tab-indicator w-2 h-2 rounded-full bg-white/30"></span>
             Por Año
           </button>
         </div>
@@ -244,7 +242,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
               )}
               <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
               <div class="relative z-10 flex flex-col gap-1">
-                <span class="font-mono text-xs uppercase tracking-[0.25em] text-[#EFEBE3]/70 font-bold">
+                <span class="font-metadata text-xs uppercase tracking-[0.25em] text-[#EFEBE3]/70 font-bold">
                   {card.count} ARTÍCULO{card.count > 1 ? 'S' : ''} {card.yearLabel && `• ${card.yearLabel}`}
                 </span>
                 <h3 class="gradient-general-h2 text-lg md:text-xl uppercase group-hover:text-[#EFEBE3] transition-colors">
@@ -256,12 +254,12 @@ function createPremierSequences(essays: typeof resolvedEssays) {
         </div>
 
         {/* Barra de Filtros Unificada de Archivo (Categoría + Tema) */}
-        <div class="flex items-center gap-3 flex-wrap relative z-30 pb-3 border-b border-white/10">
+        <div class="flex items-center gap-4 flex-wrap relative z-30 pb-3 border-b border-white/5">
           {/* Botón TODAS */}
           <button
             type="button"
             data-cat-filter-btn="all"
-            class="cat-filter-btn font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 rounded-xl border border-transparent text-[#EFEBE3] bg-transparent hover:border-[#EFEBE3] hover:bg-white/5 cursor-pointer transition-all duration-300 font-bold"
+            class="cat-filter-btn font-metadata text-[9px] uppercase tracking-[0.2em] px-2 py-1 text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
           >
             TODAS LAS INVESTIGACIONES ({publishable.length})
           </button>
@@ -271,17 +269,17 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             <select
               id="cat-linter-select"
               aria-label="Seleccionar categoría o tema de investigación"
-              class="appearance-none font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 pr-9 rounded-xl border border-white/10 text-[#EFEBE3] bg-[#151718]/90 hover:bg-[#EFEBE3]/10 hover:border-[#EFEBE3] cursor-pointer transition-all duration-300 outline-none font-bold"
+              class="appearance-none font-metadata text-[9px] uppercase tracking-[0.2em] px-2 py-1 pr-6 border-none text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
             >
-              <option value="all" class="bg-[#0a0a0a] text-white">POR CATEGORÍA / TEMA ▾</option>
+              <option value="all" class="bg-[#0a0a0a] text-white/50">POR CATEGORÍA / TEMA</option>
               {categories.map(cat => (
                 <option value={cat} class="bg-[#151718] text-[#EFEBE3]">
                   • {formatCategory(cat).toUpperCase()}
                 </option>
               ))}
             </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#EFEBE3]">
-              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1 text-white/30">
+              <svg class="w-3 h-3 fill-current" viewBox="0 0 20 20">
                 <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
               </svg>
             </div>
@@ -289,124 +287,71 @@ function createPremierSequences(essays: typeof resolvedEssays) {
         </div>
 
         {/* Lista de Categorías con estructura cinemática: Post #1 Motor Cinemático Auto + 2 Amplias + Individuales 80/20 */}
+        {/* Lista de Categorías con estructura cinemática Premier Unificada */}
         <section class="flex flex-col gap-16 md:gap-24" id="archive-list">
           {essaysByCategory.map(group => {
-            const slideBatch = mapToSlideData(group.essays);
-            const secondA = group.essays[1] ?? null;
-            const secondB = group.essays[2] ?? null;
-            const remainingEssays = group.essays.slice(3);
+            const premierSequences = createPremierSequences(group.essays);
 
             return (
               <div class="category-block flex flex-col gap-8" data-category-group={group.catKey}>
                 {/* Barra Editorial de Categoría */}
                 <div class="editorial-bar flex items-center justify-between pb-2 border-b border-white/10">
                   <div class="flex items-center gap-3">
-                    <span class="w-2 h-2 rounded-full bg-rust-orange shadow-[0_0_8px_#EFEBE3]" />
                     <h2 class="gradient-general-h2 text-xl md:text-2xl">
                       • {group.catLabel.toUpperCase()}
                     </h2>
                   </div>
-                  <span class="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40">
+                  <span class="font-metadata text-[9px] uppercase tracking-[0.25em] text-white/40">
                     {group.essays.length} DOSSIERES EN CATEGORÍA
                   </span>
                 </div>
 
-                {/* 1. Header Motor Cinemático (CinematicPostEngine.astro): Auto-batch de la Categoría */}
-                <div class="w-full card-hover-cinematic overflow-hidden rounded-2xl md:rounded-3xl border border-white/8 shadow-2xl">
-                  <CinematicPostEngine
-                    slides={slideBatch}
-                    heightClass="h-[400px] sm:h-[460px] md:h-[500px]"
-                  />
+                {/* Secuencias Cinematográficas Premier: 1 Hero Full Bleed + Dúo 60/40 */}
+                <div class="flex flex-col gap-12 md:gap-16">
+                  {premierSequences.map((seq) => (
+                    <div class="premier-sequence flex flex-col gap-6 md:gap-8">
+                      {/* 1. Hero Cinemático Full Bleed */}
+                      <div class="w-full">
+                        <CinematicArchiveCard
+                          slug={seq.hero.slug}
+                          entry={seq.hero.entry}
+                          img={seq.hero.img}
+                          variant="hero"
+                          enableCinemagraph={true}
+                        />
+                      </div>
+
+                      {/* 2. Dúo 60/40 */}
+                      {seq.duo.length > 0 && (
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+                          {seq.duo[0] && (
+                            <div class={seq.duo.length > 1 ? "lg:col-span-7 flex flex-col" : "lg:col-span-12 flex flex-col"}>
+                              <CinematicArchiveCard
+                                slug={seq.duo[0].slug}
+                                entry={seq.duo[0].entry}
+                                img={seq.duo[0].img}
+                                variant={seq.duo.length > 1 ? "duo-60" : "hero"}
+                                enableCinemagraph={true}
+                              />
+                            </div>
+                          )}
+
+                          {seq.duo[1] && (
+                            <div class="lg:col-span-5 flex flex-col">
+                              <CinematicArchiveCard
+                                slug={seq.duo[1].slug}
+                                entry={seq.duo[1].entry}
+                                img={seq.duo[1].img}
+                                variant="duo-40"
+                                enableCinemagraph={true}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-
-                {/* 2. Dos Cards Debajo También Amplias (Grid 2 Columnas) */}
-                {(secondA || secondB) && (
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                    {[secondA, secondB].filter(Boolean).map(e => e && (
-                      <article class="card-hover-cinematic group relative overflow-hidden rounded-2xl border border-white/8 bg-[#151718]/90 flex flex-col justify-between min-h-85 md:min-h-95">
-                        {e.img && (
-                          <div class="relative overflow-hidden aspect-video md:aspect-16/10 w-full shrink-0">
-                            <img
-                              src={(e.img as any)?.src ?? e.img}
-                              alt={e.entry.title || 'Dossier'}
-                              class="w-full h-full object-cover transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-85"
-                              loading="lazy"
-                              decoding="async"
-                            />
-                            <div class="absolute inset-0 bg-linear-to-t from-[#151718]/90 via-transparent to-transparent pointer-events-none" />
-                          </div>
-                        )}
-                        <div class="flex flex-col justify-between p-6 flex-1">
-                          <div class="flex flex-col gap-2">
-                            <span class="font-mono text-xs uppercase tracking-[0.3em] text-white/70 font-bold">
-                              {e.entry.category}
-                            </span>
-                            <h3 class="font-cinzel font-bold text-xl md:text-2xl leading-snug text-white group-hover:text-[#EFEBE3] transition-colors line-clamp-2">
-                              <a href={`/papers/${e.slug}`} class="gradient-metal-steel-card">{e.entry.title}</a>
-                            </h3>
-                            {e.entry.excerpt && (
-                              <p class="font-serif italic text-white/60 text-xs md:text-sm line-clamp-2 mt-1">
-                                "{e.entry.excerpt}"
-                              </p>
-                            )}
-                          </div>
-                          <div class="mt-5 pt-3 border-t border-white/5 flex items-center justify-between">
-                            <a
-                              href={`/papers/${e.slug}`}
-                              class="inline-flex items-center gap-2 px-4 py-2 bg-[#1A1C1D]/90 border border-white/10 text-[#E0E0E0]/75 font-mono font-bold text-[8.5px] tracking-[0.25em] uppercase rounded-lg hover:bg-[#EFEBE3]/10 hover:border-[#EFEBE3]/45 hover:text-[#EFEBE3] transition-all"
-                            >
-                              <span>VER REGISTRO</span>
-                              <span>▸</span>
-                            </a>
-                          </div>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                )}
-
-                {/* 3. Posts Individuales Restantes (#4, #5, etc.): Proporción Uniforme 80/20 */}
-                {remainingEssays.length > 0 && (
-                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-2">
-                    {remainingEssays.map(e => (
-                      <article class="card-hover-cinematic group relative overflow-hidden rounded-2xl border border-white/8 bg-[#151718]/80 flex flex-col justify-between">
-                        {/* 80% Viewport Imagen */}
-                        {e.img && (
-                          <div class="relative overflow-hidden aspect-video md:aspect-16/10 w-full shrink-0">
-                            <img
-                              src={(e.img as any)?.src ?? e.img}
-                              alt={e.entry.title || 'Dossier'}
-                              class="w-full h-full object-cover transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-85"
-                              loading="lazy"
-                              decoding="async"
-                            />
-                            <div class="absolute inset-0 bg-linear-to-t from-[#151718]/80 via-transparent to-transparent pointer-events-none" />
-                          </div>
-                        )}
-                        {/* 20% Contenido Metadata */}
-                        <div class="flex flex-col justify-between p-5 md:p-6 flex-1">
-                          <div class="flex flex-col gap-2">
-                            <span class="font-mono text-xs uppercase tracking-[0.3em] text-white/70 font-bold">
-                              {e.entry.category}
-                            </span>
-                            <h4 class="font-cinzel font-bold text-lg md:text-xl leading-snug text-white group-hover:text-[#EFEBE3] transition-colors line-clamp-2">
-                              <a href={`/papers/${e.slug}`} class="gradient-metal-steel-card">{e.entry.title}</a>
-                            </h4>
-                          </div>
-                          <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
-                            <a
-                              href={`/papers/${e.slug}`}
-                              class="font-mono text-[8.5px] uppercase tracking-[0.25em] text-white/50 hover:text-[#EFEBE3] transition-colors flex items-center gap-1"
-                            >
-                              <span>VER REGISTRO</span>
-                              <span>▸</span>
-                            </a>
-                          </div>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                )}
               </div>
             );
           })}
@@ -420,32 +365,32 @@ function createPremierSequences(essays: typeof resolvedEssays) {
         <div id="view-years" role="tabpanel" aria-labelledby="tab-btn-years" class="archive-view-panel hidden flex-col gap-10">
           
           {/* Cabecera y Filtros de Año */}
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/10">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/5">
             {/* Desplegable Linter Selector de Años */}
-            <div class="flex items-center gap-3 flex-wrap">
+            <div class="flex items-center gap-4 flex-wrap">
               <button
                 type="button"
                 data-year-filter-btn="all"
-                class="year-filter-btn font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 rounded-xl border border-transparent text-white/60 bg-transparent hover:border-rust-orange hover:text-white hover:bg-white/10 hover:shadow-[0_0_14px_rgba(239, 235, 227,0.3)] cursor-pointer transition-all duration-300"
+                class="year-filter-btn font-metadata text-[9px] uppercase tracking-[0.2em] px-2 py-1 text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
               >
-                Todos los Años
+                TODOS LOS AÑOS ({publishable.length})
               </button>
 
               <div class="relative inline-block text-left">
                 <select
                   id="year-linter-select"
                   aria-label="Seleccionar año de archivo"
-                  class="appearance-none font-mono text-[9.5px] uppercase tracking-[0.2em] px-4 py-2 pr-9 rounded-xl border border-transparent text-rust-orange bg-transparent hover:bg-white/10 hover:border-rust-orange hover:shadow-[0_0_16px_rgba(239, 235, 227,0.35)] cursor-pointer transition-all duration-300 outline-none font-bold"
+                  class="appearance-none font-metadata text-[9px] uppercase tracking-[0.2em] px-2 py-1 pr-6 border-none text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
                 >
-                  <option value="all" class="bg-[#0a0a0a] text-white">AÑOS ▾</option>
+                  <option value="all" class="bg-[#0a0a0a] text-white/50">POR AÑO</option>
                   {years.map(year => (
-                    <option value={year} class="bg-(--bg-main) text-rust-orange">
+                    <option value={year} class="bg-[#151718] text-[#EFEBE3]">
                       • AÑO {year}
                     </option>
                   ))}
                 </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-rust-orange">
-                  <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1 text-white/30">
+                  <svg class="w-3 h-3 fill-current" viewBox="0 0 20 20">
                     <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                   </svg>
                 </div>
@@ -464,9 +409,8 @@ function createPremierSequences(essays: typeof resolvedEssays) {
               return (
                 <div class="archive-year-cinematic-group flex flex-col gap-10 md:gap-14" data-year-group={year}>
                   {/* Divisor de Año Editorial con Amplio Tracking y Espacio Negativo */}
-                  <div class="flex items-center justify-between border-b border-rust-orange/20 pb-4 pt-2">
-                    <div class="flex items-center gap-3.5">
-                      <span class="w-2 h-2 rounded-full bg-rust-orange shadow-[0_0_8px_#EFEBE3]" />
+                  <div class="flex items-center justify-between border-b border-white/10 pb-4 pt-2">
+                    <div class="flex items-center gap-3">
                       <h2 class="gradient-general-h2 text-2xl md:text-3xl">
                         AÑO {year}
                       </h2>
@@ -544,32 +488,23 @@ function createPremierSequences(essays: typeof resolvedEssays) {
       const yearFilterButtons = document.querySelectorAll<HTMLButtonElement>('.year-filter-btn');
       const yearGroups = document.querySelectorAll<HTMLElement>('.archive-year-cinematic-group');
 
-      const activeBtnClasses = ['border-[#EFEBE3]', 'text-[#EFEBE3]', 'bg-[#EFEBE3]/15', 'shadow-[0_0_18px_rgba(239, 235, 227,0.3)]', 'font-bold'];
-      const inactiveBtnClasses = ['border-white/10', 'text-white/50', 'bg-white/3'];
+      const activeBtnClasses = ['text-[#EFEBE3]', 'font-gloock', 'text-[13px]', 'md:text-[15px]', 'tracking-wide', 'normal-case'];
+      const inactiveBtnClasses = ['text-white/50', 'font-metadata', 'text-[10px]', 'md:text-[11px]', 'uppercase', 'tracking-[0.25em]'];
 
       // Función para cambiar de solapa principal
       const switchTab = (tabName: 'categories' | 'years') => {
         tabButtons.forEach(btn => {
           const target = btn.getAttribute('data-main-tab');
-          const indicator = btn.querySelector('.tab-indicator');
           const isActive = target === tabName;
 
           if (isActive) {
             btn.classList.remove(...inactiveBtnClasses);
             btn.classList.add(...activeBtnClasses);
             btn.setAttribute('aria-selected', 'true');
-            if (indicator) {
-              indicator.classList.remove('bg-white/30');
-              indicator.classList.add('bg-[#EFEBE3]');
-            }
           } else {
             btn.classList.remove(...activeBtnClasses);
             btn.classList.add(...inactiveBtnClasses);
             btn.setAttribute('aria-selected', 'false');
-            if (indicator) {
-              indicator.classList.remove('bg-[#EFEBE3]');
-              indicator.classList.add('bg-white/30');
-            }
           }
         });
 

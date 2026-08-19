@@ -171,14 +171,14 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
       {/* CABECERA DEL MOTOR */}
       <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-5">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full border border-amber-500/40 bg-amber-500/10 flex items-center justify-center text-amber-400 font-mono text-sm font-bold shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+          <div className="w-9 h-9 rounded-full border border-amber-500/40 bg-amber-500/10 flex items-center justify-center text-amber-400 font-metadata text-sm font-bold shadow-[0_0_15px_rgba(245,158,11,0.2)]">
             🔮
           </div>
           <div>
-            <h3 className="text-sm font-mono uppercase tracking-[0.2em] text-amber-400 font-bold">
+            <h3 className="text-sm font-metadata uppercase tracking-[0.2em] text-amber-400 font-bold">
               Motor de Arquetipos Globales TGP
             </h3>
-            <p className="text-[11px] text-white/40 font-mono">
+            <p className="text-[11px] text-white/40 font-metadata">
               Generación de informe de 10 fases (Gemini 3.1 Pro · 3 Niveles Históricos · Sin visuales)
             </p>
           </div>
@@ -187,7 +187,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
         <button
           type="button"
           onClick={handleLimpiarLienzo}
-          className="px-3 py-1 bg-white/5 hover:bg-red-500/20 text-white/50 hover:text-red-300 rounded border border-white/10 text-xs font-mono transition-all cursor-pointer"
+          className="px-3 py-1 bg-white/5 hover:bg-red-500/20 text-white/50 hover:text-red-300 rounded border border-white/10 text-xs font-metadata transition-all cursor-pointer"
         >
           Limpiar Lienzo
         </button>
@@ -195,7 +195,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
 
       {/* INPUT DE TÍTULO / SUJETO ARQUETÍPICO */}
       <div className="mb-5">
-        <label className="block text-xs font-mono uppercase tracking-wider text-stone-400 mb-2">
+        <label className="block text-xs font-metadata uppercase tracking-wider text-stone-400 mb-2">
           Título o Sujeto del Arquetipo
         </label>
         <div className="flex gap-3">
@@ -213,7 +213,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
               if (detected) setTitulo(detected);
               else alert('No se detectó un título en el formulario de arriba.');
             }}
-            className="px-3 py-2.5 bg-white/10 hover:bg-white/15 text-stone-300 rounded-lg font-mono text-xs uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap"
+            className="px-3 py-2.5 bg-white/10 hover:bg-white/15 text-stone-300 rounded-lg font-metadata text-xs uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap"
           >
             Detectar Título
           </button>
@@ -226,7 +226,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
           type="button"
           disabled={isGenerating}
           onClick={handleGenerarArquetipo}
-          className={`w-full py-4 px-6 rounded-xl font-mono text-xs uppercase tracking-[0.2em] font-bold transition-all shadow-xl flex items-center justify-center gap-3 cursor-pointer ${
+          className={`w-full py-4 px-6 rounded-xl font-metadata text-xs uppercase tracking-[0.2em] font-bold transition-all shadow-xl flex items-center justify-center gap-3 cursor-pointer ${
             isGenerating
               ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse'
               : 'bg-linear-to-r from-amber-900 via-amber-800 to-amber-600 hover:from-amber-800 hover:to-amber-500 text-white border border-amber-400/40 hover:shadow-[0_0_20px_rgba(245,158,11,0.3)]'
@@ -246,7 +246,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
       </div>
 
       {errorMsg && (
-        <div className="p-3.5 mb-5 bg-red-950/60 border border-red-500/30 rounded-lg text-red-300 text-xs font-mono">
+        <div className="p-3.5 mb-5 bg-red-950/60 border border-red-500/30 rounded-lg text-red-300 text-xs font-metadata">
           {errorMsg}
         </div>
       )}
@@ -256,14 +256,14 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
         <div className="space-y-4 pt-4 border-t border-white/10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
+              <span className="text-xs font-metadata uppercase tracking-wider text-amber-400 font-bold">
                 Lienzo de Output & Previsualización
               </span>
               <div className="flex bg-black/40 p-0.5 rounded-lg border border-white/10">
                 <button
                   type="button"
                   onClick={() => setActiveTab('preview')}
-                  className={`px-2.5 py-1 rounded text-[10px] font-mono uppercase tracking-wider transition-all ${
+                  className={`px-2.5 py-1 rounded text-[10px] font-metadata uppercase tracking-wider transition-all ${
                     activeTab === 'preview' ? 'bg-amber-500/30 text-amber-300 font-bold' : 'text-white/40 hover:text-white'
                   }`}
                 >
@@ -272,7 +272,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
                 <button
                   type="button"
                   onClick={() => setActiveTab('raw')}
-                  className={`px-2.5 py-1 rounded text-[10px] font-mono uppercase tracking-wider transition-all ${
+                  className={`px-2.5 py-1 rounded text-[10px] font-metadata uppercase tracking-wider transition-all ${
                     activeTab === 'raw' ? 'bg-amber-500/30 text-amber-300 font-bold' : 'text-white/40 hover:text-white'
                   }`}
                 >
@@ -284,7 +284,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
             <button
               type="button"
               onClick={() => syncFieldsToKeystaticDOM(volantaIA, categoryIA, excerptIA)}
-              className="px-3 py-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 rounded text-xs font-mono transition-all cursor-pointer shadow-sm"
+              className="px-3 py-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 rounded text-xs font-metadata transition-all cursor-pointer shadow-sm"
             >
               Traspasar Todo a Keystatic
             </button>
@@ -292,16 +292,16 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
 
           {volantaIA && (
             <div className="p-3 bg-black/40 border border-white/10 rounded-lg">
-              <span className="block text-[10px] font-mono uppercase tracking-wider text-white/40 mb-1">
+              <span className="block text-[10px] font-metadata uppercase tracking-wider text-white/40 mb-1">
                 Volanta Sugerida
               </span>
-              <p className="font-mono text-xs text-amber-300 font-bold">{volantaIA}</p>
+              <p className="font-metadata text-xs text-amber-300 font-bold">{volantaIA}</p>
             </div>
           )}
 
           {excerptIA && (
             <div className="p-3 bg-black/40 border border-white/10 rounded-lg">
-              <span className="block text-[10px] font-mono uppercase tracking-wider text-white/40 mb-1">
+              <span className="block text-[10px] font-metadata uppercase tracking-wider text-white/40 mb-1">
                 Excerpt / Sinopsis Sugerida (2-4 Renglones)
               </span>
               <p className="font-serif italic text-xs text-stone-300 leading-relaxed">{excerptIA}</p>
@@ -313,7 +313,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
             <div className="border border-white/15 rounded-xl bg-[#0e0f0e] p-5 shadow-inner">
               {activeTab === 'preview' ? (
                 <div className="prose prose-invert max-w-none space-y-4 font-serif text-sm text-stone-300 leading-relaxed">
-                  <div className="p-3 bg-amber-500/10 border-l-2 border-amber-500 text-amber-200 text-xs font-mono mb-4">
+                  <div className="p-3 bg-amber-500/10 border-l-2 border-amber-500 text-amber-200 text-xs font-metadata mb-4">
                     <strong>Informe Arquetípico Generado:</strong> {informe.length} caracteres · 10 Fases Historiográficas
                   </div>
                   <div className="whitespace-pre-wrap font-sans text-stone-300 text-xs md:text-sm leading-relaxed">
@@ -321,7 +321,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
                   </div>
                 </div>
               ) : (
-                <div className="p-4 bg-black/60 border border-white/10 rounded-lg max-h-96 overflow-y-auto font-mono text-xs text-stone-300 leading-relaxed whitespace-pre-wrap">
+                <div className="p-4 bg-black/60 border border-white/10 rounded-lg max-h-96 overflow-y-auto font-metadata text-xs text-stone-300 leading-relaxed whitespace-pre-wrap">
                   {informe}
                 </div>
               )}

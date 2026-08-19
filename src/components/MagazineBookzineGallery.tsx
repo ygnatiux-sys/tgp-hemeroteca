@@ -110,14 +110,14 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#EFEBE3] shadow-[0_0_10px_rgba(239, 235, 227,0.8)] animate-pulse"></span>
-                <span className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.35em] text-[#EFEBE3] font-bold">
+                <span className="font-metadata text-[10px] sm:text-xs uppercase tracking-[0.35em] text-[#EFEBE3] font-bold">
                   MAGAZINEBOOK · DOSSIER VISUAL DE ARCHIVO
                 </span>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-light text-stone-100 tracking-tight">
                 {title || 'Colección Iconográfica & Documental'}
               </h2>
-              <p className="font-mono text-[11px] text-white/40 mt-1 uppercase tracking-widest">
+              <p className="font-metadata text-[11px] text-white/40 mt-1 uppercase tracking-widest">
                 {images.length} Registros en Alta Definición · Wikimedia Commons & Patrimonio Histórico
               </p>
             </div>
@@ -127,7 +127,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`px-4 py-2 rounded-full border font-mono text-[10px] uppercase tracking-widest transition-all cursor-pointer flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-full border font-metadata text-[10px] uppercase tracking-widest transition-all cursor-pointer flex items-center gap-2 ${
                   viewMode === 'grid'
                     ? 'border-[#EFEBE3] bg-[#EFEBE3]/20 text-[#EFEBE3] font-bold shadow-[0_0_15px_rgba(239, 235, 227,0.2)]'
                     : 'border-white/15 bg-white/5 hover:bg-white/10 text-white/70'
@@ -145,7 +145,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
               <button
                 type="button"
                 onClick={() => setViewMode('bookzine')}
-                className={`px-4 py-2 rounded-full border font-mono text-[10px] uppercase tracking-widest transition-all cursor-pointer flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-full border font-metadata text-[10px] uppercase tracking-widest transition-all cursor-pointer flex items-center gap-2 ${
                   viewMode === 'bookzine'
                     ? 'border-[#EFEBE3] bg-[#EFEBE3]/20 text-[#EFEBE3] font-bold shadow-[0_0_15px_rgba(239, 235, 227,0.2)]'
                     : 'border-white/15 bg-white/5 hover:bg-white/10 text-white/70'
@@ -182,7 +182,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                     />
                     
                     {/* Badge de Lámina */}
-                    <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/80 backdrop-blur-md rounded-md border border-white/15 font-mono text-[9px] text-[#EFEBE3] font-bold">
+                    <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/80 backdrop-blur-md rounded-md border border-white/15 font-metadata text-[9px] text-[#EFEBE3] font-bold">
                       #{String(idx + 1).padStart(2, '0')}
                     </div>
 
@@ -211,7 +211,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                       )}
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between font-mono text-[9px] text-white/40">
+                    <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between font-metadata text-[9px] text-white/40">
                       <span className="truncate max-w-35">{item.author || 'Wikimedia Commons'}</span>
                       <span className="text-[#EFEBE3]/70 font-semibold">{item.license || 'Public Domain'}</span>
                     </div>
@@ -265,7 +265,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                       e.stopPropagation();
                       setIsLightboxOpen(true);
                     }}
-                    className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md text-[#EFEBE3] hover:bg-[#EFEBE3] hover:text-black border border-white/20 font-mono text-[9px] uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
+                    className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md text-[#EFEBE3] hover:bg-[#EFEBE3] hover:text-black border border-white/20 font-metadata text-[9px] uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <circle cx="11" cy="11" r="8" />
@@ -279,7 +279,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                 <div className="lg:col-span-4 flex flex-col justify-between h-full space-y-6">
                   <div>
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="px-3 py-1 bg-[#EFEBE3]/10 border border-[#EFEBE3]/30 rounded-full font-mono text-[9px] uppercase tracking-[0.2em] text-[#EFEBE3] font-bold">
+                      <span className="px-3 py-1 bg-[#EFEBE3]/10 border border-[#EFEBE3]/30 rounded-full font-metadata text-[9px] uppercase tracking-[0.2em] text-[#EFEBE3] font-bold">
                         LÁMINA {String(currentIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
                       </span>
                     </div>
@@ -295,7 +295,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                     )}
                   </div>
 
-                  <div className="p-4 bg-white/5 border border-white/10 rounded-xl font-mono text-[10px] space-y-2 text-white/60">
+                  <div className="p-4 bg-white/5 border border-white/10 rounded-xl font-metadata text-[10px] space-y-2 text-white/60">
                     <div className="flex justify-between border-b border-white/5 pb-1">
                       <span className="text-white/40 uppercase">Autor / Fuente:</span>
                       <span className="text-stone-200 font-semibold truncate max-w-40">{currentItem.author || 'Wikimedia Commons'}</span>
@@ -353,7 +353,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
           {/* Barra Superior de Herramientas del Lightbox */}
           <div className="w-full max-w-7xl flex items-center justify-between border-b border-white/10 pb-4 z-20">
             <div className="flex items-center gap-3">
-              <span className="font-mono text-xs text-[#EFEBE3] font-bold tracking-widest">
+              <span className="font-metadata text-xs text-[#EFEBE3] font-bold tracking-widest">
                 LÁMINA {String(currentIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
               </span>
               <span className="text-white/30">|</span>
@@ -368,13 +368,13 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                 type="button"
                 onClick={handleZoomOut}
                 disabled={zoomLevel <= 1}
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center font-mono text-base font-bold transition-all cursor-pointer"
+                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center font-metadata text-base font-bold transition-all cursor-pointer"
                 title="Alejar (-)"
               >
                 −
               </button>
 
-              <span className="font-mono text-xs text-white/80 w-12 text-center">
+              <span className="font-metadata text-xs text-white/80 w-12 text-center">
                 {Math.round(zoomLevel * 100)}%
               </span>
 
@@ -382,7 +382,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                 type="button"
                 onClick={handleZoomIn}
                 disabled={zoomLevel >= 4}
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center font-mono text-base font-bold transition-all cursor-pointer"
+                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center font-metadata text-base font-bold transition-all cursor-pointer"
                 title="Acercar (+)"
               >
                 +
@@ -391,7 +391,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
               <button
                 type="button"
                 onClick={handleZoom100}
-                className="px-3 py-1.5 rounded-full bg-[#EFEBE3]/20 hover:bg-[#EFEBE3]/30 border border-[#EFEBE3]/40 text-[#EFEBE3] font-mono text-[10px] uppercase tracking-wider transition-all cursor-pointer ml-1"
+                className="px-3 py-1.5 rounded-full bg-[#EFEBE3]/20 hover:bg-[#EFEBE3]/30 border border-[#EFEBE3]/40 text-[#EFEBE3] font-metadata text-[10px] uppercase tracking-wider transition-all cursor-pointer ml-1"
                 title="Alternar escala 1:1"
               >
                 {zoomLevel > 1 ? 'Reset (1x)' : '100% HD'}
@@ -401,7 +401,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                 href={currentItem.url || currentItem.thumbUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-mono text-[10px] uppercase tracking-wider transition-all hidden md:flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-metadata text-[10px] uppercase tracking-wider transition-all hidden md:flex items-center gap-1.5"
                 title="Abrir imagen original sin compresión"
               >
                 <span>Original Wiki</span>
@@ -415,7 +415,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
               <button
                 type="button"
                 onClick={() => setIsLightboxOpen(false)}
-                className="w-9 h-9 rounded-full bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 flex items-center justify-center font-mono text-sm font-bold transition-all cursor-pointer ml-2"
+                className="w-9 h-9 rounded-full bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 flex items-center justify-center font-metadata text-sm font-bold transition-all cursor-pointer ml-2"
                 title="Cerrar (Esc)"
               >
                 ✕
@@ -466,7 +466,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
           {/* Pie Informativo de Pantalla Completa */}
           <div className="w-full max-w-5xl text-center border-t border-white/10 pt-3 z-20">
             <h4 className="font-serif text-base text-stone-100 font-semibold">{currentItem.title}</h4>
-            <p className="font-mono text-[10px] text-white/50 mt-1">
+            <p className="font-metadata text-[10px] text-white/50 mt-1">
               {currentItem.author || 'Wikimedia Commons'} · {currentItem.license || 'Licencia Libre'}
               {currentItem.width && currentItem.height && ` · ${currentItem.width} × ${currentItem.height} px`}
             </p>

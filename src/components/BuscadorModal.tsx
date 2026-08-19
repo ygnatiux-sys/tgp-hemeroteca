@@ -121,7 +121,7 @@ export function BuscadorModal() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar ensayo..."
-          className={`transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] bg-transparent border-b border-black/20 dark:border-white/20 outline-none text-[13px] font-mono tracking-widest uppercase placeholder:text-black/30 dark:placeholder:text-white/30 text-current ${
+          className={`transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] bg-transparent border-b border-black/20 dark:border-white/20 outline-none text-[13px] font-metadata tracking-widest uppercase placeholder:text-black/30 dark:placeholder:text-white/30 text-current ${
             isOpen ? 'w-36 md:w-44 opacity-100 ml-1 px-1' : 'w-0 opacity-0 px-0 border-transparent'
           }`}
           style={{ visibility: isOpen ? 'visible' : 'hidden' }}
@@ -131,16 +131,16 @@ export function BuscadorModal() {
         {isOpen && query.trim() !== '' && (
           <div className="absolute top-12 md:top-14 right-0 w-80 md:w-112.5 flex flex-col gap-1 z-50">
             {isLoading ? (
-              <div className="text-[10px] font-mono tracking-widest uppercase text-current opacity-50 px-2">Buscando...</div>
+              <div className="text-[10px] font-metadata tracking-widest uppercase text-current opacity-50 px-2">Buscando...</div>
             ) : filtered.length === 0 ? (
-              <div className="text-[10px] font-mono tracking-widest uppercase text-current opacity-50 px-2">No encontrado</div>
+              <div className="text-[10px] font-metadata tracking-widest uppercase text-current opacity-50 px-2">No encontrado</div>
             ) : (
               filtered.slice(0, 6).map((item) => (
                 <a
                   key={item.id || item.slug}
                   href={`/hemeroteca/${item.slug}`}
                   onClick={() => setIsOpen(false)}
-                  className="font-mono font-light text-[11px] uppercase tracking-[0.2em] text-current opacity-70 hover:opacity-100 hover:text-rust-orange dark:hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(239,235,227,0.06)] px-2 py-1.5 transition-all duration-300 select-none block"
+                  className="font-metadata font-light text-[11px] uppercase tracking-[0.2em] text-current opacity-70 hover:opacity-100 hover:text-rust-orange dark:hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(239,235,227,0.06)] px-2 py-1.5 transition-all duration-300 select-none block"
                 >
                   {item.title}
                 </a>

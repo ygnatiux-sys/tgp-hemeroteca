@@ -112,7 +112,7 @@ const sequences = createPremierSequences(resolvedEssays);
       secondaryAlt={`Segunda imagen de la colección ${label}`}
       secondaryPosition={coverPosition2}
     >
-      <nav class="flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
+      <nav class="flex items-center gap-3 font-metadata text-[9px] uppercase tracking-[0.3em] text-white/40">
         <a href="/" class="hover:text-white transition-colors">Hemeroteca</a>
         <span>/</span>
         <a href="/colecciones" class="hover:text-white transition-colors">Colecciones</a>
@@ -207,7 +207,7 @@ const sequences = createPremierSequences(resolvedEssays);
       ═══════════════════════════════════════════════════════════════════ */}
       <section class="flex flex-col gap-6 border-t border-white/10 pt-10">
         <div class="reveal-item">
-          <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-[#EFEBE3] block mb-2">Índice</span>
+          <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-[#EFEBE3] block mb-2">Índice</span>
           <h2 class="text-2xl md:text-3xl gradient-general-h2">{label} — Catálogo Completo</h2>
         </div>
 
@@ -218,22 +218,22 @@ const sequences = createPremierSequences(resolvedEssays);
                 href={`/hemeroteca/${slug}`}
                 class="group flex items-baseline gap-4 md:gap-6 py-3.5 hover:text-[#EFEBE3] transition-colors duration-300"
               >
-                <span class="font-mono text-[10px] text-white/30 tracking-[0.2em] tabular-nums shrink-0 w-6 text-right">
+                <span class="font-metadata text-[10px] text-white/30 tracking-[0.2em] tabular-nums shrink-0 w-6 text-right">
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <span class="font-mono text-[9px] text-[#EFEBE3]/70 tracking-[0.2em] shrink-0 hidden sm:inline">
+                <span class="font-metadata text-[9px] text-[#EFEBE3]/70 tracking-[0.2em] shrink-0 hidden sm:inline">
                   {formatYear(entry.date)}
                 </span>
                 <span class="font-cinzel text-sm md:text-base text-white/80 group-hover:text-[#EFEBE3] transition-colors leading-snug line-clamp-1 flex-1 font-bold">
                   {entry.title}
                 </span>
-                <span class="font-mono text-[9px] text-white/20 shrink-0 group-hover:text-[#EFEBE3]/60 group-hover:translate-x-1 transition-all">→</span>
+                <span class="font-metadata text-[9px] text-white/20 shrink-0 group-hover:text-[#EFEBE3]/60 group-hover:translate-x-1 transition-all">→</span>
               </a>
             </li>
           ))}
         </ol>
 
-        <div class="pt-6 flex items-center justify-between border-t border-white/5 font-mono text-[10px] uppercase tracking-[0.3em]">
+        <div class="pt-6 flex items-center justify-between border-t border-white/5 font-metadata text-[10px] uppercase tracking-[0.3em]">
           <a
             href="/colecciones"
             class="text-white/40 hover:text-[#EFEBE3] transition-colors flex items-center gap-2"

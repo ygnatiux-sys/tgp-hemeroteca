@@ -748,6 +748,7 @@ html[data-nav-state="2"] header:hover .brand-element {
   --font-mono: "Space Mono", "Input Mono", monospace;
   --font-sans: "Plus Jakarta Sans", sans-serif;
   --font-outfit: "Outfit", "Plus Jakarta Sans", sans-serif;
+  --font-metadata: "Google Sans Flex", "Google Sans", "Plus Jakarta Sans", sans-serif;
 }
 
 @layer utilities {
@@ -756,6 +757,10 @@ html[data-nav-state="2"] header:hover .brand-element {
   }
   .font-outfit {
     font-family: "Outfit", "Plus Jakarta Sans", sans-serif;
+  }
+  .font-metadata {
+    font-family: var(--font-metadata);
+    letter-spacing: -0.015em;
   }
 
   /* Gradiente Acero Cepillado / Titanium iOS Style con la paleta exacta de Hemeroteca (#718096 a #334155) */

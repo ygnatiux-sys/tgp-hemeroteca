@@ -30,7 +30,7 @@ const { posts } = Astro.props;
 <!-- Only render the section if there are posts to display -->
 {posts && posts.length > 0 && (
   <aside class="mt-16 md:mt-24 border-t border-white/10 pt-8">
-    <h2 class="font-mono text-sm uppercase tracking-widest text-white/50 mb-8">
+    <h2 class="font-metadata text-sm uppercase tracking-widest text-white/50 mb-8">
       Continuar Explorando
     </h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -46,10 +46,10 @@ const { posts } = Astro.props;
                 />
               </div>
             )}
-            <p class="font-mono text-xs text-white/40 tracking-wider uppercase">{post.data.category || 'Ensayo'}</p>
+            <p class="font-metadata text-xs text-white/40 tracking-wider uppercase">{post.data.category || 'Ensayo'}</p>
             <h3 class="font-serif text-2xl mt-2 text-white/80 group-hover:text-white transition-colors duration-300">{post.data.title}</h3>
             <p class="font-sans text-sm text-white/60 mt-3 grow">{truncate(post.data.excerpt)}</p>
-            <div class="mt-4 font-mono text-xs text-white/50 group-hover:text-white transition-colors duration-300">
+            <div class="mt-4 font-metadata text-xs text-white/50 group-hover:text-white transition-colors duration-300">
               Leer más →
             </div>
           </div>
