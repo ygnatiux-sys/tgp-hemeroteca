@@ -126,11 +126,19 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
   <div class={`relative z-20 ${paddingClass} w-full max-w-7xl`}>
     <div class="flex flex-col w-full h-full justify-end">
       
-      {/* Excerpt con Efecto Storybook Scroll */}
+      {/* Excerpt con Efecto TypeMagic */}
       {excerpt && (
-        <div class="storybook-container mx-auto w-full max-w-[66ch] mb-4">
-          <div class="storybook-text font-serif leading-relaxed text-center text-[#f4ecd8]/90 tracking-wider" data-storybook-text={excerpt}></div>
-        </div>
+        <p class={`font-serif leading-relaxed text-center max-w-[66ch] tracking-wider mx-auto mb-4 line-clamp-2 ch-excerpt-container ${excerptClass}`}>
+          {excerpt.split(' ').filter((w: string) => w.trim() !== '').map((word: string, i: number) => {
+            const isAmber = word.startsWith('**') && word.endsWith('**');
+            const cleanWord = isAmber ? word.replace(/\*\*/g, '') : word;
+            return (
+              <>
+                <span class={`ch-excerpt-word ${isAmber ? 'amber-neon' : ''}`} style={`--word-delay: ${3.0 + i * 0.65}s`}>{cleanWord}</span>{" "}
+              </>
+            );
+          })}
+        </p>
       )}
 
       {/* Fila Central: H1 (izq) y CTA (der) */}
@@ -177,70 +185,7 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
 
 <style>
   /* =========================================================
-     Efecto Storybook Scroll
-     ========================================================= */
-  .storybook-container {
-    height: 120px; /* Altura visible del texto rodante */
-    position: relative;
-    overflow: hidden;
-    /* Máscara: transparente arriba (0%), visible a partir del 45% */
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 45%);
-    mask-image: linear-gradient(to bottom, transparent 0%, black 45%);
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
-  
-  .choreography-active .storybook-container {
-    opacity: 1;
-    /* Aparece pasados los 2.5s (luego de que el H1 hace zoom out) */
-    transition-delay: 2.5s;
-  }
-
-  .storybook-text {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    font-size: 0.95rem; /* Ajustable a la vista */
-    text-shadow: 0 0 8px rgba(244, 236, 216, 0.4);
-    /* Inicia oculto / sin animar */
-    transform: translateY(100px);
-  }
-
-  .storybook-active .storybook-text {
-    /* 25s de subida matemática */
-    animation: storybookScroll 25s linear forwards;
-  }
-
-  @keyframes storybookScroll {
-    0% { transform: translateY(80px); }
-    100% { transform: translateY(-150%); }
-  }
-
-  /* Letras que aparecen individualmente */
-  .sb-letra {
-    opacity: 0;
-    animation: sbAparecer 0.3s forwards;
-  }
-  @keyframes sbAparecer {
-    to { opacity: 1; }
-  }
-
-  /* Cursor Mágico (Sparkle) Dorado */
-  .sb-cursor {
-    display: inline-block;
-    color: #FFD700;
-    font-weight: bold;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5);
-    margin-left: 2px;
-    animation: sbSparkleTilt 1s infinite alternate;
-  }
-  @keyframes sbSparkleTilt {
-    0% { transform: scale(1) rotate(-10deg); opacity: 0.4; }
-    100% { transform: scale(1.4) rotate(15deg); opacity: 1; }
-  }
-
-  /* =========================================================
-     Animaciones previas (Cinemagraph, etc.)
+     Animaciones Cinemagraph
      ========================================================= */
   @keyframes kenBurnsAscent {
     0% { transform: scale(1.02) translateY(2.5%) translateZ(0); }
@@ -285,69 +230,127 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
 </style>
 
 <script>
-  const initStorybookHover = () => {
-    document.querySelectorAll(".storybook-card").forEach((card) => {
-      if (!card.classList.contains("choreography-active")) {
-        card.addEventListener(
-          "mouseenter",
-          () => {
-            card.classList.add("choreography-active");
-            card.classList.add("storybook-active");
+  import { gsap } from "gsap";
 
-            // Lógica del cuento
-            const container = card.querySelector(".storybook-text") as HTMLElement;
-            if (!container) return;
+  const runCardSequence = (card: HTMLElement): Promise<void> => {
+    return new Promise((resolve) => {
+      if (card.dataset.choreographyDone === "true") {
+        resolve();
+        return;
+      }
+      card.dataset.choreographyDone = "true";
+      card.classList.add("choreography-active");
 
-            const textoCompleto = container.getAttribute("data-storybook-text") || "";
-            container.innerHTML = ""; // Limpiar texto original
-            
-            const cursor = document.createElement("span");
-            cursor.classList.add("sb-cursor");
-            cursor.textContent = "✧";
-            
-            let i = 0;
-            const velocidadEscritura = 50; // ms por letra
+      const h1Container = card.querySelector<HTMLElement>(".ch-h1-container");
+      const ctaBtn = card.querySelector<HTMLElement>(".ch-cta-btn");
+      const excerptContainer = card.querySelector<HTMLElement>(".ch-excerpt-container");
+      const words = Array.from(card.querySelectorAll<HTMLElement>(".ch-excerpt-word"));
+      const tags = Array.from(card.querySelectorAll<HTMLElement>(".ch-tag"));
 
-            // Retraso inicial para esperar a que el H1 desaparezca (ej. 2.5s)
-            setTimeout(() => {
-              function agregarLetra() {
-                if (i < textoCompleto.length) {
-                  const char = textoCompleto[i];
-                  
-                  // Remover el cursor temporalmente
-                  if (container.contains(cursor)) {
-                    container.removeChild(cursor);
-                  }
+      const tl = gsap.timeline({
+        onComplete: () => {
+          resolve();
+        },
+      });
 
-                  const span = document.createElement("span");
-                  span.classList.add("sb-letra");
-                  span.textContent = char;
-                  container.appendChild(span);
-                  
-                  // Volver a colocar el cursor al final
-                  container.appendChild(cursor);
+      // ── 1. Pase 1 del Metal Sweep (Inicio Rápido) + Tags pulse ──
+      if (ctaBtn) {
+        ctaBtn.classList.remove("sweep-fast", "sweep-slow");
+        void ctaBtn.offsetWidth;
+        ctaBtn.classList.add("sweep-fast");
+      }
 
-                  i++;
-                  setTimeout(agregarLetra, velocidadEscritura);
-                } else {
-                  // Si termina de escribir, podemos dejar el cursor un rato y luego borrarlo
-                  setTimeout(() => {
-                    if (container.contains(cursor)) {
-                      cursor.style.transition = "opacity 1s";
-                      cursor.style.opacity = "0";
-                      setTimeout(() => container.removeChild(cursor), 1000);
-                    }
-                  }, 2000);
-                }
-              }
-              
-              agregarLetra();
-            }, 2500); // Wait for the H1 to zoom out fade
+      if (tags.length) {
+        tl.fromTo(
+          tags,
+          { opacity: 0, filter: "blur(2px)" },
+          { opacity: 1, filter: "blur(0px)", duration: 0.8, stagger: 0.04, ease: "power2.out" },
+          0
+        ).to(tags, { opacity: 0.7, duration: 0.6 }, 0.8);
+      }
 
+      // ── 2. H1 zoom-out para ceder el escenario al excerpt ──
+      if (h1Container) {
+        tl.to(
+          h1Container,
+          {
+            scale: 1.10,
+            y: -4,
+            filter: "blur(10px)",
+            opacity: 0,
+            duration: 1.2,
+            ease: "power2.inOut",
           },
-          { once: true } // Solo una vez por tarjeta
+          0.5
         );
       }
+
+      // ── 3. Excerpt escribe palabra por palabra con TypeMagic ──
+      if (excerptContainer && words.length) {
+        tl.set(excerptContainer, { opacity: 1 }, 1.6);
+        tl.set(words, { opacity: 0, filter: "blur(14px)", y: 6 });
+
+        tl.to(
+          words,
+          {
+            opacity: 1,
+            filter: "blur(0px)",
+            y: 0,
+            duration: 0.7,
+            stagger: 0.45,
+            ease: "power2.out",
+          },
+          1.8
+        );
+
+        // ── 4. Pausa de lectura completa tras aparecer la ÚLTIMA palabra ──
+        tl.to({}, { duration: 3.5 });
+
+        // ── 5. Disolución fluida del excerpt completo ──
+        tl.to(words, {
+          opacity: 0,
+          filter: "blur(10px)",
+          scale: 0.95,
+          y: -6,
+          duration: 1.4,
+          ease: "power2.inOut",
+        });
+      }
+
+      // ── 6. ¡SOLO CUANDO EL EXCERPT TERMINÓ Y SE DISOLVIÓ! ──
+      // Re-escritura y materialización líquida TypeMagic del H1
+      if (h1Container) {
+        tl.fromTo(
+          h1Container,
+          { opacity: 0, filter: "blur(16px)", scale: 0.97, y: 8 },
+          { opacity: 1, filter: "blur(0px)", scale: 1, y: 0, duration: 1.8, ease: "power3.out" }
+        );
+      }
+
+      // ── 7. Pase 2 del Metal Sweep (ULTRA LENTO) en el CTA ──
+      if (ctaBtn) {
+        tl.add(() => {
+          ctaBtn.classList.remove("sweep-fast", "sweep-slow");
+          void ctaBtn.offsetWidth;
+          ctaBtn.classList.add("sweep-slow");
+        }, "-=0.8");
+      }
+
+      tl.to({}, { duration: 3.2 });
+    });
+  };
+
+  const initStorybookHover = () => {
+    document.querySelectorAll(".storybook-card").forEach((card: any) => {
+      card.addEventListener(
+        "mouseenter",
+        () => {
+          if (card.dataset.choreographyDone !== "true") {
+            runCardSequence(card);
+          }
+        },
+        { once: true }
+      );
     });
   };
 

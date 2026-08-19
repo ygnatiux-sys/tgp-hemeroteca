@@ -114,10 +114,9 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
     )
   }
 
-  {/* 3. Gradiente inferior (móvil: CSS nativo puro, sin GPU cost; desktop: blur moderado) */}
-  {/* F1: Mobile-first → gradiente fuerte CSS nativo. Desktop md: backdrop-blur-md suave */}
+  {/* 3. Gradiente inferior nítido sin desenfoque */}
   <div
-    class={`absolute inset-0 bg-linear-to-t from-black/90 via-black/50 via-45% to-transparent pointer-events-none z-10 md:backdrop-blur-[2px] ${
+    class={`absolute inset-0 bg-linear-to-t from-black/90 via-black/50 via-45% to-transparent pointer-events-none z-10 ${
       enableCinemagraph ? "cinemagraph-museum-fade" : ""
     }`}
   >
@@ -135,7 +134,7 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
             const cleanWord = isAmber ? word.replace(/\*\*/g, '') : word;
             return (
               <>
-                <span class={`ch-excerpt-word ${isAmber ? 'amber-neon' : ''}`} style={`--word-delay: ${2.5 + i * 0.4}s`}>{cleanWord}</span>{" "}
+                <span class={`ch-excerpt-word ${isAmber ? 'amber-neon' : ''}`} style={`--word-delay: ${3.0 + i * 0.65}s`}>{cleanWord}</span>{" "}
               </>
             );
           })}
@@ -262,26 +261,176 @@ const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
 </style>
 
 <script>
-  const initChoreographyHover = () => {
-    document.querySelectorAll(".cinematic-archive-card").forEach((card) => {
-      // Si la tarjeta ya fue animada en esta sesión, no re-animar
-      if (!card.classList.contains("choreography-active")) {
-        card.addEventListener(
-          "mouseenter",
-          () => {
-            card.classList.add("choreography-active");
+  import { gsap } from "gsap";
+
+  const runCardSequence = (card: HTMLElement): Promise<void> => {
+    return new Promise((resolve) => {
+      if (card.dataset.choreographyDone === "true") {
+        resolve();
+        return;
+      }
+      card.dataset.choreographyDone = "true";
+      card.classList.add("choreography-active");
+
+      const h1Container = card.querySelector<HTMLElement>(".ch-h1-container");
+      const ctaBtn = card.querySelector<HTMLElement>(".ch-cta-btn");
+      const excerptContainer = card.querySelector<HTMLElement>(".ch-excerpt-container");
+      const words = Array.from(card.querySelectorAll<HTMLElement>(".ch-excerpt-word"));
+      const tags = Array.from(card.querySelectorAll<HTMLElement>(".ch-tag"));
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          resolve();
+        },
+      });
+
+      // ── 1. Pase 1 del Metal Sweep (Inicio Rápido) + Tags pulse ──
+      if (ctaBtn) {
+        ctaBtn.classList.remove("sweep-fast", "sweep-slow");
+        void ctaBtn.offsetWidth;
+        ctaBtn.classList.add("sweep-fast");
+      }
+
+      if (tags.length) {
+        tl.fromTo(
+          tags,
+          { opacity: 0, filter: "blur(2px)" },
+          { opacity: 1, filter: "blur(0px)", duration: 0.8, stagger: 0.04, ease: "power2.out" },
+          0
+        ).to(tags, { opacity: 0.7, duration: 0.6 }, 0.8);
+      }
+
+      // ── 2. H1 zoom-out para ceder el escenario al excerpt ──
+      if (h1Container) {
+        tl.to(
+          h1Container,
+          {
+            scale: 1.10,
+            y: -4,
+            filter: "blur(10px)",
+            opacity: 0,
+            duration: 1.2,
+            ease: "power2.inOut",
           },
-          { once: true } // Ejecutar solo una vez por tarjeta
+          0.5
         );
+      }
+
+      // ── 3. Excerpt escribe palabra por palabra con TypeMagic ──
+      if (excerptContainer && words.length) {
+        tl.set(excerptContainer, { opacity: 1 }, 1.6);
+        tl.set(words, { opacity: 0, filter: "blur(14px)", y: 6 });
+
+        // Cada palabra emerge pausadamente con su gradiente y desenfoque
+        tl.to(
+          words,
+          {
+            opacity: 1,
+            filter: "blur(0px)",
+            y: 0,
+            duration: 0.7,
+            stagger: 0.45,
+            ease: "power2.out",
+          },
+          1.8
+        );
+
+        // ── 4. Pausa de lectura completa tras aparecer la ÚLTIMA palabra ──
+        tl.to({}, { duration: 3.5 });
+
+        // ── 5. Disolución fluida del excerpt completo (gota en medio denso) ──
+        tl.to(words, {
+          opacity: 0,
+          filter: "blur(10px)",
+          scale: 0.95,
+          y: -6,
+          duration: 1.4,
+          ease: "power2.inOut",
+        });
+      }
+
+      // ── 6. ¡SOLO CUANDO EL EXCERPT TERMINÓ Y SE DISOLVIÓ! ──
+      // Re-escritura y materialización líquida TypeMagic del H1
+      if (h1Container) {
+        tl.fromTo(
+          h1Container,
+          { opacity: 0, filter: "blur(16px)", scale: 0.97, y: 8 },
+          { opacity: 1, filter: "blur(0px)", scale: 1, y: 0, duration: 1.8, ease: "power3.out" }
+        );
+      }
+
+      // ── 7. Pase 2 del Metal Sweep (ULTRA LENTO) en el CTA ──
+      if (ctaBtn) {
+        tl.add(() => {
+          ctaBtn.classList.remove("sweep-fast", "sweep-slow");
+          void ctaBtn.offsetWidth;
+          ctaBtn.classList.add("sweep-slow");
+        }, "-=0.8");
+      }
+
+      // Margen final de reposo antes de dar paso a la siguiente tarjeta
+      tl.to({}, { duration: 3.2 });
+    });
+  };
+
+  const initChoreography = () => {
+    const cards = Array.from(document.querySelectorAll<HTMLElement>(".cinematic-archive-card"));
+
+    // Hover manual directo
+    cards.forEach((card) => {
+      card.addEventListener(
+        "mouseenter",
+        () => {
+          if (card.dataset.choreographyDone !== "true") {
+            runCardSequence(card);
+          }
+        },
+        { once: true }
+      );
+    });
+
+    // Observer secuencial: una por una, esperando a que termine cada tarjeta
+    const queue: HTMLElement[] = [];
+    let isRunning = false;
+
+    const processNext = async () => {
+      if (isRunning || queue.length === 0) return;
+      isRunning = true;
+      const nextCard = queue.shift();
+      if (nextCard && nextCard.dataset.choreographyDone !== "true") {
+        await runCardSequence(nextCard);
+      }
+      isRunning = false;
+      processNext();
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const card = entry.target as HTMLElement;
+            if (card.dataset.choreographyDone !== "true" && !queue.includes(card)) {
+              queue.push(card);
+              processNext();
+            }
+            observer.unobserve(card);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    cards.forEach((card) => {
+      if (card.dataset.choreographyDone !== "true") {
+        observer.observe(card);
       }
     });
   };
 
-  // Soporte para Astro View Transitions
-  document.addEventListener("astro:page-load", initChoreographyHover);
+  document.addEventListener("astro:page-load", initChoreography);
   if (document.readyState === "complete" || document.readyState === "interactive") {
-    initChoreographyHover();
+    initChoreography();
   } else {
-    document.addEventListener("DOMContentLoaded", initChoreographyHover);
+    document.addEventListener("DOMContentLoaded", initChoreography);
   }
 </script>

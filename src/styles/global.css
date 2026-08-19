@@ -211,84 +211,68 @@ header .header-btn-codice {
    Secuencia activada vía Hover (.choreography-active)
    ========================================================================== */
 
-/* 1. H1 y CTA Contenedor Principal: Ciclo de vida completo */
+/* 1. H1 y CTA Contenedor Principal */
 .ch-h1-cta {
   opacity: 1;
 }
-.choreography-active .ch-h1-cta {
-  animation: ch-h1-cta-cycle 12.5s forwards;
-}
-@keyframes ch-h1-cta-cycle {
-  0%, 10% { opacity: 1; } /* 0s a 1.25s: Visibles por defecto (continuidad inicial) */
-  16% { opacity: 0; } /* 2.0s: Ocultos para dar paso al excerpt */
-  83% { opacity: 0; } /* 10.4s: Siguen ocultos */
-  88%, 100% { opacity: 1; } /* 11.0s: Reaparecen con un fade-in global suave */
-}
 
-.choreography-active .ch-h1-container {
+.ch-h1-container {
   transform-origin: left center;
-  animation: ch-h1-zoom-out 12.5s forwards;
-}
-@keyframes ch-h1-zoom-out {
-  0%, 10% { transform: scale(1) translateZ(0); filter: blur(0); }
-  16% { transform: scale(1.15) translateZ(0); filter: blur(8px); } /* Zoom Out Fade dramático hacia la cámara */
-  83% { transform: scale(0.95); filter: blur(4px); } /* Reubicación offscreen */
-  88%, 100% { transform: scale(1); filter: blur(0); } /* Retorno natural durante el fade-in global */
+  will-change: transform, opacity, filter;
 }
 
-/* 2. Categorías (Tags): Pulso Inicial (0s a 1.5s) */
+/* 2. Categorías (Tags) */
 .ch-tag {
-  opacity: 0;
-}
-.choreography-active .ch-tag {
-  animation: ch-tag-pulse 1.5s 0s forwards;
-}
-@keyframes ch-tag-pulse {
-  0% { opacity: 0; filter: blur(2px); text-shadow: 0 0 0 transparent; }
-  30%, 70% { opacity: 1; filter: blur(0); text-shadow: 0 0 10px rgba(239, 235, 227, 0.4); }
-  100% { opacity: 0; filter: blur(2px); text-shadow: 0 0 0 transparent; }
+  opacity: 0.7;
+  will-change: opacity, filter;
 }
 
-/* 3. Excerpt Container y Efecto Cascada (Cuento) */
+/* 3. Excerpt Container y Efecto Cascada TypeMagic */
 .ch-excerpt-container {
   opacity: 0;
-}
-.choreography-active .ch-excerpt-container {
-  opacity: 1; /* El contenedor se hace visible al instante; las palabras manejan su propia opacidad */
+  will-change: opacity;
 }
 
 .ch-excerpt-word {
   opacity: 0;
   display: inline-block;
-  white-space: pre-wrap; /* Respeta los espacios al finalizar la palabra */
-}
-.choreography-active .ch-excerpt-word {
-  /* 5s de vida útil por palabra para la cascada diluyente */
-  animation: ch-excerpt-write 5s var(--word-delay) forwards;
-}
-@keyframes ch-excerpt-write {
-  0% { opacity: 0; filter: blur(4px); text-shadow: 0 0 15px rgba(239, 235, 227, 0.8); }
-  10% { opacity: 1; filter: blur(0); text-shadow: 0 0 15px rgba(239, 235, 227, 0.8); color: #FFF; } /* Brillo pico */
-  20%, 60% { opacity: 0.85; filter: blur(0); text-shadow: none; color: rgba(239, 235, 227, 0.85); } /* Legibilidad base por ~2s */
-  100% { opacity: 0; filter: blur(4px); text-shadow: none; } /* Fade out */
+  white-space: pre-wrap;
+  filter: blur(14px);
+  transform: translateY(6px);
+  will-change: opacity, filter, transform;
+
+  /* Gradiente metálico suave para palabras estándar — paleta heredada */
+  background: linear-gradient(
+    135deg,
+    #DFCA9D 0%,
+    #EFEBE3 35%,
+    #C9A86C 70%,
+    #EFEBE3 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .amber-neon {
   font-weight: 800;
-}
-.choreography-active .amber-neon {
-  animation: ch-excerpt-write-amber 5s var(--word-delay) forwards;
-}
-@keyframes ch-excerpt-write-amber {
-  0% { opacity: 0; filter: blur(4px); text-shadow: 0 0 15px rgba(255, 179, 71, 0.9); color: #FFB347; }
-  10% { opacity: 1; filter: blur(0); text-shadow: 0 0 15px rgba(255, 179, 71, 0.9); color: #FFB347; }
-  20%, 60% { opacity: 1; filter: blur(0); text-shadow: 0 0 5px rgba(255, 179, 71, 0.4); color: #FFB347; }
-  100% { opacity: 0; filter: blur(4px); text-shadow: none; color: #FFB347; }
+  background: linear-gradient(
+    135deg,
+    #FFE082 0%,
+    #FFB347 45%,
+    #C9A86C 80%,
+    #FFE082 100%
+  ) !important;
+  background-size: 200% auto !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
 }
 
-/* 4. CTA: Brillo Metálico Final (11.5s) */
+/* 4. CTA: Brillo de Espada Metálico — Clases de Pase Rápido y Pase Lento */
 .ch-cta-container {
-  opacity: 1; /* Su opacidad es manejada globalmente por ch-h1-cta */
+  opacity: 1;
 }
 
 .ch-cta-btn {
@@ -298,18 +282,72 @@ header .header-btn-codice {
 .ch-cta-btn::before {
   content: "";
   position: absolute;
-  top: 0; left: -100%;
-  width: 50%; height: 100%;
-  background: linear-gradient(to right, transparent, rgba(239, 235, 227, 0.4), transparent);
-  transform: skewX(-20deg);
+  top: 0;
+  left: -160%;
+  width: 140%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(239, 235, 227, 0.08) 18%,
+    rgba(255, 255, 255, 0.55) 38%,
+    rgba(255, 255, 255, 0.98) 50%,
+    rgba(255, 255, 255, 0.55) 62%,
+    rgba(201, 168, 108, 0.35) 82%,
+    transparent 100%
+  );
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 20px rgba(201, 168, 108, 0.75));
+  transform: skewX(-25deg);
   pointer-events: none;
 }
-.choreography-active .ch-cta-btn::before {
-  animation: ch-metallic-sweep 0.5s 12.0s forwards;
+
+/* Pase 1 rápido */
+.ch-cta-btn.sweep-fast::before {
+  animation: ch-metallic-sweep-single 1.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
-@keyframes ch-metallic-sweep {
-  0% { left: -100%; }
-  100% { left: 200%; }
+
+/* Pase 2 ultra lento tras completar el excerpt */
+.ch-cta-btn.sweep-slow::before {
+  animation: ch-metallic-sweep-single 3.0s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Hover directo */
+.ch-cta-btn:hover::before {
+  animation: ch-metallic-sweep-single 2.0s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes ch-metallic-sweep-single {
+  0% {
+    left: -160%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    left: 220%;
+    opacity: 0;
+  }
+}
+
+@keyframes ch-metallic-sweep-single {
+  0% {
+    left: -160%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    left: 220%;
+    opacity: 0;
+  }
 }
 
 /* Ocultar toolbar cuando hamburguesa está activa (estado 2 = desplegable) */

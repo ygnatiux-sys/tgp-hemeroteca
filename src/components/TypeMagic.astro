@@ -1,0 +1,294 @@
+---
+/**
+ * TypeMagic.astro — Franja de dos párrafos narrativos con efecto "condensación mágica".
+ *
+ * Efectos implementados:
+ *  1. Velocidad proporcional al largo de la palabra (cortas → rápidas, largas → lentas)
+ *  2. Sin bucle infinito: al terminar el segundo párrafo, el lienzo queda en blanco
+ *  3. Gradiente metálico dorado/acero en el texto (metallic sweep con CSS)
+ */
+
+interface Props {
+  lines?: [string, string];
+  id?: string;
+}
+
+const {
+  lines = [
+    "Cada colección es un umbral. Un conjunto de documentos que abren paso a territorios del pensamiento todavía sin cartografiar.",
+    "Aquí la investigación no concluye. Se transforma, se ramifica y aguarda nuevas lecturas en el horizonte epistémico del proyecto."
+  ],
+  id = "typemagic-" + Math.random().toString(36).substring(2, 9),
+} = Astro.props;
+---
+
+<section
+  id={id}
+  class="typemagic-section relative w-full bg-black overflow-hidden"
+  data-lines={JSON.stringify(lines)}
+  aria-label="Narrativa cinemática"
+>
+  {/* Breathing room superior */}
+  <div class="h-[12vh] md:h-[16vh]" aria-hidden="true"></div>
+
+  {/* Dos párrafos con interespacio generoso */}
+  <div class="typemagic-container">
+
+    <p class="typemagic-oracion" id={`${id}-p0`}>
+      <span class="typemagic-cursor" aria-hidden="true"> |</span>
+    </p>
+
+    {/* Interespacio generoso entre párrafos */}
+    <div class="h-[8vh] md:h-[11vh]" aria-hidden="true"></div>
+
+    <p class="typemagic-oracion" id={`${id}-p1`}>
+      <span class="typemagic-cursor" aria-hidden="true"> |</span>
+    </p>
+
+  </div>
+
+  {/* Breathing room inferior */}
+  <div class="h-[12vh] md:h-[16vh]" aria-hidden="true"></div>
+</section>
+
+<style>
+  /* ── Contenedor centrado tipo editorial (66ch = longitud óptima de lectura) ── */
+  .typemagic-container {
+    max-width: 66ch;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    text-align: center;
+    position: relative;
+  }
+
+  /* ── Párrafos: invisible al inicio ── */
+  .typemagic-oracion {
+    display: block;
+    font-family: var(--font-editorial, 'Cormorant Garamond', Georgia, serif);
+    font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+    font-weight: 500;
+    line-height: 1.85;
+    letter-spacing: 0.01em;
+    min-height: 2em; /* Reserva espacio para evitar layout shift */
+
+    /* Estado inicial: invisible (JS lo popula) */
+    transition: opacity 2.5s ease-out, filter 2.5s ease-out, transform 2.5s ease-out;
+  }
+
+  /* ── Estado de disolución: física de gota en medio denso ── */
+  .typemagic-oracion.tm-dissolve {
+    opacity: 0 !important;
+    filter: blur(8px) !important;
+    transform: scale(0.96) !important;
+    pointer-events: none;
+  }
+
+  /* ── Cada PALABRA: condensación líquida desde la nada ── */
+  .tm-word {
+    display: inline;
+    opacity: 0;
+    filter: blur(10px);
+    animation: tm-emerge var(--dur, 1.3s) cubic-bezier(0.11, 0, 0.5, 0) forwards;
+
+    /* Gradiente metálico dorado/acero — efecto 3 ── */
+    background: linear-gradient(
+      135deg,
+      #DFCA9D 0%,      /* Oro claro */
+      #EFEBE3 40%,     /* Blanco cálido */
+      #C9A86C 70%,     /* Oro TGP */
+      #EFEBE3 100%     /* Blanco cálido */
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    /* Sweep metálico al aparecer */
+    animation: tm-emerge var(--dur, 1.3s) cubic-bezier(0.11, 0, 0.5, 0) forwards,
+               tm-sweep 2.2s ease-out var(--sweep-delay, 0.5s) forwards;
+  }
+
+  @keyframes tm-emerge {
+    0%   { opacity: 0; filter: blur(10px); }
+    100% { opacity: 1; filter: blur(0);    }
+  }
+
+  /* Sweep: el gradiente se desplaza de izquierda a derecha (efecto metálico) */
+  @keyframes tm-sweep {
+    0%   { background-position: 0% center;   }
+    100% { background-position: 200% center; }
+  }
+
+  /* ── Cursor parpadeante ── */
+  .typemagic-cursor {
+    display: inline;
+    font-weight: 100;
+    color: #9d7ef5;       /* Violeta mágico */
+    text-shadow: 0 0 8px #9d7ef5;
+    -webkit-text-fill-color: #9d7ef5; /* Override del gradient text */
+    animation: tm-blink 0.7s step-end infinite;
+  }
+
+  @keyframes tm-blink {
+    from, to { color: transparent; -webkit-text-fill-color: transparent; text-shadow: none; }
+    50%       { color: #9d7ef5;    -webkit-text-fill-color: #9d7ef5; text-shadow: 0 0 8px #9d7ef5; }
+  }
+
+  /* ── Fallback sin JS / prefers-reduced-motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    .typemagic-oracion {
+      opacity: 1 !important;
+      filter: none !important;
+      transform: none !important;
+    }
+    .typemagic-cursor { display: none; }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const initTypeMagic = () => {
+      document.querySelectorAll('.typemagic-section').forEach((section) => {
+        const sectionId = section.id;
+        if (!sectionId || section.dataset.tmInit === 'true') return;
+        section.dataset.tmInit = 'true';
+
+        // ── Recuperar los textos desde los data-attributes (se pasan desde Astro) ──
+        const linesRaw = section.dataset.lines;
+        if (!linesRaw) return;
+        const lines = JSON.parse(linesRaw);
+
+        let triggered = false;
+
+        // ── IntersectionObserver como trigger de scroll ─────────────────────────
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && !triggered) {
+              triggered = true;
+              observer.unobserve(section);
+              runTypeMagic(section, lines);
+            }
+          });
+        }, { threshold: 0.2 });
+
+        observer.observe(section);
+      });
+    };
+
+    /**
+     * Efecto 1: velocidad proporcional al largo de la palabra
+     * Base: 350ms. Cada carácter extra añade 22ms de delay adicional.
+     */
+    const wordDelay = (word) => 350 + word.replace(/[^a-záéíóúüñ]/gi, '').length * 22;
+
+    /**
+     * Escribe un array de palabras en un contenedor párrafo, una por una.
+     * Resuelve la Promise cuando termina de escribir.
+     */
+    const writeParagraph = (container, words) => new Promise((resolve) => {
+      const cursor = container.querySelector('.typemagic-cursor');
+      let i = 0;
+
+      const writeNext = () => {
+        if (i >= words.length) {
+          // Ocultar cursor cuando termina de escribir
+          if (cursor) {
+            cursor.style.transition = 'opacity 0.8s ease';
+            cursor.style.opacity = '0';
+          }
+          resolve();
+          return;
+        }
+
+        const word = words[i];
+        const span = document.createElement('span');
+        span.className = 'tm-word';
+
+        // Espacio: se inserta ANTES del cursor junto con la palabra
+        const textNode = (i < words.length - 1) ? word + '\u00A0' : word;
+        span.textContent = textNode;
+
+        // Efecto 1: duración y sweep-delay proporcionales al largo
+        const dur = (0.9 + word.length * 0.04).toFixed(2) + 's';
+        const sweepDelay = (0.3 + i * 0.08).toFixed(2) + 's';
+        span.style.setProperty('--dur', dur);
+        span.style.setProperty('--sweep-delay', sweepDelay);
+
+        // Insertar antes del cursor
+        if (cursor) {
+          container.insertBefore(span, cursor);
+        } else {
+          container.appendChild(span);
+        }
+
+        i++;
+        setTimeout(writeNext, wordDelay(word));
+      };
+
+      writeNext();
+    });
+
+    /**
+     * Disuelve un párrafo con el efecto "gota en medio denso".
+     * Resuelve tras 2.5s (duración de la transición CSS).
+     */
+    const dissolve = (container) => new Promise((resolve) => {
+      container.classList.add('tm-dissolve');
+      setTimeout(resolve, 2500);
+    });
+
+    /**
+     * Orquestador principal:
+     * P0 escribe → pausa → disuelve → P1 escribe → pausa → disuelve → lienzo en blanco
+     * Efecto 2: SIN bucle infinito
+     */
+    const runTypeMagic = async (section, lines) => {
+      for (let li = 0; li < lines.length; li++) {
+        const container = section.querySelector(`#${section.id}-p${li}`);
+        if (!container) continue;
+
+        const words = lines[li].split(' ').filter(Boolean);
+
+        // Asegurar cursor presente
+        if (!container.querySelector('.typemagic-cursor')) {
+          const cur = document.createElement('span');
+          cur.className = 'typemagic-cursor';
+          cur.textContent = ' |';
+          container.appendChild(cur);
+        }
+
+        // Escribir párrafo
+        await writeParagraph(container, words);
+
+        // Pausa de lectura: ~4s
+        await new Promise(r => setTimeout(r, 4000));
+
+        // Disolver párrafo
+        await dissolve(container);
+
+        // Limpiar contenido
+        container.innerHTML = '';
+        container.classList.remove('tm-dissolve');
+      }
+
+      // Efecto 2: Al terminar, el lienzo queda en negro (ya fue disuelto todo)
+      // No se reinicia. La sección queda visualmente vacía y el usuario puede seguir scrolleando.
+    };
+
+    // ── Iniciar en page-load y DOMContentLoaded (compatibilidad con Astro y full-reload) ──
+    document.addEventListener('astro:page-load', initTypeMagic);
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTypeMagic);
+    } else {
+      initTypeMagic();
+    }
+
+    // Limpiar al navegar (Astro View Transitions)
+    document.addEventListener('astro:before-swap', () => {
+      document.querySelectorAll('.typemagic-section').forEach(s => {
+        s.dataset.tmInit = '';
+      });
+    });
+  })();
+</script>

@@ -86,8 +86,9 @@ const coleccionesSlides = collections
 
     {/* ── RESPIRO VISUAL / EXCERPT DESCANSO ── */}
     <CinematicExcerptRest 
-      text="Un ecosistema documental en **constante expansión.** Explora las distintas ramificaciones del archivo, donde la cartografía epistémica y la semiótica convergen."
+      text="Un [[archivo]] en constante expansión. **Cada colección**, un eje documental del proyecto epistémico global."
     />
+
 
     {/* ── ENGINE AUTO CINEMÁTICO: cicla colecciones full-viewport ── */}
     {coleccionesSlides.length > 0 && (
@@ -160,9 +161,9 @@ const coleccionesSlides = collections
                   <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1c242b] via-theme-dark to-[#0a0b0b] -z-10" />
                 )}
 
-                {/* F1: Gradiente mobile CSS nativo puro (costo GPU=0). Desktop: backdrop-blur-[2px] suave */}
+                {/* Gradiente nítido sin desenfoque */}
                 {/* F6: Texto siempre visible — NO depende de :hover para revelar contenido en touch */}
-                <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 via-45% to-transparent pointer-events-none z-10 md:backdrop-blur-[2px]"></div>
+                <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 via-45% to-transparent pointer-events-none z-10"></div>
 
                 <div class="relative z-20 p-6 md:p-8 flex flex-col justify-end h-full">
                   {/* F2: text-xs (WCAG). F6: siempre visible sin group-hover reveal */}

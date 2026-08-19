@@ -2,9 +2,11 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
-import InteriorHero from '../../components/InteriorHero.astro';
+import CinematicCollectionHero from '../../components/CinematicCollectionHero.astro';
 import Marquee from '../../components/Marquee.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
+import TypeMagic from '../../components/TypeMagic.astro';
+
 import {
   getPublishableEssays,
   groupByCategory,
@@ -44,6 +46,13 @@ const coverPosition =
   || (resolvedEssays[0]?.entry as any)?.imagePosition
   || 'center center';
 
+// Segunda imagen para parallax de contrapunto
+const coverImage2 = resolvedEssays[1]?.img ?? null;
+const coverPosition2 =
+  (resolvedEssays[1]?.entry as any)?.coverImagePosition
+  || (resolvedEssays[1]?.entry as any)?.imagePosition
+  || 'center center';
+
 // ─── HELPER PARA SECUENCIAS CINE PREMIER (1 HERO FULL + DÚO 60/40) ──────────
 function createPremierSequences(items: typeof resolvedEssays) {
   const sequences: Array<{
@@ -66,34 +75,38 @@ const sequences = createPremierSequences(resolvedEssays);
 <Layout title={`${label} | Colecciones TGP`}>
   <div class="text-white min-h-screen pb-32">
 
-    <InteriorHero
+    <CinematicCollectionHero
       title={label}
-      image={coverImage}
-      imageAlt={`Colección ${label}`}
-      imagePosition={coverPosition}
-      eyebrow="Colección temática"
-      titleClass="text-5xl md:text-6xl lg:text-7xl font-cinzel font-extrabold tracking-tight leading-none gradient-acero-ios"
+      eyebrow="Colección Temática — TGP"
+      paragraph={`Un territorio epistémico en expansión permanente. **${essays.length} investigaciones** documentadas que trazan los contornos de ${label} como eje documental del proyecto global.`}
+      primaryImage={coverImage ?? ''}
+      primaryAlt={`Imagen de portada de la colección ${label}`}
+      primaryPosition={coverPosition}
+      secondaryImage={coverImage2 ?? undefined}
+      secondaryAlt={`Segunda imagen de la colección ${label}`}
+      secondaryPosition={coverPosition2}
     >
-      <nav slot="breadcrumb" class="flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
+      <nav class="flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
         <a href="/" class="hover:text-white transition-colors">Hemeroteca</a>
         <span>/</span>
         <a href="/colecciones" class="hover:text-white transition-colors">Colecciones</a>
         <span>/</span>
         <span class="text-[#EFEBE3]">{label}</span>
       </nav>
-      <div slot="meta" class="flex items-center gap-4 flex-wrap">
-        <span class="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/15 font-mono text-[10px] uppercase tracking-[0.3em] text-[#EFEBE3] font-bold">
-          {essays.length} {essays.length === 1 ? 'investigación documentada' : 'investigaciones documentadas'}
-        </span>
-        <span class="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40">
-          Cartografía Epistémica · Archivo Especializado
-        </span>
-      </div>
-    </InteriorHero>
+    </CinematicCollectionHero>
 
     {/* ── RESPIRO VISUAL / EXCERPT DESCANSO ── */}
     <CinematicExcerptRest 
-      text={`Catálogo enfocado en **${label}.** Cada dossier documentado representa un nodo verificado del proyecto global.`}
+      text={`Catálogo [[${label}]]. **Cada dossier** documentado representa un nodo verificado del proyecto global.`}
+    />
+
+
+    {/* ── TYPEMAGIC: dos párrafos narrativos con efecto condensación líquida ── */}
+    <TypeMagic
+      lines={[
+        `La colección ${label} reúne investigaciones que trazan los contornos de un territorio epistémico en expansión permanente.`,
+        `Cada documento es un fragmento de un mapa mayor. Aquí, el conocimiento no concluye — se ramifica hacia horizontes aún sin nombrar.`
+      ]}
     />
 
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">

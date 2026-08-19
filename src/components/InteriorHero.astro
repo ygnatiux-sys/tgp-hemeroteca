@@ -99,6 +99,7 @@ const {
     if (!hero || hero.hasAttribute("data-reveal-done")) return;
     hero.setAttribute("data-reveal-done", "true");
 
+    const header = document.getElementById("site-header");
     const image = hero.querySelector(".interior-hero-image");
     const h1 = hero.querySelector(".interior-hero-h1") as HTMLElement;
     const h2 = hero.querySelector(".interior-hero-h2") as HTMLElement;
@@ -112,7 +113,13 @@ const {
       if (image) gsap.set(image, { clearProps: "all" });
       gsap.set(hero.querySelectorAll(".interior-hero-reveal"), { clearProps: "all" });
       if (h1) h1.classList.add("is-permanently-iridescent");
+      if (header) gsap.set(header, { opacity: 1, y: 0, pointerEvents: "auto" });
       return;
+    }
+
+    // ── Ocultar menubar al abrir el hero interior ──
+    if (header) {
+      gsap.set(header, { opacity: 0, y: -25, pointerEvents: "none" });
     }
 
     // Zoom out majestuoso de la imagen de fondo
@@ -124,7 +131,14 @@ const {
       );
     }
 
-    const tl = gsap.timeline();
+    const tl = gsap.timeline({
+      onComplete: () => {
+        // Garantizar que el menubar quede 100% interactivo al terminar
+        if (header) {
+          gsap.to(header, { opacity: 1, y: 0, pointerEvents: "auto", duration: 1.2, ease: "power2.out" });
+        }
+      }
+    });
 
     // RITMO 1: Colección / Categoría entra apagada y suave (opacity: 0.55), luego FADE OUT
     if (h2) {
@@ -138,16 +152,16 @@ const {
       .to(h2, { opacity: 0, y: -8, duration: 0.8, ease: "power2.in" });
     }
 
-    // RITMO 2: H1 (Scale Up Ampliado) + imagen bokeh simultáneo
+    // RITMO 2: H1 (Scale Up Ampliado) + imagen fija nítida
     if (h1) {
       gsap.set(h1, { transformOrigin: "center center" });
 
-      // Cuando el H1 entra: imagen va a bokeh suave (blur)
+      // Ajuste sutil de brillo sin desenfoque
       if (image) {
         tl.to(
           image,
-          { filter: "blur(12px) brightness(0.35)", opacity: 0.6, duration: 2.0, ease: "power2.inOut" },
-          "+=0.1" // Coincide con la entrada del H1
+          { opacity: 0.75, duration: 2.0, ease: "power2.inOut" },
+          "+=0.1"
         );
       }
 
@@ -164,19 +178,19 @@ const {
             h1.classList.add("is-permanently-iridescent");
           }
         },
-        "<" // Simultáneo con el bokeh de la imagen
+        "<"
       )
       // Contemplación del titanio cepillado
       .to({}, { duration: 3.0 })
-      // Título hace scale-up fade out, imagen empieza a volver a foco
+      // Título hace scale-up fade out, imagen recupera opacidad plena
       .to(h1, { opacity: 0, scale: 1.50, duration: 1.4, ease: "power2.inOut" });
 
-      // Imagen vuelve a nítida con un leve blur residual en título
+      // Imagen vuelve a opacidad completa nítida
       if (image) {
         tl.to(
           image,
-          { filter: "blur(0px) brightness(1)", opacity: 1.0, duration: 2.2, ease: "power3.out" },
-          "<0.6" // Empieza a aclarar 0.6s antes del fade del H1
+          { opacity: 1.0, duration: 2.2, ease: "power3.out" },
+          "<0.6"
         );
       }
     }
@@ -227,7 +241,29 @@ const {
         tl.to(metaContainer, { opacity: 0.65, duration: 1.6, ease: "power2.out" }, "<");
       }
     }
+
+    // ── REAPARICIÓN DEL MENUBAR AL FINAL DEL TIMELINE GSAP ──
+    if (header) {
+      tl.to(
+        header,
+        {
+          opacity: 1,
+          y: 0,
+          pointerEvents: "auto",
+          duration: 1.4,
+          ease: "power2.out",
+        },
+        "-=0.8"
+      );
+    }
   };
+
+  document.addEventListener("astro:before-swap", () => {
+    const header = document.getElementById("site-header");
+    if (header) {
+      gsap.set(header, { opacity: 1, y: 0, pointerEvents: "auto" });
+    }
+  });
 
   document.addEventListener("DOMContentLoaded", setupInteriorHeroReveal);
   document.addEventListener("astro:page-load", setupInteriorHeroReveal);

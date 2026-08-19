@@ -1,0 +1,400 @@
+---
+/**
+ * CinematicCollectionHero.astro
+ * Hero cinematografico para Categorias Padre de Colecciones.
+ * Timeline puro sin scroll, ~12s:
+ *  Fase 1 (0s): Imagen 1 entra izquierda, fade + zoom out interno
+ *  Fase 2 (2.2s): Imagen 1 se acomoda hacia su mitad izquierda
+ *  Fase 3 (4.5s): Imagen 2 entra derecha, fade + zoom out
+ *  Fase 4 (6.8s): Imagen 2 se asienta, pausa contemplativa
+ *  Fase 5 (7.8s): Texto TypeMagic emerge sobre ambas imagenes
+ */
+
+import { Image } from "astro:assets";
+
+interface Props {
+  title: string;
+  eyebrow?: string;
+  paragraph: string;
+  primaryImage: ImageMetadata | string;
+  secondaryImage?: ImageMetadata | string;
+  primaryAlt: string;
+  secondaryAlt?: string;
+  primaryPosition?: string;
+  secondaryPosition?: string;
+}
+
+const {
+  title,
+  eyebrow = "Coleccion Tematica",
+  paragraph,
+  primaryImage,
+  secondaryImage,
+  primaryAlt,
+  secondaryAlt = "",
+  primaryPosition = "center center",
+  secondaryPosition = "center center",
+} = Astro.props;
+
+const primarySrc = typeof primaryImage === "string"
+  ? primaryImage
+  : (primaryImage as any)?.src ?? primaryImage;
+
+const secondarySrc = secondaryImage
+  ? (typeof secondaryImage === "string"
+      ? secondaryImage
+      : (secondaryImage as any)?.src ?? secondaryImage)
+  : null;
+---
+
+<section
+  class="cch-stage"
+  id="cinematic-collection-hero"
+  aria-label={`Presentacion: ${title}`}
+  data-paragraph={paragraph}
+>
+
+  <!-- Panel Imagen 1 izquierda -->
+  <div class="cch-panel cch-panel--left" id="cch-panel-left">
+    <div class="cch-panel-inner" id="cch-inner-left">
+      {typeof primaryImage === "string" ? (
+        <img class="cch-img" id="cch-img-primary" src={primarySrc} alt={primaryAlt} loading="eager" style={`object-position: ${primaryPosition}`} />
+      ) : (
+        <Image class="cch-img" id="cch-img-primary" src={primaryImage as ImageMetadata} alt={primaryAlt} loading="eager" quality={88} style={`object-position: ${primaryPosition}`} />
+      )}
+    </div>
+  </div>
+
+  <!-- Panel Imagen 2 derecha (opcional) -->
+  {secondarySrc && (
+    <div class="cch-panel cch-panel--right" id="cch-panel-right">
+      <div class="cch-panel-inner" id="cch-inner-right">
+        {typeof secondaryImage === "string" ? (
+          <img class="cch-img" id="cch-img-secondary" src={secondarySrc} alt={secondaryAlt} loading="eager" style={`object-position: ${secondaryPosition}`} />
+        ) : (
+          <Image class="cch-img" id="cch-img-secondary" src={secondaryImage as ImageMetadata} alt={secondaryAlt} loading="eager" quality={80} style={`object-position: ${secondaryPosition}`} />
+        )}
+      </div>
+    </div>
+  )}
+
+  <!-- Vignette sobria perimetral -->
+  <div class="cch-vignette" aria-hidden="true"></div>
+
+  <!-- Overlay de texto central -->
+  <div class="cch-overlay" id="cch-overlay">
+    {eyebrow && <span class="cch-eyebrow" id="cch-eyebrow">{eyebrow}</span>}
+    <h1 class="cch-title" id="cch-title">{title}</h1>
+    <div class="cch-rule" id="cch-rule" aria-hidden="true"></div>
+    <p class="cch-paragraph" id="cch-paragraph"></p>
+    <div class="cch-slot" id="cch-slot"><slot /></div>
+  </div>
+
+</section>
+
+<style>
+  .cch-stage {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    min-height: 560px;
+    background: #000;
+    overflow: hidden;
+  }
+
+  /* Paneles de imagen: arrancan fuera de pantalla */
+  .cch-panel {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    overflow: hidden;
+    will-change: transform, opacity;
+  }
+  .cch-panel--left {
+    left: 0;
+    width: 50%;
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  .cch-panel--right {
+    right: 0;
+    width: 50%;
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  /* Sin imagen secundaria: izquierda ocupa todo */
+  .cch-stage:not(:has(#cch-panel-right)) #cch-panel-left {
+    width: 100%;
+  }
+
+  /* Inner mas grande para zoom interno */
+  .cch-panel-inner {
+    position: relative;
+    width: 100%;
+    height: 118%;
+    top: -9%;
+    will-change: transform;
+  }
+  .cch-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    will-change: transform;
+    filter: brightness(0.88) contrast(1.05);
+  }
+
+  /* Vignette perimetral sobria - solo bordes, no tapa el centro */
+  .cch-vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+    background:
+      linear-gradient(to bottom, rgba(0,0,0,0.52) 0%, transparent 16%),
+      linear-gradient(to top,    rgba(0,0,0,0.58) 0%, transparent 20%),
+      linear-gradient(to right,  rgba(0,0,0,0.18) 0%, transparent 8%),
+      linear-gradient(to left,   rgba(0,0,0,0.18) 0%, transparent 8%);
+  }
+
+  /* Separador central: linea muy estrecha entre las dos imagenes */
+  .cch-stage:has(#cch-panel-right) .cch-vignette::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    width: 2px;
+    transform: translateX(-50%);
+    background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.6) 70%, transparent 100%);
+  }
+
+  /* Overlay texto */
+  .cch-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: clamp(2rem, 5vw, 5rem) clamp(1.5rem, 10vw, 12rem);
+    gap: 0.9rem;
+    pointer-events: none;
+  }
+
+  .cch-eyebrow {
+    font-family: "JetBrains Mono", "Courier New", monospace;
+    font-size: clamp(8px, 0.78vw, 10px);
+    letter-spacing: 0.44em;
+    text-transform: uppercase;
+    color: #C9A86C;
+    opacity: 0;
+    transform: translateY(-10px);
+    will-change: opacity, transform;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.85);
+  }
+
+  .cch-title {
+    font-family: "Cinzel", "Trajan Pro", serif;
+    font-size: clamp(3rem, 6.5vw, 8rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    background: linear-gradient(118deg, #8499b0 0%, #c2d0de 22%, #eaeff4 46%, #bdc9d6 70%, #7a8fa4 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: cch-shimmer 16s ease-in-out infinite;
+    opacity: 0;
+    filter: drop-shadow(0 4px 24px rgba(0,0,0,0.9));
+    will-change: opacity, transform, filter;
+  }
+
+  @keyframes cch-shimmer {
+    0%, 100% { background-position: 0% center; }
+    50%       { background-position: 100% center; }
+  }
+
+  .cch-rule {
+    width: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #C9A86C 40%, #C9A86C 60%, transparent);
+    margin: 0.15rem 0;
+    will-change: width;
+  }
+
+  .cch-paragraph {
+    font-family: "Georgia", "Gloock", serif;
+    font-size: clamp(0.98rem, 1.55vw, 1.38rem);
+    line-height: 1.78;
+    max-width: 50ch;
+    color: #d4c9bc;
+    margin: 0;
+    text-shadow: 0 2px 18px rgba(0,0,0,0.88);
+  }
+
+  :global(.cch-word-wrap) {
+    display: inline-block;
+    overflow: hidden;
+    margin-right: 0.3em;
+    vertical-align: bottom;
+    line-height: inherit;
+  }
+  :global(.cch-word) {
+    display: inline-block;
+    transform: translateY(108%);
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  :global(.cch-word.is-bold) {
+    color: #fff;
+    font-style: italic;
+    text-shadow: 0 0 20px rgba(255,255,255,0.18);
+  }
+
+  .cch-slot {
+    opacity: 0;
+    transform: translateY(6px);
+    will-change: opacity, transform;
+    pointer-events: auto;
+    font-family: "JetBrains Mono", monospace;
+    font-size: clamp(8px, 0.82vw, 10px);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(239,235,227,0.42);
+  }
+
+  @media (max-width: 768px) {
+    #cch-panel-left { width: 100%; }
+    #cch-panel-right { display: none; }
+    .cch-overlay { padding: 2rem 1.5rem; }
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+
+  const initCCH = () => {
+    const section = document.getElementById("cinematic-collection-hero");
+    if (!section || section.dataset.cchInit === "true") return;
+    section.dataset.cchInit = "true";
+
+    const panelLeft  = section.querySelector<HTMLElement>("#cch-panel-left");
+    const panelRight = section.querySelector<HTMLElement>("#cch-panel-right");
+    const innerLeft  = section.querySelector<HTMLElement>("#cch-inner-left");
+    const imgLeft    = section.querySelector<HTMLElement>("#cch-img-primary");
+    const imgRight   = section.querySelector<HTMLElement>("#cch-img-secondary");
+    const eyebrow    = section.querySelector<HTMLElement>("#cch-eyebrow");
+    const titleEl    = section.querySelector<HTMLElement>("#cch-title");
+    const rule       = section.querySelector<HTMLElement>("#cch-rule");
+    const paragEl    = section.querySelector<HTMLElement>("#cch-paragraph");
+    const slotEl     = section.querySelector<HTMLElement>("#cch-slot");
+
+    // ── Split-word del parrafo ──
+    const raw = section.dataset.paragraph ?? "";
+    if (paragEl && raw) {
+      paragEl.innerHTML = "";
+      raw.trim().split(/\s+/).forEach(token => {
+        const isBold = token.startsWith("**") && token.endsWith("**");
+        const word = isBold ? token.slice(2, -2) : token;
+        const wrap = document.createElement("span");
+        wrap.className = "cch-word-wrap";
+        const inner = document.createElement("span");
+        inner.className = isBold ? "cch-word is-bold" : "cch-word";
+        inner.textContent = word;
+        wrap.appendChild(inner);
+        paragEl.appendChild(wrap);
+      });
+    }
+
+    const words = Array.from(section.querySelectorAll<HTMLElement>(".cch-word"));
+
+    const header  = document.getElementById("site-header");
+
+    // Estado inicial
+    if (header) gsap.set(header, { opacity: 0, y: -25, pointerEvents: "none" });
+    gsap.set(panelLeft,  { xPercent: -100, opacity: 0 });
+    if (panelRight) gsap.set(panelRight, { xPercent: 100, opacity: 0 });
+    gsap.set([imgLeft, imgRight].filter(Boolean), { scale: 1.14 });
+    if (eyebrow) gsap.set(eyebrow, { opacity: 0, y: -10 });
+    if (titleEl) gsap.set(titleEl, { opacity: 0, y: 20, filter: "blur(14px)" });
+    if (rule)    gsap.set(rule,    { width: 0 });
+    gsap.set(words, { y: "108%", opacity: 0 });
+    if (slotEl)  gsap.set(slotEl, { opacity: 0, y: 6 });
+
+    const tl = gsap.timeline({
+      defaults: { ease: "power2.out" },
+      onComplete: () => {
+        if (header) gsap.to(header, { opacity: 1, y: 0, pointerEvents: "auto", duration: 1.2, ease: "power2.out" });
+      }
+    });
+
+    // FASE 1 (0s - 2.4s): Imagen 1 desliza desde la izquierda
+    tl.to(panelLeft, { xPercent: 0, opacity: 1, duration: 2.2, ease: "power3.out" }, 0)
+      .to(imgLeft,   { scale: 1.0, duration: 3.8, ease: "power2.out" }, 0);
+
+    // FASE 2 (2.4s - 5.2s): Imagen 1 se acomoda a mitad izquierda (si hay imagen 2)
+    if (panelRight) {
+      tl.to(panelLeft, { width: "50%", duration: 2.6, ease: "power2.inOut" }, 2.4);
+    }
+
+    // FASE 3 (4.8s - 7.2s): Imagen 2 desliza desde la derecha, lentamente
+    if (panelRight && imgRight) {
+      tl.to(panelRight, { xPercent: 0, opacity: 1, duration: 2.5, ease: "power3.out" }, 4.8)
+        .to(imgRight,   { scale: 1.0, duration: 3.5, ease: "power2.out" }, 4.8);
+    }
+
+    // FASE 4 (7.2s): Pausa contemplativa — las imagenes se asientan
+    tl.to({}, { duration: 0.6 }, 7.2);
+
+    // FASE 5 (7.8s - 12s): Texto TypeMagic emerge
+    const t0 = 7.8;
+
+    if (eyebrow) {
+      tl.to(eyebrow, { opacity: 1, y: 0, duration: 1.0 }, t0);
+    }
+    if (titleEl) {
+      tl.fromTo(titleEl,
+        { opacity: 0, y: 20, filter: "blur(14px)" },
+        { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.6, ease: "power3.out" },
+        t0 + 0.4
+      );
+    }
+    if (rule) {
+      tl.to(rule, { width: "110px", duration: 1.2, ease: "power2.inOut" }, t0 + 1.6);
+    }
+    if (words.length) {
+      const stagger = Math.min(0.3, 5.5 / words.length);
+      tl.to(words, {
+        y: "0%", opacity: 1,
+        duration: 0.8,
+        stagger,
+        ease: "power3.out",
+      }, t0 + 2.0);
+    }
+    if (slotEl) {
+      tl.to(slotEl, { opacity: 1, y: 0, duration: 1.0 }, 11.4);
+    }
+
+    // Reaparicion suave del menubar al final
+    if (header) {
+      tl.to(header, { opacity: 1, y: 0, pointerEvents: "auto", duration: 1.2, ease: "power2.out" }, 11.6);
+    }
+  };
+
+  document.addEventListener("astro:before-swap", () => {
+    const s = document.getElementById("cinematic-collection-hero");
+    if (s) s.removeAttribute("data-cch-init");
+    const header = document.getElementById("site-header");
+    if (header) gsap.set(header, { opacity: 1, y: 0, pointerEvents: "auto" });
+  });
+
+  document.addEventListener("astro:page-load", initCCH);
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    initCCH();
+  } else {
+    document.addEventListener("DOMContentLoaded", initCCH);
+  }
+</script>
