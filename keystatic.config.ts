@@ -418,5 +418,114 @@ export default config({
         }),
       }
     }),
+
+    // Colección: Ensayos Cinemáticos (GSAP)
+    ensayosCinematicos: collection({
+      label: 'Ensayos Cinemáticos (GSAP)',
+      slugField: 'title', // ESTA CLAVE ES CRÍTICA
+      path: 'src/content/ensayos-cinematicos/*/',
+      format: { contentField: 'content' },
+      schema: {
+        // 1. EL CAMPO SLUG OBLIGATORIO (Debe llamarse 'title' para coincidir con slugField)
+        title: fields.slug({ name: { label: 'Título' } }),
+
+        // PASO 2: Temporalmente comentado para aislar la inicialización de la vista
+        /*
+        generadorTexto: {
+          kind: 'form',
+          label: '1. Motor de Pensamiento & Arte Unificado TGP',
+          Input: GeneradorTextoTGP,
+          defaultValue: () => '',
+          parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || '') }),
+          validate: (v: any) => v,
+          reader: {
+            parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          },
+        } as any,
+        */
+
+        // 2. RESTO DE CAMPOS
+        atmosfera: fields.conditional(
+          fields.select({
+            label: 'Atmósfera',
+            options: [
+              { label: 'Canon Default', value: 'obsidiana' },
+              { label: 'Documental', value: 'deriva' },
+              { label: 'Cognitivo', value: 'umbral' },
+              { label: 'Personalizado', value: 'custom' },
+            ],
+            defaultValue: 'obsidiana',
+          }),
+          {
+            obsidiana: fields.empty(),
+            deriva: fields.empty(),
+            umbral: fields.empty(),
+            custom: fields.object({
+              header: fields.select({
+                label: 'Header',
+                options: [
+                  { label: 'Minimalista', value: 'minimalista' },
+                  { label: 'Cinemático Clásico', value: 'clasico' },
+                  { label: 'Editorial Flotante', value: 'flotante' },
+                ],
+                defaultValue: 'clasico',
+              }),
+              body: fields.select({
+                label: 'Body',
+                options: [
+                  { label: 'Lectura Profunda (Serif)', value: 'serif' },
+                  { label: 'Manifiesto (Sans)', value: 'sans' },
+                  { label: 'Técnico (Mono)', value: 'mono' },
+                ],
+                defaultValue: 'serif',
+              }),
+              imagen: fields.select({
+                label: 'Imagen',
+                options: [
+                  { label: 'Vertical Fade (Eje Y)', value: 'fade-y' },
+                  { label: 'Paralaje Lateral (Eje X)', value: 'paralaje-x' },
+                  { label: 'Zoom Profundo (Eje Z)', value: 'zoom-z' },
+                ],
+                defaultValue: 'fade-y',
+              }),
+              footer: fields.select({
+                label: 'Footer',
+                options: [
+                  { label: 'Completo con Metadatos', value: 'completo' },
+                  { label: 'Minimalista Sutil', value: 'minimal' },
+                  { label: 'Retorno Rápido', value: 'retorno' },
+                ],
+                defaultValue: 'completo',
+              }),
+            }),
+          }
+        ),
+
+        coverImage: fields.image({ 
+          label: 'Imagen de Portada (Opcional)', 
+          directory: 'src/assets/ensayos-cinematicos', 
+          publicPath: '/src/assets/ensayos-cinematicos/' 
+        }),
+
+        gallery: fields.array(fields.image({
+          label: 'Imagen de Galería',
+          directory: 'src/assets/ensayos-cinematicos',
+          publicPath: '/src/assets/ensayos-cinematicos/'
+        }), {
+          label: 'Galería de Imágenes Cinemáticas (GSAP)',
+          itemLabel: () => 'Imagen'
+        }),
+
+        // 3. CAMPO DE CONTENIDO
+        content: fields.document({
+          label: 'Contenido',
+          formatting: true,
+          links: true,
+          images: true,
+          componentBlocks
+        }),
+      },
+    }),
   },
 });

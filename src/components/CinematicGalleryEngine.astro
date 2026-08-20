@@ -1,4 +1,6 @@
 ---
+import { Image } from "astro:assets";
+
 /**
  * CinematicGalleryEngine.astro
  * ──────────────────────────────────────────────────────────────────────────────
@@ -40,18 +42,29 @@ const safeSlides = slides.length > 0 ? slides : [];
           >
             {/* Fondo: Ken Burns */}
             <div class="cge-bg-wrap absolute inset-0 overflow-hidden bg-black/80">
-              <img
-                src={
-                  typeof slide.image === "string"
-                    ? slide.image
-                    : slide.image?.src || ""
-                }
-                alt={slide.title}
-                class="cge-bg-img absolute inset-0 w-full h-full object-contain scale-100 opacity-95"
-                style={`object-position: ${slide.imagePosition || "center center"};`}
-                loading={i === 0 ? "eager" : "lazy"}
-                decoding="async"
-              />
+              {typeof slide.image === "object" && slide.image ? (
+                <Image
+                  src={slide.image}
+                  alt={slide.title}
+                  format="webp"
+                  quality={85}
+                  class="cge-bg-img absolute inset-0 w-full h-full object-contain scale-100 opacity-95"
+                  style={`object-position: ${slide.imagePosition || "center center"};`}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                />
+              ) : typeof slide.image === "string" && slide.image.trim().length > 0 ? (
+                <img
+                  src={slide.image}
+                  alt={slide.title}
+                  class="cge-bg-img absolute inset-0 w-full h-full object-contain scale-100 opacity-95"
+                  style={`object-position: ${slide.imagePosition || "center center"};`}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                />
+              ) : (
+                <div class="fallback-background absolute inset-0 bg-stone-900 pointer-events-none -z-10" />
+              )}
               {/* Gradiente editorial: oscurece base */}
               <div class="absolute inset-0 bg-linear-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent pointer-events-none" />
             </div>

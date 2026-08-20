@@ -10,7 +10,7 @@ import {
 interface Props {
   slug: string;
   entry: any;
-  img?: ImageMetadata | null;
+  img?: ImageMetadata | string | null;
   variant?: "hero" | "duo-60" | "duo-40" | "standard";
   enableCinemagraph?: boolean;
   isEager?: boolean;
@@ -93,8 +93,9 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
   {
     img ? (
       <Image
-        src={img}
+        src={img as any}
         alt={entry.title || "Dossier del Archivo"}
+        format="webp"
         loading={isEager ? "eager" : "lazy"}
         decoding="async"
         quality={80}
@@ -105,7 +106,7 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
         }`}
       />
     ) : (
-      <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1c242b] via-theme-dark to-[#0a0b0b] -z-10" />
+      <div class="fallback-background absolute inset-0 bg-stone-900 pointer-events-none -z-10" />
     )
   }
 

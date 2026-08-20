@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../components/CinematicPostEngine.astro';
@@ -217,15 +218,25 @@ function createPremierSequences(essays: typeof resolvedEssays) {
               href={`/colecciones/${card.catKey}`}
               class="group card-hover-cinematic relative overflow-hidden rounded-2xl border border-white/10 bg-[#151718]/90 text-left p-4 md:p-5 flex flex-col justify-end min-h-37.5 md:min-h-42.5 cursor-pointer transition-all duration-500"
             >
-              {card.img && (
+              {typeof card.img === 'object' && card.img ? (
+                <Image
+                  src={card.img}
+                  alt={card.catLabel}
+                  format="webp"
+                  quality={80}
+                  loading="lazy"
+                  decoding="async"
+                  class="absolute inset-0 w-full h-full object-cover brightness-[0.45] group-hover:scale-105 group-hover:brightness-[0.55] transition-all duration-700"
+                />
+              ) : typeof card.img === 'string' && card.img.trim().length > 0 ? (
                 <img
-                  src={(card.img as any)?.src ?? card.img}
+                  src={card.img}
                   alt={card.catLabel}
                   loading="lazy"
                   decoding="async"
                   class="absolute inset-0 w-full h-full object-cover brightness-[0.45] group-hover:scale-105 group-hover:brightness-[0.55] transition-all duration-700"
                 />
-              )}
+              ) : null}
               <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
               <div class="relative z-10 flex flex-col gap-1">
                 <span class="font-metadata text-xs uppercase tracking-[0.25em] text-[#EFEBE3]/70 font-bold">

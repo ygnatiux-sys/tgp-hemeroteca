@@ -19,7 +19,6 @@ export function BuscadorModal() {
   const [items, setItems] = useState<SearchItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   // Cargar índice de búsqueda
   useEffect(() => {

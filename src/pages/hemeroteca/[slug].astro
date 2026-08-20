@@ -16,7 +16,6 @@ import InteriorHero from "../../components/InteriorHero.astro";
 import {
   resolveEssayImage,
   resolveAllPostGalleryImages,
-  essayImages,
   groupByCategory,
   formatCategory,
   getPublishableEssays,
@@ -151,11 +150,6 @@ if (
 let renderedHtml = "";
 if (finalMarkdownText) {
   renderedHtml = marked.parse(finalMarkdownText) as string;
-  for (const [imgKey, imgModule] of Object.entries(essayImages)) {
-    if (renderedHtml.includes(imgKey)) {
-      renderedHtml = renderedHtml.replaceAll(imgKey, imgModule.default.src);
-    }
-  }
 }
 
 // 5. Resolución de imagen de portada
@@ -336,7 +330,7 @@ const articleSchema = {
   footerVariant="minimal"
   title={`${doc.title} | Hemeroteca TGP`}
 >
-  <script slot="head" type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
   {
     isCinematicView ? (
       <div id="cinematic-override" class="w-full min-h-dvh overflow-hidden">
@@ -351,9 +345,9 @@ const articleSchema = {
         <InteriorHero
           title={doc.title || "Ensayo TGP"}
           image={optimizedImage}
-    imageAlt={`Portada de ${data.title}`}
+    imageAlt={`Portada de ${doc.title || 'Ensayo'}`}
     imagePosition={imagePosition}
-    eyebrow={data.category || "Archivo clasificado"}
+    eyebrow={doc.category || "Archivo clasificado"}
     subtitle={doc.volantaHook || (doc.excerpt ? `"${doc.excerpt}"` : undefined)}
     titleClass="text-[clamp(2.25rem,5vw,4.5rem)] font-cinzel font-extrabold tracking-tight leading-[1.05] gradient-acero-ios text-center mx-auto"
   >

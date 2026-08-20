@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 ---
 
 <div class="not-prose my-16 -mx-4 md:-mx-8 lg:-mx-10 xl:-mx-12 px-6 md:px-8">
@@ -26,9 +27,15 @@
         class="group flex items-center gap-4 rounded-xl border border-white/8 bg-white/2 p-3.5 hover:border-rust-orange/35 hover:bg-rust-orange/4 transition-all duration-400"
       >
         <div class="w-14 h-14 rounded-lg overflow-hidden shrink-0 border border-white/10">
-          <img
+          <Image
             src="/images/lead-magnet/book-cover.jpg"
             alt="El Códice Fundacional"
+            width={56}
+            height={56}
+            format="webp"
+            quality={85}
+            loading="lazy"
+            decoding="async"
             class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
           />
         </div>

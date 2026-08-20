@@ -8,14 +8,14 @@ const ensayos = defineCollection({
     pattern: "**/index.json", 
     base: "src/content/ensayos" 
   }),
-  schema: z.object({
+  schema: ({ image }) => z.object({
     title: z.string().optional().catch("Sin Título"),
     volanta: z.string().optional().nullable().catch(null),
     draft: z.boolean().default(false),
     date: z.string().optional().nullable().catch(null),
     category: z.string().optional().nullable().catch("Ensayo"),
     themeColor: z.string().optional().nullable().default('british-green'),
-    coverImage: z.string().optional().nullable().catch(null),
+    coverImage: image().optional().nullable().catch(null),
     videoBg: z.string().optional().nullable().catch(null),
     excerpt: z.string().optional().nullable().catch("Sin descripción disponible."),
     sitioGeohistorico: z.string().optional().nullable().catch(null),
@@ -76,7 +76,7 @@ const georreferencias = defineCollection({
     pattern: "**/index.json", 
     base: "src/content/georreferencias" 
   }),
-  schema: z.object({
+  schema: ({ image }) => z.object({
     title: z.string().optional().catch("Sin Título"),
     sitioGeohistorico: z.string().optional().nullable().catch(null),
     volantaHook: z.string().optional().nullable().catch(null),
@@ -85,7 +85,7 @@ const georreferencias = defineCollection({
     date: z.string().optional().nullable().catch(null),
     category: z.string().optional().nullable().default("Arqueosemiótica"),
     publicarConImagen: z.boolean().default(true),
-    coverImage: z.string().optional().nullable().catch(null),
+    coverImage: image().optional().nullable().catch(null),
     bancoImagenesWikimedia: z.string().optional().nullable().catch(null),
     excerpt: z.string().optional().nullable().catch("Sin descripción disponible."),
     generadorGeoref: z.string().optional().nullable().catch(null),
@@ -104,14 +104,14 @@ const arquetiposGlobales = defineCollection({
     pattern: "**/index.json", 
     base: "src/content/arquetipos-globales" 
   }),
-  schema: z.object({
+  schema: ({ image }) => z.object({
     title: z.string().optional().catch("Sin Título"),
     volanta: z.string().optional().nullable().catch(null),
     draft: z.boolean().default(false),
     date: z.string().optional().nullable().catch(null),
     category: z.string().optional().nullable().catch("Arquetipos Globales"),
     themeColor: z.string().optional().nullable().default('rust-orange'),
-    coverImage: z.string().optional().nullable().catch(null),
+    coverImage: image().optional().nullable().catch(null),
     videoBg: z.string().optional().nullable().catch(null),
     excerpt: z.string().optional().nullable().catch("Sin descripción disponible."),
     sitioGeohistorico: z.string().optional().nullable().catch(null),
@@ -133,6 +133,27 @@ const arquetiposGlobalesContent = defineCollection({
   }),
 });
 
+const ensayosCinematicos = defineCollection({
+  loader: glob({ 
+    pattern: "**/index.mdoc", 
+    base: "src/content/ensayos-cinematicos" 
+  }),
+  schema: ({ image }) => z.object({
+    title: z.string().optional().catch("Sin Título"),
+    atmosfera: z.any().optional().default('obsidiana'),
+    coverImage: image().optional().nullable().catch(null),
+    gallery: z.array(image()).optional().default([]),
+    generadorTexto: z.string().optional().nullable().catch(null),
+  })
+});
+
+const ensayosCinematicosContent = defineCollection({
+  loader: glob({ 
+    pattern: "**/content.mdoc", 
+    base: "src/content/ensayos-cinematicos" 
+  }),
+});
+
 export const collections = {
   ensayos,
   ensayosContent,
@@ -141,4 +162,6 @@ export const collections = {
   georreferenciasContent,
   arquetiposGlobales,
   arquetiposGlobalesContent,
+  ensayosCinematicos,
+  ensayosCinematicosContent,
 };

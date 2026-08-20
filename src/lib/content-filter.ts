@@ -20,7 +20,7 @@ export interface EssayEntry {
     date?: string | null;
     category?: string | null;
     themeColor?: string | null;
-    coverImage?: string | null;
+    coverImage?: ImageMetadata | string | null;
     excerpt?: string | null;
     spotifyLink?: string | null;
     youtubeLink?: string | null;
@@ -33,55 +33,18 @@ export interface EssayEntry {
 }
 
 /**
- * Mapa centralizado de imágenes de ensayos y georreferencias en Vite/Astro.
+ * Retorna la portada del ensayo o recurso (ImageMetadata si fue importado por Astro, o string / null).
  */
-export const essayImages = import.meta.glob<{ default: ImageMetadata }>(
-  [
-    '/src/assets/ensayos/**/*.{jpeg,jpg,png,gif,webp,avif,svg}',
-    '/src/assets/georreferencias/**/*.{jpeg,jpg,png,gif,webp,avif,svg}',
-    '/src/assets/arquetipos-globales/**/*.{jpeg,jpg,png,gif,webp,avif,svg}'
-  ],
-  { eager: true }
-);
-
-/**
- * Resuelve la imagen óptima de un ensayo, georreferencia o arquetipo:
- * 1. Coincidencia exacta con coverImage en import.meta.glob.
- * 2. Si es URL remota HTTP/HTTPS, retorna objeto ImageMetadata sintético.
- * 3. Si no, busca automáticamente cualquier imagen en la carpeta del slug.
- */
-export function resolveEssayImage(coverPath?: string | null, slug?: string): ImageMetadata | null {
-  if (coverPath && essayImages[coverPath]) {
-    return essayImages[coverPath].default;
-  }
-
-  if (coverPath && (coverPath.startsWith('http://') || coverPath.startsWith('https://'))) {
-    return { src: coverPath, width: 1920, height: 1080, format: 'jpg' } as any;
-  }
-
-  if (slug) {
-    const ensayoPrefix = `/src/assets/ensayos/${slug}/`;
-    const georefPrefix = `/src/assets/georreferencias/${slug}/`;
-    const arquetipoPrefix = `/src/assets/arquetipos-globales/${slug}/`;
-    for (const [key, mod] of Object.entries(essayImages)) {
-      if (key.startsWith(ensayoPrefix) || key.startsWith(georefPrefix) || key.startsWith(arquetipoPrefix)) {
-        return mod.default;
-      }
-    }
-  }
-
-  if (coverPath && typeof coverPath === 'string' && coverPath.trim().length > 0) {
-    return { src: coverPath, width: 1920, height: 1080, format: 'jpg' } as any;
-  }
-
-  return null;
+export function resolveEssayImage(coverPath?: any, slug?: string): any {
+  if (!coverPath) return null;
+  return coverPath;
 }
 
 /**
  * Determina si una entrada carece de foto y su título o slug indica que es un post de prueba ('Test' / 'Prueba').
  */
 export function isNoPhotoTestPost(entry: EssayEntry): boolean {
-  const hasImg = resolveEssayImage(entry.entry?.coverImage, entry.slug) !== null;
+  const hasImg = Boolean(entry.entry?.coverImage);
   if (hasImg) return false;
 
   const title = (entry.entry?.title || '').toLowerCase();
@@ -310,37 +273,37 @@ export function resolveAllPostGalleryImages(doc: any, slug?: string): GalleryIma
     } catch (e) {}
   }
 
-  // 2. Imágenes locales en carpeta del slug
-  if (slug) {
-    const ensayoPrefix = `/src/assets/ensayos/${slug}/`;
-    const georefPrefix = `/src/assets/georreferencias/${slug}/`;
-    const arquetipoPrefix = `/src/assets/arquetipos-globales/${slug}/`;
-    for (const [key, mod] of Object.entries(essayImages)) {
-      if (key.startsWith(ensayoPrefix) || key.startsWith(georefPrefix) || key.startsWith(arquetipoPrefix)) {
-        const fileName = key.split('/').pop() || 'Fotografía de Archivo';
-        addImg({
-          url: mod.default.src,
-          thumbUrl: mod.default.src,
-          title: fileName.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
-          caption: `Registro de archivo fotográfico: ${slug}`,
-          width: mod.default.width,
-          height: mod.default.height
-        });
-      }
+  // 2. Portada principal
+  if (doc?.coverImage) {
+    const cover = doc.coverImage;
+    const coverUrl = typeof cover === 'object' && cover?.src ? cover.src : typeof cover === 'string' ? cover : null;
+    if (coverUrl) {
+      addImg({
+        url: coverUrl,
+        thumbUrl: coverUrl,
+        title: doc.title || 'Portada de Archivo',
+        caption: doc.excerpt || 'Registro principal',
+        width: typeof cover === 'object' ? cover?.width : undefined,
+        height: typeof cover === 'object' ? cover?.height : undefined
+      });
     }
   }
 
-  // 3. Portada si no está en la lista
-  if (doc?.coverImage && essayImages[doc.coverImage]) {
-    const mod = essayImages[doc.coverImage];
-    addImg({
-      url: mod.default.src,
-      thumbUrl: mod.default.src,
-      title: doc.title || 'Portada de Archivo',
-      caption: doc.excerpt || 'Registro principal',
-      width: mod.default.width,
-      height: mod.default.height
-    });
+  // 3. Galería de imágenes (si existe array en doc.gallery)
+  if (Array.isArray(doc?.gallery)) {
+    for (const item of doc.gallery) {
+      const gUrl = typeof item === 'object' && item?.src ? item.src : typeof item === 'string' ? item : null;
+      if (gUrl) {
+        addImg({
+          url: gUrl,
+          thumbUrl: gUrl,
+          title: doc.title || 'Lámina de Galería',
+          caption: 'Registro de galería',
+          width: typeof item === 'object' ? item?.width : undefined,
+          height: typeof item === 'object' ? item?.height : undefined
+        });
+      }
+    }
   }
 
   return images;

@@ -169,6 +169,24 @@ declare module 'astro:content' {
   filePath?: string;
   digest?: string | number;
 }>;
+"ensayosCinematicos": Record<string, {
+  id: string;
+  body?: string;
+  collection: "ensayosCinematicos";
+  data: InferEntrySchema<"ensayosCinematicos">;
+  rendered?: RenderedContent;
+  filePath?: string;
+  digest?: string | number;
+}>;
+"ensayosCinematicosContent": Record<string, {
+  id: string;
+  body?: string;
+  collection: "ensayosCinematicosContent";
+  data: any;
+  rendered?: RenderedContent;
+  filePath?: string;
+  digest?: string | number;
+}>;
 "ensayosContent": Record<string, {
   id: string;
   body?: string;

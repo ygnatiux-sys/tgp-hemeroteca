@@ -512,9 +512,15 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
               title="Ver perfil de Xavier Benítez en Gravatar"
             >
               <div class="w-full h-full rounded-xl overflow-hidden relative">
-                <img
+                <Image
                   src="/perfil.webp"
                   alt="Xavier Benítez"
+                  width={112}
+                  height={112}
+                  format="webp"
+                  quality={90}
+                  loading="lazy"
+                  decoding="async"
                   class="w-full h-full object-cover transition-transform duration-700 group-hover/avatar:scale-110"
                 />
                 <div class="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-60 group-hover/avatar:opacity-10 transition-opacity"></div>

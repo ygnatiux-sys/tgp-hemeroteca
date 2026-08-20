@@ -1,0 +1,74 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import LayoutObsidiana from '../../layouts/CinematicFX/LayoutObsidiana.astro';
+import LayoutDeriva from '../../layouts/CinematicFX/LayoutDeriva.astro';
+import LayoutUmbral from '../../layouts/CinematicFX/LayoutUmbral.astro';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const ensayos = await getCollection('ensayosCinematicos').catch(() => []);
+
+  return ensayos.map((entry) => ({
+    params: { slug: entry.id.replace(/\/index$/, '') },
+    props: { entry },
+  }));
+}
+
+const { slug } = Astro.params;
+const { entry } = Astro.props;
+
+// Carga del contenido Markdoc si existe en la colección
+let Content: any = null;
+try {
+  const contentEntry = await getEntry('ensayosCinematicosContent' as any, `${slug}/content`);
+  if (contentEntry) {
+    const rendered = await render(contentEntry);
+    Content = rendered.Content;
+  }
+} catch (err) {
+  console.warn(`[Ensayos Cinemáticos] No se pudo cargar Markdoc para ${slug}:`, err);
+}
+
+// 1. Diccionario de Presets Cinemáticos
+const PRESETS_CINEMATICOS = {
+  obsidiana: LayoutObsidiana,
+  deriva: LayoutDeriva,
+  umbral: LayoutUmbral,
+} as const;
+
+type PresetKey = keyof typeof PRESETS_CINEMATICOS;
+
+// 2. Extracción de atmósfera (soporte para valor simple o fields.conditional de Keystatic)
+const rawAtmosfera = entry.data.atmosfera;
+let atmosferaKey: string = 'obsidiana';
+let customVariables: Record<string, any> = {};
+
+if (typeof rawAtmosfera === 'string') {
+  atmosferaKey = rawAtmosfera;
+} else if (rawAtmosfera && typeof rawAtmosfera === 'object') {
+  atmosferaKey = rawAtmosfera.discriminant || 'obsidiana';
+  if (atmosferaKey === 'custom' && rawAtmosfera.value) {
+    customVariables = rawAtmosfera.value;
+  }
+}
+
+const isCustom = atmosferaKey === 'custom';
+
+// 3. Resolución dinámica del Layout (fallback a LayoutObsidiana si no coincide o es custom)
+const SelectedLayout = !isCustom && atmosferaKey in PRESETS_CINEMATICOS
+  ? PRESETS_CINEMATICOS[atmosferaKey as PresetKey]
+  : LayoutObsidiana;
+
+// 4. Parámetros de configuración (preset estándar vs variables personalizadas custom)
+const layoutProps = {
+  frontmatter: entry.data,
+  isCustom,
+  atmosfera: atmosferaKey,
+  config: isCustom ? customVariables : undefined,
+};
+---
+
+<SelectedLayout {...layoutProps}>
+  {Content ? <Content /> : <slot />}
+</SelectedLayout>

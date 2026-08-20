@@ -19,7 +19,6 @@ import MarqueeColecciones from "../../components/MarqueeColecciones.astro";
 import { QuickReturnButton } from "../../components/QuickReturnButton";
 import {
   resolveEssayImage,
-  essayImages,
   formatCategory,
   formatDate,
   getPublishableEssays,
@@ -106,9 +105,6 @@ if (!Content) {
   }
   if (raw) {
     renderedHtml = marked.parse(raw) as string;
-    for (const [k, mod] of Object.entries(essayImages)) {
-      if (renderedHtml.includes(k)) renderedHtml = renderedHtml.replaceAll(k, (mod as any).default.src);
-    }
   }
 }
 

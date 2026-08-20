@@ -1,0 +1,46 @@
+---
+interface Props {
+  frontmatter?: any;
+  config?: any;
+  class?: string;
+}
+
+const { frontmatter, config, class: className = "" } = Astro.props;
+---
+
+<div class={`typemagyk-wrapper prose prose-invert max-w-none ${className}`}>
+  <slot />
+</div>
+
+<style>
+  .typemagyk-wrapper {
+    color: var(--text-main, #e3ddd3);
+    font-family: var(--font-body, 'Newsreader', serif);
+    font-size: clamp(1.15rem, 2vw, 1.4rem);
+    line-height: 1.9;
+    letter-spacing: 0.012em;
+  }
+  
+  .typemagyk-wrapper :global(p) {
+    margin-bottom: 2.2rem;
+    color: rgba(227, 221, 211, 0.88);
+  }
+
+  .typemagyk-wrapper :global(h1),
+  .typemagyk-wrapper :global(h2),
+  .typemagyk-wrapper :global(h3) {
+    font-family: var(--font-serif, 'Gloock', serif);
+    color: #e3ddd3;
+    letter-spacing: -0.02em;
+    margin-top: 3.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .typemagyk-wrapper :global(blockquote) {
+    border-left: 2px solid #c9a86c;
+    padding-left: 1.5rem;
+    font-style: italic;
+    color: #dfca9d;
+    margin: 2.5rem 0;
+  }
+</style>

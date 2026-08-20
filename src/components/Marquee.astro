@@ -1,4 +1,6 @@
 ---
+import { Image } from "astro:assets";
+
 interface Props {
   title: string;
   subtitle?: string;
@@ -27,20 +29,50 @@ const gradientClass = isSerif ? "gradient-general-h1" : "gradient-acero-ios";
   <div class="absolute inset-0 z-0 opacity-70 marquee-bg-pin flex">
     <div class="marquee-track flex h-full w-[200vw]">
       <div class="cine-wrapper">
-        <img
-          src={imageUrl}
-          alt="Background Marquee 1"
-          class="dark-img-target w-full h-full object-cover"
-          style="transform-origin: center center;"
-        />
+        {typeof imageUrl === 'object' && imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt="Background Marquee 1"
+            format="webp"
+            quality={85}
+            loading="eager"
+            decoding="async"
+            class="dark-img-target w-full h-full object-cover"
+            style="transform-origin: center center;"
+          />
+        ) : typeof imageUrl === 'string' && imageUrl.trim().length > 0 ? (
+          <img
+            src={imageUrl}
+            alt="Background Marquee 1"
+            loading="eager"
+            decoding="async"
+            class="dark-img-target w-full h-full object-cover"
+            style="transform-origin: center center;"
+          />
+        ) : null}
       </div>
       <div class="cine-wrapper">
-        <img
-          src={imageUrl}
-          alt="Background Marquee 2"
-          class="dark-img-target w-full h-full object-cover"
-          style="transform-origin: center center;"
-        />
+        {typeof imageUrl === 'object' && imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt="Background Marquee 2"
+            format="webp"
+            quality={85}
+            loading="eager"
+            decoding="async"
+            class="dark-img-target w-full h-full object-cover"
+            style="transform-origin: center center;"
+          />
+        ) : typeof imageUrl === 'string' && imageUrl.trim().length > 0 ? (
+          <img
+            src={imageUrl}
+            alt="Background Marquee 2"
+            loading="eager"
+            decoding="async"
+            class="dark-img-target w-full h-full object-cover"
+            style="transform-origin: center center;"
+          />
+        ) : null}
       </div>
     </div>
   </div>
