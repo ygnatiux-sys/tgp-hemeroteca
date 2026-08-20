@@ -6,15 +6,36 @@ export interface GeminiCinematicProps {
 }
 
 export function GeminiCinematicStudio({ value, onChange }: GeminiCinematicProps) {
+  // ─── ESTADO INTERNO UNIFICADO ───
+  // Si el valor inicial es un JSON, lo parseamos
+  let initialText = value;
+  let initialImage = null;
+  try {
+    const parsed = JSON.parse(value);
+    if (parsed && typeof parsed === 'object') {
+      initialText = parsed.text || '';
+      initialImage = parsed.image || null;
+    }
+  } catch (e) {
+    // Es texto plano o vacío
+  }
+
+  const [generatedText, setGeneratedText] = useState(initialText);
   const [tema, setTema] = useState('');
   const [generarAmbos, setGenerarAmbos] = useState(false);
   const [isGeneratingText, setIsGeneratingText] = useState(false);
   const [isGeneratingArt, setIsGeneratingArt] = useState(false);
   const [statusMsg, setStatusMsg] = useState<{ type: 'info' | 'error' | 'success'; text: string } | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(initialImage);
   const [previewPrompt, setPreviewPrompt] = useState<string | null>(null);
 
-  // Auto-detectar título desde el campo de título de Keystatic si no se ha escrito manualmente
+  // Sincronizar hacia Keystatic
+  const syncToKeystatic = (newText: string, newImage: string | null) => {
+    const payload = JSON.stringify({ text: newText, image: newImage });
+    onChange(payload);
+  };
+
+  // Auto-detectar título desde el campo de título de Keystatic
   const getEffectiveTopic = (): string => {
     if (tema.trim()) return tema.trim();
     if (typeof document !== 'undefined') {
@@ -46,7 +67,9 @@ export function GeminiCinematicStudio({ value, onChange }: GeminiCinematicProps)
       if (!res.ok) throw new Error(data.error || 'Error al generar texto');
 
       const content = data.content || '';
-      onChange(content);
+      setGeneratedText(content);
+      syncToKeystatic(content, previewImage);
+      
       setStatusMsg({ type: 'success', text: '✅ Ensayo generado y sincronizado exitosamente.' });
       return content;
     } catch (err: any) {
@@ -81,6 +104,8 @@ export function GeminiCinematicStudio({ value, onChange }: GeminiCinematicProps)
       if (data.imageUrl) {
         setPreviewImage(data.imageUrl);
         setPreviewPrompt(data.imagePrompt || null);
+        syncToKeystatic(generatedText, data.imageUrl);
+        
         setStatusMsg({ type: 'success', text: '✅ Imagen cinemática materializada exitosamente.' });
         return data.imageUrl;
       } else {
@@ -100,8 +125,31 @@ export function GeminiCinematicStudio({ value, onChange }: GeminiCinematicProps)
   const handleExecuteCombined = async () => {
     setStatusMsg(null);
     if (generarAmbos) {
-      await handleGenerateText();
-      await handleGenerateArt();
+      const textResult = await handleGenerateText();
+      
+      // Hacemos el fetch de la imagen pero con el texto ya guardado localmente si fue exitoso
+      setIsGeneratingArt(true);
+      setStatusMsg({ type: 'info', text: 'Ensayo completado. Materializando arte cinemático 16:9...' });
+      
+      try {
+        const res = await fetch('/api/generar-tgp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ titulo: getEffectiveTopic(), generarImagen: true, estilo: 'dark-academia' })
+        });
+        const data = await res.json();
+        
+        if (data.imageUrl) {
+          setPreviewImage(data.imageUrl);
+          setPreviewPrompt(data.imagePrompt || null);
+          syncToKeystatic(textResult || generatedText, data.imageUrl);
+          setStatusMsg({ type: 'success', text: '✅ Dossier y Arte Cinemático generados y unificados.' });
+        }
+      } catch (err: any) {
+        setStatusMsg({ type: 'error', text: `Error en arte: ${err.message || 'Fallo de conexión'}` });
+      } finally {
+        setIsGeneratingArt(false);
+      }
     }
   };
 

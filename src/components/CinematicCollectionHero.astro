@@ -60,7 +60,7 @@ const secondarySrc = secondaryImage
       {typeof primaryImage === "string" ? (
         <img class="cch-img" id="cch-img-primary" src={primarySrc} alt={primaryAlt} loading="eager" style={`object-position: ${primaryPosition}`} />
       ) : (
-        <Image class="cch-img" id="cch-img-primary" src={primaryImage as ImageMetadata} alt={primaryAlt} loading="eager" quality={88} style={`object-position: ${primaryPosition}`} />
+        <Image class="cch-img" id="cch-img-primary" src={primaryImage as ImageMetadata} alt={primaryAlt} inferSize={true} loading="eager" quality={88} style={`object-position: ${primaryPosition}`} />
       )}
     </div>
   </div>
@@ -72,7 +72,7 @@ const secondarySrc = secondaryImage
         {typeof secondaryImage === "string" ? (
           <img class="cch-img" id="cch-img-secondary" src={secondarySrc} alt={secondaryAlt} loading="eager" style={`object-position: ${secondaryPosition}`} />
         ) : (
-          <Image class="cch-img" id="cch-img-secondary" src={secondaryImage as ImageMetadata} alt={secondaryAlt} loading="eager" quality={80} style={`object-position: ${secondaryPosition}`} />
+          <Image class="cch-img" id="cch-img-secondary" src={secondaryImage as ImageMetadata} alt={secondaryAlt} inferSize={true} loading="eager" quality={80} style={`object-position: ${secondaryPosition}`} />
         )}
       </div>
     </div>

@@ -13,6 +13,7 @@
 
 export interface EssayEntry {
   slug: string;
+  isCinematicGSAP?: boolean;
   entry: {
     title?: string;
     volanta?: string | null;
@@ -61,10 +62,15 @@ export function sortEssaysByVisualFirst(a: EssayEntry, b: EssayEntry): number {
     return isTestA ? 1 : -1;
   }
 
+  // PRIORIDAD ABSOLUTA: Ensayos cinemáticos siempre al tope (Dossier GSAP)
+  if (a.isCinematicGSAP !== b.isCinematicGSAP) {
+    return a.isCinematicGSAP ? -1 : 1;
+  }
+
   const hasImgA = resolveEssayImage(a.entry?.coverImage, a.slug) ? 1 : 0;
   const hasImgB = resolveEssayImage(b.entry?.coverImage, b.slug) ? 1 : 0;
   
-  // Priorizar posts con imagen
+  // Priorizar posts con imagen (sólo aplica si ambos son cinemáticos o ambos son normales)
   if (hasImgA !== hasImgB) {
     return hasImgB - hasImgA;
   }

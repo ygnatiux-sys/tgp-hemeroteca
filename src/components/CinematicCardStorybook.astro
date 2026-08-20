@@ -92,18 +92,32 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
   {/* 1. Imagen de fondo */}
   {
     img ? (
-      <Image
-        src={img}
-        alt={entry.title || "Dossier del Archivo"}
-        loading={isEager ? "eager" : "lazy"}
-        decoding="async"
-        quality={80}
-        class={`absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none -z-10 ${
-          enableCinemagraph
-            ? "cinemagraph-ken-burns"
-            : "group-hover:scale-[1.018] group-hover:brightness-95 transition-transform duration-700 delay-75 ease-out"
-        }`}
-      />
+      typeof img === 'object' ? (
+        <Image
+          src={img}
+          alt={entry.title || "Dossier del Archivo"}
+          loading={isEager ? "eager" : "lazy"}
+          decoding="async"
+          quality={80}
+          class={`absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none -z-10 ${
+            enableCinemagraph
+              ? "cinemagraph-ken-burns"
+              : "group-hover:scale-[1.018] group-hover:brightness-95 transition-transform duration-700 delay-75 ease-out"
+          }`}
+        />
+      ) : (
+        <img
+          src={img as string}
+          alt={entry.title || "Dossier del Archivo"}
+          loading={isEager ? "eager" : "lazy"}
+          decoding="async"
+          class={`absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none -z-10 ${
+            enableCinemagraph
+              ? "cinemagraph-ken-burns"
+              : "group-hover:scale-[1.018] group-hover:brightness-95 transition-transform duration-700 delay-75 ease-out"
+          }`}
+        />
+      )
     ) : (
       <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1c242b] via-theme-dark to-[#0a0b0b] -z-10" />
     )

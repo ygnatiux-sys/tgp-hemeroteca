@@ -1,5 +1,6 @@
 ---
 import { getCollection, getEntry, render } from 'astro:content';
+import { marked } from 'marked';
 import LayoutObsidiana from '../../layouts/CinematicFX/LayoutObsidiana.astro';
 import LayoutDeriva from '../../layouts/CinematicFX/LayoutDeriva.astro';
 import LayoutUmbral from '../../layouts/CinematicFX/LayoutUmbral.astro';
@@ -29,6 +30,24 @@ try {
 } catch (err) {
   console.warn(`[Ensayos Cinemáticos] No se pudo cargar Markdoc para ${slug}:`, err);
 }
+
+// ─── EXTRACCIÓN UNIFICADA DE IA (TEXTO + IMAGEN) ───
+let aiText = entry.data.generadorTexto || '';
+let aiImage = null;
+
+if (entry.data.generadorTexto && entry.data.generadorTexto.startsWith('{')) {
+  try {
+    const parsed = JSON.parse(entry.data.generadorTexto);
+    aiText = parsed.text || '';
+    aiImage = parsed.image || null;
+  } catch (e) {}
+}
+
+const finalFrontmatter = {
+  ...entry.data,
+  // Si no hay coverImage manual, inyectamos la generada por Gemini Flash
+  coverImage: entry.data.coverImage || aiImage
+};
 
 // 1. Diccionario de Presets Cinemáticos
 const PRESETS_CINEMATICOS = {
@@ -62,13 +81,25 @@ const SelectedLayout = !isCustom && atmosferaKey in PRESETS_CINEMATICOS
 
 // 4. Parámetros de configuración (preset estándar vs variables personalizadas custom)
 const layoutProps = {
-  frontmatter: entry.data,
+  frontmatter: finalFrontmatter,
   isCustom,
   atmosfera: atmosferaKey,
   config: isCustom ? customVariables : undefined,
 };
+
+let aiTextHtml = "";
+if (!Content && aiText) {
+  try {
+    const parsed = await marked.parse(aiText);
+    aiTextHtml = typeof parsed === 'string' ? parsed : await parsed;
+  } catch (err) {
+    console.error("Error parsing marked for", slug, err);
+  }
+}
 ---
 
 <SelectedLayout {...layoutProps}>
-  {Content ? <Content /> : <slot />}
+  {Content ? <Content /> : (
+    aiTextHtml ? <div set:html={aiTextHtml} /> : <slot />
+  )}
 </SelectedLayout>

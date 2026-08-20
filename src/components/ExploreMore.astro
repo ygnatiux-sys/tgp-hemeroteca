@@ -61,6 +61,7 @@ const secondB = exploreEssays[2] ?? null;
                 <Image
                   src={lead.img}
                   alt={lead.entry.title || "Dossier"}
+                  inferSize={true}
                   class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03] brightness-75"
                 />
                 <div class="absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.85)] pointer-events-none" />
@@ -120,6 +121,7 @@ const secondB = exploreEssays[2] ?? null;
                   <Image
                     src={secondA.img}
                     alt={secondA.entry.title || "Dossier"}
+                    inferSize={true}
                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04] brightness-75"
                   />
                   <div class="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.8)] pointer-events-none" />
@@ -163,6 +165,7 @@ const secondB = exploreEssays[2] ?? null;
                   <Image
                     src={secondB.img}
                     alt={secondB.entry.title || "Dossier"}
+                    inferSize={true}
                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04] brightness-75"
                   />
                   <div class="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.8)] pointer-events-none" />

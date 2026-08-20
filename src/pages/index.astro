@@ -7,6 +7,7 @@ import YouTubeIcon from '../components/icons/YouTube.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../components/CinematicPostEngine.astro';
 import {
+  type EssayEntry,
   getPublishableEssays,
   groupByCategory,
   formatCategory,
@@ -35,23 +36,37 @@ const allArquetiposRaw = await getCollection('arquetiposGlobales').catch(() => [
 
 const isProd = import.meta.env.PROD;
 const publishableEssays = getPublishableEssays(allEssaysRaw, isProd);
-const publishableCinematicos = allCinematicosRaw.map(item => ({
-  slug: item.id.replace(/\/index$/, ''),
-  isCinematicGSAP: true,
-  entry: {
-    title: item.data.title || 'Dossier Cinemático',
-    category: 'Ensayos Cinemáticos',
-    coverImage: item.data.coverImage || (Array.isArray(item.data.gallery) && item.data.gallery.length > 0 ? item.data.gallery[0] : null),
-    excerpt: 'Experiencia inmersiva GSAP a pantalla completa con diseño atmosférico.',
-    date: new Date().toISOString(),
-    themeColor: 'obsidiana',
-  }
-}));
+const publishableCinematicos: EssayEntry[] = allCinematicosRaw.map(item => {
+  let aiImage = null;
+  let aiText = item.data.generadorTexto;
+  try {
+    if (item.data.generadorTexto && item.data.generadorTexto.startsWith('{')) {
+      const parsed = JSON.parse(item.data.generadorTexto);
+      aiImage = parsed.image || null;
+      aiText = parsed.text || '';
+    }
+  } catch (e) {}
+
+  return {
+    slug: item.id.replace(/\/index$/, ''),
+    isCinematicGSAP: true,
+    entry: {
+      title: item.data.title || 'Dossier Cinemático',
+      category: 'Ensayos Cinemáticos',
+      coverImage: item.data.coverImage || (Array.isArray(item.data.gallery) && item.data.gallery.length > 0 ? item.data.gallery[0] : aiImage),
+      excerpt: 'Experiencia inmersiva GSAP a pantalla completa con diseño atmosférico.',
+      date: new Date().toISOString(),
+      themeColor: 'obsidiana',
+      spotifyLink: null,
+      youtubeLink: null,
+    }
+  };
+});
 const publishableGeorefs = getPublishableEssays(allGeorefsRaw, isProd);
 const publishableArquetipos = getPublishableEssays(allArquetiposRaw, isProd);
 
 // PRIORIDAD OBLIGATORIA: Los nuevos ensayos cinemáticos van al inicio de los Heroes y feeds
-const publishable = [
+const publishable: EssayEntry[] = [
   ...publishableCinematicos,
   ...publishableEssays,
   ...publishableGeorefs,
@@ -172,13 +187,22 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
               {/* Imagen lateral / superior en mobile */}
               {leadImage && (
                 <div class="relative overflow-hidden lg:w-[55%] xl:w-[58%] aspect-video lg:aspect-auto shrink-0">
-                  <Image
-                    src={leadImage}
-                    alt={leadStory.entry.title || "Dossier Destacado"}
-                    loading="eager"
-                    quality={80}
-                    class="w-full h-full object-cover object-center transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-80"
-                  />
+                  {typeof leadImage === 'object' ? (
+                    <Image
+                      src={leadImage}
+                      alt={leadStory.entry.title || "Dossier Destacado"}
+                      loading="eager"
+                      quality={80}
+                      class="w-full h-full object-cover object-center transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-80"
+                    />
+                  ) : (
+                    <img
+                      src={leadImage as string}
+                      alt={leadStory.entry.title || "Dossier Destacado"}
+                      loading="eager"
+                      class="w-full h-full object-cover object-center transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-80"
+                    />
+                  )}
                   <div class="absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.85)] pointer-events-none" />
                   <div class="absolute inset-0 bg-linear-to-r from-transparent via-transparent to-(--bg-main) hidden lg:block pointer-events-none" />
                   <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/85 via-transparent to-transparent lg:hidden pointer-events-none" />
@@ -257,14 +281,24 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
                 <div class="flex flex-col md:flex-row md:min-h-70">
                   {secAImage && (
                     <div class="relative overflow-hidden md:w-[45%] shrink-0 aspect-video md:aspect-auto">
-                      <Image
-                        src={secAImage}
-                        alt={secondaryA.entry.title || "Dossier"}
-                        loading="lazy"
-                        decoding="async"
-                        quality={80}
-                        class="w-full h-full object-cover object-center transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-85"
-                      />
+                      {typeof secAImage === 'object' ? (
+                        <Image
+                          src={secAImage}
+                          alt={secondaryA.entry.title || "Dossier"}
+                          loading="lazy"
+                          decoding="async"
+                          quality={80}
+                          class="w-full h-full object-cover object-center transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-85"
+                        />
+                      ) : (
+                        <img
+                          src={secAImage as string}
+                          alt={secondaryA.entry.title || "Dossier"}
+                          loading="lazy"
+                          decoding="async"
+                          class="w-full h-full object-cover object-center transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-85"
+                        />
+                      )}
                       <div class="absolute inset-0 bg-linear-to-r from-transparent to-(--bg-main)/70 hidden md:block pointer-events-none" />
                       <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/60 via-transparent to-transparent md:hidden pointer-events-none" />
                     </div>
@@ -293,14 +327,24 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
                 <article class="col-span-1 md:col-span-6 w-full h-full card-hover-cinematic group relative overflow-hidden rounded-xl border border-white/8 bg-white/3 transition-all duration-500 flex flex-col">
                   {secBImage && (
                     <div class="relative overflow-hidden aspect-video">
-                      <Image
-                        src={secBImage}
-                        alt={secondaryB.entry.title || "Dossier"}
-                        loading="lazy"
-                        decoding="async"
-                        quality={80}
-                        class="w-full h-full object-cover transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-80"
-                      />
+                      {typeof secBImage === 'object' ? (
+                        <Image
+                          src={secBImage}
+                          alt={secondaryB.entry.title || "Dossier"}
+                          loading="lazy"
+                          decoding="async"
+                          quality={80}
+                          class="w-full h-full object-cover transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-80"
+                        />
+                      ) : (
+                        <img
+                          src={secBImage as string}
+                          alt={secondaryB.entry.title || "Dossier"}
+                          loading="lazy"
+                          decoding="async"
+                          class="w-full h-full object-cover transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-80"
+                        />
+                      )}
                       <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/70 via-transparent to-transparent pointer-events-none" />
                     </div>
                   )}
@@ -421,7 +465,11 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
               >
                 {img ? (
                   <div class="overflow-hidden aspect-video relative">
-                    <Image src={img} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-70 group-hover:opacity-90" />
+                    {typeof img === 'object' ? (
+                      <Image src={img} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-70 group-hover:opacity-90" />
+                    ) : (
+                      <img src={img as string} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-70 group-hover:opacity-90" />
+                    )}
                     <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent" />
                     <div class="absolute bottom-0 left-0 p-4">
                       <p class="font-metadata text-[9px] uppercase tracking-[0.3em] text-rust-orange mb-1">{count} artículos</p>

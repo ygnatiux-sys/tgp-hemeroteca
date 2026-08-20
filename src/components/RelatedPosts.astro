@@ -40,11 +40,19 @@ const { posts } = Astro.props;
           <div class="flex flex-col h-full">
             {post.data.coverImage && (
               <div class="aspect-video w-full overflow-hidden rounded-md mb-4 border border-white/10">
-                <Image 
-                  src={post.data.coverImage as any} 
-                  alt={`Cover image for ${post.data.title}`}
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
-                />
+                {typeof post.data.coverImage === 'object' ? (
+                  <Image 
+                    src={post.data.coverImage as any} 
+                    alt={`Cover image for ${post.data.title}`}
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                  />
+                ) : (
+                  <img 
+                    src={post.data.coverImage as string} 
+                    alt={`Cover image for ${post.data.title}`}
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                  />
+                )}
               </div>
             )}
             <p class="font-metadata text-xs text-white/40 tracking-wider uppercase">{post.data.category || 'Ensayo'}</p>

@@ -55,7 +55,11 @@ const resolvedCollections = collections.map(c => ({
           >
             {img ? (
               <div class="overflow-hidden aspect-video relative">
-                <Image src={img} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
+                {typeof img === 'object' ? (
+                  <Image src={img} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
+                ) : (
+                  <img src={img as string} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
+                )}
                 <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent" />
                 <div class="absolute bottom-0 left-0 p-4 md:p-5 w-full">
                   <p class="font-metadata text-[9px] uppercase tracking-[0.3em] text-rust-orange mb-1">{count} artículos</p>
@@ -82,7 +86,11 @@ const resolvedCollections = collections.map(c => ({
           >
             {img ? (
               <div class="overflow-hidden aspect-video relative">
-                <Image src={img} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
+                {typeof img === 'object' ? (
+                  <Image src={img} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
+                ) : (
+                  <img src={img as string} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
+                )}
                 <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent" />
                 <div class="absolute bottom-0 left-0 p-4 md:p-5 w-full">
                   <p class="font-metadata text-[9px] uppercase tracking-[0.3em] text-rust-orange mb-1">{count} artículos</p>
