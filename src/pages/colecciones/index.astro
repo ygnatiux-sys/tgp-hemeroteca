@@ -17,11 +17,26 @@ import {
 
 // ─── CARGA Y FILTRADO ────────────────────────────────────────────────────────
 const allEssaysRaw = await getCollection('ensayos').catch(() => []);
+const allCinematicosRaw = await getCollection('ensayosCinematicos').catch(() => []);
 const allArquetiposRaw = await getCollection('arquetiposGlobales').catch(() => []);
 const allGeorefsRaw = await getCollection('georreferencias').catch(() => []);
 const isProd = import.meta.env.PROD;
 const publishableGeorefs = getPublishableEssays(allGeorefsRaw, isProd);
+const publishableCinematicos = allCinematicosRaw.map(item => ({
+  slug: item.id.replace(/\/index$/, ''),
+  isCinematicGSAP: true,
+  entry: {
+    title: item.data.title || 'Dossier Cinemático',
+    category: 'Ensayos Cinemáticos',
+    coverImage: item.data.coverImage || (Array.isArray(item.data.gallery) && item.data.gallery.length > 0 ? item.data.gallery[0] : null),
+    excerpt: 'Experiencia inmersiva GSAP a pantalla completa.',
+    date: new Date().toISOString(),
+    themeColor: 'obsidiana',
+  }
+}));
+
 const publishable = [
+  ...publishableCinematicos,
   ...getPublishableEssays(allEssaysRaw, isProd),
   ...getPublishableEssays(allArquetiposRaw, isProd),
   ...publishableGeorefs

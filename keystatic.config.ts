@@ -9,6 +9,7 @@ import {
   GeneradorGeorreferenciaTGP,
   componentBlocks 
 } from './src/components';
+import { geminiCinematicField } from './src/keystatic/geminiCinematic';
 
 export default config({
   storage: {
@@ -422,30 +423,17 @@ export default config({
     // Colección: Ensayos Cinemáticos (GSAP)
     ensayosCinematicos: collection({
       label: 'Ensayos Cinemáticos (GSAP)',
-      slugField: 'title', // ESTA CLAVE ES CRÍTICA
+      slugField: 'title',
       path: 'src/content/ensayos-cinematicos/*/',
-      format: { contentField: 'content' },
+      format: { data: 'json' },
       schema: {
-        // 1. EL CAMPO SLUG OBLIGATORIO (Debe llamarse 'title' para coincidir con slugField)
+        // 1. EL CAMPO SLUG OBLIGATORIO
         title: fields.slug({ name: { label: 'Título' } }),
 
-        // PASO 2: Temporalmente comentado para aislar la inicialización de la vista
-        /*
-        generadorTexto: {
-          kind: 'form',
-          label: '1. Motor de Pensamiento & Arte Unificado TGP',
-          Input: GeneradorTextoTGP,
-          defaultValue: () => '',
-          parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
-          serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || '') }),
-          validate: (v: any) => v,
-          reader: {
-            parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
-          },
-        } as any,
-        */
+        // 2. MÓDULO IA DEDICADO Y MODULAR: Gemini Cinemático (Pro Texto + Flash Imagen)
+        generadorTexto: geminiCinematicField as any,
 
-        // 2. RESTO DE CAMPOS
+        // 3. RESTO DE CAMPOS
         atmosfera: fields.conditional(
           fields.select({
             label: 'Atmósfera',

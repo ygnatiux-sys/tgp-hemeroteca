@@ -135,7 +135,7 @@ const arquetiposGlobalesContent = defineCollection({
 
 const ensayosCinematicos = defineCollection({
   loader: glob({ 
-    pattern: "**/index.mdoc", 
+    pattern: "**/*.{json,mdoc}", 
     base: "src/content/ensayos-cinematicos" 
   }),
   schema: ({ image }) => z.object({

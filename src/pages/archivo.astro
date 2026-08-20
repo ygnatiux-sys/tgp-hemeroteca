@@ -22,13 +22,30 @@ const allEssaysRaw = await getCollection('ensayos').catch(err => {
   return [];
 });
 
+const allCinematicosRaw = await getCollection('ensayosCinematicos').catch(() => []);
 const allArquetiposRaw = await getCollection('arquetiposGlobales').catch(() => []);
 
 const isProd = import.meta.env.PROD;
 const publishableEssays = getPublishableEssays(allEssaysRaw, isProd);
+const publishableCinematicos = allCinematicosRaw.map(item => ({
+  slug: item.id.replace(/\/index$/, ''),
+  isCinematicGSAP: true,
+  entry: {
+    title: item.data.title || 'Dossier Cinemático',
+    category: 'Ensayos Cinemáticos',
+    coverImage: item.data.coverImage || (Array.isArray(item.data.gallery) && item.data.gallery.length > 0 ? item.data.gallery[0] : null),
+    excerpt: 'Experiencia inmersiva GSAP a pantalla completa con diseño atmosférico.',
+    date: new Date().toISOString(),
+    themeColor: 'obsidiana',
+  }
+}));
 const publishableArquetipos = getPublishableEssays(allArquetiposRaw, isProd);
 
-const publishable = [...publishableEssays, ...publishableArquetipos].sort(sortEssaysByVisualFirst);
+const publishable = [
+  ...publishableCinematicos,
+  ...publishableEssays,
+  ...publishableArquetipos
+].sort(sortEssaysByVisualFirst);
 
 // ─── CATEGORÍAS Y AÑOS REALES PARA FILTROS ───────────────────────────────────
 const categories = [...new Set(

@@ -21,6 +21,11 @@ const allEssaysRaw = await getCollection('ensayos').catch(err => {
   return [];
 });
 
+const allCinematicosRaw = await getCollection('ensayosCinematicos').catch(err => {
+  console.error("[INDEX] Falló carga de ensayos cinemáticos:", err);
+  return [];
+});
+
 const allGeorefsRaw = await getCollection('georreferencias').catch(err => {
   console.error("[INDEX] Falló carga de georreferencias:", err);
   return [];
@@ -30,10 +35,28 @@ const allArquetiposRaw = await getCollection('arquetiposGlobales').catch(() => [
 
 const isProd = import.meta.env.PROD;
 const publishableEssays = getPublishableEssays(allEssaysRaw, isProd);
+const publishableCinematicos = allCinematicosRaw.map(item => ({
+  slug: item.id.replace(/\/index$/, ''),
+  isCinematicGSAP: true,
+  entry: {
+    title: item.data.title || 'Dossier Cinemático',
+    category: 'Ensayos Cinemáticos',
+    coverImage: item.data.coverImage || (Array.isArray(item.data.gallery) && item.data.gallery.length > 0 ? item.data.gallery[0] : null),
+    excerpt: 'Experiencia inmersiva GSAP a pantalla completa con diseño atmosférico.',
+    date: new Date().toISOString(),
+    themeColor: 'obsidiana',
+  }
+}));
 const publishableGeorefs = getPublishableEssays(allGeorefsRaw, isProd);
 const publishableArquetipos = getPublishableEssays(allArquetiposRaw, isProd);
 
-const publishable = [...publishableEssays, ...publishableGeorefs, ...publishableArquetipos].sort(sortEssaysByVisualFirst);
+// PRIORIDAD OBLIGATORIA: Los nuevos ensayos cinemáticos van al inicio de los Heroes y feeds
+const publishable = [
+  ...publishableCinematicos,
+  ...publishableEssays,
+  ...publishableGeorefs,
+  ...publishableArquetipos
+].sort(sortEssaysByVisualFirst);
 
 // ─── SEGMENTACIÓN EDITORIAL ───────────────────────────────────────────────────
 // Los primeros 30 posts (o los disponibles) alimentan el Motor Cinemático Hero (slider).
@@ -50,7 +73,7 @@ const heroSlides   = publishable.slice(0, HERO_COUNT).map(e => ({
   readTime: undefined as string | undefined,
   image: resolveEssayImage(e.entry.coverImage, e.slug) || '',
   imagePosition: (e.entry as any).coverImagePosition || (e.entry as any).imagePosition || 'center center',
-  link: `/hemeroteca/${e.slug}`,
+  link: (e as any).isCinematicGSAP ? `/ensayos-cinematicos/${e.slug}` : `/hemeroteca/${e.slug}`,
   papersLink: (e.entry as any).papersSlug ? `/papers/${(e.entry as any).papersSlug}` : undefined,
 }));
 
