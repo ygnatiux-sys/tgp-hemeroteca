@@ -86,14 +86,15 @@ const wordsData = rawWords.map((rawWord, wordIdx) => {
 
 <section
   id={id}
-  class="cinematic-excerpt-rest relative w-full bg-black overflow-hidden select-none"
+  class="cinematic-excerpt-rest relative w-full bg-(--bg-main) overflow-hidden select-none min-h-[85vh] flex flex-col justify-center"
+  style="background-color: var(--bg-main);"
   data-text={text}
 >
   <!-- Lienzo de partículas de polvo en movimiento (viento) -->
   <canvas class="excerpt-dust-canvas absolute inset-0 z-0 pointer-events-none" id={`${id}-canvas`}></canvas>
 
-  {/* Breathing room superior */}
-  <div class="h-[14vh] md:h-[18vh]" aria-hidden="true"></div>
+  {/* Breathing room superior — doble scroll de aire y tracking */}
+  <div class="h-[22vh] md:h-[30vh]" aria-hidden="true"></div>
 
   {/* Contenedor central de lectura */}
   <div class="excerpt-content relative z-10 max-w-3xl mx-auto px-6 md:px-16 text-center">
@@ -124,7 +125,7 @@ const wordsData = rawWords.map((rawWord, wordIdx) => {
   </div>
 
   {/* Breathing room inferior */}
-  <div class="h-[14vh] md:h-[18vh]" aria-hidden="true"></div>
+  <div class="h-[22vh] md:h-[30vh]" aria-hidden="true"></div>
 </section>
 
 <style>

@@ -5,7 +5,6 @@ import { Image } from 'astro:assets';
 import SpotifyIcon from '../components/icons/Spotify.astro';
 import YouTubeIcon from '../components/icons/YouTube.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
-import CinematicCardStorybook from '../components/CinematicCardStorybook.astro';
 import CinematicPostEngine from '../components/CinematicPostEngine.astro';
 import {
   getPublishableEssays,
@@ -59,8 +58,8 @@ const heroSlides   = publishable.slice(0, HERO_COUNT).map(e => ({
 const leadStory    = publishable[HERO_COUNT]     ?? null;
 const secondaryA   = publishable[HERO_COUNT + 1] ?? null;
 const secondaryB   = publishable[HERO_COUNT + 2] ?? null;
-const recentEssays = publishable.slice(HERO_COUNT + 3, HERO_COUNT + 9);   // hasta 6
-const archiveRows  = publishable.slice(HERO_COUNT + 9, HERO_COUNT + 19);  // hasta 10
+const recentEssays = publishable.slice(HERO_COUNT + 3, HERO_COUNT + 6);   // 3 ensayos: 1 Hero + 2 Dúo
+const archiveRows  = publishable.slice(HERO_COUNT + 6, HERO_COUNT + 16);  // hasta 10 para Del Archivo
 
 // ─── COLECCIONES DESTACADAS (§5.4) ────────────────────────────────────────────
 const categoryGroups = groupByCategory(publishable, 2);
@@ -124,7 +123,7 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
 
     {/* Lienzo / grilla: se desliza sobre el Hero ya oscurecido */}
     <div id="home-canvas" class="relative z-20 bg-(--bg-main) shadow-[0_-24px_60px_rgba(0,0,0,0.85)]">
-    <div class="container-editorial max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-20 md:gap-28 pt-16 md:pt-24">
+    <div class="container-editorial max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-32 md:gap-48 lg:gap-60 pt-20 md:pt-32 pb-28 md:pb-44">
 
       {/* ═══════════════════════════════════════════════════════════════════
           BLOQUE 2A: DOSSIER DESTACADO — SECCIÓN AUTÓNOMA CON SOLAPA CINEMÁTICA
@@ -312,11 +311,11 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
 
 
       {/* ═══════════════════════════════════════════════════════════════════
-          BLOQUE 3: ENSAYOS RECIENTES (Formato Cinemático Archivo General)
-          Mapeo: publishable[4..9] (máx 6)
+          BLOQUE 3: ENSAYOS RECIENTES (Estructura: 1 Hero Card + 2 Cards debajo)
+          Mapeo: 1 Hero principal + Dúo 60/40 secundario
       ═══════════════════════════════════════════════════════════════════ */}
       {resolvedRecent.length > 0 && (
-        <section class="flex flex-col gap-8">
+        <section class="flex flex-col gap-8 md:gap-12">
           <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4">
             <div>
               <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Archivo de Ensayos</span>
@@ -324,31 +323,53 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
                 Ensayos Recientes
               </h2>
             </div>
-            <a href="/archivo" class="font-metadata text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(239, 235, 227,0.5)] transition-all">
+            <a href="/archivo" class="font-metadata text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(239,235,227,0.5)] transition-all">
               Ver Catálogo Completo ({publishable.length}) →
             </a>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {resolvedRecent.map(({ slug, entry, img }) => (
-              slug === 'moctezuma-y-cortez-el-ultimo-azteca' ? (
-                <CinematicCardStorybook
-                  slug={slug}
-                  entry={entry}
-                  img={img}
-                  variant="standard"
-                  enableCinemagraph={false}
-                />
-              ) : (
+          <div class="flex flex-col gap-8 md:gap-12">
+            {/* 1. Hero Cinemático Superior Full Width */}
+            {resolvedRecent[0] && (
+              <div class="w-full">
                 <CinematicArchiveCard
-                  slug={slug}
-                  entry={entry}
-                  img={img}
-                  variant="standard"
-                  enableCinemagraph={false}
+                  slug={resolvedRecent[0].slug}
+                  entry={resolvedRecent[0].entry}
+                  img={resolvedRecent[0].img}
+                  variant="hero"
+                  enableCinemagraph={true}
                 />
-              )
-            ))}
+              </div>
+            )}
+
+            {/* 2. Dúo de Cards Inferiores con Proporción 60/40 */}
+            {resolvedRecent.length > 1 && (
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
+                {resolvedRecent[1] && (
+                  <div class={resolvedRecent.length > 2 ? "lg:col-span-7 flex flex-col" : "lg:col-span-12 flex flex-col"}>
+                    <CinematicArchiveCard
+                      slug={resolvedRecent[1].slug}
+                      entry={resolvedRecent[1].entry}
+                      img={resolvedRecent[1].img}
+                      variant={resolvedRecent.length > 2 ? "duo-60" : "hero"}
+                      enableCinemagraph={true}
+                    />
+                  </div>
+                )}
+
+                {resolvedRecent[2] && (
+                  <div class="lg:col-span-5 flex flex-col">
+                    <CinematicArchiveCard
+                      slug={resolvedRecent[2].slug}
+                      entry={resolvedRecent[2].entry}
+                      img={resolvedRecent[2].img}
+                      variant="duo-40"
+                      enableCinemagraph={true}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </section>
       )}

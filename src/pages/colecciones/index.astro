@@ -4,7 +4,6 @@ import { Image } from 'astro:assets';
 import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../../components/CinematicPostEngine.astro';
-import InteriorHero from '../../components/InteriorHero.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import Marquee from '../../components/Marquee.astro';
 import {
@@ -19,11 +18,18 @@ import {
 // ─── CARGA Y FILTRADO ────────────────────────────────────────────────────────
 const allEssaysRaw = await getCollection('ensayos').catch(() => []);
 const allArquetiposRaw = await getCollection('arquetiposGlobales').catch(() => []);
+const allGeorefsRaw = await getCollection('georreferencias').catch(() => []);
 const isProd = import.meta.env.PROD;
+const publishableGeorefs = getPublishableEssays(allGeorefsRaw, isProd);
 const publishable = [
   ...getPublishableEssays(allEssaysRaw, isProd),
-  ...getPublishableEssays(allArquetiposRaw, isProd)
+  ...getPublishableEssays(allArquetiposRaw, isProd),
+  ...publishableGeorefs
 ].sort(sortEssaysByVisualFirst);
+
+const georefCoverEssay = publishableGeorefs
+  .map(e => ({ ...e, img: resolveEssayImage(e.entry.coverImage, e.slug) }))
+  .find(e => e.img);
 
 // ─── TODAS LAS COLECCIONES TEMÁTICAS (≥ 1 ARTÍCULO) ──────────────────────────
 const categoryGroups = groupByCategory(publishable, 1);
@@ -70,34 +76,20 @@ const coleccionesSlides = collections
 <Layout title="Colecciones | The Great Puzzle Project">
   <div class="text-white min-h-screen pb-32">
 
-    <InteriorHero
-      title="Colecciones"
-      image={indexCover}
-      imageAlt="Colecciones del archivo TGP"
-      imagePosition={indexCoverPosition}
-      eyebrow="The Great Puzzle Project"
-      subtitle="Organización temática del archivo de investigaciones"
-      titleClass="text-6xl md:text-8xl gradient-general-h1 leading-[0.95] tracking-tighter"
-    >
-      {/* F2: text-[10px] → text-xs */}
-      <div slot="meta" class="font-mono text-xs uppercase tracking-[0.3em] text-[#EFEBE3] font-bold">
-        {collections.length} {collections.length === 1 ? 'colección' : 'colecciones'} · {publishable.length} dossiers
-      </div>
-    </InteriorHero>
-
-    {/* ── RESPIRO VISUAL / EXCERPT DESCANSO ── */}
-    <CinematicExcerptRest 
-      text="Un [[mapa de fragmentos]] desgastados por el tiempo. **Cada colección**, un intento humano de arrebatarle el sentido al olvido absoluto."
-    />
-
-    {/* ── HERO MARQUEE DE SECCIÓN ── */}
+    {/* ── HERO PRINCIPAL CINEMÁTICO DARK GLOOCK (H1) ── */}
     <Marquee
       title="COLECCIONES DESTACADAS"
       subtitle="The Great Puzzle Project"
       imageUrl={(collections[0]?.coverEssay?.img as any)?.src ?? collections[0]?.coverEssay?.img ?? ''}
       vibeClass="vibe-travel-senses"
+      isH1={true}
+      fontClass="font-serif font-black"
     />
 
+    {/* ── RESPIRO VISUAL / EXCERPT DOBLE SCROLL POLVO DORADO & TYPEMAGIC EN BG-MAIN ── */}
+    <CinematicExcerptRest 
+      text="Un [[mapa de fragmentos]] desgastados por el tiempo. **Cada colección**, un intento humano de arrebatarle el sentido al olvido absoluto."
+    />
 
     {/* ── ENGINE AUTO CINEMÁTICO: cicla colecciones full-viewport ── */}
     {coleccionesSlides.length > 0 && (
@@ -106,29 +98,38 @@ const coleccionesSlides = collections
 
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">
 
-      {/* BANNER DESTACADO: SITIOS GEOHISTÓRICOS */}
+      {/* BANNER DESTACADO: SITIOS GEOHISTÓRICOS (Hero Card Cinemática con Imagen) */}
       <section class="reveal-item">
         <a
           href="/colecciones/sitios-arqueohistoricos"
-          class="group block p-8 md:p-12 rounded-2xl border border-white/15 bg-theme-dark hover:border-rust-orange/50 transition-all duration-500 shadow-2xl relative overflow-hidden"
+          class="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 bg-theme-dark/80 hover:border-rust-orange/50 transition-all duration-500 shadow-2xl min-h-60 md:min-h-72 flex flex-col justify-end p-8 md:p-12 isolate"
         >
-          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          {georefCoverEssay?.img && (
+            <Image
+              src={georefCoverEssay.img}
+              alt="Sitios Geohistóricos & Arqueohistóricos"
+              loading="lazy"
+              quality={80}
+              class="absolute inset-0 w-full h-full object-cover object-center brightness-60 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-75"
+            />
+          )}
+          <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/50 via-50% to-transparent pointer-events-none z-10"></div>
+
+          <div class="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div class="flex flex-col gap-2 max-w-3xl">
-              {/* F2: text-[10px] → text-xs (WCAG min 12px) */}
-              <span class="font-mono text-xs uppercase tracking-[0.4em] text-[#64b5f6]">
-                Colección Especializada
+              <span class="font-mono text-xs uppercase tracking-[0.4em] text-rust-orange font-bold">
+                Colección Especializada · Georreferencias
               </span>
-              <h2 class="text-3xl md:text-5xl gradient-general-h2 leading-tight">
+              <h2 class="text-3xl md:text-5xl font-serif font-black gradient-general-h1 leading-tight">
                 Sitios Geohistóricos &amp; Arqueohistóricos
               </h2>
-              <p class="h2-thin-hook text-sm md:text-base text-white/60 tracking-[0.2em] mt-1">
+              <p class="h2-thin-hook text-sm md:text-base text-white/80 tracking-[0.15em] mt-1">
                 Aramu Muru · Tikal · Bonampak · Cartago · Qapaq Ñan · Yonaguni
               </p>
             </div>
 
             <div class="shrink-0">
-              {/* F2: text-[10px] → text-xs */}
-              <span class="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-[#151718]/90 border border-white/10 text-[#E0E0E0]/75 font-mono text-xs uppercase tracking-[0.3em] font-bold group-hover:bg-white/10 group-hover:border-white/30 group-hover:text-white transition-all duration-300">
+              <span class="inline-flex items-center gap-3 px-6 py-3.5 rounded-xl bg-[#151718]/90 border border-white/15 text-[#E0E0E0]/85 font-mono text-xs uppercase tracking-[0.3em] font-bold group-hover:bg-white/20 group-hover:border-white/40 group-hover:text-white transition-all duration-300 shadow-lg">
                 Explorar Cartografía →
               </span>
             </div>

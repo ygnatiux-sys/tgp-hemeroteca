@@ -3,7 +3,6 @@ import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../components/CinematicPostEngine.astro';
-import InteriorHero from '../components/InteriorHero.astro';
 import CinematicExcerptRest from '../components/CinematicExcerptRest.astro';
 import Marquee from '../components/Marquee.astro';
 import {
@@ -154,37 +153,24 @@ function createPremierSequences(essays: typeof resolvedEssays) {
 ---
 
 <Layout title="Archivo General | The Great Puzzle Project">
-  <InteriorHero
-    title="ARCHIVO GENERAL"
-    image={archiveCoverEssay?.img ?? null}
-    imageAlt="Archivo General — The Great Puzzle Project"
-    imagePosition={archiveCover?.position ?? 'center center'}
-    eyebrow="Cartografía Epistémica · TGP"
-    subtitle="Análisis multidisciplinario de investigaciones"
-    titleClass="text-6xl md:text-8xl gradient-general-h1 leading-[0.95] tracking-tighter"
-  >
-    <div slot="meta" class="font-metadata text-[10px] uppercase tracking-[0.3em] text-[#EFEBE3] font-bold">
-      {publishable.length} DOSSIERS · {categories.length} CATEGORÍAS
-    </div>
-  </InteriorHero>
-
-  {/* ── RESPIRO VISUAL / EXCERPT DESCANSO ── */}
-  <CinematicExcerptRest 
-    text="El repositorio del [[tiempo transcurrido]]. **Huellas epistémicas** clasificadas y resguardadas, listas para el escrutinio del alma humana."
-  />
-
-
-  {archiveSlides.length > 0 && (
-    <CinematicPostEngine slides={archiveSlides} />
-  )}
-
-  {/* ── HERO MARQUEE DE SECCIÓN ── */}
+  {/* ── HERO PRINCIPAL CINEMÁTICO DARK GLOOCK (H1) ── */}
   <Marquee
     title="ARCHIVO GENERAL"
     subtitle="Registros documentales e investigaciones cartografiadas"
     imageUrl={archiveCover?.src ?? ''}
     vibeClass="vibe-travel-senses"
+    isH1={true}
+    fontClass="font-serif font-black"
   />
+
+  {/* ── RESPIRO VISUAL / EXCERPT DOBLE SCROLL POLVO DORADO & TYPEMAGIC EN BG-MAIN ── */}
+  <CinematicExcerptRest 
+    text="El repositorio del [[tiempo transcurrido]]. **Huellas epistémicas** clasificadas y resguardadas, listas para el escrutinio del alma humana."
+  />
+
+  {archiveSlides.length > 0 && (
+    <CinematicPostEngine slides={archiveSlides} />
+  )}
 
   <div class="min-h-screen pb-32 pt-12">
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16">

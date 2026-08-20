@@ -2,10 +2,8 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
-import CinematicCollectionHero from '../../components/CinematicCollectionHero.astro';
 import Marquee from '../../components/Marquee.astro';
-import TypeMagic from '../../components/TypeMagic.astro';
-import PolvoDorado from '../../components/PolvoDorado.astro';
+import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 
 import {
   getPublishableEssays,
@@ -100,40 +98,19 @@ const sequences = createPremierSequences(resolvedEssays);
 <Layout title={`${label} | Colecciones TGP`}>
   <div class="text-white min-h-screen pb-32">
 
-    <CinematicCollectionHero
-      title={label}
-      eyebrow="Colección Temática — TGP"
-      primaryImage={coverImage ?? ''}
-      primaryAlt={`Imagen de portada de la colección ${label}`}
-      primaryPosition={coverPosition}
-      secondaryImage={coverImage2 ?? undefined}
-      secondaryAlt={`Segunda imagen de la colección ${label}`}
-      secondaryPosition={coverPosition2}
-    >
-      <nav class="flex items-center gap-3 font-metadata text-[9px] uppercase tracking-[0.3em] text-white/40">
-        <a href="/" class="hover:text-white transition-colors">Hemeroteca</a>
-        <span>/</span>
-        <a href="/colecciones" class="hover:text-white transition-colors">Colecciones</a>
-        <span>/</span>
-        <span class="text-[#EFEBE3]">{label}</span>
-      </nav>
-    </CinematicCollectionHero>
-
-    {/* ── TYPEMAGIC: dos párrafos narrativos con efecto condensación líquida ── */}
-    <TypeMagic
-      lines={[
-        `La colección ${label} reúne investigaciones que trazan los contornos de un territorio epistémico en expansión permanente.`,
-        `Cada documento es un fragmento de un mapa mayor. Aquí, el conocimiento no concluye — se ramifica hacia horizontes aún sin nombrar.`
-      ]}
-    />
-
-    {/* ── HERO MARQUEE DE SECCIÓN ── */}
+    {/* ── HERO PRINCIPAL CINEMÁTICO DARK GLOOCK (H1) ── */}
     <Marquee
       title={label.toUpperCase()}
-      subtitle="Colección Documental"
+      subtitle="Colección Documental · TGP"
       imageUrl={(coverImage as any)?.src ?? coverImage ?? ''}
       vibeClass="vibe-travel-senses"
-      fontClass="font-cinzel font-extrabold"
+      isH1={true}
+      fontClass="font-serif font-black"
+    />
+
+    {/* ── RESPIRO VISUAL / EXCERPT DOBLE SCROLL POLVO DORADO & TYPEMAGIC EN BG-MAIN ── */}
+    <CinematicExcerptRest 
+      text={dustText}
     />
 
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">
@@ -155,15 +132,7 @@ const sequences = createPremierSequences(resolvedEssays);
               />
             </div>
 
-            {/* 2. PolvoDorado entre Hero y Dúo (solo en la primera secuencia) */}
-            {seqIdx === 0 && (
-              <PolvoDorado
-                text={dustText}
-                eyebrow={`Colección · ${label}`}
-              />
-            )}
-
-            {/* 3. Dúo 60/40 */}
+            {/* 2. Dúo 60/40 */}
             {seq.duo.length > 0 && (
               <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
                 {seq.duo[0] && (

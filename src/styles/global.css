@@ -788,12 +788,12 @@ html[data-nav-state="2"] header:hover .brand-element {
     100% { background-position: 0% 50%; }
   }
 
-  /* Gradiente Elegido para H1 en Presentaciones Generales (Didone Gloock, tracking-tighter, fade vertical) */
+  /* Gradiente Elegido para H1 en Presentaciones Generales (Didone Gloock, tracking-tighter, fade vertical con base #E3DDD3) */
   .gradient-general-h1 {
     font-family: "Gloock", serif;
     font-weight: 900;
     letter-spacing: -0.04em;
-    background-image: linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.3) 100%);
+    background-image: linear-gradient(to bottom, #E3DDD3 0%, rgba(227, 221, 211, 0.50) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -803,20 +803,22 @@ html[data-nav-state="2"] header:hover .brand-element {
     background-image: linear-gradient(to bottom, #1c1e21 0%, rgba(28, 30, 33, 0.4) 100%);
   }
 
-  /* Gradiente Elegido para H2/Labels en Presentaciones Generales (Didone Gloock, tracking y spacing optimizados para legibilidad) */
+  /* Gradiente Elegido para H2/Labels en Presentaciones Generales (Didone Gloock, tracking y spacing optimizados para legibilidad con base sólida #E3DDD3) */
   .gradient-general-h2 {
     font-family: "Gloock", serif;
     font-weight: 800;
     letter-spacing: 0.015em;
     word-spacing: 0.08em;
-    background-image: linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.4) 100%);
+    background-image: linear-gradient(to bottom, #E3DDD3 0%, #D4CDC2 50%, rgba(227, 221, 211, 0.60) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    filter: brightness(0.96);
   }
 
   [data-theme='light'] .gradient-general-h2 {
     background-image: linear-gradient(to bottom, #1c1e21 0%, rgba(28, 30, 33, 0.5) 100%);
+    filter: none;
   }
 
   /* Regla de Espaciado Global de Respiro Visual (1/2 scroll) entre Bloques Cinemáticos */
@@ -832,15 +834,17 @@ html[data-nav-state="2"] header:hover .brand-element {
     }
   }
 
-  /* Gradiente Metal Steel Titanio para títulos en tarjetas estándar (vertical, blanco a blanco/30) */
+  /* Gradiente / Color base para títulos H2 en tarjetas estándar (tono sólido #E3DDD3 con brillo moderado y presencia física) */
   .gradient-metal-steel-card {
-    background-image: linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.35) 100%);
+    background-image: linear-gradient(to bottom, #E3DDD3 0%, #D4CDC2 55%, rgba(227, 221, 211, 0.50) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    filter: brightness(0.96);
   }
   [data-theme='light'] .gradient-metal-steel-card {
     background-image: linear-gradient(to bottom, #1c1e21 0%, rgba(28, 30, 33, 0.45) 100%);
+    filter: none;
   }
 
   /* H2 Hook Inteligente Sans Outfit / Jakarta (Conciso de 2 renglones, elegante y equilibrado) */
@@ -1093,12 +1097,12 @@ html[data-nav-state="2"] header:hover .brand-element {
 @keyframes titleKeywordShineFade {
   0% {
     opacity: 1;
-    filter: brightness(1) drop-shadow(0 2px 10px rgba(255, 255, 255, 0.40));
+    filter: brightness(0.96) drop-shadow(0 2px 8px rgba(227, 221, 211, 0.25));
   }
   20% {
-    /* Destello Hype de Brillo Metálico Especular */
+    /* Destello sutil metálico cálido */
     opacity: 1;
-    filter: brightness(1.25) drop-shadow(0 0 22px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 34px rgba(239, 235, 227, 0.85));
+    filter: brightness(1.08) drop-shadow(0 0 16px rgba(227, 221, 211, 0.50));
   }
   45% {
     /* Umbral de Oscurecimiento Total: se apaga y oscurece completamente */
@@ -1113,7 +1117,7 @@ html[data-nav-state="2"] header:hover .brand-element {
   100% {
     /* Se reenciende y reaparece la frase completa limpia para reiniciar el loop */
     opacity: 1;
-    filter: brightness(1) drop-shadow(0 2px 10px rgba(255, 255, 255, 0.40));
+    filter: brightness(0.96) drop-shadow(0 2px 8px rgba(227, 221, 211, 0.25));
   }
 }
 

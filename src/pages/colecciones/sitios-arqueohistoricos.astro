@@ -3,7 +3,6 @@ import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../../components/CinematicPostEngine.astro';
-import InteriorHero from '../../components/InteriorHero.astro';
 import Marquee from '../../components/Marquee.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import {
@@ -84,31 +83,17 @@ const geoSlides = resolvedEssays
 <Layout title="Sitios Geohistóricos & Arqueohistóricos | Hemeroteca TGP">
   <div class="text-white min-h-screen pb-32">
 
-    <InteriorHero
-      title="Sitios Geohistóricos"
-      image={coverImage}
-      imageAlt="Sitios geohistóricos y arqueohistóricos"
-      imagePosition={coverPosition}
-      eyebrow="Colección especializada"
-      subtitle="Cartografía epistémica & análisis arqueosemiótico de lugares sagrados"
-      titleClass="text-6xl md:text-8xl gradient-general-h1 leading-[0.95] tracking-tighter"
-    >
-      <nav slot="breadcrumb" class="flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
-        <a href="/colecciones" class="hover:text-[#EFEBE3] transition-colors">Colecciones</a>
-        <span>/</span>
-        <span class="text-[#EFEBE3]">Georreferencias</span>
-      </nav>
-      <div slot="meta" class="flex items-center gap-4 flex-wrap pt-2 border-t border-white/10">
-        <span class="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/15 font-mono text-[10px] uppercase tracking-[0.3em] text-[#EFEBE3] font-bold">
-          {resolvedEssays.length} {resolvedEssays.length === 1 ? 'sitio documentado' : 'sitios documentados'}
-        </span>
-        <span class="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40">
-          Geología · Arqueología · Etnografía · Hermenéutica
-        </span>
-      </div>
-    </InteriorHero>
+    {/* ── HERO PRINCIPAL CINEMÁTICO DARK GLOOCK (H1) ── */}
+    <Marquee 
+      title="SITIOS GEOHISTÓRICOS" 
+      subtitle="Cartografía epistémica & análisis arqueosemiótico de lugares sagrados" 
+      imageUrl={coverImage?.src || (coverImage as any) || ''} 
+      vibeClass="vibe-travel-senses" 
+      isH1={true} 
+      fontClass="font-serif font-black"
+    />
 
-    {/* ── RESPIRO VISUAL / EXCERPT DESCANSO ── */}
+    {/* ── RESPIRO VISUAL / EXCERPT DOBLE SCROLL POLVO DORADO & TYPEMAGIC EN BG-MAIN ── */}
     <CinematicExcerptRest 
       text="Umbrales de [[piedra y silencio]]. **Hitos geohistóricos** que interrogan a la modernidad desde la profundidad de su propio misterio."
     />
@@ -117,16 +102,6 @@ const geoSlides = resolvedEssays
     {geoSlides.length > 0 && (
       <CinematicPostEngine slides={geoSlides} />
     )}
-
-    {/* ── HERO MARQUEE DE SECCIÓN ── */}
-    <Marquee 
-      title="SITIOS GEOHISTÓRICOS" 
-      subtitle="Cartografía epistémica & análisis arqueosemiótico de lugares sagrados" 
-      imageUrl={coverImage?.src || (coverImage as any)} 
-      vibeClass="vibe-travel-senses" 
-      isH1={false} 
-      fontClass="font-cinzel font-extrabold"
-    />
 
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">
 
