@@ -5,6 +5,7 @@ import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../../components/CinematicPostEngine.astro';
 import Marquee from '../../components/Marquee.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
+import AguaNieve from '../../components/AguaNieve.astro';
 import {
   getPublishableEssays,
   formatDate,
@@ -119,7 +120,7 @@ const geoSlides = resolvedEssays
         </div>
 
         <div class="flex flex-col gap-10 md:gap-14">
-          {sequences.map((seq) => (
+          {sequences.map((seq, seqIdx) => (
             <div class="premier-sequence flex flex-col gap-6 md:gap-8">
               {/* 1. Hero Cinemático Full Bleed */}
               <div class="w-full">
@@ -131,6 +132,11 @@ const geoSlides = resolvedEssays
                   enableCinemagraph={true}
                 />
               </div>
+
+              {/* 1.5. Excerpt AguaNieve (sleet + conversational 2-line chunks) */}
+              {seqIdx === 0 && (
+                <AguaNieve category="georreferencias" />
+              )}
 
               {/* 2. Dúo 60/40 */}
               {seq.duo.length > 0 && (

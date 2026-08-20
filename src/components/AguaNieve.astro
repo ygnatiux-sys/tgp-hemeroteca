@@ -1,0 +1,423 @@
+---
+/**
+ * AguaNieve.astro — Aguanieve Blanco Cristal + Texto Narrativo en bloques de 2 renglones
+ *
+ * Colocado luego del hero principal de cada colección.
+ *
+ * Características:
+ *  1. Partículas de aguanieve/drizzle cristalino (blanco lluvia brillante: #F0F8FF / #FFFFFF).
+ *  2. Frecuencia baja y esporádica ("como cuando comienza a gotear").
+ *  3. Texto narrativo escrito de a 2 renglones a la vez antes de disolverse.
+ *  4. Tono coloquial, cercano e informativo.
+ */
+
+import { formatCategory } from '../lib/content-filter';
+
+interface Props {
+  category?: string;
+  customLines?: string[];
+  id?: string;
+}
+
+const {
+  category = "general",
+  customLines,
+  id = "aguanieve-" + Math.random().toString(36).substring(2, 9),
+} = Astro.props;
+
+// Diccionario de textos conversacionales adaptados a cada colección (3-4 líneas agrupadas de a 2)
+const categoryTexts: Record<string, string[]> = {
+  'antropologia': [
+    "¿Qué nos hace verdaderamente humanos? En este rincón intentamos responderlo juntos.",
+    "Estudiamos los ritos y los símbolos cotidianos que le dan forma a nuestras comunidades.",
+    "Cada cultura es una respuesta diferente a las mismas preguntas existenciales de siempre.",
+    "Explora estas investigaciones para descubrir cómo la memoria colectiva nos construye."
+  ],
+  'arqueologia': [
+    "Hola. Adentrarse en esta colección es empezar a excavar la memoria física de la tierra.",
+    "No buscamos tesoros dorados, sino los pequeños rastros cotidianos que dejamos al pasar.",
+    "Desde vasijas rotas hasta templos enterrados, cada hallazgo arqueológico es una pregunta abierta.",
+    "Tómate tu tiempo; aquí aprendemos que las respuestas más valiosas tardan siglos en emerger."
+  ],
+  'arqueosemiotica': [
+    "Los símbolos existieron mucho antes que las palabras. De eso trata esta sección.",
+    "Buscamos entender cómo nuestros ancestros depositaron significado en rocas y formas antiguas.",
+    "Es una excavación de los lenguajes visuales primitivos que definieron el pensamiento humano.",
+    "Mira de cerca: cada trazo geométrico y cada grabado en la piedra tiene una historia que contarte."
+  ],
+  'arquetipos-globales': [
+    "Hay imágenes y temores que habitan en nosotros mucho antes de que tengamos memoria.",
+    "Los arquetipos son ese mapa genético de símbolos universales que compartimos como especie.",
+    "Aquí vas a encontrar figuras familiares repitiéndose en leyendas de pueblos que jamás se cruzaron.",
+    "Es un viaje fascinante hacia el inconsciente colectivo y los moldes eternos de nuestra mente."
+  ],
+  'historia-medieval': [
+    "La Edad Media no fue una época oscura; al contrario, fue un laboratorio de ideas fascinantes.",
+    "Entre scriptorios de monasterios y debates teológicos se sentaron las bases del mundo moderno.",
+    "Esta sección reúne textos e investigaciones sobre esa era de tensiones místicas y heréticas.",
+    "Descubre los secretos que los cronistas medievales dejaron escritos entre líneas."
+  ],
+  'historia-moderna': [
+    "Entramos en el umbral de la razón, las máquinas y la transformación del sujeto occidental.",
+    "La historia moderna es el relato de cómo aprendimos a cuestionar el cielo y a medir la tierra.",
+    "Agrupamos análisis sobre imprentas, revoluciones y el nacimiento de las ciencias del signo.",
+    "Pasa y lee cómo las ideas de la Ilustración y la modernidad nos trajeron hasta el día de hoy."
+  ],
+  'historia-antigua': [
+    "Viajamos al origen de las ciudades, los primeros imperios y la invención misma del registro.",
+    "La historia antigua es el momento clave en que la humanidad decidió que no quería olvidar.",
+    "Desde tablillas de arcilla cuneiformes hasta las crónicas del Mediterráneo clásico.",
+    "Son los cimientos de nuestra civilización, analizados bajo un enfoque fresco y multidisciplinar."
+  ],
+  'lingueistica': [
+    "El lenguaje no es solo una herramienta para comunicarnos; es el molde en el que creamos la realidad.",
+    "Cada lengua extinguida se lleva consigo una forma única e irrecuperable de percibir la existencia.",
+    "Aquí tratamos a las palabras como verdaderos fósiles de la conciencia a lo largo de las eras.",
+    "Explora cómo la lingüística histórica nos permite trazar las rutas migratorias de la mente humana."
+  ],
+  'semiotica': [
+    "Nada en nuestra cultura es neutral. Todo signo, color y silencio está comunicando algo más.",
+    "La semiótica nos da los lentes necesarios para leer los mensajes ocultos en lo que nos rodea.",
+    "Desde la publicidad moderna hasta el significado ritual de los colores en el arte clásico.",
+    "Es la aventura de desarmar los discursos cotidianos y entender el software del significado."
+  ],
+  'filosofia': [
+    "Pensar la vida no es acumular respuestas rápidas, sino aprender a convivir con grandes dudas.",
+    "Aquí reunimos sistemas de pensamiento que intentaron descifrar el cosmos, el tiempo y la ética.",
+    "Desde los diálogos platónicos tradicionales hasta las reflexiones sobre la estética del silencio.",
+    "Un espacio pensado para bajar las revoluciones cotidianas, leer despacio y cuestionar lo obvio."
+  ],
+  'mitologia': [
+    "El mito no es una mentira antigua; es una verdad profunda escrita en clave simbólica.",
+    "Los mitos expresan verdades existenciales que la historia factual a menudo no puede alcanzar.",
+    "Vas a encontrar relatos sobre dioses, héroes y monstruos interpretados desde la semiótica clásica.",
+    "Una puerta de entrada al alma colectiva y a los cuentos eternos que nos ayudan a vivir."
+  ],
+  'prehistoria': [
+    "Antes del alfabeto escrito, la humanidad ya se expresaba con pigmentos, ritos y huesos tallados.",
+    "La prehistoria es nuestro capítulo más extenso y el cimiento de toda nuestra expresión simbólica.",
+    "Analizamos el arte rupestre y la tecnología lítica no como toscos inicios, sino como hitos de genio.",
+    "Acércate al fuego primigenio y descubre el momento exacto en que nació nuestra sed de trascendencia."
+  ],
+  'georreferencias': [
+    "Los lugares sagrados del planeta no son solo piedras mudas; son portales abiertos al pasado.",
+    "Esta colección mapea coordenadas físicas donde la memoria histórica y la geología se fusionan.",
+    "De las ruinas de Cartago y Altamira hasta el enigmático portal andino de Aramu Muru.",
+    "Investigaciones rigurosas sobre territorios y monumentos cargados de semiótica arqueohistórica."
+  ],
+  'sitios-arqueohistoricos': [
+    "Los lugares sagrados del planeta no son solo piedras mudas; son portales abiertos al pasado.",
+    "Esta colección mapea coordenadas físicas donde la memoria histórica y la geología se fusionan.",
+    "De las ruinas de Cartago y Altamira hasta el enigmático portal andino de Aramu Muru.",
+    "Investigaciones rigurosas sobre territorios y monumentos cargados de semiótica arqueohistórica."
+  ],
+  'general': [
+    "Te damos la bienvenida a esta sección del archivo de The Great Puzzle.",
+    "Aquí agrupamos documentos que indagan sobre el sentido profundo de nuestra memoria histórica.",
+    "Son investigaciones y dossiers rigurosos diseñados para ser leídos con calma.",
+    "Tómate un respiro, explora las tarjetas de abajo y déjate llevar por sus conexiones epistémicas."
+  ]
+};
+
+// Obtener las líneas correspondientes (3-4 líneas)
+const cleanKey = category.toLowerCase().replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u').replace(/ñ/g, 'n');
+const activeLines = customLines || categoryTexts[cleanKey] || categoryTexts['general'];
+
+// Dividir las líneas de a dos
+const pair1 = activeLines.slice(0, 2);
+const pair2 = activeLines.slice(2, 4);
+---
+
+<div
+  id={id}
+  class="aguanieve-root relative w-full overflow-hidden select-none py-16 md:py-24 bg-(--bg-main)"
+  style="background-color: var(--bg-main);"
+  data-pair1={JSON.stringify(pair1)}
+  data-pair2={JSON.stringify(pair2)}
+>
+  {/* Canvas de aguanieve blanca/cristalina */}
+  <canvas
+    id={`${id}-canvas`}
+    class="absolute inset-0 w-full h-full pointer-events-none z-0"
+    aria-hidden="true"
+  ></canvas>
+
+  {/* Contenedor del texto (66ch para legibilidad óptima) */}
+  <div class="aguanieve-container relative z-10 max-w-3xl mx-auto px-6 md:px-16 text-center flex flex-col justify-center min-h-36">
+    <p class="aguanieve-text-block text-balance" id={`${id}-text`}>
+      <span class="aguanieve-cursor" id={`${id}-cursor`} aria-hidden="true">|</span>
+    </p>
+  </div>
+</div>
+
+<style>
+  /* ── Tipografía estilizada y cercana ── */
+  .aguanieve-container {
+    max-width: 66ch;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .aguanieve-text-block {
+    font-family: var(--font-editorial, 'Newsreader', Georgia, serif);
+    font-size: clamp(1.15rem, 2.3vw, 1.55rem);
+    font-weight: 400;
+    line-height: 1.8;
+    color: rgba(227, 221, 211, 0.78); /* #E3DDD3 con brillo bajado */
+    letter-spacing: 0.015em;
+    min-height: 3.8em;
+    transition: opacity 1.8s ease-in-out, filter 1.8s ease-in-out;
+  }
+
+  .aguanieve-text-block.an-dissolve {
+    opacity: 0 !important;
+    filter: blur(8px) !important;
+  }
+
+  /* Animación de condensación cristalina para cada palabra */
+  :global(.an-word) {
+    display: inline-block;
+    opacity: 0;
+    filter: blur(8px);
+    animation: an-emerge var(--dur, 1.2s) cubic-bezier(0.19, 1, 0.22, 1) forwards;
+    background: linear-gradient(
+      to bottom,
+      #E3DDD3 0%,
+      rgba(227, 221, 211, 0.55) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @keyframes an-emerge {
+    0% {
+      opacity: 0;
+      filter: blur(8px);
+      transform: translateY(4px);
+    }
+    100% {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+    }
+  }
+
+  .aguanieve-cursor {
+    display: inline;
+    color: #E3DDD3;
+    opacity: 0.6;
+    animation: an-blink 1s step-end infinite;
+  }
+
+  @keyframes an-blink {
+    from, to { opacity: 0; }
+    50% { opacity: 0.8; }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    // ─── Canvas Drizzle: Aguanieve Blanco Cristal ───
+    const initAguaNieveCanvas = (root) => {
+      const canvas = root.querySelector('canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      let width = 0;
+      let height = 0;
+      let particles = [];
+      let animationFrameId = null;
+
+      const resize = () => {
+        width = canvas.width = root.clientWidth;
+        height = canvas.height = root.clientHeight;
+      };
+      resize();
+      window.addEventListener('resize', resize);
+
+      // Partícula de aguanieve (blanco lluvia brillante: #FFFFFF / #F0F8FF)
+      class SleetParticle {
+        constructor() {
+          this.reset(true);
+        }
+
+        reset(init = false) {
+          this.x = Math.random() * width;
+          this.y = init ? Math.random() * height : -10;
+          this.length = 3 + Math.random() * 6; // Delgadas, gotitas pequeñas
+          this.speedY = 1.8 + Math.random() * 2.8; // Velocidad moderada de caída
+          this.speedX = -0.4 + Math.random() * 0.8; // Ligero slant por viento
+          this.opacity = 0.15 + Math.random() * 0.45; // Blanco translúcido brillante
+        }
+
+        update() {
+          this.y += this.speedY;
+          this.x += this.speedX;
+
+          // Si sale del lienzo, reaparece con probabilidad baja (para mantener goteo no constante)
+          if (this.y > height + 10 || this.x < -10 || this.x > width + 10) {
+            if (Math.random() < 0.15) {
+              this.reset();
+            } else {
+              // Dejar inactiva temporalmente moviéndola fuera de escena
+              this.y = -100;
+            }
+          }
+        }
+
+        draw() {
+          if (this.y < 0) return;
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(240, 248, 255, ${this.opacity})`; // Blanco lluvia brillante
+          ctx.lineWidth = 1.0;
+          ctx.moveTo(this.x, this.y);
+          ctx.lineTo(this.x + this.speedX * 1.5, this.y + this.length);
+          ctx.stroke();
+        }
+      }
+
+      // Inicializar pocas partículas para lograr sensación de goteo escaso
+      const maxParticles = 14;
+      for (let i = 0; i < maxParticles; i++) {
+        particles.push(new SleetParticle());
+      }
+
+      const loop = () => {
+        ctx.clearRect(0, 0, width, height);
+
+        // Ocasionalmente generar gotas de forma no constante
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+
+        animationFrameId = requestAnimationFrame(loop);
+      };
+      loop();
+
+      // Guardar id de animación para limpieza posterior
+      root.dataset.animId = animationFrameId;
+    };
+
+    // ─── TypeMagic: Narrativa de a 2 renglones ───
+    const wordDelay = (word) => 240 + word.replace(/[^a-záéíóúüñ]/gi, '').length * 15;
+
+    const writeLines = (textBlock, lines) => new Promise((resolve) => {
+      textBlock.innerHTML = '';
+      textBlock.classList.remove('an-dissolve');
+
+      // Unir las líneas con salto de línea html
+      const fullText = lines.join('<br />');
+      const words = fullText.split(' ');
+
+      // Cursor minimalista
+      const cursor = document.createElement('span');
+      cursor.className = 'aguanieve-cursor';
+      cursor.textContent = '|';
+      textBlock.appendChild(cursor);
+
+      let i = 0;
+
+      const writeNext = () => {
+        if (i >= words.length) {
+          if (cursor) cursor.style.opacity = '0';
+          resolve();
+          return;
+        }
+
+        const rawWord = words[i];
+        
+        // Manejar etiquetas <br /> dentro del texto para los saltos
+        if (rawWord.includes('<br')) {
+          const parts = rawWord.split(/<br\s*\/?>/i);
+          for (let pIdx = 0; pIdx < parts.length; pIdx++) {
+            if (parts[pIdx]) {
+              const span = document.createElement('span');
+              span.className = 'an-word';
+              span.textContent = parts[pIdx] + '\u00A0';
+              span.style.setProperty('--dur', (0.8 + parts[pIdx].length * 0.03).toFixed(2) + 's');
+              textBlock.insertBefore(span, cursor);
+            }
+            if (pIdx < parts.length - 1) {
+              const br = document.createElement('br');
+              textBlock.insertBefore(br, cursor);
+            }
+          }
+        } else {
+          const span = document.createElement('span');
+          span.className = 'an-word';
+          span.textContent = rawWord + '\u00A0';
+          span.style.setProperty('--dur', (0.8 + rawWord.length * 0.03).toFixed(2) + 's');
+          textBlock.insertBefore(span, cursor);
+        }
+
+        i++;
+        setTimeout(writeNext, wordDelay(rawWord));
+      };
+
+      writeNext();
+    });
+
+    const dissolveBlock = (textBlock) => new Promise((resolve) => {
+      textBlock.classList.add('an-dissolve');
+      setTimeout(resolve, 1800);
+    });
+
+    const runAguaNieveTypeMagic = async (root, pair1, pair2) => {
+      const textBlock = root.querySelector('.aguanieve-text-block');
+      if (!textBlock) return;
+
+      // 1. Escribir primer bloque de 2 renglones
+      await writeLines(textBlock, pair1);
+      await new Promise(r => setTimeout(r, 4500)); // Pausa lectura
+
+      // 2. Disolver
+      await dissolveBlock(textBlock);
+
+      // 3. Escribir segundo bloque de 2 renglones
+      if (pair2 && pair2.length > 0) {
+        await writeLines(textBlock, pair2);
+        await new Promise(r => setTimeout(r, 4500));
+        await dissolveBlock(textBlock);
+      }
+
+      textBlock.innerHTML = '';
+      textBlock.classList.remove('an-dissolve');
+    };
+
+    // Orquestación
+    const initAguaNieve = () => {
+      document.querySelectorAll('.aguanieve-root').forEach((root) => {
+        if (root.dataset.anInit === 'true') return;
+        root.dataset.anInit = 'true';
+
+        initAguaNieveCanvas(root);
+
+        const pair1 = JSON.parse(root.dataset.pair1 || '[]');
+        const pair2 = JSON.parse(root.dataset.pair2 || '[]');
+
+        let triggered = false;
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && !triggered) {
+              triggered = true;
+              observer.unobserve(root);
+              runAguaNieveTypeMagic(root, pair1, pair2);
+            }
+          });
+        }, { threshold: 0.15 });
+
+        observer.observe(root);
+      });
+    };
+
+    document.addEventListener('astro:page-load', initAguaNieve);
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAguaNieve);
+    } else {
+      initAguaNieve();
+    }
+  })();
+</script>

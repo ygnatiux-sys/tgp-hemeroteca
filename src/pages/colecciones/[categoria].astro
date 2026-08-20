@@ -4,6 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import Marquee from '../../components/Marquee.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
+import AguaNieve from '../../components/AguaNieve.astro';
 
 import {
   getPublishableEssays,
@@ -131,6 +132,11 @@ const sequences = createPremierSequences(resolvedEssays);
                 enableCinemagraph={true}
               />
             </div>
+
+            {/* 1.5. Excerpt AguaNieve (sleet + conversational 2-line chunks) */}
+            {seqIdx === 0 && (
+              <AguaNieve category={key} />
+            )}
 
             {/* 2. Dúo 60/40 */}
             {seq.duo.length > 0 && (
