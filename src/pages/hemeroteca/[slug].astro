@@ -31,11 +31,22 @@ export async function getStaticPaths() {
   const arquetipos = await getCollection("arquetiposGlobales").catch(() => []);
 
   const combined = [...essays, ...georefs, ...arquetipos];
+  const seen = new Set<string>();
 
-  return combined.map((item) => ({
-    params: { slug: item.id.replace(/\/index$/, "") },
-    props: { data: item.data },
-  }));
+  return combined
+    .map((item) => ({
+      slug: item.id.replace(/\/index$/, ""),
+      item,
+    }))
+    .filter(({ slug }) => {
+      if (!slug || seen.has(slug)) return false;
+      seen.add(slug);
+      return true;
+    })
+    .map(({ slug, item }) => ({
+      params: { slug },
+      props: { data: item.data },
+    }));
 }
 
 const { slug } = Astro.params;

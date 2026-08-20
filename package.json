@@ -15,9 +15,10 @@
   },
   "dependencies": {
     "@0no-co/graphql.web": "^1.2.0",
-    "@astrojs/markdoc": "^1.0.3",
-    "@astrojs/node": "^10.0.5",
-    "@astrojs/react": "^5.0.3",
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/markdoc": "^2.0.8",
+    "@astrojs/node": "^11.1.4",
+    "@astrojs/react": "^6.0.4",
     "@google/genai": "^1.50.1",
     "@google/generative-ai": "^0.24.1",
     "@keystatic/astro": "^5.0.6",
@@ -26,7 +27,7 @@
     "@tailwindcss/vite": "^4.2.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "astro": "^6.1.8",
+    "astro": "^7.2.4",
     "dotenv": "^17.4.2",
     "gsap": "^3.15.0",
     "marked": "^18.0.2",
@@ -34,6 +35,7 @@
     "react-dom": "^19.2.5",
     "split-type": "^0.3.4",
     "tailwindcss": "^4.2.2",
+    "typescript": "^6.0.3",
     "wrangler": "^4.83.0"
   },
   "devDependencies": {
@@ -43,5 +45,12 @@
     "@keystatic/astro": {
       "astro": "$astro"
     }
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "esbuild@0.27.3": true,
+    "protobufjs@7.5.5": true,
+    "sharp@0.34.5": true,
+    "workerd@1.20260415.1": true
   }
 }
