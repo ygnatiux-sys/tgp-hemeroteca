@@ -2,10 +2,12 @@
   "title": "Pazuzu",
   "generadorTexto": "",
   "bancoImagenesWikimedia": "",
+  "date": "2026-08-20",
   "category": "Arquetipos Globales",
   "themeColor": "rust-orange",
   "publicarConImagen": true,
   "draft": false,
+  "coverImage": "/src/assets/arquetipos-globales/pazuzu/coverImage.jpg",
   "isCinematic": false,
   "gallery": []
 }
