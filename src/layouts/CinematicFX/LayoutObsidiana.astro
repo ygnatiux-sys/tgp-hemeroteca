@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import Layout from '../Layout.astro';
 import TypeMagyk from '../../components/TypeMagyk.astro';
 
 interface Props {
@@ -10,32 +11,36 @@ interface Props {
 }
 
 const { frontmatter, config } = Astro.props;
-const images: string[] = frontmatter.images || frontmatter.gallery || frontmatter.galeria || (frontmatter.coverImage ? [frontmatter.coverImage] : []);
+
+// Construir el array de imágenes: gallery, coverImage, o imagen AI base64
+const rawImages: any[] = [
+  ...(Array.isArray(frontmatter.gallery) ? frontmatter.gallery : []),
+];
+// coverImage puede ser ImageMetadata o string (base64)
+if (frontmatter.coverImage && !rawImages.length) {
+  rawImages.push(frontmatter.coverImage);
+}
+
 const title = frontmatter.title || 'Dossier — Obsidiana';
+const excerpt = frontmatter.excerpt || '';
 ---
 
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-  </head>
-  <body class="bg-[#0b0c0d] text-[#e3ddd3] min-h-screen relative overflow-x-hidden selection:bg-[#c9a86c]/30 selection:text-white">
-    
-    <!-- Contenedor Ambiental Fijo (Fondo Eje Y) -->
+<Layout title={title} description={excerpt} headerTransparentUntilScroll={true} footerVariant="minimal">
+  <div class="min-h-screen bg-[#0b0c0d] text-[#e3ddd3] relative overflow-x-hidden selection:bg-[#c9a86c]/30 selection:text-white">
+
+    {/* Contenedor Ambiental Fijo (Imágenes de fondo con GSAP) */}
     <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden" id="obsidiana-bg-root">
-      <div class="absolute inset-0 bg-black/45 z-10"></div>
+      <div class="absolute inset-0 bg-black/50 z-10"></div>
       <div class="absolute inset-0 bg-radial from-transparent via-[#0b0c0d]/60 to-[#0b0c0d] z-10"></div>
 
-      <!-- Capa de Polvo Ambiental / Ruido Estático -->
-      <div 
+      {/* Capa de Polvo Ambiental */}
+      <div
         class="absolute inset-0 pointer-events-none opacity-[0.07] mix-blend-screen bg-repeat z-20"
         style="background-image: url('data:image/svg+xml;utf8,<svg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'dustNoise\'><feTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/></filter><rect width=\'100%\' height=\'100%\' filter=\'url(%23dustNoise)\'/></svg>');"
         aria-hidden="true"
       ></div>
-      
-      {images.map((img, i) => (
+
+      {rawImages.length > 0 ? rawImages.map((img: any, i: number) => (
         typeof img === 'object' && img ? (
           <Image
             src={img}
@@ -57,54 +62,88 @@ const title = frontmatter.title || 'Dossier — Obsidiana';
             data-index={i}
           />
         ) : null
-      ))}
+      )) : (
+        <div class="absolute inset-0 bg-linear-to-br from-[#0b0c0d] via-[#121418] to-[#0a0a0c]"></div>
+      )}
     </div>
 
-    <!-- Contenedor de Contenido y Lectura -->
-    <main class="relative z-30 max-w-4xl mx-auto px-6 py-32 md:py-48 min-h-[300vh]" id="obsidiana-content">
+    {/* Header del artículo */}
+    <header class="relative z-30 pt-24 pb-8 px-6 max-w-4xl mx-auto">
+      <div class="flex flex-col gap-4">
+        <span class="font-metadata text-[9px] uppercase tracking-[0.5em] text-[#c9a86c]/70">
+          Ensayo Cinemático · {frontmatter.atmosfera?.discriminant || frontmatter.atmosfera || 'Obsidiana'}
+        </span>
+        <h1 class="font-cinzel font-extrabold text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-white drop-shadow-[0_2px_30px_rgba(0,0,0,0.9)]">
+          {title}
+        </h1>
+        {excerpt && (
+          <p class="font-serif text-white/60 text-lg italic leading-relaxed max-w-2xl">
+            {excerpt}
+          </p>
+        )}
+      </div>
+    </header>
+
+    {/* Divisor atmosférico */}
+    <div class="relative z-30 max-w-4xl mx-auto px-6 mb-12">
+      <div class="h-px w-full bg-linear-to-r from-transparent via-[#c9a86c]/30 to-transparent"></div>
+    </div>
+
+    {/* Cuerpo del artículo */}
+    <main class="relative z-30 max-w-4xl mx-auto px-6 pb-32 md:pb-48 min-h-[80vh]" id="obsidiana-content">
       <TypeMagyk frontmatter={frontmatter} config={config}>
         <slot />
       </TypeMagyk>
     </main>
 
-    <script>
-      import gsap from 'gsap';
-      import { ScrollTrigger } from 'gsap/ScrollTrigger';
+    {/* CTA de retorno */}
+    <div class="relative z-30 max-w-4xl mx-auto px-6 pb-24">
+      <a
+        href="/"
+        class="inline-flex items-center gap-2 font-metadata text-[9px] uppercase tracking-[0.4em] text-white/30 hover:text-[#c9a86c] transition-colors duration-300"
+      >
+        ← Volver al Archivo
+      </a>
+    </div>
+  </div>
+</Layout>
 
-      gsap.registerPlugin(ScrollTrigger);
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-      function initObsidiana() {
-        const images = gsap.utils.toArray<HTMLElement>('.obsidiana-img');
-        if (!images.length) return;
+  gsap.registerPlugin(ScrollTrigger);
 
-        // Estado inicial de la primera imagen
-        gsap.set(images[0], { opacity: 0.85, scale: 1 });
+  function initObsidiana() {
+    const images = gsap.utils.toArray<HTMLElement>('.obsidiana-img');
+    if (!images.length) return;
 
-        if (images.length === 1) return;
+    // Mostrar primera imagen
+    gsap.set(images[0], { opacity: 0.75, scale: 1 });
 
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: '#obsidiana-content',
-            start: 'top top',
-            end: 'bottom bottom',
-            scrub: 1,
-          }
-        });
+    if (images.length === 1) return;
 
-        images.forEach((img, i) => {
-          if (i > 0) {
-            tl.to(images[i - 1], { opacity: 0, scale: 1.04, ease: 'power1.inOut' }, i)
-              .to(img, { opacity: 0.85, scale: 1, ease: 'power1.inOut' }, i);
-          }
-        });
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#obsidiana-content',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1,
       }
+    });
 
-      document.addEventListener('astro:page-load', initObsidiana);
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initObsidiana);
-      } else {
-        initObsidiana();
+    images.forEach((img, i) => {
+      if (i > 0) {
+        tl.to(images[i - 1], { opacity: 0, scale: 1.04, ease: 'power1.inOut' }, i)
+          .to(img, { opacity: 0.75, scale: 1, ease: 'power1.inOut' }, i);
       }
-    </script>
-  </body>
-</html>
+    });
+  }
+
+  document.addEventListener('astro:page-load', initObsidiana);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initObsidiana);
+  } else {
+    initObsidiana();
+  }
+</script>

@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import Layout from '../Layout.astro';
 import TypeMagyk from '../../components/TypeMagyk.astro';
 
 interface Props {
@@ -10,103 +11,103 @@ interface Props {
 }
 
 const { frontmatter, config } = Astro.props;
-const images: string[] = frontmatter.images || frontmatter.gallery || frontmatter.galeria || (frontmatter.coverImage ? [frontmatter.coverImage] : []);
+
+const rawImages: any[] = [
+  ...(Array.isArray(frontmatter.gallery) ? frontmatter.gallery : []),
+];
+if (frontmatter.coverImage && !rawImages.length) {
+  rawImages.push(frontmatter.coverImage);
+}
+
 const title = frontmatter.title || 'Dossier — Umbral';
+const excerpt = frontmatter.excerpt || '';
 ---
 
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-  </head>
-  <body class="bg-[#0b0c0d] text-[#e3ddd3] min-h-screen relative overflow-x-hidden selection:bg-[#c9a86c]/30 selection:text-white">
-    
-    <!-- Contenedor Ambiental Fijo (Fondo Eje Z - Profundidad / Zoom Scale: 4) -->
-    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden perspective-[1000px]" id="umbral-bg-root">
-      <div class="absolute inset-0 bg-black/40 z-20"></div>
-      <div class="absolute inset-0 bg-radial from-transparent via-[#0b0c0d]/50 to-[#0b0c0d] z-20"></div>
+<Layout title={title} description={excerpt} headerTransparentUntilScroll={true} footerVariant="minimal">
+  <div class="min-h-screen bg-[#060607] text-[#e3ddd3] relative overflow-x-hidden">
 
-      <!-- Capa de Polvo Ambiental / Ruido Estático -->
-      <div 
-        class="absolute inset-0 pointer-events-none opacity-[0.07] mix-blend-screen bg-repeat z-30"
+    {/* Umbral: Zoom profundo (eje Z) - capas que se expanden con el scroll */}
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden" id="umbral-bg-root">
+      <div class="absolute inset-0 bg-black/60 z-30"></div>
+      <div class="absolute inset-0 bg-radial from-transparent via-[#060607]/50 to-[#060607] z-30"></div>
+
+      <div class="absolute inset-0 pointer-events-none opacity-[0.05] mix-blend-screen bg-repeat z-40"
         style="background-image: url('data:image/svg+xml;utf8,<svg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'dustNoise\'><feTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/></filter><rect width=\'100%\' height=\'100%\' filter=\'url(%23dustNoise)\'/></svg>');"
-        aria-hidden="true"
-      ></div>
+        aria-hidden="true">
+      </div>
 
-      {images.map((img, i) => (
-        <div 
-          class="umbral-layer absolute inset-0 w-full h-full will-change-[transform,opacity] transform-gpu"
-          style={`z-index: ${images.length - i};`}
-        >
+      {rawImages.length > 0 ? rawImages.map((img: any, i: number) => (
+        <div class={`umbral-layer absolute inset-0 will-change-[opacity,transform] ${i === 0 ? 'z-10' : 'z-20'}`}>
           {typeof img === 'object' && img ? (
-            <Image
-              src={img}
-              alt=""
-              format="webp"
-              quality={80}
-              loading={i === 0 ? "eager" : "lazy"}
-              decoding="async"
-              class="w-full h-full object-cover object-center brightness-75"
-            />
+            <Image src={img} alt="" format="webp" quality={80} loading={i === 0 ? "eager" : "lazy"} decoding="async" class="w-full h-full object-cover object-center" />
           ) : typeof img === 'string' && img.trim().length > 0 ? (
-            <img
-              src={img}
-              alt=""
-              loading={i === 0 ? "eager" : "lazy"}
-              decoding="async"
-              class="w-full h-full object-cover object-center brightness-75"
-            />
+            <img src={img} alt="" loading={i === 0 ? "eager" : "lazy"} decoding="async" class="w-full h-full object-cover object-center" />
           ) : null}
         </div>
-      ))}
+      )) : (
+        <div class="absolute inset-0 bg-linear-to-br from-[#060607] via-[#0f0f12] to-[#060607]"></div>
+      )}
     </div>
 
-    <!-- Contenedor de Contenido y Lectura -->
-    <main class="relative z-40 max-w-4xl mx-auto px-6 py-32 md:py-48 min-h-[300vh]" id="umbral-content">
+    {/* Header */}
+    <header class="relative z-40 pt-24 pb-8 px-6 max-w-4xl mx-auto">
+      <div class="flex flex-col gap-4">
+        <span class="font-metadata text-[9px] uppercase tracking-[0.5em] text-[#c9a86c]/70">Ensayo Cinemático · Umbral</span>
+        <h1 class="font-cinzel font-extrabold text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-white drop-shadow-[0_2px_30px_rgba(0,0,0,0.9)]">
+          {title}
+        </h1>
+        {excerpt && <p class="font-serif text-white/60 text-lg italic leading-relaxed max-w-2xl">{excerpt}</p>}
+      </div>
+    </header>
+
+    <div class="relative z-40 max-w-4xl mx-auto px-6 mb-12">
+      <div class="h-px w-full bg-linear-to-r from-transparent via-[#c9a86c]/30 to-transparent"></div>
+    </div>
+
+    <main class="relative z-40 max-w-4xl mx-auto px-6 pb-32 md:pb-48 min-h-[300vh]" id="umbral-content">
       <TypeMagyk frontmatter={frontmatter} config={config}>
         <slot />
       </TypeMagyk>
     </main>
 
-    <script>
-      import gsap from 'gsap';
-      import { ScrollTrigger } from 'gsap/ScrollTrigger';
+    <div class="relative z-40 max-w-4xl mx-auto px-6 pb-24">
+      <a href="/" class="inline-flex items-center gap-2 font-metadata text-[9px] uppercase tracking-[0.4em] text-white/30 hover:text-[#c9a86c] transition-colors duration-300">
+        ← Volver al Archivo
+      </a>
+    </div>
+  </div>
+</Layout>
 
-      gsap.registerPlugin(ScrollTrigger);
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-      function initUmbral() {
-        const layers = gsap.utils.toArray<HTMLElement>('.umbral-layer');
-        if (!layers.length || layers.length <= 1) return;
+  gsap.registerPlugin(ScrollTrigger);
 
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: '#umbral-content',
-            start: 'top top',
-            end: 'bottom bottom',
-            scrub: 1,
-          }
-        });
+  function initUmbral() {
+    const layers = gsap.utils.toArray<HTMLElement>('.umbral-layer');
+    if (!layers.length || layers.length <= 1) return;
 
-        layers.forEach((layer, i) => {
-          // Todas excepto la capa base del fondo escalan a 4 y se desvanecen
-          if (i < layers.length - 1) {
-            tl.to(layer, {
-              scale: 4,
-              opacity: 0,
-              ease: 'power2.inOut',
-            }, i);
-          }
-        });
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#umbral-content',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1,
       }
+    });
 
-      document.addEventListener('astro:page-load', initUmbral);
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initUmbral);
-      } else {
-        initUmbral();
+    layers.forEach((layer, i) => {
+      if (i < layers.length - 1) {
+        tl.to(layer, { scale: 4, opacity: 0, ease: 'power2.inOut' }, i);
       }
-    </script>
-  </body>
-</html>
+    });
+  }
+
+  document.addEventListener('astro:page-load', initUmbral);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initUmbral);
+  } else {
+    initUmbral();
+  }
+</script>

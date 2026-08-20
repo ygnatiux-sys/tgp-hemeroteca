@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import Layout from '../Layout.astro';
 import TypeMagyk from '../../components/TypeMagyk.astro';
 
 interface Props {
@@ -10,97 +11,102 @@ interface Props {
 }
 
 const { frontmatter, config } = Astro.props;
-const images: string[] = frontmatter.images || frontmatter.gallery || frontmatter.galeria || (frontmatter.coverImage ? [frontmatter.coverImage] : []);
+
+const rawImages: any[] = [
+  ...(Array.isArray(frontmatter.gallery) ? frontmatter.gallery : []),
+];
+if (frontmatter.coverImage && !rawImages.length) {
+  rawImages.push(frontmatter.coverImage);
+}
+
 const title = frontmatter.title || 'Dossier — Deriva';
+const excerpt = frontmatter.excerpt || '';
 ---
 
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-  </head>
-  <body class="bg-[#0b0c0d] text-[#e3ddd3] min-h-screen relative overflow-x-hidden selection:bg-[#c9a86c]/30 selection:text-white">
-    
-    <!-- Contenedor Ambiental Fijo (Fondo Eje X - Carrusel / Paralaje Lateral) -->
+<Layout title={title} description={excerpt} headerTransparentUntilScroll={true} footerVariant="minimal">
+  <div class="min-h-screen bg-[#0b0c0d] text-[#e3ddd3] relative overflow-x-hidden">
+
+    {/* Fondo paralaje lateral (Deriva: eje X) */}
     <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden" id="deriva-bg-root">
       <div class="absolute inset-0 bg-black/40 z-10"></div>
       <div class="absolute inset-0 bg-linear-to-b from-[#0b0c0d]/70 via-transparent to-[#0b0c0d]/90 z-10"></div>
 
-      <!-- Capa de Polvo Ambiental / Ruido Estático -->
-      <div 
-        class="absolute inset-0 pointer-events-none opacity-[0.07] mix-blend-screen bg-repeat z-20"
+      <div class="absolute inset-0 pointer-events-none opacity-[0.07] mix-blend-screen bg-repeat z-20"
         style="background-image: url('data:image/svg+xml;utf8,<svg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'dustNoise\'><feTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/></filter><rect width=\'100%\' height=\'100%\' filter=\'url(%23dustNoise)\'/></svg>');"
-        aria-hidden="true"
-      ></div>
-
-      <div 
-        class="deriva-track flex h-full will-change-transform" 
-        style={`width: ${Math.max(100, images.length * 100)}vw;`}
-      >
-        {images.map((img, i) => (
-          <div class="w-screen h-full shrink-0 relative overflow-hidden">
-            {typeof img === 'object' && img ? (
-              <Image
-                src={img}
-                alt=""
-                format="webp"
-                quality={80}
-                loading={i === 0 ? "eager" : "lazy"}
-                decoding="async"
-                class="w-full h-full object-cover object-center brightness-75 scale-105"
-              />
-            ) : typeof img === 'string' && img.trim().length > 0 ? (
-              <img
-                src={img}
-                alt=""
-                loading={i === 0 ? "eager" : "lazy"}
-                decoding="async"
-                class="w-full h-full object-cover object-center brightness-75 scale-105"
-              />
-            ) : null}
-          </div>
-        ))}
+        aria-hidden="true">
       </div>
+
+      {rawImages.length > 0 && (
+        <div class="deriva-track flex h-full will-change-transform" style={`width: ${Math.max(100, rawImages.length * 100)}vw;`}>
+          {rawImages.map((img: any, i: number) => (
+            <div class="w-screen h-full shrink-0 relative overflow-hidden">
+              {typeof img === 'object' && img ? (
+                <Image src={img} alt="" format="webp" quality={80} loading={i === 0 ? "eager" : "lazy"} decoding="async" class="w-full h-full object-cover object-center brightness-75 scale-105" />
+              ) : typeof img === 'string' && img.trim().length > 0 ? (
+                <img src={img} alt="" loading={i === 0 ? "eager" : "lazy"} decoding="async" class="w-full h-full object-cover object-center brightness-75 scale-105" />
+              ) : null}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
 
-    <!-- Contenedor de Contenido y Lectura -->
-    <main class="relative z-30 max-w-4xl mx-auto px-6 py-32 md:py-48 min-h-[300vh]" id="deriva-content">
+    {/* Header */}
+    <header class="relative z-30 pt-24 pb-8 px-6 max-w-4xl mx-auto">
+      <div class="flex flex-col gap-4">
+        <span class="font-metadata text-[9px] uppercase tracking-[0.5em] text-[#c9a86c]/70">Ensayo Cinemático · Deriva</span>
+        <h1 class="font-cinzel font-extrabold text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-white drop-shadow-[0_2px_30px_rgba(0,0,0,0.9)]">
+          {title}
+        </h1>
+        {excerpt && <p class="font-serif text-white/60 text-lg italic leading-relaxed max-w-2xl">{excerpt}</p>}
+      </div>
+    </header>
+
+    <div class="relative z-30 max-w-4xl mx-auto px-6 mb-12">
+      <div class="h-px w-full bg-linear-to-r from-transparent via-[#c9a86c]/30 to-transparent"></div>
+    </div>
+
+    <main class="relative z-30 max-w-4xl mx-auto px-6 pb-32 md:pb-48 min-h-[300vh]" id="deriva-content">
       <TypeMagyk frontmatter={frontmatter} config={config}>
         <slot />
       </TypeMagyk>
     </main>
 
-    <script>
-      import gsap from 'gsap';
-      import { ScrollTrigger } from 'gsap/ScrollTrigger';
+    <div class="relative z-30 max-w-4xl mx-auto px-6 pb-24">
+      <a href="/" class="inline-flex items-center gap-2 font-metadata text-[9px] uppercase tracking-[0.4em] text-white/30 hover:text-[#c9a86c] transition-colors duration-300">
+        ← Volver al Archivo
+      </a>
+    </div>
+  </div>
+</Layout>
 
-      gsap.registerPlugin(ScrollTrigger);
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-      function initDeriva() {
-        const track = document.querySelector<HTMLElement>('.deriva-track');
-        const totalImages = track?.children.length || 0;
-        if (!track || totalImages <= 1) return;
+  gsap.registerPlugin(ScrollTrigger);
 
-        gsap.to(track, {
-          xPercent: -100 * ((totalImages - 1) / totalImages),
-          ease: 'none',
-          scrollTrigger: {
-            trigger: '#deriva-content',
-            start: 'top top',
-            end: 'bottom bottom',
-            scrub: 1,
-          }
-        });
+  function initDeriva() {
+    const track = document.querySelector<HTMLElement>('.deriva-track');
+    const totalImages = track?.children.length || 0;
+    if (!track || totalImages <= 1) return;
+
+    gsap.to(track, {
+      xPercent: -100 * ((totalImages - 1) / totalImages),
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '#deriva-content',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1,
       }
+    });
+  }
 
-      document.addEventListener('astro:page-load', initDeriva);
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initDeriva);
-      } else {
-        initDeriva();
-      }
-    </script>
-  </body>
-</html>
+  document.addEventListener('astro:page-load', initDeriva);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDeriva);
+  } else {
+    initDeriva();
+  }
+</script>

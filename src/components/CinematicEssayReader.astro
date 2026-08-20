@@ -1,0 +1,362 @@
+---
+/**
+ * CinematicEssayReader.astro (CER)
+ * ──────────────────────────────────────────────────────────────────────────────
+ * Renderizador Cinemático Global TGP.
+ *
+ * Características:
+ *  1. Sin máscaras oscuras: fondo 100% limpio y transparente (sin viñetas ni oscurecedores).
+ *  2. Renderiza todos los párrafos agrupados en bloques de 5 renglones cada uno.
+ *  3. Tipografía TypeMagyk gruesa (36px, negrita, centrada).
+ *  4. Polvo ambiental flotante con caudal aumentado (95 motes) y alta dispersión aleatoria.
+ *  5. Palabras entre **...** se renderizan con color especial y brillo de linterna suave (Lantern Glow).
+ *  6. Desplazamiento GSAP ScrollTrigger: los párrafos emergen con scroll y se "disuelven"
+ *     con desenfoque y opacidad al salir del área de lectura por la parte superior.
+ */
+
+interface Props {
+  text?: string;
+  id?: string;
+}
+
+const {
+  text = "",
+  id = "cer-" + Math.random().toString(36).substring(2, 9),
+} = Astro.props;
+
+// Helper: Divide todo el texto en bloques de 5 renglones (~45 palabras cada uno), conservando los marcadores **
+function chunkTextIntoFiveLineBlocks(raw: string): string[] {
+  if (!raw) return [
+    "En las brumas del tiempo, el archivo se despliega como un **umbral ontológico** donde la materia y la memoria convergen en el horizonte. Cada fragmento recuperado revela estratos profundos de civilizaciones olvidadas, restituyendo el valor sagrado de la palabra.",
+    "La investigación no concluye en la superficie del documento, sino que se ramifica y profundiza en el **silencio contemplativo** del paisaje virgen, aguardando nuevas lecturas en el horizonte epistémico del proyecto."
+  ];
+
+  // Limpieza de encabezados y blockquotes, pero CONSERVANDO **
+  const cleaned = raw
+    .replace(/^#+\s+/gm, '')
+    .replace(/^>\s+/gm, '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .trim();
+
+  // Párrafos originales
+  const rawParagraphs = cleaned
+    .split(/\n\s*\n/)
+    .map(p => p.trim())
+    .filter(p => p.length > 15);
+
+  const blocks: string[] = [];
+  let currentBlockWords: string[] = [];
+  const WORDS_PER_5_LINES = 45; // ~5 renglones a 36px (aprox 9 palabras por línea)
+
+  rawParagraphs.forEach((para) => {
+    const words = para.split(/\s+/);
+    words.forEach((w) => {
+      currentBlockWords.push(w);
+      if (currentBlockWords.length >= WORDS_PER_5_LINES) {
+        blocks.push(currentBlockWords.join(' '));
+        currentBlockWords = [];
+      }
+    });
+  });
+
+  if (currentBlockWords.length > 0) {
+    blocks.push(currentBlockWords.join(' '));
+  }
+
+  return blocks.length > 0 ? blocks : [cleaned];
+}
+
+const paragraphBlocks = chunkTextIntoFiveLineBlocks(text);
+
+// Procesar palabras de cada bloque, detectando marcadores ** para aplicar Lantern Glow
+const processedBlocks = paragraphBlocks.map((blockText) => {
+  const words = blockText.split(/\s+/);
+  return words.map((w, idx) => {
+    let isGlow = false;
+    let cleanWord = w;
+
+    // Detección de patrones **palabra**
+    if (w.startsWith('**') && w.endsWith('**')) {
+      isGlow = true;
+      cleanWord = w.slice(2, -2);
+    } else if (w.includes('**')) {
+      isGlow = true;
+      cleanWord = w.replace(/\*\*/g, '');
+    }
+
+    return {
+      word: cleanWord,
+      isGlow,
+      isLast: idx === words.length - 1
+    };
+  });
+});
+---
+
+<section
+  id={id}
+  class="cinematic-essay-reader relative w-full overflow-hidden select-none min-h-screen py-32 flex flex-col items-center justify-center bg-transparent animate-fade-in"
+  data-reader-id={id}
+>
+  {/* Canvas de Polvo Ambiental Flotante */}
+  <canvas
+    id={`${id}-canvas`}
+    class="cer-dust-canvas absolute inset-0 w-full h-full pointer-events-none z-0"
+    aria-hidden="true"
+  ></canvas>
+
+  {/* Contenedor Principal de Lectura Cinemática en Bloques de 5 Renglones */}
+  <div class="cer-container relative z-20 max-w-4xl mx-auto px-6 text-center flex flex-col gap-32 md:gap-48 py-24">
+    {processedBlocks.map((pWords, pIndex) => (
+      <div class="cer-paragraph-block cer-scroll-displace" data-p-index={pIndex}>
+        <p class="cer-typemagyk-bold text-center">
+          {pWords.map((item, wIndex) => (
+            <span
+              class={[
+                "cer-word inline-block",
+                item.isGlow ? "cer-word--glow" : ""
+              ].filter(Boolean).join(" ")}
+              data-word-idx={`${pIndex}-${wIndex}`}
+            >
+              {item.word}{!item.isLast ? "\u00A0" : ""}
+            </span>
+          ))}
+          <span class="cer-cursor inline-block" aria-hidden="true">|</span>
+        </p>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  /* ── Estilos Tipográficos TypeMagyk Grueso (36px, Negrita, Centrado) ── */
+  .cer-typemagyk-bold {
+    font-family: 'Newsreader', 'Gloock', 'Libre Bodoni', Georgia, serif;
+    font-size: 36px !important;
+    font-weight: 700 !important;
+    line-height: 1.65 !important;
+    letter-spacing: 0.02em !important;
+    color: rgba(227, 221, 211, 0.95);
+    text-align: center !important;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85), 0 0 8px rgba(227, 221, 211, 0.15);
+    margin: 0 auto;
+    max-width: 44ch;
+  }
+
+  /* Adaptación responsiva para móviles */
+  @media (max-width: 768px) {
+    .cer-typemagyk-bold {
+      font-size: 26px !important;
+      line-height: 1.55 !important;
+      max-width: 92%;
+    }
+  }
+
+  /* Palabras individuales para tipeado y revelado */
+  .cer-word {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(8px);
+    will-change: opacity, filter, transform;
+    transition: opacity 0.6s ease-out, filter 0.6s ease-out, transform 0.6s ease-out;
+  }
+
+  .cer-word.cer-revealed {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+  }
+
+  /* ── Efecto Lantern Glow en palabras destacadas con ** ── */
+  .cer-word--glow {
+    color: #ffe6c2 !important; /* Blanco cálido / ámbar suave */
+    font-weight: 800 !important;
+    text-shadow: 
+      0 0 16px rgba(201, 168, 108, 0.85), 
+      0 0 8px rgba(255, 190, 110, 0.45), 
+      0 2px 10px rgba(0, 0, 0, 0.95) !important;
+  }
+
+  /* Cursor TGP de tipeado */
+  .cer-cursor {
+    color: #c9a86c;
+    font-weight: 300;
+    margin-left: 3px;
+    animation: cer-cursor-blink 0.85s step-end infinite;
+  }
+
+  @keyframes cer-cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Bloques de párrafo para desplazamiento scroll */
+  .cer-paragraph-block {
+    will-change: transform, opacity, filter;
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // ─── CANVAS DE POLVO AMBIENTAL FLOTANTE ───
+  class AmbientDustCanvas {
+    private canvas: HTMLCanvasElement;
+    private ctx: CanvasRenderingContext2D;
+    private motes: Array<{
+      x: number;
+      y: number;
+      radius: number;
+      opacity: number;
+      vx: number;
+      vy: number;
+      angle: number;
+      angleSpeed: number;
+    }> = [];
+    private animationId: number | null = null;
+    private isRunning: boolean = false;
+
+    constructor(canvas: HTMLCanvasElement) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext('2d')!;
+      this.resize();
+      window.addEventListener('resize', this.resize.bind(this));
+    }
+
+    private resize() {
+      const parent = this.canvas.parentElement;
+      this.canvas.width = parent?.clientWidth || window.innerWidth;
+      this.canvas.height = parent?.clientHeight || window.innerHeight;
+    }
+
+    public start() {
+      if (this.isRunning) return;
+      this.isRunning = true;
+      // Caudal aumentado a 95 motes y alta dispersión aleatoria
+      this.motes = Array.from({ length: 95 }, () => ({
+        x: Math.random() * this.canvas.width,
+        y: Math.random() * this.canvas.height,
+        radius: 0.5 + Math.random() * 3.5, // Mayor dispersión de radios
+        opacity: 0.08 + Math.random() * 0.45, // Opacidades variables
+        vx: 0.08 + Math.random() * 0.75, // Velocidad horizontal variable
+        vy: (Math.random() - 0.5) * 0.35, // Alta dispersión vertical aleatoria
+        angle: Math.random() * Math.PI * 2,
+        angleSpeed: 0.003 + Math.random() * 0.025,
+      }));
+      this.loop();
+    }
+
+    public stop() {
+      this.isRunning = false;
+      if (this.animationId) {
+        cancelAnimationFrame(this.animationId);
+        this.animationId = null;
+      }
+    }
+
+    private loop() {
+      if (!this.isRunning) return;
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+      this.motes.forEach((m) => {
+        m.x += m.vx;
+        m.y += m.vy + Math.sin(m.angle) * 0.12;
+        m.angle += m.angleSpeed;
+
+        if (m.x > this.canvas.width + 10) {
+          m.x = -10;
+          m.y = Math.random() * this.canvas.height;
+        }
+
+        this.ctx.beginPath();
+        const grad = this.ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.radius * 2.2);
+        grad.addColorStop(0, `rgba(201, 168, 108, ${m.opacity})`);
+        grad.addColorStop(1, 'rgba(201, 168, 108, 0)');
+        this.ctx.fillStyle = grad;
+        this.ctx.arc(m.x, m.y, m.radius * 2.2, 0, Math.PI * 2);
+        this.ctx.fill();
+      });
+
+      this.animationId = requestAnimationFrame(this.loop.bind(this));
+    }
+  }
+
+  // ─── INICIALIZACIÓN DE CADA LECTOR CINEMÁTICO ───
+  function initCinematicEssayReader() {
+    document.querySelectorAll<HTMLElement>('.cinematic-essay-reader').forEach((root) => {
+      if (root.dataset.cerInit === 'true') return;
+      root.dataset.cerInit = 'true';
+
+      const readerId = root.dataset.readerId;
+      const canvas = root.querySelector<HTMLCanvasElement>(`#${readerId}-canvas`);
+      const blocks = Array.from(root.querySelectorAll<HTMLElement>('.cer-paragraph-block'));
+
+      if (canvas) {
+        const dust = new AmbientDustCanvas(canvas);
+        dust.start();
+      }
+
+      // GSAP ScrollTrigger: Entrada, permanencia y disolución del párrafo
+      blocks.forEach((block) => {
+        const words = Array.from(block.querySelectorAll<HTMLElement>('.cer-word'));
+        const cursor = block.querySelector<HTMLElement>('.cer-cursor');
+
+        // Transición combinada por scroll
+        gsap.timeline({
+          scrollTrigger: {
+            trigger: block,
+            start: 'top 88%',
+            end: 'bottom 12%',
+            scrub: 1,
+          }
+        })
+        .fromTo(block, 
+          { y: 55, opacity: 0.15, filter: 'blur(8px)' },
+          { y: 15, opacity: 1, filter: 'blur(0px)', duration: 0.4 }
+        )
+        .to(block, 
+          { y: -55, opacity: 0, filter: 'blur(12px)', scale: 0.95, duration: 0.6 },
+          "+=0.2"
+        );
+
+        // Observer para disparar el tipeado ralentizado (75ms/palabra) al entrar al viewport
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                observer.unobserve(block);
+
+                const TYPING_DELAY_MS = 75;
+
+                words.forEach((w, i) => {
+                  setTimeout(() => {
+                    w.classList.add('cer-revealed');
+                  }, i * TYPING_DELAY_MS);
+                });
+
+                // Apagar cursor al terminar el bloque
+                const totalTime = words.length * TYPING_DELAY_MS + 600;
+                setTimeout(() => {
+                  if (cursor) cursor.style.opacity = '0';
+                }, totalTime);
+              }
+            });
+          },
+          { threshold: 0.15 }
+        );
+
+        observer.observe(block);
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initCinematicEssayReader);
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initCinematicEssayReader();
+  } else {
+    document.addEventListener('DOMContentLoaded', initCinematicEssayReader);
+  }
+</script>

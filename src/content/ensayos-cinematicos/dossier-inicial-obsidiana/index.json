@@ -2,9 +2,8 @@
   "title": "Dossier Inicial Obsidiana",
   "generadorTexto": "",
   "atmosfera": {
-    "discriminant": "obsidiana",
-    "value": null
+    "discriminant": "obsidiana"
   },
-  "coverImage": null,
+  "coverImage": "/src/assets/ensayos-cinematicos/dossier-inicial-obsidiana/coverImage.jpeg",
   "gallery": []
 }

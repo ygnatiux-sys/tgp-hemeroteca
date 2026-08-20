@@ -1,9 +1,9 @@
 ---
 import { getCollection, getEntry, render } from 'astro:content';
-import { marked } from 'marked';
 import LayoutObsidiana from '../../layouts/CinematicFX/LayoutObsidiana.astro';
 import LayoutDeriva from '../../layouts/CinematicFX/LayoutDeriva.astro';
 import LayoutUmbral from '../../layouts/CinematicFX/LayoutUmbral.astro';
+import CinematicEssayReader from '../../components/CinematicEssayReader.astro';
 
 export const prerender = true;
 
@@ -16,7 +16,7 @@ export async function getStaticPaths() {
   }));
 }
 
-const { slug } = Astro.params;
+const slug = Astro.params.slug as string;
 const { entry } = Astro.props;
 
 // Carga del contenido Markdoc si existe en la colección
@@ -24,11 +24,11 @@ let Content: any = null;
 try {
   const contentEntry = await getEntry('ensayosCinematicosContent' as any, `${slug}/content`);
   if (contentEntry) {
-    const rendered = await render(contentEntry);
+    const rendered = await render(contentEntry as any);
     Content = rendered.Content;
   }
 } catch (err) {
-  console.warn(`[Ensayos Cinemáticos] No se pudo cargar Markdoc para ${slug}:`, err);
+  // Sin content.mdoc — se renderizará desde generadorTexto o aiText
 }
 
 // ─── EXTRACCIÓN UNIFICADA DE IA (TEXTO + IMAGEN) ───
@@ -46,7 +46,9 @@ if (entry.data.generadorTexto && entry.data.generadorTexto.startsWith('{')) {
 const finalFrontmatter = {
   ...entry.data,
   // Si no hay coverImage manual, inyectamos la generada por Gemini Flash
-  coverImage: entry.data.coverImage || aiImage
+  coverImage: entry.data.coverImage || aiImage,
+  // Excerpt de los primeros 200 chars del texto IA si no hay ninguno
+  excerpt: (entry.data as any).excerpt || (aiText ? aiText.replace(/[#*_`]/g, '').slice(0, 200) + '…' : ''),
 };
 
 // 1. Diccionario de Presets Cinemáticos
@@ -87,19 +89,9 @@ const layoutProps = {
   config: isCustom ? customVariables : undefined,
 };
 
-let aiTextHtml = "";
-if (!Content && aiText) {
-  try {
-    const parsed = await marked.parse(aiText);
-    aiTextHtml = typeof parsed === 'string' ? parsed : await parsed;
-  } catch (err) {
-    console.error("Error parsing marked for", slug, err);
-  }
-}
+const fullEssayText = aiText || (finalFrontmatter as any).generadorTexto || '';
 ---
 
 <SelectedLayout {...layoutProps}>
-  {Content ? <Content /> : (
-    aiTextHtml ? <div set:html={aiTextHtml} /> : <slot />
-  )}
+  <CinematicEssayReader text={fullEssayText} />
 </SelectedLayout>
