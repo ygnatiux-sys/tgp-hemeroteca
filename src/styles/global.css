@@ -1471,4 +1471,76 @@ html[data-nav-state="2"] header:hover .brand-element {
   font-family: "Google Sans Flex", "Plus Jakarta Sans", sans-serif !important;
 }
 
+/* ═════════════════════════════════════════════════════════════════════════
+   ANTI Z-FIGHTING: GPU COMPOSITING ESTABLE EN MOBILE Y DESKTOP
+   Promueve tarjetas y slides a capas de compositing independientes.
+   Evita Z-fighting (elementos que pelean por la profundidad) y el
+   parpadeo del gradiente de titanio durante las animaciones GSAP.
+   NO modifica animaciones, coreografías ni keyframes existentes.
+═════════════════════════════════════════════════════════════════════════ */
+
+/* 1. Tarjetas: capas 3D independientes para evitar Z-fighting */
+.cinematic-archive-card,
+.storybook-card,
+.cpe-slide {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+
+/* 2. Ancla títulos con gradiente animado en su propia sub-capa de renderizado.
+      translateZ(0) crea un nuevo stacking context sin alterar la visual. */
+.gradient-acero-ios,
+.gradient-metal-steel-card,
+.gradient-general-h2,
+.gradient-general-h1,
+.cch-title {
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 3. Pausa el sweep del gradiente MIENTRAS la tarjeta se está animando (GSAP).
+      El script de CinematicArchiveCard.astro añade .card-settled al onComplete
+      del timeline para reactivarlo cuando la tarjeta está en reposo. */
+.cinematic-archive-card:not(.card-settled) .gradient-acero-ios,
+.cinematic-archive-card:not(.card-settled) .gradient-metal-steel-card {
+  animation-play-state: paused;
+}
+.cinematic-archive-card.card-settled .gradient-acero-ios,
+.cinematic-archive-card.card-settled .gradient-metal-steel-card {
+  animation-play-state: running;
+}
+
+/* ─── MOBILE (≤767px): reducción quirúrgica del compositor ──────────────
+   En pantallas de toque el pintor no puede sostener múltiples capas
+   animándose simultáneamente. Se congela el gradiente en el punto más
+   bonito del sweep y se apaga el dynamis. Nada más cambia. */
+@media (max-width: 767px) {
+  /* Gradiente estático en tarjetas — no en el hero CPE ni títulos de página */
+  .cinematic-archive-card .gradient-acero-ios,
+  .cinematic-archive-card .gradient-metal-steel-card,
+  .storybook-card .gradient-acero-ios,
+  .storybook-card .gradient-metal-steel-card {
+    animation: none;
+    background-position: 60% 50%; /* punto óptimo del sweep: acero cálido */
+  }
+
+  /* Dynamis apagado en mobile: la capa mix-blend-mode + opacity + filter
+     combinada es el mayor villano del parpadeo en GPU móviles */
+  .cinemagraph-dynamis {
+    opacity: 0 !important;
+    animation: none !important;
+  }
+
+  /* Tipografía del CinematicCollectionHero escalada para pantallas pequeñas */
+  .cch-title {
+    font-size: clamp(2.2rem, 9vw, 4.5rem);
+    line-height: 1.05;
+  }
+  .cch-overlay {
+    padding: 2rem 1.5rem;
+  }
+}
+
 

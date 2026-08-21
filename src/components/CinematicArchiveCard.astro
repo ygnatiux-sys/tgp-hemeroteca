@@ -250,6 +250,9 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
       alternate;
     will-change: transform;
     transform-origin: center center;
+    /* Ancla esta capa en GPU para evitar Z-fighting con el texto animado */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 
   .cinemagraph-museum-fade {
@@ -266,6 +269,9 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
     mix-blend-mode: screen;
     animation: dynamisLoop 16s ease-in-out infinite alternate;
     will-change: transform, opacity, filter;
+    /* Ancla el dynamis en su propia capa para que no compita con el texto */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -297,6 +303,9 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
 
       const tl = gsap.timeline({
         onComplete: () => {
+          // Reactivar el sweep del gradiente (pausado por CSS) ahora que
+          // la tarjeta está estable — evita Z-fighting durante la animación
+          card.classList.add('card-settled');
           resolve();
         },
       });
@@ -328,6 +337,7 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
             opacity: 0,
             duration: 1.2,
             ease: "power2.inOut",
+            force3D: true, // GPU path para evitar parpadeos en mobile
           },
           0.5
         );
@@ -372,7 +382,7 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
         tl.fromTo(
           h1Container,
           { opacity: 0, filter: "blur(16px)", scale: 0.97, y: 8 },
-          { opacity: 1, filter: "blur(0px)", scale: 1, y: 0, duration: 1.8, ease: "power3.out" }
+          { opacity: 1, filter: "blur(0px)", scale: 1, y: 0, duration: 1.8, ease: "power3.out", force3D: true } // GPU path
         );
       }
 

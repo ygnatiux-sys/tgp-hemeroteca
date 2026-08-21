@@ -159,7 +159,7 @@ const coleccionesSlides = collections
       ═══════════════════════════════════════════════════════════════════ */}
       <section class="flex flex-col gap-6 md:gap-8 w-full">
         {/* F5: CSS Grid Bento Asimétrico — F6: cols-1 en mobile */}
-        <div class="grid grid-cols-1 lg:grid-cols-12 auto-rows-[minmax(280px,auto)] gap-6 lg:gap-8 w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-12 auto-rows-[minmax(280px,auto)] gap-4 md:gap-6 lg:gap-8 w-full">
           {collections.map((col, index) => {
             // F5: distribución asimétrica según posición
             let spanClass = "lg:col-span-4 lg:row-span-1";
@@ -167,10 +167,15 @@ const coleccionesSlides = collections
             else if (index === 1) spanClass = "lg:col-span-7 lg:row-span-1";
             else if (index === 2) spanClass = "lg:col-span-5 lg:row-span-1";
 
+            // Mobile height control: card hero ocupa menos en móvil para no saturar el viewport
+            const mobileHeightClass = index === 0
+              ? "min-h-[48vh] md:min-h-[75px]"  // hero: ~mitad del viewport en móvil
+              : "min-h-[42vh] md:min-h-[280px]"; // resto: ~40% en móvil
+
             return (
               <a
                 href={`/colecciones/${col.key}`}
-                class={`group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/5 bg-theme-dark/80 shadow-2xl flex flex-col justify-end w-full isolate ${spanClass} min-h-75`}
+                class={`group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/5 bg-theme-dark/80 shadow-2xl flex flex-col justify-end w-full isolate mx-4 md:mx-0 ${spanClass} ${mobileHeightClass}`}
               >
                 {col.coverEssay?.img ? (
                   <Image
@@ -190,11 +195,11 @@ const coleccionesSlides = collections
                 {/* F6: Texto siempre visible — NO depende de :hover para revelar contenido en touch */}
                 <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 via-45% to-transparent pointer-events-none z-10"></div>
 
-                <div class="relative z-20 p-6 md:p-8 flex flex-col justify-end h-full">
+                <div class="relative z-20 p-5 md:p-6 lg:p-8 flex flex-col justify-end h-full">
                   {/* F2: text-xs (WCAG). F6: siempre visible sin group-hover reveal */}
                   <span class="font-mono text-xs uppercase tracking-widest text-rust-orange font-bold mb-2">Colección TGP</span>
-                  <h2 class="gradient-general-h2 text-3xl md:text-4xl mb-2 leading-tight">{col.label}</h2>
-                  <p class="font-sans text-sm text-white/80">{col.count} {col.count === 1 ? 'Documento' : 'Documentos'}</p>
+                  <h2 class="gradient-general-h2 text-2xl md:text-3xl lg:text-4xl mb-2 leading-tight">{col.label}</h2>
+                  <p class="font-sans text-xs md:text-sm text-white/80">{col.count} {col.count === 1 ? 'Documento' : 'Documentos'}</p>
                 </div>
               </a>
             );
