@@ -1,3 +1,6 @@
+# Astro build & dev runtime cache
+.astro/
+
 # Environment variables and secrets
 .env
 .env.local
