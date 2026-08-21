@@ -1,0 +1,156 @@
+﻿[
+    {
+        "Collection":  "ensayos",
+        "Slug":  "fragmento-test-z",
+        "Title":  "fragmento test z",
+        "Category":  "arqueologia",
+        "Draft":  false,
+        "BodyHash":  "",
+        "BodyLength":  0,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\fragmento-test-z",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\fragmento-test-z\\index.json"
+    },
+    {
+        "Collection":  "ensayos",
+        "Slug":  "moai-test",
+        "Title":  "MOAI TEST",
+        "Category":  "Etnografía",
+        "Draft":  false,
+        "BodyHash":  "",
+        "BodyLength":  0,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\moai-test",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\moai-test\\index.json"
+    },
+    {
+        "Collection":  "ensayos",
+        "Slug":  "prueba-ruteo-keystatic",
+        "Title":  "Prueba de Ruteo Keystatic",
+        "Category":  "Ensayos",
+        "Draft":  true,
+        "BodyHash":  "C43C1C096DB26199EB6DA01739F27926A259038DB6FEA77AF196E96D3C26B850",
+        "BodyLength":  588,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\prueba-ruteo-keystatic",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\prueba-ruteo-keystatic\\index.json"
+    },
+    {
+        "Collection":  "ensayos",
+        "Slug":  "test-0-ne-hemeroteca",
+        "Title":  "TEST 0NE HEMEROTECA",
+        "Category":  "",
+        "Draft":  true,
+        "BodyHash":  "5BBFB1690E6B9FB5E44243BBF54E7F6D341C05DC305F7A326094546FA5ECABCF",
+        "BodyLength":  4934,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-0-ne-hemeroteca",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-0-ne-hemeroteca\\index.json"
+    },
+    {
+        "Collection":  "ensayos",
+        "Slug":  "test-eleven",
+        "Title":  "TEST ELEVEN !",
+        "Category":  "Cahiers",
+        "Draft":  false,
+        "BodyHash":  "",
+        "BodyLength":  0,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-eleven",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-eleven\\index.json"
+    },
+    {
+        "Collection":  "ensayos",
+        "Slug":  "test-five",
+        "Title":  "TEST FIVE",
+        "Category":  "Arqueología",
+        "Draft":  false,
+        "BodyHash":  "",
+        "BodyLength":  0,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-five",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-five\\index.json"
+    },
+    {
+        "Collection":  "ensayos",
+        "Slug":  "test-four-hemeroteca",
+        "Title":  "test four hemeroteca",
+        "Category":  "",
+        "Draft":  false,
+        "BodyHash":  "71CC775FFA13AE21F3A824CD9F9BED0086D897D59A9342FC84E7F11EDD38A9BD",
+        "BodyLength":  785,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-four-hemeroteca",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-four-hemeroteca\\index.json"
+    },
+    {
+        "Collection":  "ensayos",
+        "Slug":  "test-nine",
+        "Title":  "TEST NINE ",
+        "Category":  "",
+        "Draft":  false,
+        "BodyHash":  "",
+        "BodyLength":  0,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-nine",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-nine\\index.json"
+    },
+    {
+        "Collection":  "ensayos",
+        "Slug":  "test-six-hemeroteca",
+        "Title":  "TEST SIX HEMEROTECA",
+        "Category":  "",
+        "Draft":  false,
+        "BodyHash":  "51E52F32CA7AF6357A027B88C7B8862EEB69AEE8EF2ACBB5674E4B25ED7A60AD",
+        "BodyLength":  2743,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-six-hemeroteca",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-six-hemeroteca\\index.json"
+    },
+    {
+        "Collection":  "ensayos",
+        "Slug":  "test-ten",
+        "Title":  "TEST TEN",
+        "Category":  "",
+        "Draft":  false,
+        "BodyHash":  "",
+        "BodyLength":  0,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-ten",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-ten\\index.json"
+    },
+    {
+        "Collection":  "ensayos",
+        "Slug":  "test-thirteen",
+        "Title":  "TEST THIRTEEN",
+        "Category":  "Sociología",
+        "Draft":  false,
+        "BodyHash":  "",
+        "BodyLength":  0,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-thirteen",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-thirteen\\index.json"
+    },
+    {
+        "Collection":  "ensayos",
+        "Slug":  "test-three",
+        "Title":  "TEST THREE",
+        "Category":  "Dossiers",
+        "Draft":  true,
+        "BodyHash":  "1C20E75ABC83DE6E3A7650DBF6E8ADDD6EE29F1FEC768401FAF002B68513ED37",
+        "BodyLength":  322,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-three",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-three\\index.json"
+    },
+    {
+        "Collection":  "ensayos",
+        "Slug":  "test-twelve",
+        "Title":  "TEST TWELVE",
+        "Category":  "",
+        "Draft":  false,
+        "BodyHash":  "",
+        "BodyLength":  0,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-twelve",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-twelve\\index.json"
+    },
+    {
+        "Collection":  "ensayos",
+        "Slug":  "test-two-hemeroteca",
+        "Title":  "TEST TWO HEMEROTECA",
+        "Category":  "",
+        "Draft":  true,
+        "BodyHash":  "E0F46C5B9F2037B1C97C915DC95156AB7869C0771996E84F62F8BDC1CF792A81",
+        "BodyLength":  424,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-two-hemeroteca",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\test-two-hemeroteca\\index.json"
+    }
+]

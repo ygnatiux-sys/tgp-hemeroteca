@@ -52,7 +52,7 @@ const allCategories = [...new Set(publishable.map(item => formatCategory(item.en
         {sorted.length > 0 ? (
           <ul class="index-card-list">
             {sorted.map((item) => {
-              const img    = resolveEssayImage(item.entry.coverImage, item.slug);
+              const img    = resolveEssayImage(item.entry, item.slug);
               const cat    = formatCategory(item.entry.category);
               const date   = item.entry.date ? formatDate(item.entry.date) : null;
               const initialLikes = (item.slug.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 70) + 14;

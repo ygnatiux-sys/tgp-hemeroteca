@@ -34,18 +34,57 @@ export interface EssayEntry {
 }
 
 /**
- * Retorna la portada del ensayo o recurso (ImageMetadata si fue importado por Astro, o string / null).
+ * Retorna la imagen principal del ensayo o recurso (ImageMetadata si fue importado por Astro, o string URL / null).
+ * Si no tiene coverImage directo, busca inteligentemente en sus imágenes asignadas de Wikimedia o galería.
  */
-export function resolveEssayImage(coverPath?: any, slug?: string): any {
-  if (!coverPath) return null;
-  return coverPath;
+export function resolveEssayImage(coverOrEntry?: any, slug?: string): any {
+  if (!coverOrEntry) return null;
+
+  // Si ya es un ImageMetadata de Astro (objeto con .src) o string directo
+  if (typeof coverOrEntry === 'string' && coverOrEntry.trim().length > 0) {
+    return coverOrEntry;
+  }
+  if (typeof coverOrEntry === 'object' && coverOrEntry.src && typeof coverOrEntry.src === 'string') {
+    return coverOrEntry;
+  }
+
+  // Si es una entrada completa (e.entry o item.data o item)
+  const doc = coverOrEntry.entry || coverOrEntry.data || coverOrEntry;
+
+  // 1. Portada asignada directa
+  if (doc?.coverImage) {
+    if (typeof doc.coverImage === 'string' && doc.coverImage.trim().length > 0) return doc.coverImage;
+    if (typeof doc.coverImage === 'object' && doc.coverImage.src) return doc.coverImage;
+  }
+
+  // 2. Banco de Imágenes Wikimedia (HERO o primera seleccionada)
+  const rawWm = doc?.bancoImagenesWikimedia || doc?.buscadorWikimedia;
+  if (rawWm) {
+    try {
+      const parsed = typeof rawWm === 'string' ? JSON.parse(rawWm) : rawWm;
+      if (parsed?.selectedItems && Array.isArray(parsed.selectedItems) && parsed.selectedItems.length > 0) {
+        const hero = parsed.selectedItems.find((item: any) => item.role === 'HERO') || parsed.selectedItems[0];
+        const url = hero?.thumbUrl || hero?.url;
+        if (url) return url;
+      }
+    } catch (e) {}
+  }
+
+  // 3. Array de galería
+  if (Array.isArray(doc?.gallery) && doc.gallery.length > 0) {
+    const firstGal = doc.gallery[0];
+    if (typeof firstGal === 'string') return firstGal;
+    if (typeof firstGal === 'object' && firstGal?.src) return firstGal;
+  }
+
+  return null;
 }
 
 /**
  * Determina si una entrada carece de foto y su título o slug indica que es un post de prueba ('Test' / 'Prueba').
  */
 export function isNoPhotoTestPost(entry: EssayEntry): boolean {
-  const hasImg = Boolean(entry.entry?.coverImage);
+  const hasImg = Boolean(resolveEssayImage(entry));
   if (hasImg) return false;
 
   const title = (entry.entry?.title || '').toLowerCase();
@@ -67,8 +106,8 @@ export function sortEssaysByVisualFirst(a: EssayEntry, b: EssayEntry): number {
     return a.isCinematicGSAP ? -1 : 1;
   }
 
-  const hasImgA = resolveEssayImage(a.entry?.coverImage, a.slug) ? 1 : 0;
-  const hasImgB = resolveEssayImage(b.entry?.coverImage, b.slug) ? 1 : 0;
+  const hasImgA = resolveEssayImage(a) ? 1 : 0;
+  const hasImgB = resolveEssayImage(b) ? 1 : 0;
   
   // Priorizar posts con imagen (sólo aplica si ambos son cinemáticos o ambos son normales)
   if (hasImgA !== hasImgB) {

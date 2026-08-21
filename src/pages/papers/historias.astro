@@ -34,7 +34,7 @@ const stories = all.filter(p => p.entry.excerpt).slice(0, 12);
       <div class="stories-feed-inner">
         {stories.length > 0 ? (
           stories.map((item) => {
-            const img  = resolveEssayImage(item.entry.coverImage, item.slug);
+            const img  = resolveEssayImage(item.entry, item.slug);
             const cat  = formatCategory(item.entry.category);
             const date = item.entry.date ? formatDate(item.entry.date) : null;
             return (
@@ -43,7 +43,7 @@ const stories = all.filter(p => p.entry.excerpt).slice(0, 12);
                   <div class="story-author-row">
                     <span class="story-avatar">XB</span>
                     <span class="story-author-name">Xavier Benítez</span>
-                    {date && <span class="story-meta-sep">·</span>}
+                    {date && <span class="story-sep">·</span>}
                     {date && <time class="story-date">{date}</time>}
                   </div>
                   <h2 class="story-title">{item.entry.title}</h2>
@@ -55,7 +55,7 @@ const stories = all.filter(p => p.entry.excerpt).slice(0, 12);
                 </div>
                 {img && (
                   <div class="story-img-wrap">
-                    <img src={img.src} alt={item.entry.title || ""} class="story-img" loading="lazy" />
+                    <img src={typeof img === 'object' ? img.src : img} alt={item.entry.title || ""} class="story-img" loading="lazy" />
                   </div>
                 )}
               </a>

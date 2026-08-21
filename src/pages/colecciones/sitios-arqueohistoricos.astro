@@ -32,7 +32,7 @@ const geohistoricalEssays = publishable.filter(e => {
 
 const resolvedEssays = geohistoricalEssays.map(e => {
   const showImg = e.entry.publicarConImagen !== false;
-  const img = showImg ? resolveEssayImage(e.entry.coverImage, e.slug) : null;
+  const img = showImg ? resolveEssayImage(e.entry, e.slug) : null;
   return {
     ...e,
     showImg,

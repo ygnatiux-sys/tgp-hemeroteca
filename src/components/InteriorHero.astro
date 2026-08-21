@@ -7,7 +7,7 @@ import { Image } from "astro:assets";
 
 interface Props {
   title: string;
-  image?: ImageMetadata | null;
+  image?: ImageMetadata | string | null;
   imageAlt?: string;
   imagePosition?: string;
   eyebrow?: string;
@@ -33,12 +33,30 @@ const {
   <div class="absolute inset-0 z-0 overflow-hidden bg-black">
     {
       image ? (
-        <Image
-          src={image}
-          alt={imageAlt || title}
-          class="interior-hero-image w-full h-full object-cover opacity-100"
-          style={`object-position: ${imagePosition};`}
-        />
+        typeof image === 'object' ? (
+          <Image
+            src={image}
+            alt={imageAlt || title}
+            class="interior-hero-image w-full h-full object-cover opacity-100"
+            style={`object-position: ${imagePosition};`}
+            loading="eager"
+            quality={85}
+          />
+        ) : typeof image === 'string' && image.trim().length > 0 ? (
+          <img
+            src={image}
+            alt={imageAlt || title}
+            class="interior-hero-image w-full h-full object-cover opacity-100"
+            style={`object-position: ${imagePosition};`}
+            loading="eager"
+            decoding="async"
+          />
+        ) : (
+          <div
+            class="interior-hero-image w-full h-full bg-stone-900"
+            aria-hidden="true"
+          />
+        )
       ) : (
         <div
           class="interior-hero-image w-full h-full bg-stone-900"

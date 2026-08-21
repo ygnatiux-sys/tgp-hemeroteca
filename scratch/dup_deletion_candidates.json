@@ -1,0 +1,46 @@
+﻿[
+    {
+        "Collection":  "georreferencias",
+        "Slug":  "aramu-muru-puerta-de-los-dioses",
+        "Title":  "Aramu Muru: El Umbral Megalítico de Hayumarca",
+        "Category":  "Arqueosemiótica",
+        "Draft":  false,
+        "BodyHash":  "AC9375C6706BBADA757A1E48ABA6F311111F174465150B14F45425206E2B4BD6",
+        "BodyLength":  3313,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\georreferencias\\aramu-muru-puerta-de-los-dioses",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\georreferencias\\aramu-muru-puerta-de-los-dioses\\index.json"
+    },
+    {
+        "Collection":  "ensayos",
+        "Slug":  "atila-y-el-papa-copy",
+        "Title":  "Atila y el Papa ",
+        "Category":  "historia antigua",
+        "Draft":  false,
+        "BodyHash":  "48F0EA925B6A9EFF280D7608D6A1CC9D69984EF3AAF79B523DB872C358DB9D16",
+        "BodyLength":  9291,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\atila-y-el-papa-copy",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\ensayos\\atila-y-el-papa-copy\\index.json"
+    },
+    {
+        "Collection":  "georreferencias",
+        "Slug":  "la-cueva-de-lascaux-2",
+        "Title":  "La Cueva de Lascaux 2",
+        "Category":  "Arqueologia",
+        "Draft":  false,
+        "BodyHash":  "20F8E83A499A1B627C77094474CDC8BD1A92EB768BC9AAAAF4BC8ED7D165E751",
+        "BodyLength":  4114,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\georreferencias\\la-cueva-de-lascaux-2",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\georreferencias\\la-cueva-de-lascaux-2\\index.json"
+    },
+    {
+        "Collection":  "georreferencias",
+        "Slug":  "stonehenge-bis-1",
+        "Title":  "Stonehenge bis",
+        "Category":  "Arqueología",
+        "Draft":  false,
+        "BodyHash":  "1946AC57611ED1242877188EE08F6833BFC51CF2C2866359E555C283FBA9CEDC",
+        "BodyLength":  4444,
+        "FolderPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\georreferencias\\stonehenge-bis-1",
+        "JsonPath":  "C:\\Users\\ygnat\\tgp-hemeroteca\\src\\content\\georreferencias\\stonehenge-bis-1\\index.json"
+    }
+]

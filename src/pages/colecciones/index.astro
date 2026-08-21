@@ -43,7 +43,7 @@ const publishable = [
 ].sort(sortEssaysByVisualFirst);
 
 const georefCoverEssay = publishableGeorefs
-  .map(e => ({ ...e, img: resolveEssayImage(e.entry.coverImage, e.slug) }))
+  .map(e => ({ ...e, img: resolveEssayImage(e.entry, e.slug) }))
   .find(e => e.img);
 
 // ─── TODAS LAS COLECCIONES TEMÁTICAS (≥ 1 ARTÍCULO) ──────────────────────────
@@ -54,7 +54,7 @@ const collections = Array.from(categoryGroups.entries())
   .map(([key, rawEssays]) => {
     const essays = rawEssays.map(essay => ({
       ...essay,
-      img: resolveEssayImage(essay.entry.coverImage, essay.slug),
+      img: resolveEssayImage(essay.entry, essay.slug),
     }));
     return {
       key,
@@ -120,13 +120,23 @@ const coleccionesSlides = collections
           class="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 bg-theme-dark/80 hover:border-rust-orange/50 transition-all duration-500 shadow-2xl min-h-60 md:min-h-72 flex flex-col justify-end p-8 md:p-12 isolate"
         >
           {georefCoverEssay?.img && (
-            <Image
-              src={georefCoverEssay.img}
-              alt="Sitios Geohistóricos & Arqueohistóricos"
-              loading="lazy"
-              quality={80}
-              class="absolute inset-0 w-full h-full object-cover object-center brightness-60 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-75"
-            />
+            typeof georefCoverEssay.img === 'object' ? (
+              <Image
+                src={georefCoverEssay.img}
+                alt="Sitios Geohistóricos & Arqueohistóricos"
+                loading="lazy"
+                quality={80}
+                class="absolute inset-0 w-full h-full object-cover object-center brightness-60 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-75"
+              />
+            ) : (
+              <img
+                src={georefCoverEssay.img as string}
+                alt="Sitios Geohistóricos & Arqueohistóricos"
+                loading="lazy"
+                decoding="async"
+                class="absolute inset-0 w-full h-full object-cover object-center brightness-60 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-75"
+              />
+            )
           )}
           <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/50 via-50% to-transparent pointer-events-none z-10"></div>
 
@@ -178,15 +188,25 @@ const coleccionesSlides = collections
                 class={`group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/5 bg-theme-dark/80 shadow-2xl flex flex-col justify-end w-full isolate mx-4 md:mx-0 ${spanClass} ${mobileHeightClass}`}
               >
                 {col.coverEssay?.img ? (
-                  <Image
-                    src={col.coverEssay.img}
-                    alt={col.label}
-                    loading={index === 0 ? "eager" : "lazy"}
-                    fetchpriority={index === 0 ? "high" : undefined}
-                    decoding="async"
-                    quality={80}
-                    class="absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.018] group-hover:brightness-95"
-                  />
+                  typeof col.coverEssay.img === 'object' ? (
+                    <Image
+                      src={col.coverEssay.img}
+                      alt={col.label}
+                      loading={index === 0 ? "eager" : "lazy"}
+                      fetchpriority={index === 0 ? "high" : undefined}
+                      decoding="async"
+                      quality={80}
+                      class="absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.018] group-hover:brightness-95"
+                    />
+                  ) : (
+                    <img
+                      src={col.coverEssay.img as string}
+                      alt={col.label}
+                      loading={index === 0 ? "eager" : "lazy"}
+                      decoding="async"
+                      class="absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.018] group-hover:brightness-95"
+                    />
+                  )
                 ) : (
                   <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1c242b] via-theme-dark to-[#0a0b0b] -z-10" />
                 )}

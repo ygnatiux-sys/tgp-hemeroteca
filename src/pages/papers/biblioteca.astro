@@ -38,11 +38,11 @@ const categories = Array.from(byCategory.entries());
               </div>
               <div class="collection-previews">
                 {preview.map((p) => {
-                  const img = resolveEssayImage(p.entry.coverImage, p.slug);
+                  const img = resolveEssayImage(p.entry, p.slug);
                   return (
                     <a href={`/papers/${p.slug}`} class="preview-row">
                       <span class="preview-title">{p.entry.title}</span>
-                      {img && <div class="preview-thumb-wrap"><img src={img.src} alt="" class="preview-thumb" loading="lazy" /></div>}
+                      {img && <div class="preview-thumb-wrap"><img src={typeof img === 'object' ? img.src : img} alt="" class="preview-thumb" loading="lazy" /></div>}
                     </a>
                   );
                 })}

@@ -113,7 +113,7 @@ const title        = doc.title || slug?.replace(/-/g, " ") || "Paper";
 const category     = formatCategory(doc.category);
 const dateStr      = doc.date ? formatDate(doc.date) : null;
 const excerpt      = doc.excerpt || null;
-const optimizedImg = resolveEssayImage(doc.coverImage, slug);
+const optimizedImg = resolveEssayImage(doc, slug);
 const hasContent   = !!Content || !!renderedHtml;
 
 // ─── POSTS RELACIONADOS (misma categoría del autor) ──────────────────────────

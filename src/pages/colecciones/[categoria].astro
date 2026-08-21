@@ -40,7 +40,7 @@ const label = formatCategory(essays[0]?.entry.category);
 // ─── IMÁGENES CON RESOLUCIÓN INTELIGENTE ──────────────────────────────────────
 const resolvedEssays = essays.map((e: typeof essays[0]) => ({
   ...e,
-  img: resolveEssayImage(e.entry.coverImage, e.slug),
+  img: resolveEssayImage(e.entry, e.slug),
 }));
 
 const coverImage = resolvedEssays[0]?.img ?? '/images/placeholder-cover.png';

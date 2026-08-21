@@ -23,7 +23,7 @@ const collections = Array.from(categoryGroups.entries())
   
 const resolvedCollections = collections.map(c => ({
   ...c,
-  img: resolveEssayImage(c.coverEssay.entry.coverImage, c.coverEssay.slug),
+  img: resolveEssayImage(c.coverEssay.entry, c.coverEssay.slug),
 }));
 ---
 

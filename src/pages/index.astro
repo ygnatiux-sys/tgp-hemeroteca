@@ -86,7 +86,7 @@ const heroSlides   = publishable.slice(0, HERO_COUNT).map(e => ({
   category: formatCategory(e.entry.category),
   date: formatDate(e.entry.date),
   readTime: undefined as string | undefined,
-  image: resolveEssayImage(e.entry.coverImage, e.slug) || '',
+  image: resolveEssayImage(e.entry, e.slug) || '',
   imagePosition: (e.entry as any).coverImagePosition || (e.entry as any).imagePosition || 'center center',
   link: (e as any).isCinematicGSAP ? `/ensayos-cinematicos/${e.slug}` : `/hemeroteca/${e.slug}`,
   papersLink: (e.entry as any).papersSlug ? `/papers/${(e.entry as any).papersSlug}` : undefined,
@@ -111,23 +111,23 @@ const collections = Array.from(categoryGroups.entries())
   .slice(0, 4);
 
 // ─── CARGA DE IMÁGENES EDITORIAL ──────────────────────────────────────────────
-const leadImage  = resolveEssayImage(leadStory?.entry.coverImage, leadStory?.slug);
-const secAImage  = resolveEssayImage(secondaryA?.entry.coverImage, secondaryA?.slug);
-const secBImage  = resolveEssayImage(secondaryB?.entry.coverImage, secondaryB?.slug);
+const leadImage  = resolveEssayImage(leadStory?.entry, leadStory?.slug);
+const secAImage  = resolveEssayImage(secondaryA?.entry, secondaryA?.slug);
+const secBImage  = resolveEssayImage(secondaryB?.entry, secondaryB?.slug);
 
 const resolvedRecent = recentEssays.map(e => ({
   ...e,
-  img: resolveEssayImage(e.entry.coverImage, e.slug),
+  img: resolveEssayImage(e.entry, e.slug),
 }));
 
 const resolvedArchiveRows = archiveRows.map(e => ({
   ...e,
-  img: resolveEssayImage(e.entry.coverImage, e.slug),
+  img: resolveEssayImage(e.entry, e.slug),
 }));
 
 const resolvedCollections = collections.map(c => ({
   ...c,
-  img: resolveEssayImage(c.coverEssay.entry.coverImage, c.coverEssay.slug),
+  img: resolveEssayImage(c.coverEssay.entry, c.coverEssay.slug),
 }));
 
 // ─── SECUENCIAS CINE PREMIER PARA ZONA ARCHIVOS (1 HERO FULL + DÚO 60/40) ────

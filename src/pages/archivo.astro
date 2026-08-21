@@ -63,7 +63,7 @@ const years = [...new Set(
 // ─── CARGA DE IMÁGENES CON RESOLUCIÓN INTELIGENTE ─────────────────────────────
 const resolvedEssays = publishable.map(e => ({
   ...e,
-  img: resolveEssayImage(e.entry.coverImage, e.slug),
+  img: resolveEssayImage(e.entry, e.slug),
 }));
 
 // Agrupamiento por categorías para barras editoriales estilo suizo
@@ -111,7 +111,7 @@ const categoryHighlightCards = essaysByCategory.slice(0, 4).map(group => {
 
 // ─── PORTADA DEL HERO: primer arquetipoGlobal con imagen ────────────────────
 const arquetiposConImg = publishableArquetipos
-  .map(e => ({ ...e, img: resolveEssayImage(e.entry.coverImage, e.slug) }))
+  .map(e => ({ ...e, img: resolveEssayImage(e.entry, e.slug) }))
   .filter(e => e.img);
 const archiveCoverEssay = arquetiposConImg[0] ?? resolvedEssays.find(e => e.img);
 const archiveCover = archiveCoverEssay
