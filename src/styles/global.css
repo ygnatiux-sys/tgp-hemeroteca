@@ -1521,6 +1521,12 @@ html[data-nav-state="2"] header:hover .brand-element {
   z-index: 9999;
 }
 
+/* ── Animación de entrada para modales/visores TGP ── */
+@keyframes tgp-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 /* ─── Imágenes Interiores de Artículos: Coherencia Responsiva ── */
 .prose img,
 #post-article img:not(.cge-bg-img),

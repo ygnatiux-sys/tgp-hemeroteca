@@ -178,7 +178,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                     <img
                       src={item.thumbUrl || item.url}
                       alt={item.title}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                       loading="lazy"
                     />
                     
@@ -194,9 +194,6 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                         <line x1="21" y1="21" x2="16.65" y2="16.65" />
                       </svg>
                     </div>
-
-                    {/* Gradiente Inferior de Sombra */}
-                    <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-stone-900 to-transparent"></div>
                   </div>
 
                   {/* Metadatos y Epígrafe */}
@@ -347,35 +344,36 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
       ═══════════════════════════════════════════════════════════════════ */}
       {isLightboxOpen && (
         <div
-          className="fixed inset-0 z-99999 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-between p-4 sm:p-6 select-none animate-fade-in"
+          className="fixed inset-0 z-99999 bg-[#060606]/98 backdrop-blur-2xl flex flex-col items-center justify-between select-none"
+          style={{ animation: 'tgp-fade-in 0.25s ease forwards' }}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
         >
-          {/* Barra Superior de Herramientas del Lightbox */}
-          <div className="w-full max-w-7xl flex items-center justify-between border-b border-white/10 pb-4 z-20">
+          {/* Barra Superior — Toolbar fija */}
+          <div className="w-full flex items-center justify-between border-b border-white/8 px-5 sm:px-8 py-4 z-20 bg-[#060606]/60 backdrop-blur-sm">
             <div className="flex items-center gap-3">
-              <span className="font-metadata text-xs text-[#EFEBE3] font-bold tracking-widest">
+              <span className="font-metadata text-[10px] text-[#EFEBE3]/60 font-bold tracking-widest uppercase">
                 LÁMINA {String(currentIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
               </span>
-              <span className="text-white/30">|</span>
-              <span className="font-serif text-sm text-stone-200 truncate max-w-md hidden sm:inline">
+              <span className="text-white/20">|</span>
+              <span className="font-serif text-sm text-stone-300 truncate max-w-sm hidden sm:inline">
                 {currentItem.title}
               </span>
             </div>
 
-            {/* CONTROLES DE ZOOM Y PANTALLA COMPLETA */}
+            {/* Controles zoom + cierre */}
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={handleZoomOut}
                 disabled={zoomLevel <= 1}
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center font-metadata text-base font-bold transition-all cursor-pointer"
+                className="w-8 h-8 rounded-full bg-white/8 hover:bg-white/15 disabled:opacity-25 text-white flex items-center justify-center font-bold transition-all cursor-pointer text-base"
                 title="Alejar (-)"
               >
                 −
               </button>
 
-              <span className="font-metadata text-xs text-white/80 w-12 text-center">
+              <span className="font-metadata text-[10px] text-white/60 w-10 text-center">
                 {Math.round(zoomLevel * 100)}%
               </span>
 
@@ -383,7 +381,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                 type="button"
                 onClick={handleZoomIn}
                 disabled={zoomLevel >= 4}
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center font-metadata text-base font-bold transition-all cursor-pointer"
+                className="w-8 h-8 rounded-full bg-white/8 hover:bg-white/15 disabled:opacity-25 text-white flex items-center justify-center font-bold transition-all cursor-pointer text-base"
                 title="Acercar (+)"
               >
                 +
@@ -392,41 +390,46 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
               <button
                 type="button"
                 onClick={handleZoom100}
-                className="px-3 py-1.5 rounded-full bg-[#EFEBE3]/20 hover:bg-[#EFEBE3]/30 border border-[#EFEBE3]/40 text-[#EFEBE3] font-metadata text-[10px] uppercase tracking-wider transition-all cursor-pointer ml-1"
+                className="px-3 py-1 rounded-full border border-white/15 bg-white/5 hover:bg-white/10 text-[#EFEBE3]/80 font-metadata text-[9px] uppercase tracking-wider transition-all cursor-pointer ml-1"
                 title="Alternar escala 1:1"
               >
-                {zoomLevel > 1 ? 'Reset (1x)' : '100% HD'}
+                {zoomLevel > 1 ? 'Reset' : 'HD'}
               </button>
 
               <a
                 href={currentItem.url || currentItem.thumbUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-metadata text-[10px] uppercase tracking-wider transition-all hidden md:flex items-center gap-1.5"
+                className="px-3 py-1 rounded-full border border-white/15 bg-white/5 hover:bg-white/10 text-white/70 font-metadata text-[9px] uppercase tracking-wider transition-all hidden md:flex items-center gap-1.5"
                 title="Abrir imagen original sin compresión"
               >
-                <span>Original Wiki</span>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <span>Original</span>
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                   <polyline points="15 3 21 3 21 9" />
                   <line x1="10" y1="14" x2="21" y2="3" />
                 </svg>
               </a>
 
+              {/* Botón Cerrar — Estandarizado con el sistema TGP */}
               <button
                 type="button"
                 onClick={() => setIsLightboxOpen(false)}
-                className="w-9 h-9 rounded-full bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 flex items-center justify-center font-metadata text-sm font-bold transition-all cursor-pointer ml-2"
+                className="ml-2 w-9 h-9 rounded-full border border-white/20 bg-white/8 hover:bg-white/18 text-white/80 hover:text-white flex items-center justify-center transition-all cursor-pointer group"
                 title="Cerrar (Esc)"
+                aria-label="Cerrar visor"
               >
-                ✕
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
               </button>
             </div>
           </div>
 
-          {/* ÁREA CENTRAL DE LA IMAGEN CON ZOOM Y PAN INTERACTIVO */}
+          {/* Área Central de Imagen — Zoom y Pan Interactivo, limpio sin máscaras */}
           <div
-            className="relative w-full h-[74vh] flex items-center justify-center overflow-hidden my-auto"
+            className="relative flex-1 w-full flex items-center justify-center overflow-hidden"
             onMouseDown={handleMouseDown}
             style={{ cursor: zoomLevel > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
           >
@@ -438,40 +441,41 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                 WebkitBackfaceVisibility: 'hidden'
               }}
             >
+              {/* Imagen LIMPIA: sin shadow, sin border-radius, sin decoraciones */}
               <img
                 src={currentItem.url || currentItem.thumbUrl}
                 alt={currentItem.title}
-                className="max-h-[72vh] max-w-[90vw] object-contain select-none pointer-events-none rounded shadow-2xl"
+                className="max-h-[calc(100dvh-9rem)] max-w-[92vw] object-contain select-none pointer-events-none"
                 draggable={false}
               />
             </div>
 
-            {/* Flechas de Navegación en Pantalla Completa */}
+            {/* Flechas de Navegación */}
             <button
               type="button"
               onClick={handlePrev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-black/60 hover:bg-[#EFEBE3] text-white hover:text-black border border-white/20 flex items-center justify-center text-xl transition-all duration-300 cursor-pointer shadow-2xl"
+              className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/50 hover:bg-[#EFEBE3]/15 border border-white/15 hover:border-white/40 text-white flex items-center justify-center transition-all duration-300 cursor-pointer"
               title="Anterior (←)"
             >
-              ❮
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             </button>
 
             <button
               type="button"
               onClick={handleNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-black/60 hover:bg-[#EFEBE3] text-white hover:text-black border border-white/20 flex items-center justify-center text-xl transition-all duration-300 cursor-pointer shadow-2xl"
+              className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/50 hover:bg-[#EFEBE3]/15 border border-white/15 hover:border-white/40 text-white flex items-center justify-center transition-all duration-300 cursor-pointer"
               title="Siguiente (→)"
             >
-              ❯
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
 
-          {/* Pie Informativo de Pantalla Completa */}
-          <div className="w-full max-w-5xl text-center border-t border-white/10 pt-3 z-20">
-            <h4 className="font-serif text-base text-stone-100 font-semibold">{currentItem.title}</h4>
-            <p className="font-metadata text-[10px] text-white/50 mt-1">
-              {currentItem.author || 'Wikimedia Commons'} · {currentItem.license || 'Licencia Libre'}
-              {currentItem.width && currentItem.height && ` · ${currentItem.width} × ${currentItem.height} px`}
+          {/* Pie del Lightbox */}
+          <div className="w-full text-center border-t border-white/8 px-6 py-3 z-20">
+            <p className="font-metadata text-[10px] text-white/40 tracking-widest">
+              {currentItem.author || 'Wikimedia Commons'}
+              {currentItem.license && <> &middot; {currentItem.license}</>}
+              {currentItem.width && currentItem.height && <> &middot; {currentItem.width} × {currentItem.height} px</>}
             </p>
           </div>
 
