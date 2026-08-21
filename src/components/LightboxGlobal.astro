@@ -307,11 +307,11 @@
 
   // Función para capturar EXCLUSIVAMENTE el batch de fotos del artículo o galería clickeada
   function openScopedLightbox(targetImg: HTMLImageElement) {
-    const scope = targetImg.closest(".cge-root, #post-article, article, #wiki-article-body, .prose, main") || targetImg.parentElement || document.body;
+    const scope = targetImg.closest("#post-article, #wiki-article-body, .prose, main") || targetImg.parentElement || document.body;
     
     const scopedImages = Array.from(
       scope.querySelectorAll<HTMLImageElement>(
-        "img:not(#tgp-lightbox-img):not(header img):not(footer img):not(nav img)"
+        "img:not(#tgp-lightbox-img):not(header img):not(footer img):not(nav img):not(.cinematic-archive-card img):not(.storybook-card img):not(.cge-bg-img):not(.no-lightbox)"
       )
     ).filter((img) => img.naturalWidth > 50 || img.clientWidth > 50 || img.src);
 
@@ -323,9 +323,9 @@
   // Exponer API global
   (window as any).tgpOpenLightbox = (index: number) => openLightbox(index);
   (window as any).tgpOpenLightboxForSrc = (src: string, clickedEl?: HTMLElement) => {
-    const scope = clickedEl?.closest(".cge-root, #post-article, article, #wiki-article-body, main") || document.querySelector(".cge-root, #post-article, article") || document.body;
+    const scope = clickedEl?.closest("#post-article, #wiki-article-body, .prose, main") || document.querySelector("#post-article, #wiki-article-body, .prose") || document.body;
     images = Array.from(
-      scope.querySelectorAll<HTMLImageElement>("img:not(#tgp-lightbox-img):not(header img):not(footer img):not(nav img)")
+      scope.querySelectorAll<HTMLImageElement>("img:not(#tgp-lightbox-img):not(header img):not(footer img):not(nav img):not(.cinematic-archive-card img):not(.storybook-card img):not(.cge-bg-img):not(.no-lightbox)")
     );
     const idx = images.findIndex((img) => img.src === src);
     if (idx !== -1) openLightbox(idx);
@@ -333,10 +333,10 @@
   };
 
   function initLightbox() {
-    // Buscar imágenes dentro del contenido editorial únicamente (sin header, footer, etc.)
+    // Buscar imágenes dentro del contenido editorial únicamente (sin header, footer, tarjetas de navegación, etc.)
     const articleImages = Array.from(
       document.querySelectorAll(
-        "#post-article img, article img, #wiki-article-body img, .prose img, .cge-bg-img",
+        "#post-article img:not(.cge-bg-img):not(.no-lightbox):not(.cinematic-archive-card img), #wiki-article-body img:not(.no-lightbox), .prose img:not(.no-lightbox):not(.cinematic-archive-card img)",
       ),
     ) as HTMLImageElement[];
 

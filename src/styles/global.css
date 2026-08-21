@@ -1482,7 +1482,8 @@ html[data-nav-state="2"] header:hover .brand-element {
 /* 1. Tarjetas: capas 3D independientes para evitar Z-fighting */
 .cinematic-archive-card,
 .storybook-card,
-.cpe-slide {
+.cpe-slide,
+.cge-slide {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   transform-style: preserve-3d;
@@ -1495,7 +1496,8 @@ html[data-nav-state="2"] header:hover .brand-element {
 .gradient-metal-steel-card,
 .gradient-general-h2,
 .gradient-general-h1,
-.cch-title {
+.cch-title,
+.cge-content {
   transform: translateZ(0);
   -webkit-font-smoothing: antialiased;
 }
@@ -1510,6 +1512,30 @@ html[data-nav-state="2"] header:hover .brand-element {
 .cinematic-archive-card.card-settled .gradient-acero-ios,
 .cinematic-archive-card.card-settled .gradient-metal-steel-card {
   animation-play-state: running;
+}
+
+/* 4. Botón hamburguesa móvil independiente del header */
+#nav-mobile-btn,
+.nav-mobile-btn {
+  position: fixed;
+  z-index: 9999;
+}
+
+/* ─── Imágenes Interiores de Artículos: Coherencia Responsiva ── */
+.prose img,
+#post-article img:not(.cge-bg-img),
+#wiki-article-body img {
+  max-height: 85vh;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin-inline: auto;
+  border-radius: 0.75rem;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 /* ─── MOBILE (≤767px): reducción quirúrgica del compositor ──────────────
@@ -1541,6 +1567,16 @@ html[data-nav-state="2"] header:hover .brand-element {
   .cch-overlay {
     padding: 2rem 1.5rem;
   }
+
+  /* Imágenes en móvil más compactas para no saturar el viewport */
+  .prose img,
+  #post-article img:not(.cge-bg-img),
+  #wiki-article-body img {
+    max-height: 70vh;
+    border-radius: 0.5rem;
+  }
 }
+
+
 
 

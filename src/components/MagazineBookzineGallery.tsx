@@ -170,6 +170,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                 <div
                   key={item.id || idx}
                   onClick={() => openLightboxAt(idx)}
+                  style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
                   className="group relative bg-stone-900 border border-white/10 hover:border-[#EFEBE3]/60 rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 hover:shadow-[0_0_30px_rgba(239, 235, 227,0.2)] flex flex-col cursor-zoom-in"
                 >
                   {/* Contenedor de la Imagen */}
@@ -432,7 +433,9 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
             <div
               className="transition-transform duration-100 ease-out"
               style={{
-                transform: `translate(${panPosition.x}px, ${panPosition.y}px) scale(${zoomLevel})`
+                transform: `translate(${panPosition.x}px, ${panPosition.y}px) scale(${zoomLevel})`,
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden'
               }}
             >
               <img

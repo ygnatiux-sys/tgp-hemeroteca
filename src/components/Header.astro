@@ -76,10 +76,82 @@ const { transparentUntilScroll = false } = Astro.props;
       </a>
     </nav>
 
-    {/* Derecha: Acciones (Tema, Lupa, Menú) */}
+    {/* Derecha: Acciones (Tema, Lupa, Menú Hamburguesa en móvil) */}
     <div class="flex items-center gap-2 md:gap-2.5 ml-auto z-10">
       <ThemeToggle />
       <BuscadorModal client:load />
+
+      {/* Botón Hamburguesa Cinemático (Visible solo en < xl) */}
+      <button
+        id="nav-mobile-btn"
+        type="button"
+        class="xl:hidden w-9 h-9 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 text-[#EFEBE3] flex flex-col items-center justify-center gap-1.25 transition-all duration-300 cursor-pointer"
+        aria-label="Alternar menú de navegación"
+        aria-expanded="false"
+      >
+        <span class="hamburger-line w-4.5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center"></span>
+        <span class="hamburger-line w-4.5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center"></span>
+        <span class="hamburger-line w-4.5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center"></span>
+      </button>
+    </div>
+  </div>
+
+  {/* Overlay de Navegación Móvil Cinemático (Glassmorphism Dark) */}
+  <div
+    id="nav-mobile-overlay"
+    class="fixed inset-0 z-9990 bg-black/92 backdrop-blur-2xl opacity-0 pointer-events-none transition-all duration-500 flex flex-col justify-between p-8 sm:p-12 xl:hidden"
+    aria-hidden="true"
+  >
+    {/* Cabecera del overlay móvil */}
+    <div class="flex items-center justify-between border-b border-white/10 pb-6 pt-2">
+      <span class="font-metadata text-xs uppercase tracking-[0.3em] text-rust-orange font-bold">
+        Hemeroteca TGP · Navegación
+      </span>
+      <button
+        id="nav-mobile-close"
+        type="button"
+        class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center font-metadata text-base transition-colors cursor-pointer"
+        aria-label="Cerrar menú"
+      >
+        ✕
+      </button>
+    </div>
+
+    {/* Enlaces Principales Grandes */}
+    <nav class="flex flex-col gap-5 sm:gap-6 my-auto py-6">
+      <a href="/" class="mobile-nav-link font-['Gloock'] text-2xl sm:text-3xl text-[#EFEBE3] hover:text-rust-orange transition-colors">
+        Inicio
+      </a>
+      <a href="/colecciones" class="mobile-nav-link font-['Gloock'] text-2xl sm:text-3xl text-[#EFEBE3] hover:text-rust-orange transition-colors">
+        Colecciones
+      </a>
+      <a href="/archivo" class="mobile-nav-link font-['Gloock'] text-2xl sm:text-3xl text-[#EFEBE3] hover:text-rust-orange transition-colors">
+        Archivo
+      </a>
+      <a href="/papers" class="mobile-nav-link font-['Gloock'] text-2xl sm:text-3xl text-[#EFEBE3] hover:text-rust-orange transition-colors">
+        Papers
+      </a>
+      <a href="/about" class="mobile-nav-link font-['Gloock'] text-2xl sm:text-3xl text-[#EFEBE3] hover:text-rust-orange transition-colors">
+        About
+      </a>
+      <a href="/codice" class="mobile-nav-link font-['Gloock'] text-2xl sm:text-3xl text-[#EFEBE3] hover:text-rust-orange transition-colors">
+        El Códice
+      </a>
+      <a
+        href="https://ediciones.thegreatpuzzleproject.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mobile-nav-link font-['Gloock'] text-xl sm:text-2xl text-[#EFEBE3]/70 hover:text-white transition-colors flex items-center gap-2 pt-2 border-t border-white/10"
+      >
+        Editorial TGP
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+      </a>
+    </nav>
+
+    {/* Pie del overlay */}
+    <div class="border-t border-white/10 pt-4 flex items-center justify-between font-metadata text-[10px] uppercase tracking-widest text-white/40">
+      <span>The Great Puzzle Project</span>
+      <span>Patrimonio & Archivo</span>
     </div>
   </div>
 </header>
@@ -205,6 +277,58 @@ const { transparentUntilScroll = false } = Astro.props;
     window.tgpHeaderState.scrollHandler = scrollHandler;
     window.tgpHeaderState.clickHandler = clickHandler;
     
+    // ── Menú Móvil Cinemático (Hamburguesa + Overlay) ──
+    const mobileBtn = document.getElementById('nav-mobile-btn');
+    const mobileOverlay = document.getElementById('nav-mobile-overlay');
+    const mobileClose = document.getElementById('nav-mobile-close');
+    const mobileLinks = document.querySelectorAll('.mobile-nav-link');
+
+    if (mobileBtn && mobileOverlay) {
+      let isMobileMenuOpen = false;
+
+      const setMobileMenuState = (open) => {
+        isMobileMenuOpen = open;
+        mobileBtn.setAttribute('aria-expanded', String(open));
+        mobileOverlay.setAttribute('aria-hidden', String(!open));
+
+        if (open) {
+          mobileOverlay.classList.remove('opacity-0', 'pointer-events-none');
+          mobileOverlay.classList.add('opacity-100', 'pointer-events-auto');
+          mobileBtn.classList.add('is-active');
+          document.body.style.overflow = 'hidden';
+        } else {
+          mobileOverlay.classList.remove('opacity-100', 'pointer-events-auto');
+          mobileOverlay.classList.add('opacity-0', 'pointer-events-none');
+          mobileBtn.classList.remove('is-active');
+          document.body.style.overflow = '';
+        }
+      };
+
+      mobileBtn.onclick = (e) => {
+        e.stopPropagation();
+        setMobileMenuState(!isMobileMenuOpen);
+      };
+
+      if (mobileClose) {
+        mobileClose.onclick = (e) => {
+          e.stopPropagation();
+          setMobileMenuState(false);
+        };
+      }
+
+      mobileLinks.forEach((link) => {
+        link.addEventListener('click', () => {
+          setMobileMenuState(false);
+        });
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isMobileMenuOpen) {
+          setMobileMenuState(false);
+        }
+      });
+    }
+
     scrollHandler();
   };
 
@@ -247,9 +371,20 @@ const { transparentUntilScroll = false } = Astro.props;
     transform: translateY(0) !important;
   }
 
+  /* Animación del botón hamburguesa activo */
+  #nav-mobile-btn.is-active .hamburger-line:nth-child(1) {
+    transform: translateY(5.5px) rotate(45deg);
+  }
+  #nav-mobile-btn.is-active .hamburger-line:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  #nav-mobile-btn.is-active .hamburger-line:nth-child(3) {
+    transform: translateY(-5.5px) rotate(-45deg);
+  }
+
   /* NOTA: El estado activo (.active / [data-active]) está definido en global.css
      con la especificidad necesaria para superar las reglas !important del header. */
-
 
   [data-theme='light'] #site-header .header-brand-title,
   [data-theme='light'] #site-header .header-nav-link,

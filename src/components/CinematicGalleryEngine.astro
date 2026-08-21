@@ -510,12 +510,17 @@ const safeSlides = slides.length > 0 ? slides : [];
     }
   }
 
-  /* GPU layers para fluidez */
+  /* GPU layers para fluidez — backface-hidden evita Z-fighting */
   .cge-slide {
     will-change: opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
   }
   .cge-bg-img {
     will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 
   /* Dots: transición de ancho fluida */
