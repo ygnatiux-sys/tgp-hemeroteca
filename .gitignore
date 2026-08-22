@@ -11,3 +11,5 @@ node_modules/
 .history/
 node_modules
 tgp-mind-*.json
+# Cloudflare local state
+.wrangler/
