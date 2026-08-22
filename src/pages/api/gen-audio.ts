@@ -2,6 +2,8 @@ import type { APIRoute } from 'astro';
 import fs from 'node:fs';
 import path from 'node:path';
 
+export const prerender = false;
+
 function applyLowPass(buffer: Float32Array, cutoff: number, fs: number) {
   const w0 = 2 * Math.PI * cutoff / fs;
   const alpha = Math.sin(w0) / (2 * 0.707); // Q = 0.707
