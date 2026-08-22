@@ -13,16 +13,13 @@ export default defineConfig({
   adapter: cloudflare({
     routes: {
       extend: {
-        // El Worker de Cloudflare intercepta estas rutas dinámicas
+        // El Worker de Cloudflare intercepta estas rutas dinámicas en producción
         include: [
           { pattern: '/keystatic' },
           { pattern: '/keystatic/*' },
           { pattern: '/api/keystatic/*' },
         ],
       },
-    },
-    platformProxy: {
-      enabled: true,
     },
   }),
 

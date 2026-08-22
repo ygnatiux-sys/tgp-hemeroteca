@@ -33,6 +33,13 @@ export const tgpIntegrations = [
 export const tgpViteConfig = {
   plugins: [tailwindcss()],
   optimizeDeps: {
-    include: ['lodash/debounce', 'lodash']
+    include: ['lodash/debounce', 'lodash'],
+    exclude: [
+      '@keystatic/core',
+      '@keystatic/core/ui',
+      '@keystatic/astro',
+      '@keystatic/astro/ui',
+      '@keystatic/astro/api'
+    ]
   }
 };
