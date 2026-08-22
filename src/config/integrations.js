@@ -41,5 +41,15 @@ export const tgpViteConfig = {
       '@keystatic/astro/ui',
       '@keystatic/astro/api'
     ]
+  },
+  ssr: {
+    noExternal: [
+      '@keystatic/core',
+      '@keystatic/astro',
+      'react',
+      'react-dom',
+      'lodash',
+      'lodash/debounce'
+    ]
   }
 };
