@@ -6,7 +6,7 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: 'https://tgp-hemeroteca.pages.dev',
   // 'hybrid' = sitio estático por defecto + SSR solo donde se necesita (Keystatic + API routes)
-  output: 'hybrid',
+  output: 'static',
   vite: tgpViteConfig,
 
   adapter: cloudflare({
