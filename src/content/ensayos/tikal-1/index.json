@@ -3,7 +3,7 @@
   "date": "2026-08-03",
   "category": "Historia",
   "themeColor": "british-green",
-  "draft": true,
+  "draft": false,
   "sitioGeohistorico": null,
   "publicarConImagen": true,
   "coverImage": "/src/assets/ensayos/tikal-1/coverImage.jpg",

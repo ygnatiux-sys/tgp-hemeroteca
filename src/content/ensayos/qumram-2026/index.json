@@ -3,7 +3,7 @@
   "date": "2026-04-25",
   "category": "Arqueología",
   "themeColor": "vintage-yellow",
-  "draft": true,
+  "draft": false,
   "coverImage": "/src/assets/ensayos/qumram-2026/coverImage.png",
   "generador": "Gemini-1.5-Pro",
   "notasInvestigador": ""
