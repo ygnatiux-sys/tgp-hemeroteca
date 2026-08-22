@@ -26,8 +26,7 @@ function startupLogger() {
 export const tgpIntegrations = [
   react(), 
   markdoc(), 
-  // Solo cargamos Keystatic si no estamos en producción para evitar el error de adaptador
-  ...(process.env.NODE_ENV !== 'production' ? [keystatic()] : []),
+  keystatic(), // ← activo en todos los entornos (local + Cloudflare Worker)
   startupLogger()
 ];
 

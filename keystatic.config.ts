@@ -26,7 +26,13 @@ const agenteEruditoField = {
 
 export default config({
   storage: {
-    kind: 'local',
+    // En producción (Cloudflare): usa GitHub como backend.
+    // En local (dev): Keystatic detecta automáticamente el entorno y usa el repo git local.
+    // Las credenciales NUNCA van en este archivo — van en .env y en Cloudflare Pages > Settings > Variables.
+    kind: 'github',
+    repo: 'ygnatiux-sys/tgp-hemeroteca',
+    // El branch donde se guardan los contenidos al editar en el CMS
+    branchPrefix: 'tgp-cms/',
   },
   collections: {
     ensayos: collection({
@@ -232,6 +238,20 @@ export default config({
           },
         } as any,
 
+        // FASE 3: Motor de Materialización Manual (Arte Nano Banana)
+        generadorImagen: {
+          kind: 'form',
+          label: '3. Motor de Arte Nano Banana (Laboratorio Manual)',
+          Input: MotorArteTGP,
+          defaultValue: () => '',
+          parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || '') }),
+          validate: (v: any) => v,
+          reader: {
+            parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          },
+        } as any,
+
         date: fields.date({ label: 'Fecha' }),
         
         category: {
@@ -378,6 +398,20 @@ export default config({
           kind: 'form',
           label: '📷 Buscador & Galería de Archivo Wikimedia Commons',
           Input: BuscadorWikimediaTGP,
+          defaultValue: () => '',
+          parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || '') }),
+          validate: (v: any) => v,
+          reader: {
+            parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          },
+        } as any,
+
+        // MOTOR DE MATERIALIZACIÓN MANUAL (Arte Nano Banana)
+        generadorImagen: {
+          kind: 'form',
+          label: '🎨 Motor de Arte Nano Banana (Laboratorio Manual)',
+          Input: MotorArteTGP,
           defaultValue: () => '',
           parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
           serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || '') }),
