@@ -31,5 +31,8 @@ export const tgpIntegrations = [
 ];
 
 export const tgpViteConfig = {
-  plugins: [tailwindcss()]
+  plugins: [tailwindcss()],
+  optimizeDeps: {
+    include: ['lodash/debounce', 'lodash']
+  }
 };
