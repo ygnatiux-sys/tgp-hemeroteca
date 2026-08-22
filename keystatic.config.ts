@@ -25,15 +25,14 @@ const agenteEruditoField = {
 };
 
 export default config({
-  storage: {
-    // En producción (Cloudflare): usa GitHub como backend.
-    // En local (dev): Keystatic detecta automáticamente el entorno y usa el repo git local.
-    // Las credenciales NUNCA van en este archivo — van en .env y en Cloudflare Pages > Settings > Variables.
-    kind: 'github',
-    repo: 'ygnatiux-sys/tgp-hemeroteca',
-    // El branch donde se guardan los contenidos al editar en el CMS
-    branchPrefix: 'tgp-cms/',
-  },
+  storage:
+    process.env.NODE_ENV === 'development'
+      ? { kind: 'local' }
+      : {
+          kind: 'github',
+          repo: 'ygnatiux-sys/tgp-hemeroteca',
+          branchPrefix: 'tgp-cms/',
+        },
   collections: {
     ensayos: collection({
       label: 'Ensayos',
