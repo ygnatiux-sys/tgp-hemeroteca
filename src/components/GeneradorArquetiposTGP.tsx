@@ -3,6 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 export function GeneradorArquetiposTGP({ value, onChange }: any) {
   const [titulo, setTitulo] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isGeneratingArt, setIsGeneratingArt] = useState(false);
+  const [generarAmbosJuntos, setGenerarAmbosJuntos] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Estado local para el texto del informe, volanta, excerpt y categoría
@@ -12,8 +14,15 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
   const [categoryIA, setCategoryIA] = useState<string>('Arquetipos Globales');
   const [activeTab, setActiveTab] = useState<'preview' | 'raw'>('preview');
 
+  const [arteResult, setArteResult] = useState<{
+    imageUrl: string | null;
+    imagePrompt: string;
+    brief: string;
+    resolvedDirection?: any;
+  } | null>(null);
+
   // Ref acumulador
-  const pendingRef = useRef<{ content?: string; volanta?: string; excerpt?: string; category?: string }>({});
+  const pendingRef = useRef<{ content?: string; volanta?: string; excerpt?: string; category?: string; imageUrl?: string }>({});
 
   const getSlugFromUrl = (): string | null => {
     if (typeof window === 'undefined') return null;
@@ -41,6 +50,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
             if (parsed.volantaIA) setVolantaIA(parsed.volantaIA);
             if (parsed.excerptIA) setExcerptIA(parsed.excerptIA);
             if (parsed.categoryIA) setCategoryIA(parsed.categoryIA);
+            if (parsed.arteResult) setArteResult(parsed.arteResult);
           }
         }
       } catch (e) {}
@@ -67,6 +77,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
     setVolantaIA('');
     setExcerptIA('');
     setCategoryIA('Arquetipos Globales');
+    setArteResult(null);
     setTitulo('');
     pendingRef.current = {};
     try { localStorage.removeItem(BACKUP_KEY); } catch (e) {}
@@ -110,16 +121,17 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
     }
   };
 
-  const handleGenerarArquetipo = async () => {
+  // 1. Generación de Texto / Informe Arquetípico
+  const handleGenerarTexto = async (): Promise<string | null> => {
     const arquetipoTema = detectPostTitle() || titulo.trim();
     if (!arquetipoTema) {
       alert('Por favor, ingresa o auto-detecta un título de arquetipo arriba.');
-      return;
+      return null;
     }
 
     if (informe && informe.length > 50) {
       if (!window.confirm(`Este arquetipo ya posee un informe de ${informe.length} caracteres. ¿Estás seguro de regenerarlo?`)) {
-        return;
+        return null;
       }
     }
 
@@ -143,12 +155,10 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
       if (data.excerpt) setExcerptIA(data.excerpt);
       if (data.category) setCategoryIA(data.category);
 
-      pendingRef.current = {
-        content: data.content,
-        volanta: data.volanta,
-        excerpt: data.excerpt,
-        category: data.category
-      };
+      pendingRef.current.content = data.content;
+      pendingRef.current.volanta = data.volanta;
+      pendingRef.current.excerpt = data.excerpt;
+      pendingRef.current.category = data.category;
 
       syncFieldsToKeystaticDOM(data.volanta, data.category, data.excerpt);
 
@@ -159,10 +169,77 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
         categoryIA: data.category
       });
 
+      return data.content;
     } catch (err: any) {
       setErrorMsg(`Motor Arquetipos: ${err.message}`);
+      return null;
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  // 2. Generación de Arte de Portada con Nano Banana V2 / Imagen 3
+  const handleGenerarArte = async (): Promise<string | null> => {
+    const temaFinal = detectPostTitle() || titulo.trim() || 'Arquetipo Universal';
+    const slug = getSlugFromUrl();
+
+    setIsGeneratingArt(true);
+    setErrorMsg(null);
+
+    try {
+      const res = await fetch('/api/generar-arte', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug: slug,
+          mode: 'intelligent',
+          intelligentInput: {
+            title: temaFinal,
+            concept: `Arquetipo mitológico e histórico: ${temaFinal}`
+          }
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error en el motor de arte');
+
+      const imageUrl = data.imageUrl || data.image;
+      const artData = {
+        imageUrl,
+        imagePrompt: data.imagePrompt,
+        brief: data.brief,
+        resolvedDirection: data.resolvedDirection
+      };
+
+      setArteResult(artData);
+
+      if (imageUrl) {
+        pendingRef.current.imageUrl = imageUrl;
+        saveToLocalBackup({ arteResult: artData });
+      }
+
+      return imageUrl || null;
+    } catch (err: any) {
+      setErrorMsg(`Arte: ${err.message}`);
+      return null;
+    } finally {
+      setIsGeneratingArt(false);
+    }
+  };
+
+  // 3. Ejecución Unificada Conjunta (Redacción + Imagen)
+  const handleGenerarAmbos = async () => {
+    const arquetipoTema = detectPostTitle() || titulo.trim();
+    if (!arquetipoTema) {
+      alert('Por favor, ingresa o auto-detecta un título de arquetipo arriba.');
+      return;
+    }
+
+    if (generarAmbosJuntos) {
+      await handleGenerarTexto();
+      await handleGenerarArte();
+    } else {
+      await handleGenerarTexto();
     }
   };
 
@@ -176,10 +253,10 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
           </div>
           <div>
             <h3 className="text-sm font-metadata uppercase tracking-[0.2em] text-amber-400 font-bold">
-              Motor de Arquetipos Globales TGP
+              Motor de Arquetipos Globales & Arte Unificado TGP
             </h3>
             <p className="text-[11px] text-white/40 font-metadata">
-              Generación de informe de 10 fases (Gemini 3.1 Pro · 3 Niveles Históricos · Sin visuales)
+              Gemini 3.1 Pro (10 Fases Históricas) + Nano Banana / Imagen 3 (Portada)
             </p>
           </div>
         </div>
@@ -203,7 +280,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
             type="text"
             value={titulo}
             onChange={(e) => setTitulo(e.target.value)}
-            placeholder="Ej: El Laberinto, El Náufrago, El Axis Mundi, El Guardián del Umbral..."
+            placeholder="Ej: Mercurio, El Laberinto, Jung y los Arquetipos, Los Annunaki..."
             className="grow px-4 py-2.5 bg-black/40 border border-white/15 rounded-lg text-sm font-sans text-white focus:outline-none focus:border-amber-500/60 placeholder:text-white/20"
           />
           <button
@@ -220,30 +297,109 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
         </div>
       </div>
 
-      {/* BOTÓN DE GENERACIÓN UNIFICADA */}
-      <div className="mb-6">
+      {/* TOGGLE: GENERAR REDACCIÓN + IMAGEN A LA VEZ */}
+      <div className="flex items-center gap-3 p-3.5 mb-5 bg-amber-500/5 border border-amber-500/20 rounded-xl">
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            checked={generarAmbosJuntos}
+            onChange={(e) => setGenerarAmbosJuntos(e.target.checked)}
+            className="sr-only peer"
+          />
+          <div className="w-10 h-5 bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-stone-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+        </label>
+        <div className="text-xs">
+          <span className="font-metadata font-bold text-amber-300">Generar Redacción + Portada IA en un solo clic</span>
+          <p className="text-stone-400 text-[11px]">Genera el informe erudito de 10 fases y materializa la portada cinemática simultáneamente.</p>
+        </div>
+      </div>
+
+      {/* BOTONES DE ACCIÓN */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+        {/* BOTÓN 1: PRINCIPAL CONJUNTO */}
         <button
           type="button"
-          disabled={isGenerating}
-          onClick={handleGenerarArquetipo}
-          className={`w-full py-4 px-6 rounded-xl font-metadata text-xs uppercase tracking-[0.2em] font-bold transition-all shadow-xl flex items-center justify-center gap-3 cursor-pointer ${
-            isGenerating
+          disabled={isGenerating || isGeneratingArt}
+          onClick={handleGenerarAmbos}
+          className={`md:col-span-3 py-4 px-6 rounded-xl font-metadata text-xs uppercase tracking-[0.2em] font-bold transition-all shadow-xl flex items-center justify-center gap-3 cursor-pointer ${
+            isGenerating || isGeneratingArt
               ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse'
               : 'bg-linear-to-r from-amber-900 via-amber-800 to-amber-600 hover:from-amber-800 hover:to-amber-500 text-white border border-amber-400/40 hover:shadow-[0_0_20px_rgba(245,158,11,0.3)]'
           }`}
         >
-          {isGenerating ? (
+          {isGenerating || isGeneratingArt ? (
             <>
               <div className="w-4.5 h-4.5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-              <span>Ejecutando Análisis Histórico & Arquetípico (Gemini 3.1 Pro)...</span>
+              <span>{isGenerating ? 'Generando Informe Erudito...' : 'Materializando Portada IA...'}</span>
             </>
           ) : (
             <>
-              <span>✨ Generar Informe de Arquetipo Global (10 Fases)</span>
+              <span>✦ 1. Generar Redacción + Portada Unificada (Proceso Completo)</span>
             </>
           )}
         </button>
+
+        {/* BOTÓN 2: SOLO TEXTO */}
+        <button
+          type="button"
+          disabled={isGenerating}
+          onClick={handleGenerarTexto}
+          className="py-2.5 px-4 bg-white/5 hover:bg-white/10 text-stone-300 border border-white/10 rounded-lg text-xs font-metadata transition-all cursor-pointer flex items-center justify-center gap-2"
+        >
+          <span>📜 2. Solo Redacción (Texto)</span>
+        </button>
+
+        {/* BOTÓN 3: SOLO PORTADA IA */}
+        <button
+          type="button"
+          disabled={isGeneratingArt}
+          onClick={handleGenerarArte}
+          className="py-2.5 px-4 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 rounded-lg text-xs font-metadata transition-all cursor-pointer flex items-center justify-center gap-2"
+        >
+          <span>🎨 3. Solo Portada IA (Nano Banana)</span>
+        </button>
+
+        {/* BOTÓN 4: SINCRONIZAR AHORA */}
+        <button
+          type="button"
+          onClick={() => {
+            if (!informe) return alert('No hay texto para sincronizar.');
+            onChange(informe);
+            syncFieldsToKeystaticDOM(volantaIA, categoryIA, excerptIA);
+            alert('✦ Campos sincronizados correctamente con Keystatic.');
+          }}
+          className="py-2.5 px-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 rounded-lg text-xs font-metadata transition-all cursor-pointer flex items-center justify-center gap-2"
+        >
+          <span>✓ Sincronizar Campos</span>
+        </button>
       </div>
+
+      {/* PREVIEW DEL ARTE GENERADO */}
+      {arteResult && arteResult.imageUrl && (
+        <div className="mb-5 p-4 bg-black/40 border border-amber-500/20 rounded-xl">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-metadata uppercase tracking-wider text-amber-400 font-bold">
+              ✦ Portada Materializada por IA
+            </span>
+            {arteResult.resolvedDirection?.nombreEstilo && (
+              <span className="text-[10px] font-metadata text-white/50 px-2 py-0.5 bg-white/5 rounded">
+                Estilo: {arteResult.resolvedDirection.nombreEstilo}
+              </span>
+            )}
+          </div>
+          <div className="flex gap-4 items-start">
+            <img
+              src={arteResult.imageUrl}
+              alt="Portada IA"
+              className="w-48 h-28 object-cover rounded-lg border border-white/10 shadow-lg"
+            />
+            <div className="text-xs text-stone-400 space-y-1.5 overflow-hidden">
+              <p className="line-clamp-2 text-stone-300"><strong className="text-white/60 font-metadata">Concepto:</strong> {arteResult.brief}</p>
+              <p className="line-clamp-2 text-[11px] text-white/40"><strong className="text-white/50 font-metadata">Prompt:</strong> {arteResult.imagePrompt}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {errorMsg && (
         <div className="p-3.5 mb-5 bg-red-950/60 border border-red-500/30 rounded-lg text-red-300 text-xs font-metadata">

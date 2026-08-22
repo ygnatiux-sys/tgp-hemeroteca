@@ -13,11 +13,13 @@
     "astro": "astro",
     "generar": "node scripts/generar-post.js",
     "audit": "node scripts/audit-content.mjs",
-    "check-images": "node check-images.mjs"
+    "check-images": "node check-images.mjs",
+    "generate-types": "wrangler types"
   },
   "dependencies": {
     "@0no-co/graphql.web": "^1.2.0",
     "@astrojs/check": "^0.9.10",
+    "@astrojs/cloudflare": "^14.2.3",
     "@astrojs/markdoc": "^2.0.8",
     "@astrojs/node": "^11.1.4",
     "@astrojs/react": "^6.0.4",
@@ -38,7 +40,7 @@
     "split-type": "^0.3.4",
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.3",
-    "wrangler": "^4.83.0"
+    "wrangler": "^4.125.0"
   },
   "devDependencies": {
     "@types/node": "^25.6.0"
