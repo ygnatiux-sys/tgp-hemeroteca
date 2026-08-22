@@ -38,8 +38,8 @@ const recent = all.slice(0, 6);
             <span><strong>1</strong> seguido</span>
           </div>
           <div class="profile-actions">
-            <a href="/about" class="btn-primary">Sobre el Proyecto</a>
-            <a href="/papers" class="btn-ghost">Ver todos los papers</a>
+            <a href="/about/" class="btn-primary">Sobre el Proyecto</a>
+            <a href="/papers/" class="btn-ghost">Ver todos los papers</a>
           </div>
         </div>
       </div>
@@ -54,7 +54,7 @@ const recent = all.slice(0, 6);
             const cat  = formatCategory(item.entry.category);
             const date = item.entry.date ? formatDate(item.entry.date) : null;
             return (
-              <a href={`/papers/${item.slug}`} class="profile-post-row">
+              <a href={`/papers/${item.slug}/`} class="profile-post-row">
                 <div class="post-row-body">
                   <p class="post-row-meta">
                     {cat}

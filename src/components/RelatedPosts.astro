@@ -36,7 +36,7 @@ const { posts } = Astro.props;
     </h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       {posts.map((post: CollectionEntry<'ensayos'>) => (
-        <a href={`/hemeroteca/${post.id.replace(/\/index$/, '')}`} class="group block p-4 -m-4 rounded-lg transition-colors duration-300 hover:bg-white/5">
+        <a href={`/hemeroteca/${post.id.replace(/\/index$/, '')}/`} class="group block p-4 -m-4 rounded-lg transition-colors duration-300 hover:bg-white/5">
           <div class="flex flex-col h-full">
             {post.data.coverImage && (
               <div class="aspect-video w-full overflow-hidden rounded-md mb-4 border border-white/10">

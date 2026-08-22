@@ -152,11 +152,11 @@ const pageTitle = `${title} — Papers · TGP`;
       <!-- Firma del autor e Interacciones — estilo Medium -->
       <div class="paper-author-and-actions">
         <div class="paper-author-row">
-          <a href="/papers/perfil" class="paper-author-avatar-link" aria-label="Perfil de Xavier Benítez">
+          <a href="/papers/perfil/" class="paper-author-avatar-link" aria-label="Perfil de Xavier Benítez">
             <img src="/perfil.webp" alt="Xavier Benítez" class="paper-author-avatar" />
           </a>
           <div class="paper-author-info">
-            <a href="/papers/perfil" class="paper-author-name-link">
+            <a href="/papers/perfil/" class="paper-author-name-link">
               <span class="paper-author-name">Xavier Benítez | TGP Project</span>
             </a>
             <div class="paper-author-meta">
@@ -347,7 +347,7 @@ const pageTitle = `${title} — Papers · TGP`;
 
         <hr class="context-divider" />
 
-        <a href={`/hemeroteca/${slug}`} class="context-hemeroteca-link">
+        <a href={`/hemeroteca/${slug}/`} class="context-hemeroteca-link">
           Ver en Hemeroteca ↗
         </a>
       </div>
@@ -372,12 +372,12 @@ const pageTitle = `${title} — Papers · TGP`;
   <!-- ZONA 5: BLOQUE AUTOR — Xavier Benítez | TGP Project -->
   <section class="paper-author-zone">
     <div class="paper-author-card">
-      <a href="/papers/perfil" class="author-card-avatar-link">
+      <a href="/papers/perfil/" class="author-card-avatar-link">
         <img src="/perfil.webp" alt="Xavier Benítez" class="author-card-avatar" />
       </a>
       <div class="author-card-body">
         <p class="author-card-written-by">Escrito por</p>
-        <a href="/papers/perfil" class="author-card-name-link">
+        <a href="/papers/perfil/" class="author-card-name-link">
           <h3 class="author-card-name">Xavier Benítez | TGP Project</h3>
         </a>
         <div class="author-card-stats">
@@ -391,7 +391,7 @@ const pageTitle = `${title} — Papers · TGP`;
         </p>
         <div class="author-card-actions">
           <button type="button" class="btn-follow trigger-subscribe">Seguir autor</button>
-          <a href="/papers/historias" class="btn-follow btn-follow--ghost">Historias</a>
+          <a href="/papers/historias/" class="btn-follow btn-follow--ghost">Historias</a>
         </div>
       </div>
     </div>
@@ -408,7 +408,7 @@ const pageTitle = `${title} — Papers · TGP`;
           <span class="more-kicker">[ Sigue Explorando ]</span>
           <div class="more-header-row">
             <h2 class="more-section-title">Continuar la lectura</h2>
-            <a href="/archivo" class="more-archive-link">Ver todo el Archivo →</a>
+            <a href="/archivo/" class="more-archive-link">Ver todo el Archivo →</a>
           </div>
         </div>
         
@@ -435,15 +435,15 @@ const pageTitle = `${title} — Papers · TGP`;
                     <div class="explore-lead-content">
                       {leadCat && <span class="explore-cat">{leadCat}</span>}
                       <h3 class="explore-lead-title">
-                        <a href={`/papers/${lead.slug}`}>{lead.entry.title}</a>
+                        <a href={`/papers/${lead.slug}/`}>{lead.entry.title}</a>
                       </h3>
                       {lead.entry.excerpt && (
                         <p class="explore-lead-excerpt">"{lead.entry.excerpt}"</p>
                       )}
                     </div>
                     <div class="explore-lead-footer flex items-center flex-wrap gap-3">
-                      <a href={`/papers/${lead.slug}`} class="explore-read-btn"><span>Leer Dossier</span> <span class="arrow">▸</span></a>
-                      <a href={`/hemeroteca/${lead.slug}`} class="explore-read-btn explore-read-btn-ghost"><span>Ver Hemeroteca</span> <span class="arrow">▸</span></a>
+                      <a href={`/papers/${lead.slug}/`} class="explore-read-btn"><span>Leer Dossier</span> <span class="arrow">▸</span></a>
+                      <a href={`/hemeroteca/${lead.slug}/`} class="explore-read-btn explore-read-btn-ghost"><span>Ver Hemeroteca</span> <span class="arrow">▸</span></a>
                       {leadDate && <span class="explore-date ml-auto hidden sm:inline">{leadDate}</span>}
                     </div>
                   </div>
@@ -459,7 +459,7 @@ const pageTitle = `${title} — Papers · TGP`;
               const secCat = formatCategory(post.entry.category);
               return (
                 <article class="explore-secondary-card">
-                  <a href={`/papers/${post.slug}`} class="explore-sec-link">
+                  <a href={`/papers/${post.slug}/`} class="explore-sec-link">
                     {secImg ? (
                       <div class="explore-sec-img-wrap">
                         <img src={secImg.src} alt="" class="explore-sec-img" loading="lazy" />
@@ -475,8 +475,8 @@ const pageTitle = `${title} — Papers · TGP`;
                         <h4 class="explore-sec-title">{post.entry.title}</h4>
                       </div>
                       <div class="explore-sec-footer flex items-center justify-between gap-2">
-                        <a href={`/papers/${post.slug}`} class="explore-sec-read hover:text-rust-orange transition-colors">Dossier ▸</a>
-                        <a href={`/hemeroteca/${post.slug}`} class="explore-sec-read opacity-60 hover:opacity-100 hover:text-rust-orange transition-colors">Hemeroteca ▸</a>
+                        <a href={`/papers/${post.slug}/`} class="explore-sec-read hover:text-rust-orange transition-colors">Dossier ▸</a>
+                        <a href={`/hemeroteca/${post.slug}/`} class="explore-sec-read opacity-60 hover:opacity-100 hover:text-rust-orange transition-colors">Hemeroteca ▸</a>
                       </div>
                     </div>
                   </a>
@@ -516,10 +516,10 @@ const pageTitle = `${title} — Papers · TGP`;
   <!-- Nav pie de artículo enriquecido -->
   <nav class="paper-footer-rich-nav" aria-label="Navegación de artículo" style="position: relative; z-index: 20;">
     <div class="footer-rich-inner">
-      <a href="/papers" class="btn-rich-ghost">
+      <a href="/papers/" class="btn-rich-ghost">
         ← Volver al Índice
       </a>
-      <a href="/archivo" class="btn-rich-primary">
+      <a href="/archivo/" class="btn-rich-primary">
         Explorar Archivo Completo →
       </a>
     </div>
@@ -585,7 +585,7 @@ const pageTitle = `${title} — Papers · TGP`;
               <a href="https://medium.com/@TheGreatPuzzleProject" target="_blank" rel="noopener noreferrer" class="tgp-modal-link">Medium ↗</a>
             </div>
             <div class="tgp-modal-links">
-              <a href="/papers/perfil" class="tgp-modal-link">Perfil de Autor ↗</a>
+              <a href="/papers/perfil/" class="tgp-modal-link">Perfil de Autor ↗</a>
             </div>
           </div>
         </div>

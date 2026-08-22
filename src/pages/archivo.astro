@@ -232,7 +232,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 pb-4 border-b border-white/10">
           {categoryHighlightCards.map(card => (
             <a
-              href={`/colecciones/${card.catKey}`}
+              href={`/colecciones/${card.catKey}/`}
               class="group card-hover-cinematic relative overflow-hidden rounded-2xl border border-white/10 bg-[#151718]/90 text-left p-4 md:p-5 flex flex-col justify-end min-h-37.5 md:min-h-42.5 cursor-pointer transition-all duration-500"
             >
               {typeof card.img === 'object' && card.img ? (

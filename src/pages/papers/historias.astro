@@ -38,7 +38,7 @@ const stories = all.filter(p => p.entry.excerpt).slice(0, 12);
             const cat  = formatCategory(item.entry.category);
             const date = item.entry.date ? formatDate(item.entry.date) : null;
             return (
-              <a href={`/papers/${item.slug}`} class="story-row">
+              <a href={`/papers/${item.slug}/`} class="story-row">
                 <div class="story-body">
                   <div class="story-author-row">
                     <span class="story-avatar">XB</span>

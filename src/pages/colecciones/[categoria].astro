@@ -182,7 +182,7 @@ const sequences = createPremierSequences(resolvedEssays);
           {resolvedEssays.map(({ slug, entry }: { slug: string; entry: typeof essays[0]['entry'] }, i: number) => (
             <li>
               <a
-                href={`/hemeroteca/${slug}`}
+                href={`/hemeroteca/${slug}/`}
                 class="group flex items-baseline gap-4 md:gap-6 py-3.5 hover:text-[#EFEBE3] transition-colors duration-300"
               >
                 <span class="font-metadata text-[10px] text-white/30 tracking-[0.2em] tabular-nums shrink-0 w-6 text-right">
@@ -202,14 +202,14 @@ const sequences = createPremierSequences(resolvedEssays);
 
         <div class="pt-6 flex items-center justify-between border-t border-white/5 font-metadata text-[10px] uppercase tracking-[0.3em]">
           <a
-            href="/colecciones"
+            href="/colecciones/"
             class="text-white/40 hover:text-[#EFEBE3] transition-colors flex items-center gap-2"
           >
             <span>←</span>
             <span>Todas las colecciones</span>
           </a>
           <a
-            href="/archivo"
+            href="/archivo/"
             class="text-white/40 hover:text-[#EFEBE3] transition-colors flex items-center gap-2"
           >
             <span>Archivo general</span>

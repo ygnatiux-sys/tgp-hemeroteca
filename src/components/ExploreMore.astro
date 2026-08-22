@@ -44,7 +44,7 @@ const secondB = exploreEssays[2] ?? null;
           Continuar la Lectura
         </h3>
       </div>
-      <a href="/archivo" class="font-metadata text-[9px] uppercase tracking-[0.3em] text-white/40 hover:text-rust-orange transition-colors shrink-0 pb-1">
+      <a href="/archivo/" class="font-metadata text-[9px] uppercase tracking-[0.3em] text-white/40 hover:text-rust-orange transition-colors shrink-0 pb-1">
         Ver todo el Archivo →
       </a>
     </div>
@@ -90,7 +90,7 @@ const secondB = exploreEssays[2] ?? null;
                   {formatCategory(lead.entry.category)}
                 </span>
                 <h4 class="font-cinzel font-bold text-xl sm:text-2xl md:text-3xl leading-tight group-hover:text-rust-orange/90 transition-colors duration-300">
-                  <a href={`/hemeroteca/${lead.slug}`}>{lead.entry.title}</a>
+                  <a href={`/hemeroteca/${lead.slug}/`}>{lead.entry.title}</a>
                 </h4>
                 {lead.entry.excerpt && (
                   <p class="font-serif italic text-[#E0E0E0]/55 text-sm md:text-base leading-relaxed line-clamp-2 max-w-prose">
@@ -100,13 +100,13 @@ const secondB = exploreEssays[2] ?? null;
               </div>
               <div class="mt-6 pt-4 border-t border-white/5 flex items-center flex-wrap gap-3">
                 <a
-                  href={`/papers/${lead.slug}`}
+                  href={`/papers/${lead.slug}/`}
                   class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#151718]/90 backdrop-blur-sm border border-white/10 text-[#E0E0E0]/80 font-metadata font-bold text-[8.5px] tracking-[0.2em] uppercase rounded-lg hover:bg-rust-orange/10 hover:border-rust-orange/45 hover:text-rust-orange transition-all duration-300"
                 >
                   <span>Leer Dossier</span><span class="opacity-50 group-hover:translate-x-0.5 transition-transform">▸</span>
                 </a>
                 <a
-                  href={`/hemeroteca/${lead.slug}`}
+                  href={`/hemeroteca/${lead.slug}/`}
                   class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-transparent border border-white/15 text-[#E0E0E0]/60 font-metadata font-bold text-[8.5px] tracking-[0.2em] uppercase rounded-lg hover:bg-white/5 hover:border-rust-orange/40 hover:text-rust-orange transition-all duration-300"
                 >
                   <span>Ver Hemeroteca</span><span class="opacity-50 group-hover:translate-x-0.5 transition-transform">▸</span>
@@ -154,18 +154,18 @@ const secondB = exploreEssays[2] ?? null;
                 <div class="flex flex-col gap-2">
                   <span class="font-metadata text-[8px] uppercase tracking-[0.3em] text-rust-orange/65">{formatCategory(secondA.entry.category)}</span>
                   <h4 class="font-cinzel font-bold text-base leading-snug group-hover:text-rust-orange/80 transition-colors line-clamp-2">
-                    <a href={`/hemeroteca/${secondA.slug}`}>{secondA.entry.title}</a>
+                    <a href={`/hemeroteca/${secondA.slug}/`}>{secondA.entry.title}</a>
                   </h4>
                 </div>
                 <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between gap-2 font-metadata text-[8px] uppercase tracking-[0.2em] flex-wrap">
                   <a
-                    href={`/papers/${secondA.slug}`}
+                    href={`/papers/${secondA.slug}/`}
                     class="inline-flex items-center gap-1 py-1 px-2.5 rounded-md bg-[#151718] border border-white/10 text-white/70 hover:text-rust-orange hover:border-rust-orange/40 transition-all"
                   >
                     <span>Dossier</span> ▸
                   </a>
                   <a
-                    href={`/hemeroteca/${secondA.slug}`}
+                    href={`/hemeroteca/${secondA.slug}/`}
                     class="inline-flex items-center gap-1 py-1 px-2.5 rounded-md border border-white/10 text-white/40 hover:text-rust-orange hover:border-rust-orange/40 transition-all"
                   >
                     <span>Hemeroteca</span> ▸
@@ -207,18 +207,18 @@ const secondB = exploreEssays[2] ?? null;
                 <div class="flex flex-col gap-2">
                   <span class="font-metadata text-[8px] uppercase tracking-[0.3em] text-rust-orange/65">{formatCategory(secondB.entry.category)}</span>
                   <h4 class="font-cinzel font-bold text-base leading-snug group-hover:text-rust-orange/80 transition-colors line-clamp-2">
-                    <a href={`/hemeroteca/${secondB.slug}`}>{secondB.entry.title}</a>
+                    <a href={`/hemeroteca/${secondB.slug}/`}>{secondB.entry.title}</a>
                   </h4>
                 </div>
                 <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between gap-2 font-metadata text-[8px] uppercase tracking-[0.2em] flex-wrap">
                   <a
-                    href={`/papers/${secondB.slug}`}
+                    href={`/papers/${secondB.slug}/`}
                     class="inline-flex items-center gap-1 py-1 px-2.5 rounded-md bg-[#151718] border border-white/10 text-white/70 hover:text-rust-orange hover:border-rust-orange/40 transition-all"
                   >
                     <span>Dossier</span> ▸
                   </a>
                   <a
-                    href={`/hemeroteca/${secondB.slug}`}
+                    href={`/hemeroteca/${secondB.slug}/`}
                     class="inline-flex items-center gap-1 py-1 px-2.5 rounded-md border border-white/10 text-white/40 hover:text-rust-orange hover:border-rust-orange/40 transition-all"
                   >
                     <span>Hemeroteca</span> ▸

@@ -59,7 +59,7 @@ const allCategories = [...new Set(publishable.map(item => formatCategory(item.en
               return (
                 <li class="index-card-item" data-cat={cat || ""}>
                   <article class="index-card-article">
-                    <a href={`/papers/${item.slug}`} class="index-card">
+                    <a href={`/papers/${item.slug}/`} class="index-card">
                       {img && (
                         <div class="index-card-img-wrap">
                           <img

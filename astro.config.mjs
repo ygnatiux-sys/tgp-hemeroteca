@@ -7,7 +7,7 @@ export default defineConfig({
   site: 'https://tgp-hemeroteca.pages.dev',
   // A partir de Astro 5, 'hybrid' fue removido. Usa 'static' y apaga el prerender individualmente con export const prerender = false;
   output: 'static',
-  trailingSlash: 'ignore',
+  trailingSlash: 'always',
   vite: tgpViteConfig,
 
   adapter: cloudflare({

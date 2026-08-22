@@ -37,7 +37,7 @@ const resolvedCollections = collections.map(c => ({
             Colecciones Destacadas
           </h2>
         </div>
-        <a href="/archivo" class="font-metadata text-[9px] sm:text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-rust-orange transition-colors shrink-0">
+        <a href="/archivo/" class="font-metadata text-[9px] sm:text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-rust-orange transition-colors shrink-0">
           Ver todas <span class="hidden sm:inline">las categorías</span>
         </a>
       </div>
@@ -50,7 +50,7 @@ const resolvedCollections = collections.map(c => ({
       <div class="marquee-track flex gap-4 md:gap-6 px-2 w-max animate-marquee group-hover:pause">
         {resolvedCollections.map(({ key, label, count, img }) => (
           <a
-            href={`/colecciones/${key}`}
+            href={`/colecciones/${key}/`}
             class="group/card shrink-0 w-[72vw] sm:w-[50vw] md:w-70 lg:w-85 bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-rust-orange/50 transition-all duration-500 flex flex-col"
           >
             {img ? (
@@ -80,7 +80,7 @@ const resolvedCollections = collections.map(c => ({
       <div class="marquee-track flex gap-4 md:gap-6 px-2 w-max animate-marquee group-hover:pause" aria-hidden="true">
         {resolvedCollections.map(({ key, label, count, img }) => (
           <a
-            href={`/colecciones/${key}`}
+            href={`/colecciones/${key}/`}
             class="group/card shrink-0 w-[72vw] sm:w-[50vw] md:w-70 lg:w-85 bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-rust-orange/50 transition-all duration-500 flex flex-col"
             tabindex="-1"
           >

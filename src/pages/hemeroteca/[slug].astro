@@ -579,7 +579,7 @@ const articleSchema = {
         {/* Cierre de navegación */}
         <div class="pt-16 pb-8 text-center">
           <a
-            href="/archivo"
+            href="/archivo/"
             class="inline-flex items-center gap-3 font-metadata text-[9px] bg-[#151718]/90 backdrop-blur-sm border border-white/10 px-8 py-3.5 uppercase tracking-[0.3em] text-white/50 hover:bg-rust-orange/10 hover:border-rust-orange/45 hover:text-rust-orange transition-all duration-500 rounded-full"
           >
             Cerrar Archivo
@@ -660,7 +660,7 @@ const articleSchema = {
                     <span class="text-[8px] text-rust-orange/70 transition-transform duration-300 group-open/col-toggle:rotate-180">▼</span>
                   </div>
                   <a
-                    href="/colecciones"
+                    href="/colecciones/"
                     onclick="event.stopPropagation()"
                     class="font-metadata text-[8px] uppercase tracking-widest text-white/40 hover:text-rust-orange transition-all"
                   >
@@ -671,7 +671,7 @@ const articleSchema = {
                 <div class="flex flex-col gap-1 pt-2.5">
                   {sidebarCollections.map((col) => (
                     <a
-                      href={`/colecciones/${encodeURIComponent(col.key)}`}
+                      href={`/colecciones/${encodeURIComponent(col.key)}/`}
                       class="group/item flex items-center justify-between py-1.5 px-2.5 rounded-lg border border-transparent hover:border-rust-orange/30 hover:bg-rust-orange/10 transition-all duration-300"
                     >
                       <span class="font-metadata text-[9px] text-white/60 group-hover/item:text-white transition-all truncate">

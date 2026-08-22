@@ -137,7 +137,7 @@ export function BuscadorModal() {
               filtered.slice(0, 6).map((item) => (
                 <a
                   key={item.id || item.slug}
-                  href={`/hemeroteca/${item.slug}`}
+                  href={`/hemeroteca/${item.slug}/`}
                   onClick={() => setIsOpen(false)}
                   className="font-metadata font-light text-[11px] uppercase tracking-[0.2em] text-current opacity-70 hover:opacity-100 hover:text-rust-orange dark:hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(239,235,227,0.06)] px-2 py-1.5 transition-all duration-300 select-none block"
                 >

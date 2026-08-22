@@ -27,7 +27,7 @@ const rest      = all.slice(1, 9);
       const date = featured.entry.date ? formatDate(featured.entry.date) : null;
       return (
         <section class="home-featured">
-          <a href={`/papers/${featured.slug}`} class="featured-card">
+          <a href={`/papers/${featured.slug}/`} class="featured-card">
             {img && (
               <div class="featured-card-img-wrap">
                 <img src={typeof img === 'object' ? img.src : img} alt={featured.entry.title || ""} class="featured-card-img" loading="eager" />
@@ -59,7 +59,7 @@ const rest      = all.slice(1, 9);
             const cat  = formatCategory(item.entry.category);
             const date = item.entry.date ? formatDate(item.entry.date) : null;
             return (
-              <a href={`/papers/${item.slug}`} class="home-card">
+              <a href={`/papers/${item.slug}/`} class="home-card">
                 {img && (
                   <div class="home-card-img-wrap">
                     <img src={img.src} alt={item.entry.title || ""} class="home-card-img" loading="lazy" />
@@ -78,7 +78,7 @@ const rest      = all.slice(1, 9);
           })}
         </div>
         <div class="home-see-all">
-          <a href="/papers" class="see-all-link">Ver índice completo →</a>
+          <a href="/papers/" class="see-all-link">Ver índice completo →</a>
         </div>
       </div>
     </section>
