@@ -1,0 +1,9 @@
+---
+import { makePage } from '@keystatic/astro/ui';
+import keystaticConfig from '../../../keystatic.config';
+
+export const prerender = false; // Forzamos SSR para la interfaz de Keystatic
+
+const Keystatic = makePage(keystaticConfig);
+---
+<Keystatic client:only="react" />
