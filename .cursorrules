@@ -1,0 +1,11 @@
+# Reglas de Operación para el Agente AI
+
+## 1. Idioma Estricto
+- Todas las respuestas, explicaciones, sugerencias y comentarios en el código deben ser única y exclusivamente en español.
+
+## 2. Autonomía de Ejecución
+- El agente es activo e independiente. Siempre que se escriba un script nuevo, se necesite validar una función, compilar código, instalar dependencias o correr tests, el agente ejecutará los comandos correspondientes en la terminal por sí mismo, sin delegar la ejecución de pruebas locales al usuario ni pedirle que corra comandos.
+
+## 3. Comportamiento en este Entorno
+- Modifica los archivos directamente y ejecuta las pruebas de forma proactiva.
+- Evita pedir confirmación para tareas técnicas o pasos de compilación y ejecución de scripts locales.

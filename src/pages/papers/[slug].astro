@@ -17,6 +17,8 @@ import { marked } from "marked";
 import AcademicLayout from "../../layouts/AcademicLayout.astro";
 import MarqueeColecciones from "../../components/MarqueeColecciones.astro";
 import { QuickReturnButton } from "../../components/QuickReturnButton";
+import PostCinematicStyle from "../../components/PostCinematicStyle.astro";
+import { parseLLMText } from "../../lib/parseLLMText";
 import {
   resolveEssayImage,
   formatCategory,
@@ -88,24 +90,25 @@ if (hasRealMdoc) {
   } catch (_) {}
 }
 
-// ─── FALLBACK: marked ────────────────────────────────────────────────────────
-let renderedHtml = "";
-if (!Content) {
-  let raw = hasRealMdoc ? rawMdocText.trim()
-    : doc.generadorGeoref?.trim() || doc.generadorTexto?.trim() || doc.generador?.trim() || "";
+// ─── RESOLUCIÓN UNIVERSAL DE TEXTO Y PARSEO CINEMÁTICO ──────────────────────
+let rawSourceText = hasRealMdoc ? rawMdocText.trim()
+  : doc.generadorGeoref?.trim() || doc.generadorTexto?.trim() || doc.generador?.trim() || "";
 
-  if (raw.startsWith("{") && (raw.includes('"informeMarkdown"') || raw.includes('"content"'))) {
-    try {
-      const p = JSON.parse(raw);
-      raw = p.informeMarkdown || p.content || raw;
-    } catch {
-      const m = raw.match(/"(?:informeMarkdown|content)"\s*:\s*"([\s\S]*?)"(?=\s*,\s*"|\s*})/);
-      if (m) raw = m[1].replace(/\\n/g, "\n").replace(/\\"/g, '"');
-    }
+if (rawSourceText.startsWith("{") && (rawSourceText.includes('"informeMarkdown"') || rawSourceText.includes('"content"'))) {
+  try {
+    const p = JSON.parse(rawSourceText);
+    rawSourceText = p.informeMarkdown || p.content || rawSourceText;
+  } catch {
+    const m = rawSourceText.match(/"(?:informeMarkdown|content)"\s*:\s*"([\s\S]*?)"(?=\s*,\s*"|\s*})/);
+    if (m) rawSourceText = m[1].replace(/\\n/g, "\n").replace(/\\"/g, '"');
   }
-  if (raw) {
-    renderedHtml = marked.parse(raw) as string;
-  }
+}
+
+let renderedHtml = "";
+let cinematicHtml = "";
+if (rawSourceText) {
+  renderedHtml = marked.parse(rawSourceText) as string;
+  cinematicHtml = parseLLMText(rawSourceText);
 }
 
 // ─── METADATOS ───────────────────────────────────────────────────────────────
@@ -249,9 +252,9 @@ const pageTitle = `${title} — Papers · TGP`;
   )}
 
   <!-- ═══════════════════════════════════════════════════════════════
-       ZONA 3: ÁREA DE LECTURA — Grid 3 columnas
+       ZONA 3: ÁREA DE LECTURA — Grid (Expandible en Cinemático / 3 Columnas en Doc)
   ══════════════════════════════════════════════════════════════════ -->
-  <div class="paper-reading-zone">
+  <div id="paper-reading-grid-container" class="paper-reading-zone is-cinematic-mode">
     
     <!-- ═══ COLUMNA TOC (Izquierda — "Archipiélago") ═══ -->
     <aside class="paper-sidebar-toc" aria-label="Tabla de Contenidos">
@@ -264,7 +267,51 @@ const pageTitle = `${title} — Papers · TGP`;
 
     <!-- ═══ CUERPO DEL ENSAYO (Centro) ═══ -->
     <article class="academic-prose paper-main-col" id="paper-content">
-      <div class="paper-body prose" id="paper-body">
+      <!-- Selector de Modo de Lectura -->
+      <div class="reading-mode-selector flex flex-wrap items-center justify-between gap-3 mb-8 pb-4 border-b border-stone-300/30 dark:border-white/10">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-rust-orange animate-pulse"></span>
+          <span class="font-metadata text-[9px] uppercase tracking-[0.25em] text-[#EFEBE3]/60 font-bold">
+            EXPERIENCIA DE LECTURA
+          </span>
+        </div>
+        <div class="inline-flex p-1 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md" role="tablist">
+          <button
+            id="paper-btn-cinematic-mode"
+            type="button"
+            role="tab"
+            aria-selected="true"
+            class="paper-mode-toggle-btn active-mode flex items-center gap-1.5 px-3 py-1 rounded-lg font-metadata text-[8.5px] uppercase tracking-widest font-bold transition-all duration-300 cursor-pointer"
+          >
+            <span>🎬</span>
+            <span>Cinemático TGP</span>
+          </button>
+          <button
+            id="paper-btn-doc-mode"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            class="paper-mode-toggle-btn flex items-center gap-1.5 px-3 py-1 rounded-lg font-metadata text-[8.5px] uppercase tracking-widest font-bold transition-all duration-300 cursor-pointer"
+          >
+            <span>📄</span>
+            <span>Académico Doc</span>
+          </button>
+        </div>
+      </div>
+
+      {/* ─── VISTA 1: MODO CINEMÁTICO ─── */}
+      <div id="paper-view-cinematic" class="paper-cinematic-view w-full">
+        {cinematicHtml ? (
+          <PostCinematicStyle>
+            <div class="cinematic-essay-content w-full" set:html={cinematicHtml} />
+          </PostCinematicStyle>
+        ) : (
+          <p class="paper-empty">Documento en proceso de catalogación cinemática.</p>
+        )}
+      </div>
+
+      {/* ─── VISTA 2: MODO ACADÉMICO DOC TRADICIONAL ─── */}
+      <div id="paper-view-doc" class="paper-doc-view hidden paper-body prose">
         {hasContent ? (
           Content ? <Content /> : <Fragment set:html={renderedHtml} />
         ) : (
@@ -2426,4 +2473,94 @@ const pageTitle = `${title} — Papers · TGP`;
     .footer-rich-inner { flex-direction: column; gap: 1rem; }
     .btn-rich-primary, .btn-rich-ghost { width: 100%; text-align: center; }
   }
+
+  /* ── Expansión Inmersiva para Modo Cinemático en Papers (88ch, 14-18 palabras/renglón) ── */
+  .paper-reading-zone.is-cinematic-mode {
+    display: block !important;
+    max-width: 1100px !important;
+    margin: 0 auto !important;
+    padding: 0 1.5rem !important;
+  }
+
+  .paper-reading-zone.is-cinematic-mode .paper-sidebar-toc,
+  .paper-reading-zone.is-cinematic-mode .paper-sidebar-context {
+    display: none !important;
+  }
+
+  .paper-reading-zone.is-cinematic-mode .paper-main-col {
+    max-width: 1050px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  /* ── Selector de Modo de Lectura en Papers ── */
+  .paper-mode-toggle-btn {
+    color: rgba(239, 235, 227, 0.55);
+    background: transparent;
+  }
+  .paper-mode-toggle-btn:hover {
+    color: rgba(239, 235, 227, 0.9);
+  }
+  .paper-mode-toggle-btn.active-mode {
+    color: #ffffff;
+    background: rgba(201, 168, 108, 0.35);
+    box-shadow: 0 0 14px rgba(201, 168, 108, 0.25);
+    border: 1px solid rgba(201, 168, 108, 0.6);
+  }
 </style>
+
+<script>
+  const setupPaperReadingModes = () => {
+    const btnCinematic = document.getElementById('paper-btn-cinematic-mode');
+    const btnDoc       = document.getElementById('paper-btn-doc-mode');
+    const viewCinematic = document.getElementById('paper-view-cinematic');
+    const viewDoc       = document.getElementById('paper-view-doc');
+
+    if (!btnCinematic || !btnDoc || !viewCinematic || !viewDoc) return;
+
+    const gridContainer = document.getElementById('paper-reading-grid-container');
+
+    const setMode = (mode: 'cinematic' | 'doc') => {
+      if (mode === 'cinematic') {
+        viewCinematic.classList.remove('hidden');
+        viewDoc.classList.add('hidden');
+        gridContainer?.classList.add('is-cinematic-mode');
+        btnCinematic.classList.add('active-mode');
+        btnCinematic.setAttribute('aria-selected', 'true');
+        btnDoc.classList.remove('active-mode');
+        btnDoc.setAttribute('aria-selected', 'false');
+        localStorage.setItem('tgp_paper_reading_mode', 'cinematic');
+
+        // Disparar ScrollTrigger GSAP
+        import('../../lib/cinematic-scroll').then(({ initCinematicScroll }) => {
+          initCinematicScroll();
+        });
+      } else {
+        viewCinematic.classList.add('hidden');
+        viewDoc.classList.remove('hidden');
+        gridContainer?.classList.remove('is-cinematic-mode');
+        btnDoc.classList.add('active-mode');
+        btnDoc.setAttribute('aria-selected', 'true');
+        btnCinematic.classList.remove('active-mode');
+        btnCinematic.setAttribute('aria-selected', 'false');
+        localStorage.setItem('tgp_paper_reading_mode', 'doc');
+      }
+    };
+
+    btnCinematic.addEventListener('click', () => setMode('cinematic'));
+    btnDoc.addEventListener('click', () => setMode('doc'));
+
+    const saved = localStorage.getItem('tgp_paper_reading_mode');
+    if (saved === 'doc') {
+      setMode('doc');
+    } else {
+      setMode('cinematic');
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', setupPaperReadingModes);
+  document.addEventListener('astro:page-load', setupPaperReadingModes);
+  if (document.readyState !== 'loading') {
+    setupPaperReadingModes();
+  }
+</script>

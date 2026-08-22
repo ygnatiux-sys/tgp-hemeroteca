@@ -7,3 +7,5 @@ export * from './SelectorCategoriaTGP';
 export * from './GeneradorGeorreferenciaTGP';
 export * from './MagazineBookzineGallery';
 export * from './component-blocks';
+export * from './AgenteEruditoTGP';
+

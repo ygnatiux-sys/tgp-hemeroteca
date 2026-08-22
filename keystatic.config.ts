@@ -7,9 +7,22 @@ import {
   BuscadorWikimediaTGP,
   SelectorCategoriaTGP,
   GeneradorGeorreferenciaTGP,
+  AgenteEruditoTGP,
   componentBlocks 
 } from './src/components';
 import { geminiCinematicField } from './src/keystatic/geminiCinematic';
+
+// Campo reutilizable — Agente Erudito Académico TGP (global, excluye Dirección de Arte)
+const agenteEruditoField = {
+  kind: 'form' as const,
+  label: '✦ Agente Erudito Académico TGP',
+  Input: AgenteEruditoTGP,
+  defaultValue: () => '',
+  parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+  serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || '') }),
+  validate: (v: any) => v,
+  reader: { parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')) },
+};
 
 export default config({
   storage: {
@@ -53,6 +66,9 @@ export default config({
             parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
           },
         } as any,
+
+        // ✦ AGENTE ERUDITO ACADÉMICO GLOBAL
+        agenteErudito: agenteEruditoField as any,
 
         // FASE 2: Buscador y Selector de Imágenes Wikimedia Commons TGP
         bancoImagenesWikimedia: {
@@ -198,6 +214,9 @@ export default config({
             parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
           },
         } as any,
+
+        // ✦ AGENTE ERUDITO ACADÉMICO GLOBAL
+        agenteErudito: agenteEruditoField as any,
 
         // FASE 2: Buscador y Selector de Imágenes Wikimedia Commons TGP
         bancoImagenesWikimedia: {
@@ -351,6 +370,9 @@ export default config({
           },
         } as any,
 
+        // ✦ AGENTE ERUDITO ACADÉMICO GLOBAL
+        agenteErudito: agenteEruditoField as any,
+
         // BUSCADOR & GALERÍA DE ARCHIVOS WIKIMEDIA COMMONS
         bancoImagenesWikimedia: {
           kind: 'form',
@@ -432,6 +454,9 @@ export default config({
 
         // 2. MÓDULO IA DEDICADO Y MODULAR: Gemini Cinemático (Pro Texto + Flash Imagen)
         generadorTexto: geminiCinematicField as any,
+
+        // ✦ AGENTE ERUDITO ACADÉMICO GLOBAL
+        agenteErudito: agenteEruditoField as any,
 
         // 3. RESTO DE CAMPOS
         atmosfera: fields.conditional(

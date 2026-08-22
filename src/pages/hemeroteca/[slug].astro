@@ -7,8 +7,11 @@ import SpotifyIcon from "../../components/icons/Spotify.astro";
 import YouTubeIcon from "../../components/icons/YouTube.astro";
 import { marked } from "marked";
 import Header from "../../components/Header.astro";
+import PostCinematicStyle from "../../components/PostCinematicStyle.astro";
+import { parseLLMText } from "../../lib/parseLLMText";
 import { QuickReturnButton } from "../../components/QuickReturnButton";
 import BackSlideButton from "../../components/BackSlideButton.astro";
+import PolvoDorado from "../../components/PolvoDorado.astro";
 
 import RelatedReading from "../../components/RelatedReading.astro";
 import ExploreMore from "../../components/ExploreMore.astro";
@@ -148,8 +151,10 @@ if (
 
 // 4. Procesar HTML y vincular imágenes relativas a los assets procesados de Vite
 let renderedHtml = "";
+let cinematicHtml = "";
 if (finalMarkdownText) {
   renderedHtml = marked.parse(finalMarkdownText) as string;
+  cinematicHtml = parseLLMText(finalMarkdownText);
 }
 
 // 5. Resolución de imagen de portada
@@ -302,6 +307,11 @@ const activeAccent = doc.themeColor
 const imagePosition =
   doc.coverImagePosition || doc.imagePosition || "center center";
 
+// ── DETECCIÓN DE ARQUETIPOS GLOBALES ──
+const isArquetipo = (doc.category || data.category || "").toLowerCase().includes("arquetipo");
+// URL de imagen de portada para fondo (puede ser string base64, URL remota o rutas procesadas)
+const heroBgUrl: string = (typeof optimizedImage === 'string' ? optimizedImage : (optimizedImage as any)?.src || "");
+
 const articleSchema = {
   "@context": "https://schema.org",
   "@type": "ScholarlyArticle",
@@ -388,21 +398,39 @@ const articleSchema = {
   }
   <article
     id="post-article"
-    class="w-full bg-(--bg-main) relative z-20 pt-16 md:pt-20 pb-32"
+    class={`w-full relative z-20 pt-16 md:pt-20 pb-32 ${isArquetipo ? 'arquetipo-post' : 'bg-(--bg-main)'}`}
     style={`--theme-accent: ${activeAccent};`}
     data-sitio-geo={data.sitioGeohistorico || doc.sitioGeohistorico || ""}
+    data-is-arquetipo={isArquetipo ? 'true' : 'false'}
+    data-hero-bg={heroBgUrl}
+    data-image-position={imagePosition}
   >
-    {/* FX: Aura Atmosférica sutil */}
-    <div
-      class="pointer-events-none absolute inset-0 opacity-15"
-      style="background: radial-gradient(circle at 50% 20%, var(--theme-accent) 0%, transparent 70%); mix-blend-screen;"
-    />
+    {/* FX: FONDO HERO (Arquetipos) — JS toma la imagen del InteriorHero y la aplica al body */}
+    {isArquetipo ? (
+      <>
+        {/* Overlay y viñeta oscura cinemática (el bg real lo inyecta JS desde hero-image) */}
+        <div
+          id="arquetipo-overlay"
+          class="pointer-events-none fixed inset-0 z-[-1] w-full h-full"
+          aria-hidden="true"
+          style="background: linear-gradient(to bottom, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0.80) 50%, rgba(10,10,12,0.95) 100%);"
+        />
+        {/* Canvas de polvo dorado TGP */}
+        <canvas
+          id="arquetipo-polvo-canvas"
+          class="pointer-events-none fixed inset-0 z-0 w-full h-full"
+          aria-hidden="true"
+        ></canvas>
+      </>
+    ) : (
+      <div
+        class="pointer-events-none absolute inset-0 opacity-15"
+        style="background: radial-gradient(circle at 50% 20%, var(--theme-accent) 0%, transparent 70%); mix-blend-screen;"
+      />
+    )}
 
-    {/* ═══ GRID DE LECTURA 3 COLUMNAS ═══
-        [TOC izq sticky] | [Body central 65ch] | [Sidebar der sticky]
-        Mobile: una columna. Desktop ≥1200px: 3 columnas.
-    */}
-    <div class="post-reading-grid relative z-10">
+    {/* ═══ GRID DE LECTURA (Expandible en Cinemático / 3 Columnas en Doc) ═══ */}
+    <div id="reading-grid-container" class="post-reading-grid is-cinematic-mode relative z-10">
 
       {/* ── TOC IZQUIERDO STICKY ── */}
       <aside class="post-toc-col" aria-label="Tabla de contenidos">
@@ -416,17 +444,70 @@ const articleSchema = {
       <div class="post-body-col">
         {
           data.excerpt && (
-            <div class="border-l-3 border-[#6E2424] dark:border-rust-orange pl-6 md:pl-8 mb-12 py-3 bg-linear-to-r from-[#6E2424]/10 via-[#6E2424]/5 to-transparent dark:from-rust-orange/10 rounded-r-xl">
-              <p class="text-xl md:text-2xl font-serif font-light text-[#6E2424] dark:text-rust-orange leading-relaxed tracking-tight italic">
-                "{data.excerpt}"
-              </p>
-            </div>
+            isArquetipo ? (
+              <PolvoDorado
+                text={data.excerpt}
+                eyebrow="RESPIRO CINEMÁTICO · TGP"
+              />
+            ) : (
+              <div class="border-l-3 border-[#6E2424] dark:border-rust-orange pl-6 md:pl-8 mb-12 py-3 bg-linear-to-r from-[#6E2424]/10 via-[#6E2424]/5 to-transparent dark:from-rust-orange/10 rounded-r-xl">
+                <p class="text-xl md:text-2xl font-serif font-light text-[#6E2424] dark:text-rust-orange leading-relaxed tracking-tight italic">
+                  "{data.excerpt}"
+                </p>
+              </div>
+            )
           )
         }
 
+        {/* SELECTOR DE MODO DE LECTURA */}
+        <div class="reading-mode-selector flex flex-wrap items-center justify-between gap-3 mb-10 pb-4 border-b border-stone-300/40 dark:border-white/10">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-rust-orange animate-pulse"></span>
+            <span class="font-metadata text-[9.5px] uppercase tracking-[0.25em] text-[#1C1E21]/70 dark:text-white/60 font-bold">
+              EXPERIENCIA DE LECTURA
+            </span>
+          </div>
+          <div class="inline-flex p-1 rounded-xl bg-stone-200/70 dark:bg-white/5 border border-stone-300 dark:border-white/10 backdrop-blur-md" role="tablist">
+            <button
+              id="btn-cinematic-mode"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              class="mode-toggle-btn active-mode flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-metadata text-[8.5px] md:text-[9px] uppercase tracking-widest font-bold transition-all duration-300 cursor-pointer"
+            >
+              <span>🎬</span>
+              <span>Cinemático TGP</span>
+            </button>
+            <button
+              id="btn-doc-mode"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              class="mode-toggle-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-metadata text-[8.5px] md:text-[9px] uppercase tracking-widest font-bold transition-all duration-300 cursor-pointer"
+            >
+              <span>📄</span>
+              <span>Editorial Doc</span>
+            </button>
+          </div>
+        </div>
+
+        {/* ─── VISTA 1: MODO CINEMÁTICO (PostCinematicStyle + GSAP) ─── */}
+        <div id="view-cinematic" class="cinematic-reading-view w-full">
+          {cinematicHtml ? (
+            <PostCinematicStyle class={isArquetipo ? 'is-arquetipo-mode' : ''}>
+              <div class={`cinematic-essay-content w-full ${isArquetipo ? 'arquetipo-typing-root' : ''}`} set:html={cinematicHtml} />
+            </PostCinematicStyle>
+          ) : (
+            <div class="py-12 text-stone-500 dark:text-white/50 font-serif italic text-lg text-center">
+              Documento en proceso de catalogación en el archivo hemerográfico.
+            </div>
+          )}
+        </div>
+
+        {/* ─── VISTA 2: MODO EDITORIAL / DOC TRADICIONAL (prose + Markdoc .mdoc) ─── */}
         <div
-          id="post-body-content"
-          class="prose prose-invert max-w-none
+          id="view-doc"
+          class="doc-reading-view hidden prose prose-invert max-w-none
           prose-p:font-body prose-p:font-light prose-p:not-italic prose-p:text-[1.18rem] md:prose-p:text-[1.22rem] prose-p:leading-[1.75] prose-p:tracking-tight prose-p:mb-8 prose-p:text-left prose-p:text-pretty
           prose-h1:hidden
           prose-h2:font-sans prose-h2:font-extrabold prose-h2:text-2xl md:prose-h2:text-3xl prose-h2:tracking-tight prose-h2:mt-14 prose-h2:mb-5 prose-h2:leading-snug prose-h2:text-[#1C1E21] dark:prose-h2:text-[#F5F4F0] prose-h2:border-b-2 prose-h2:border-[#6E2424]/40 dark:prose-h2:border-rust-orange/40 prose-h2:pb-2.5 prose-h2:scroll-mt-24
@@ -689,6 +770,26 @@ const articleSchema = {
     max-width: 720px;
     margin: 0 auto;
     padding: 0 1.25rem;
+    transition: max-width 0.4s ease;
+  }
+
+  /* ── Expansión Inmersiva para Modo Cinemático (88ch, 14-18 palabras/renglón) ── */
+  .post-reading-grid.is-cinematic-mode {
+    display: block !important;
+    max-width: 1100px !important;
+    margin: 0 auto !important;
+    padding: 0 1.5rem !important;
+  }
+
+  .post-reading-grid.is-cinematic-mode .post-toc-col,
+  .post-reading-grid.is-cinematic-mode .post-sidebar-col {
+    display: none !important;
+  }
+
+  .post-reading-grid.is-cinematic-mode .post-body-col {
+    max-width: 1050px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
   }
 
   @media (min-width: 1200px) {
@@ -844,6 +945,21 @@ const articleSchema = {
     margin: 0;
     line-height: 1.4;
   }
+
+  /* ── Selector de Modo de Lectura ── */
+  .mode-toggle-btn {
+    color: rgba(239, 235, 227, 0.55);
+    background: transparent;
+  }
+  .mode-toggle-btn:hover {
+    color: rgba(239, 235, 227, 0.9);
+  }
+  .mode-toggle-btn.active-mode {
+    color: #ffffff;
+    background: rgba(184, 115, 51, 0.35);
+    box-shadow: 0 0 14px rgba(184, 115, 51, 0.25);
+    border: 1px solid rgba(184, 115, 51, 0.6);
+  }
 </style>
 
 <script>
@@ -909,6 +1025,340 @@ const articleSchema = {
     headings.forEach(h => obs.observe(h));
   };
 
-  document.addEventListener('DOMContentLoaded', initPostScript);
-  document.addEventListener('astro:page-load', initPostScript);
+  /* 4. Switcher interactivo de experiencia de lectura (Cinemático vs Doc) */
+  const setupReadingModes = () => {
+    const btnCinematic = document.getElementById('btn-cinematic-mode');
+    const btnDoc       = document.getElementById('btn-doc-mode');
+    const viewCinematic = document.getElementById('view-cinematic');
+    const viewDoc       = document.getElementById('view-doc');
+
+    if (!btnCinematic || !btnDoc || !viewCinematic || !viewDoc) return;
+
+    const gridContainer = document.getElementById('reading-grid-container');
+
+    const setMode = (mode: 'cinematic' | 'doc') => {
+      if (mode === 'cinematic') {
+        viewCinematic.classList.remove('hidden');
+        viewDoc.classList.add('hidden');
+        gridContainer?.classList.add('is-cinematic-mode');
+        btnCinematic.classList.add('active-mode');
+        btnCinematic.setAttribute('aria-selected', 'true');
+        btnDoc.classList.remove('active-mode');
+        btnDoc.setAttribute('aria-selected', 'false');
+        localStorage.setItem('tgp_reading_mode', 'cinematic');
+
+        // Disparar ScrollTrigger GSAP
+        import('../../lib/cinematic-scroll').then(({ initCinematicScroll }) => {
+          initCinematicScroll();
+        });
+      } else {
+        viewCinematic.classList.add('hidden');
+        viewDoc.classList.remove('hidden');
+        gridContainer?.classList.remove('is-cinematic-mode');
+        btnDoc.classList.add('active-mode');
+        btnDoc.setAttribute('aria-selected', 'true');
+        btnCinematic.classList.remove('active-mode');
+        btnCinematic.setAttribute('aria-selected', 'false');
+        localStorage.setItem('tgp_reading_mode', 'doc');
+      }
+    };
+
+    btnCinematic.addEventListener('click', () => setMode('cinematic'));
+    btnDoc.addEventListener('click', () => setMode('doc'));
+
+    const saved = localStorage.getItem('tgp_reading_mode');
+    if (saved === 'doc') {
+      setMode('doc');
+    } else {
+      setMode('cinematic');
+    }
+  };
+
+  const runAll = () => {
+    initPostScript();
+    setupReadingModes();
+  };
+
+  document.addEventListener('DOMContentLoaded', runAll);
+  document.addEventListener('astro:page-load', runAll);
+  if (document.readyState !== 'loading') {
+    runAll();
+  }
+</script>
+
+{/* ══════════════════════════════════════════════════════════════════════════
+    RESPIRO CINEMÁTICO TGP — Polvo Dorado + Tipeado Word-by-Word
+    (Sólo activo en páginas de Arquetipos Globales)
+══════════════════════════════════════════════════════════════════════════ */}
+<style is:global>
+  /* ── Arquetipos: fondo transparente para mostrar imagen hero ── */
+  .arquetipo-post {
+    background: transparent !important;
+  }
+
+  /* ── Body en modo Arquetipo: fondo base oscuro para que el overlay fixed sea visible ── */
+  body.arquetipo-body-mode {
+    background-color: #0a0a0c !important;
+  }
+  body.arquetipo-body-mode main,
+  body.arquetipo-body-mode .layout-main {
+    background: transparent !important;
+  }
+
+  /* ── Palabras para tipeado cinemático TGP ── */
+  .arquetipo-typing-root .cinematic-block p .aqt-word {
+    display: inline;
+    opacity: 0;
+    filter: blur(9px);
+    transition: opacity 0.75s ease-out, filter 0.75s ease-out;
+    will-change: opacity, filter;
+  }
+  .arquetipo-typing-root .cinematic-block p .aqt-word.aqt-revealed {
+    opacity: 1;
+    filter: blur(0);
+  }
+
+  /* ── Cursor dorado parpadeante TGP ── */
+  .aqt-cursor {
+    display: inline-block;
+    color: #C9A86C;
+    font-weight: 100;
+    margin-left: 2px;
+    animation: aqt-blink 0.85s step-end infinite;
+    transition: opacity 0.5s ease;
+  }
+  @keyframes aqt-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* ── Arquetipos: texto h1/h2/h3 heredado con transparencia extra ── */
+  .arquetipo-typing-root .cinematic-block p {
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.95) !important;
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    /* ════════════════════════════════════════════════════════════════
+       MOTOR DE POLVO DORADO TGP (idéntico a PolvoDorado.astro)
+       55 partículas, radio 0.8–3.2px, color #C9A86C / dorado
+    ════════════════════════════════════════════════════════════════ */
+    class ArquetipoPolvo {
+      constructor(canvas) {
+        this.canvas  = canvas;
+        this.ctx     = canvas.getContext('2d');
+        this.motes   = [];
+        this.raf     = null;
+        this.running = false;
+        this._resize();
+        window.addEventListener('resize', () => this._resize());
+      }
+
+      _resize() {
+        this.canvas.width  = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      }
+
+      _spawn(fromLeft = false) {
+        const w = this.canvas.width, h = this.canvas.height;
+        return {
+          x:  fromLeft ? -10 : Math.random() * w,
+          y:  Math.random() * h,
+          r:  0.8 + Math.random() * 2.4,
+          op: 0.08 + Math.random() * 0.38,
+          vx: 0.15 + Math.random() * 0.45,
+          vy: (Math.random() - 0.5) * 0.12,
+          angle: Math.random() * Math.PI * 2,
+          av:    0.004 + Math.random() * 0.014,
+          osc:   0.05  + Math.random() * 0.10,
+          flickPhase: Math.random() * Math.PI * 2,
+          flickSpeed: 0.009 + Math.random() * 0.022,
+        };
+      }
+
+      start() {
+        if (this.running) return;
+        this.running = true;
+        this.motes = Array.from({ length: 55 }, () => this._spawn());
+        this._loop();
+      }
+
+      _loop() {
+        if (!this.running) return;
+        const { ctx, canvas, motes } = this;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        motes.forEach(m => {
+          m.x += m.vx;
+          m.y += m.vy + Math.sin(m.angle) * m.osc;
+          m.angle += m.av;
+          m.flickPhase += m.flickSpeed;
+          if (m.x > canvas.width + 14) Object.assign(m, this._spawn(true));
+
+          const flick   = 1 + 0.15 * Math.sin(m.flickPhase);
+          const finalOp = Math.min(1, m.op * flick);
+          const grad    = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r * 2.5);
+          grad.addColorStop(0,   `rgba(201, 168, 108, ${finalOp})`);
+          grad.addColorStop(0.4, `rgba(223, 202, 157, ${(finalOp * 0.55).toFixed(3)})`);
+          grad.addColorStop(1,   'rgba(201, 168, 108, 0)');
+
+          ctx.beginPath();
+          ctx.fillStyle = grad;
+          ctx.arc(m.x, m.y, m.r * 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        this.raf = requestAnimationFrame(() => this._loop());
+      }
+
+      stop() {
+        this.running = false;
+        if (this.raf) cancelAnimationFrame(this.raf);
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       TIPEADO WORD-BY-WORD CINEMÁTICO TGP
+       Idéntico al comportamiento de CinematicEssayReader.astro:
+         - IntersectionObserver dispara por bloque
+         - Cada palabra emerge con clase .aqt-revealed (75ms/palabra)
+         - Cursor dorado parpadea y se apaga al terminar el bloque
+    ════════════════════════════════════════════════════════════════ */
+    function wrapWordsInCinematicBlocks(root) {
+      const blocks = root.querySelectorAll('.cinematic-block');
+      blocks.forEach(block => {
+        if (block.dataset.aqtInit === 'true') return;
+        block.dataset.aqtInit = 'true';
+
+        // Sólo los <p> directos del bloque cinemático
+        const paragraphs = block.querySelectorAll('p');
+        paragraphs.forEach(para => {
+          // No procesar si ya fue wrapeado
+          if (para.querySelector('.aqt-word')) return;
+
+          const originalText = para.innerHTML;
+          // Tokenizar preservando HTML interior (negritas, cursivas, spans)
+          // Estrategia: dividir por espacios preservando etiquetas HTML abiertas/cerradas
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = originalText;
+          const textContent = tempDiv.textContent || tempDiv.innerText || '';
+          const words = textContent.trim().split(/\s+/).filter(w => w.length > 0);
+
+          if (!words.length) return;
+
+          // Reconstruir con spans para cada palabra (usando textContent simple)
+          // Para no romper el HTML interior, re-procesamos el innerHTML tokenizando nodos de texto
+          const newHtml = words.map((w, i) =>
+            `<span class="aqt-word" data-wi="${i}">${w}</span>`
+          ).join('\u00A0');
+
+          para.innerHTML = newHtml;
+
+          // Agregar cursor al final
+          const cursor = document.createElement('span');
+          cursor.className = 'aqt-cursor';
+          cursor.setAttribute('aria-hidden', 'true');
+          cursor.textContent = '|';
+          para.appendChild(cursor);
+        });
+      });
+    }
+
+    function initArquetipoTyping(root) {
+      const blocks = root.querySelectorAll('.cinematic-block');
+      const TYPING_DELAY_MS = 72;
+
+      blocks.forEach(block => {
+        const words  = Array.from(block.querySelectorAll('.aqt-word'));
+        const cursor = block.querySelector('.aqt-cursor');
+        if (!words.length) return;
+
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            observer.unobserve(block);
+
+            words.forEach((w, i) => {
+              setTimeout(() => w.classList.add('aqt-revealed'), i * TYPING_DELAY_MS);
+            });
+
+            const totalTime = words.length * TYPING_DELAY_MS + 700;
+            setTimeout(() => {
+              if (cursor) cursor.style.opacity = '0';
+            }, totalTime);
+          });
+        }, { threshold: 0.12 });
+
+        observer.observe(block);
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       INICIALIZACIÓN GLOBAL
+    ════════════════════════════════════════════════════════════════ */
+    function initArquetipoRespiro() {
+      // 0. Fondo hero del post: leer el src de la imagen del InteriorHero ya renderizada
+      //    y aplicarla como background-image fijo al body (más confiable que SSR con ImageMetadata)
+      const postArticle = document.getElementById('post-article');
+      if (postArticle && postArticle.dataset.isArquetipo === 'true') {
+        // Obtener la imagen del InteriorHero ya renderizada en el DOM
+        const heroImg = document.querySelector('.interior-hero-image');
+        const imgSrc = heroImg
+          ? (heroImg.currentSrc || heroImg.getAttribute('src') || '')
+          : (postArticle.dataset.heroBg || '');
+        const imgPos = postArticle.dataset.imagePosition || 'center center';
+
+        if (imgSrc) {
+          document.body.classList.add('arquetipo-body-mode');
+          const overlay = document.getElementById('arquetipo-overlay');
+          if (overlay) {
+            // Imagen + gradiente de oscurecimiento cinemático combinados
+            overlay.style.background = [
+              `linear-gradient(to bottom, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0.80) 55%, rgba(10,10,12,0.97) 100%)`,
+              `url("${imgSrc}") ${imgPos} / cover fixed`
+            ].join(', ');
+          }
+        }
+      }
+
+      // 1. Polvo dorado
+      const canvas = document.getElementById('arquetipo-polvo-canvas');
+      if (canvas && !canvas.dataset.pdInit) {
+        canvas.dataset.pdInit = 'true';
+        const dust = new ArquetipoPolvo(canvas);
+        dust.start();
+      }
+
+      // 2. Tipeado word-by-word
+      const typingRoot = document.querySelector('.arquetipo-typing-root');
+      if (typingRoot && !typingRoot.dataset.aqtGlobalInit) {
+        typingRoot.dataset.aqtGlobalInit = 'true';
+        wrapWordsInCinematicBlocks(typingRoot);
+        initArquetipoTyping(typingRoot);
+      }
+    }
+
+    document.addEventListener('astro:page-load', initArquetipoRespiro);
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      initArquetipoRespiro();
+    } else {
+      document.addEventListener('DOMContentLoaded', initArquetipoRespiro);
+    }
+
+    // Limpiar init flags al navegar (View Transitions)
+    document.addEventListener('astro:before-swap', () => {
+      const canvas = document.getElementById('arquetipo-polvo-canvas');
+      if (canvas) canvas.dataset.pdInit = '';
+      const typingRoot = document.querySelector('.arquetipo-typing-root');
+      if (typingRoot) {
+        typingRoot.dataset.aqtGlobalInit = '';
+        typingRoot.querySelectorAll('.cinematic-block').forEach(b => {
+          b.dataset.aqtInit = '';
+        });
+      }
+      // Limpiar clase del body para no contaminar otras páginas
+      document.body.classList.remove('arquetipo-body-mode');
+    });
+  })();
 </script>

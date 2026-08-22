@@ -2,6 +2,15 @@ import 'dotenv/config';
 import type { APIRoute } from 'astro';
 import { GoogleGenAI } from '@google/genai';
 import { SYSTEM_PROMPT_HISTORIA_SIMBOLICA_TGP } from '../config/prompts/prompt-historia-simbolica-tgp';
+import { AGENTE_ERUDITO_ACADEMICO_PROMPT } from '../config/geminiPrompts';
+
+// El system prompt combina el rigor académico + las reglas de formato Markdown estricto
+const SISTEMA_ARQUETIPOS = `${SYSTEM_PROMPT_HISTORIA_SIMBOLICA_TGP}
+
+---
+
+REGLAS ADICIONALES DE FORMATO Y REDACCIÓN (AGENTE ERUDITO ACADÉMICO):
+${AGENTE_ERUDITO_ACADEMICO_PROMPT}`;
 
 export const prerender = false;
 
@@ -27,7 +36,7 @@ Aplica estrictamente todas las reglas de los 10 puntos, dividiendo el análisis 
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       config: {
         responseMimeType: 'application/json',
-        systemInstruction: SYSTEM_PROMPT_HISTORIA_SIMBOLICA_TGP,
+        systemInstruction: SISTEMA_ARQUETIPOS,
       }
     });
 
@@ -48,13 +57,22 @@ Aplica estrictamente todas las reglas de los 10 puntos, dividiendo el análisis 
       };
     }
 
-    // Si existen fuentes o nota de control devueltas por separado, las adjuntamos al final del contenido
-    let finalContent = parsed.content || rawText;
-    if (parsed.fuentes) {
-      finalContent += `\n\n## Fuentes & Lecturas Historiográficas\n${parsed.fuentes}`;
-    }
-    if (parsed.notaControl) {
-      finalContent += `\n\n> [!NOTE]\n> **Nota de Control de Calidad Historiográfica**\n> ${parsed.notaControl}`;
+    // Si existen fuentes devueltas por separado, las adjuntamos formateadas en lista limpia con viñetas
+    let finalContent = (parsed.content || rawText).trim();
+
+    if (parsed.fuentes && !finalContent.includes("## Fuentes")) {
+      const fuentesRaw = String(parsed.fuentes).trim();
+      let fuentesFormatted = fuentesRaw;
+      if (!fuentesRaw.startsWith('*') && !fuentesRaw.startsWith('-')) {
+        // Convertir fuentes separadas por comas o saltos en viñetas
+        fuentesFormatted = fuentesRaw
+          .split(/[\n,]+(?=[A-ZÁÉÍÓÚ][a-z]+,\s*[A-Z]\.)|(?<=\))\s*,\s*/g)
+          .map(f => f.trim())
+          .filter(Boolean)
+          .map(f => `* ${f.replace(/^\*+\s*/, '')}`)
+          .join('\n');
+      }
+      finalContent += `\n\n---\n\n## Fuentes & Lecturas Historiográficas\n\n${fuentesFormatted}`;
     }
 
     return new Response(JSON.stringify({ 

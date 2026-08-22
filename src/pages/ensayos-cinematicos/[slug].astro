@@ -3,7 +3,9 @@ import { getCollection, getEntry, render } from 'astro:content';
 import LayoutObsidiana from '../../layouts/CinematicFX/LayoutObsidiana.astro';
 import LayoutDeriva from '../../layouts/CinematicFX/LayoutDeriva.astro';
 import LayoutUmbral from '../../layouts/CinematicFX/LayoutUmbral.astro';
-import CinematicEssayReader from '../../components/CinematicEssayReader.astro';
+import { parseLLMText } from '../../lib/parseLLMText';
+import PolvoDorado from '../../components/PolvoDorado.astro';
+import PostCinematicStyle from '../../components/PostCinematicStyle.astro';
 
 export const prerender = true;
 
@@ -23,7 +25,7 @@ const { entry } = Astro.props;
 let Content: any = null;
 try {
   const contentEntry = await getEntry('ensayosCinematicosContent' as any, `${slug}/content`);
-  if (contentEntry) {
+  if (contentEntry && contentEntry.body && contentEntry.body.trim().length > 0) {
     const rendered = await render(contentEntry as any);
     Content = rendered.Content;
   }
@@ -90,8 +92,38 @@ const layoutProps = {
 };
 
 const fullEssayText = aiText || (finalFrontmatter as any).generadorTexto || '';
+const parsedHtml = parseLLMText(fullEssayText);
 ---
 
 <SelectedLayout {...layoutProps}>
-  <CinematicEssayReader text={fullEssayText} />
+  {Content ? (
+    <div class="flex flex-col gap-12 w-full">
+      <Content />
+    </div>
+  ) : (
+    <div class="flex flex-col gap-12 w-full">
+      {finalFrontmatter.excerpt && (
+        <PolvoDorado 
+          text={finalFrontmatter.excerpt} 
+          eyebrow="RESPIRO CINEMÁTICO · TGP"
+        />
+      )}
+      <PostCinematicStyle>
+        <div class="cinematic-essay-content w-full" set:html={parsedHtml} />
+      </PostCinematicStyle>
+    </div>
+  )}
 </SelectedLayout>
+
+<script>
+  import { initCinematicScroll } from '../../lib/cinematic-scroll';
+
+  document.addEventListener('astro:page-load', initCinematicScroll);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCinematicScroll);
+  } else {
+    initCinematicScroll();
+  }
+</script>
+
+
