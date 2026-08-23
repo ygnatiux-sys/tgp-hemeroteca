@@ -28,28 +28,23 @@ export default defineConfig({
       : { noExternal: true }
   },
 
-  // EL CORTE ARQUITECTÓNICO: El motor procesa las páginas, pero EXCLUIMOS explícitamente 
-  // los recursos estáticos para que Cloudflare Pages los sirva correctamente.
+  // EL CORTE ARQUITECTÓNICO: El motor procesa toda la web, pero excluye la estética
   adapter: isDev ? undefined : cloudflare({
     routes: {
       extend: {
+        include: ['/*'], // LA PIEZA FALTANTE: Obliga al Worker a renderizar la portada y la web
         exclude: [
-          // Bundles compilados por Vite (JS, CSS, assets hasheados)
           '/_astro/*',
-          // Favicons raíz
+          '/images/*',
           '/favicon.svg',
           '/favicon.png',
           '/favicon.ico',
           '/faviconTGP.png',
-          // Imagen de perfil
           '/perfil.webp',
-          // Imágenes estáticas de public/images/
-          '/images/*',
-          // Audio cinematic (public/)
           '/intro.cinematic.wav',
           '/intro_cinematic.wav',
           '/outro.cinematic.wav',
-          '/outro_cinematic.wav',
+          '/outro_cinematic.wav'
         ],
       },
     }
