@@ -1,7 +1,8 @@
+export const prerender = false;
+
 import type { APIRoute } from 'astro';
 import { GoogleGenAI } from '@google/genai';
-
-export const prerender = false;
+import { env } from 'cloudflare:workers';
 
 export const POST: APIRoute = async ({ request }) => {
   const headers = { 'Content-Type': 'application/json' };
@@ -17,15 +18,15 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const API_KEY = import.meta.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
-    if (!API_KEY) {
+    const geminiKey = (env as any)?.GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
+    if (!geminiKey) {
       return new Response(
         JSON.stringify({ success: false, error: 'GEMINI_API_KEY no encontrada en el servidor.' }),
         { status: 500, headers }
       );
     }
 
-    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    const ai = new GoogleGenAI({ apiKey: geminiKey });
 
     const response = await ai.models.generateContent({
       model: 'gemini-3.6-flash',
@@ -40,7 +41,7 @@ User Concept: "${conceptoBase}"`
         }]
       }],
       config: {
-        systemInstruction: "You are a prompt engineering assistant specializing in subject isolation. Output purely the physical subject description in concise, vivid English."
+        systemInstruction: 'You are a prompt engineering assistant specializing in subject isolation. Output purely the physical subject description in concise, vivid English.'
       }
     });
 

@@ -1,4 +1,7 @@
+export const prerender = false;
+
 import type { APIRoute } from 'astro';
+import { env } from 'cloudflare:workers';
 import {
   resolveIntelligentDirection,
   resolveManualDirection,
@@ -6,10 +9,8 @@ import {
   buildFinalImagePrompt,
   generateImageWithGemini,
   adaptLegacyToV2Intelligent,
-} from '../lib/arte-tgp';
-import type { IntelligentDirectorInput, ManualLabInput, ResolvedArtDirection } from '../lib/arte-tgp/types';
-
-export const prerender = false;
+} from '../../lib/arte-tgp';
+import type { IntelligentDirectorInput, ManualLabInput, ResolvedArtDirection } from '../../lib/arte-tgp/types';
 
 export const POST: APIRoute = async ({ request }) => {
   const headers = { 'Content-Type': 'application/json' };
@@ -17,6 +18,14 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const data = await request.json();
     const slug = data.slug || null;
+
+    const geminiKey = (env as any)?.GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
+    if (!geminiKey) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Falta GEMINI_API_KEY en las variables de entorno de Cloudflare / servidor.',
+      }), { status: 500, headers });
+    }
 
     let resolvedDirection: ResolvedArtDirection | null = null;
     let finalPrompt = data.prompt || '';
@@ -34,6 +43,7 @@ export const POST: APIRoute = async ({ request }) => {
       finalPrompt = await buildFinalImagePrompt({
         direction: resolvedDirection,
         useLLM: true,
+        apiKey: geminiKey,
       });
     } else if (data.mode === 'manual' && data.manualInput) {
       // MODO LABORATORIO MANUAL V2
@@ -44,6 +54,7 @@ export const POST: APIRoute = async ({ request }) => {
       finalPrompt = await buildFinalImagePrompt({
         direction: resolvedDirection,
         useLLM: false, // En modo manual se respeta estrictamente la síntesis directa
+        apiKey: geminiKey,
       });
     } else if (data.style && data.titulo) {
       // MODO LEGACY ADAPTADO A V2
@@ -54,11 +65,15 @@ export const POST: APIRoute = async ({ request }) => {
       finalPrompt = await buildFinalImagePrompt({
         direction: resolvedDirection,
         useLLM: true,
+        apiKey: geminiKey,
       });
     }
 
     if (!finalPrompt && !resolvedDirection) {
-      throw new Error('No se proporcionó un prompt ni configuración de dirección de arte.');
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'No se proporcionó un prompt ni configuración de dirección de arte.',
+      }), { status: 400, headers });
     }
 
     // ==============================================================
@@ -70,6 +85,7 @@ export const POST: APIRoute = async ({ request }) => {
       prompt: finalPrompt,
       aspectRatio,
       slug,
+      apiKey: geminiKey,
     });
 
     if (!imageResult.success || !imageResult.image) {

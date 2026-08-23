@@ -1,8 +1,8 @@
-import 'dotenv/config';
+export const prerender = false;
+
 import type { APIRoute } from 'astro';
 import { GoogleGenAI } from '@google/genai';
-
-export const prerender = false;
+import { env } from 'cloudflare:workers';
 
 function sanitizeAndParseJson(rawText: string, lugar: string) {
   let clean = rawText.trim();
@@ -15,7 +15,6 @@ function sanitizeAndParseJson(rawText: string, lugar: string) {
   try {
     return JSON.parse(clean);
   } catch (err) {
-    // Intento de extracción con regex de campos individuales si el JSON está malformado
     const extractField = (fieldName: string) => {
       const match = clean.match(new RegExp(`"${fieldName}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*})`));
       return match ? match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : null;
@@ -36,7 +35,6 @@ function sanitizeAndParseJson(rawText: string, lugar: string) {
       };
     }
 
-    // Si todo falla, asegurar que informeMarkdown no sea un JSON crudo
     let pureMarkdown = clean;
     if (pureMarkdown.includes('informeMarkdown":')) {
       const splitPart = pureMarkdown.split('"informeMarkdown":');
@@ -68,12 +66,12 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Debes proporcionar un lugar o tema válido para la Georreferencia Arqueosemiótica.' }), { status: 400, headers });
     }
 
-    const API_KEY = import.meta.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
-    if (!API_KEY) {
+    const geminiKey = (env as any)?.GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
+    if (!geminiKey) {
       return new Response(JSON.stringify({ error: 'Falta GEMINI_API_KEY en las variables de entorno del servidor.' }), { status: 500, headers });
     }
 
-    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    const ai = new GoogleGenAI({ apiKey: geminiKey });
 
     const prompt = `Actúa como el Investigador Senior y Cartógrafo Epistémico del proyecto TGP (The Great Puzzle Project).
 Generá un informe completo, riguroso, erudito y neutral de "Georreferencias Arqueosemióticas" para el lugar o sitio: "${lugar}".
@@ -105,7 +103,6 @@ Devolvé ESTRICTAMENTE un JSON válido con esta estructura exacta (sin texto fue
 
     const parsed = sanitizeAndParseJson(rawText, lugar);
 
-    // Asegurar que informeMarkdown sea exclusivamente texto markdown limpio
     let cleanInforme = parsed.informeMarkdown || '';
     if (cleanInforme.trim().startsWith('{') && cleanInforme.includes('informeMarkdown')) {
       const nested = sanitizeAndParseJson(cleanInforme, lugar);
@@ -122,9 +119,8 @@ Devolvé ESTRICTAMENTE un JSON válido con esta estructura exacta (sin texto fue
     }), { status: 200, headers });
 
   } catch (error: any) {
-    console.warn('[Aviso] Caída o fallo en API Gemini para georreferencias. Usando fallback de contingencia local:', error.message);
+    console.warn('[Aviso] Fallo en API Gemini para georreferencias. Usando fallback:', error.message);
     
-    // FALLBACK DE CONTINGENCIA ANTE CAÍDAS DE RED/API
     const lugar = body?.lugar || 'Sitio Geohistórico';
     const fallbackResponse = {
       success: true,

@@ -25,14 +25,10 @@ const agenteEruditoField = {
 };
 
 export default config({
-  storage:
-    process.env.NODE_ENV === 'development'
-      ? { kind: 'local' }
-      : {
-          kind: 'github',
-          repo: 'ygnatiux-sys/tgp-hemeroteca',
-          branchPrefix: 'tgp-cms/',
-        },
+  storage: {
+    kind: 'github',
+    repo: 'ygnatiux-sys/tgp-hemeroteca',
+  },
   collections: {
     ensayos: collection({
       label: 'Ensayos',

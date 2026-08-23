@@ -67,12 +67,7 @@ export default defineConfig({
       hooks: {
         'astro:config:setup': ({ injectRoute, command }) => {
           if (command === 'dev' || isDev) {
-            injectRoute({ pattern: '/api/generar-tgp', entrypoint: './src/api/_generar-tgp.ts' });
-            injectRoute({ pattern: '/api/generar-sujeto', entrypoint: './src/api/_generar-sujeto.ts' });
-            injectRoute({ pattern: '/api/generar-arte', entrypoint: './src/api/_generar-arte.ts' });
             injectRoute({ pattern: '/api/guardar-ensayo', entrypoint: './src/api/_guardar-ensayo.ts' });
-            injectRoute({ pattern: '/api/generar-georreferencia', entrypoint: './src/api/_generar-georreferencia.ts' });
-            injectRoute({ pattern: '/api/generar-arquetipo', entrypoint: './src/api/_generar-arquetipo.ts' });
             injectRoute({ pattern: '/api/guardar-georreferencia', entrypoint: './src/api/_guardar-georreferencia.ts' });
             injectRoute({ pattern: '/api/agente-erudito', entrypoint: './src/api/agente-erudito.ts' });
           }

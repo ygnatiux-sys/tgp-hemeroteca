@@ -1,10 +1,8 @@
-import 'dotenv/config';
+export const prerender = false;
+
 import type { APIRoute } from 'astro';
 import { GoogleGenAI } from '@google/genai';
-import fs from 'fs';
-import path from 'path';
-
-export const prerender = false;
+import { env } from 'cloudflare:workers';
 
 const CATEGORIAS_TGP = [
   'Historia', 'Antropología', 'Sociología', 'Arqueología', 'Historia Antigua',
@@ -16,6 +14,9 @@ const CATEGORIAS_TGP = [
   'Biografías', 'Dossiers', 'Cahiers', 'Ensayos', 'Bitácora'
 ];
 
+// Carga estática bundled de estilos visuales para compatibilidad total con Cloudflare Workers
+const visualStyles = import.meta.glob<{ default: any }>('/src/content/estilos-visuales/*.json', { eager: true });
+
 export const POST: APIRoute = async ({ request }) => {
   const headers = { 'Content-Type': 'application/json' };
 
@@ -23,36 +24,40 @@ export const POST: APIRoute = async ({ request }) => {
     const body = await request.json();
     const { titulo, generarImagen, estilo } = body;
 
-    if (!titulo) return new Response(JSON.stringify({ error: 'Falta el título.' }), { status: 400, headers });
-    
-    const API_KEY = import.meta.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
-    if (!API_KEY) return new Response(JSON.stringify({ error: 'Falta GEMINI_API_KEY en el servidor.' }), { status: 500, headers });
+    if (!titulo) {
+      return new Response(JSON.stringify({ error: 'Falta el título.' }), { status: 400, headers });
+    }
 
-    // Inicializamos el nuevo SDK unificado (v1.0+)
-    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    const geminiKey = (env as any)?.GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
+    if (!geminiKey) {
+      return new Response(JSON.stringify({ error: 'Falta GEMINI_API_KEY en las variables de entorno de Cloudflare / servidor.' }), { status: 500, headers });
+    }
+
+    const ai = new GoogleGenAI({ apiKey: geminiKey });
 
     // --- BIFURCACIÓN LÓGICA OBLIGATORIA (Ruteo de API) ---
     if (generarImagen) {
       try {
-        let finalImagePrompt = "";
+        let finalImagePrompt = '';
         
-        // Cargar estilo dinámico desde la colección direccionArte
-        const stylePath = path.join(process.cwd(), 'src', 'content', 'estilos-visuales', `${estilo}.json`);
-        
-        let styleConfig;
-        if (fs.existsSync(stylePath)) {
-          const fileContent = fs.readFileSync(stylePath, 'utf-8');
-          styleConfig = JSON.parse(fileContent);
-          
-          // Ensamblaje de Micro-Dirección
-          finalImagePrompt = `${styleConfig.formatoCamara} Subject: ${titulo}. ${styleConfig.iluminacion} ${styleConfig.colorTextura} ${styleConfig.descripcionEstetica}`;
+        // Cargar estilo dinámico desde la colección
+        let styleConfig: any = null;
+        if (estilo) {
+          for (const [pathKey, module] of Object.entries(visualStyles)) {
+            if (pathKey.endsWith(`/${estilo}.json`)) {
+              styleConfig = (module as any).default || module;
+              break;
+            }
+          }
+        }
+
+        if (styleConfig) {
+          finalImagePrompt = `${styleConfig.formatoCamara || ''} Subject: ${titulo}. ${styleConfig.iluminacion || ''} ${styleConfig.colorTextura || ''} ${styleConfig.descripcionEstetica || ''}`.trim();
         } else {
-          // Fallback por si el estilo no existe o es una atmósfera antigua
           finalImagePrompt = `Cinematic conceptual photography. Subject: ${titulo}. Moody lighting, sharp focus, photorealistic film still.`;
         }
 
-        // Inyectamos instrucción de formato 16:9 explícita
-        finalImagePrompt += " --ar 16:9, panoramic wide shot, landscape orientation";
+        finalImagePrompt += ' --ar 16:9, panoramic wide shot, landscape orientation';
 
         // --- PASO A: EL DIRECTOR DE ARTE (Gemini 3.6 Flash) ---
         const responseDirector = await ai.models.generateContent({
@@ -87,9 +92,8 @@ export const POST: APIRoute = async ({ request }) => {
           } as any,
         });
 
-        // Extracción de la imagen nativa del payload de la Serie 3
         const candidate = responseImagen.candidates?.[0];
-        const imagePart = candidate?.content?.parts?.find(p => p.inlineData);
+        const imagePart = candidate?.content?.parts?.find((p: any) => p.inlineData);
 
         if (imagePart?.inlineData?.data) {
           const imageUrl = `data:image/jpeg;base64,${imagePart.inlineData.data}`;
@@ -103,7 +107,7 @@ export const POST: APIRoute = async ({ request }) => {
             success: true, 
             imageUrl: null, 
             imagePrompt: detailedPrompt,
-            warning: "El modelo de materialización no devolvió bytes de imagen. Se muestra la dirección de arte." 
+            warning: 'El modelo de materialización no devolvió bytes de imagen. Se muestra la dirección de arte.' 
           }), { status: 200, headers });
         }
 
@@ -132,13 +136,12 @@ Devuelve estrictamente un JSON válido con esta estructura:
         });
 
         const rawText = responseTexto.text?.trim() || '';
-        if (!rawText) throw new Error("El motor de texto no devolvió contenido.");
+        if (!rawText) throw new Error('El motor de texto no devolvió contenido.');
 
         let parsed: any = {};
         try {
           parsed = JSON.parse(rawText);
         } catch (e) {
-          // Fallback por si no vino en JSON puro
           parsed = {
             content: rawText,
             excerpt: rawText.slice(0, 220) + '...',
