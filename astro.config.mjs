@@ -30,6 +30,9 @@ export default defineConfig({
 
   // EL CORTE ARQUITECTÓNICO: Worker SSR maneja el sitio, CDN sirve los estáticos
   adapter: isDev ? undefined : cloudflare({
+    platformProxy: {
+      enabled: false
+    },
     routes: {
       extend: {
         exclude: [
