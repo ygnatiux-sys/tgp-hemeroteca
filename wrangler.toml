@@ -2,5 +2,9 @@ name = "tgp-hemeroteca"
 compatibility_date = "2026-08-22"
 compatibility_flags = [ "nodejs_compat", "global_fetch_strictly_public" ]
 
+[[kv_namespaces]]
+binding = "SESSION"
+id = "5792b625de48422e875b04c7948546b6"
+
 [observability]
 enabled = true
