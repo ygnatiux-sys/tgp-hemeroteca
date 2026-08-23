@@ -376,113 +376,206 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
 
       {/* PREVIEW DEL ARTE GENERADO */}
       {arteResult && arteResult.imageUrl && (
-        <div className="mb-5 p-4 bg-black/40 border border-amber-500/20 rounded-xl">
+        <div 
+          className="mb-5 p-4 rounded-xl border"
+          style={{
+            backgroundColor: '#0c100e',
+            borderColor: 'rgba(245, 158, 11, 0.25)',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.4)'
+          }}
+        >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-metadata uppercase tracking-wider text-amber-400 font-bold">
-              ✦ Portada Materializada por IA
+            <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-2">
+              <span>✦</span> Portada Materializada por IA
             </span>
             {arteResult.resolvedDirection?.nombreEstilo && (
-              <span className="text-[10px] font-metadata text-white/50 px-2 py-0.5 bg-white/5 rounded">
+              <span className="text-[10px] font-mono text-stone-400 px-2 py-0.5 bg-white/5 rounded border border-white/10">
                 Estilo: {arteResult.resolvedDirection.nombreEstilo}
               </span>
             )}
           </div>
-          <div className="flex gap-4 items-start">
+          <div className="flex flex-col sm:flex-row gap-4 items-start">
             <img
               src={arteResult.imageUrl}
               alt="Portada IA"
-              className="w-48 h-28 object-cover rounded-lg border border-white/10 shadow-lg"
+              className="w-full sm:w-52 h-32 object-cover rounded-lg border border-white/10 shadow-lg"
+              style={{ maxHeight: '140px' }}
             />
-            <div className="text-xs text-stone-400 space-y-1.5 overflow-hidden">
-              <p className="line-clamp-2 text-stone-300"><strong className="text-white/60 font-metadata">Concepto:</strong> {arteResult.brief}</p>
-              <p className="line-clamp-2 text-[11px] text-white/40"><strong className="text-white/50 font-metadata">Prompt:</strong> {arteResult.imagePrompt}</p>
+            <div className="text-xs text-stone-300 space-y-2 overflow-hidden flex-1">
+              <p className="line-clamp-2 text-stone-200">
+                <strong className="text-amber-400/80 font-mono uppercase text-[11px] block">Concepto Curatorial:</strong> 
+                {arteResult.brief}
+              </p>
+              <p className="line-clamp-2 text-[11px] text-stone-400 font-mono bg-black/40 p-2 rounded border border-white/5">
+                <strong className="text-stone-500 uppercase text-[10px] block">Prompt de Imagen:</strong> 
+                {arteResult.imagePrompt}
+              </p>
             </div>
           </div>
         </div>
       )}
 
       {errorMsg && (
-        <div className="p-3.5 mb-5 bg-red-950/60 border border-red-500/30 rounded-lg text-red-300 text-xs font-metadata">
-          {errorMsg}
+        <div 
+          className="p-3.5 mb-5 rounded-lg text-red-300 text-xs font-mono border"
+          style={{ backgroundColor: '#200808', borderColor: '#ef4444' }}
+        >
+          <strong>⚠️ Error:</strong> {errorMsg}
         </div>
       )}
 
-      {/* FIELD DE PREVISUALIZACIÓN DE OUTPUT (LIVE OUTPUT PREVIEW) */}
-      {(informe || volantaIA || excerptIA) && (
-        <div className="space-y-4 pt-4 border-t border-white/10">
-          <div className="flex items-center justify-between">
+      {/* CAJA DE PREVISUALIZACIÓN Y AUDITORÍA DEL TEXTO GENERADO (LIVE PREVIEW & AUDIT BOX) */}
+      {informe && (
+        <div 
+          className="mb-5 p-5 rounded-xl border transition-all"
+          style={{
+            backgroundColor: '#0a0e0d',
+            borderColor: 'rgba(245, 158, 11, 0.35)',
+            boxShadow: '0 8px 30px rgba(0, 0, 0, 0.5)'
+          }}
+        >
+          {/* Header de la caja de auditoría */}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3 mb-4">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-metadata uppercase tracking-wider text-amber-400 font-bold">
-                Lienzo de Output & Previsualización
+              <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-1.5">
+                <span>📜</span> Previsualización del Ensayo Erudito
               </span>
-              <div className="flex bg-black/40 p-0.5 rounded-lg border border-white/10">
+              <span 
+                className="text-[10px] font-mono px-2 py-0.5 rounded-full border"
+                style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)', borderColor: 'rgba(245, 158, 11, 0.3)', color: '#fbbf24' }}
+              >
+                {informe.length.toLocaleString()} caracteres · {informe.trim().split(/\s+/).filter(Boolean).length} palabras
+              </span>
+            </div>
+
+            {/* Pestañas de modo de visualización */}
+            <div className="flex items-center gap-2">
+              <div className="flex bg-black/50 p-0.5 rounded-lg border border-white/10 text-xs">
                 <button
                   type="button"
                   onClick={() => setActiveTab('preview')}
-                  className={`px-2.5 py-1 rounded text-[10px] font-metadata uppercase tracking-wider transition-all ${
-                    activeTab === 'preview' ? 'bg-amber-500/30 text-amber-300 font-bold' : 'text-white/40 hover:text-white'
+                  className={`px-3 py-1 rounded text-[11px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
+                    activeTab === 'preview' 
+                      ? 'bg-amber-500/30 text-amber-300 font-bold border border-amber-500/40' 
+                      : 'text-stone-400 hover:text-white'
                   }`}
                 >
-                  👁️ Previsualización Live
+                  👁️ Lectura
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab('raw')}
-                  className={`px-2.5 py-1 rounded text-[10px] font-metadata uppercase tracking-wider transition-all ${
-                    activeTab === 'raw' ? 'bg-amber-500/30 text-amber-300 font-bold' : 'text-white/40 hover:text-white'
+                  className={`px-3 py-1 rounded text-[11px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
+                    activeTab === 'raw' 
+                      ? 'bg-amber-500/30 text-amber-300 font-bold border border-amber-500/40' 
+                      : 'text-stone-400 hover:text-white'
                   }`}
                 >
-                  📝 Markdown Raw
+                  ✏️ Editor / Raw
                 </button>
               </div>
-            </div>
 
-            <button
-              type="button"
-              onClick={() => syncFieldsToKeystaticDOM(volantaIA, categoryIA, excerptIA)}
-              className="px-3 py-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 rounded text-xs font-metadata transition-all cursor-pointer shadow-sm"
-            >
-              Traspasar Todo a Keystatic
-            </button>
+              {/* Botón copiar al portapapeles */}
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(informe);
+                  alert('✓ Ensayo copiado al portapapeles.');
+                }}
+                className="px-2.5 py-1 bg-white/5 hover:bg-white/15 text-stone-300 rounded border border-white/10 text-[11px] font-mono transition-all cursor-pointer"
+                title="Copiar texto completo"
+              >
+                📋 Copiar
+              </button>
+            </div>
           </div>
 
-          {volantaIA && (
-            <div className="p-3 bg-black/40 border border-white/10 rounded-lg">
-              <span className="block text-[10px] font-metadata uppercase tracking-wider text-white/40 mb-1">
-                Volanta Sugerida
-              </span>
-              <p className="font-metadata text-xs text-amber-300 font-bold">{volantaIA}</p>
-            </div>
-          )}
-
-          {excerptIA && (
-            <div className="p-3 bg-black/40 border border-white/10 rounded-lg">
-              <span className="block text-[10px] font-metadata uppercase tracking-wider text-white/40 mb-1">
-                Excerpt / Sinopsis Sugerida (2-4 Renglones)
-              </span>
-              <p className="font-serif italic text-xs text-stone-300 leading-relaxed">{excerptIA}</p>
-            </div>
-          )}
-
-          {/* LIENZO DE PREVISUALIZACIÓN DE OUTPUT */}
-          {informe && (
-            <div className="border border-white/15 rounded-xl bg-[#0e0f0e] p-5 shadow-inner">
-              {activeTab === 'preview' ? (
-                <div className="prose prose-invert max-w-none space-y-4 font-serif text-sm text-stone-300 leading-relaxed">
-                  <div className="p-3 bg-amber-500/10 border-l-2 border-amber-500 text-amber-200 text-xs font-metadata mb-4">
-                    <strong>Informe Arquetípico Generado:</strong> {informe.length} caracteres · 10 Fases Historiográficas
-                  </div>
-                  <div className="whitespace-pre-wrap font-sans text-stone-300 text-xs md:text-sm leading-relaxed">
-                    {informe}
-                  </div>
+          {/* Sugerencias de Volanta y Excerpt si existen */}
+          {(volantaIA || excerptIA) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+              {volantaIA && (
+                <div className="p-3 bg-black/40 border border-white/10 rounded-lg">
+                  <span className="block text-[10px] font-mono uppercase tracking-wider text-amber-400/70 mb-1">
+                    Volanta Sugerida
+                  </span>
+                  <p className="font-mono text-xs text-amber-300 font-bold">{volantaIA}</p>
                 </div>
-              ) : (
-                <div className="p-4 bg-black/60 border border-white/10 rounded-lg max-h-96 overflow-y-auto font-metadata text-xs text-stone-300 leading-relaxed whitespace-pre-wrap">
-                  {informe}
+              )}
+              {excerptIA && (
+                <div className="p-3 bg-black/40 border border-white/10 rounded-lg">
+                  <span className="block text-[10px] font-mono uppercase tracking-wider text-amber-400/70 mb-1">
+                    Excerpt / Sinopsis Sugerida
+                  </span>
+                  <p className="font-serif italic text-xs text-stone-300 leading-relaxed">{excerptIA}</p>
                 </div>
               )}
             </div>
           )}
+
+          {/* Contenedor de Scroll / Auditoría Visual */}
+          {activeTab === 'preview' ? (
+            <div 
+              className="p-5 rounded-lg border overflow-y-auto"
+              style={{
+                backgroundColor: '#060807',
+                borderColor: 'rgba(255, 255, 255, 0.08)',
+                maxHeight: '440px',
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(245, 158, 11, 0.4) transparent'
+              }}
+            >
+              <div 
+                className="font-serif text-stone-200 text-sm leading-relaxed whitespace-pre-wrap selection:bg-amber-500/30"
+                style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", serif', lineHeight: '1.8' }}
+              >
+                {informe}
+              </div>
+            </div>
+          ) : (
+            <div className="relative">
+              <textarea
+                value={informe}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setInforme(val);
+                  onChange(val); // Persistencia reactiva a Keystatic
+                  pendingRef.current.content = val;
+                  saveToLocalBackup({ informe: val });
+                }}
+                className="w-full p-4 rounded-lg font-mono text-xs text-stone-200 border focus:outline-none transition-all"
+                style={{
+                  backgroundColor: '#060807',
+                  borderColor: 'rgba(245, 158, 11, 0.3)',
+                  height: '400px',
+                  resize: 'vertical',
+                  lineHeight: '1.6'
+                }}
+                placeholder="El texto del ensayo aparecerá aquí..."
+              />
+              <span className="absolute bottom-3 right-3 text-[10px] font-mono text-stone-500 bg-black/70 px-2 py-0.5 rounded border border-white/5">
+                Edición en vivo habilitada
+              </span>
+            </div>
+          )}
+
+          {/* Barra inferior de estado y sincronización */}
+          <div className="flex flex-wrap items-center justify-between gap-3 mt-4 pt-3 border-t border-white/10 text-xs">
+            <span className="text-emerald-400 font-mono text-[11px] flex items-center gap-1.5">
+              <span>✓</span> Texto sincronizado con Keystatic (listo para guardar)
+            </span>
+
+            <button
+              type="button"
+              onClick={() => {
+                onChange(informe);
+                syncFieldsToKeystaticDOM(volantaIA, categoryIA, excerptIA);
+                alert('✦ Texto, volanta y excerpt sincronizados exitosamente con el formulario de Keystatic.');
+              }}
+              className="px-3.5 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 rounded-lg text-xs font-mono uppercase tracking-wider transition-all cursor-pointer font-bold shadow-sm"
+            >
+              Re-Sincronizar con Formulario
+            </button>
+          </div>
         </div>
       )}
     </div>
