@@ -34,7 +34,9 @@ export default defineConfig({
       extend: {
         include: ['/*'], // LA PIEZA FALTANTE: Obliga al Worker a renderizar la portada y la web
         exclude: [
+          // Bundles Vite (CSS, JS, assets hasheados)
           '/_astro/*',
+          // Imágenes y recursos estáticos de public/
           '/images/*',
           '/favicon.svg',
           '/favicon.png',
@@ -44,7 +46,19 @@ export default defineConfig({
           '/intro.cinematic.wav',
           '/intro_cinematic.wav',
           '/outro.cinematic.wav',
-          '/outro_cinematic.wav'
+          '/outro_cinematic.wav',
+          // Páginas prerenderizadas (output: static) — el Worker no debe interceptarlas
+          '/colecciones',
+          '/colecciones/*',
+          '/hemeroteca/*',
+          '/papers',
+          '/papers/*',
+          '/ensayos-cinematicos/*',
+          '/codice',
+          '/archivo',
+          '/about',
+          '/manifiesto',
+          '/404',
         ],
       },
     }
