@@ -24,8 +24,8 @@ const agenteEruditoField = {
   reader: { parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')) },
 };
 
-// Detecta automáticamente si estás en tu PC o en la nube de Cloudflare
-const isLocal = process.env.NODE_ENV !== 'production';
+// Detecta de forma nativa en Astro si estás en modo local o en producción
+const isLocal = import.meta.env.DEV;
 
 export default config({
   storage: isLocal 
