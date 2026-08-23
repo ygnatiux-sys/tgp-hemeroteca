@@ -24,11 +24,14 @@ const agenteEruditoField = {
   reader: { parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')) },
 };
 
+// Detecta automáticamente si estás en tu PC o en la nube de Cloudflare
+const isLocal = process.env.NODE_ENV !== 'production';
+
 export default config({
-  storage: {
-    kind: 'github',
-    repo: 'ygnatiux-sys/tgp-hemeroteca',
-  },
+  storage: isLocal 
+    ? { kind: 'local' } // Si estás en tu PC, guarda en el disco duro sin pedir contraseñas.
+    : { kind: 'github', repo: 'ygnatiux-sys/tgp-hemeroteca' }, // Si estás en la nube, usa GitHub.
+    
   collections: {
     ensayos: collection({
       label: 'Ensayos',
