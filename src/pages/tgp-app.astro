@@ -1,0 +1,39 @@
+---
+export const prerender = true;
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="TGP Scriptorium | Panel de Control">
+  <main class="min-h-screen bg-[#0b0f0e] text-[#d4d4d2] flex flex-col items-center justify-center p-6">
+    <div class="max-w-xl w-full border border-[#263231] bg-[#111716] p-8 rounded-lg shadow-2xl backdrop-blur-md">
+      <header class="mb-8 text-center border-b border-[#263231] pb-6">
+        <span class="text-xs uppercase tracking-widest text-[#8a9a98] font-mono">Cartografía Epistémica & Ediciones</span>
+        <h1 class="text-3xl font-serif font-light text-[#f0f2f1] mt-2">TGP Scriptorium</h1>
+      </header>
+
+      <div class="space-y-4">
+        <a 
+          href="/keystatic" 
+          class="block p-4 border border-[#263231] hover:border-[#4a5a58] bg-[#161d1c] hover:bg-[#1c2423] transition-all rounded group"
+        >
+          <h2 class="text-lg font-serif text-[#f0f2f1] group-hover:text-white">Hemeroteca (Main Web)</h2>
+          <p class="text-sm text-[#8a9a98] mt-1">Gestionar ensayos, arquetipos y sitios arqueohistóricos.</p>
+        </a>
+
+        <a 
+          href="https://ediciones.thegreatpuzzleproject.com/keystatic" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="block p-4 border border-[#263231] hover:border-[#4a5a58] bg-[#161d1c] hover:bg-[#1c2423] transition-all rounded group"
+        >
+          <h2 class="text-lg font-serif text-[#f0f2f1] group-hover:text-white">Ediciones & Ebooks</h2>
+          <p class="text-sm text-[#8a9a98] mt-1">Gestionar publicaciones, dossiers y magazines.</p>
+        </a>
+      </div>
+
+      <footer class="mt-8 text-center text-xs text-[#62706e] font-mono">
+        Acceso restringido — Autorizado exclusivamente para Xavier Benítez.
+      </footer>
+    </div>
+  </main>
+</Layout>
