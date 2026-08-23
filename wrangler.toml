@@ -1,6 +1,6 @@
 name = "tgp-hemeroteca"
 compatibility_date = "2026-08-22"
-compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+compatibility_flags = [ "nodejs_compat", "global_fetch_strictly_public" ]
 
 [observability]
 enabled = true
