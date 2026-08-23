@@ -33,7 +33,7 @@ export const tgpIntegrations = [
 export const tgpViteConfig = {
   plugins: [tailwindcss()],
   build: {
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 4000,
     rollupOptions: {
       onwarn(warning, warn) {
         if (warning.code === 'SOURCEMAP_ERROR' || (warning.message && warning.message.includes('points to missing source files'))) {

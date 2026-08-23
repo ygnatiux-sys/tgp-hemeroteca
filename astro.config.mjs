@@ -2,16 +2,21 @@ import { defineConfig } from 'astro/config';
 import { tgpIntegrations, tgpViteConfig } from './src/config/integrations.js';
 import cloudflare from '@astrojs/cloudflare';
 
-// DETECCIÓN BLINDADA ABSOLUTA: Combina 4 métodos para que Vite nunca pierda el estado local
-const isDev = 
+// DETECCIÓN BLINDADA CORREGIDA
+const isCloudflare = process.env.CF_PAGES === '1';
+const isBuild = process.argv.includes('build') || process.env.npm_lifecycle_event === 'build';
+
+// Si estamos en Cloudflare o en proceso de build, JAMÁS es Dev.
+const isDev = !(isCloudflare || isBuild) && (
   process.argv.includes('dev') || 
-  process.argv.includes('--force') || 
   process.env.npm_lifecycle_event === 'dev' || 
-  process.env.NODE_ENV === 'development';
+  process.env.NODE_ENV === 'development'
+);
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://tgp-hemeroteca.pages.dev',
+  // Dominio principal
+  site: 'https://thegreatpuzzleproject.com',
   output: 'static',
   trailingSlash: 'ignore',
   
@@ -19,26 +24,12 @@ export default defineConfig({
   vite: {
     ...tgpViteConfig,
     ssr: isDev
-      ? {
-          external: ['react', 'react-dom']
-        }
-      : {
-          noExternal: true
-        }
+      ? { external: ['react', 'react-dom'] }
+      : { noExternal: true }
   },
 
-  // EL CORTE ARQUITECTÓNICO (Cloudflare apagado en local)
-  adapter: isDev ? undefined : cloudflare({
-    routes: {
-      extend: {
-        include: [
-          { pattern: '/keystatic' },
-          { pattern: '/keystatic/*' },
-          { pattern: '/api/keystatic/*' },
-        ],
-      },
-    }
-  }),
+  // EL CORTE ARQUITECTÓNICO SIMPLIFICADO
+  adapter: isDev ? undefined : cloudflare(),
 
   integrations: [
     ...tgpIntegrations,
