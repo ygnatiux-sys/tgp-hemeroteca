@@ -34,6 +34,9 @@ export default defineConfig({
       extend: {
         include: ['/*'], // LA PIEZA FALTANTE: Obliga al Worker a renderizar la portada y la web
         exclude: [
+          // Bundles Vite (CSS, JS, assets hasheados) — CDN nativa de Cloudflare
+          '/_astro/*',
+          '/assets/*',
           // Imágenes y recursos estáticos de public/
           '/images/*',
           '/favicon.svg',
