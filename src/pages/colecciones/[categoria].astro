@@ -17,6 +17,7 @@ import {
 } from '../../lib/content-filter';
 
 // ─── GENERACIÓN ESTÁTICA DE RUTAS ────────────────────────────────────────────
+export const prerender = true;
 export async function getStaticPaths() {
   const allEssaysRaw = await getCollection('ensayos').catch(() => []);
   const allArquetiposRaw = await getCollection('arquetiposGlobales').catch(() => []);

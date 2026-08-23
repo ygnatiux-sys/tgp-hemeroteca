@@ -1,0 +1,9 @@
+# Wrangler config para @astrojs/cloudflare
+# Output dir se configura en el dashboard de Cloudflare Pages (dist/client)
+
+name = "tgp-hemeroteca"
+compatibility_date = "2026-08-22"
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+
+[observability]
+enabled = true
