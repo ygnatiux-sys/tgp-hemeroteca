@@ -32,8 +32,39 @@ export const tgpIntegrations = [
 
 export const tgpViteConfig = {
   plugins: [tailwindcss()],
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      onwarn(warning, warn) {
+        if (warning.code === 'SOURCEMAP_ERROR' || (warning.message && warning.message.includes('points to missing source files'))) {
+          return;
+        }
+        warn(warning);
+      }
+    }
+  },
   optimizeDeps: {
-    include: ['lodash/debounce', 'lodash'],
+    // La lista nuclear de paquetes CommonJS que Vite debe traducir sí o sí
+    include: [
+      'lodash/debounce', 
+      'lodash', 
+      'direction', 
+      'is-hotkey', 
+      'is-plain-object', 
+      'slate', 
+      'slate-react', 
+      'slate-history',
+      'use-sync-external-store/shim/index.js',
+      'cookie',
+      'remove-accents',
+      'brace-expansion',
+      'debug',
+      'acorn-jsx',
+      'escape-string-regexp',
+      '@braintree/sanitize-url',
+      'fast-deep-equal',
+      '@sindresorhus/slugify'
+    ],
     exclude: [
       '@keystatic/core',
       '@keystatic/core/ui',
@@ -43,13 +74,8 @@ export const tgpViteConfig = {
     ]
   },
   ssr: {
-    noExternal: [
-      '@keystatic/core',
-      '@keystatic/astro',
-      'react',
-      'react-dom',
-      'lodash',
-      'lodash/debounce'
-    ]
+    noExternal: process.env.NODE_ENV === 'development'
+      ? ['@keystatic/core', '@keystatic/astro']
+      : true
   }
 };

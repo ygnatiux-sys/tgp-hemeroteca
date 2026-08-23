@@ -2,28 +2,42 @@ import { defineConfig } from 'astro/config';
 import { tgpIntegrations, tgpViteConfig } from './src/config/integrations.js';
 import cloudflare from '@astrojs/cloudflare';
 
+// DETECCIÓN BLINDADA ABSOLUTA: Combina 4 métodos para que Vite nunca pierda el estado local
+const isDev = 
+  process.argv.includes('dev') || 
+  process.argv.includes('--force') || 
+  process.env.npm_lifecycle_event === 'dev' || 
+  process.env.NODE_ENV === 'development';
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://tgp-hemeroteca.pages.dev',
-  // A partir de Astro 5, 'hybrid' fue removido. Usa 'static' y apaga el prerender individualmente con export const prerender = false;
   output: 'static',
   trailingSlash: 'ignore',
-  vite: tgpViteConfig,
+  
+  // EL ESCUDO VITE: En local aislamos React como external puro; en build forzamos empaquetado para Cloudflare
+  vite: {
+    ...tgpViteConfig,
+    ssr: isDev
+      ? {
+          external: ['react', 'react-dom']
+        }
+      : {
+          noExternal: true
+        }
+  },
 
-  adapter: cloudflare({
+  // EL CORTE ARQUITECTÓNICO (Cloudflare apagado en local)
+  adapter: isDev ? undefined : cloudflare({
     routes: {
       extend: {
-        // El Worker de Cloudflare intercepta estas rutas dinámicas en producción
         include: [
           { pattern: '/keystatic' },
           { pattern: '/keystatic/*' },
           { pattern: '/api/keystatic/*' },
         ],
       },
-    },
-    platformProxy: {
-      enabled: true,
-    },
+    }
   }),
 
   integrations: [
@@ -32,40 +46,15 @@ export default defineConfig({
       name: 'gemini-motor-local',
       hooks: {
         'astro:config:setup': ({ injectRoute, command }) => {
-          // En modo desarrollo local (astro dev), inyectamos dinámicamente las rutas API de Gemini
-          if (command === 'dev' || process.env.NODE_ENV === 'development') {
-            injectRoute({
-              pattern: '/api/generar-tgp',
-              entrypoint: './src/api/_generar-tgp.ts'
-            });
-            injectRoute({
-              pattern: '/api/generar-sujeto',
-              entrypoint: './src/api/_generar-sujeto.ts'
-            });
-            injectRoute({
-              pattern: '/api/generar-arte',
-              entrypoint: './src/api/_generar-arte.ts'
-            });
-            injectRoute({
-              pattern: '/api/guardar-ensayo',
-              entrypoint: './src/api/_guardar-ensayo.ts'
-            });
-            injectRoute({
-              pattern: '/api/generar-georreferencia',
-              entrypoint: './src/api/_generar-georreferencia.ts'
-            });
-            injectRoute({
-              pattern: '/api/generar-arquetipo',
-              entrypoint: './src/api/_generar-arquetipo.ts'
-            });
-            injectRoute({
-              pattern: '/api/guardar-georreferencia',
-              entrypoint: './src/api/_guardar-georreferencia.ts'
-            });
-            injectRoute({
-              pattern: '/api/agente-erudito',
-              entrypoint: './src/api/agente-erudito.ts'
-            });
+          if (command === 'dev' || isDev) {
+            injectRoute({ pattern: '/api/generar-tgp', entrypoint: './src/api/_generar-tgp.ts' });
+            injectRoute({ pattern: '/api/generar-sujeto', entrypoint: './src/api/_generar-sujeto.ts' });
+            injectRoute({ pattern: '/api/generar-arte', entrypoint: './src/api/_generar-arte.ts' });
+            injectRoute({ pattern: '/api/guardar-ensayo', entrypoint: './src/api/_guardar-ensayo.ts' });
+            injectRoute({ pattern: '/api/generar-georreferencia', entrypoint: './src/api/_generar-georreferencia.ts' });
+            injectRoute({ pattern: '/api/generar-arquetipo', entrypoint: './src/api/_generar-arquetipo.ts' });
+            injectRoute({ pattern: '/api/guardar-georreferencia', entrypoint: './src/api/_guardar-georreferencia.ts' });
+            injectRoute({ pattern: '/api/agente-erudito', entrypoint: './src/api/agente-erudito.ts' });
           }
         }
       }
