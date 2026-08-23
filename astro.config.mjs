@@ -28,8 +28,32 @@ export default defineConfig({
       : { noExternal: true }
   },
 
-  // EL CORTE ARQUITECTÓNICO SIMPLIFICADO
-  adapter: isDev ? undefined : cloudflare(),
+  // EL CORTE ARQUITECTÓNICO: El motor procesa las páginas, pero EXCLUIMOS explícitamente 
+  // los recursos estáticos para que Cloudflare Pages los sirva correctamente.
+  adapter: isDev ? undefined : cloudflare({
+    routes: {
+      extend: {
+        exclude: [
+          // Bundles compilados por Vite (JS, CSS, assets hasheados)
+          '/_astro/*',
+          // Favicons raíz
+          '/favicon.svg',
+          '/favicon.png',
+          '/favicon.ico',
+          '/faviconTGP.png',
+          // Imagen de perfil
+          '/perfil.webp',
+          // Imágenes estáticas de public/images/
+          '/images/*',
+          // Audio cinematic (public/)
+          '/intro.cinematic.wav',
+          '/intro_cinematic.wav',
+          '/outro.cinematic.wav',
+          '/outro_cinematic.wav',
+        ],
+      },
+    }
+  }),
 
   integrations: [
     ...tgpIntegrations,
