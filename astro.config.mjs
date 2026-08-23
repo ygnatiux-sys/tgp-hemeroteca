@@ -34,8 +34,6 @@ export default defineConfig({
       extend: {
         include: ['/*'], // LA PIEZA FALTANTE: Obliga al Worker a renderizar la portada y la web
         exclude: [
-          // Bundles Vite (CSS, JS, assets hasheados)
-          '/_astro/*',
           // Imágenes y recursos estáticos de public/
           '/images/*',
           '/favicon.svg',
