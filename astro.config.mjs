@@ -17,7 +17,7 @@ const isDev = !(isCloudflare || isBuild) && (
 export default defineConfig({
   // Dominio principal
   site: 'https://thegreatpuzzleproject.com',
-  output: 'static',
+  output: 'server',  // CRÍTICO: genera _worker.js para Cloudflare Pages Functions
   trailingSlash: 'ignore',
   
   // EL ESCUDO VITE: En local aislamos React como external puro; en build forzamos empaquetado para Cloudflare
@@ -28,11 +28,10 @@ export default defineConfig({
       : { noExternal: true }
   },
 
-  // EL CORTE ARQUITECTÓNICO: El motor procesa toda la web, pero excluye la estética
+  // EL CORTE ARQUITECTÓNICO: Worker SSR maneja el sitio, CDN sirve los estáticos
   adapter: isDev ? undefined : cloudflare({
     routes: {
       extend: {
-        include: ['/*'], // LA PIEZA FALTANTE: Obliga al Worker a renderizar la portada y la web
         exclude: [
           // Bundles Vite (CSS, JS, assets hasheados) — CDN nativa de Cloudflare
           '/_astro/*',
@@ -48,18 +47,11 @@ export default defineConfig({
           '/intro_cinematic.wav',
           '/outro.cinematic.wav',
           '/outro_cinematic.wav',
-          // Páginas prerenderizadas (output: static) — el Worker no debe interceptarlas
-          '/colecciones',
-          '/colecciones/*',
+          // Páginas con export const prerender = true → archivos HTML estáticos
           '/hemeroteca/*',
           '/papers',
           '/papers/*',
           '/ensayos-cinematicos/*',
-          '/codice',
-          '/archivo',
-          '/about',
-          '/manifiesto',
-          '/404',
         ],
       },
     }
