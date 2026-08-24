@@ -1,9 +1,35 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+// ─── Helper: Setter nativo de React 18 ─────────────────────────────────────
+// Keystatic usa inputs controlados por React. El simple `element.value = x`
+// no dispara el estado interno de React. Este helper usa el setter nativo
+// del prototipo para forzar que React detecte el cambio.
+function setNativeValue(element: HTMLElement, value: string): void {
+  const proto = Object.getPrototypeOf(element);
+  const descriptor =
+    Object.getOwnPropertyDescriptor(proto, 'value') ||
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value') ||
+    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
+
+  if (descriptor && descriptor.set) {
+    descriptor.set.call(element, value);
+  } else {
+    // Fallback: asignacion directa si no se encontro el descriptor
+    (element as any).value = value;
+  }
+
+  // Disparar todos los eventos que React 18 necesita para detectar el cambio
+  element.dispatchEvent(new Event('input',  { bubbles: true }));
+  element.dispatchEvent(new Event('change', { bubbles: true }));
+  element.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true }));
+}
+
 export function GeneradorArquetiposTGP({ value, onChange }: any) {
   const [titulo, setTitulo] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratingArt, setIsGeneratingArt] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [generarAmbosJuntos, setGenerarAmbosJuntos] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -13,6 +39,11 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
   const [excerptIA, setExcerptIA] = useState<string>('');
   const [categoryIA, setCategoryIA] = useState<string>('Arquetipos Globales');
   const [activeTab, setActiveTab] = useState<'preview' | 'raw'>('preview');
+
+  // ── Toggles para campos opcionales (default OFF → no sobrecargar el front-end) ──
+  const [syncVolanta,   setSyncVolanta]   = useState(false);
+  const [syncExcerpt,  setSyncExcerpt]   = useState(false);
+  const [syncCategory, setSyncCategory]  = useState(false);
 
   const [arteResult, setArteResult] = useState<{
     imageUrl: string | null;
@@ -90,35 +121,51 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
     return '';
   };
 
-  // Inyectar en los campos DOM de Keystatic (volanta, category, excerpt)
+  // ─── Inyectar en los campos DOM de Keystatic ─────────────────────────────────
+  // SIEMPRE: titulo (obligatorio para la validacion del slug)
+  // CONDICIONAL segun toggles: volanta, category, excerpt
+  // NUNCA: spotifyLink, youtubeLink (evitar URLs invalidas que rompan hrefs)
   const syncFieldsToKeystaticDOM = (volantaToUse?: string, categoryToUse?: string, excToUse?: string) => {
     if (typeof document === 'undefined') return;
 
-    if (volantaToUse) {
-      const volInput = document.querySelector<HTMLInputElement>('input[name="volanta"], input[id*="volanta"]');
-      if (volInput) {
-        volInput.value = volantaToUse;
-        volInput.dispatchEvent(new Event('input', { bubbles: true }));
-        volInput.dispatchEvent(new Event('change', { bubbles: true }));
-      }
+    // ── OBLIGATORIO: Titulo / Slug ──────────────────────────────────────────────
+    // Usamos setNativeValue para que React 18 detecte el cambio en el campo slug
+    const titleInStr = titulo.trim() || volantaIA || 'Arquetipo';
+    const titleInputs = document.querySelectorAll<HTMLInputElement>(
+      'input[name="title"], input[id*="title"], input[placeholder*="titulo"], input[placeholder*="tit"]'
+    );
+    titleInputs.forEach(el => setNativeValue(el, titleInStr));
+
+    // ── CONDICIONAL: Volanta ────────────────────────────────────────────────────
+    if (syncVolanta && volantaToUse) {
+      const volInputs = document.querySelectorAll<HTMLInputElement>(
+        'input[name="volanta"], input[id*="volanta"]'
+      );
+      volInputs.forEach(el => setNativeValue(el, volantaToUse));
     }
 
-    if (categoryToUse) {
-      const catSelect = document.querySelector<HTMLSelectElement>('select[name="category"], select[id*="category"]');
-      if (catSelect) {
-        catSelect.value = categoryToUse;
-        catSelect.dispatchEvent(new Event('change', { bubbles: true }));
-      }
+    // ── CONDICIONAL: Categoría ──────────────────────────────────────────────────
+    if (syncCategory && categoryToUse) {
+      // Keystatic usa un custom field para categoría (SelectorCategoriaTGP), no un <select> nativo
+      // Intentamos select nativo como fallback
+      const catSelects = document.querySelectorAll<HTMLSelectElement>(
+        'select[name="category"], select[id*="category"]'
+      );
+      catSelects.forEach(el => {
+        setNativeValue(el, categoryToUse);
+      });
     }
 
-    if (excToUse) {
-      const excTextarea = document.querySelector<HTMLTextAreaElement>('textarea[name="excerpt"], textarea');
-      if (excTextarea) {
-        excTextarea.value = excToUse;
-        excTextarea.dispatchEvent(new Event('input', { bubbles: true }));
-        excTextarea.dispatchEvent(new Event('change', { bubbles: true }));
-      }
+    // ── CONDICIONAL: Excerpt ────────────────────────────────────────────────────
+    if (syncExcerpt && excToUse) {
+      const excTextareas = document.querySelectorAll<HTMLTextAreaElement>(
+        'textarea[name="excerpt"], textarea[id*="excerpt"]'
+      );
+      excTextareas.forEach(el => setNativeValue(el, excToUse));
     }
+
+    // ── NUNCA inyectar spotifyLink / youtubeLink ────────────────────────────────
+    // Dejar vacíos para que los componentes de Astro los oculten condicionalmente.
   };
 
   // 1. Generación de Texto / Informe Arquetípico
@@ -359,20 +406,82 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
           <span>🎨 3. Solo Portada IA (Nano Banana)</span>
         </button>
 
-        {/* BOTÓN 4: SINCRONIZAR AHORA */}
+        {/* BOTÓN 4: TRASPASAR TODO (con toggles para campos opcionales) */}
         <button
           type="button"
           onClick={() => {
             if (!informe) return alert('No hay texto para sincronizar.');
             onChange(informe);
             syncFieldsToKeystaticDOM(volantaIA, categoryIA, excerptIA);
-            alert('✦ Campos sincronizados correctamente con Keystatic.');
+            alert('✦ Campos sincronizados con Keystatic. El título siempre se inyecta; los opcionales solo si sus toggles están activos.');
           }}
           className="py-2.5 px-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 rounded-lg text-xs font-metadata transition-all cursor-pointer flex items-center justify-center gap-2"
         >
-          <span>✓ Sincronizar Campos</span>
+          <span>✓ Traspasar Todo a Keystatic</span>
         </button>
       </div>
+
+      {/* PANEL DE TOGGLES: Campos Opcionales — qué se inyecta en Keystatic */}
+      {(volantaIA || excerptIA || categoryIA) && (
+        <div className="mb-5 p-4 bg-black/30 border border-white/10 rounded-xl">
+          <span className="block text-[10px] font-mono uppercase tracking-[0.2em] text-stone-400 mb-3">
+            ❖ Campos Opcionales a Inyectar en Keystatic
+          </span>
+          <p className="text-[10px] text-stone-500 mb-3 font-mono">
+            Activa solo los campos que quieras traspasar. Los desactivados quedan vacíos en Keystatic para no sobrecargar la vista del post.
+          </p>
+          <div className="flex flex-col gap-2">
+            {/* Toggle: Volanta */}
+            {volantaIA && (
+              <label className="flex items-start gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={syncVolanta}
+                  onChange={e => setSyncVolanta(e.target.checked)}
+                  className="mt-0.5 accent-amber-500"
+                />
+                <div>
+                  <span className="text-xs font-mono text-amber-300 font-bold">Volanta</span>
+                  <p className="text-[10px] text-stone-400 mt-0.5 font-mono">"{volantaIA}"</p>
+                </div>
+              </label>
+            )}
+            {/* Toggle: Excerpt */}
+            {excerptIA && (
+              <label className="flex items-start gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={syncExcerpt}
+                  onChange={e => setSyncExcerpt(e.target.checked)}
+                  className="mt-0.5 accent-amber-500"
+                />
+                <div>
+                  <span className="text-xs font-mono text-amber-300 font-bold">Excerpt / Sínopsis</span>
+                  <p className="text-[10px] text-stone-400 mt-0.5 font-mono line-clamp-2 italic">"{excerptIA}"</p>
+                </div>
+              </label>
+            )}
+            {/* Toggle: Categoría */}
+            {categoryIA && (
+              <label className="flex items-start gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={syncCategory}
+                  onChange={e => setSyncCategory(e.target.checked)}
+                  className="mt-0.5 accent-amber-500"
+                />
+                <div>
+                  <span className="text-xs font-mono text-amber-300 font-bold">Categoría</span>
+                  <p className="text-[10px] text-stone-400 mt-0.5 font-mono">"{categoryIA}"</p>
+                </div>
+              </label>
+            )}
+          </div>
+          <p className="text-[10px] text-stone-600 mt-3 font-mono">
+            ⚠️ Los campos YouTube / Spotify se dejan siempre vacíos (URLs manuales en Keystatic).
+          </p>
+        </div>
+      )}
 
       {/* PREVIEW DEL ARTE GENERADO */}
       {arteResult && arteResult.imageUrl && (
@@ -564,18 +673,120 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
               <span>✓</span> Texto sincronizado con Keystatic (listo para guardar)
             </span>
 
-            <button
-              type="button"
-              onClick={() => {
-                onChange(informe);
-                syncFieldsToKeystaticDOM(volantaIA, categoryIA, excerptIA);
-                alert('✦ Texto, volanta y excerpt sincronizados exitosamente con el formulario de Keystatic.');
-              }}
-              className="px-3.5 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 rounded-lg text-xs font-mono uppercase tracking-wider transition-all cursor-pointer font-bold shadow-sm"
-            >
-              Re-Sincronizar con Formulario
-            </button>
+            <div className="flex gap-2">
+              {/* Copiar Cuerpo: para pegar manualmente en el editor Markdoc nativo */}
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(informe);
+                  alert('✓ Cuerpo del arquetipo copiado. Pegá (Ctrl+V) directamente en el editor Markdoc de Keystatic para que se guarde en content.mdoc.');
+                }}
+                className="px-3 py-1.5 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 rounded-lg text-[11px] font-mono uppercase tracking-wider transition-all cursor-pointer font-bold"
+              >
+                ⌘ Copiar Cuerpo al Portapapeles
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  onChange(informe);
+                  syncFieldsToKeystaticDOM(volantaIA, categoryIA, excerptIA);
+                  alert('✦ Re-sincronizado con el formulario de Keystatic.');
+                }}
+                className="px-3.5 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 rounded-lg text-xs font-mono uppercase tracking-wider transition-all cursor-pointer font-bold shadow-sm"
+              >
+                Re-Sincronizar
+              </button>
+            </div>
           </div>
+        </div>
+      )}
+
+      {/* ══ BOTÓN CONFIRMAR Y GUARDAR EN LA HEMEROTECA ══════════════════════════ */}
+      {informe && (
+        <div
+          className="mt-6 p-5 rounded-xl border"
+          style={{
+            background: 'linear-gradient(135deg, #0a1a0a, #0f2a0f)',
+            borderColor: 'rgba(74, 222, 128, 0.25)',
+          }}
+        >
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-emerald-500 mb-1">
+            Paso Final de Vinculación
+          </p>
+          <p className="text-[11px] text-stone-400 mb-4 font-mono leading-relaxed">
+            Guarda el informe, los metadatos y la portada directamente en el sistema de archivos de la hemeroteca.
+            <br />
+            <span className="text-stone-600">(Solo opera en modo local. En producción, usá el botón Save de Keystatic.)</span>
+          </p>
+
+          <button
+            type="button"
+            disabled={isSaving || !informe || informe.length < 10}
+            onClick={async () => {
+              const slugToUse = getSlugFromUrl();
+              if (!slugToUse || slugToUse === 'new' || slugToUse === 'nuevo_arquetipo') {
+                alert('✦ POST NUEVO DETECTADO\n\nPrimero escribí el Título arriba y presioná el botón "Save" / "Create" de Keystatic para crear la entrada. Luego podrás usar este botón para actualizaciones.');
+                return;
+              }
+
+              setIsSaving(true);
+              setIsSaved(false);
+
+              // Sincronizar con el formulario de Keystatic primero
+              onChange(informe);
+              syncFieldsToKeystaticDOM(volantaIA, categoryIA, excerptIA);
+
+              try {
+                const res = await fetch('/api/guardar-arquetipo', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    slug: slugToUse,
+                    title: titulo.trim() || volantaIA || slugToUse.replace(/-/g, ' '),
+                    content: informe,
+                    excerpt:  syncExcerpt  ? excerptIA  : undefined,
+                    volanta:  syncVolanta  ? volantaIA  : undefined,
+                    category: syncCategory ? categoryIA : 'Arquetipos Globales',
+                    imageUrl: arteResult?.imageUrl ?? undefined,
+                    // spotifyLink / youtubeLink NO se envían (URLs manuales en Keystatic)
+                  }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                  setIsSaved(true);
+                  alert(`✦ ARQUETIPO GUARDADO EN LA HEMEROTECA\n\n• Metadatos: ${data.indexPath}\n• Contenido: ${data.mdocPath}\n• Caracteres escritos: ${data.charactersWritten}`);
+                  setTimeout(() => setIsSaved(false), 5000);
+                } else {
+                  alert(`Error guardando: ${data.error}`);
+                }
+              } catch (err: any) {
+                alert(`Error de conexión: ${err.message}`);
+              } finally {
+                setIsSaving(false);
+              }
+            }}
+            className={`w-full py-4 px-6 rounded-xl font-metadata text-xs uppercase tracking-[0.2em] font-bold transition-all flex items-center justify-center gap-3 ${
+              isSaving
+                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse cursor-wait'
+                : isSaved
+                  ? 'bg-emerald-600/40 text-white border border-emerald-400/60 shadow-[0_0_20px_rgba(74,222,128,0.3)] cursor-default'
+                  : (!informe || informe.length < 10)
+                    ? 'bg-white/5 text-stone-600 border border-white/10 cursor-not-allowed'
+                    : 'bg-linear-to-r from-emerald-900 via-emerald-800 to-emerald-600 hover:from-emerald-800 hover:to-emerald-500 text-white border border-emerald-400/40 hover:shadow-[0_0_20px_rgba(74,222,128,0.3)] cursor-pointer'
+            }`}
+          >
+            {isSaving ? (
+              <>
+                <div className="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
+                <span>Guardando en Hemeroteca...</span>
+              </>
+            ) : isSaved ? (
+              <span>✦ Arquetipo Guardado Exitosamente en Hemeroteca</span>
+            ) : (
+              <span>✦ Confirmar y Guardar en la Hemeroteca</span>
+            )}
+          </button>
         </div>
       )}
     </div>

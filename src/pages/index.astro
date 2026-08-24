@@ -74,12 +74,14 @@ const publishable: EssayEntry[] = [
   ...publishableArquetipos
 ].sort(sortEssaysByVisualFirst);
 
-// ─── SEGMENTACIÓN EDITORIAL ───────────────────────────────────────────────────
-// Los primeros 30 posts (o los disponibles) alimentan el Motor Cinemático Hero (slider).
-// Se eligen preferentemente los que tienen imágenes gracias a sortEssaysByVisualFirst.
-// El resto del array mantiene la grilla Bento existente (sin repeticiones).
+// ─── SEGMENTACIÓN EDITORIAL ADAPTATIVA ───────────────────────────────────────
+// El Hero Slider toma como máximo 6 posts (evita dejar el resto del site vacío
+// cuando el catálogo tiene pocos artículos).
+// El resto se distribuye entre Lead, Secondary y Recientes sin depender de un
+// offset fijo. Con 10 posts: 6 Hero + 1 Lead + 1 SecA + 1 SecB + 1 Recent = todo visible.
 
-const HERO_COUNT   = Math.min(30, publishable.length);
+const HERO_MAX     = 6;
+const HERO_COUNT   = Math.min(HERO_MAX, publishable.length);
 const heroSlides   = publishable.slice(0, HERO_COUNT).map(e => ({
   id: e.slug,
   title: e.entry.title || '',
@@ -93,12 +95,15 @@ const heroSlides   = publishable.slice(0, HERO_COUNT).map(e => ({
   papersLink: (e.entry as any).papersSlug ? `/papers/${(e.entry as any).papersSlug}` : undefined,
 }));
 
-// Bloques editoriales a continuación del Hero (offset 5)
-const leadStory    = publishable[HERO_COUNT]     ?? null;
-const secondaryA   = publishable[HERO_COUNT + 1] ?? null;
-const secondaryB   = publishable[HERO_COUNT + 2] ?? null;
-const recentEssays = publishable.slice(HERO_COUNT + 3, HERO_COUNT + 6);   // 3 ensayos: 1 Hero + 2 Dúo
-const archiveRows  = publishable.slice(HERO_COUNT + 6, HERO_COUNT + 16);  // hasta 10 para Del Archivo
+// ─── DISTRIBUCIÓN EDITORIAL (offset desde el Hero) ───────────────────────────
+// Posts disponibles después del Hero (nunca vacío si hay contenido)
+const remaining    = publishable.slice(HERO_COUNT);
+
+const leadStory    = remaining[0]           ?? null;
+const secondaryA   = remaining[1]           ?? null;
+const secondaryB   = remaining[2]           ?? null;
+const recentEssays = remaining.slice(3, 6);        // hasta 3 posts en "Recientes"
+const archiveRows  = remaining.slice(6, 16);       // hasta 10 posts en "Del Archivo"
 
 // ─── COLECCIONES DESTACADAS (§5.4) ────────────────────────────────────────────
 const categoryGroups = groupByCategory(publishable, 2);

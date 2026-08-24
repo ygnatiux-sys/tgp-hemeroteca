@@ -9,14 +9,15 @@ const ensayos = defineCollection({
     pattern: "**/index.json", 
     base: "src/content/ensayos" 
   }),
-  schema: ({ image }) => z.object({
+  schema: z.object({
     title: z.string().optional().catch("Sin Título"),
     volanta: z.string().optional().nullable().catch(null),
     draft: z.boolean().default(false),
     date: z.string().optional().nullable().catch(null),
     category: z.string().optional().nullable().catch("Ensayo"),
     themeColor: z.string().optional().nullable().default('british-green'),
-    coverImage: image().optional().nullable().catch(null),
+    // Acepta ImageMetadata (local) o string URL externa (Wikimedia/IA) — resolveEssayImage() maneja ambos
+    coverImage: z.any().optional().nullable().catch(null),
     videoBg: z.string().optional().nullable().catch(null),
     excerpt: z.string().optional().nullable().catch("Sin descripción disponible."),
     sitioGeohistorico: z.string().optional().nullable().catch(null),
@@ -77,7 +78,7 @@ const georreferencias = defineCollection({
     pattern: "**/index.json", 
     base: "src/content/georreferencias" 
   }),
-  schema: ({ image }) => z.object({
+  schema: z.object({
     title: z.string().optional().catch("Sin Título"),
     sitioGeohistorico: z.string().optional().nullable().catch(null),
     volantaHook: z.string().optional().nullable().catch(null),
@@ -86,7 +87,8 @@ const georreferencias = defineCollection({
     date: z.string().optional().nullable().catch(null),
     category: z.string().optional().nullable().default("Arqueosemiótica"),
     publicarConImagen: z.boolean().default(true),
-    coverImage: image().optional().nullable().catch(null),
+    // Acepta ImageMetadata (local) o string URL externa (Wikimedia/IA)
+    coverImage: z.any().optional().nullable().catch(null),
     bancoImagenesWikimedia: z.string().optional().nullable().catch(null),
     excerpt: z.string().optional().nullable().catch("Sin descripción disponible."),
     generadorGeoref: z.string().optional().nullable().catch(null),
@@ -105,14 +107,15 @@ const arquetiposGlobales = defineCollection({
     pattern: "**/index.json", 
     base: "src/content/arquetipos-globales" 
   }),
-  schema: ({ image }) => z.object({
+  schema: z.object({
     title: z.string().optional().catch("Sin Título"),
     volanta: z.string().optional().nullable().catch(null),
     draft: z.boolean().default(false),
     date: z.string().optional().nullable().catch(null),
     category: z.string().optional().nullable().catch("Arquetipos Globales"),
     themeColor: z.string().optional().nullable().default('rust-orange'),
-    coverImage: image().optional().nullable().catch(null),
+    // Acepta ImageMetadata (local) o string URL externa (Wikimedia/IA) — resolveEssayImage() maneja ambos
+    coverImage: z.any().optional().nullable().catch(null),
     videoBg: z.string().optional().nullable().catch(null),
     excerpt: z.string().optional().nullable().catch("Sin descripción disponible."),
     sitioGeohistorico: z.string().optional().nullable().catch(null),
@@ -139,11 +142,12 @@ const ensayosCinematicos = defineCollection({
     pattern: "**/index.json", 
     base: "src/content/ensayos-cinematicos" 
   }),
-  schema: ({ image }) => z.object({
+  schema: z.object({
     title: z.string().optional().catch("Sin Título"),
     atmosfera: z.any().optional().default('obsidiana'),
-    coverImage: image().optional().nullable().catch(null),
-    gallery: z.array(image()).optional().default([]),
+    // Acepta ImageMetadata (local) o string URL externa (Wikimedia/IA)
+    coverImage: z.any().optional().nullable().catch(null),
+    gallery: z.array(z.any()).optional().default([]),
     generadorTexto: z.string().optional().nullable().catch(null),
   })
 });
