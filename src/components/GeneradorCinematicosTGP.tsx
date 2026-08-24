@@ -27,25 +27,76 @@ function setNativeValue(element: HTMLElement, value: string): void {
 // ─── Helper: inyectar en el editor ProseMirror de KS (fields.document "Contenido") ───────
 function injectIntoKSDocumentEditor(markdownText: string): boolean {
   if (typeof document === 'undefined' || !markdownText) return false;
+  
+  // Buscar el editor ProseMirror de Keystatic (campo Contenido)
   const editorEl = document.querySelector<HTMLDivElement>(
-    '[contenteditable="true"].ProseMirror, [contenteditable="true"][role="textbox"], [contenteditable="true"]'
+    '.ProseMirror[contenteditable="true"], [contenteditable="true"].ProseMirror, div[contenteditable="true"][role="textbox"], [contenteditable="true"]'
   );
-  if (!editorEl) return false;
+  if (!editorEl) {
+    console.warn('[TGP] Editor ProseMirror no encontrado en el DOM.');
+    return false;
+  }
+
   try {
+    // 1. Enfocar el editor
     editorEl.focus();
+
+    // 2. Seleccionar todo el contenido existente
     const sel = window.getSelection();
     const range = document.createRange();
     range.selectNodeContents(editorEl);
     sel?.removeAllRanges();
     sel?.addRange(range);
-    const ok = document.execCommand('insertText', false, markdownText);
-    if (!ok) {
-      const dt = new DataTransfer();
-      dt.setData('text/plain', markdownText);
-      editorEl.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
-    }
+
+    // 3. Método Primario: Simulación de Pegado con DataTransfer (ProseMirror nativo)
+    const dt = new DataTransfer();
+    dt.setData('text/plain', markdownText);
+    const htmlFormatted = markdownText
+      .split('\n\n')
+      .filter(Boolean)
+      .map(p => p.startsWith('#') ? `<h2>${p.replace(/^#+\s*/, '')}</h2>` : `<p>${p}</p>`)
+      .join('');
+    dt.setData('text/html', htmlFormatted);
+
+    const pasteEvt = new ClipboardEvent('paste', {
+      clipboardData: dt,
+      bubbles: true,
+      cancelable: true,
+      composed: true
+    });
+    editorEl.dispatchEvent(pasteEvt);
+
+    // 4. Método Secundario: execCommand insertText
+    try {
+      document.execCommand('insertText', false, markdownText);
+    } catch (e) {}
+
+    // 5. Método Terciario: InputEvent beforeinput
+    try {
+      const inputEvt = new InputEvent('beforeinput', {
+        inputType: 'insertText',
+        data: markdownText,
+        bubbles: true,
+        cancelable: true,
+        composed: true
+      });
+      editorEl.dispatchEvent(inputEvt);
+    } catch (e) {}
+
+    // 6. Copiar automáticamente al portapapeles como respaldo
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(markdownText);
+      }
+    } catch (e) {}
+
+    // 7. Notificar cambio de input
+    editorEl.dispatchEvent(new Event('input', { bubbles: true }));
     return true;
-  } catch { return false; }
+  } catch (err) {
+    console.error('[TGP] Error inyectando en ProseMirror:', err);
+    return false;
+  }
 }
 
 export interface GeminiCinematicProps {
@@ -234,14 +285,13 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
 
       const content = data.content || '';
       const generatedExcerpt = data.excerpt || '';
-      if (generatedExcerpt) setExcerptIA(generatedExcerpt);
-
       setGeneratedText(content);
+      injectIntoKSDocumentEditor(content);
       syncToKeystatic(content, previewImage);
       syncFieldsToKeystaticDOM(topic, generatedExcerpt);
       setIsSynced(true);
       lockKeystatiSave(false);
-      setStatusMsg({ type: 'success', text: '✅ Ensayo y Slug sincronizados exitosamente con Keystatic.' });
+      setStatusMsg({ type: 'success', text: '✅ Ensayo inyectado en el editor Contenido y sincronizado.' });
       return content;
     } catch (err: any) {
       setStatusMsg({ type: 'error', text: `Error en texto: ${err.message || 'Fallo de conexión'}` });
