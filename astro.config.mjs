@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import { tgpIntegrations, tgpViteConfig } from './src/config/integrations.js';
 import cloudflare from '@astrojs/cloudflare';
+import sitemap from '@astrojs/sitemap';
 
 // DETECCIÓN BLINDADA CORREGIDA
 const isCloudflare = process.env.CF_PAGES === '1';
@@ -39,6 +40,10 @@ export default defineConfig({
           // Bundles Vite (CSS, JS, assets hasheados) — CDN nativa de Cloudflare
           '/_astro/*',
           '/assets/*',
+          // SEO y robots
+          '/robots.txt',
+          '/sitemap-index.xml',
+          '/sitemap-*.xml',
           // Imágenes y recursos estáticos de public/
           '/images/*',
           '/favicon.svg',
@@ -61,6 +66,7 @@ export default defineConfig({
   }),
 
   integrations: [
+    sitemap(),
     ...tgpIntegrations,
     {
       name: 'gemini-motor-local',

@@ -53,8 +53,8 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const { data } = Astro.props;
-const doc = data as any;
+const data = Astro.props.data as any;
+const doc = data;
 
 // 1. Cargar contenido raw de .mdoc si existe en disco (ensayos, georreferencias, arquetipos globales y ensayos cinemáticos)
 const rawMdocs = import.meta.glob<string>(

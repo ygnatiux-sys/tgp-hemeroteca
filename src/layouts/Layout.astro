@@ -22,11 +22,13 @@ const {
   headerTransparentUntilScroll = true,
 } = Astro.props;
 
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
+
 const globalSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "The Great Puzzle Project",
-  "url": Astro.site ? new URL(Astro.url.pathname, Astro.site) : Astro.url.href,
+  "url": canonicalURL.href,
   "author": {
     "@type": "Person",
     "name": "Xavier Benítez",
@@ -49,6 +51,7 @@ const globalSchema = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
+    <link rel="canonical" href={canonicalURL} />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="shortcut icon" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/favicon.png" />
@@ -60,6 +63,7 @@ const globalSchema = {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL.href} />
     <meta property="og:site_name" content="The Great Puzzle Project" />
     <script type="application/ld+json" set:html={JSON.stringify(globalSchema)} />
     <slot name="head" />

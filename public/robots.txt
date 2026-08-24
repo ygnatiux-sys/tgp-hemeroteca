@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://thegreatpuzzleproject.com/sitemap-index.xml

@@ -23,6 +23,7 @@
     "@astrojs/markdoc": "^2.0.8",
     "@astrojs/node": "^11.1.4",
     "@astrojs/react": "^6.0.4",
+    "@astrojs/sitemap": "^3.7.3",
     "@google/genai": "^1.50.1",
     "@google/generative-ai": "^0.24.1",
     "@keystatic/astro": "^6.0.0",
