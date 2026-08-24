@@ -2,7 +2,7 @@
 # CRITICAL SYSTEM RULE: MANDATORY DEPLOYMENT TEMPLATE
 # ==========================================
 
-At the conclusion of every task that involves code modifications, bug fixes, features, content updates, SEO configurations, or style changes, you MUST ALWAYS provide the standardized 3-option PowerShell deployment sequence at the very end of your response.
+At the conclusion of every task that involves code modifications, bug fixes, features, content updates, SEO configurations, or style changes, you MUST ALWAYS provide the standardized deployment ranking sequence at the very end of your response.
 
 ### Mandatory Format:
 
@@ -11,20 +11,21 @@ At the conclusion of every task that involves code modifications, bug fixes, fea
 
 ### ⚡ Plantilla de Despliegue:
 
-#### 1️⃣ Flujo Todo-en-Uno (Build + Deploy a Cloudflare + Git Push):
-```powershell
-npm run build; npx wrangler deploy; git add .; git commit -m "<tipo>: <descripcion concisa del cambio>"; git push origin main
-```
+#### 🏆 1. Flujo Git Estándar (Mandatory: 90% de los casos)
+*Esta es la opción que usarás casi siempre. Es la única que hace de puente perfecto entre tu trabajo de contenidos en la nube (Keystatic) y tu trabajo de diseño en local (CSS).*
 
-#### 2️⃣ Solo Despliegue a Producción (Cloudflare Workers):
 ```powershell
-npm run build; npx wrangler deploy
+git add . ; git commit -m "<tipo>: <descripcion concisa del cambio>" ; git pull origin main --rebase ; git push origin main
 ```
+> **Por qué es el #1:** Al hacer `git pull origin main --rebase`, Git baja silenciosamente todos los artículos escritos con Keystatic en GitHub y los integra en tu máquina local. Luego coloca tus cambios de código/CSS por encima y el `push` sube todo ordenado, disparando GitHub Actions (`deploy.yml`) para actualizar Cloudflare automáticamente sin fricción.
 
-#### 3️⃣ Solo Respaldo a GitHub:
+#### 🥈 2. Solo Deploy Manual (Casos aislados: 9% de los casos)
+*Solo para pruebas rápidas en vivo en Cloudflare sin impactar GitHub todavía o en emergencias.*
+
 ```powershell
-git add .; git commit -m "<tipo>: <descripcion concisa del cambio>"; git push origin main
+npm run build ; npx wrangler deploy
 ```
+> **Cuándo usarlo:** Si realizas un cambio experimental que quieres validar en vivo antes de asentarlo en Git, o si GitHub Actions está momentáneamente no disponible.
 ```
 
 ### Guidelines:
