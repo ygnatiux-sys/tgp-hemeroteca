@@ -89,7 +89,11 @@ const coleccionesSlides = collections
   }));
 ---
 
-<Layout title="Colecciones | The Great Puzzle Project">
+<Layout
+  title="Colecciones Temáticas | The Great Puzzle Project"
+  description="Colecciones temáticas, arqueología, antropología, semiología y análisis documental de The Great Puzzle Project."
+  image={(collections[0]?.coverEssay?.img as any)?.src ?? collections[0]?.coverEssay?.img}
+>
   <div class="text-white min-h-screen pb-32">
 
     {/* ── HERO PRINCIPAL CINEMÁTICO DARK GLOOCK (H1) ── */}

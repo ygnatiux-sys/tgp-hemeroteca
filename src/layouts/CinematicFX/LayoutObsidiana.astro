@@ -23,9 +23,11 @@ if (frontmatter.coverImage && !rawImages.length) {
 
 const title = frontmatter.title || 'Dossier — Obsidiana';
 const excerpt = frontmatter.excerpt || '';
+const rawCover = rawImages[0];
+const coverImgUrl = typeof rawCover === 'object' && rawCover?.src ? rawCover.src : (typeof rawCover === 'string' ? rawCover : undefined);
 ---
 
-<Layout title={title} description={excerpt} headerTransparentUntilScroll={true} footerVariant="minimal">
+<Layout title={title} description={excerpt} image={coverImgUrl} headerTransparentUntilScroll={true} footerVariant="minimal">
   <div class="min-h-screen bg-[#0b0c0d] text-[#e3ddd3] relative overflow-x-hidden selection:bg-[#c9a86c]/30 selection:text-white">
 
     {/* Contenedor Ambiental Fijo (Imágenes de fondo con GSAP) */}

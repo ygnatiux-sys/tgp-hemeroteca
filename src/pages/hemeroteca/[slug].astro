@@ -338,12 +338,15 @@ const articleSchema = {
     ...(doc.tags || [])
   ].filter(Boolean).join(", ")
 };
+const metaImageUrl = typeof optimizedImage === 'object' && optimizedImage?.src ? optimizedImage.src : (typeof optimizedImage === 'string' ? optimizedImage : undefined);
 ---
 
 <Layout
   hideHeader={true}
   footerVariant="minimal"
   title={`${doc.title} | Hemeroteca TGP`}
+  description={doc.excerpt || doc.description}
+  image={metaImageUrl}
 >
   <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
   {

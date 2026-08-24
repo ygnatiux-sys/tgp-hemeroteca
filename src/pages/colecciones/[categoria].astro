@@ -117,7 +117,11 @@ function createPremierSequences(items: typeof resolvedEssays) {
 const sequences = createPremierSequences(resolvedEssays);
 ---
 
-<Layout title={`${label} | Colecciones TGP`}>
+<Layout
+  title={`${label} | Colecciones TGP`}
+  description={`Colección temática especializada sobre ${label} en The Great Puzzle Project.`}
+  image={(coverImage as any)?.src ?? coverImage}
+>
   <div class="text-white min-h-screen pb-32">
 
     {/* ── HERO PRINCIPAL CINEMÁTICO DARK GLOOCK (H1) ── */}

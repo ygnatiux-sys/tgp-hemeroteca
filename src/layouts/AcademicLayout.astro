@@ -14,16 +14,71 @@ import BackSlideButton from '../components/BackSlideButton.astro';
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
   slug?: string;
 }
 
 const {
-  title = "TGP Papers & Dossiers",
+  title = "TGP Papers & Dossiers — The Great Puzzle Project",
   description = "Scriptorium Epistémico. Lectura profunda de dossieres y ensayos de investigación.",
+  image = "/images/favicon.TGP.webp",
   slug,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
+const imageURL = new URL(image, Astro.site ?? Astro.url.origin);
+
+const officialSocialLinks = [
+  "https://linktr.ee/thegreatpuzzleproject",
+  "https://open.spotify.com/show/3zFq9ab980MamMHW48Sqxy",
+  "https://www.youtube.com/@thegreatpuzzleproject",
+  "https://www.instagram.com/thegreatpuzzleproject",
+  "https://x.com/TheTGPProject",
+  "https://thegreatpuzzleproject.substack.com",
+  "https://www.threads.net/@thegreatpuzzleproject",
+  "https://www.tiktok.com/@thegreatpuzzleproject",
+  "https://bsky.app/profile/thegreatpuzzleproject.bsky.social",
+  "https://www.facebook.com/thegreatpuzzleproject",
+  "https://linkedin.com/in/xavierbenitez",
+  "https://www.pinterest.com/thegreatpuzzleproject",
+  "https://ygnatiux.tumblr.com",
+  "https://gravatar.com/xavierbeniteztgp"
+];
+
+const globalSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${canonicalURL.origin}/#website`,
+      "url": canonicalURL.origin,
+      "name": "The Great Puzzle Project",
+      "description": description,
+      "publisher": {
+        "@id": "https://thegreatpuzzleproject.com/#organization"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://thegreatpuzzleproject.com/#organization",
+      "name": "The Great Puzzle Project",
+      "url": "https://thegreatpuzzleproject.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": new URL("/favicon.png", canonicalURL).href
+      },
+      "sameAs": officialSocialLinks
+    },
+    {
+      "@type": "Person",
+      "@id": "https://thegreatpuzzleproject.com/#author",
+      "name": "Xavier Benítez",
+      "url": "https://linktr.ee/thegreatpuzzleproject",
+      "jobTitle": "Investigador & Editor General",
+      "sameAs": officialSocialLinks
+    }
+  ]
+};
 ---
 
 <!doctype html>
@@ -31,17 +86,45 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin)
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- URL Canónica y Sitemap -->
     <link rel="canonical" href={canonicalURL} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!-- Favicons -->
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="shortcut icon" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/favicon.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+
+    <!-- Metadatos Primarios SEO -->
     <title>{title}</title>
-    {description && <meta name="description" content={description} />}
-    <meta property="og:title" content={title} />
-    {description && <meta property="og:description" content={description} />}
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <meta name="author" content="Xavier Benítez" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article" />
     <meta property="og:url" content={canonicalURL.href} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={imageURL.href} />
+    <meta property="og:site_name" content="The Great Puzzle Project" />
+    <meta property="og:locale" content="es_LA" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@TheTGPProject" />
+    <meta name="twitter:creator" content="@TheTGPProject" />
+    <meta name="twitter:url" content={canonicalURL.href} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageURL.href} />
+
+    <!-- Datos Estructurados JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify(globalSchema)} />
+    <slot name="head" />
 
     <!-- Tipografías: Cormorant (brand) + Lora (cuerpo) + Inter (UI/meta) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

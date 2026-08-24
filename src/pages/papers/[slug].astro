@@ -136,7 +136,7 @@ const relatedPosts = publishable
 const pageTitle = `${title} — Papers · TGP`;
 ---
 
-<AcademicLayout title={pageTitle} description={excerpt ?? undefined} slug={slug}>
+<AcademicLayout title={pageTitle} description={excerpt ?? undefined} image={optimizedImg?.src} slug={slug}>
   <QuickReturnButton client:only="react" variant="papers" accentColor="#EFEBE3" fallbackUrl="/papers" />
 
   <!-- ═══════════════════════════════════════════════════════════════
