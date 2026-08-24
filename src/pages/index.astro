@@ -7,6 +7,7 @@ import SpotifyIcon from '../components/icons/Spotify.astro';
 import YouTubeIcon from '../components/icons/YouTube.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../components/CinematicPostEngine.astro';
+import SliderCinematico from '../components/SliderCinematico.astro';
 import {
   type EssayEntry,
   getPublishableEssays,
@@ -384,66 +385,23 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
 
 
       {/* ═══════════════════════════════════════════════════════════════════
-          BLOQUE 3: ENSAYOS RECIENTES (Estructura: 1 Hero Card + 2 Cards debajo)
-          Mapeo: 1 Hero principal + Dúo 60/40 secundario
+          BLOQUE 3: ENSAYOS RECIENTES — SLIDER CINEMÁTICO
       ═══════════════════════════════════════════════════════════════════ */}
       {resolvedRecent.length > 0 && (
-        <section class="flex flex-col gap-8 md:gap-12">
-          <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4">
+        <section class="flex flex-col gap-6 md:gap-8 reveal-item">
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-white/8">
             <div>
               <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Archivo de Ensayos</span>
               <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-cinzel font-extrabold tracking-tight bg-linear-to-b from-[#FFFFFF] via-[#8E8E93] to-[#1C1C1E] bg-clip-text text-transparent drop-shadow-md">
                 Ensayos Recientes
               </h2>
             </div>
-            <a href="/archivo/" class="font-metadata text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(239,235,227,0.5)] transition-all">
+            <a href="/archivo/" class="font-metadata text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(239,235,227,0.5)] transition-all pb-1">
               Ver Catálogo Completo ({publishable.length}) →
             </a>
           </div>
 
-          <div class="flex flex-col gap-8 md:gap-12">
-            {/* 1. Hero Cinemático Superior Full Width */}
-            {resolvedRecent[0] && (
-              <div class="w-full">
-                <CinematicArchiveCard
-                  slug={resolvedRecent[0].slug}
-                  entry={resolvedRecent[0].entry}
-                  img={resolvedRecent[0].img}
-                  variant="hero"
-                  enableCinemagraph={true}
-                />
-              </div>
-            )}
-
-            {/* 2. Dúo de Cards Inferiores con Proporción 60/40 */}
-            {resolvedRecent.length > 1 && (
-              <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
-                {resolvedRecent[1] && (
-                  <div class={resolvedRecent.length > 2 ? "lg:col-span-7 flex flex-col" : "lg:col-span-12 flex flex-col"}>
-                    <CinematicArchiveCard
-                      slug={resolvedRecent[1].slug}
-                      entry={resolvedRecent[1].entry}
-                      img={resolvedRecent[1].img}
-                      variant={resolvedRecent.length > 2 ? "duo-60" : "hero"}
-                      enableCinemagraph={true}
-                    />
-                  </div>
-                )}
-
-                {resolvedRecent[2] && (
-                  <div class="lg:col-span-5 flex flex-col">
-                    <CinematicArchiveCard
-                      slug={resolvedRecent[2].slug}
-                      entry={resolvedRecent[2].entry}
-                      img={resolvedRecent[2].img}
-                      variant="duo-40"
-                      enableCinemagraph={true}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          <SliderCinematico ensayos={resolvedRecent} />
         </section>
       )}
 

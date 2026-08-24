@@ -1,0 +1,67 @@
+---
+// src/components/SliderCinematico.astro
+import { formatCategory } from '../lib/content-filter';
+
+interface Props {
+  ensayos: Array<any>;
+}
+
+const { ensayos = [] } = Astro.props; 
+---
+
+<!-- El contenedor usa 'group' para coordinar el estado de todos los hijos -->
+<section class="w-full py-6 md:py-10">
+  <div class="group flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar pb-4 pt-2 px-1">
+    
+    {ensayos.slice(0, 3).map((ensayo) => {
+      const titulo = ensayo.titulo || ensayo.title || ensayo.entry?.title || 'Sin Título';
+      const categoria = ensayo.categoria || ensayo.category || (ensayo.entry?.category ? formatCategory(ensayo.entry.category) : 'ENSAYO');
+      const rawImg = ensayo.imagen || ensayo.img || ensayo.image || ensayo.entry?.coverImage;
+      const imagen = typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '');
+      const link = ensayo.link || (ensayo.slug ? `/hemeroteca/${ensayo.slug}/` : '#');
+
+      return (
+        <a 
+          href={link}
+          class="relative flex-none w-[85%] sm:w-[48%] md:w-[32%] snap-center rounded-xl overflow-hidden cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]
+                 opacity-80 scale-95
+                 group-hover:opacity-30 group-hover:scale-90
+                 hover:opacity-100! hover:scale-105! hover:z-10 hover:shadow-2xl border border-white/10 block"
+        >
+          <!-- Imagen de Fondo -->
+          {imagen ? (
+            <img 
+              src={imagen} 
+              alt={titulo} 
+              loading="lazy"
+              decoding="async"
+              class="w-full h-87.5 object-cover transition-transform duration-700"
+            />
+          ) : (
+            <div class="w-full h-87.5 bg-stone-900 flex items-center justify-center text-stone-500 font-mono text-xs">
+              Sin Imagen
+            </div>
+          )}
+          
+          <!-- Gradiente y Metadatos -->
+          <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-0 hover:opacity-100 transition-opacity duration-500">
+            <h3 class="text-2xl font-serif text-white tracking-wide leading-tight line-clamp-2">{titulo}</h3>
+            <p class="text-sm text-gray-400 mt-2 uppercase tracking-widest font-metadata">{categoria}</p>
+          </div>
+        </a>
+      );
+    })}
+
+  </div>
+</section>
+
+<style>
+  /* Utilidad para ocultar la barra de scroll manteniendo la funcionalidad */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
