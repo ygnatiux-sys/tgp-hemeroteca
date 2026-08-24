@@ -1,5 +1,75 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+/**
+ * Helper para forzar la actualización del valor en inputs y textareas de React 18
+ */
+export function setNativeValue(element: HTMLElement | null, value: string) {
+  if (!element || value === undefined || value === null) return;
+  const proto = Object.getPrototypeOf(element);
+  const descriptor =
+    Object.getOwnPropertyDescriptor(proto, 'value') ||
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value') ||
+    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value') ||
+    Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+
+  if (descriptor && descriptor.set) {
+    descriptor.set.call(element, value);
+  } else {
+    (element as any).value = value;
+  }
+
+  // Disparar los eventos sintéticos que React 18 escucha
+  element.dispatchEvent(new Event('input', { bubbles: true }));
+  element.dispatchEvent(new Event('change', { bubbles: true }));
+  element.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true }));
+}
+
+/**
+ * Helper para inyectar programáticamente texto Markdown en el editor ProseMirror (fields.document) de Keystatic
+ */
+export function injectIntoKeystaticDocumentEditor(markdownText: string): boolean {
+  if (typeof document === 'undefined' || !markdownText) return false;
+
+  const editorEl = document.querySelector<HTMLDivElement>(
+    '[contenteditable="true"].ProseMirror, [contenteditable="true"][role="textbox"], [contenteditable="true"]'
+  );
+
+  if (!editorEl) {
+    console.warn('[TGP] No se encontró el editor ProseMirror en el DOM.');
+    return false;
+  }
+
+  try {
+    editorEl.focus();
+
+    // Seleccionar todo el contenido actual del editor para sobreescribirlo limpiamente
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(editorEl);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+
+    // 1. Intentar execCommand('insertText')
+    const success = document.execCommand('insertText', false, markdownText);
+
+    // 2. Si no funcionó execCommand, intentar evento de pegado sintético (ClipboardEvent)
+    if (!success) {
+      const dataTransfer = new DataTransfer();
+      dataTransfer.setData('text/plain', markdownText);
+      const pasteEvent = new ClipboardEvent('paste', {
+        clipboardData: dataTransfer,
+        bubbles: true,
+        cancelable: true,
+      });
+      editorEl.dispatchEvent(pasteEvent);
+    }
+    return true;
+  } catch (err) {
+    console.error('[TGP] Error inyectando en el editor ProseMirror:', err);
+    return false;
+  }
+}
+
 export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
   const [lugar, setLugar] = useState('');
   const [generarConImagen, setGenerarConImagen] = useState(true);
@@ -16,6 +86,12 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
   const [excerpt, setExcerpt] = useState('');
   const [titulosSugeridos, setTitulosSugeridos] = useState<string[]>([]);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  // ── TOGGLES DE METADATA OPCIONAL (El usuario decide qué campos opcionales sincronizar) ──
+  const [syncVolanta, setSyncVolanta] = useState(true);
+  const [syncSaberMas, setSyncSaberMas] = useState(true);
+  const [syncExcerpt, setSyncExcerpt] = useState(true);
+  const [syncSitio, setSyncSitio] = useState(true);
 
   const pendingRef = useRef<any>({});
 
@@ -58,6 +134,88 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
     return null;
   };
 
+  const detectTitleFromDOM = (): string => {
+    if (lugar.trim()) return lugar.trim();
+    if (typeof document === 'undefined') return '';
+    const input = document.querySelector<HTMLInputElement>('input[name="title"], input[id^="title"]');
+    if (input && input.value.trim()) return input.value.trim();
+    const slug = getSlugFromUrl();
+    if (slug && slug !== 'new' && slug !== 'nuevo_post') return slug.replace(/-/g, ' ');
+    return '';
+  };
+
+  const effectiveTitle = detectTitleFromDOM();
+
+  /**
+   * SINCRONIZACIÓN TOTAL CON EL FORMULARIO DE KEYSTATIC Y EL EDITOR MARKDOC PROSEMIRROR
+   * - Título, Slug y Editor Markdoc: SIEMPRE se inyectan.
+   * - Volanta, Saber Más, Excerpt, Sitio: Se inyectan según el estado de los Toggles.
+   * - YouTube / Spotify: NUNCA se tocan (permanecen vacíos).
+   */
+  const syncAllKeystaticFields = (data?: {
+    title?: string;
+    volanta?: string;
+    saberMas?: string;
+    excerpt?: string;
+    sitio?: string;
+    contentMarkdown?: string;
+  }) => {
+    if (typeof document === 'undefined') return;
+
+    const titleVal = data?.title || lugar || effectiveTitle || '';
+    const volantaVal = data?.volanta ?? volanta;
+    const saberMasVal = data?.saberMas ?? saberMas;
+    const excerptVal = data?.excerpt ?? excerpt;
+    const sitioVal = data?.sitio ?? (lugar || effectiveTitle || '');
+    const contentVal = data?.contentMarkdown ?? informe;
+
+    // 1. Título & Slug (SIEMPRE)
+    if (titleVal) {
+      const titleInputs = document.querySelectorAll<HTMLInputElement>(
+        'input[name="title"], input[id^="title"], input[placeholder*="titulo"], input[placeholder*="tit"]'
+      );
+      titleInputs.forEach((el) => setNativeValue(el, titleVal));
+    }
+
+    // 2. Volanta Hook (Condicional según toggle)
+    if (syncVolanta && volantaVal) {
+      const volantaEls = document.querySelectorAll<HTMLTextAreaElement | HTMLInputElement>(
+        'textarea[name="volantaHook"], textarea[id*="volantaHook"], textarea[name*="volanta"], textarea[id*="volanta"], input[name="volantaHook"], input[id*="volantaHook"]'
+      );
+      volantaEls.forEach((el) => setNativeValue(el, volantaVal));
+    }
+
+    // 3. Saber Más Dato (Condicional según toggle)
+    if (syncSaberMas && saberMasVal) {
+      const saberEls = document.querySelectorAll<HTMLTextAreaElement | HTMLInputElement>(
+        'textarea[name="saberMasDato"], textarea[id*="saberMasDato"], textarea[name*="saberMas"], textarea[id*="saberMas"], input[name="saberMasDato"], input[id*="saberMasDato"]'
+      );
+      saberEls.forEach((el) => setNativeValue(el, saberMasVal));
+    }
+
+    // 4. Excerpt / Sinopsis (Condicional según toggle)
+    if (syncExcerpt && excerptVal) {
+      const excEls = document.querySelectorAll<HTMLTextAreaElement | HTMLInputElement>(
+        'textarea[name="excerpt"], textarea[id*="excerpt"]'
+      );
+      excEls.forEach((el) => setNativeValue(el, excerptVal));
+    }
+
+    // 5. Ubicación Geohistórica / Sitio (Condicional según toggle)
+    if (syncSitio && sitioVal) {
+      const sitioEls = document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
+        'input[name="sitioGeohistorico"], input[id*="sitioGeohistorico"], input[name*="sitio"], input[id*="sitio"]'
+      );
+      sitioEls.forEach((el) => setNativeValue(el, sitioVal));
+    }
+
+    // 6. Inyección Forzada en el Editor ProseMirror / fields.document (SIEMPRE)
+    if (contentVal) {
+      injectIntoKeystaticDocumentEditor(contentVal);
+      onChange(contentVal);
+    }
+  };
+
   useEffect(() => {
     if (value) {
       const unnested = unnestMarkdownJson(value);
@@ -67,11 +225,12 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
         if (unnested.saberMasDato) setSaberMas(unnested.saberMasDato);
         if (unnested.excerpt) setExcerpt(unnested.excerpt);
         if (unnested.titulosSugeridos) setTitulosSugeridos(unnested.titulosSugeridos);
-        syncFieldsToKeystaticDOM({
+        syncAllKeystaticFields({
           volanta: unnested.volantaHook,
           saberMas: unnested.saberMasDato,
           excerpt: unnested.excerpt,
-          sitio: lugar || effectiveTitle
+          sitio: lugar || effectiveTitle,
+          contentMarkdown: unnested.informeMarkdown
         });
         onChange(unnested.informeMarkdown);
         setStatusFeedback('Campos separados y desanidados correctamente');
@@ -126,62 +285,6 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
     } catch (e) {}
   };
 
-  const detectTitleFromDOM = (): string => {
-    if (lugar.trim()) return lugar.trim();
-    if (typeof document === 'undefined') return '';
-    const input = document.querySelector<HTMLInputElement>('input[name="title"], input[id^="title"]');
-    if (input && input.value.trim()) return input.value.trim();
-    const slug = getSlugFromUrl();
-    if (slug && slug !== 'new' && slug !== 'nuevo_post') return slug.replace(/-/g, ' ');
-    return '';
-  };
-
-  const effectiveTitle = detectTitleFromDOM();
-
-  const setInputElementValue = (el: HTMLInputElement | HTMLTextAreaElement | null, val: string) => {
-    if (!el || !val) return;
-    const nativeSetter = Object.getOwnPropertyDescriptor(
-      window.HTMLTextAreaElement.prototype,
-      'value'
-    )?.set || Object.getOwnPropertyDescriptor(
-      window.HTMLInputElement.prototype,
-      'value'
-    )?.set;
-
-    if (nativeSetter) {
-      nativeSetter.call(el, val);
-    } else {
-      el.value = val;
-    }
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-    el.dispatchEvent(new Event('change', { bubbles: true }));
-  };
-
-  const syncFieldsToKeystaticDOM = (data: { title?: string; volanta?: string; saberMas?: string; excerpt?: string; sitio?: string }) => {
-    if (typeof document === 'undefined') return;
-
-    if (data.title) {
-      const titleEl = document.querySelector<HTMLInputElement>('input[name="title"], input[id^="title"]');
-      setInputElementValue(titleEl, data.title);
-    }
-    if (data.volanta) {
-      const volantaEl = document.querySelector<HTMLTextAreaElement>('textarea[name="volantaHook"], textarea[id*="volantaHook"], textarea[name*="volanta"], textarea[id*="volanta"]');
-      setInputElementValue(volantaEl, data.volanta);
-    }
-    if (data.saberMas) {
-      const saberEl = document.querySelector<HTMLTextAreaElement>('textarea[name="saberMasDato"], textarea[id*="saberMasDato"], textarea[name*="saberMas"], textarea[id*="saberMas"]');
-      setInputElementValue(saberEl, data.saberMas);
-    }
-    if (data.excerpt) {
-      const excEl = document.querySelector<HTMLTextAreaElement>('textarea[name="excerpt"], textarea[id*="excerpt"]');
-      setInputElementValue(excEl, data.excerpt);
-    }
-    if (data.sitio) {
-      const sitioEl = document.querySelector<HTMLInputElement>('input[name="sitioGeohistorico"], input[id*="sitioGeohistorico"], input[name*="sitio"], input[id*="sitio"]');
-      setInputElementValue(sitioEl, data.sitio);
-    }
-  };
-
   // BOTÓN DE RESET / LIMPIEZA DE LIENZO (Evita mezclas indeseadas)
   const handleLimpiarLienzo = () => {
     if (informe && !window.confirm('¿Estás seguro de que deseas limpiar el lienzo de este post por completo? Se restablecerán todos los campos en blanco.')) {
@@ -205,7 +308,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
   // Aplicar un título sugerido por Gemini
   const handleSeleccionarTituloSugerido = (titulo: string) => {
     setLugar(titulo);
-    syncFieldsToKeystaticDOM({ title: titulo, sitio: titulo });
+    syncAllKeystaticFields({ title: titulo, sitio: titulo });
   };
 
   // 1. Generación de Informe Geohistórico Multidimensional (Gemini 3.1 Pro)
@@ -248,12 +351,14 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       pendingRef.current.excerpt = data.excerpt;
       pendingRef.current.titulosSugeridos = data.titulosSugeridos;
 
-      // Inyectar automáticamente en los campos de Keystatic
-      syncFieldsToKeystaticDOM({
+      // Inyectar automáticamente en los campos de Keystatic y en el editor Markdoc
+      syncAllKeystaticFields({
+        title: data.titulosSugeridos?.[0] || temaToUse,
         volanta: data.volantaHook,
         saberMas: data.saberMasDato,
         excerpt: data.excerpt,
-        sitio: temaToUse
+        sitio: temaToUse,
+        contentMarkdown: data.informeMarkdown
       });
 
       saveToLocalBackup({
@@ -264,7 +369,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
         titulosSugeridos: data.titulosSugeridos
       });
 
-      setStatusFeedback('Informe generado exitosamente. Listo para guardar.');
+      setStatusFeedback('Informe generado e inyectado en Keystatic. Listo para guardar.');
       
       // Si el toggle de imagen está activado, generar también imagen de portada
       if (generarConImagen) {
@@ -318,7 +423,25 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
     }
   };
 
-  // 3. Guardado Directo a Disco en la Colección Georreferencias
+  // 3. Acción Manual de Inyección / Traspasar Todo
+  const handleTraspasarTodo = () => {
+    const temaToUse = effectiveTitle || lugar.trim();
+    if (!informe) return alert('No hay contenido generado para traspasar.');
+
+    syncAllKeystaticFields({
+      title: temaToUse,
+      volanta,
+      saberMas,
+      excerpt,
+      sitio: temaToUse,
+      contentMarkdown: informe
+    });
+
+    setStatusFeedback('✓ Datos inyectados en el formulario y editor Markdoc de Keystatic.');
+    alert('✓ ¡TRASPASO EXITOSO!\n\nLos datos fueron inyectados en los campos de Keystatic y en el editor Markdoc ProseMirror.\n\nYa puedes presionar el botón "Save" de la barra superior de Keystatic.');
+  };
+
+  // 4. Guardado Directo a Disco en la Colección Georreferencias
   const handleConfirmarSincronizacion = async () => {
     const temaToUse = effectiveTitle || lugar.trim();
     if (!informe) return alert('No hay contenido de informe geohistórico para guardar.');
@@ -326,6 +449,16 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
     const slugConfirmado = (getSlugFromUrl() && getSlugFromUrl() !== 'new')
       ? getSlugFromUrl()! 
       : temaToUse.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
+
+    // Inyectar en Keystatic antes de guardar
+    syncAllKeystaticFields({
+      title: temaToUse,
+      volanta,
+      saberMas,
+      excerpt,
+      sitio: temaToUse,
+      contentMarkdown: informe
+    });
 
     try {
       const res = await fetch('/api/guardar-georreferencia', {
@@ -335,10 +468,10 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
           slug: slugConfirmado,
           title: temaToUse,
           content: pendingRef.current.informe ?? informe,
-          volantaHook: pendingRef.current.volanta ?? volanta,
-          saberMasDato: pendingRef.current.saberMas ?? saberMas,
-          sitioGeohistorico: temaToUse,
-          excerpt: pendingRef.current.excerpt ?? excerpt,
+          volantaHook: syncVolanta ? (pendingRef.current.volanta ?? volanta) : '',
+          saberMasDato: syncSaberMas ? (pendingRef.current.saberMas ?? saberMas) : '',
+          sitioGeohistorico: syncSitio ? temaToUse : '',
+          excerpt: syncExcerpt ? (pendingRef.current.excerpt ?? excerpt) : '',
           category: 'Arqueosemiótica',
           imageUrl: pendingRef.current.imageUrl ?? imageUrl,
           publicarConImagen: generarConImagen
@@ -348,7 +481,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       const data = await res.json();
       if (data.success) {
         setIsSaved(true);
-        setStatusFeedback('¡Fue publicada nueva reseña y guardada exitosamente en disco!');
+        setStatusFeedback('¡Publicación guardada exitosamente en disco!');
         alert(`¡PUBLICACIÓN GUARDADA EXITOSAMENTE EN DISCO!\n\nArtículo: "${temaToUse}"\nRuta: src/content/georreferencias/${slugConfirmado}/`);
         setTimeout(() => setIsSaved(false), 5000);
       } else {
@@ -495,6 +628,63 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
         )}
       </div>
 
+      {/* ── PANEL DE TOGGLES DE METADATA OPCIONAL ── */}
+      <div style={{
+        padding: '14px 16px',
+        background: '#0d1b2a',
+        border: '1px solid #1e3a5f',
+        borderRadius: '8px',
+        marginBottom: '18px'
+      }}>
+        <span style={{ fontSize: '0.75rem', color: '#90caf9', fontWeight: 700, display: 'block', marginBottom: '10px' }}>
+          OPCIONES DE SINCRONIZACIÓN DE METADATA (TOGGLES):
+        </span>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', color: syncVolanta ? '#e0e0e0' : '#888', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={syncVolanta}
+              onChange={(e) => setSyncVolanta(e.target.checked)}
+              style={{ accentColor: '#1976d2', cursor: 'pointer' }}
+            />
+            Volanta / H2 Hook
+          </label>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', color: syncSaberMas ? '#e0e0e0' : '#888', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={syncSaberMas}
+              onChange={(e) => setSyncSaberMas(e.target.checked)}
+              style={{ accentColor: '#1976d2', cursor: 'pointer' }}
+            />
+            Saber Más (Dato Local)
+          </label>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', color: syncExcerpt ? '#e0e0e0' : '#888', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={syncExcerpt}
+              onChange={(e) => setSyncExcerpt(e.target.checked)}
+              style={{ accentColor: '#1976d2', cursor: 'pointer' }}
+            />
+            Excerpt / Sinopsis
+          </label>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', color: syncSitio ? '#e0e0e0' : '#888', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={syncSitio}
+              onChange={(e) => setSyncSitio(e.target.checked)}
+              style={{ accentColor: '#1976d2', cursor: 'pointer' }}
+            />
+            Ubicación Geohistórica
+          </label>
+        </div>
+        <span style={{ fontSize: '0.68rem', color: '#64b5f6', marginTop: '8px', display: 'block' }}>
+          ℹ️ Título, Slug y el editor de Contenido Markdoc se inyectan siempre. YouTube y Spotify permanecen vacíos.
+        </span>
+      </div>
+
       {/* Toggle Separado para Generar Imagen */}
       <div style={{
         display: 'flex',
@@ -518,8 +708,8 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
         </label>
       </div>
 
-      {/* Botonera de Acción */}
-      <div style={{ display: 'grid', gridTemplateColumns: generarConImagen ? '2fr 1fr' : '1fr', gap: '12px', marginBottom: '24px' }}>
+      {/* Botonera de Acción de Generación */}
+      <div style={{ display: 'grid', gridTemplateColumns: generarConImagen ? '2fr 1fr' : '1fr', gap: '12px', marginBottom: '18px' }}>
         <button
           type="button"
           onClick={handleGenerarInforme}
@@ -567,10 +757,33 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       )}
 
       {/* ÁREA DE TEXTO DEL INFORME */}
-      <div style={{ marginBottom: '24px' }}>
-        <label style={{ fontSize: '0.75rem', color: '#aaa', display: 'block', marginBottom: '6px', fontWeight: 700 }}>
-          INFORME GEOHISTÓRICO (MARKDOWN):
-        </label>
+      <div style={{ marginBottom: '18px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+          <label style={{ fontSize: '0.75rem', color: '#aaa', fontWeight: 700 }}>
+            INFORME GEOHISTÓRICO (MARKDOWN):
+          </label>
+          {informe && (
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(informe);
+                alert('✓ Informe copiado al portapapeles.');
+              }}
+              style={{
+                padding: '4px 10px',
+                background: '#14283c',
+                color: '#90caf9',
+                border: '1px solid #285484',
+                borderRadius: '4px',
+                fontSize: '0.72rem',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              📋 Copiar Markdown
+            </button>
+          )}
+        </div>
         <textarea
           value={informe}
           onChange={(e) => {
@@ -597,7 +810,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
 
       {/* PREVIEW DE PORTADA SI EXISTE */}
       {imageUrl && (
-        <div style={{ marginBottom: '24px', textAlign: 'center', background: '#081018', padding: '16px', borderRadius: '8px', border: '1px solid #19436d' }}>
+        <div style={{ marginBottom: '20px', textAlign: 'center', background: '#081018', padding: '16px', borderRadius: '8px', border: '1px solid #19436d' }}>
           <span style={{ fontSize: '0.75rem', color: '#90caf9', fontWeight: 700, display: 'block', marginBottom: '10px' }}>
             PORTADA FOTOGRÁFICA GENERADA
           </span>
@@ -605,31 +818,56 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
         </div>
       )}
 
-      {/* BOTÓN CONFIRMAR EN DISCO */}
-      <button
-        type="button"
-        onClick={handleConfirmarSincronizacion}
-        disabled={!informe || informe.length < 10}
-        style={{
-          width: '100%',
-          padding: '18px',
-          background: (!informe || informe.length < 10) 
-            ? '#1f2937' 
-            : isSaved 
-              ? 'linear-gradient(135deg, #1b5e20, #2e7d32)' 
-              : 'linear-gradient(135deg, #0d47a1, #1565c0)',
-          color: (!informe || informe.length < 10) ? '#666' : '#fff',
-          border: '1px solid #42a5f5',
-          borderRadius: '8px',
-          fontWeight: 800,
-          fontSize: '0.95rem',
-          letterSpacing: '0.08em',
-          cursor: (!informe || informe.length < 10) ? 'not-allowed' : 'pointer',
-          boxShadow: '0 4px 14px rgba(21, 101, 192, 0.4)'
-        }}
-      >
-        {isSaved ? '¡PUBLICACIÓN GUARDADA EXITOSAMENTE EN DISCO!' : 'CONFIRMAR & GUARDAR GEORREFERENCIA EN DISCO'}
-      </button>
+      {/* BOTONERA DE ACCIÓN: TRASPASAR TODO & GUARDAR EN DISCO */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
+        {/* BOTÓN 1: TRASPASAR AL FORMULARIO & PROSEMIRROR */}
+        <button
+          type="button"
+          onClick={handleTraspasarTodo}
+          disabled={!informe || informe.length < 10}
+          style={{
+            padding: '16px',
+            background: (!informe || informe.length < 10)
+              ? '#1b222d'
+              : 'linear-gradient(135deg, #00695c, #00897b)',
+            color: (!informe || informe.length < 10) ? '#666' : '#fff',
+            border: '1px solid #26a69a',
+            borderRadius: '8px',
+            fontWeight: 800,
+            fontSize: '0.9rem',
+            letterSpacing: '0.04em',
+            cursor: (!informe || informe.length < 10) ? 'not-allowed' : 'pointer',
+            boxShadow: '0 4px 12px rgba(0, 137, 123, 0.35)'
+          }}
+        >
+          ⚡ TRASPASAR TODO AL FORMULARIO & EDITOR
+        </button>
+
+        {/* BOTÓN 2: CONFIRMAR EN DISCO */}
+        <button
+          type="button"
+          onClick={handleConfirmarSincronizacion}
+          disabled={!informe || informe.length < 10}
+          style={{
+            padding: '16px',
+            background: (!informe || informe.length < 10) 
+              ? '#1f2937' 
+              : isSaved 
+                ? 'linear-gradient(135deg, #1b5e20, #2e7d32)' 
+                : 'linear-gradient(135deg, #0d47a1, #1565c0)',
+            color: (!informe || informe.length < 10) ? '#666' : '#fff',
+            border: '1px solid #42a5f5',
+            borderRadius: '8px',
+            fontWeight: 800,
+            fontSize: '0.9rem',
+            letterSpacing: '0.04em',
+            cursor: (!informe || informe.length < 10) ? 'not-allowed' : 'pointer',
+            boxShadow: '0 4px 12px rgba(21, 101, 192, 0.35)'
+          }}
+        >
+          {isSaved ? '¡PUBLICACIÓN GUARDADA EN DISCO!' : '💾 CONFIRMAR & GUARDAR EN DISCO'}
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { setNativeValue, injectIntoKeystaticDocumentEditor } from './GeneradorGeorreferenciaTGP';
 
 export function GeneradorTextoTGP({ value, onChange }: any) {
   const [titulo, setTitulo] = useState('');
@@ -183,26 +184,24 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
     }
   };
 
-  // Inyectar automáticamente la categoría y el excerpt en los campos de Keystatic
-  const syncFieldsToKeystaticDOM = (suggestedCategory?: string, suggestedExcerpt?: string) => {
+  // Inyectar automáticamente la categoría, excerpt y contenido en los campos de Keystatic
+  const syncFieldsToKeystaticDOM = (suggestedCategory?: string, suggestedExcerpt?: string, contentToInject?: string) => {
     const catToUse = suggestedCategory || categoryIA;
     const excToUse = suggestedExcerpt || excerptIA;
+    const textToUse = contentToInject || ensayo;
 
     if (catToUse) {
       const catSelect = document.querySelector<HTMLSelectElement>('select[name="category"], select');
-      if (catSelect) {
-        catSelect.value = catToUse;
-        catSelect.dispatchEvent(new Event('change', { bubbles: true }));
-      }
+      if (catSelect) setNativeValue(catSelect, catToUse);
     }
 
     if (excToUse) {
       const excTextarea = document.querySelector<HTMLTextAreaElement>('textarea[name="excerpt"], textarea');
-      if (excTextarea) {
-        excTextarea.value = excToUse;
-        excTextarea.dispatchEvent(new Event('input', { bubbles: true }));
-        excTextarea.dispatchEvent(new Event('change', { bubbles: true }));
-      }
+      if (excTextarea) setNativeValue(excTextarea, excToUse);
+    }
+
+    if (textToUse) {
+      injectIntoKeystaticDocumentEditor(textToUse);
     }
   };
 
@@ -245,8 +244,8 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
       pendingRef.current.excerpt = data.excerpt;
       pendingRef.current.category = data.category;
 
-      // Inyectar en el formulario de Keystatic (categoría, excerpt)
-      syncFieldsToKeystaticDOM(data.category, data.excerpt);
+      // Inyectar en el formulario de Keystatic (categoría, excerpt y editor Markdoc)
+      syncFieldsToKeystaticDOM(data.category, data.excerpt, data.content);
 
       // Backup local
       saveToLocalBackup({
