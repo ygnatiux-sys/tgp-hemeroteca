@@ -30,6 +30,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
   const [isGeneratingArt, setIsGeneratingArt] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isSynced, setIsSynced] = useState(false); // true cuando «Traspasar» fue ejecutado
   const [generarAmbosJuntos, setGenerarAmbosJuntos] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -100,6 +101,26 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
       localStorage.setItem(BACKUP_KEY, JSON.stringify(updated));
     } catch (e) {}
   };
+
+  // Helper: bloquea/desbloquea el botón Save nativo de Keystatic
+  const lockKeystatiSave = (lock: boolean) => {
+    if (typeof document === 'undefined') return;
+    document.querySelectorAll<HTMLButtonElement>('button').forEach(btn => {
+      const label = (btn.textContent || '').trim().toLowerCase();
+      if (label === 'save' || label === 'create') {
+        if (lock) {
+          btn.setAttribute('disabled', 'true');
+          btn.setAttribute('title', '⚠️ Primero presioná «Traspasar Todo»');
+          btn.style.opacity = '0.35'; btn.style.cursor = 'not-allowed';
+        } else {
+          btn.removeAttribute('disabled'); btn.removeAttribute('title');
+          btn.style.opacity = ''; btn.style.cursor = '';
+        }
+      }
+    });
+  };
+  useEffect(() => { if (!isSynced) lockKeystatiSave(true); }, []);
+  useEffect(() => { lockKeystatiSave(!isSynced); }, [isSynced]);
 
   const handleLimpiarLienzo = () => {
     if (informe && !window.confirm('¿Deseas limpiar el lienzo de este informe de arquetipo?')) return;
@@ -420,11 +441,12 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
             if (!informe) return alert('No hay texto para sincronizar.');
             onChange(informe);
             syncFieldsToKeystaticDOM(volantaIA, categoryIA, excerptIA);
-            alert('✦ Campos sincronizados con Keystatic. El título siempre se inyecta; los opcionales solo si sus toggles están activos.');
+            setIsSynced(true);
+            lockKeystatiSave(false);
           }}
           className="py-2.5 px-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 rounded-lg text-xs font-metadata transition-all cursor-pointer flex items-center justify-center gap-2"
         >
-          <span>✓ Traspasar Todo a Keystatic</span>
+          <span>{isSynced ? '✅ Traspasado — Podés hacer Save' : '✓ Traspasar Todo a Keystatic'}</span>
         </button>
       </div>
 
@@ -657,6 +679,8 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
                   onChange(val); // Persistencia reactiva a Keystatic
                   pendingRef.current.content = val;
                   saveToLocalBackup({ informe: val });
+                  setIsSynced(false);
+                  lockKeystatiSave(true);
                 }}
                 className="w-full p-4 rounded-lg font-mono text-xs text-stone-200 border focus:outline-none transition-all"
                 style={{
@@ -698,6 +722,8 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
                 onClick={() => {
                   onChange(informe);
                   syncFieldsToKeystaticDOM(volantaIA, categoryIA, excerptIA);
+                  setIsSynced(true);
+                  lockKeystatiSave(false);
                   alert('✦ Re-sincronizado con el formulario de Keystatic.');
                 }}
                 className="px-3.5 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 rounded-lg text-xs font-mono uppercase tracking-wider transition-all cursor-pointer font-bold shadow-sm"
@@ -706,6 +732,19 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* BADGE DE SINCRONIZACIÓN */}
+      {informe && (
+        <div className={`mb-4 px-4 py-3 rounded-xl border text-xs font-mono ${
+          isSynced
+            ? 'bg-blue-950/40 border-blue-600/60 text-blue-300'
+            : 'bg-amber-950/30 border-amber-700/50 text-amber-400'
+        }`}>
+          {isSynced
+            ? '✅ Contenido traspasado — ya podés presionar «Save» en la barra de Keystatic.'
+            : '⚠️ Hay contenido listo. Presioná «Traspasar Todo» antes de «Save».'}
         </div>
       )}
 
@@ -729,7 +768,8 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
 
           <button
             type="button"
-            disabled={isSaving || !informe || informe.length < 10}
+            disabled={isSaving || !informe || informe.length < 10 || !isSynced}
+          title={!isSynced ? 'Primero presioná «Traspasar Todo»' : ''}
             onClick={async () => {
               const slugToUse = getSlugFromUrl();
               if (!slugToUse || slugToUse === 'new' || slugToUse === 'nuevo_arquetipo') {

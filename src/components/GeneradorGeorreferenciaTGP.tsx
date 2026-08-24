@@ -78,6 +78,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
   const [isGeneratingArt, setIsGeneratingArt] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
+  const [isSynced, setIsSynced] = useState(false); // ← true cuando «Traspasar» fue ejecutado
   const [statusFeedback, setStatusFeedback] = useState<string | null>(null);
 
   const [informe, setInforme] = useState(value || '');
@@ -430,6 +431,34 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
     }
   };
 
+  // Helper: habilita / deshabilita el botón Save nativo de Keystatic en el DOM
+  const lockKeystatiSave = (lock: boolean) => {
+    if (typeof document === 'undefined') return;
+    const saveButtons = document.querySelectorAll<HTMLButtonElement>(
+      'button[type="submit"], form button[type="submit"], [data-keystatic-save-button], button'
+    );
+    saveButtons.forEach(btn => {
+      const label = (btn.textContent || '').trim().toLowerCase();
+      if (label === 'save' || label === 'guardar' || label === 'create') {
+        if (lock) {
+          btn.setAttribute('disabled', 'true');
+          btn.setAttribute('title', '⚠️ Primero presiona «Traspasar Todo» para inyectar el contenido');
+          btn.style.opacity = '0.35';
+          btn.style.cursor = 'not-allowed';
+        } else {
+          btn.removeAttribute('disabled');
+          btn.removeAttribute('title');
+          btn.style.opacity = '';
+          btn.style.cursor = '';
+        }
+      }
+    });
+  };
+
+  // Activar lock al montar si no hay contenido sinc.
+  useEffect(() => { if (!isSynced) lockKeystatiSave(true); }, []);
+  useEffect(() => { lockKeystatiSave(!isSynced); }, [isSynced]);
+
   // 3. Acción Manual de Inyección / Traspasar Todo
   const handleTraspasarTodo = () => {
     const temaToUse = effectiveTitle || lugar.trim();
@@ -444,8 +473,9 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       contentMarkdown: informe
     });
 
+    setIsSynced(true);
+    lockKeystatiSave(false);
     setStatusFeedback('✓ Datos inyectados en el formulario y editor Markdoc de Keystatic.');
-    alert('✓ ¡TRASPASO EXITOSO!\n\nLos datos fueron inyectados en los campos de Keystatic y en el editor Markdoc ProseMirror.\n\nYa puedes presionar el botón "Save" de la barra superior de Keystatic.');
   };
 
   // 4. Guardado Directo a Disco en la Colección Georreferencias
@@ -883,6 +913,37 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
         </div>
       )}
 
+      {/* BADGE DE ESTADO DE SINCRONIZACIÓN */}
+      {isSynced && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '8px',
+          padding: '10px 16px',
+          background: 'rgba(25, 118, 210, 0.12)',
+          border: '1px solid #1976d2',
+          borderRadius: '8px',
+          marginBottom: '14px',
+          fontSize: '0.8rem',
+          color: '#90caf9',
+          fontWeight: 700
+        }}>
+          ✅ Contenido traspasado — ya podés presionar «Save» en la barra de Keystatic.
+        </div>
+      )}
+      {!isSynced && informe && informe.length > 10 && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '8px',
+          padding: '10px 16px',
+          background: 'rgba(255, 152, 0, 0.08)',
+          border: '1px solid #f57c00',
+          borderRadius: '8px',
+          marginBottom: '14px',
+          fontSize: '0.78rem',
+          color: '#ffb74d'
+        }}>
+          ⚠️ Hay contenido generado. Presioná «Traspasar Todo» antes de «Save» en Keystatic.
+        </div>
+      )}
+
       {/* BOTONERA DE ACCIÓN: TRASPASAR TODO & GUARDAR EN DISCO */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
         {/* BOTÓN 1: TRASPASAR AL FORMULARIO & PROSEMIRROR */}
@@ -892,41 +953,44 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
           disabled={!informe || informe.length < 10}
           style={{
             padding: '16px',
-            background: (!informe || informe.length < 10)
-              ? '#1b222d'
-              : 'linear-gradient(135deg, #00695c, #00897b)',
+            background: isSynced
+              ? 'linear-gradient(135deg, #004d40, #00695c)'
+              : (!informe || informe.length < 10)
+                ? '#1b222d'
+                : 'linear-gradient(135deg, #00695c, #00897b)',
             color: (!informe || informe.length < 10) ? '#666' : '#fff',
-            border: '1px solid #26a69a',
+            border: isSynced ? '2px solid #00e5ff' : '1px solid #26a69a',
             borderRadius: '8px',
             fontWeight: 800,
             fontSize: '0.9rem',
             letterSpacing: '0.04em',
             cursor: (!informe || informe.length < 10) ? 'not-allowed' : 'pointer',
-            boxShadow: '0 4px 12px rgba(0, 137, 123, 0.35)'
+            boxShadow: isSynced ? '0 0 16px rgba(0,229,255,0.3)' : '0 4px 12px rgba(0, 137, 123, 0.35)'
           }}
         >
-          ⚡ TRASPASAR TODO AL FORMULARIO & EDITOR
+          {isSynced ? '✅ TRASPASADO — Podés hacer Save' : '⚡ TRASPASAR TODO AL FORMULARIO & EDITOR'}
         </button>
 
-        {/* BOTÓN 2: CONFIRMAR EN DISCO */}
+        {/* BOTÓN 2: CONFIRMAR EN DISCO — solo activo si ya fue traspasado */}
         <button
           type="button"
           onClick={handleConfirmarSincronizacion}
-          disabled={!informe || informe.length < 10}
+          disabled={!isSynced || !informe || informe.length < 10}
+          title={!isSynced ? 'Primero presioná «Traspasar Todo»' : ''}
           style={{
             padding: '16px',
-            background: (!informe || informe.length < 10) 
-              ? '#1f2937' 
-              : isSaved 
-                ? 'linear-gradient(135deg, #1b5e20, #2e7d32)' 
+            background: (!isSynced || !informe || informe.length < 10)
+              ? '#1f2937'
+              : isSaved
+                ? 'linear-gradient(135deg, #1b5e20, #2e7d32)'
                 : 'linear-gradient(135deg, #0d47a1, #1565c0)',
-            color: (!informe || informe.length < 10) ? '#666' : '#fff',
+            color: (!isSynced || !informe || informe.length < 10) ? '#666' : '#fff',
             border: '1px solid #42a5f5',
             borderRadius: '8px',
             fontWeight: 800,
             fontSize: '0.9rem',
             letterSpacing: '0.04em',
-            cursor: (!informe || informe.length < 10) ? 'not-allowed' : 'pointer',
+            cursor: (!isSynced || !informe || informe.length < 10) ? 'not-allowed' : 'pointer',
             boxShadow: '0 4px 12px rgba(21, 101, 192, 0.35)'
           }}
         >

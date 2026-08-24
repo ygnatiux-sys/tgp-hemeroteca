@@ -1,6 +1,5 @@
 import React from 'react';
 export {
-  setNativeValue,
   GeneradorCinematicosTGP,
   GeneradorCinematicosTGP as GeminiCinematicStudio,
   geminiCinematicField,

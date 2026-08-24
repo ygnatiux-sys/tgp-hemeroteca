@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 // Keystatic usa inputs controlados por React. El simple `element.value = x`
 // no dispara el estado interno de React. Este helper usa el setter nativo
 // del prototipo para forzar que React detecte el cambio y valide el slug.
-export function setNativeValue(element: HTMLElement, value: string): void {
+// setNativeValue: función interna (no re-exportada para evitar colisión con GeneradorGeorreferenciaTGP)
+function setNativeValue(element: HTMLElement, value: string): void {
   const proto = Object.getPrototypeOf(element);
   const descriptor =
     Object.getOwnPropertyDescriptor(proto, 'value') ||
@@ -54,6 +55,7 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
   // ── Toggles para campos opcionales (default OFF) ──
   const [syncExcerpt, setSyncExcerpt] = useState(false);
   const [excerptIA, setExcerptIA] = useState<string>('');
+  const [isSynced, setIsSynced] = useState(false); // true cuando el texto fue enviado a Keystatic
 
   const pendingRef = useRef<{ text?: string; excerpt?: string; image?: string }>({});
 
@@ -108,6 +110,26 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
       }));
     } catch (e) {}
   };
+
+  // Helper: bloquea/desbloquea el botón Save nativo de Keystatic
+  const lockKeystatiSave = (lock: boolean) => {
+    if (typeof document === 'undefined') return;
+    document.querySelectorAll<HTMLButtonElement>('button').forEach(btn => {
+      const label = (btn.textContent || '').trim().toLowerCase();
+      if (label === 'save' || label === 'create') {
+        if (lock) {
+          btn.setAttribute('disabled', 'true');
+          btn.setAttribute('title', '⚠️ Presioná «Generar» primero para crear el ensayo');
+          btn.style.opacity = '0.35'; btn.style.cursor = 'not-allowed';
+        } else {
+          btn.removeAttribute('disabled'); btn.removeAttribute('title');
+          btn.style.opacity = ''; btn.style.cursor = '';
+        }
+      }
+    });
+  };
+  useEffect(() => { if (!isSynced) lockKeystatiSave(true); }, []);
+  useEffect(() => { lockKeystatiSave(!isSynced); }, [isSynced]);
 
   // Auto-detectar título desde el campo de título de Keystatic
   const getEffectiveTopic = (): string => {
@@ -193,7 +215,8 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
       setGeneratedText(content);
       syncToKeystatic(content, previewImage);
       syncFieldsToKeystaticDOM(topic, generatedExcerpt);
-      
+      setIsSynced(true);
+      lockKeystatiSave(false);
       setStatusMsg({ type: 'success', text: '✅ Ensayo y Slug sincronizados exitosamente con Keystatic.' });
       return content;
     } catch (err: any) {
@@ -278,6 +301,8 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
           setPreviewPrompt(data.imagePrompt || null);
           syncToKeystatic(textResult || generatedText, data.imageUrl);
           syncFieldsToKeystaticDOM(topic);
+          setIsSynced(true);
+          lockKeystatiSave(false);
           setStatusMsg({ type: 'success', text: '✅ Ensayo, Portada y Slug GSAP sincronizados exitosamente.' });
         }
       } catch (err: any) {
@@ -476,6 +501,24 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
           color: statusMsg.type === 'error' ? '#fca5a5' : statusMsg.type === 'success' ? '#86efac' : '#93c5fd'
         }}>
           {statusMsg.text}
+        </div>
+      )}
+
+      {/* BADGE SINCRONIZACIÓN */}
+      {generatedText && (
+        <div style={{
+          padding: '10px 14px',
+          marginBottom: '12px',
+          borderRadius: '6px',
+          fontSize: '12px',
+          fontWeight: 700,
+          background: isSynced ? 'rgba(25,118,210,0.12)' : 'rgba(245,124,0,0.08)',
+          border: isSynced ? '1px solid #1976d2' : '1px solid #f57c00',
+          color: isSynced ? '#90caf9' : '#ffb74d'
+        }}>
+          {isSynced
+            ? '✅ Ensayo traspasado — podés presionar «Save» en Keystatic.'
+            : '⚠️ Ensayo listo. El contenido ya fue enviado automáticamente — presioná «Save».'}
         </div>
       )}
 
