@@ -2,7 +2,6 @@
 import { render, getEntry, getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import MarqueeColecciones from "../../components/MarqueeColecciones.astro";
-import { Image } from "astro:assets";
 import SpotifyIcon from "../../components/icons/Spotify.astro";
 import YouTubeIcon from "../../components/icons/YouTube.astro";
 import { marked } from "marked";
@@ -22,6 +21,7 @@ import {
   groupByCategory,
   formatCategory,
   getPublishableEssays,
+  sanitizeImageUrl,
 } from "../../lib/content-filter";
 import CinematicDossier from "../../components/CinematicDossier.astro"; // reservado para uso futuro
 import CinematicGalleryEngine from "../../components/CinematicGalleryEngine.astro";
@@ -712,10 +712,11 @@ const metaImageUrl = typeof optimizedImage === 'object' && optimizedImage?.src ?
                       title={wmItem.title}
                     >
                       <img
-                        src={wmItem.thumbUrl || wmItem.url}
+                        src={sanitizeImageUrl(wmItem.thumbUrl || wmItem.url)}
                         alt={wmItem.title}
                         class="w-full h-full object-cover group-hover/img:scale-108 transition-transform duration-700 opacity-80 group-hover/img:opacity-100"
                         loading="lazy"
+                        decoding="async"
                       />
                       <span class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 text-[7px] font-metadata text-white/70 rounded">#{idx + 1}</span>
                     </a>
@@ -724,11 +725,13 @@ const metaImageUrl = typeof optimizedImage === 'object' && optimizedImage?.src ?
               </div>
             ) : optimizedImage ? (
               <div class="cinematic-card-lantern overflow-hidden rounded-2xl aspect-4/5 relative group shadow-xl">
-                {typeof optimizedImage === 'object' && optimizedImage ? (
-                  <Image src={optimizedImage} alt="Registro visual" class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out" />
-                ) : typeof optimizedImage === 'string' && optimizedImage.trim().length > 0 ? (
-                  <img src={optimizedImage} alt="Registro visual" class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy" decoding="async" />
-                ) : null}
+                <img
+                  src={sanitizeImageUrl(optimizedImage)}
+                  alt="Registro visual"
+                  class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out"
+                  loading="lazy"
+                  decoding="async"
+                />
                 <div class="absolute bottom-0 inset-x-0 p-3 bg-linear-to-t from-black/90 via-black/40 to-transparent">
                   <p class="font-metadata text-[8px] text-white/70 tracking-wider uppercase">FIG I. Portada de archivo.</p>
                 </div>

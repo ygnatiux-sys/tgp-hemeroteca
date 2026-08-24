@@ -3,7 +3,7 @@
  * Hero Cinematográfico 100vh (Viewport Hero) para TGP.
  * Imagen full-bleed con fade-to-black profundo y revelación GSAP escalonada.
  */
-import { Image } from "astro:assets";
+import { sanitizeImageUrl } from "../lib/content-filter";
 
 interface Props {
   title: string;
@@ -24,6 +24,8 @@ const {
   subtitle,
   titleClass = "font-cinzel text-5xl md:text-7xl lg:text-8xl font-extrabold leading-tight tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-[0_15px_50px_rgba(0,0,0,0.95)]",
 } = Astro.props;
+
+const safeImageUrl = sanitizeImageUrl(image);
 ---
 
 <header
@@ -32,31 +34,16 @@ const {
   {/* 1. Canvas Visual: Imagen Absoluta + Fade to Black */}
   <div class="absolute inset-0 z-0 overflow-hidden bg-black">
     {
-      image ? (
-        typeof image === 'object' ? (
-          <Image
-            src={image}
-            alt={imageAlt || title}
-            class="interior-hero-image w-full h-full object-cover opacity-100"
-            style={`object-position: ${imagePosition};`}
-            loading="eager"
-            quality={85}
-          />
-        ) : typeof image === 'string' && image.trim().length > 0 ? (
-          <img
-            src={image}
-            alt={imageAlt || title}
-            class="interior-hero-image w-full h-full object-cover opacity-100"
-            style={`object-position: ${imagePosition};`}
-            loading="eager"
-            decoding="async"
-          />
-        ) : (
-          <div
-            class="interior-hero-image w-full h-full bg-stone-900"
-            aria-hidden="true"
-          />
-        )
+      safeImageUrl ? (
+        <img
+          src={safeImageUrl}
+          alt={imageAlt || title}
+          class="interior-hero-image w-full h-full object-cover opacity-100"
+          style={`object-position: ${imagePosition};`}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
       ) : (
         <div
           class="interior-hero-image w-full h-full bg-stone-900"

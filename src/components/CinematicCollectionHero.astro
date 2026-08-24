@@ -10,7 +10,7 @@
  *  Fase 5 (7.8s): Texto TypeMagic emerge sobre ambas imagenes
  */
 
-import { Image } from "astro:assets";
+import { sanitizeImageUrl } from "../lib/content-filter";
 
 interface Props {
   title: string;
@@ -36,15 +36,8 @@ const {
   secondaryPosition = "center center",
 } = Astro.props;
 
-const primarySrc = typeof primaryImage === "string"
-  ? primaryImage
-  : (primaryImage as any)?.src ?? primaryImage;
-
-const secondarySrc = secondaryImage
-  ? (typeof secondaryImage === "string"
-      ? secondaryImage
-      : (secondaryImage as any)?.src ?? secondaryImage)
-  : null;
+const primarySrc = sanitizeImageUrl(primaryImage);
+const secondarySrc = secondaryImage ? sanitizeImageUrl(secondaryImage) : null;
 ---
 
 <section
@@ -57,11 +50,18 @@ const secondarySrc = secondaryImage
   <!-- Panel Imagen 1 izquierda -->
   <div class="cch-panel cch-panel--left" id="cch-panel-left">
     <div class="cch-panel-inner" id="cch-inner-left">
-      {typeof primaryImage === "string" ? (
-        <img class="cch-img" id="cch-img-primary" src={primarySrc} alt={primaryAlt} loading="eager" style={`object-position: ${primaryPosition}`} />
-      ) : (
-        <Image class="cch-img" id="cch-img-primary" src={primaryImage as ImageMetadata} alt={primaryAlt} inferSize={true} loading="eager" quality={88} style={`object-position: ${primaryPosition}`} />
-      )}
+      {primarySrc ? (
+        <img
+          class="cch-img"
+          id="cch-img-primary"
+          src={primarySrc}
+          alt={primaryAlt}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          style={`object-position: ${primaryPosition}`}
+        />
+      ) : null}
     </div>
   </div>
 
@@ -69,11 +69,15 @@ const secondarySrc = secondaryImage
   {secondarySrc && (
     <div class="cch-panel cch-panel--right" id="cch-panel-right">
       <div class="cch-panel-inner" id="cch-inner-right">
-        {typeof secondaryImage === "string" ? (
-          <img class="cch-img" id="cch-img-secondary" src={secondarySrc} alt={secondaryAlt} loading="eager" style={`object-position: ${secondaryPosition}`} />
-        ) : (
-          <Image class="cch-img" id="cch-img-secondary" src={secondaryImage as ImageMetadata} alt={secondaryAlt} inferSize={true} loading="eager" quality={80} style={`object-position: ${secondaryPosition}`} />
-        )}
+        <img
+          class="cch-img"
+          id="cch-img-secondary"
+          src={secondarySrc}
+          alt={secondaryAlt}
+          loading="eager"
+          decoding="async"
+          style={`object-position: ${secondaryPosition}`}
+        />
       </div>
     </div>
   )}

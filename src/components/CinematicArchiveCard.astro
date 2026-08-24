@@ -1,10 +1,10 @@
 ---
-import { Image } from "astro:assets";
 import {
   getRelatedCategories,
   formatYear,
   normalizeCategory,
   splitTitleKeyword,
+  sanitizeImageUrl,
 } from "../lib/content-filter";
 
 interface Props {
@@ -29,6 +29,7 @@ const {
   isCinematicGSAP = false,
 } = Astro.props;
 
+const safeImg = sanitizeImageUrl(img);
 const sitio = entry.sitioGeohistorico || null;
 const relatedTags = getRelatedCategories(entry.category, sitio, entry.title);
 const year = formatYear(entry.date);
@@ -97,34 +98,19 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
 >
   {/* 1. Imagen de fondo */}
   {
-    img ? (
-      typeof img === 'object' ? (
-        <Image
-          src={img}
-          alt={entry.title || "Dossier del Archivo"}
-          format="webp"
-          loading={isEager ? "eager" : "lazy"}
-          decoding="async"
-          quality={80}
-          class={`absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none -z-10 ${
-            enableCinemagraph
-              ? "cinemagraph-ken-burns"
-              : "group-hover:scale-[1.018] group-hover:brightness-95 transition-transform duration-700 delay-75 ease-out"
-          }`}
-        />
-      ) : (
-        <img
-          src={img as string}
-          alt={entry.title || "Dossier del Archivo"}
-          loading={isEager ? "eager" : "lazy"}
-          decoding="async"
-          class={`absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none -z-10 ${
-            enableCinemagraph
-              ? "cinemagraph-ken-burns"
-              : "group-hover:scale-[1.018] group-hover:brightness-95 transition-transform duration-700 delay-75 ease-out"
-          }`}
-        />
-      )
+    safeImg ? (
+      <img
+        src={safeImg}
+        alt={entry.title || "Dossier del Archivo"}
+        loading={isEager ? "eager" : "lazy"}
+        fetchpriority={isEager ? "high" : undefined}
+        decoding="async"
+        class={`absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none -z-10 ${
+          enableCinemagraph
+            ? "cinemagraph-ken-burns"
+            : "group-hover:scale-[1.018] group-hover:brightness-95 transition-transform duration-700 delay-75 ease-out"
+        }`}
+      />
     ) : (
       <div class="fallback-background absolute inset-0 bg-stone-900 pointer-events-none -z-10" />
     )

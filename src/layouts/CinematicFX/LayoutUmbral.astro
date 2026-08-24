@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { sanitizeImageUrl } from '../../lib/content-filter';
 import Layout from '../Layout.astro';
 import TypeMagyk from '../../components/TypeMagyk.astro';
 
@@ -22,7 +22,7 @@ if (frontmatter.coverImage && !rawImages.length) {
 const title = frontmatter.title || 'Dossier — Umbral';
 const excerpt = frontmatter.excerpt || '';
 const rawCover = rawImages[0];
-const coverImgUrl = typeof rawCover === 'object' && rawCover?.src ? rawCover.src : (typeof rawCover === 'string' ? rawCover : undefined);
+const coverImgUrl = sanitizeImageUrl(rawCover) || undefined;
 ---
 
 <Layout title={title} description={excerpt} image={coverImgUrl} headerTransparentUntilScroll={true} footerVariant="minimal">
@@ -38,15 +38,23 @@ const coverImgUrl = typeof rawCover === 'object' && rawCover?.src ? rawCover.src
         aria-hidden="true">
       </div>
 
-      {rawImages.length > 0 ? rawImages.map((img: any, i: number) => (
-        <div class={`umbral-layer absolute inset-0 will-change-[opacity,transform] ${i === 0 ? 'z-10' : 'z-20'}`}>
-          {typeof img === 'object' && img ? (
-            <Image src={img} alt="" format="webp" quality={80} loading={i === 0 ? "eager" : "lazy"} decoding="async" class="w-full h-full object-cover object-center" />
-          ) : typeof img === 'string' && img.trim().length > 0 ? (
-            <img src={img} alt="" loading={i === 0 ? "eager" : "lazy"} decoding="async" class="w-full h-full object-cover object-center" />
-          ) : null}
-        </div>
-      )) : (
+      {rawImages.length > 0 ? rawImages.map((img: any, i: number) => {
+        const safeSrc = sanitizeImageUrl(img);
+        return (
+          <div class={`umbral-layer absolute inset-0 will-change-[opacity,transform] ${i === 0 ? 'z-10' : 'z-20'}`}>
+            {safeSrc ? (
+              <img
+                src={safeSrc}
+                alt=""
+                loading={i === 0 ? "eager" : "lazy"}
+                fetchpriority={i === 0 ? "high" : undefined}
+                decoding="async"
+                class="w-full h-full object-cover object-center"
+              />
+            ) : null}
+          </div>
+        );
+      }) : (
         <div class="absolute inset-0 bg-linear-to-br from-[#060607] via-[#0f0f12] to-[#060607]"></div>
       )}
     </div>

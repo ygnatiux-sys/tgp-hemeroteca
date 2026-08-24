@@ -1,6 +1,6 @@
 ---
 // src/components/SliderCinematico.astro
-import { formatCategory } from '../lib/content-filter';
+import { formatCategory, sanitizeImageUrl } from '../lib/content-filter';
 
 interface Props {
   ensayos: Array<any>;
@@ -17,7 +17,7 @@ const { ensayos = [] } = Astro.props;
       const titulo = ensayo.titulo || ensayo.title || ensayo.entry?.title || 'Sin Título';
       const categoria = ensayo.categoria || ensayo.category || (ensayo.entry?.category ? formatCategory(ensayo.entry.category) : 'ENSAYO');
       const rawImg = ensayo.imagen || ensayo.img || ensayo.image || ensayo.entry?.coverImage;
-      const imagen = typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '');
+      const imagen = sanitizeImageUrl(rawImg);
       const isCine = ensayo.isCinematicGSAP || ensayo.entry?.isCinematicGSAP || categoria === 'Ensayos Cinemáticos';
       const link = ensayo.link || (ensayo.slug ? (isCine ? `/ensayos-cinematicos/${ensayo.slug}/` : `/hemeroteca/${ensayo.slug}/`) : '#');
 

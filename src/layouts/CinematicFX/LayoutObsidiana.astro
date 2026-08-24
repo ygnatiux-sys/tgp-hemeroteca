@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { sanitizeImageUrl } from '../../lib/content-filter';
 import Layout from '../Layout.astro';
 import TypeMagyk from '../../components/TypeMagyk.astro';
 
@@ -24,7 +24,7 @@ if (frontmatter.coverImage && !rawImages.length) {
 const title = frontmatter.title || 'Dossier — Obsidiana';
 const excerpt = frontmatter.excerpt || '';
 const rawCover = rawImages[0];
-const coverImgUrl = typeof rawCover === 'object' && rawCover?.src ? rawCover.src : (typeof rawCover === 'string' ? rawCover : undefined);
+const coverImgUrl = sanitizeImageUrl(rawCover) || undefined;
 ---
 
 <Layout title={title} description={excerpt} image={coverImgUrl} headerTransparentUntilScroll={true} footerVariant="minimal">
@@ -42,29 +42,20 @@ const coverImgUrl = typeof rawCover === 'object' && rawCover?.src ? rawCover.src
         aria-hidden="true"
       ></div>
 
-      {rawImages.length > 0 ? rawImages.map((img: any, i: number) => (
-        typeof img === 'object' && img ? (
-          <Image
-            src={img}
-            alt=""
-            format="webp"
-            quality={80}
-            loading={i === 0 ? "eager" : "lazy"}
-            decoding="async"
-            class="obsidiana-img absolute inset-0 w-full h-full object-cover object-center opacity-0 will-change-[opacity,transform]"
-            data-index={i}
-          />
-        ) : typeof img === 'string' && img.trim().length > 0 ? (
+      {rawImages.length > 0 ? rawImages.map((img: any, i: number) => {
+        const safeSrc = sanitizeImageUrl(img);
+        return safeSrc ? (
           <img
-            src={img}
+            src={safeSrc}
             alt=""
             loading={i === 0 ? "eager" : "lazy"}
+            fetchpriority={i === 0 ? "high" : undefined}
             decoding="async"
             class="obsidiana-img absolute inset-0 w-full h-full object-cover object-center opacity-0 will-change-[opacity,transform]"
             data-index={i}
           />
-        ) : null
-      )) : (
+        ) : null;
+      }) : (
         <div class="absolute inset-0 bg-linear-to-br from-[#0b0c0d] via-[#121418] to-[#0a0a0c]"></div>
       )}
     </div>

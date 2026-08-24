@@ -1,11 +1,11 @@
 ---
 import { getCollection } from "astro:content";
-import { Image } from "astro:assets";
 import {
   getPublishableEssays,
   groupByCategory,
   formatCategory,
   resolveEssayImage,
+  sanitizeImageUrl,
 } from "../lib/content-filter";
 
 const allEssaysRaw = await getCollection('ensayos').catch(() => []);
@@ -23,7 +23,7 @@ const collections = Array.from(categoryGroups.entries())
   
 const resolvedCollections = collections.map(c => ({
   ...c,
-  img: resolveEssayImage(c.coverEssay.entry, c.coverEssay.slug),
+  img: sanitizeImageUrl(resolveEssayImage(c.coverEssay.entry, c.coverEssay.slug)),
 }));
 ---
 
@@ -55,11 +55,7 @@ const resolvedCollections = collections.map(c => ({
           >
             {img ? (
               <div class="overflow-hidden aspect-video relative">
-                {typeof img === 'object' ? (
-                  <Image src={img} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
-                ) : (
-                  <img src={img as string} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
-                )}
+                <img src={img} alt={label} loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
                 <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent" />
                 <div class="absolute bottom-0 left-0 p-4 md:p-5 w-full">
                   <p class="font-metadata text-[9px] uppercase tracking-[0.3em] text-rust-orange mb-1">{count} artículos</p>
@@ -86,11 +82,7 @@ const resolvedCollections = collections.map(c => ({
           >
             {img ? (
               <div class="overflow-hidden aspect-video relative">
-                {typeof img === 'object' ? (
-                  <Image src={img} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
-                ) : (
-                  <img src={img as string} alt={label} class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
-                )}
+                <img src={img} alt={label} loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90" />
                 <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent" />
                 <div class="absolute bottom-0 left-0 p-4 md:p-5 w-full">
                   <p class="font-metadata text-[9px] uppercase tracking-[0.3em] text-rust-orange mb-1">{count} artículos</p>

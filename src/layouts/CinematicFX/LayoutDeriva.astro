@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { sanitizeImageUrl } from '../../lib/content-filter';
 import Layout from '../Layout.astro';
 import TypeMagyk from '../../components/TypeMagyk.astro';
 
@@ -22,7 +22,7 @@ if (frontmatter.coverImage && !rawImages.length) {
 const title = frontmatter.title || 'Dossier — Deriva';
 const excerpt = frontmatter.excerpt || '';
 const rawCover = rawImages[0];
-const coverImgUrl = typeof rawCover === 'object' && rawCover?.src ? rawCover.src : (typeof rawCover === 'string' ? rawCover : undefined);
+const coverImgUrl = sanitizeImageUrl(rawCover) || undefined;
 ---
 
 <Layout title={title} description={excerpt} image={coverImgUrl} headerTransparentUntilScroll={true} footerVariant="minimal">
@@ -40,15 +40,23 @@ const coverImgUrl = typeof rawCover === 'object' && rawCover?.src ? rawCover.src
 
       {rawImages.length > 0 && (
         <div class="deriva-track flex h-full will-change-transform" style={`width: ${Math.max(100, rawImages.length * 100)}vw;`}>
-          {rawImages.map((img: any, i: number) => (
-            <div class="w-screen h-full shrink-0 relative overflow-hidden">
-              {typeof img === 'object' && img ? (
-                <Image src={img} alt="" format="webp" quality={80} loading={i === 0 ? "eager" : "lazy"} decoding="async" class="w-full h-full object-cover object-center brightness-75 scale-105" />
-              ) : typeof img === 'string' && img.trim().length > 0 ? (
-                <img src={img} alt="" loading={i === 0 ? "eager" : "lazy"} decoding="async" class="w-full h-full object-cover object-center brightness-75 scale-105" />
-              ) : null}
-            </div>
-          ))}
+          {rawImages.map((img: any, i: number) => {
+            const safeSrc = sanitizeImageUrl(img);
+            return (
+              <div class="w-screen h-full shrink-0 relative overflow-hidden">
+                {safeSrc ? (
+                  <img
+                    src={safeSrc}
+                    alt=""
+                    loading={i === 0 ? "eager" : "lazy"}
+                    fetchpriority={i === 0 ? "high" : undefined}
+                    decoding="async"
+                    class="w-full h-full object-cover object-center brightness-75 scale-105"
+                  />
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

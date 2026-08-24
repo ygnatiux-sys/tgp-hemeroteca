@@ -1,7 +1,6 @@
 ---
 export const prerender = true;
 import Layout from '../layouts/Layout.astro';
-import { Image } from 'astro:assets';
 import m1 from '../assets/manifiesto/m1.png';
 import m2 from '../assets/manifiesto/m2.png';
 import m3 from '../assets/manifiesto/m3.png';
@@ -236,7 +235,7 @@ import KitLeadMagnet from '../components/KitLeadMagnet.astro';
           {/* Fragmento I */}
           <section class="relative min-h-[70vh] w-full flex items-center justify-center overflow-hidden">
             <div class="absolute inset-0 z-0">
-              <Image src={m1} alt="Signals" class="w-full h-full object-cover opacity-40" />
+              <img src={m1.src} alt="Signals" loading="lazy" decoding="async" class="w-full h-full object-cover opacity-40" />
               <div class="absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/80"></div>
             </div>
             <div class="relative z-10 text-center px-8 max-w-5xl py-20">
@@ -250,7 +249,7 @@ import KitLeadMagnet from '../components/KitLeadMagnet.astro';
           {/* Fragmento II */}
           <section class="relative min-h-[70vh] w-full flex items-center justify-center overflow-hidden">
             <div class="absolute inset-0 z-0">
-              <Image src={m2} alt="Stone & Algorithm" class="w-full h-full object-cover opacity-40" />
+              <img src={m2.src} alt="Stone & Algorithm" loading="lazy" decoding="async" class="w-full h-full object-cover opacity-40" />
               <div class="absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/80"></div>
             </div>
             <div class="relative z-10 text-center px-8 max-w-5xl py-20">
@@ -264,7 +263,7 @@ import KitLeadMagnet from '../components/KitLeadMagnet.astro';
           {/* Fragmento III */}
           <section class="relative min-h-[70vh] w-full flex items-center justify-center overflow-hidden">
             <div class="absolute inset-0 z-0">
-              <Image src={m3} alt="The Puzzle" class="w-full h-full object-cover opacity-40" />
+              <img src={m3.src} alt="The Puzzle" loading="lazy" decoding="async" class="w-full h-full object-cover opacity-40" />
               <div class="absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/80"></div>
             </div>
             <div class="relative z-10 text-center px-8 max-w-5xl py-20">

@@ -34,6 +34,28 @@ export interface EssayEntry {
 }
 
 /**
+ * Sanitiza y codifica de manera segura URLs de imágenes remotas (R2, CDNs, etc.)
+ * para evitar errores 404 causados por caracteres especiales, comas, espacios o doble codificación.
+ */
+export function sanitizeImageUrl(imgUrl: string | any): string {
+  if (!imgUrl) return '';
+  const urlStr = typeof imgUrl === 'string' ? imgUrl : (imgUrl?.src || '');
+  if (!urlStr || typeof urlStr !== 'string') return '';
+  const trimmed = urlStr.trim();
+  if (!trimmed) return '';
+  
+  if (trimmed.startsWith('/') && !trimmed.includes(' ') && !trimmed.includes(',')) {
+    return trimmed;
+  }
+
+  try {
+    return encodeURI(decodeURI(trimmed));
+  } catch (e) {
+    return encodeURI(trimmed);
+  }
+}
+
+/**
  * Retorna la imagen principal del ensayo o recurso (ImageMetadata si fue importado por Astro, o string URL / null).
  * Si no tiene coverImage directo, busca inteligentemente en sus imágenes asignadas de Wikimedia o galería.
  */
