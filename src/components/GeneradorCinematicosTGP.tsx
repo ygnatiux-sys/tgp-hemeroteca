@@ -24,6 +24,30 @@ function setNativeValue(element: HTMLElement, value: string): void {
   element.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true }));
 }
 
+// ─── Helper: inyectar en el editor ProseMirror de KS (fields.document "Contenido") ───────
+function injectIntoKSDocumentEditor(markdownText: string): boolean {
+  if (typeof document === 'undefined' || !markdownText) return false;
+  const editorEl = document.querySelector<HTMLDivElement>(
+    '[contenteditable="true"].ProseMirror, [contenteditable="true"][role="textbox"], [contenteditable="true"]'
+  );
+  if (!editorEl) return false;
+  try {
+    editorEl.focus();
+    const sel = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(editorEl);
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+    const ok = document.execCommand('insertText', false, markdownText);
+    if (!ok) {
+      const dt = new DataTransfer();
+      dt.setData('text/plain', markdownText);
+      editorEl.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+    }
+    return true;
+  } catch { return false; }
+}
+
 export interface GeminiCinematicProps {
   value: string;
   onChange: (val: string) => void;
@@ -315,6 +339,25 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
 
   const isBusy = isGeneratingText || isGeneratingArt;
 
+  // 4. Traspasar Todo a Keystatic (inyecta en campos nativos y editor ProseMirror)
+  const handleTraspasarTodo = () => {
+    const topic = getEffectiveTopic();
+    if (!generatedText && !previewImage) {
+      setStatusMsg({ type: 'error', text: 'No hay contenido generado para traspasar. Generá primero.' });
+      return;
+    }
+    syncFieldsToKeystaticDOM(topic, excerptIA);
+    if (generatedText) {
+      injectIntoKSDocumentEditor(generatedText);
+    }
+    syncToKeystatic(generatedText, previewImage);
+    setIsSynced(true);
+    lockKeystatiSave(false);
+    setStatusMsg({ type: 'success', text: '✅ Contenido inyectado en campos nativos y editor de Keystatic. Podés hacer Save.' });
+  };
+
+  const hasContent = !!(generatedText || previewImage);
+
   return (
     <div style={{
       backgroundColor: '#0c0d0e',
@@ -518,7 +561,7 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
         }}>
           {isSynced
             ? '✅ Ensayo traspasado — podés presionar «Save» en Keystatic.'
-            : '⚠️ Ensayo listo. El contenido ya fue enviado automáticamente — presioná «Save».'}
+            : '⚠️ Ensayo listo. Presioná «Traspasar Todo a Keystatic» abajo antes de «Save».'}
         </div>
       )}
 
@@ -532,6 +575,40 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
             </p>
           )}
         </div>
+      )}
+
+      {/* ─── BOTÓN TRASPASAR TODO A KEYSTATIC ─── */}
+      {hasContent && (
+        <button
+          type="button"
+          onClick={handleTraspasarTodo}
+          style={{
+            width: '100%',
+            marginTop: '16px',
+            padding: '14px',
+            borderRadius: '8px',
+            border: isSynced ? '2px solid #00e5ff' : '2px solid #3b82f6',
+            background: isSynced
+              ? 'linear-gradient(135deg, #0d2847, #1a4a8a)'
+              : 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+            color: '#fff',
+            fontSize: '13px',
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            cursor: 'pointer',
+            boxShadow: isSynced ? '0 0 16px rgba(0,229,255,0.25)' : '0 4px 14px rgba(37,99,235,0.4)',
+            transition: 'all 0.2s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+          }}
+        >
+          {isSynced
+            ? '✅ Traspasado — Podés presionar Save'
+            : '✓ Traspasar Todo a Keystatic'}
+        </button>
       )}
     </div>
   );

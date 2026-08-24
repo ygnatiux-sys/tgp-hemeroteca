@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 /**
  * AgenteEruditoTGP — Keystatic Custom Field Component
@@ -12,7 +12,55 @@
  *
  * El componente acepta el texto actual del campo `generadorTexto` (vía `value`)
  * y devuelve el texto procesado / generado al campo vía `onChange`.
+ * Además, al presionar "Traspasar Todo" inyecta directamente en:
+ *   - El editor ProseMirror (fields.document "Contenido")
+ *   - Desbloquea el botón Save nativo de Keystatic
  */
+
+// ─── Helper: inyectar en el editor ProseMirror de KS (fields.document) ───────
+function injectIntoKSDocumentEditor(markdownText: string): boolean {
+  if (typeof document === 'undefined' || !markdownText) return false;
+  const editorEl = document.querySelector<HTMLDivElement>(
+    '[contenteditable="true"].ProseMirror, [contenteditable="true"][role="textbox"], [contenteditable="true"]'
+  );
+  if (!editorEl) return false;
+  try {
+    editorEl.focus();
+    const sel = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(editorEl);
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+    const ok = document.execCommand('insertText', false, markdownText);
+    if (!ok) {
+      const dt = new DataTransfer();
+      dt.setData('text/plain', markdownText);
+      editorEl.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+    }
+    return true;
+  } catch { return false; }
+}
+
+// ─── Helper: lock/unlock del botón Save nativo de Keystatic ──────────────────
+function lockKSSave(lock: boolean) {
+  if (typeof document === 'undefined') return;
+  document.querySelectorAll<HTMLButtonElement>('button').forEach(btn => {
+    const label = (btn.textContent || '').trim().toLowerCase();
+    if (label === 'save' || label === 'create') {
+      if (lock) {
+        btn.setAttribute('disabled', 'true');
+        btn.setAttribute('title', '⚠️ Primero presioná «Traspasar Todo» para inyectar el contenido');
+        btn.style.opacity = '0.35';
+        btn.style.cursor = 'not-allowed';
+      } else {
+        btn.removeAttribute('disabled');
+        btn.removeAttribute('title');
+        btn.style.opacity = '';
+        btn.style.cursor = '';
+      }
+    }
+  });
+}
 
 export function AgenteEruditoTGP({ value, onChange }: any) {
   const [modo, setModo] = useState<'divulgativo' | 'academico'>('divulgativo');
@@ -20,7 +68,15 @@ export function AgenteEruditoTGP({ value, onChange }: any) {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [generatedContent, setGeneratedContent] = useState<string>('');
+  const [isSynced, setIsSynced] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Lock el Save al montar si no hay contenido
+  useEffect(() => { lockKSSave(true); }, []);
+  useEffect(() => { lockKSSave(!isSynced); }, [isSynced]);
+  // Reset sincronización si cambia el valor externo
+  useEffect(() => { if (!value) { setIsSynced(false); lockKSSave(true); } }, [value]);
 
   // Detectar título del post desde el DOM de Keystatic
   const detectTitle = (): string => {
@@ -34,10 +90,11 @@ export function AgenteEruditoTGP({ value, onChange }: any) {
   const handleRun = async () => {
     setErrorMsg(null);
     setSuccessMsg(null);
+    setIsSynced(false);
+    lockKSSave(true);
     const titulo = detectTitle();
     const textoActual = typeof value === 'string' ? value : (value?.value || '');
 
-    // En modo académico necesitamos texto a reformatear
     if (modo === 'academico' && !textoActual.trim()) {
       setErrorMsg('Primero genera el texto con el motor principal para que el Agente Erudito lo formatee.');
       return;
@@ -63,9 +120,10 @@ export function AgenteEruditoTGP({ value, onChange }: any) {
       if (!data.content) throw new Error('El agente no devolvió contenido.');
 
       onChange(data.content);
+      setGeneratedContent(data.content);
       setSuccessMsg(modo === 'divulgativo'
-        ? '✦ Ensayo divulgativo generado. Revisa el Motor de Pensamiento.'
-        : '✦ Texto reformateado con estándar académico TGP.'
+        ? '✦ Ensayo divulgativo generado. Presioná «Traspasar Todo» para enviarlo al editor.'
+        : '✦ Texto reformateado. Presioná «Traspasar Todo» para enviarlo al editor.'
       );
     } catch (err: any) {
       if (err.name !== 'AbortError') {
@@ -80,6 +138,22 @@ export function AgenteEruditoTGP({ value, onChange }: any) {
     abortRef.current?.abort();
     setIsLoading(false);
     setErrorMsg('Generación cancelada.');
+  };
+
+  // ─── TRASPASAR TODO ──────────────────────────────────────────────────────────
+  const handleTraspasarTodo = () => {
+    const content = generatedContent || (typeof value === 'string' ? value : (value?.value || ''));
+    if (!content) {
+      setErrorMsg('No hay contenido generado para traspasar. Ejecutá el Agente primero.');
+      return;
+    }
+    const injected = injectIntoKSDocumentEditor(content);
+    setIsSynced(true);
+    lockKSSave(false);
+    setSuccessMsg(injected
+      ? '✅ Texto inyectado en el editor «Contenido» de Keystatic. Podés presionar Save.'
+      : '✅ Traspaso completado. El texto está en el campo del motor. Presioná Save.'
+    );
   };
 
   const baseBtn: React.CSSProperties = {
@@ -115,6 +189,8 @@ export function AgenteEruditoTGP({ value, onChange }: any) {
     border: `1px solid ${active ? 'rgba(201,168,108,0.45)' : 'rgba(255,255,255,0.1)'}`,
     fontSize: '12px',
   });
+
+  const hasContent = !!(generatedContent || (typeof value === 'string' ? value : (value?.value || '')));
 
   return (
     <div style={{
@@ -186,8 +262,8 @@ export function AgenteEruditoTGP({ value, onChange }: any) {
         </div>
       )}
 
-      {/* Botones de acción */}
-      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+      {/* Botones de acción — Generar */}
+      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '12px' }}>
         {!isLoading ? (
           <button style={primaryBtn} onClick={handleRun}>
             ✦ Usar Agente Erudito Académico
@@ -205,13 +281,61 @@ export function AgenteEruditoTGP({ value, onChange }: any) {
 
       {/* Mensajes de estado */}
       {errorMsg && (
-        <div style={{ marginTop: '12px', padding: '10px 14px', background: 'rgba(255,80,80,0.08)', border: '1px solid rgba(255,80,80,0.2)', borderRadius: '8px', color: '#ff6b6b', fontSize: '12px' }}>
+        <div style={{ marginBottom: '12px', padding: '10px 14px', background: 'rgba(255,80,80,0.08)', border: '1px solid rgba(255,80,80,0.2)', borderRadius: '8px', color: '#ff6b6b', fontSize: '12px' }}>
           {errorMsg}
         </div>
       )}
       {successMsg && (
-        <div style={{ marginTop: '12px', padding: '10px 14px', background: 'rgba(201,168,108,0.08)', border: '1px solid rgba(201,168,108,0.25)', borderRadius: '8px', color: '#C9A86C', fontSize: '12px' }}>
+        <div style={{ marginBottom: '12px', padding: '10px 14px', background: 'rgba(201,168,108,0.08)', border: '1px solid rgba(201,168,108,0.25)', borderRadius: '8px', color: '#C9A86C', fontSize: '12px' }}>
           {successMsg}
+        </div>
+      )}
+
+      {/* ─── BOTÓN TRASPASAR TODO ─── */}
+      {hasContent && (
+        <button
+          onClick={handleTraspasarTodo}
+          style={{
+            width: '100%',
+            padding: '14px',
+            borderRadius: '8px',
+            border: isSynced ? '2px solid #00e5ff' : '2px solid #3b82f6',
+            background: isSynced
+              ? 'linear-gradient(135deg, #0d2847, #1a4a8a)'
+              : 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+            color: '#fff',
+            fontSize: '13px',
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase' as const,
+            cursor: 'pointer',
+            boxShadow: isSynced ? '0 0 16px rgba(0,229,255,0.25)' : '0 4px 14px rgba(37,99,235,0.4)',
+            transition: 'all 0.2s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+          }}
+        >
+          {isSynced
+            ? '✅ Traspasado — Podés presionar Save'
+            : '✓ Traspasar Todo a Keystatic'}
+        </button>
+      )}
+
+      {/* Badge de estado de sincronización */}
+      {!isSynced && hasContent && !isLoading && (
+        <div style={{
+          marginTop: '8px',
+          padding: '8px 12px',
+          background: 'rgba(245,124,0,0.08)',
+          border: '1px solid rgba(245,124,0,0.3)',
+          borderRadius: '6px',
+          fontSize: '11px',
+          color: '#ffb74d',
+          textAlign: 'center' as const,
+        }}>
+          ⚠️ Presioná «Traspasar Todo» antes de «Save» en Keystatic
         </div>
       )}
 
