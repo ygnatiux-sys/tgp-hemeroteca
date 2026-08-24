@@ -118,21 +118,29 @@ async function downloadImageBuffer(filename, originalUrl) {
 async function uploadToR2(filename, buffer, contentType) {
   if (!s3) return false;
   try {
-    const key = filename;
-    const command = new PutObjectCommand({
-      Bucket: BUCKET_NAME,
-      Key: key,
-      Body: buffer,
-      ContentType: contentType,
-      CacheControl: 'public, max-age=31536000, immutable',
-    });
-    await s3.send(command);
+    const decodedKey = decodeURIComponent(filename);
+    const keysToUpload = [filename];
+    if (decodedKey !== filename) {
+      keysToUpload.push(decodedKey);
+    }
+
+    for (const key of keysToUpload) {
+      const command = new PutObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+        Body: buffer,
+        ContentType: contentType,
+        CacheControl: 'public, max-age=31536000, immutable',
+      });
+      await s3.send(command);
+    }
     return true;
   } catch (err) {
     console.error(`  ❌ Error subiendo a R2 [${filename}]:`, err.message);
     return false;
   }
 }
+
 
 // Registro global de imágenes para evitar descargas duplicadas
 const uploadedCache = new Map();
