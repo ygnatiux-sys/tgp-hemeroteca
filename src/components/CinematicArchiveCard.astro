@@ -14,6 +14,8 @@ interface Props {
   variant?: "hero" | "duo-60" | "duo-40" | "standard";
   enableCinemagraph?: boolean;
   isEager?: boolean;
+  href?: string;
+  isCinematicGSAP?: boolean;
 }
 
 const {
@@ -23,13 +25,17 @@ const {
   variant = "standard",
   enableCinemagraph = false,
   isEager = false,
+  href: customHref,
+  isCinematicGSAP = false,
 } = Astro.props;
 
 const sitio = entry.sitioGeohistorico || null;
 const relatedTags = getRelatedCategories(entry.category, sitio, entry.title);
 const year = formatYear(entry.date);
 const excerpt = entry.excerpt || "";
-const href = `/hemeroteca/${slug}`;
+
+const isCinematic = isCinematicGSAP || (entry as any)?.isCinematicGSAP || entry.category === 'Ensayos Cinemáticos' || entry.category === 'ensayos-cinematicos' || normalizeCategory(entry.category) === 'ensayos-cinematicos';
+const href = customHref || (isCinematic ? `/ensayos-cinematicos/${slug}/` : `/hemeroteca/${slug}/`);
 
 // Lógica de ruteo y CTA limpia
 let secondaryLabel = "VER REGISTRO";

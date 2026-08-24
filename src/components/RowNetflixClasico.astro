@@ -1,0 +1,317 @@
+---
+/**
+ * RowNetflixClasico.astro
+ * Componente de Carrusel Netflix Clásico Vertical (Sibling Push + Hover Delay + Paginación)
+ * 4 Columnas visibles en Desktop con soporte para colecciones de TGP.
+ */
+import { resolveEssayImage, formatCategory, formatDate } from "../lib/content-filter";
+
+interface Props {
+  title?: string;
+  eyebrow?: string;
+  items?: Array<{
+    title?: string;
+    titulo?: string;
+    subtitle?: string;
+    excerpt?: string;
+    image?: string | any;
+    img?: string | any;
+    link?: string;
+    slug?: string;
+    collectionLabel?: string;
+    category?: string;
+    date?: string;
+    entry?: any;
+  }>;
+  max?: number;
+}
+
+const { 
+  title = "También podrían gustarte",
+  eyebrow = "Colecciones",
+  items = [],
+  max = 15
+} = Astro.props;
+
+// Normalizamos los items
+let displayItems = items.slice(0, max).map((item) => {
+  const t = item.title || item.titulo || item.entry?.title || "Sin título";
+  const cat = item.collectionLabel || formatCategory(item.category || item.entry?.category) || "Ensayo";
+  const rawImg = item.img || item.image || resolveEssayImage(item.entry || item, item.slug);
+  const image = typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop');
+  const link = item.link || (item.slug ? `/hemeroteca/${item.slug}/` : '#');
+  const d = item.date || item.entry?.date ? formatDate(item.date || item.entry?.date) : '';
+
+  return {
+    title: t,
+    subtitle: item.subtitle || item.excerpt || item.entry?.excerpt || '',
+    image,
+    link,
+    collectionLabel: cat,
+    date: d,
+  };
+});
+
+// Sanitización segura de caracteres
+displayItems = displayItems.map(item => ({
+  ...item,
+  title: (item.title || '')
+    .replaceAll('Ã±', 'ñ')
+    .replaceAll('Ã¡', 'á')
+    .replaceAll('Ã©', 'é')
+    .replaceAll('Ã\u00AD', 'í')
+    .replaceAll('Ã\xAD', 'í')
+    .replaceAll('Ã³', 'ó')
+    .replaceAll('Ãº', 'ú')
+    .replaceAll('Ã‘', 'Ñ')
+    .replaceAll('Â', ''),
+}));
+
+const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
+---
+
+<section 
+  id={uid} 
+  class="netflix-row-root w-full py-6 md:py-10 overflow-hidden relative select-none group/section"
+  aria-label={title}
+>
+  <!-- Encabezado de la fila -->
+  <div class="mb-4 px-2 md:px-4 z-20 relative flex items-end justify-between gap-4">
+    <div>
+      {eyebrow && (
+        <span class="text-[8.5px] md:text-[9px] tracking-[0.4em] uppercase font-metadata text-rust-orange/90 font-bold block mb-1">
+          {eyebrow}
+        </span>
+      )}
+      <h3 class="text-white text-xl md:text-2xl font-cinzel font-bold tracking-tight leading-tight">
+        {title}
+      </h3>
+    </div>
+    
+    <span class="text-[8.5px] font-metadata tracking-[0.25em] text-white/30 uppercase hidden sm:inline-block">
+      {displayItems.length} Artículos
+    </span>
+  </div>
+
+  <!-- Contenedor Maestro -->
+  <div class="relative w-full px-2 md:px-4" style="min-height: 280px;">
+    
+    <!-- Botón Anterior Flotante en Cápsula -->
+    <button 
+      class="nav-btn prev-btn absolute left-0 md:left-1 top-1/2 -translate-y-1/2 z-40 w-9 md:w-10 h-16 md:h-20 rounded-full bg-black/60 hover:bg-black/90 text-white/70 hover:text-white border border-white/15 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-0 group-hover/section:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-xl"
+      aria-label="Anterior"
+    >
+      <svg class="w-5 h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+      </svg>
+    </button>
+
+    <!-- Botón Siguiente Flotante en Cápsula -->
+    <button 
+      class="nav-btn next-btn absolute right-0 md:right-1 top-1/2 -translate-y-1/2 z-40 w-9 md:w-10 h-16 md:h-20 rounded-full bg-black/60 hover:bg-black/90 text-white/70 hover:text-white border border-white/15 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-0 group-hover/section:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-xl"
+      aria-label="Siguiente"
+    >
+      <svg class="w-5 h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+      </svg>
+    </button>
+
+    <!-- Pista de Deslizamiento -->
+    <div class="track-wrapper overflow-visible py-4">
+      <div class="netflix-track flex gap-3 md:gap-4 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]">
+        
+        {displayItems.map((item) => (
+          <article class="netflix-card relative flex-none rounded-xl md:rounded-2xl overflow-hidden cursor-pointer">
+            <a href={item.link} class="block w-full h-full" aria-label={`Ver: ${item.title}`}>
+              <div class="w-full h-full bg-black/40 overflow-hidden">
+                <img 
+                  src={item.image} 
+                  alt={item.title} 
+                  class="netflix-card-img w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              
+              <!-- Viñeta degradada inferior -->
+              <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/40 to-transparent pointer-events-none"></div>
+
+              <!-- Información Editorial -->
+              <div class="card-info absolute inset-x-0 bottom-0 p-3.5 md:p-4 flex flex-col justify-end">
+                <span class="text-[7.5px] tracking-[0.3em] uppercase text-rust-orange/90 font-metadata mb-1 block">
+                  {item.collectionLabel}
+                </span>
+                <h4 class="netflix-card-title text-white font-cinzel font-medium line-clamp-2 leading-snug">
+                  {item.title}
+                </h4>
+              </div>
+            </a>
+          </article>
+        ))}
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ── 1. DIMENSIONES BASE: 4 COLUMNAS VISIBLES EN DESKTOP ── */
+  .track-wrapper {
+    width: 100%;
+  }
+
+  .netflix-track {
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* Tarjeta en Reposo: 2 cols mobile, 3 cols tablet, 4 cols desktop */
+  .netflix-card {
+    width: calc(48% - 6px);
+    aspect-ratio: 2 / 3;
+    opacity: 0.65;
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.4);
+    
+    transform: translate3d(0, 0, 0) scale(1);
+    transform-origin: center center;
+    transition: 
+      transform 340ms cubic-bezier(0.25, 1, 0.5, 1), 
+      opacity 340ms ease,
+      box-shadow 340ms ease, 
+      border-color 340ms ease;
+    will-change: transform, opacity;
+  }
+
+  .netflix-card-img {
+    filter: brightness(0.72) contrast(1.06);
+    transition: filter 340ms ease;
+  }
+
+  .netflix-card-title {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    transition: opacity 300ms ease, color 300ms ease;
+  }
+
+  @media (min-width: 640px) {
+    .netflix-card {
+      width: calc(33.333% - 10px); /* 3 cols tablet */
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .netflix-card {
+      width: calc(25% - 12px); /* 4 columnas visibles exactas en desktop */
+    }
+    .netflix-card-title {
+      font-size: 0.95rem;
+    }
+  }
+
+  /* ── 2. EL EFECTO ZOOM Y EMPUJE DESTACADO (HOVER) ── */
+  .netflix-card:hover {
+    transform: translate3d(0, 0, 0) scale(1.18);
+    z-index: 30;
+    opacity: 1;
+    border-color: rgba(184, 115, 51, 0.6);
+    box-shadow: 
+      0 18px 38px -10px rgba(0, 0, 0, 0.75),
+      0 0 0 1px rgba(184, 115, 51, 0.4);
+    transition-delay: 260ms; 
+  }
+
+  .netflix-card:hover .netflix-card-img {
+    filter: brightness(0.95) contrast(1.04);
+    transition-delay: 260ms;
+  }
+
+  .netflix-card:hover .netflix-card-title {
+    opacity: 1;
+    color: #ffffff;
+    transition-delay: 260ms;
+  }
+
+  /* SIBLING PUSH con :has() */
+  .netflix-track:has(.netflix-card:hover) .netflix-card:not(:hover):has(~ .netflix-card:hover) {
+    transform: translate3d(-10%, 0, 0);
+    transition-delay: 260ms;
+  }
+
+  .netflix-card:hover ~ .netflix-card {
+    transform: translate3d(10%, 0, 0);
+    transition-delay: 260ms;
+  }
+
+  .netflix-track:not(:hover) .netflix-card {
+    transition-delay: 0ms;
+  }
+</style>
+
+<script>
+  function initNetflixRows() {
+    const rows = document.querySelectorAll<HTMLElement>('.netflix-row-root');
+
+    rows.forEach(row => {
+      if (row.hasAttribute('data-init')) return;
+      row.setAttribute('data-init', 'true');
+
+      const track = row.querySelector('.netflix-track') as HTMLElement | null;
+      const prevBtn = row.querySelector('.prev-btn') as HTMLButtonElement | null;
+      const nextBtn = row.querySelector('.next-btn') as HTMLButtonElement | null;
+      
+      if (!track || !prevBtn || !nextBtn || !track.parentElement) return;
+
+      const trackEl: HTMLElement = track;
+      const parentEl: HTMLElement = track.parentElement;
+      const prevBtnEl: HTMLButtonElement = prevBtn;
+      const nextBtnEl: HTMLButtonElement = nextBtn;
+
+      let currentTransform = 0;
+
+      function updateButtons() {
+        const trackWidth = trackEl.scrollWidth;
+        const containerWidth = parentEl.offsetWidth;
+        
+        prevBtnEl.disabled = currentTransform >= 0;
+        nextBtnEl.disabled = Math.abs(currentTransform) + containerWidth >= trackWidth - 10;
+      }
+
+      function slide(direction: 'next' | 'prev') {
+        const containerWidth = parentEl.offsetWidth;
+        const moveAmount = containerWidth * 0.90; 
+
+        if (direction === 'next') {
+          currentTransform -= moveAmount;
+        } else {
+          currentTransform += moveAmount;
+        }
+
+        const maxScroll = -(trackEl.scrollWidth - containerWidth);
+        
+        if (currentTransform > 0) currentTransform = 0;
+        if (currentTransform < maxScroll) currentTransform = maxScroll;
+
+        trackEl.style.transform = `translate3d(${currentTransform}px, 0, 0)`;
+        updateButtons();
+      }
+
+      nextBtnEl.addEventListener('click', () => slide('next'));
+      prevBtnEl.addEventListener('click', () => slide('prev'));
+
+      window.addEventListener('resize', () => {
+        currentTransform = 0;
+        trackEl.style.transform = `translate3d(0px, 0, 0)`;
+        updateButtons();
+      });
+
+      updateButtons();
+    });
+  }
+
+  if (typeof document !== 'undefined') {
+    initNetflixRows();
+    document.addEventListener('astro:page-load', initNetflixRows);
+  }
+</script>

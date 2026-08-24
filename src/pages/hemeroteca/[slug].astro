@@ -31,8 +31,9 @@ export async function getStaticPaths() {
   const essays = await getCollection("ensayos").catch(() => []);
   const georefs = await getCollection("georreferencias").catch(() => []);
   const arquetipos = await getCollection("arquetiposGlobales").catch(() => []);
+  const cinematicos = await getCollection("ensayosCinematicos").catch(() => []);
 
-  const combined = [...essays, ...georefs, ...arquetipos];
+  const combined = [...essays, ...georefs, ...arquetipos, ...cinematicos];
   const seen = new Set<string>();
 
   return combined
@@ -55,12 +56,13 @@ const { slug } = Astro.params;
 const { data } = Astro.props;
 const doc = data as any;
 
-// 1. Cargar contenido raw de .mdoc si existe en disco (ensayos, georreferencias y arquetipos globales)
+// 1. Cargar contenido raw de .mdoc si existe en disco (ensayos, georreferencias, arquetipos globales y ensayos cinemáticos)
 const rawMdocs = import.meta.glob<string>(
   [
     "/src/content/ensayos/**/content.mdoc",
     "/src/content/georreferencias/**/content.mdoc",
     "/src/content/arquetipos-globales/**/content.mdoc",
+    "/src/content/ensayos-cinematicos/**/content.mdoc",
   ],
   { query: "?raw", import: "default", eager: true },
 );
@@ -68,10 +70,12 @@ const rawMdocs = import.meta.glob<string>(
 const mdocKey = `/src/content/ensayos/${slug}/content.mdoc`;
 const georefMdocKey = `/src/content/georreferencias/${slug}/content.mdoc`;
 const arquetipoMdocKey = `/src/content/arquetipos-globales/${slug}/content.mdoc`;
+const cinematicMdocKey = `/src/content/ensayos-cinematicos/${slug}/content.mdoc`;
 const rawMdocText =
   rawMdocs[mdocKey] ||
   rawMdocs[georefMdocKey] ||
   rawMdocs[arquetipoMdocKey] ||
+  rawMdocs[cinematicMdocKey] ||
   "";
 
 // 2. Carga segura del componente Markdoc si existe
@@ -80,7 +84,8 @@ try {
   const targetCollectionName =
     mdocKey in rawMdocs ? "ensayosContent" :
     georefMdocKey in rawMdocs ? "georreferenciasContent" :
-    arquetipoMdocKey in rawMdocs ? "arquetiposGlobalesContent" : null;
+    arquetipoMdocKey in rawMdocs ? "arquetiposGlobalesContent" :
+    cinematicMdocKey in rawMdocs ? "ensayosCinematicosContent" : null;
 
   if (targetCollectionName) {
     const contentEntry = await getEntry(targetCollectionName as any, `${slug}/content`);
@@ -90,7 +95,7 @@ try {
     }
   }
 } catch (err) {
-  // Fallback silencioso
+  console.warn(`[HEMEROTECA] Sin contenido Markdoc para ${slug}:`, err);
 }
 
 // 3. Resolución universal y resiliente del texto del ensayo

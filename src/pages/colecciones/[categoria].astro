@@ -5,6 +5,7 @@ import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import Marquee from '../../components/Marquee.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import AguaNieve from '../../components/AguaNieve.astro';
+import RowNetflixClasico from '../../components/RowNetflixClasico.astro';
 
 import {
   getPublishableEssays,
@@ -21,10 +22,29 @@ export const prerender = true;
 export async function getStaticPaths() {
   const allEssaysRaw = await getCollection('ensayos').catch(() => []);
   const allArquetiposRaw = await getCollection('arquetiposGlobales').catch(() => []);
+  const allCinematicosRaw = await getCollection('ensayosCinematicos').catch(() => []);
+  const allGeorefsRaw = await getCollection('georreferencias').catch(() => []);
+
   const isProd = import.meta.env.PROD;
+  const publishableCinematicos = allCinematicosRaw.map(item => ({
+    slug: item.id.replace(/\/index$/, ''),
+    isCinematicGSAP: true,
+    entry: {
+      title: item.data.title || 'Dossier Cinemático',
+      category: 'Ensayos Cinemáticos',
+      coverImage: item.data.coverImage || (Array.isArray(item.data.gallery) && item.data.gallery.length > 0 ? item.data.gallery[0] : null),
+      excerpt: 'Experiencia inmersiva GSAP a pantalla completa con diseño atmosférico.',
+      date: new Date().toISOString(),
+      themeColor: 'obsidiana',
+      isCinematicGSAP: true,
+    }
+  }));
+
   const publishable = [
+    ...publishableCinematicos,
     ...getPublishableEssays(allEssaysRaw, isProd),
-    ...getPublishableEssays(allArquetiposRaw, isProd)
+    ...getPublishableEssays(allArquetiposRaw, isProd),
+    ...getPublishableEssays(allGeorefsRaw, isProd)
   ];
   const groups = groupByCategory(publishable, 1);
 
@@ -170,6 +190,17 @@ const sequences = createPremierSequences(resolvedEssays);
         ))}
       </section>
 
+      {resolvedEssays.length > 4 && (
+        <section class="flex flex-col gap-4 border-t border-white/10 pt-10">
+          <RowNetflixClasico
+            items={resolvedEssays}
+            title={`${label} — Galería`}
+            eyebrow="Explorar Colección"
+            max={15}
+          />
+        </section>
+      )}
+
       {/* ═══════════════════════════════════════════════════════════════════
           ÍNDICE INTERNO & NAVEGACIÓN
       ═══════════════════════════════════════════════════════════════════ */}
@@ -180,25 +211,29 @@ const sequences = createPremierSequences(resolvedEssays);
         </div>
 
         <ol class="flex flex-col divide-y divide-white/5">
-          {resolvedEssays.map(({ slug, entry }: { slug: string; entry: typeof essays[0]['entry'] }, i: number) => (
-            <li>
-              <a
-                href={`/hemeroteca/${slug}/`}
-                class="group flex items-baseline gap-4 md:gap-6 py-3.5 hover:text-[#EFEBE3] transition-colors duration-300"
-              >
-                <span class="font-metadata text-[10px] text-white/30 tracking-[0.2em] tabular-nums shrink-0 w-6 text-right">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <span class="font-metadata text-[9px] text-[#EFEBE3]/70 tracking-[0.2em] shrink-0 hidden sm:inline">
-                  {formatYear(entry.date)}
-                </span>
-                <span class="font-cinzel text-sm md:text-base text-white/80 group-hover:text-[#EFEBE3] transition-colors leading-snug line-clamp-1 flex-1 font-bold">
-                  {entry.title}
-                </span>
-                <span class="font-metadata text-[9px] text-white/20 shrink-0 group-hover:text-[#EFEBE3]/60 group-hover:translate-x-1 transition-all">→</span>
-              </a>
-            </li>
-          ))}
+          {resolvedEssays.map(({ slug, entry, isCinematicGSAP }: { slug: string; entry: typeof essays[0]['entry']; isCinematicGSAP?: boolean }, i: number) => {
+            const isCine = isCinematicGSAP || entry.category === 'Ensayos Cinemáticos' || (entry as any)?.isCinematicGSAP;
+            const linkHref = isCine ? `/ensayos-cinematicos/${slug}/` : `/hemeroteca/${slug}/`;
+            return (
+              <li>
+                <a
+                  href={linkHref}
+                  class="group flex items-baseline gap-4 md:gap-6 py-3.5 hover:text-[#EFEBE3] transition-colors duration-300"
+                >
+                  <span class="font-metadata text-[10px] text-white/30 tracking-[0.2em] tabular-nums shrink-0 w-6 text-right">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span class="font-metadata text-[9px] text-[#EFEBE3]/70 tracking-[0.2em] shrink-0 hidden sm:inline">
+                    {formatYear(entry.date)}
+                  </span>
+                  <span class="font-cinzel text-sm md:text-base text-white/80 group-hover:text-[#EFEBE3] transition-colors leading-snug line-clamp-1 flex-1 font-bold">
+                    {entry.title}
+                  </span>
+                  <span class="font-metadata text-[9px] text-white/20 shrink-0 group-hover:text-[#EFEBE3]/60 group-hover:translate-x-1 transition-all">→</span>
+                </a>
+              </li>
+            );
+          })}
         </ol>
 
         <div class="pt-6 flex items-center justify-between border-t border-white/5 font-metadata text-[10px] uppercase tracking-[0.3em]">
