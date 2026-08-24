@@ -87,11 +87,11 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
   const [titulosSugeridos, setTitulosSugeridos] = useState<string[]>([]);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  // ── TOGGLES DE METADATA OPCIONAL (El usuario decide qué campos opcionales sincronizar) ──
-  const [syncVolanta, setSyncVolanta] = useState(true);
-  const [syncSaberMas, setSyncSaberMas] = useState(true);
-  const [syncExcerpt, setSyncExcerpt] = useState(true);
-  const [syncSitio, setSyncSitio] = useState(true);
+  // ── TOGGLES DE METADATA OPCIONAL (Apagados por defecto - false) ──
+  const [syncVolanta, setSyncVolanta] = useState(false);
+  const [syncSaberMas, setSyncSaberMas] = useState(false);
+  const [syncExcerpt, setSyncExcerpt] = useState(false);
+  const [syncSitio, setSyncSitio] = useState(false);
 
   const pendingRef = useRef<any>({});
 
@@ -148,8 +148,8 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
 
   /**
    * SINCRONIZACIÓN TOTAL CON EL FORMULARIO DE KEYSTATIC Y EL EDITOR MARKDOC PROSEMIRROR
-   * - Título, Slug y Editor Markdoc: SIEMPRE se inyectan.
-   * - Volanta, Saber Más, Excerpt, Sitio: Se inyectan según el estado de los Toggles.
+   * - Título, Slug, Fecha Actualizada y Editor Markdoc: SIEMPRE se inyectan.
+   * - Volanta, Saber Más, Excerpt, Sitio: Se inyectan SOLO si su Toggle está activo.
    * - YouTube / Spotify: NUNCA se tocan (permanecen vacíos).
    */
   const syncAllKeystaticFields = (data?: {
@@ -169,7 +169,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
     const sitioVal = data?.sitio ?? (lugar || effectiveTitle || '');
     const contentVal = data?.contentMarkdown ?? informe;
 
-    // 1. Título & Slug (SIEMPRE)
+    // 1. Título & Slug (OBLIGATORIO - SIEMPRE)
     if (titleVal) {
       const titleInputs = document.querySelectorAll<HTMLInputElement>(
         'input[name="title"], input[id^="title"], input[placeholder*="titulo"], input[placeholder*="tit"]'
@@ -177,7 +177,14 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       titleInputs.forEach((el) => setNativeValue(el, titleVal));
     }
 
-    // 2. Volanta Hook (Condicional según toggle)
+    // 2. Fecha Actualizada (OBLIGATORIO - SIEMPRE fecha de hoy YYYY-MM-DD)
+    const todayStr = new Date().toISOString().split('T')[0];
+    const dateInputs = document.querySelectorAll<HTMLInputElement>(
+      'input[name="date"], input[type="date"], input[id*="date"]'
+    );
+    dateInputs.forEach((el) => setNativeValue(el, todayStr));
+
+    // 3. Volanta Hook (Condicional según toggle)
     if (syncVolanta && volantaVal) {
       const volantaEls = document.querySelectorAll<HTMLTextAreaElement | HTMLInputElement>(
         'textarea[name="volantaHook"], textarea[id*="volantaHook"], textarea[name*="volanta"], textarea[id*="volanta"], input[name="volantaHook"], input[id*="volantaHook"]'
@@ -185,7 +192,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       volantaEls.forEach((el) => setNativeValue(el, volantaVal));
     }
 
-    // 3. Saber Más Dato (Condicional según toggle)
+    // 4. Saber Más Dato (Condicional según toggle)
     if (syncSaberMas && saberMasVal) {
       const saberEls = document.querySelectorAll<HTMLTextAreaElement | HTMLInputElement>(
         'textarea[name="saberMasDato"], textarea[id*="saberMasDato"], textarea[name*="saberMas"], textarea[id*="saberMas"], input[name="saberMasDato"], input[id*="saberMasDato"]'
@@ -193,7 +200,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       saberEls.forEach((el) => setNativeValue(el, saberMasVal));
     }
 
-    // 4. Excerpt / Sinopsis (Condicional según toggle)
+    // 5. Excerpt / Sinopsis (Condicional según toggle)
     if (syncExcerpt && excerptVal) {
       const excEls = document.querySelectorAll<HTMLTextAreaElement | HTMLInputElement>(
         'textarea[name="excerpt"], textarea[id*="excerpt"]'
@@ -201,7 +208,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       excEls.forEach((el) => setNativeValue(el, excerptVal));
     }
 
-    // 5. Ubicación Geohistórica / Sitio (Condicional según toggle)
+    // 6. Ubicación Geohistórica / Sitio (Condicional según toggle)
     if (syncSitio && sitioVal) {
       const sitioEls = document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
         'input[name="sitioGeohistorico"], input[id*="sitioGeohistorico"], input[name*="sitio"], input[id*="sitio"]'
@@ -209,7 +216,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       sitioEls.forEach((el) => setNativeValue(el, sitioVal));
     }
 
-    // 6. Inyección Forzada en el Editor ProseMirror / fields.document (SIEMPRE)
+    // 7. Inyección Forzada en el Editor ProseMirror / fields.document (OBLIGATORIO - SIEMPRE)
     if (contentVal) {
       injectIntoKeystaticDocumentEditor(contentVal);
       onChange(contentVal);
@@ -628,19 +635,38 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
         )}
       </div>
 
-      {/* ── PANEL DE TOGGLES DE METADATA OPCIONAL ── */}
+      {/* ── PANEL MINIMALISTA DE TOGGLES DE METADATA OPCIONAL (Apagados por defecto en gris) ── */}
       <div style={{
-        padding: '14px 16px',
-        background: '#0d1b2a',
-        border: '1px solid #1e3a5f',
+        padding: '12px 14px',
+        background: '#090d13',
+        border: '1px solid #16202c',
         borderRadius: '8px',
-        marginBottom: '18px'
+        marginBottom: '16px'
       }}>
-        <span style={{ fontSize: '0.75rem', color: '#90caf9', fontWeight: 700, display: 'block', marginBottom: '10px' }}>
-          OPCIONES DE SINCRONIZACIÓN DE METADATA (TOGGLES):
-        </span>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', color: syncVolanta ? '#e0e0e0' : '#888', cursor: 'pointer' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <span style={{ fontSize: '0.7rem', color: '#6b7280', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            ⚙️ Metadatos Opcionales (Apagados por defecto)
+          </span>
+          <span style={{ fontSize: '0.65rem', color: '#4b5563' }}>
+            Activa el checkbox solo si deseas sobreescribir ese campo
+          </span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '8px' }}>
+          <label style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 12px',
+            background: syncVolanta ? '#0d2847' : '#10141b',
+            color: syncVolanta ? '#90caf9' : '#525b6a',
+            border: syncVolanta ? '1px solid #1976d2' : '1px solid #1c2430',
+            borderRadius: '6px',
+            fontSize: '0.75rem',
+            fontWeight: syncVolanta ? 700 : 500,
+            cursor: 'pointer',
+            transition: 'all 0.15s ease'
+          }}>
             <input
               type="checkbox"
               checked={syncVolanta}
@@ -650,7 +676,20 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
             Volanta / H2 Hook
           </label>
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', color: syncSaberMas ? '#e0e0e0' : '#888', cursor: 'pointer' }}>
+          <label style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 12px',
+            background: syncSaberMas ? '#0d2847' : '#10141b',
+            color: syncSaberMas ? '#90caf9' : '#525b6a',
+            border: syncSaberMas ? '1px solid #1976d2' : '1px solid #1c2430',
+            borderRadius: '6px',
+            fontSize: '0.75rem',
+            fontWeight: syncSaberMas ? 700 : 500,
+            cursor: 'pointer',
+            transition: 'all 0.15s ease'
+          }}>
             <input
               type="checkbox"
               checked={syncSaberMas}
@@ -660,7 +699,20 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
             Saber Más (Dato Local)
           </label>
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', color: syncExcerpt ? '#e0e0e0' : '#888', cursor: 'pointer' }}>
+          <label style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 12px',
+            background: syncExcerpt ? '#0d2847' : '#10141b',
+            color: syncExcerpt ? '#90caf9' : '#525b6a',
+            border: syncExcerpt ? '1px solid #1976d2' : '1px solid #1c2430',
+            borderRadius: '6px',
+            fontSize: '0.75rem',
+            fontWeight: syncExcerpt ? 700 : 500,
+            cursor: 'pointer',
+            transition: 'all 0.15s ease'
+          }}>
             <input
               type="checkbox"
               checked={syncExcerpt}
@@ -670,7 +722,20 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
             Excerpt / Sinopsis
           </label>
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', color: syncSitio ? '#e0e0e0' : '#888', cursor: 'pointer' }}>
+          <label style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 12px',
+            background: syncSitio ? '#0d2847' : '#10141b',
+            color: syncSitio ? '#90caf9' : '#525b6a',
+            border: syncSitio ? '1px solid #1976d2' : '1px solid #1c2430',
+            borderRadius: '6px',
+            fontSize: '0.75rem',
+            fontWeight: syncSitio ? 700 : 500,
+            cursor: 'pointer',
+            transition: 'all 0.15s ease'
+          }}>
             <input
               type="checkbox"
               checked={syncSitio}
@@ -680,8 +745,8 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
             Ubicación Geohistórica
           </label>
         </div>
-        <span style={{ fontSize: '0.68rem', color: '#64b5f6', marginTop: '8px', display: 'block' }}>
-          ℹ️ Título, Slug y el editor de Contenido Markdoc se inyectan siempre. YouTube y Spotify permanecen vacíos.
+        <span style={{ fontSize: '0.67rem', color: '#4a5568', marginTop: '8px', display: 'block' }}>
+          ✓ Obligatorios fijos: Título, Slug, Fecha actualizada y Editor Markdoc. YouTube y Spotify permanecen vacíos.
         </span>
       </div>
 

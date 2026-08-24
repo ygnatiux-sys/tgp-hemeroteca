@@ -146,7 +146,14 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
     );
     slugInputs.forEach(el => setNativeValue(el, slugValue));
 
-    // 3. CONDICIONAL: Excerpt
+    // 3. Inyección de Fecha Actualizada
+    const todayStr = new Date().toISOString().split('T')[0];
+    const dateInputs = document.querySelectorAll<HTMLInputElement>(
+      'input[name="date"], input[type="date"], input[id*="date"]'
+    );
+    dateInputs.forEach(el => setNativeValue(el, todayStr));
+
+    // 4. CONDICIONAL: Excerpt
     if (syncExcerpt && excToUse) {
       const excTextareas = document.querySelectorAll<HTMLTextAreaElement>(
         'textarea[name="excerpt"], textarea[id*="excerpt"], textarea[placeholder*="excerpt"], textarea[placeholder*="resumen"]'

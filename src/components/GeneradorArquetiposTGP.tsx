@@ -136,6 +136,13 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
     );
     titleInputs.forEach(el => setNativeValue(el, titleInStr));
 
+    // ── OBLIGATORIO: Fecha Actualizada ──────────────────────────────────────────
+    const todayStr = new Date().toISOString().split('T')[0];
+    const dateInputs = document.querySelectorAll<HTMLInputElement>(
+      'input[name="date"], input[type="date"], input[id*="date"]'
+    );
+    dateInputs.forEach(el => setNativeValue(el, todayStr));
+
     // ── CONDICIONAL: Volanta ────────────────────────────────────────────────────
     if (syncVolanta && volantaToUse) {
       const volInputs = document.querySelectorAll<HTMLInputElement>(
