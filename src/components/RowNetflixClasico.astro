@@ -21,16 +21,23 @@ interface Props {
     collectionLabel?: string;
     category?: string;
     date?: string;
+    date?: string;
     entry?: any;
   }>;
   max?: number;
+  actionText?: string;
+  actionHref?: string;
+  cardAspect?: "vertical" | "horizontal";
 }
 
 const { 
   title = "También podrían gustarte",
   eyebrow = "Colecciones",
   items = [],
-  max = 15
+  max = 15,
+  actionText,
+  actionHref,
+  cardAspect = "vertical"
 } = Astro.props;
 
 // Normalizamos los items
@@ -73,6 +80,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
 <section 
   id={uid} 
   class="netflix-row-root w-full py-6 md:py-10 overflow-hidden relative select-none group/section"
+  data-aspect={cardAspect}
   aria-label={title}
 >
   <!-- Encabezado de la fila -->
@@ -88,9 +96,16 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
       </h3>
     </div>
     
-    <span class="text-[8.5px] font-metadata tracking-[0.25em] text-white/30 uppercase hidden sm:inline-block">
-      {displayItems.length} Artículos
-    </span>
+    <div class="flex items-center gap-4">
+      <span class="text-[8.5px] font-metadata tracking-[0.25em] text-white/30 uppercase hidden sm:inline-block">
+        {displayItems.length} Artículos
+      </span>
+      {actionText && actionHref && (
+        <a href={actionHref} class="font-metadata text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(239,235,227,0.5)] transition-all">
+          {actionText}
+        </a>
+      )}
+    </div>
   </div>
 
   <!-- Contenedor Maestro -->
@@ -98,7 +113,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     
     <!-- Botón Anterior Flotante en Cápsula -->
     <button 
-      class="nav-btn prev-btn absolute left-0 md:left-1 top-1/2 -translate-y-1/2 z-40 w-9 md:w-10 h-16 md:h-20 rounded-full bg-black/60 hover:bg-black/90 text-white/70 hover:text-white border border-white/15 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-0 group-hover/section:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-xl"
+      class="nav-btn prev-btn absolute left-0 md:left-1 top-1/2 -translate-y-1/2 z-40 w-9 md:w-10 h-16 md:h-20 rounded-full bg-black/60 hover:bg-black/90 text-white/70 hover:text-white border border-white/15 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-xl"
       aria-label="Anterior"
     >
       <svg class="w-5 h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -108,7 +123,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
 
     <!-- Botón Siguiente Flotante en Cápsula -->
     <button 
-      class="nav-btn next-btn absolute right-0 md:right-1 top-1/2 -translate-y-1/2 z-40 w-9 md:w-10 h-16 md:h-20 rounded-full bg-black/60 hover:bg-black/90 text-white/70 hover:text-white border border-white/15 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-0 group-hover/section:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-xl"
+      class="nav-btn next-btn absolute right-0 md:right-1 top-1/2 -translate-y-1/2 z-40 w-9 md:w-10 h-16 md:h-20 rounded-full bg-black/60 hover:bg-black/90 text-white/70 hover:text-white border border-white/15 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-xl"
       aria-label="Siguiente"
     >
       <svg class="w-5 h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -168,7 +183,6 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
   /* Tarjeta en Reposo: 2 cols mobile, 3 cols tablet, 4 cols desktop */
   .netflix-card {
     width: calc(48% - 6px);
-    aspect-ratio: 2 / 3;
     opacity: 0.65;
     background-color: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.06);
@@ -182,6 +196,14 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
       box-shadow 340ms ease, 
       border-color 340ms ease;
     will-change: transform, opacity;
+  }
+
+  .netflix-row-root[data-aspect="vertical"] .netflix-card {
+    aspect-ratio: 2 / 3;
+  }
+  
+  .netflix-row-root[data-aspect="horizontal"] .netflix-card {
+    aspect-ratio: 16 / 9;
   }
 
   .netflix-card-img {

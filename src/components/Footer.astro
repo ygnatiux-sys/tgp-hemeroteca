@@ -125,8 +125,8 @@ const isActive = (href: string) => {
       <div class="max-w-360 mx-auto flex flex-col">
         {/* ─── GRID PRINCIPAL: 4 COLUMNAS EDITORIALES ─── */}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 items-start pb-12">
-          {/* 1. COLUMNA MARCA & CARTOGRAFÍA (Span 5) */}
-          <div class="lg:col-span-5 flex flex-col items-center text-center">
+          {/* 1. COLUMNA MARCA & CARTOGRAFÍA (Span 4) */}
+          <div class="lg:col-span-4 flex flex-col items-center text-center">
             <a href="/" class="group flex flex-col items-center text-center" title="The Great Puzzle Project">
               <div class="flex flex-col items-center text-center">
                 <span class="font-['Gloock'] font-black text-base md:text-lg lg:text-xl tracking-tight leading-none gradient-steel-line-1">
@@ -317,17 +317,36 @@ const isActive = (href: string) => {
             </div>
           </div>
 
-          {/* 4. COLUMNA CONTACTO (Span 3) */}
-          <div class="lg:col-span-3 flex flex-col">
+          {/* 4. COLUMNA CONTACTO & AUTORÍA (Span 4) */}
+          <div class="lg:col-span-4 flex flex-col">
             <h3 class="font-metadata text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-white/40 font-bold mb-4">
               Contacto
             </h3>
             <a
               href="mailto:thegreatpuzzleproject@gmail.com"
-              class="footer-nav-link text-xs md:text-sm lg:text-[14.5px] font-bold block truncate"
+              class="footer-nav-link text-xs md:text-sm lg:text-[14.5px] font-bold block truncate mb-10"
             >
               THEGREATPUZZLEPROJECT@GMAIL.COM
             </a>
+            
+            <h3 class="font-metadata text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-white/40 font-bold mb-4">
+              Autoría & Dirección
+            </h3>
+            <div class="flex items-start gap-4">
+              <a
+                href="https://gravatar.com/xavierbeniteztgp"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="shrink-0 group/avatar block rounded-lg p-0.5 bg-linear-to-b from-rust-orange/30 to-white/5 border border-white/10 hover:border-[#c084fc] hover:shadow-[0_0_15px_rgba(192,132,252,0.4)] transition-all duration-300"
+                title="Ver perfil de Xavier Benítez en Gravatar"
+              >
+                 <img src="/perfil.webp" alt="Xavier Benítez" width="56" height="56" loading="lazy" decoding="async" class="rounded-md object-cover w-14 h-14 grayscale group-hover/avatar:grayscale-0 transition-all duration-500" />
+              </a>
+              <div class="flex flex-col">
+                <a href="https://gravatar.com/xavierbeniteztgp" target="_blank" rel="noopener noreferrer" class="font-cinzel font-bold text-white tracking-wide text-sm hover:text-[#f5d0fe] transition-colors">Xavier Benítez</a>
+                <p class="font-serif text-[11.5px] text-white/70 leading-relaxed mt-1.5 pr-2">Con <strong class="text-white">25 años de trayectoria educativa</strong> e investigación en semiótica y tecnología, dirige <em class="text-rust-orange">TGP</em> como plataforma independiente.</p>
+              </div>
+            </div>
           </div>
         </div>
 

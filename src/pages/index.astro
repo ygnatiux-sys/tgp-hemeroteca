@@ -7,6 +7,7 @@ import YouTubeIcon from '../components/icons/YouTube.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../components/CinematicPostEngine.astro';
 import SliderCinematico from '../components/SliderCinematico.astro';
+import RowNetflixClasico from '../components/RowNetflixClasico.astro';
 import {
   type EssayEntry,
   getPublishableEssays,
@@ -357,23 +358,19 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
 
 
       {/* ═══════════════════════════════════════════════════════════════════
-          BLOQUE 3: ENSAYOS RECIENTES — SLIDER CINEMÁTICO
+          BLOQUE 3: ENSAYOS RECIENTES — ROW NETFLIX CLÁSICO
       ═══════════════════════════════════════════════════════════════════ */}
       {resolvedRecent.length > 0 && (
-        <section class="flex flex-col gap-6 md:gap-8 reveal-item">
-          <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-white/8">
-            <div>
-              <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Archivo de Ensayos</span>
-              <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-cinzel font-extrabold tracking-tight bg-linear-to-b from-[#FFFFFF] via-[#8E8E93] to-[#1C1C1E] bg-clip-text text-transparent drop-shadow-md">
-                Ensayos Recientes
-              </h2>
-            </div>
-            <a href="/archivo/" class="font-metadata text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(239,235,227,0.5)] transition-all pb-1">
-              Ver Catálogo Completo ({publishable.length}) →
-            </a>
-          </div>
-
-          <SliderCinematico ensayos={resolvedRecent} />
+        <section class="flex flex-col gap-6 md:gap-8 reveal-item -mx-4 px-4 md:mx-0 md:px-0">
+          <RowNetflixClasico 
+            title="Ensayos Recientes"
+            eyebrow="Archivo de Ensayos"
+            items={resolvedRecent}
+            max={15}
+            actionText={`Ver Catálogo Completo (${publishable.length}) →`}
+            actionHref="/archivo/"
+            cardAspect="horizontal"
+          />
         </section>
       )}
 
@@ -497,108 +494,7 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
         </section>
       )}
 
-      {/* ═══════════════════════════════════════════════════════════════════
-          BLOQUE 6: FRANJA AUTORAL CINEMÁTICA & VIDU GLASSMORPHIC
-      ═══════════════════════════════════════════════════════════════════ */}
-      <section class="cinematic-card-lantern w-full rounded-3xl p-8 md:p-12 lg:p-14 shadow-2xl relative">
-        <div class="absolute -right-20 -top-20 w-80 h-80 bg-rust-orange/5 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
-          
-          {/* Columna Izquierda: Identidad, Avatar y Dirección */}
-          <div class="lg:col-span-4 flex flex-col md:flex-row lg:flex-col items-start gap-6">
-            <a
-              href="https://gravatar.com/xavierbeniteztgp"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="group/avatar relative block w-24 h-24 md:w-28 md:h-28 rounded-2xl p-1 bg-linear-to-b from-rust-orange/30 to-white/5 border border-white/15 shadow-2xl hover:border-[#c084fc] hover:shadow-[0_0_35px_rgba(192,132,252,0.65)] transition-all duration-500 shrink-0 cursor-pointer active:scale-95"
-              title="Ver perfil de Xavier Benítez en Gravatar"
-            >
-              <div class="w-full h-full rounded-xl overflow-hidden relative">
-                <img
-                  src="/perfil.webp"
-                  alt="Xavier Benítez"
-                  width={112}
-                  height={112}
-                  loading="lazy"
-                  decoding="async"
-                  class="w-full h-full object-cover transition-transform duration-700 group-hover/avatar:scale-110"
-                />
-                <div class="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-60 group-hover/avatar:opacity-10 transition-opacity"></div>
-              </div>
-            </a>
-
-            <div class="flex flex-col gap-1">
-              <span class="font-metadata text-[9px] uppercase tracking-[0.4em] text-rust-orange font-bold block">
-                [ Dirección Editorial & Autoría ]
-              </span>
-              <h3 class="font-cinzel font-extrabold text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-tight leading-none mt-1">
-                <a
-                  href="https://gravatar.com/xavierbeniteztgp"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="gradient-acero-ios hover:text-[#f5d0fe] hover:drop-shadow-[0_0_20px_rgba(232,121,249,1)] transition-all duration-300 inline-block active:scale-95"
-                >
-                  Xavier Benítez
-                </a>
-              </h3>
-              <p class="font-metadata text-[10px] uppercase tracking-[0.25em] text-white/40 mt-1">
-                Investigador & Editor General
-              </p>
-            </div>
-          </div>
-
-          {/* Columna Derecha: Reseña Biográfica & Coordenadas */}
-          <div class="lg:col-span-8 flex flex-col justify-between gap-6 border-t lg:border-t-0 lg:border-l border-white/5 pt-8 lg:pt-0 lg:pl-12">
-            <p class="font-serif text-lg md:text-xl lg:text-[1.32rem] text-white/85 leading-relaxed font-normal">
-              Con <strong class="text-white font-bold tracking-tight">25 años de trayectoria educativa</strong> e investigación en semiótica y tecnología, <span class="text-white font-cinzel font-bold">Xavier Benítez</span> dirige <em class="font-serif italic text-rust-orange">The Great Puzzle Project</em> como una plataforma de investigación independiente, cartografía epistémica y archivo sobre la interacción entre la cultura visual, la memoria histórica y los sistemas de información.
-            </p>
-
-            <div class="flex flex-wrap items-center justify-between gap-4 mt-2 pt-6 border-t border-white/10 font-metadata text-[9.5px] uppercase tracking-[0.25em]">
-              <div class="flex items-center gap-2 text-white/50">
-                <span class="w-2 h-2 rounded-full bg-rust-orange shadow-[0_0_8px_#EFEBE3] shrink-0"></span>
-                <span class="flex items-center gap-1.5 flex-wrap">
-                  <a
-                    href="https://share.google/2jdBPO5AZhrjplGgj"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="hover:text-rust-orange hover:drop-shadow-[0_0_10px_rgba(239, 235, 227,0.7)] transition-all duration-300 active:scale-95"
-                  >
-                    Buenos Aires
-                  </a>
-                  <span class="text-rust-orange font-bold mx-1">·</span>
-                  <a
-                    href="https://share.google/2jdBPO5AZhrjplGgj"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="hover:text-rust-orange hover:drop-shadow-[0_0_10px_rgba(239, 235, 227,0.7)] transition-all duration-300 active:scale-95"
-                  >
-                    Burzaco
-                  </a>
-                  <span class="text-rust-orange font-bold mx-1">·</span>
-                  <a
-                    href="https://share.google/2jdBPO5AZhrjplGgj"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="hover:text-rust-orange hover:drop-shadow-[0_0_10px_rgba(239, 235, 227,0.7)] transition-all duration-300 active:scale-95"
-                  >
-                    Sur Global
-                  </a>
-                </span>
-              </div>
-
-              <a
-                href="mailto:thegreatpuzzleproject@gmail.com"
-                class="text-rust-orange hover:text-[#f5d0fe] hover:drop-shadow-[0_0_12px_rgba(232,121,249,0.8)] transition-all duration-300 flex items-center gap-2 active:scale-95"
-              >
-                <span>thegreatpuzzleproject@gmail.com</span>
-                <span class="text-xs">↗</span>
-              </a>
-            </div>
-          </div>
-
-        </div>
-      </section>
 
     </div>
     </div>{/* /#home-canvas */}
