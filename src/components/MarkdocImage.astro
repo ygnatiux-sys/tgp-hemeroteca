@@ -1,0 +1,29 @@
+---
+// src/components/MarkdocImage.astro
+import { resolveR2ImageUrl } from '../lib/content-filter';
+
+interface Props {
+  src: string;
+  alt?: string;
+  title?: string;
+}
+
+const { src, alt = '', title } = Astro.props;
+const safeSrc = resolveR2ImageUrl(src);
+---
+
+<figure class="my-8 flex flex-col items-center justify-center">
+  <img
+    src={safeSrc}
+    alt={alt}
+    title={title}
+    loading="lazy"
+    decoding="async"
+    class="tgp-markdoc-image rounded-xl max-w-full h-auto mx-auto shadow-2xl border border-white/10 object-cover"
+  />
+  {title && (
+    <figcaption class="mt-3 text-center font-metadata text-xs uppercase tracking-widest text-[#dfca9d]/70">
+      {title}
+    </figcaption>
+  )}
+</figure>

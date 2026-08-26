@@ -63,7 +63,7 @@ const allCategories = [...new Set(publishable.map(item => formatCategory(item.en
                       {img && (
                         <div class="index-card-img-wrap">
                           <img
-                            src={img.src}
+                            src={typeof img === 'object' ? img?.src : img}
                             alt={item.entry.title || item.slug}
                             class="index-card-img"
                             loading="lazy"

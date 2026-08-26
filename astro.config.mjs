@@ -21,6 +21,11 @@ export default defineConfig({
   output: 'server',  // CRÍTICO: genera _worker.js para Cloudflare Pages Functions
   trailingSlash: 'ignore',
   
+  // Autorización de dominios remotos para el servicio de optimización de imágenes de Astro (<Image />, getImage())
+  image: {
+    domains: ['storage.thegreatpuzzleproject.com', 'upload.wikimedia.org', 'images.unsplash.com'],
+  },
+  
   // EL ESCUDO VITE: En local aislamos React como external puro; en build forzamos empaquetado para Cloudflare
   vite: {
     ...tgpViteConfig,

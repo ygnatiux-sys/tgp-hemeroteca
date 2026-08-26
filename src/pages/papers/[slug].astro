@@ -21,6 +21,8 @@ import PostCinematicStyle from "../../components/PostCinematicStyle.astro";
 import { parseLLMText } from "../../lib/parseLLMText";
 import {
   resolveEssayImage,
+  resolveR2ImageUrl,
+  R2_STORAGE_BASE_URL,
   formatCategory,
   formatDate,
   getPublishableEssays,
@@ -107,8 +109,9 @@ if (rawSourceText.startsWith("{") && (rawSourceText.includes('"informeMarkdown"'
 let renderedHtml = "";
 let cinematicHtml = "";
 if (rawSourceText) {
-  renderedHtml = marked.parse(rawSourceText) as string;
-  cinematicHtml = parseLLMText(rawSourceText);
+  const normalizedSourceText = rawSourceText.replace(/(?:src\/assets|\/src\/assets)\/([^\s"')]+)/g, `${R2_STORAGE_BASE_URL}/$1`);
+  renderedHtml = marked.parse(normalizedSourceText) as string;
+  cinematicHtml = parseLLMText(normalizedSourceText);
 }
 
 // ─── METADATOS ───────────────────────────────────────────────────────────────
@@ -117,6 +120,7 @@ const category     = formatCategory(doc.category);
 const dateStr      = doc.date ? formatDate(doc.date) : null;
 const excerpt      = doc.excerpt || null;
 const optimizedImg = resolveEssayImage(doc, slug);
+const optimizedImgUrl = typeof optimizedImg === 'object' ? optimizedImg?.src : optimizedImg;
 const hasContent   = !!Content || !!renderedHtml;
 
 // ─── POSTS RELACIONADOS (misma categoría del autor) ──────────────────────────
@@ -136,7 +140,7 @@ const relatedPosts = publishable
 const pageTitle = `${title} — Papers · TGP`;
 ---
 
-<AcademicLayout title={pageTitle} description={excerpt ?? undefined} image={optimizedImg?.src} slug={slug}>
+<AcademicLayout title={pageTitle} description={excerpt ?? undefined} image={optimizedImgUrl} slug={slug}>
   <QuickReturnButton client:only="react" variant="papers" accentColor="#EFEBE3" fallbackUrl="/papers" />
 
   <!-- ═══════════════════════════════════════════════════════════════
@@ -235,13 +239,13 @@ const pageTitle = `${title} — Papers · TGP`;
   <!-- ═══════════════════════════════════════════════════════════════
        ZONA 2: IMAGEN DE PORTADA — span completo al ancho del contenido
   ══════════════════════════════════════════════════════════════════ -->
-  {optimizedImg && (
+  {optimizedImgUrl && (
     <div class="paper-cover-zone">
       <figure class="paper-cover-figure">
         <img
-          src={optimizedImg.src}
-          width={optimizedImg.width}
-          height={optimizedImg.height}
+          src={optimizedImgUrl}
+          width={optimizedImg?.width}
+          height={optimizedImg?.height}
           alt={`Imagen de portada: ${title}`}
           class="paper-cover-img"
           loading="eager"
@@ -424,7 +428,7 @@ const pageTitle = `${title} — Papers · TGP`;
                 <div class="explore-lead-inner">
                   {leadImg ? (
                     <div class="explore-lead-img-wrap">
-                      <img src={leadImg.src} alt="" class="explore-lead-img" loading="lazy" />
+                      <img src={typeof leadImg === 'object' ? leadImg?.src : leadImg} alt="" class="explore-lead-img" loading="lazy" />
                     </div>
                   ) : (
                     <div class="explore-lead-img-wrap explore-lead-fallback flex items-center justify-center bg-linear-to-br from-[#8C6D2F]/15 via-[#242424] to-[#151718] p-6 text-center">
@@ -462,7 +466,7 @@ const pageTitle = `${title} — Papers · TGP`;
                   <a href={`/papers/${post.slug}/`} class="explore-sec-link">
                     {secImg ? (
                       <div class="explore-sec-img-wrap">
-                        <img src={secImg.src} alt="" class="explore-sec-img" loading="lazy" />
+                        <img src={typeof secImg === 'object' ? secImg?.src : secImg} alt="" class="explore-sec-img" loading="lazy" />
                       </div>
                     ) : (
                       <div class="explore-sec-img-wrap flex items-center justify-center bg-linear-to-br from-[#8C6D2F]/10 via-[#1e1e1e] to-[#151718]">

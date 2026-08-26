@@ -33,15 +33,69 @@ export interface EssayEntry {
   };
 }
 
+export const R2_STORAGE_BASE_URL = 'https://storage.thegreatpuzzleproject.com';
+
 /**
- * Sanitiza y codifica de manera segura URLs de imágenes remotas (R2, CDNs, etc.)
+ * Transforma rutas locales (/src/assets/...) generadas por Keystatic o el entorno de desarrollo
+ * a URLs públicas absolutas del CDN Cloudflare R2 (https://storage.thegreatpuzzleproject.com/...).
+ */
+export function resolveR2ImageUrl(pathOrUrl: string | any): string {
+  if (!pathOrUrl) return '';
+  const rawStr = typeof pathOrUrl === 'string' ? pathOrUrl : (pathOrUrl?.src || '');
+  if (!rawStr || typeof rawStr !== 'string') return '';
+  const trimmed = rawStr.trim();
+  if (!trimmed) return '';
+
+  // 1. Data URLs o URLs absolutas remotas (Wikimedia, R2, CDNs externos)
+  if (trimmed.startsWith('data:') || trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+
+  // 2. Rutas generadas por Keystatic (/src/assets/... o src/assets/...)
+  if (trimmed.startsWith('/src/assets/')) {
+    const relPath = trimmed.replace(/^\/src\/assets\//, '');
+    return `${R2_STORAGE_BASE_URL}/${relPath}`;
+  }
+  if (trimmed.startsWith('src/assets/')) {
+    const relPath = trimmed.replace(/^src\/assets\//, '');
+    return `${R2_STORAGE_BASE_URL}/${relPath}`;
+  }
+  if (trimmed.startsWith('@assets/')) {
+    const relPath = trimmed.replace(/^@assets\//, '');
+    return `${R2_STORAGE_BASE_URL}/${relPath}`;
+  }
+
+  // 3. Rutas de colecciones directas
+  if (
+    trimmed.startsWith('/ensayos/') ||
+    trimmed.startsWith('/georreferencias/') ||
+    trimmed.startsWith('/arquetipos-globales/') ||
+    trimmed.startsWith('/ensayos-cinematicos/')
+  ) {
+    return `${R2_STORAGE_BASE_URL}${trimmed}`;
+  }
+  if (
+    trimmed.startsWith('ensayos/') ||
+    trimmed.startsWith('georreferencias/') ||
+    trimmed.startsWith('arquetipos-globales/') ||
+    trimmed.startsWith('ensayos-cinematicos/')
+  ) {
+    return `${R2_STORAGE_BASE_URL}/${trimmed}`;
+  }
+
+  // 4. Recursos estáticos locales en /public (/images/..., /favicon..., /perfil.webp)
+  return trimmed;
+}
+
+/**
+ * Sanitiza, resuelve contra R2 y codifica de manera segura URLs de imágenes
  * para evitar errores 404 causados por caracteres especiales, comas, espacios o doble codificación.
  */
 export function sanitizeImageUrl(imgUrl: string | any): string {
   if (!imgUrl) return '';
-  const urlStr = typeof imgUrl === 'string' ? imgUrl : (imgUrl?.src || '');
-  if (!urlStr || typeof urlStr !== 'string') return '';
-  const trimmed = urlStr.trim();
+  const resolved = resolveR2ImageUrl(imgUrl);
+  if (!resolved || typeof resolved !== 'string') return '';
+  const trimmed = resolved.trim();
   if (!trimmed) return '';
   
   if (trimmed.startsWith('/') && !trimmed.includes(' ') && !trimmed.includes(',')) {
@@ -56,7 +110,7 @@ export function sanitizeImageUrl(imgUrl: string | any): string {
 }
 
 /**
- * Retorna la imagen principal del ensayo o recurso (ImageMetadata si fue importado por Astro, o string URL / null).
+ * Retorna la imagen principal del ensayo o recurso (URL absoluta de R2 / CDN o null).
  * Si no tiene coverImage directo, busca inteligentemente en sus imágenes asignadas de Wikimedia o galería.
  */
 export function resolveEssayImage(coverOrEntry?: any, slug?: string): any {
@@ -64,10 +118,10 @@ export function resolveEssayImage(coverOrEntry?: any, slug?: string): any {
 
   // Si ya es un ImageMetadata de Astro (objeto con .src) o string directo
   if (typeof coverOrEntry === 'string' && coverOrEntry.trim().length > 0) {
-    return coverOrEntry;
+    return sanitizeImageUrl(coverOrEntry);
   }
   if (typeof coverOrEntry === 'object' && coverOrEntry.src && typeof coverOrEntry.src === 'string') {
-    return coverOrEntry;
+    return sanitizeImageUrl(coverOrEntry.src);
   }
 
   // Si es una entrada completa (e.entry o item.data o item)
@@ -75,8 +129,12 @@ export function resolveEssayImage(coverOrEntry?: any, slug?: string): any {
 
   // 1. Portada asignada directa
   if (doc?.coverImage) {
-    if (typeof doc.coverImage === 'string' && doc.coverImage.trim().length > 0) return doc.coverImage;
-    if (typeof doc.coverImage === 'object' && doc.coverImage.src) return doc.coverImage;
+    if (typeof doc.coverImage === 'string' && doc.coverImage.trim().length > 0) {
+      return sanitizeImageUrl(doc.coverImage);
+    }
+    if (typeof doc.coverImage === 'object' && doc.coverImage.src) {
+      return sanitizeImageUrl(doc.coverImage.src);
+    }
   }
 
   // 2. Banco de Imágenes Wikimedia (HERO o primera seleccionada)
@@ -87,7 +145,7 @@ export function resolveEssayImage(coverOrEntry?: any, slug?: string): any {
       if (parsed?.selectedItems && Array.isArray(parsed.selectedItems) && parsed.selectedItems.length > 0) {
         const hero = parsed.selectedItems.find((item: any) => item.role === 'HERO') || parsed.selectedItems[0];
         const url = hero?.thumbUrl || hero?.url;
-        if (url) return url;
+        if (url) return sanitizeImageUrl(url);
       }
     } catch (e) {}
   }
@@ -95,8 +153,8 @@ export function resolveEssayImage(coverOrEntry?: any, slug?: string): any {
   // 3. Array de galería
   if (Array.isArray(doc?.gallery) && doc.gallery.length > 0) {
     const firstGal = doc.gallery[0];
-    if (typeof firstGal === 'string') return firstGal;
-    if (typeof firstGal === 'object' && firstGal?.src) return firstGal;
+    if (typeof firstGal === 'string') return sanitizeImageUrl(firstGal);
+    if (typeof firstGal === 'object' && firstGal?.src) return sanitizeImageUrl(firstGal.src);
   }
 
   return null;
@@ -310,9 +368,14 @@ export function resolveAllPostGalleryImages(doc: any, slug?: string): GalleryIma
   const seenUrls = new Set<string>();
 
   const addImg = (item: GalleryImageItem) => {
-    if (!item.url || seenUrls.has(item.url)) return;
-    seenUrls.add(item.url);
-    images.push(item);
+    const safeUrl = sanitizeImageUrl(item.url);
+    if (!safeUrl || seenUrls.has(safeUrl)) return;
+    seenUrls.add(safeUrl);
+    images.push({
+      ...item,
+      url: safeUrl,
+      thumbUrl: item.thumbUrl ? sanitizeImageUrl(item.thumbUrl) : safeUrl
+    });
   };
 
   // 1. Imágenes seleccionadas de Wikimedia

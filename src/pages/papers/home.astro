@@ -62,7 +62,7 @@ const rest      = all.slice(1, 9);
               <a href={`/papers/${item.slug}/`} class="home-card">
                 {img && (
                   <div class="home-card-img-wrap">
-                    <img src={img.src} alt={item.entry.title || ""} class="home-card-img" loading="lazy" />
+                    <img src={typeof img === 'object' ? img?.src : img} alt={item.entry.title || ""} class="home-card-img" loading="lazy" />
                   </div>
                 )}
                 <div class="home-card-body">
