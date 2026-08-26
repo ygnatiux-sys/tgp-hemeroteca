@@ -14,7 +14,10 @@
     "generar": "node scripts/generar-post.js",
     "audit": "node scripts/audit-content.mjs",
     "check-images": "node check-images.mjs",
-    "generate-types": "wrangler types"
+    "generate-types": "wrangler types",
+    "upload:assets": "node scripts/sync-assets-r2.mjs",
+    "upload:assets:force": "node scripts/sync-assets-r2.mjs --force",
+    "upload:assets:dry": "node scripts/sync-assets-r2.mjs --dry-run"
   },
   "dependencies": {
     "@0no-co/graphql.web": "^1.2.0",
