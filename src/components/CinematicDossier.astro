@@ -3,6 +3,7 @@
 import SpotifyIcon from './icons/Spotify.astro';
 import YouTubeIcon from './icons/YouTube.astro';
 import { QuickReturnButton } from './QuickReturnButton';
+import { sanitizeImageUrl } from '../lib/content-filter';
 
 export interface Fragment {
   image: any;
@@ -28,7 +29,7 @@ const { fragments = [], isModal = false } = Astro.props;
 <section 
   id="cinematic-dossier"
   class={`cinematic-dossier-wrapper w-full h-dvh overflow-hidden relative bg-theme-dark ${isModal ? 'fixed inset-0 z-9999 opacity-0 pointer-events-none' : 'block'}`}
-  data-images={JSON.stringify(fragments.map(f => typeof f.image === 'string' ? f.image : (f.image?.src || '')))}
+  data-images={JSON.stringify(fragments.map(f => sanitizeImageUrl(typeof f.image === 'string' ? f.image : (f.image?.src || ''))))}
 >
   {/* Botón de Cerrar Modal (Solo si es Modal) */}
   {isModal && (
@@ -44,7 +45,7 @@ const { fragments = [], isModal = false } = Astro.props;
          <div class="absolute inset-4 md:inset-8 overflow-hidden rounded-3xl md:rounded-[2.5rem] shadow-2xl bg-black">
            {/* Imagen de fondo — clase cpe-bg-img para motor Engine */}
            <img 
-             src={typeof fragment.image === 'string' ? fragment.image : fragment.image?.src} 
+             src={sanitizeImageUrl(typeof fragment.image === 'string' ? fragment.image : (fragment.image?.src || ''))} 
              alt={fragment.highlight || "Registro Documental"} 
              class="cpe-bg-img absolute inset-0 w-full h-full object-cover scale-100"
              style={`object-position: ${fragment.position || 'center center'}; transform-origin: ${fragment.origin || 'center center'};`} 
