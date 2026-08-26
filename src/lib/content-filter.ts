@@ -38,41 +38,56 @@ export const R2_STORAGE_BASE_URL = 'https://storage.thegreatpuzzleproject.com';
 /**
  * Transforma rutas locales (/src/assets/...) generadas por Keystatic o el entorno de desarrollo
  * a URLs públicas absolutas del CDN Cloudflare R2 (https://storage.thegreatpuzzleproject.com/...).
+ *
+ * [DEBUG] Console.log activo — remover tras confirmar el fix en producción.
  */
 export function resolveR2ImageUrl(pathOrUrl: string | any): string {
   if (!pathOrUrl) return '';
-  const rawStr = typeof pathOrUrl === 'string' ? pathOrUrl : (pathOrUrl?.src || '');
-  if (!rawStr || typeof rawStr !== 'string') return '';
+
+  // Si es un objeto ImageMetadata de Astro, extraer .src
+  const rawStr = typeof pathOrUrl === 'string' ? pathOrUrl : (pathOrUrl?.src ?? pathOrUrl?.href ?? '');
+  if (!rawStr || typeof rawStr !== 'string') {
+    console.warn('[R2] resolveR2ImageUrl recibió un valor no-string inesperado:', typeof pathOrUrl, pathOrUrl);
+    return '';
+  }
   const trimmed = rawStr.trim();
   if (!trimmed) return '';
 
-  // 1. Data URLs o URLs absolutas remotas (Wikimedia, R2, CDNs externos)
+  // 1. Data URLs o URLs absolutas remotas (Wikimedia, R2, CDNs externos) → sin cambio
   if (trimmed.startsWith('data:') || trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
     return trimmed;
   }
 
-  // 2. Rutas generadas por Keystatic (/src/assets/... o src/assets/...)
+  // 2. Rutas generadas por Keystatic (/src/assets/... o src/assets/...) → R2
   if (trimmed.startsWith('/src/assets/')) {
     const relPath = trimmed.replace(/^\/src\/assets\//, '');
-    return `${R2_STORAGE_BASE_URL}/${relPath}`;
+    const resolved = `${R2_STORAGE_BASE_URL}/${relPath}`;
+    console.log(`[R2] RUTA LOCAL → R2: "${trimmed}" → "${resolved}"`);
+    return resolved;
   }
   if (trimmed.startsWith('src/assets/')) {
     const relPath = trimmed.replace(/^src\/assets\//, '');
-    return `${R2_STORAGE_BASE_URL}/${relPath}`;
+    const resolved = `${R2_STORAGE_BASE_URL}/${relPath}`;
+    console.log(`[R2] RUTA LOCAL → R2: "${trimmed}" → "${resolved}"`);
+    return resolved;
   }
   if (trimmed.startsWith('@assets/')) {
     const relPath = trimmed.replace(/^@assets\//, '');
-    return `${R2_STORAGE_BASE_URL}/${relPath}`;
+    const resolved = `${R2_STORAGE_BASE_URL}/${relPath}`;
+    console.log(`[R2] RUTA @assets → R2: "${trimmed}" → "${resolved}"`);
+    return resolved;
   }
 
-  // 3. Rutas de colecciones directas
+  // 3. Rutas de colecciones directas (sin /src/assets/ prefix)
   if (
     trimmed.startsWith('/ensayos/') ||
     trimmed.startsWith('/georreferencias/') ||
     trimmed.startsWith('/arquetipos-globales/') ||
     trimmed.startsWith('/ensayos-cinematicos/')
   ) {
-    return `${R2_STORAGE_BASE_URL}${trimmed}`;
+    const resolved = `${R2_STORAGE_BASE_URL}${trimmed}`;
+    console.log(`[R2] RUTA COLECCIÓN → R2: "${trimmed}" → "${resolved}"`);
+    return resolved;
   }
   if (
     trimmed.startsWith('ensayos/') ||
@@ -80,10 +95,12 @@ export function resolveR2ImageUrl(pathOrUrl: string | any): string {
     trimmed.startsWith('arquetipos-globales/') ||
     trimmed.startsWith('ensayos-cinematicos/')
   ) {
-    return `${R2_STORAGE_BASE_URL}/${trimmed}`;
+    const resolved = `${R2_STORAGE_BASE_URL}/${trimmed}`;
+    console.log(`[R2] RUTA COLECCIÓN → R2: "${trimmed}" → "${resolved}"`);
+    return resolved;
   }
 
-  // 4. Recursos estáticos locales en /public (/images/..., /favicon..., /perfil.webp)
+  // 4. Recursos estáticos locales en /public (/images/..., /favicon..., /perfil.webp) → sin cambio
   return trimmed;
 }
 

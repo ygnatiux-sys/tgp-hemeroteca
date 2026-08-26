@@ -4,7 +4,7 @@
  * Componente de Carrusel Netflix Clásico Vertical (Sibling Push + Hover Delay + Paginación)
  * 4 Columnas visibles en Desktop con soporte para colecciones de TGP.
  */
-import { resolveEssayImage, formatCategory, formatDate } from "../lib/content-filter";
+import { resolveEssayImage, sanitizeImageUrl, formatCategory, formatDate } from "../lib/content-filter";
 
 interface Props {
   title?: string;
@@ -38,7 +38,7 @@ let displayItems = items.slice(0, max).map((item) => {
   const t = item.title || item.titulo || item.entry?.title || "Sin título";
   const cat = item.collectionLabel || formatCategory(item.category || item.entry?.category) || "Ensayo";
   const rawImg = item.img || item.image || resolveEssayImage(item.entry || item, item.slug);
-  const image = typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop');
+  const image = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '')) || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop';
   const link = item.link || (item.slug ? `/hemeroteca/${item.slug}/` : '#');
   const d = item.date || item.entry?.date ? formatDate(item.date || item.entry?.date) : '';
 
