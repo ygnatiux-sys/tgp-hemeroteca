@@ -130,12 +130,12 @@
 
 .wocFace180 {
   transform: rotateY(180deg);
-  background-color: #1a1c1d;
+  background-color: #121413;
 }
 
 .wocFace360 {
   transform: rotateY(360deg);
-  background-color: #1a1c1d;
+  background-color: #121413;
 }
 
 .wocIcon {
