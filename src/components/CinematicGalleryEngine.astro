@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import { sanitizeImageUrl } from "../lib/content-filter";
 
 /**
@@ -45,11 +46,13 @@ const safeSlides = slides.length > 0 ? slides : [];
               {/* Fondo: Ken Burns */}
               <div class="cge-bg-wrap absolute inset-0 overflow-hidden bg-[#0a0a0a]">
                 {safeSrc ? (
-                  <img
+                  <Image
                     src={safeSrc}
                     alt={slide.title}
                     class="cge-bg-img absolute inset-0 w-full h-full object-contain scale-100"
                     style={`object-position: ${slide.imagePosition || "center center"};`}
+                    inferSize={true}
+                    format="webp"
                     loading={i === 0 ? "eager" : "lazy"}
                     fetchpriority={i === 0 ? "high" : undefined}
                     decoding="async"
