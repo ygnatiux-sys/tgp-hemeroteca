@@ -58,7 +58,8 @@ const safeSlides = slides.length > 0 ? slides : [];
           const safeSrc = sanitizeImageUrl(slide.image);
           return (
             <article
-              class={`cpe-slide absolute inset-0 flex items-end justify-start pb-24 md:pb-32 ${i === 0 ? "z-20" : "z-10 opacity-0 pointer-events-none"}`}
+              class={`cpe-slide absolute inset-0 flex items-end justify-start pb-24 md:pb-32 backface-hidden transform-3d will-change-transform [backface-visibility:hidden] [transform-style:preserve-3d] ${i === 0 ? "z-20" : "z-10 opacity-0 pointer-events-none"}`}
+              style={`z-index: ${100 - i}; transform: translateZ(1px);`}
               data-index={i}
               {...(i !== 0 ? { "aria-hidden": "true" } : {})}
             >
