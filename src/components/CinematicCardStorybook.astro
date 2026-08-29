@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import {
   getRelatedCategories,
   formatYear,
@@ -93,9 +94,11 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
   {/* 1. Imagen de fondo */}
   {
     safeImg ? (
-      <img
+      <Image
         src={safeImg}
         alt={entry.title || "Dossier del Archivo"}
+        inferSize={true}
+        format="webp"
         loading={isEager ? "eager" : "lazy"}
         fetchpriority={isEager ? "high" : undefined}
         decoding="async"

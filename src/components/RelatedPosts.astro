@@ -1,5 +1,5 @@
 ---
-// src/components/RelatedPosts.astro
+import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import { sanitizeImageUrl } from '../lib/content-filter';
 
@@ -40,9 +40,11 @@ const { posts } = Astro.props;
           <div class="flex flex-col h-full">
             {post.data.coverImage && (
               <div class="aspect-video w-full overflow-hidden rounded-md mb-4 border border-white/10">
-                <img 
+                <Image 
                   src={sanitizeImageUrl(post.data.coverImage)} 
                   alt={`Cover image for ${post.data.title}`}
+                  inferSize={true}
+                  format="webp"
                   loading="lazy"
                   decoding="async"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"

@@ -10,6 +10,7 @@
  *  Fase 5 (7.8s): Texto TypeMagic emerge sobre ambas imagenes
  */
 
+import { Image } from 'astro:assets';
 import { sanitizeImageUrl } from "../lib/content-filter";
 
 interface Props {
@@ -51,11 +52,13 @@ const secondarySrc = secondaryImage ? sanitizeImageUrl(secondaryImage) : null;
   <div class="cch-panel cch-panel--left" id="cch-panel-left">
     <div class="cch-panel-inner" id="cch-inner-left">
       {primarySrc ? (
-        <img
+        <Image
           class="cch-img"
           id="cch-img-primary"
           src={primarySrc}
           alt={primaryAlt}
+          inferSize={true}
+          format="webp"
           loading="eager"
           fetchpriority="high"
           decoding="async"
@@ -69,11 +72,13 @@ const secondarySrc = secondaryImage ? sanitizeImageUrl(secondaryImage) : null;
   {secondarySrc && (
     <div class="cch-panel cch-panel--right" id="cch-panel-right">
       <div class="cch-panel-inner" id="cch-inner-right">
-        <img
+        <Image
           class="cch-img"
           id="cch-img-secondary"
           src={secondarySrc}
           alt={secondaryAlt}
+          inferSize={true}
+          format="webp"
           loading="eager"
           decoding="async"
           style={`object-position: ${secondaryPosition}`}

@@ -1,5 +1,5 @@
 ---
-// src/components/SliderCinematico.astro
+import { Image } from 'astro:assets';
 import { formatCategory, sanitizeImageUrl } from '../lib/content-filter';
 
 interface Props {
@@ -31,9 +31,11 @@ const { ensayos = [] } = Astro.props;
         >
           <!-- Imagen de Fondo -->
           {imagen ? (
-            <img 
+            <Image 
               src={imagen} 
               alt={titulo} 
+              inferSize={true}
+              format="webp"
               loading="lazy"
               decoding="async"
               class="w-full h-87.5 object-cover transition-transform duration-700"

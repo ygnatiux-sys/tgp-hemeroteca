@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import { render, getEntry, getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import MarqueeColecciones from "../../components/MarqueeColecciones.astro";
@@ -713,9 +714,11 @@ const metaImageUrl = typeof optimizedImage === 'object' && optimizedImage?.src ?
                       class="group/img relative aspect-4/3 rounded-lg overflow-hidden border border-white/10 bg-white/5 hover:border-rust-orange/70 transition-all duration-500"
                       title={wmItem.title}
                     >
-                      <img
+                      <Image
                         src={sanitizeImageUrl(wmItem.thumbUrl || wmItem.url)}
                         alt={wmItem.title}
+                        inferSize={true}
+                        format="webp"
                         class="w-full h-full object-cover group-hover/img:scale-108 transition-transform duration-700 opacity-80 group-hover/img:opacity-100"
                         loading="lazy"
                         decoding="async"
@@ -727,9 +730,11 @@ const metaImageUrl = typeof optimizedImage === 'object' && optimizedImage?.src ?
               </div>
             ) : optimizedImage ? (
               <div class="cinematic-card-lantern overflow-hidden rounded-2xl aspect-4/5 relative group shadow-xl">
-                <img
+                <Image
                   src={sanitizeImageUrl(optimizedImage)}
                   alt="Registro visual"
+                  inferSize={true}
+                  format="webp"
                   class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out"
                   loading="lazy"
                   decoding="async"

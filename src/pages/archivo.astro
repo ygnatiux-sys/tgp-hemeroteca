@@ -1,5 +1,6 @@
 ---
 export const prerender = true;
+import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
@@ -242,9 +243,11 @@ function createPremierSequences(essays: typeof resolvedEssays) {
               class="group card-hover-cinematic relative overflow-hidden rounded-2xl border border-white/10 bg-[#151718]/90 text-left p-4 md:p-5 flex flex-col justify-end min-h-37.5 md:min-h-42.5 cursor-pointer transition-all duration-500"
             >
               {card.img ? (
-                <img
+                <Image
                   src={sanitizeImageUrl(card.img)}
                   alt={card.catLabel}
+                  inferSize={true}
+                  format="webp"
                   loading="lazy"
                   decoding="async"
                   class="absolute inset-0 w-full h-full object-cover brightness-[0.45] group-hover:scale-105 group-hover:brightness-[0.55] transition-all duration-700"
