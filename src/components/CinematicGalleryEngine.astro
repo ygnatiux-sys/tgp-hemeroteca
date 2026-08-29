@@ -40,7 +40,7 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
           const safeSrc = sanitizeImageUrl(slide.image);
           return (
             <article
-              class={`cge-slide absolute inset-0 flex items-end justify-start pb-20 md:pb-24 [content-visibility:auto] [contain:content] ${i === 0 ? "z-20" : "z-10 opacity-0 pointer-events-none"}`}
+              class={`cge-slide absolute inset-0 flex items-end justify-start pb-20 md:pb-24 [content-visibility:auto] contain-content ${i === 0 ? "z-20" : "z-10 opacity-0 pointer-events-none"}`}
               data-index={i}
               {...(i !== 0 ? { "aria-hidden": "true" } : {})}
             >
