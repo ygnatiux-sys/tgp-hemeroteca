@@ -1,0 +1,73 @@
+---
+/**
+ * src/components/SafeImage.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Componente de Imagen Seguro y Resiliente para Astro.
+ * 
+ * Intenta optimizar la imagen remota a WebP mediante `getImage()` con `inferSize`.
+ * Si la imagen falla (red, caracteres especiales, 404, etc.), realiza un
+ * fallback silencioso a la etiqueta <img> nativa sin interrumpir el build de Astro.
+ */
+import { getImage } from 'astro:assets';
+
+interface Props {
+  src: string;
+  alt?: string;
+  class?: string;
+  style?: string;
+  id?: string;
+  loading?: "eager" | "lazy";
+  fetchpriority?: "high" | "low" | "auto";
+  decoding?: "async" | "sync" | "auto";
+  format?: "webp" | "avif" | "png" | "jpeg";
+  inferSize?: boolean;
+}
+
+const {
+  src,
+  alt = "",
+  class: className = "",
+  style = "",
+  id,
+  loading = "lazy",
+  fetchpriority,
+  decoding = "async",
+  format = "webp",
+  inferSize = true,
+} = Astro.props;
+
+let finalSrc = src;
+let finalWidth: number | undefined = undefined;
+let finalHeight: number | undefined = undefined;
+
+if (src && typeof src === 'string' && (src.startsWith('http://') || src.startsWith('https://'))) {
+  try {
+    const opt = await getImage({ src, inferSize, format });
+    if (opt?.src) {
+      finalSrc = opt.src;
+      finalWidth = opt.attributes?.width ? Number(opt.attributes.width) : undefined;
+      finalHeight = opt.attributes?.height ? Number(opt.attributes.height) : undefined;
+    }
+  } catch (_err) {
+    // Fallback silencioso a la URL original sin romper el build
+    finalSrc = src;
+  }
+}
+---
+
+{
+  finalSrc ? (
+    <img
+      src={finalSrc}
+      alt={alt}
+      class={className}
+      style={style}
+      id={id}
+      width={finalWidth}
+      height={finalHeight}
+      loading={loading}
+      fetchpriority={fetchpriority}
+      decoding={decoding}
+    />
+  ) : null
+}

@@ -4,7 +4,7 @@
  * Componente de Carrusel Netflix Clásico Vertical (Sibling Push + Hover Delay + Paginación)
  * 4 Columnas visibles en Desktop con soporte para colecciones de TGP.
  */
-import { Image } from 'astro:assets';
+import Image from './SafeImage.astro';
 import { resolveEssayImage, sanitizeImageUrl, formatCategory, formatDate } from "../lib/content-filter";
 
 interface Props {

@@ -10,7 +10,7 @@
  *  Fase 5 (7.8s): Texto TypeMagic emerge sobre ambas imagenes
  */
 
-import { Image } from 'astro:assets';
+import Image from './SafeImage.astro';
 import { sanitizeImageUrl } from "../lib/content-filter";
 
 interface Props {

@@ -3,7 +3,7 @@
  * Hero Cinematográfico 100vh (Viewport Hero) para TGP.
  * Imagen full-bleed con fade-to-black profundo y revelación GSAP escalonada.
  */
-import { Image } from 'astro:assets';
+import Image from './SafeImage.astro';
 import { sanitizeImageUrl } from "../lib/content-filter";
 
 interface Props {

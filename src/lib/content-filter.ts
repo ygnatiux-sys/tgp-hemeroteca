@@ -92,24 +92,41 @@ export function resolveR2ImageUrl(pathOrUrl: string | any): string {
 }
 
 /**
- * Sanitiza, resuelve contra R2 y codifica de manera segura URLs de imágenes
- * para evitar errores 404 causados por caracteres especiales, comas, espacios o doble codificación.
+ * Sanitiza, resuelve contra R2 y decodifica/normaliza de manera segura URLs de imágenes
+ * para eliminar dobles codificaciones (%252C -> %2C -> ,) y caracteres conflictivos.
  */
 export function sanitizeImageUrl(imgUrl: string | any): string {
   if (!imgUrl) return '';
   const resolved = resolveR2ImageUrl(imgUrl);
   if (!resolved || typeof resolved !== 'string') return '';
-  const trimmed = resolved.trim();
-  if (!trimmed) return '';
-  
-  if (trimmed.startsWith('/') && !trimmed.includes(' ') && !trimmed.includes(',')) {
-    return trimmed;
+  let str = resolved.trim();
+  if (!str) return '';
+
+  // 1. Decodificación recursiva para desenrollar cualquier doble o triple encoding (%252C -> %2C -> ,)
+  try {
+    let prev = str;
+    for (let i = 0; i < 5; i++) {
+      const decoded = decodeURIComponent(prev);
+      if (decoded === prev) break;
+      prev = decoded;
+    }
+    str = prev;
+  } catch (e) {
+    try {
+      str = decodeURI(str);
+    } catch (_) {}
   }
 
+  // 2. Si es una ruta local simple sin espacios
+  if (str.startsWith('/') && !str.includes(' ') && !str.includes(',')) {
+    return str;
+  }
+
+  // 3. Re-codificar de forma limpia con encodeURI (preserva protocolo y slashes, escapa espacios/tildes)
   try {
-    return encodeURI(decodeURI(trimmed));
+    return encodeURI(str);
   } catch (e) {
-    return encodeURI(trimmed);
+    return str;
   }
 }
 
