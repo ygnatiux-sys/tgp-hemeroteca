@@ -18,6 +18,8 @@
     "upload:assets": "node scripts/sync-assets-r2.mjs",
     "upload:assets:force": "node scripts/sync-assets-r2.mjs --force",
     "upload:assets:dry": "node scripts/sync-assets-r2.mjs --dry-run",
+    "optimize:r2": "node scripts/optimizar-r2.mjs",
+    "optimize:r2:dry": "node scripts/optimizar-r2.mjs --dry-run",
     "sync": "git pull origin main && git add . && git commit -m \"TGP Sync: Actualización unificada de arquitectura y contenido\" && git push origin main"
   },
   "dependencies": {
@@ -28,7 +30,7 @@
     "@astrojs/node": "^11.1.4",
     "@astrojs/react": "^6.0.4",
     "@astrojs/sitemap": "^3.7.3",
-    "@aws-sdk/client-s3": "^3.1116.0",
+    "@aws-sdk/client-s3": "^3.1121.0",
     "@google/genai": "^1.50.1",
     "@google/generative-ai": "^0.24.1",
     "@keystatic/astro": "^6.0.0",
@@ -43,6 +45,7 @@
     "marked": "^18.0.2",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
+    "sharp": "^0.35.4",
     "split-type": "^0.3.4",
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.3",
@@ -57,10 +60,10 @@
     }
   },
   "allowScripts": {
-    "protobufjs@7.5.5": true,
     "sharp@0.34.5": true,
     "workerd@1.20260820.1": true,
     "esbuild@0.28.2": true,
-    "esbuild@0.28.1": true
+    "esbuild@0.28.1": true,
+    "protobufjs@7.6.6": true
   }
 }
