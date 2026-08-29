@@ -5,9 +5,9 @@
    PALETA Y VARIABLES DE TEMA (DARK ACADEMIA / MODO DÍA PAPIRO FRÍO)
 ═════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* Modo Oscuro Base (Color Ahumado) */
-  --bg-main: #1A1C1D; /* Ahumado oscuro de fondo */
-  --bg-alt: #222527;  /* Ahumado un tono más claro para contraste sutil */
+  /* Modo Oscuro Base (Theme Dark - #121413) */
+  --bg-main: #121413; /* Fondo Dark Academia idéntico a sección About */
+  --bg-alt: #1A1D1C;  /* Tono sutilmente elevado para contraste */
   --bg-surface: rgba(255, 255, 255, 0.04);
   --text-main: #E0E0E0;
   --text-body: #E0E0E0;
@@ -15,7 +15,7 @@
   --accent-secondary: #EFEBE3;
   --accent-silver: #94A3B8;
   --border-subtle: rgba(255, 255, 255, 0.1);
-  --header-bg: rgba(26, 28, 29, 0.85); /* Coincidencia exacta con --bg-main #1A1C1D */
+  --header-bg: rgba(18, 20, 19, 0.85); /* Coincidencia exacta con --bg-main #121413 */
   --header-border: rgba(255, 255, 255, 0.08);
   --theme-transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out, border-color 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
 }
