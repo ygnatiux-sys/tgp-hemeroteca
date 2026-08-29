@@ -1123,8 +1123,15 @@ html[data-nav-state="2"] header:hover .brand-element {
 
 .title-keyword-shine-fade {
   display: inline;
-  animation: titleKeywordShineFade 9s ease-in-out infinite;
-  will-change: opacity, filter;
+  animation: none;
+  will-change: auto;
+}
+
+@media (min-width: 768px) {
+  .title-keyword-shine-fade {
+    animation: titleKeywordShineFade 9s ease-in-out infinite;
+    will-change: opacity, filter;
+  }
 }
 
 .group:hover .title-keyword-shine-fade,
