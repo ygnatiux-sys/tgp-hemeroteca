@@ -56,10 +56,10 @@ const isHero = variant === "hero";
 const isDuo40 = variant === "duo-40";
 
 const minHeightClass = isHero
-  ? "min-h-[460px] sm:min-h-[520px] md:min-h-[560px] lg:min-h-[600px]"
+  ? "min-h-[460px] sm:min-h-[520px] md:min-h-[560px] lg:min-h-[600px] aspect-[16/9] md:aspect-auto"
   : isDuo40
-    ? "min-h-[380px] sm:min-h-[420px] md:min-h-[450px]"
-    : "min-h-[400px] sm:min-h-[440px] md:min-h-[480px]";
+    ? "min-h-[380px] sm:min-h-[420px] md:min-h-[450px] aspect-[16/9] md:aspect-auto"
+    : "min-h-[400px] sm:min-h-[440px] md:min-h-[480px] aspect-[16/9] md:aspect-auto";
 
 const paddingClass = isHero
   ? "p-6 sm:p-8 md:p-12 lg:p-14"
@@ -99,6 +99,8 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
         alt={entry.title || "Dossier del Archivo"}
         inferSize={true}
         format="webp"
+        widths={[400, 768, 1200, 1920]}
+        sizes="(max-width: 768px) 400px, (max-width: 1200px) 768px, 1200px"
         loading={isEager ? "eager" : "lazy"}
         fetchpriority={isEager ? "high" : undefined}
         decoding="async"
@@ -347,16 +349,22 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
   };
 
   const initStorybookHover = () => {
-    document.querySelectorAll(".storybook-card").forEach((card: any) => {
-      card.addEventListener(
-        "mouseenter",
-        () => {
-          if (card.dataset.choreographyDone !== "true") {
-            runCardSequence(card);
-          }
-        },
-        { once: true }
-      );
+    const cards = Array.from(document.querySelectorAll<HTMLElement>(".storybook-card"));
+    if (cards.length === 0) return;
+
+    const mm = gsap.matchMedia();
+    mm.add("(min-width: 768px)", () => {
+      cards.forEach((card) => {
+        card.addEventListener(
+          "mouseenter",
+          () => {
+            if (card.dataset.choreographyDone !== "true") {
+              runCardSequence(card);
+            }
+          },
+          { once: true }
+        );
+      });
     });
   };
 

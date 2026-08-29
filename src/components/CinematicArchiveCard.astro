@@ -62,10 +62,10 @@ const isHero = variant === "hero";
 const isDuo40 = variant === "duo-40";
 
 const minHeightClass = isHero
-  ? "min-h-[460px] sm:min-h-[520px] md:min-h-[560px] lg:min-h-[600px]"
+  ? "min-h-[460px] sm:min-h-[520px] md:min-h-[560px] lg:min-h-[600px] aspect-[16/9] md:aspect-auto"
   : isDuo40
-    ? "min-h-[380px] sm:min-h-[420px] md:min-h-[450px]"
-    : "min-h-[400px] sm:min-h-[440px] md:min-h-[480px]";
+    ? "min-h-[380px] sm:min-h-[420px] md:min-h-[450px] aspect-[16/9] md:aspect-auto"
+    : "min-h-[400px] sm:min-h-[440px] md:min-h-[480px] aspect-[16/9] md:aspect-auto";
 
 const paddingClass = isHero
   ? "p-6 sm:p-8 md:p-12 lg:p-14"
@@ -399,55 +399,65 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
 
   const initChoreography = () => {
     const cards = Array.from(document.querySelectorAll<HTMLElement>(".cinematic-archive-card"));
+    if (cards.length === 0) return;
 
-    // Hover manual directo
-    cards.forEach((card) => {
-      card.addEventListener(
-        "mouseenter",
-        () => {
-          if (card.dataset.choreographyDone !== "true") {
-            runCardSequence(card);
-          }
-        },
-        { once: true }
-      );
-    });
+    /* ── Aislamiento de GSAP con matchMedia (Solo Desktop: min-width: 768px) ── */
+    const mm = gsap.matchMedia();
 
-    // Observer secuencial: una por una, esperando a que termine cada tarjeta
-    const queue: HTMLElement[] = [];
-    let isRunning = false;
-
-    const processNext = async () => {
-      if (isRunning || queue.length === 0) return;
-      isRunning = true;
-      const nextCard = queue.shift();
-      if (nextCard && nextCard.dataset.choreographyDone !== "true") {
-        await runCardSequence(nextCard);
-      }
-      isRunning = false;
-      processNext();
-    };
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const card = entry.target as HTMLElement;
-            if (card.dataset.choreographyDone !== "true" && !queue.includes(card)) {
-              queue.push(card);
-              processNext();
+    mm.add("(min-width: 768px)", () => {
+      // Hover manual directo
+      cards.forEach((card) => {
+        card.addEventListener(
+          "mouseenter",
+          () => {
+            if (card.dataset.choreographyDone !== "true") {
+              runCardSequence(card);
             }
-            observer.unobserve(card);
-          }
-        });
-      },
-      { threshold: 0.3 }
-    );
+          },
+          { once: true }
+        );
+      });
 
-    cards.forEach((card) => {
-      if (card.dataset.choreographyDone !== "true") {
-        observer.observe(card);
-      }
+      // Observer secuencial: una por una, esperando a que termine cada tarjeta
+      const queue: HTMLElement[] = [];
+      let isRunning = false;
+
+      const processNext = async () => {
+        if (isRunning || queue.length === 0) return;
+        isRunning = true;
+        const nextCard = queue.shift();
+        if (nextCard && nextCard.dataset.choreographyDone !== "true") {
+          await runCardSequence(nextCard);
+        }
+        isRunning = false;
+        processNext();
+      };
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const card = entry.target as HTMLElement;
+              if (card.dataset.choreographyDone !== "true" && !queue.includes(card)) {
+                queue.push(card);
+                processNext();
+              }
+              observer.unobserve(card);
+            }
+          });
+        },
+        { threshold: 0.3 }
+      );
+
+      cards.forEach((card) => {
+        if (card.dataset.choreographyDone !== "true") {
+          observer.observe(card);
+        }
+      });
+
+      return () => {
+        observer.disconnect();
+      };
     });
   };
 
