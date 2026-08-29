@@ -20,6 +20,7 @@
     "upload:assets:dry": "node scripts/sync-assets-r2.mjs --dry-run",
     "optimize:r2": "node scripts/optimizar-r2.mjs",
     "optimize:r2:dry": "node scripts/optimizar-r2.mjs --dry-run",
+    "clean:urls": "node scripts/limpiar-urls-contenido.mjs",
     "sync": "git pull origin main && git add . && git commit -m \"TGP Sync: Actualización unificada de arquitectura y contenido\" && git push origin main"
   },
   "dependencies": {
