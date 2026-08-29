@@ -21,16 +21,17 @@ export interface GallerySlideData {
 interface Props {
   slides: GallerySlideData[];
   heightClass?: string;
+  maxSlides?: number;
 }
 
-const { slides = [], heightClass = "h-[85vh] md:h-dvh" } = Astro.props;
-const safeSlides = slides.length > 0 ? slides : [];
+const { slides = [], heightClass = "h-[85vh] md:h-dvh", maxSlides = 15 } = Astro.props;
+const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
 ---
 
 {
   safeSlides.length > 0 && (
     <section
-      class={`cge-root relative w-full ${heightClass} overflow-hidden bg-[#0a0a0a] rounded-2xl select-none my-12 shadow-2xl border border-white/5 cursor-zoom-in`}
+      class={`cge-root relative w-full ${heightClass} overflow-hidden bg-[#0a0a0a] rounded-2xl select-none my-12 md:shadow-2xl border border-white/5 cursor-zoom-in [contain-intrinsic-size:auto_85vh]`}
       aria-label="Galería Cinemática"
     >
       {/* ── SLIDES ── */}
@@ -39,7 +40,7 @@ const safeSlides = slides.length > 0 ? slides : [];
           const safeSrc = sanitizeImageUrl(slide.image);
           return (
             <article
-              class={`cge-slide absolute inset-0 flex items-end justify-start pb-20 md:pb-24 ${i === 0 ? "z-20" : "z-10 opacity-0 pointer-events-none"}`}
+              class={`cge-slide absolute inset-0 flex items-end justify-start pb-20 md:pb-24 [content-visibility:auto] [contain:content] ${i === 0 ? "z-20" : "z-10 opacity-0 pointer-events-none"}`}
               data-index={i}
               {...(i !== 0 ? { "aria-hidden": "true" } : {})}
             >
@@ -53,7 +54,9 @@ const safeSlides = slides.length > 0 ? slides : [];
                     style={`object-position: ${slide.imagePosition || "center center"};`}
                     inferSize={true}
                     format="webp"
-                    loading={i === 0 ? "eager" : "lazy"}
+                    widths={[400, 768, 1200, 1920]}
+                    sizes="(max-width: 768px) 400px, (max-width: 1200px) 768px, 1200px"
+                    loading={i < 2 ? "eager" : "lazy"}
                     fetchpriority={i === 0 ? "high" : undefined}
                     decoding="async"
                   />

@@ -41,16 +41,17 @@ export interface SlideData {
 interface Props {
   slides: SlideData[];
   heightClass?: string;
+  maxSlides?: number;
 }
 
-const { slides = [], heightClass = "h-dvh" } = Astro.props;
-const safeSlides = slides.length > 0 ? slides : [];
+const { slides = [], heightClass = "h-dvh", maxSlides = 15 } = Astro.props;
+const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
 ---
 
 {
   safeSlides.length > 0 && (
     <section
-      class={`cpe-root relative w-full ${heightClass} overflow-hidden bg-black rounded-2xl md:rounded-3xl select-none mb-[25vh] md:mb-[35vh]`}
+      class={`cpe-root relative w-full ${heightClass} overflow-hidden bg-black rounded-2xl md:rounded-3xl select-none mb-[25vh] md:mb-[35vh] [contain-intrinsic-size:auto_100vh]`}
       aria-label="Cartelera Cinemática TGP"
     >
       {/* ── SLIDES ── */}
@@ -59,7 +60,7 @@ const safeSlides = slides.length > 0 ? slides : [];
           const safeSrc = sanitizeImageUrl(slide.image);
           return (
             <article
-              class={`cpe-slide absolute inset-0 flex items-end justify-start pb-24 md:pb-32 backface-hidden transform-3d will-change-transform ${i === 0 ? "z-20" : "z-10 opacity-0 pointer-events-none"}`}
+              class={`cpe-slide absolute inset-0 flex items-end justify-start pb-24 md:pb-32 backface-hidden transform-3d will-change-transform [content-visibility:auto] [contain:content] ${i === 0 ? "z-20" : "z-10 opacity-0 pointer-events-none"}`}
               style={`z-index: ${100 - i}; transform: translateZ(1px);`}
               data-index={i}
               {...(i !== 0 ? { "aria-hidden": "true" } : {})}
@@ -135,7 +136,7 @@ const safeSlides = slides.length > 0 ? slides : [];
                 <div class="cpe-cta flex items-center gap-3 md:pb-2 flex-wrap md:justify-end shrink-0">
                   <a
                     href={slide.link}
-                    class="group inline-flex items-center gap-2 px-5 py-2.5 bg-[#151718]/85 backdrop-blur-sm border border-white/15 text-[#E0E0E0]/80 font-metadata font-bold text-[9px] tracking-[0.25em] uppercase rounded-lg hover:bg-white/10 hover:border-white/40 hover:text-white transition-all duration-400 active:scale-95"
+                    class="group inline-flex items-center gap-2 px-5 py-2.5 bg-[#151718]/90 md:backdrop-blur-sm border border-white/15 text-[#E0E0E0]/80 font-metadata font-bold text-[9px] tracking-[0.25em] uppercase rounded-lg hover:bg-white/10 hover:border-white/40 hover:text-white transition-all duration-400 active:scale-95"
                   >
                     <span>Ver Hemeroteca</span>
                     <span class="opacity-50 group-hover:translate-x-0.5 transition-transform">
@@ -181,7 +182,7 @@ const safeSlides = slides.length > 0 ? slides : [];
 
           {/* Flecha Prev */}
           <button
-            class="cpe-arrow cpe-prev absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center lantern-hover transition-all duration-300 active:scale-90 pointer-events-auto shadow-lg z-50"
+            class="cpe-arrow cpe-prev absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center lantern-hover transition-all duration-300 active:scale-90 pointer-events-auto md:shadow-lg z-50"
             aria-label="Anterior"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -189,7 +190,7 @@ const safeSlides = slides.length > 0 ? slides : [];
 
            {/* Flecha Next */}
           <button
-            class="cpe-arrow cpe-next absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center lantern-hover transition-all duration-300 active:scale-90 pointer-events-auto shadow-lg z-50"
+            class="cpe-arrow cpe-next absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center lantern-hover transition-all duration-300 active:scale-90 pointer-events-auto md:shadow-lg z-50"
             aria-label="Siguiente"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>

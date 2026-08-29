@@ -194,7 +194,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
   />
 
   {archiveSlides.length > 0 && (
-    <CinematicPostEngine slides={archiveSlides} />
+    <CinematicPostEngine slides={archiveSlides} maxSlides={15} />
   )}
 
   <div class="min-h-screen pb-32 pt-12">
@@ -321,8 +321,8 @@ function createPremierSequences(essays: typeof resolvedEssays) {
 
                 {/* Secuencias Cinematográficas Premier: 1 Hero Full Bleed + Dúo 60/40 */}
                 <div class="flex flex-col gap-12 md:gap-16">
-                  {premierSequences.map((seq) => (
-                    <div class="premier-sequence flex flex-col gap-6 md:gap-8">
+                  {premierSequences.map((seq, seqIdx) => (
+                    <div class={`premier-sequence flex flex-col gap-6 md:gap-8 ${seqIdx >= 5 ? "hidden archive-extra-seq" : ""}`}>
                       {/* 1. Hero Cinemático Full Bleed */}
                       <div class="w-full">
                         <CinematicArchiveCard
@@ -365,6 +365,19 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                     </div>
                   ))}
                 </div>
+
+                {/* Botón Cargar Más Hemeroteca (si hay más de 5 secuencias / 15 tarjetas) */}
+                {premierSequences.length > 5 && (
+                  <div class="flex justify-center pt-10 pb-4 archive-load-more-wrap">
+                    <button
+                      type="button"
+                      class="archive-load-more-btn group inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-[#151718]/90 hover:bg-white/10 border border-white/15 hover:border-white/40 text-[#E0E0E0]/80 hover:text-white font-metadata text-[10px] tracking-[0.3em] uppercase transition-all duration-300 active:scale-95 cursor-pointer shadow-lg"
+                    >
+                      <span>Cargar más hemeroteca</span>
+                      <span class="text-rust-orange group-hover:translate-y-0.5 transition-transform">↓</span>
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -651,6 +664,23 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             history.replaceState(null, '', `?vista=ano`);
           } else {
             history.replaceState(null, '', `?vista=ano&año=${encodeURIComponent(val)}`);
+          }
+        });
+      });
+
+      // Eventos para botones Cargar más hemeroteca
+      document.querySelectorAll('.archive-load-more-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const wrapper = (e.currentTarget as HTMLElement).closest('.category-archive-group');
+          if (!wrapper) return;
+          const hiddenSeqs = wrapper.querySelectorAll('.archive-extra-seq.hidden');
+          const batchSize = 5; // revela las siguientes 5 secuencias (15 tarjetas)
+          for (let i = 0; i < Math.min(batchSize, hiddenSeqs.length); i++) {
+            hiddenSeqs[i].classList.remove('hidden');
+          }
+          if (wrapper.querySelectorAll('.archive-extra-seq.hidden').length === 0) {
+            const btnWrap = (e.currentTarget as HTMLElement).closest('.archive-load-more-wrap');
+            if (btnWrap) btnWrap.remove();
           }
         });
       });
