@@ -39,6 +39,9 @@ function cleanUrlPath(encodedPath) {
     }
   }
 
+  // Eliminar comillas dobles residuales que pudieran romper cadenas JSON
+  current = current.replace(/"/g, '');
+
   return current;
 }
 
