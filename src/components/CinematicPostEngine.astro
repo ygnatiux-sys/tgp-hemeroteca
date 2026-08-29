@@ -229,308 +229,322 @@ const safeSlides = slides.length > 0 ? slides : [];
 
       if (total === 0) return;
 
-      const reduceMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-      let current = 0;
-      let isAnimating = false;
-      let autoTimer: ReturnType<typeof setTimeout> | undefined;
-      let resumeTimer: ReturnType<typeof setTimeout> | undefined;
-      let toolbarTimer: ReturnType<typeof setTimeout> | undefined;
-      let progressTween: gsap.core.Tween | undefined;
-      let metaPulseTween: gsap.core.Tween | undefined;
-
-      /* ── Auto-hide de Toolbar en movimiento / hover ── */
-      function showToolbar() {
-        if (!toolbar) return;
-        toolbar.classList.remove("opacity-0");
-        toolbar.classList.add("opacity-100");
+      // Estado estático estándar en móvil (primer slide visible y activo)
+      if (slideEls[0]) {
+        slideEls[0].classList.remove("pointer-events-none");
+        slideEls[0].removeAttribute("aria-hidden");
+        slideEls[0].style.opacity = "1";
       }
 
-      function hideToolbar() {
-        if (!toolbar) return;
-        toolbar.classList.remove("opacity-100");
-        toolbar.classList.add("opacity-0");
-      }
+      /* ── 1. Aislamiento de GSAP con matchMedia (Escritorio: min-width: 768px) ── */
+      const mm = gsap.matchMedia();
 
-      function resetToolbarTimer() {
-        showToolbar();
-        clearTimeout(toolbarTimer);
-        toolbarTimer = setTimeout(() => {
+      mm.add("(min-width: 768px)", () => {
+        const reduceMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+        let current = 0;
+        let isAnimating = false;
+        let autoTimer: ReturnType<typeof setTimeout> | undefined;
+        let resumeTimer: ReturnType<typeof setTimeout> | undefined;
+        let toolbarTimer: ReturnType<typeof setTimeout> | undefined;
+        let progressTween: gsap.core.Tween | undefined;
+        let metaPulseTween: gsap.core.Tween | undefined;
+
+        /* ── Auto-hide de Toolbar en movimiento / hover ── */
+        function showToolbar() {
+          if (!toolbar) return;
+          toolbar.classList.remove("opacity-0");
+          toolbar.classList.add("opacity-100");
+        }
+
+        function hideToolbar() {
+          if (!toolbar) return;
+          toolbar.classList.remove("opacity-100");
+          toolbar.classList.add("opacity-0");
+        }
+
+        function resetToolbarTimer() {
+          showToolbar();
+          clearTimeout(toolbarTimer);
+          toolbarTimer = setTimeout(() => {
+            hideToolbar();
+          }, 2800);
+        }
+
+        root.addEventListener("mousemove", resetToolbarTimer);
+        root.addEventListener("mouseenter", resetToolbarTimer);
+        root.addEventListener("touchstart", resetToolbarTimer, { passive: true });
+        root.addEventListener("mouseleave", () => {
+          clearTimeout(toolbarTimer);
           hideToolbar();
-        }, 2800);
-      }
+        });
 
-      root.addEventListener("mousemove", resetToolbarTimer);
-      root.addEventListener("mouseenter", resetToolbarTimer);
-      root.addEventListener("touchstart", resetToolbarTimer, { passive: true });
-      root.addEventListener("mouseleave", () => {
-        clearTimeout(toolbarTimer);
-        hideToolbar();
-      });
+        /* ── Entrada de slide ── */
+        function slideIn(slide: HTMLElement, done: (() => void) | null) {
+          const bg = slide.querySelector<HTMLElement>(".cpe-bg-img");
+          const metaEl = slide.querySelector<HTMLElement>(".cpe-meta");
+          const titleEl = slide.querySelector<HTMLElement>(".cpe-title");
+          const subEl = slide.querySelector<HTMLElement>(".cpe-subtitle");
+          const ctaEl = slide.querySelector<HTMLElement>(".cpe-cta");
+          const dot = slide.querySelector<HTMLElement>(".cpe-meta-dot");
 
-      /* ── Entrada de slide ── */
-      function slideIn(slide: HTMLElement, done: (() => void) | null) {
-        const bg = slide.querySelector<HTMLElement>(".cpe-bg-img");
-        const metaEl = slide.querySelector<HTMLElement>(".cpe-meta");
-        const titleEl = slide.querySelector<HTMLElement>(".cpe-title");
-        const subEl = slide.querySelector<HTMLElement>(".cpe-subtitle");
-        const ctaEl = slide.querySelector<HTMLElement>(".cpe-cta");
-        const dot = slide.querySelector<HTMLElement>(".cpe-meta-dot");
+          slide.classList.remove("pointer-events-none");
+          slide.setAttribute("aria-hidden", "false");
+          slide.style.zIndex = "20";
 
-        slide.classList.remove("pointer-events-none");
-        slide.setAttribute("aria-hidden", "false");
-        slide.style.zIndex = "20";
+          if (reduceMotion) {
+            gsap.set(slide, { opacity: 1 });
+            done?.();
+            return;
+          }
 
-        if (reduceMotion) {
-          gsap.set(slide, { opacity: 1 });
-          done?.();
-          return;
-        }
+          const tl = gsap.timeline();
 
-        const tl = gsap.timeline();
-
-        /* Slide fade-in */
-        tl.fromTo(
-          slide,
-          { opacity: 0 },
-          { 
-            opacity: 1, 
-            duration: 0.85, 
-            ease: "power2.inOut",
-            onComplete: () => done?.()
-          },
-          0,
-        );
-
-        /* Ken Burns: escala milimétrica y ascenso vertical suave durante el slide */
-        if (bg) {
-          gsap.set(bg, { scale: 1, yPercent: 0 });
-          gsap.to(bg, {
-            scale: 1.035,
-            yPercent: -2.5,
-            duration: SLIDE_DURATION / 1000 + FADE_DUR,
-            ease: "none",
-          });
-        }
-
-        /* Textos: stagger desde abajo y luego fade out ("desvanecen al ms") */
-        const textEls = [metaEl, titleEl, subEl, ctaEl].filter(
-          Boolean,
-        ) as HTMLElement[];
-        if (textEls.length > 0) {
+          /* Slide fade-in */
           tl.fromTo(
-            textEls,
-            { opacity: 0, y: 20 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.65,
-              stagger: 0.12,
-              ease: "power3.out",
-              clearProps: "transform",
+            slide,
+            { opacity: 0 },
+            { 
+              opacity: 1, 
+              duration: 0.85, 
+              ease: "power2.inOut",
+              onComplete: () => done?.()
             },
-            0.35,
+            0,
           );
 
-          // Desvanecimiento rápido luego de 2.5s de permanencia
-          tl.to(
-            textEls,
-            { opacity: 0, duration: 1.2, ease: "power2.inOut" },
-            "+=2.5",
-          );
+          /* Ken Burns: escala milimétrica y ascenso vertical suave durante el slide */
+          if (bg) {
+            gsap.set(bg, { scale: 1, yPercent: 0 });
+            gsap.to(bg, {
+              scale: 1.035,
+              yPercent: -2.5,
+              duration: SLIDE_DURATION / 1000 + FADE_DUR,
+              ease: "none",
+            });
+          }
+
+          /* Textos: stagger desde abajo y luego fade out ("desvanecen al ms") */
+          const textEls = [metaEl, titleEl, subEl, ctaEl].filter(
+            Boolean,
+          ) as HTMLElement[];
+          if (textEls.length > 0) {
+            tl.fromTo(
+              textEls,
+              { opacity: 0, y: 20 },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.65,
+                stagger: 0.12,
+                ease: "power3.out",
+                clearProps: "transform",
+              },
+              0.35,
+            );
+
+            // Desvanecimiento rápido luego de 2.5s de permanencia
+            tl.to(
+              textEls,
+              { opacity: 0, duration: 1.2, ease: "power2.inOut" },
+              "+=2.5",
+            );
+          }
+
+          /* Pulso del dot: yoyo opacidad */
+          if (dot) {
+            metaPulseTween?.kill();
+            metaPulseTween = gsap.to(dot, {
+              opacity: 0.35,
+              duration: 1.4,
+              ease: "sine.inOut",
+              yoyo: true,
+              repeat: -1,
+              delay: 0.8,
+            });
+          }
         }
 
-        /* Pulso del dot: yoyo opacidad */
-        if (dot) {
-          metaPulseTween?.kill();
-          metaPulseTween = gsap.to(dot, {
-            opacity: 0.35,
-            duration: 1.4,
-            ease: "sine.inOut",
-            yoyo: true,
-            repeat: -1,
-            delay: 0.8,
-          });
-        }
-      }
-
-      /* ── Salida de slide ── */
-      function slideOut(slide: HTMLElement, done: (() => void) | null) {
-        if (reduceMotion) {
-          gsap.set(slide, { opacity: 0 });
-          slide.classList.add("pointer-events-none");
-          slide.setAttribute("aria-hidden", "true");
-          slide.style.zIndex = "10";
-          done?.();
-          return;
-        }
-        gsap.to(slide, {
-          opacity: 0,
-          duration: FADE_DUR * 0.85,
-          ease: "power2.inOut",
-          onComplete: () => {
+        /* ── Salida de slide ── */
+        function slideOut(slide: HTMLElement, done: (() => void) | null) {
+          if (reduceMotion) {
+            gsap.set(slide, { opacity: 0 });
             slide.classList.add("pointer-events-none");
             slide.setAttribute("aria-hidden", "true");
             slide.style.zIndex = "10";
             done?.();
-          },
-        });
-      }
+            return;
+          }
+          gsap.to(slide, {
+            opacity: 0,
+            duration: FADE_DUR * 0.85,
+            ease: "power2.inOut",
+            onComplete: () => {
+              slide.classList.add("pointer-events-none");
+              slide.setAttribute("aria-hidden", "true");
+              slide.style.zIndex = "10";
+              done?.();
+            },
+          });
+        }
 
-      /* ── Dots ── */
-      function updateDots(idx: number) {
-        dotEls.forEach((d, i) => {
-          const active = i === idx;
-          d.classList.toggle("w-6", active);
-          d.classList.toggle("md:w-8", active);
-          d.classList.toggle("bg-[#EFEBE3]", active);
-          d.classList.toggle("w-1.5", !active);
-          d.classList.toggle("md:w-2", !active);
-          d.classList.toggle("bg-white/30", !active);
-        });
-      }
+        /* ── Dots ── */
+        function updateDots(idx: number) {
+          dotEls.forEach((d, i) => {
+            const active = i === idx;
+            d.classList.toggle("w-6", active);
+            d.classList.toggle("md:w-8", active);
+            d.classList.toggle("bg-[#EFEBE3]", active);
+            d.classList.toggle("w-1.5", !active);
+            d.classList.toggle("md:w-2", !active);
+            d.classList.toggle("bg-white/30", !active);
+          });
+        }
 
-      /* ── Barra de progreso ── */
-      function startProgress() {
-        progressTween?.kill();
-        // Dejar línea punteada estática
-      }
+        /* ── Barra de progreso ── */
+        function startProgress() {
+          progressTween?.kill();
+        }
 
-      /* ── Ir al slide idx ── */
-      function goTo(idx: number) {
-        if (isAnimating || idx === current) return;
-        isAnimating = true;
+        /* ── Ir al slide idx ── */
+        function goTo(idx: number) {
+          if (isAnimating || idx === current) return;
+          isAnimating = true;
 
-        const prevIdx = current;
-        const nextIdx = ((idx % total) + total) % total;
-        current = nextIdx;
-        updateDots(current);
-        startProgress();
+          const prevIdx = current;
+          const nextIdx = ((idx % total) + total) % total;
+          current = nextIdx;
+          updateDots(current);
+          startProgress();
 
-        slideEls[nextIdx].style.zIndex = "20";
-        slideEls[prevIdx].style.zIndex = "15";
+          slideEls[nextIdx].style.zIndex = "20";
+          slideEls[prevIdx].style.zIndex = "15";
 
-        /* Cross-fade: salida del anterior, entrada del nuevo en paralelo */
-        slideOut(slideEls[prevIdx], null);
-        slideIn(slideEls[nextIdx], () => {
-          isAnimating = false;
-        });
-      }
+          /* Cross-fade: salida del anterior, entrada del nuevo en paralelo */
+          slideOut(slideEls[prevIdx], null);
+          slideIn(slideEls[nextIdx], () => {
+            isAnimating = false;
+          });
+        }
 
-      /* ── Auto-avance ── */
-      function scheduleNext() {
-        clearTimeout(autoTimer);
-        autoTimer = setTimeout(() => {
-          goTo((current + 1) % total);
-          scheduleNext();
-        }, SLIDE_DURATION);
-      }
+        /* ── Auto-avance ── */
+        function scheduleNext() {
+          clearTimeout(autoTimer);
+          autoTimer = setTimeout(() => {
+            goTo((current + 1) % total);
+            scheduleNext();
+          }, SLIDE_DURATION);
+        }
 
-      function pauseAuto() {
-        clearTimeout(autoTimer);
-        clearTimeout(resumeTimer);
-        progressTween?.pause();
-      }
+        function pauseAuto() {
+          clearTimeout(autoTimer);
+          clearTimeout(resumeTimer);
+          progressTween?.pause();
+        }
 
-      function resumeAuto() {
-        clearTimeout(resumeTimer);
-        resumeTimer = setTimeout(() => {
-          progressTween?.play();
-          scheduleNext();
-        }, AUTO_RESUME);
-      }
+        function resumeAuto() {
+          clearTimeout(resumeTimer);
+          resumeTimer = setTimeout(() => {
+            progressTween?.play();
+            scheduleNext();
+          }, AUTO_RESUME);
+        }
 
-      /* ── Botones ── */
-      prevBtn?.addEventListener("click", (e) => {
-        e.stopPropagation();
-        pauseAuto();
-        goTo((current - 1 + total) % total);
-        resumeAuto();
-      });
-      nextBtn?.addEventListener("click", (e) => {
-        e.stopPropagation();
-        pauseAuto();
-        goTo((current + 1) % total);
-        resumeAuto();
-      });
-
-      /* ── Dots click ── */
-      dotEls.forEach((d) => {
-        d.addEventListener("click", (e) => {
+        /* ── Botones ── */
+        const onPrev = (e: MouseEvent) => {
           e.stopPropagation();
-          const idx = Number(d.dataset["dot"]);
-          if (idx === current) return;
-          pauseAuto();
-          goTo(idx);
-          resumeAuto();
-        });
-      });
-
-      /* ── Swipe / drag (respetando clicks en enlaces/botones) ── */
-      let dragStartX = 0;
-      let isDragging = false;
-
-      root.addEventListener("pointerdown", (e: PointerEvent) => {
-        const target = e.target as HTMLElement | null;
-        // No capturar pointer si el click fue sobre un enlace, botón o nav
-        if (target?.closest("a, button, nav, input, select")) {
-          return;
-        }
-        dragStartX = e.clientX;
-        isDragging = true;
-        pauseAuto();
-        (root as HTMLElement).setPointerCapture(e.pointerId);
-      });
-
-      root.addEventListener("pointerup", (e: PointerEvent) => {
-        if (!isDragging) return;
-        isDragging = false;
-        const delta = e.clientX - dragStartX;
-        if (Math.abs(delta) > SWIPE_THRESHOLD) {
-          goTo(
-            delta < 0 ? (current + 1) % total : (current - 1 + total) % total,
-          );
-        }
-        resumeAuto();
-      });
-
-      root.addEventListener("pointercancel", () => {
-        isDragging = false;
-        resumeAuto();
-      });
-
-      /* ── Teclado (solo responde si este root está visible) ── */
-      const onKey = (e: KeyboardEvent) => {
-        if (!root.isConnected || root.offsetParent === null) return;
-        if (e.key === "ArrowLeft") {
           pauseAuto();
           goTo((current - 1 + total) % total);
           resumeAuto();
-        }
-        if (e.key === "ArrowRight") {
+        };
+        const onNext = (e: MouseEvent) => {
+          e.stopPropagation();
           pauseAuto();
           goTo((current + 1) % total);
           resumeAuto();
-        }
-      };
-      document.addEventListener("keydown", onKey);
+        };
 
-      /* ── Arranque ── */
-      gsap.set(slideEls[0], { opacity: 1 });
-      slideEls[0].classList.remove("pointer-events-none");
-      slideEls[0].removeAttribute("aria-hidden");
-      if (!reduceMotion) slideIn(slideEls[0], null);
+        prevBtn?.addEventListener("click", onPrev);
+        nextBtn?.addEventListener("click", onNext);
 
-      updateDots(0);
-      startProgress();
-      resetToolbarTimer();
-      if (total > 1) scheduleNext();
+        /* ── Dots click ── */
+        const dotListeners: Array<{ el: HTMLElement; fn: (e: MouseEvent) => void }> = [];
+        dotEls.forEach((d) => {
+          const fn = (e: MouseEvent) => {
+            e.stopPropagation();
+            const idx = Number(d.dataset["dot"]);
+            if (idx === current) return;
+            pauseAuto();
+            goTo(idx);
+            resumeAuto();
+          };
+          d.addEventListener("click", fn);
+          dotListeners.push({ el: d, fn });
+        });
 
-      /* ── Cleanup ── */
-      document.addEventListener(
-        "astro:before-swap",
-        () => {
+        /* ── Swipe / drag (respetando clicks en enlaces/botones) ── */
+        let dragStartX = 0;
+        let isDragging = false;
+
+        const onPointerDown = (e: PointerEvent) => {
+          const target = e.target as HTMLElement | null;
+          if (target?.closest("a, button, nav, input, select")) return;
+          dragStartX = e.clientX;
+          isDragging = true;
+          pauseAuto();
+          (root as HTMLElement).setPointerCapture(e.pointerId);
+        };
+
+        const onPointerUp = (e: PointerEvent) => {
+          if (!isDragging) return;
+          isDragging = false;
+          const delta = e.clientX - dragStartX;
+          if (Math.abs(delta) > SWIPE_THRESHOLD) {
+            goTo(
+              delta < 0 ? (current + 1) % total : (current - 1 + total) % total,
+            );
+          }
+          resumeAuto();
+        };
+
+        const onPointerCancel = () => {
+          isDragging = false;
+          resumeAuto();
+        };
+
+        root.addEventListener("pointerdown", onPointerDown);
+        root.addEventListener("pointerup", onPointerUp);
+        root.addEventListener("pointercancel", onPointerCancel);
+
+        /* ── Teclado (solo responde si este root está visible) ── */
+        const onKey = (e: KeyboardEvent) => {
+          if (!root.isConnected || root.offsetParent === null) return;
+          if (e.key === "ArrowLeft") {
+            pauseAuto();
+            goTo((current - 1 + total) % total);
+            resumeAuto();
+          }
+          if (e.key === "ArrowRight") {
+            pauseAuto();
+            goTo((current + 1) % total);
+            resumeAuto();
+          }
+        };
+        document.addEventListener("keydown", onKey);
+
+        /* ── Arranque Desktop ── */
+        gsap.set(slideEls[0], { opacity: 1 });
+        slideEls[0].classList.remove("pointer-events-none");
+        slideEls[0].removeAttribute("aria-hidden");
+        if (!reduceMotion) slideIn(slideEls[0], null);
+
+        updateDots(0);
+        startProgress();
+        resetToolbarTimer();
+        if (total > 1) scheduleNext();
+
+        return () => {
           clearTimeout(autoTimer);
           clearTimeout(resumeTimer);
           clearTimeout(toolbarTimer);
@@ -538,7 +552,21 @@ const safeSlides = slides.length > 0 ? slides : [];
           metaPulseTween?.kill();
           gsap.killTweensOf(slideEls);
           gsap.killTweensOf(Array.from(root.querySelectorAll(".cpe-bg-img")));
+          prevBtn?.removeEventListener("click", onPrev);
+          nextBtn?.removeEventListener("click", onNext);
+          dotListeners.forEach(({ el, fn }) => el.removeEventListener("click", fn));
+          root.removeEventListener("pointerdown", onPointerDown);
+          root.removeEventListener("pointerup", onPointerUp);
+          root.removeEventListener("pointercancel", onPointerCancel);
           document.removeEventListener("keydown", onKey);
+        };
+      });
+
+      /* ── Cleanup Global Astro ── */
+      document.addEventListener(
+        "astro:before-swap",
+        () => {
+          mm.revert();
         },
         { once: true },
       );
@@ -592,6 +620,21 @@ const safeSlides = slides.length > 0 ? slides : [];
     transition:
       width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
       background-color 0.4s ease;
+  }
+
+  /* 2. Optimización CSS H1: Gradiente estático en móvil (< md), animación de movimiento activa solo en escritorio (md+) */
+  .cpe-title a.gradient-acero-ios,
+  .cpe-title .gradient-acero-ios {
+    animation: none !important;
+    will-change: auto !important;
+  }
+
+  @media (min-width: 768px) {
+    .cpe-title a.gradient-acero-ios,
+    .cpe-title .gradient-acero-ios {
+      animation: titaniumMetallicSweep 16s ease-in-out infinite !important;
+      will-change: background-position !important;
+    }
   }
 
   /* Título: Hover en degradado de titanio (Ash White con brillo suave) */
