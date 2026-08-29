@@ -17,7 +17,8 @@
     "generate-types": "wrangler types",
     "upload:assets": "node scripts/sync-assets-r2.mjs",
     "upload:assets:force": "node scripts/sync-assets-r2.mjs --force",
-    "upload:assets:dry": "node scripts/sync-assets-r2.mjs --dry-run"
+    "upload:assets:dry": "node scripts/sync-assets-r2.mjs --dry-run",
+    "sync": "git pull origin main && git add . && git commit -m \"TGP Sync: Actualización unificada de arquitectura y contenido\" && git push origin main"
   },
   "dependencies": {
     "@0no-co/graphql.web": "^1.2.0",
