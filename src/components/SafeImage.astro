@@ -4,9 +4,9 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * Componente de Imagen Seguro y Resiliente para Astro.
  * 
- * Intenta optimizar la imagen remota a WebP mediante `getImage()` con `inferSize`.
- * Si la imagen falla (red, caracteres especiales, 404, etc.), realiza un
- * fallback silencioso a la etiqueta <img> nativa sin interrumpir el build de Astro.
+ * Intenta optimizar la imagen remota a WebP mediante `getImage()` con `inferSize`,
+ * `widths` y `sizes`. Si la imagen remota falla, realiza un fallback silencioso
+ * a la etiqueta <img> nativa sin interrumpir el build de Astro.
  */
 import { getImage } from 'astro:assets';
 
@@ -21,6 +21,8 @@ interface Props {
   decoding?: "async" | "sync" | "auto";
   format?: "webp" | "avif" | "png" | "jpeg";
   inferSize?: boolean;
+  widths?: number[];
+  sizes?: string;
 }
 
 const {
@@ -34,17 +36,27 @@ const {
   decoding = "async",
   format = "webp",
   inferSize = true,
+  widths,
+  sizes,
 } = Astro.props;
 
 let finalSrc = src;
+let finalSrcSet: string | undefined = undefined;
 let finalWidth: number | undefined = undefined;
 let finalHeight: number | undefined = undefined;
 
 if (src && typeof src === 'string' && (src.startsWith('http://') || src.startsWith('https://'))) {
   try {
-    const opt = await getImage({ src, inferSize, format });
+    const opt = await getImage({ 
+      src, 
+      inferSize, 
+      format,
+      ...(widths && widths.length > 0 ? { widths } : {}),
+      ...(sizes ? { sizes } : {}),
+    });
     if (opt?.src) {
       finalSrc = opt.src;
+      finalSrcSet = opt.srcSet?.attribute || opt.attributes?.srcset;
       finalWidth = opt.attributes?.width ? Number(opt.attributes.width) : undefined;
       finalHeight = opt.attributes?.height ? Number(opt.attributes.height) : undefined;
     }
@@ -59,6 +71,8 @@ if (src && typeof src === 'string' && (src.startsWith('http://') || src.startsWi
   finalSrc ? (
     <img
       src={finalSrc}
+      srcset={finalSrcSet}
+      sizes={sizes}
       alt={alt}
       class={className}
       style={style}
