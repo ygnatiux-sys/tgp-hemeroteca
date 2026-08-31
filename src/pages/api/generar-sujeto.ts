@@ -2,9 +2,8 @@ export const prerender = false;
 
 import type { APIRoute } from 'astro';
 import { GoogleGenAI } from '@google/genai';
-import { env } from 'cloudflare:workers';
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   const headers = { 'Content-Type': 'application/json' };
 
   try {
@@ -18,7 +17,7 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const geminiKey = (env as any)?.GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
+    const geminiKey = (locals as any)?.runtime?.env?.GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
     if (!geminiKey) {
       return new Response(
         JSON.stringify({ success: false, error: 'GEMINI_API_KEY no encontrada en el servidor.' }),

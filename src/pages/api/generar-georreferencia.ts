@@ -2,7 +2,6 @@ export const prerender = false;
 
 import type { APIRoute } from 'astro';
 import { GoogleGenAI } from '@google/genai';
-import { env } from 'cloudflare:workers';
 
 function sanitizeAndParseJson(rawText: string, lugar: string) {
   let clean = rawText.trim();
@@ -54,7 +53,7 @@ function sanitizeAndParseJson(rawText: string, lugar: string) {
   }
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   const headers = { 'Content-Type': 'application/json' };
   let body: any = {};
 
@@ -66,7 +65,7 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Debes proporcionar un lugar o tema válido para la Georreferencia Arqueosemiótica.' }), { status: 400, headers });
     }
 
-    const geminiKey = (env as any)?.GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
+    const geminiKey = (locals as any)?.runtime?.env?.GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
     if (!geminiKey) {
       return new Response(JSON.stringify({ error: 'Falta GEMINI_API_KEY en las variables de entorno del servidor.' }), { status: 500, headers });
     }

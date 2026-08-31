@@ -2,7 +2,6 @@ export const prerender = false;
 
 import type { APIRoute } from 'astro';
 import { GoogleGenAI } from '@google/genai';
-import { env } from 'cloudflare:workers';
 import { SYSTEM_PROMPT_HISTORIA_SIMBOLICA_TGP } from '../../config/prompts/prompt-historia-simbolica-tgp';
 import { AGENTE_ERUDITO_ACADEMICO_PROMPT } from '../../config/geminiPrompts';
 
@@ -14,7 +13,7 @@ const SISTEMA_ARQUETIPOS = `${SYSTEM_PROMPT_HISTORIA_SIMBOLICA_TGP}
 REGLAS ADICIONALES DE FORMATO Y REDACCIÓN (AGENTE ERUDITO ACADÉMICO):
 ${AGENTE_ERUDITO_ACADEMICO_PROMPT}`;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   const headers = { 'Content-Type': 'application/json' };
 
   try {
@@ -25,7 +24,7 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Falta el título o arquetipo a analizar.' }), { status: 400, headers });
     }
 
-    const geminiKey = (env as any)?.GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
+    const geminiKey = (locals as any)?.runtime?.env?.GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
     if (!geminiKey) {
       return new Response(JSON.stringify({ error: 'Falta GEMINI_API_KEY en las variables de entorno de Cloudflare / servidor.' }), { status: 500, headers });
     }
