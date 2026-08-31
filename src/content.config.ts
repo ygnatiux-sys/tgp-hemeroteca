@@ -20,6 +20,7 @@ const ensayos = defineCollection({
     coverImage: z.any().optional().nullable().catch(null),
     videoBg: z.string().optional().nullable().catch(null),
     excerpt: z.string().optional().nullable().catch("Sin descripción disponible."),
+    dek: z.string().optional().nullable().catch(null),
     sitioGeohistorico: z.string().optional().nullable().catch(null),
     publicarConImagen: z.boolean().default(true),
     generador: z.string().optional().default(''),
@@ -91,6 +92,7 @@ const georreferencias = defineCollection({
     coverImage: z.any().optional().nullable().catch(null),
     bancoImagenesWikimedia: z.string().optional().nullable().catch(null),
     excerpt: z.string().optional().nullable().catch("Sin descripción disponible."),
+    dek: z.string().optional().nullable().catch(null),
     generadorGeoref: z.string().optional().nullable().catch(null),
   })
 });
@@ -118,6 +120,7 @@ const arquetiposGlobales = defineCollection({
     coverImage: z.any().optional().nullable().catch(null),
     videoBg: z.string().optional().nullable().catch(null),
     excerpt: z.string().optional().nullable().catch("Sin descripción disponible."),
+    dek: z.string().optional().nullable().catch(null),
     sitioGeohistorico: z.string().optional().nullable().catch(null),
     publicarConImagen: z.boolean().default(true),
     generador: z.string().optional().default(''),

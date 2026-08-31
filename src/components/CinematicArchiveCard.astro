@@ -35,6 +35,7 @@ const sitio = entry.sitioGeohistorico || null;
 const relatedTags = getRelatedCategories(entry.category, sitio, entry.title);
 const year = formatYear(entry.date);
 const excerpt = entry.excerpt || "";
+const dek = entry.dek || null;
 
 const isCinematic = isCinematicGSAP || (entry as any)?.isCinematicGSAP || entry.category === 'Ensayos Cinemáticos' || entry.category === 'ensayos-cinematicos' || normalizeCategory(entry.category) === 'ensayos-cinematicos';
 const href = customHref || (isCinematic ? `/ensayos-cinematicos/${slug}/` : `/hemeroteca/${slug}/`);
@@ -128,11 +129,12 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
     )
   }
 
-  {/* 3. Gradiente inferior nítido sin desenfoque */}
+  {/* 3. Gradiente inferior nítido sin desenfoque — scrim reforzado para imágenes claras */}
   <div
-    class={`absolute inset-0 bg-linear-to-t from-black/90 via-black/50 via-45% to-transparent pointer-events-none z-10 ${
+    class={`absolute inset-0 pointer-events-none z-10 ${
       enableCinemagraph ? "cinemagraph-museum-fade" : ""
     }`}
+    style="background: linear-gradient(to top, rgba(12,10,9,0.95) 0%, rgba(12,10,9,0.6) 45%, transparent 100%);"
   >
   </div>
 
@@ -171,10 +173,17 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
             class="ch-cta-btn inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-[#151718]/90 md:backdrop-blur-sm border border-white/10 text-[#E0E0E0]/75 font-metadata font-medium text-xs tracking-widest uppercase rounded-lg hover:bg-white/10 hover:border-white/30 hover:text-white transition-all duration-400 active:translate-y-0.5"
           >
             <span>{secondaryLabel}</span>
-            <span class="text-[10px] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">▸</span>
+            <span class="text-[10px] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">&#9656;</span>
           </a>
         </div>
       </div>
+
+      {/* Dek / Bajada Editorial — Mobile: siempre visible. Desktop: reveal en hover */}
+      {dek && (
+        <p class="card-dek font-serif italic text-xs md:text-sm text-stone-300 leading-relaxed line-clamp-2 mt-2 mb-0.5 max-w-[56ch]">
+          {dek}
+        </p>
+      )}
 
       {/* Tags de Categorías Relacionadas (Debajo del H1/CTA) */}
       {/* F2: text-xs (12px WCAG) + text-white/70. F6: siempre visible, sin hover-reveal */}
@@ -199,6 +208,28 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
 </article>
 
 <style>
+  /* ─────────────────────────────────────────────────────────────
+   * DEK — Bajada Editorial
+   * Mobile (< 768px): siempre visible
+   * Desktop (>= 768px): oculto en reposo, reveal suave en hover
+   * ───────────────────────────────────────────────────────────── */
+  .card-dek {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms ease-out, transform 300ms ease-out;
+  }
+
+  @media (min-width: 768px) {
+    .card-dek {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    .cinematic-archive-card:hover .card-dek {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   /* Se conservan las animaciones intactas */
   @keyframes kenBurnsAscent {
     0% {

@@ -165,6 +165,11 @@ export default config({
         spotifyLink: fields.url({ label: 'Link de Spotify Podcast (Opcional)' }),
         youtubeLink: fields.url({ label: 'Link de YouTube Podcast (Opcional)' }),
         excerpt: fields.text({ label: 'Excerpt (Sinopsis / Cita Filosofica 2-4 Renglones)', multiline: true }),
+        dek: fields.text({
+          label: 'Bajada / Excerpt (Dek)',
+          multiline: true,
+          description: 'Síntesis editorial de 1 a 2 líneas (70-110 caracteres) para la tarjeta de portada. Ej: "Entre la furia de los vientos y el amuleto: anatomía del demonio asirio."'
+        }),
         content: fields.document({
           label: 'Contenido',
           formatting: true,
@@ -318,6 +323,12 @@ export default config({
         youtubeLink: fields.url({ label: 'Link de YouTube Podcast (Opcional)' }),
         excerpt: fields.text({ label: 'Excerpt (Sinopsis / Cita Filosofica 2-4 Renglones)', multiline: true }),
 
+        dek: fields.text({
+          label: 'Bajada / Excerpt (Dek)',
+          multiline: true,
+          description: 'Síntesis editorial de 1 a 2 líneas (70-110 caracteres) para la tarjeta de portada.'
+        }),
+
         content: fields.document({
           label: 'Contenido',
           formatting: true,
@@ -462,6 +473,12 @@ export default config({
         }),
 
         excerpt: fields.text({ label: 'Sinopsis / Excerpt', multiline: true }),
+
+        dek: fields.text({
+          label: 'Bajada / Excerpt (Dek)',
+          multiline: true,
+          description: 'Síntesis editorial de 1 a 2 líneas (70-110 caracteres) para la tarjeta de portada.'
+        }),
 
         content: fields.document({
           label: 'Informe Geohistórico Multidimensional',
