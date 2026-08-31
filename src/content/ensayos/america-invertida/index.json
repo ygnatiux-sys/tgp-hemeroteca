@@ -1,8 +1,9 @@
 {
-  "title": "america invertida",
-  "themeColor": "rust-orange",
-  "draft": false,
-  "coverImage": "/src/assets/ensayos/america-invertida/coverImage.avif",
-  "generador": "Gemini-1.5-Pro",
-  "notasInvestigador": ""
+    "title":  "america invertida",
+    "themeColor":  "rust-orange",
+    "draft":  false,
+    "coverImage":  "/src/assets/ensayos/america-invertida/coverImage.avif",
+    "generador":  "Gemini-1.5-Pro",
+    "notasInvestigador":  "",
+    "dek":  "El cÃ©lebre mapa de JoaquÃ­n Torres GarcÃ­a que redefiniÃ³ el norte simbÃ³lico del continente."
 }

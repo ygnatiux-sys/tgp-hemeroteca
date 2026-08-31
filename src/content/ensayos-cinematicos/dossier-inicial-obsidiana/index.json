@@ -1,9 +1,12 @@
 {
-  "title": "Dossier Inicial Obsidiana",
-  "generadorTexto": "",
-  "atmosfera": {
-    "discriminant": "obsidiana"
-  },
-  "coverImage": "/src/assets/ensayos-cinematicos/dossier-inicial-obsidiana/coverImage.jpeg",
-  "gallery": []
+    "title":  "Dossier Inicial Obsidiana",
+    "generadorTexto":  "",
+    "atmosfera":  {
+                      "discriminant":  "obsidiana"
+                  },
+    "coverImage":  "/src/assets/ensayos-cinematicos/dossier-inicial-obsidiana/coverImage.jpeg",
+    "gallery":  [
+
+                ],
+    "dek":  "Un recorrido visual por los fundamentos simbÃ³licos y la memoria arcaica del proyecto TGP."
 }

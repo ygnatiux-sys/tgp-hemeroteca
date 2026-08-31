@@ -1,8 +1,9 @@
 {
-  "title": "the ATACAMA mummy ",
-  "category": "Arqueología",
-  "themeColor": "vintage-yellow",
-  "coverImage": "/src/assets/ensayos/the-atacama-mummy/coverImage.png",
-  "generador": "Gemini-1.5-Pro",
-  "notasInvestigador": ""
+    "title":  "the ATACAMA mummy ",
+    "category":  "Arqueología",
+    "themeColor":  "vintage-yellow",
+    "coverImage":  "/src/assets/ensayos/the-atacama-mummy/coverImage.png",
+    "generador":  "Gemini-1.5-Pro",
+    "notasInvestigador":  "",
+    "dek":  "MomificaciÃ³n chinchorro en el desierto mÃ¡s Ã¡rido del planeta: un rito milenario previo a Egipto."
 }

@@ -1,12 +1,13 @@
 {
-  "title": "Jung y los Arquetipos",
-  "date": "2026-08-06",
-  "category": "Historia",
-  "themeColor": "british-green",
-  "draft": false,
-  "sitioGeohistorico": null,
-  "publicarConImagen": true,
-  "coverImage": "/src/assets/ensayos/jung-y-los-arquetipos/coverImage.jpg",
-  "excerpt": "",
-  "generador": "Gemini-3.1-Pro"
+    "title":  "Jung y los Arquetipos",
+    "date":  "2026-08-06",
+    "category":  "Historia",
+    "themeColor":  "british-green",
+    "draft":  false,
+    "sitioGeohistorico":  null,
+    "publicarConImagen":  true,
+    "coverImage":  "/src/assets/ensayos/jung-y-los-arquetipos/coverImage.jpg",
+    "excerpt":  "",
+    "generador":  "Gemini-3.1-Pro",
+    "dek":  "ExploraciÃ³n e investigaciÃ³n archivÃ­stica sobre Jung y los Arquetipos en la hemeroteca TGP."
 }

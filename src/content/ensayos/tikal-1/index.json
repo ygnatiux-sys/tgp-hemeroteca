@@ -1,12 +1,13 @@
 {
-  "title": "tikal",
-  "date": "2026-08-03",
-  "category": "Historia",
-  "themeColor": "british-green",
-  "draft": false,
-  "sitioGeohistorico": null,
-  "publicarConImagen": true,
-  "coverImage": "/src/assets/ensayos/tikal-1/coverImage.jpg",
-  "excerpt": "",
-  "generador": "Gemini-3.1-Pro"
+    "title":  "tikal",
+    "date":  "2026-08-03",
+    "category":  "Historia",
+    "themeColor":  "british-green",
+    "draft":  false,
+    "sitioGeohistorico":  null,
+    "publicarConImagen":  true,
+    "coverImage":  "/src/assets/ensayos/tikal-1/coverImage.jpg",
+    "excerpt":  "",
+    "generador":  "Gemini-3.1-Pro",
+    "dek":  "Auge y caÃ­da de la gran metrÃ³poli maya del PetÃ©n guatemalteco."
 }

@@ -1,7 +1,8 @@
 {
-  "title": "del cosmos a la luna",
-  "themeColor": "old-navy",
-  "coverImage": "/src/assets/ensayos/del-cosmos-a-la-luna/coverImage.png",
-  "generador": "Gemini-1.5-Pro",
-  "notasInvestigador": ""
+    "title":  "del cosmos a la luna",
+    "themeColor":  "old-navy",
+    "coverImage":  "/src/assets/ensayos/del-cosmos-a-la-luna/coverImage.png",
+    "generador":  "Gemini-1.5-Pro",
+    "notasInvestigador":  "",
+    "dek":  "La carrera espacial como metÃ¡fora del anhelo humano por traspasar sus propias fronteras."
 }

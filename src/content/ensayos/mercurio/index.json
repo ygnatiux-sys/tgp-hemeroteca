@@ -1,12 +1,13 @@
 {
-  "title": "Mercurio",
-  "date": "2026-08-07",
-  "category": "Historia",
-  "themeColor": "british-green",
-  "draft": false,
-  "sitioGeohistorico": null,
-  "publicarConImagen": true,
-  "coverImage": "/src/assets/ensayos/mercurio/coverImage.jpg",
-  "excerpt": "",
-  "generador": "Gemini-3.1-Pro"
+    "title":  "Mercurio",
+    "date":  "2026-08-07",
+    "category":  "Historia",
+    "themeColor":  "british-green",
+    "draft":  false,
+    "sitioGeohistorico":  null,
+    "publicarConImagen":  true,
+    "coverImage":  "/src/assets/ensayos/mercurio/coverImage.jpg",
+    "excerpt":  "",
+    "generador":  "Gemini-3.1-Pro",
+    "dek":  "ExploraciÃ³n e investigaciÃ³n archivÃ­stica sobre Mercurio en la hemeroteca TGP."
 }

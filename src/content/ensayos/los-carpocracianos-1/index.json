@@ -1,11 +1,12 @@
 {
-  "title": "Los Carpocracianos",
-  "date": "2026-08-03",
-  "category": "Historia de las Religiones",
-  "themeColor": "bordeaux",
-  "draft": false,
-  "coverImage": "/src/assets/ensayos/los-carpocracianos-1/portada-ensayo.png",
-  "excerpt": "Papiros y manuscritos de las primeras corrientes gnósticas del siglo II en Egipto.",
-  "generador": "Gemini-3.1-Pro",
-  "bancoImagenesWikimedia": "{\n  \"query\": \"Oxyrhynchus Papyrus early Christian text\",\n  \"count\": 1,\n  \"selectedItems\": [\n    {\n      \"id\": \"28801920\",\n      \"title\": \"POxy_I_1.jpg\",\n      \"url\": \"https://storage.thegreatpuzzleproject.com/POxy_I_1.jpg\",\n      \"thumbUrl\": \"https://storage.thegreatpuzzleproject.com/POxy_I_1.jpg\",\n      \"width\": 2880,\n      \"height\": 1920,\n      \"aspectRatio\": 1.5,\n      \"mime\": \"image/jpeg\",\n      \"role\": \"HERO\",\n      \"roleLabel\": \"Hero Image (Encabezado Panorámico Full-Bleed)\",\n      \"author\": \"Manuscrito de Oxirrinco (Egipto, s. II-III d.C.)\",\n      \"license\": \"Public Domain / Wikimedia Commons\",\n      \"licenseUrl\": \"https://commons.wikimedia.org/wiki/File:POxy_I_1.jpg\",\n      \"description\": \"Fragmento del papiro I de Oxirrinco conteniendo dichos gnósticos y paleocristianos primigenios.\",\n      \"credit\": \"Bodleian Library / Wikimedia Commons\",\n      \"pageUrl\": \"https://commons.wikimedia.org/wiki/File:POxy_I_1.jpg\"\n    }\n  ]\n}"
+    "title":  "Los Carpocracianos",
+    "date":  "2026-08-03",
+    "category":  "Historia de las Religiones",
+    "themeColor":  "bordeaux",
+    "draft":  false,
+    "coverImage":  "/src/assets/ensayos/los-carpocracianos-1/portada-ensayo.png",
+    "excerpt":  "Papiros y manuscritos de las primeras corrientes gnósticas del siglo II en Egipto.",
+    "generador":  "Gemini-3.1-Pro",
+    "bancoImagenesWikimedia":  "{\n  \"query\": \"Oxyrhynchus Papyrus early Christian text\",\n  \"count\": 1,\n  \"selectedItems\": [\n    {\n      \"id\": \"28801920\",\n      \"title\": \"POxy_I_1.jpg\",\n      \"url\": \"https://storage.thegreatpuzzleproject.com/POxy_I_1.jpg\",\n      \"thumbUrl\": \"https://storage.thegreatpuzzleproject.com/POxy_I_1.jpg\",\n      \"width\": 2880,\n      \"height\": 1920,\n      \"aspectRatio\": 1.5,\n      \"mime\": \"image/jpeg\",\n      \"role\": \"HERO\",\n      \"roleLabel\": \"Hero Image (Encabezado Panorámico Full-Bleed)\",\n      \"author\": \"Manuscrito de Oxirrinco (Egipto, s. II-III d.C.)\",\n      \"license\": \"Public Domain / Wikimedia Commons\",\n      \"licenseUrl\": \"https://commons.wikimedia.org/wiki/File:POxy_I_1.jpg\",\n      \"description\": \"Fragmento del papiro I de Oxirrinco conteniendo dichos gnósticos y paleocristianos primigenios.\",\n      \"credit\": \"Bodleian Library / Wikimedia Commons\",\n      \"pageUrl\": \"https://commons.wikimedia.org/wiki/File:POxy_I_1.jpg\"\n    }\n  ]\n}",
+    "dek":  "Doctrina de la transgresiÃ³n y bÃºsqueda de la liberaciÃ³n espiritual en el gnosticismo."
 }

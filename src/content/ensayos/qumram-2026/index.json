@@ -1,10 +1,11 @@
 {
-  "title": "Qumram 2026",
-  "date": "2026-04-25",
-  "category": "Arqueología",
-  "themeColor": "vintage-yellow",
-  "draft": false,
-  "coverImage": "/src/assets/ensayos/qumram-2026/coverImage.png",
-  "generador": "Gemini-1.5-Pro",
-  "notasInvestigador": ""
+    "title":  "Qumram 2026",
+    "date":  "2026-04-25",
+    "category":  "Arqueología",
+    "themeColor":  "vintage-yellow",
+    "draft":  false,
+    "coverImage":  "/src/assets/ensayos/qumram-2026/coverImage.png",
+    "generador":  "Gemini-1.5-Pro",
+    "notasInvestigador":  "",
+    "dek":  "Las cuevas del desierto de Judea y los rollos que conservaron textos bÃ­blicos milenarios."
 }

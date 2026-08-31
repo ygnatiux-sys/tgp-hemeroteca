@@ -1,12 +1,13 @@
 {
-  "title": "Saturno y la Astrología",
-  "date": "2026-08-05",
-  "category": "Historia",
-  "themeColor": "british-green",
-  "draft": false,
-  "sitioGeohistorico": null,
-  "publicarConImagen": true,
-  "coverImage": "/src/assets/ensayos/saturno-y-la-astrologia/coverImage.jpg",
-  "excerpt": "",
-  "generador": "Gemini-3.1-Pro"
+    "title":  "Saturno y la Astrología",
+    "date":  "2026-08-05",
+    "category":  "Historia",
+    "themeColor":  "british-green",
+    "draft":  false,
+    "sitioGeohistorico":  null,
+    "publicarConImagen":  true,
+    "coverImage":  "/src/assets/ensayos/saturno-y-la-astrologia/coverImage.jpg",
+    "excerpt":  "",
+    "generador":  "Gemini-3.1-Pro",
+    "dek":  "El arquetipo del tiempo, los lÃ­mites, la disciplina y la melancolÃ­a filosÃ³fica."
 }

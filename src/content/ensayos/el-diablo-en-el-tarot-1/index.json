@@ -1,13 +1,14 @@
 {
-  "title": "el diablo en el tarot 1",
-  "generador": "Gemini-3.1-Pro",
-  "date": "2026-08-05",
-  "category": "Historia",
-  "themeColor": "british-green",
-  "sitioGeohistorico": "el diablo en el tarot 1",
-  "publicarConImagen": true,
-  "draft": false,
-  "coverImage": "/src/assets/ensayos/el-diablo-en-el-tarot-1/coverImage.png",
-  "excerpt": "Simbolismo histórico y hermenéutica de la figura del diablo en los manuscritos y la baraja de tarot renacentista.",
-  "bancoImagenesWikimedia": "{\n  \"query\": \"Eliphas Levi Baphomet tarot symbolism\",\n  \"count\": 1,\n  \"selectedItems\": [\n    {\n      \"id\": \"25601800\",\n      \"title\": \"Baphomet.png\",\n      \"url\": \"https://storage.thegreatpuzzleproject.com/Baphomet.png\",\n      \"thumbUrl\": \"https://storage.thegreatpuzzleproject.com/Baphomet.png\",\n      \"width\": 2560,\n      \"height\": 1800,\n      \"aspectRatio\": 1.42,\n      \"mime\": \"image/png\",\n      \"role\": \"HERO\",\n      \"roleLabel\": \"Hero Image (Encabezado Panorámico Full-Bleed)\",\n      \"author\": \"Éliphas Lévi (1856)\",\n      \"license\": \"Public Domain / Wikimedia Commons\",\n      \"licenseUrl\": \"https://commons.wikimedia.org/wiki/File:Baphomet.png\",\n      \"description\": \"Ilustración alegórica del principio andrógino y simbólico por Éliphas Lévi (Dogme et Rituel de la Haute Magie).\",\n      \"credit\": \"Wikimedia Commons / Public Domain\",\n      \"pageUrl\": \"https://commons.wikimedia.org/wiki/File:Baphomet.png\"\n    }\n  ]\n}"
+    "title":  "el diablo en el tarot 1",
+    "generador":  "Gemini-3.1-Pro",
+    "date":  "2026-08-05",
+    "category":  "Historia",
+    "themeColor":  "british-green",
+    "sitioGeohistorico":  "el diablo en el tarot 1",
+    "publicarConImagen":  true,
+    "draft":  false,
+    "coverImage":  "/src/assets/ensayos/el-diablo-en-el-tarot-1/coverImage.png",
+    "excerpt":  "Simbolismo histórico y hermenéutica de la figura del diablo en los manuscritos y la baraja de tarot renacentista.",
+    "bancoImagenesWikimedia":  "{\n  \"query\": \"Eliphas Levi Baphomet tarot symbolism\",\n  \"count\": 1,\n  \"selectedItems\": [\n    {\n      \"id\": \"25601800\",\n      \"title\": \"Baphomet.png\",\n      \"url\": \"https://storage.thegreatpuzzleproject.com/Baphomet.png\",\n      \"thumbUrl\": \"https://storage.thegreatpuzzleproject.com/Baphomet.png\",\n      \"width\": 2560,\n      \"height\": 1800,\n      \"aspectRatio\": 1.42,\n      \"mime\": \"image/png\",\n      \"role\": \"HERO\",\n      \"roleLabel\": \"Hero Image (Encabezado Panorámico Full-Bleed)\",\n      \"author\": \"Éliphas Lévi (1856)\",\n      \"license\": \"Public Domain / Wikimedia Commons\",\n      \"licenseUrl\": \"https://commons.wikimedia.org/wiki/File:Baphomet.png\",\n      \"description\": \"Ilustración alegórica del principio andrógino y simbólico por Éliphas Lévi (Dogme et Rituel de la Haute Magie).\",\n      \"credit\": \"Wikimedia Commons / Public Domain\",\n      \"pageUrl\": \"https://commons.wikimedia.org/wiki/File:Baphomet.png\"\n    }\n  ]\n}",
+    "dek":  "Lectura simbÃ³lica del arcano XV: sombras, deseo e iluminaciÃ³n por confrontaciÃ³n."
 }

@@ -1,13 +1,14 @@
 {
-  "title": "Santuario de Ballenas, peninsula de Valdez, patagonia",
-  "sitioGeohistorico": "Santuario de Ballenas, peninsula de Valdez, patagonia",
-  "volantaHook": "Georreferencia Arqueosemiótica e investigación geohistórica sobre Santuario de Ballenas, peninsula de Valdez, patagonia.",
-  "saberMasDato": "Tradición etnográfica local documentada en las inmediaciones de Santuario de Ballenas, peninsula de Valdez, patagonia.",
-  "date": "2026-08-05",
-  "category": "Arqueosemiótica",
-  "publicarConImagen": false,
-  "draft": false,
-  "coverImage": null,
-  "bancoImagenesWikimedia": null,
-  "excerpt": "Informe geohistórico y etnográfico sobre Santuario de Ballenas, peninsula de Valdez, patagonia."
+    "title":  "Santuario de Ballenas, peninsula de Valdez, patagonia",
+    "sitioGeohistorico":  "Santuario de Ballenas, peninsula de Valdez, patagonia",
+    "volantaHook":  "Georreferencia Arqueosemiótica e investigación geohistórica sobre Santuario de Ballenas, peninsula de Valdez, patagonia.",
+    "saberMasDato":  "Tradición etnográfica local documentada en las inmediaciones de Santuario de Ballenas, peninsula de Valdez, patagonia.",
+    "date":  "2026-08-05",
+    "category":  "Arqueosemiótica",
+    "publicarConImagen":  false,
+    "draft":  false,
+    "coverImage":  null,
+    "bancoImagenesWikimedia":  null,
+    "excerpt":  "Informe geohistórico y etnográfico sobre Santuario de Ballenas, peninsula de Valdez, patagonia.",
+    "dek":  "ConservaciÃ³n y ciclo reproductivo de la fauna marina en PenÃ­nsula ValdÃ©s."
 }

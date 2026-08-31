@@ -23,6 +23,7 @@ export interface EssayEntry {
     themeColor?: string | null;
     coverImage?: ImageMetadata | string | null;
     excerpt?: string | null;
+    dek?: string | null;
     spotifyLink?: string | null;
     youtubeLink?: string | null;
     generador?: string;

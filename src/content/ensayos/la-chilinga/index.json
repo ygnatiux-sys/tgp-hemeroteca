@@ -1,9 +1,10 @@
 {
-  "title": "La Chilinga ",
-  "category": "sociologia",
-  "themeColor": "old-navy",
-  "coverImage": "/src/assets/ensayos/la-chilinga/coverImage.png",
-  "excerpt": "testin g always testing for now",
-  "generador": "Gemini-1.5-Pro",
-  "notasInvestigador": ""
+    "title":  "La Chilinga ",
+    "category":  "sociologia",
+    "themeColor":  "old-navy",
+    "coverImage":  "/src/assets/ensayos/la-chilinga/coverImage.png",
+    "excerpt":  "testin g always testing for now",
+    "generador":  "Gemini-1.5-Pro",
+    "notasInvestigador":  "",
+    "dek":  "El tambor comunitario, las raÃ­ces del candombe y la percusiÃ³n como lenguaje colectivo."
 }

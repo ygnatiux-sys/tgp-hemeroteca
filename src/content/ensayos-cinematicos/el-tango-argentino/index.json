@@ -1,9 +1,12 @@
 {
-  "title": "El Tango Argentino",
-  "generadorTexto": "",
-  "agenteErudito": "",
-  "atmosfera": {
-    "discriminant": "obsidiana"
-  },
-  "gallery": []
+    "title":  "El Tango Argentino",
+    "generadorTexto":  "",
+    "agenteErudito":  "",
+    "atmosfera":  {
+                      "discriminant":  "obsidiana"
+                  },
+    "gallery":  [
+
+                ],
+    "dek":  "Del arrabal portuario a sÃ­mbolo universal: la evoluciÃ³n musical y poÃ©tica del arrabal rioplatense."
 }

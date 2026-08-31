@@ -579,6 +579,13 @@ export default config({
           itemLabel: () => 'Imagen'
         }),
 
+        excerpt: fields.text({ label: 'Excerpt / Sinopsis (Opcional)', multiline: true }),
+        dek: fields.text({
+          label: 'Bajada / Excerpt (Dek)',
+          multiline: true,
+          description: 'Síntesis editorial de 1 a 2 líneas para la tarjeta de portada.'
+        }),
+
         // 3. CAMPO DE CONTENIDO
         content: fields.document({
           label: 'Contenido',

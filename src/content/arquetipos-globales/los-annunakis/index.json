@@ -1,12 +1,15 @@
 {
-  "title": "Los Annunakis",
-  "generadorTexto": "",
-  "agenteErudito": "",
-  "bancoImagenesWikimedia": "",
-  "category": "Arquetipos Globales",
-  "themeColor": "rust-orange",
-  "publicarConImagen": true,
-  "draft": false,
-  "isCinematic": false,
-  "gallery": []
+    "title":  "Los Annunakis",
+    "generadorTexto":  "",
+    "agenteErudito":  "",
+    "bancoImagenesWikimedia":  "",
+    "category":  "Arquetipos Globales",
+    "themeColor":  "rust-orange",
+    "publicarConImagen":  true,
+    "draft":  false,
+    "isCinematic":  false,
+    "gallery":  [
+
+                ],
+    "dek":  "CosmologÃ­a y mitologÃ­a sumeria sobre las deidades primordiales del cielo y la tierra."
 }

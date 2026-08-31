@@ -1,11 +1,12 @@
 {
-  "title": "Homero, el poeta ciego",
-  "date": "2026-08-02",
-  "category": "Historia",
-  "themeColor": "bus-red",
-  "draft": false,
-  "coverImage": "/src/assets/ensayos/homero-el-poeta-ciego/coverImage.jpg",
-  "excerpt": "La Ilíada, la Odisea y la tradición aédica helénica: la ceguera como metáfora del intelecto clarividente y la memoria épica de la Hélade.",
-  "generador": "Gemini-3.1-Pro",
-  "bancoImagenesWikimedia": "{\n  \"query\": \"Homer bust British Museum Hellenistic sculpture\",\n  \"count\": 1,\n  \"selectedItems\": [\n    {\n      \"id\": \"30722048\",\n      \"title\": \"Homer_British_Museum.jpg\",\n      \"url\": \"https://storage.thegreatpuzzleproject.com/Homer_British_Museum.jpg\",\n      \"thumbUrl\": \"https://storage.thegreatpuzzleproject.com/Homer_British_Museum.jpg\",\n      \"width\": 3072,\n      \"height\": 2048,\n      \"aspectRatio\": 1.5,\n      \"mime\": \"image/jpeg\",\n      \"role\": \"HERO\",\n      \"roleLabel\": \"Hero Image (Encabezado Panorámico Full-Bleed)\",\n      \"author\": \"Escultura Helenística (Copia romana s. II a.C.), Museo Británico\",\n      \"license\": \"Public Domain / Wikimedia Commons\",\n      \"licenseUrl\": \"https://commons.wikimedia.org/wiki/File:Homer_British_Museum.jpg\",\n      \"description\": \"Busto clásico idealizado de Homero, el aedo ciego, Museo Británico.\",\n      \"credit\": \"British Museum / Wikimedia Commons\",\n      \"pageUrl\": \"https://commons.wikimedia.org/wiki/File:Homer_British_Museum.jpg\"\n    }\n  ]\n}"
+    "title":  "Homero, el poeta ciego",
+    "date":  "2026-08-02",
+    "category":  "Historia",
+    "themeColor":  "bus-red",
+    "draft":  false,
+    "coverImage":  "/src/assets/ensayos/homero-el-poeta-ciego/coverImage.jpg",
+    "excerpt":  "La Ilíada, la Odisea y la tradición aédica helénica: la ceguera como metáfora del intelecto clarividente y la memoria épica de la Hélade.",
+    "generador":  "Gemini-3.1-Pro",
+    "bancoImagenesWikimedia":  "{\n  \"query\": \"Homer bust British Museum Hellenistic sculpture\",\n  \"count\": 1,\n  \"selectedItems\": [\n    {\n      \"id\": \"30722048\",\n      \"title\": \"Homer_British_Museum.jpg\",\n      \"url\": \"https://storage.thegreatpuzzleproject.com/Homer_British_Museum.jpg\",\n      \"thumbUrl\": \"https://storage.thegreatpuzzleproject.com/Homer_British_Museum.jpg\",\n      \"width\": 3072,\n      \"height\": 2048,\n      \"aspectRatio\": 1.5,\n      \"mime\": \"image/jpeg\",\n      \"role\": \"HERO\",\n      \"roleLabel\": \"Hero Image (Encabezado Panorámico Full-Bleed)\",\n      \"author\": \"Escultura Helenística (Copia romana s. II a.C.), Museo Británico\",\n      \"license\": \"Public Domain / Wikimedia Commons\",\n      \"licenseUrl\": \"https://commons.wikimedia.org/wiki/File:Homer_British_Museum.jpg\",\n      \"description\": \"Busto clásico idealizado de Homero, el aedo ciego, Museo Británico.\",\n      \"credit\": \"British Museum / Wikimedia Commons\",\n      \"pageUrl\": \"https://commons.wikimedia.org/wiki/File:Homer_British_Museum.jpg\"\n    }\n  ]\n}",
+    "dek":  "La IlÃ­ada, la Odisea y la forja de la identidad mitolÃ³gica y heroica de Grecia."
 }

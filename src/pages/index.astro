@@ -58,7 +58,8 @@ const publishableCinematicos: EssayEntry[] = allCinematicosRaw.map(item => {
       title: item.data.title || 'Dossier Cinemático',
       category: 'Ensayos Cinemáticos',
       coverImage: item.data.coverImage || (Array.isArray(item.data.gallery) && item.data.gallery.length > 0 ? item.data.gallery[0] : aiImage),
-      excerpt: 'Experiencia inmersiva GSAP a pantalla completa con diseño atmosférico.',
+      excerpt: ((item.data as any).dek || 'Experiencia inmersiva GSAP a pantalla completa con diseño atmosférico.') as string,
+      dek: ((item.data as any).dek || 'Experiencia inmersiva GSAP a pantalla completa con diseño atmosférico.') as string,
       date: new Date().toISOString(),
       themeColor: 'obsidiana',
       spotifyLink: null,
@@ -88,7 +89,7 @@ const HERO_COUNT   = Math.min(HERO_MAX, publishable.length);
 const heroSlides   = publishable.slice(0, HERO_COUNT).map(e => ({
   id: e.slug,
   title: e.entry.title || '',
-  subtitle: e.entry.excerpt || undefined,
+  subtitle: (e.entry.dek || e.entry.excerpt || undefined) as string | undefined,
   category: formatCategory(e.entry.category),
   date: formatDate(e.entry.date),
   readTime: undefined as string | undefined,
@@ -225,9 +226,9 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
                       {leadStory.entry.title}
                     </a>
                   </h2>
-                  {leadStory.entry.excerpt && (
+                  {(leadStory.entry.dek || leadStory.entry.excerpt) && (
                     <p class="font-serif text-white/70 text-base leading-relaxed line-clamp-3 italic max-w-prose">
-                      "{leadStory.entry.excerpt}"
+                      "{leadStory.entry.dek || leadStory.entry.excerpt}"
                     </p>
                   )}
                 </div>
@@ -302,11 +303,11 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
                   <div class="flex flex-col justify-between p-6 md:p-8 flex-1">
                     <div class="flex flex-col gap-3">
                       <span class="font-metadata text-xs uppercase tracking-[0.3em] text-rust-orange/70">{formatCategory(secondaryA.entry.category)}</span>
-                      <h3 class="font-cinzel font-bold text-xl sm:text-2xl md:text-3xl leading-tight group-hover:text-rust-orange transition-colors duration-300">
+                      <h3 class="font-cinzel font-bold text-xl sm:text-2xl md:text-3xl leading-tight gradient-metal-steel-card">
                         <a href={`/hemeroteca/${secondaryA.slug}/`}>{secondaryA.entry.title}</a>
                       </h3>
-                      {secondaryA.entry.excerpt && (
-                        <p class="font-serif text-white/70 text-base leading-relaxed line-clamp-2 italic">{secondaryA.entry.excerpt}</p>
+                      {(secondaryA.entry.dek || secondaryA.entry.excerpt) && (
+                        <p class="font-serif text-white/70 text-base leading-relaxed line-clamp-2 italic">{secondaryA.entry.dek || secondaryA.entry.excerpt}</p>
                       )}
                     </div>
                     <div class="mt-5 pt-4 border-t border-white/5 font-metadata text-xs uppercase tracking-[0.3em]">
@@ -338,7 +339,7 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
                   <div class="flex flex-col justify-between p-5 flex-1">
                     <div class="flex flex-col gap-2">
                       <span class="font-metadata text-xs uppercase tracking-[0.3em] text-rust-orange/70">{formatCategory(secondaryB.entry.category)}</span>
-                      <h3 class="font-cinzel font-bold text-base sm:text-lg leading-snug group-hover:text-rust-orange transition-colors">
+                      <h3 class="font-cinzel font-bold text-base sm:text-lg leading-snug gradient-metal-steel-card">
                         <a href={`/hemeroteca/${secondaryB.slug}/`}>{secondaryB.entry.title}</a>
                       </h3>
                     </div>
@@ -443,9 +444,9 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
           </div>
 
           {/* Secuencias Cinematográficas Premier: 1 Hero Full Bleed + Dúo 60/40 con Cinemagraph */}
-          <div class="flex flex-col gap-16 md:gap-24">
+          <div class="flex flex-col gap-20 md:gap-28">
             {archiveSequences.map((seq) => (
-              <div class="premier-sequence flex flex-col gap-8 md:gap-12">
+              <div class="premier-sequence flex flex-col gap-10 md:gap-14">
                 {/* 1. Hero Cinemático Full Bleed */}
                 <div class="w-full">
                   <CinematicArchiveCard
@@ -459,7 +460,7 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
 
                 {/* 2. Dúo de Films Secundarios con Aire, Espaciado y Proporción 60/40 */}
                 {seq.duo.length > 0 && (
-                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
+                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-10 gap-y-12 lg:gap-x-12 lg:gap-y-0 items-start">
                     {seq.duo[0] && (
                       <div class={seq.duo.length > 1 ? "lg:col-span-7 flex flex-col" : "lg:col-span-12 flex flex-col"}>
                         <CinematicArchiveCard

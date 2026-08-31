@@ -1,9 +1,10 @@
 {
-  "title": "Bonampak",
-  "date": "2026-08-03",
-  "category": "Arqueología",
-  "themeColor": "british-green",
-  "draft": false,
-  "excerpt": "Estudio iconográfico y semiótico sobre los murales de la Estructura 1 de Bonampak.",
-  "coverImage": "/src/assets/ensayos/bonampak-1/coverImage.jpeg"
+    "title":  "Bonampak",
+    "date":  "2026-08-03",
+    "category":  "Arqueología",
+    "themeColor":  "british-green",
+    "draft":  false,
+    "excerpt":  "Estudio iconográfico y semiótico sobre los murales de la Estructura 1 de Bonampak.",
+    "coverImage":  "/src/assets/ensayos/bonampak-1/coverImage.jpeg",
+    "dek":  "CrÃ³nica visual de la vida cortesana y las ceremonias mayas en Bonampak."
 }

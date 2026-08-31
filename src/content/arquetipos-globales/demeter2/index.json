@@ -1,15 +1,18 @@
 {
-  "title": "demeter",
-  "volanta": "demter",
-  "generadorTexto": "",
-  "agenteErudito": "",
-  "bancoImagenesWikimedia": "",
-  "generadorImagen": "",
-  "date": "2026-08-24",
-  "category": "Arquetipos Globales",
-  "themeColor": "rust-orange",
-  "publicarConImagen": true,
-  "draft": false,
-  "isCinematic": false,
-  "gallery": []
+    "title":  "demeter",
+    "volanta":  "demter",
+    "generadorTexto":  "",
+    "agenteErudito":  "",
+    "bancoImagenesWikimedia":  "",
+    "generadorImagen":  "",
+    "date":  "2026-08-24",
+    "category":  "Arquetipos Globales",
+    "themeColor":  "rust-orange",
+    "publicarConImagen":  true,
+    "draft":  false,
+    "isCinematic":  false,
+    "gallery":  [
+
+                ],
+    "dek":  "El ciclo de las estaciones, el rapto de PersÃ©fone y los misterios de la fertilidad agraria."
 }

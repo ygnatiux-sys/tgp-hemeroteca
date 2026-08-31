@@ -1,10 +1,11 @@
 {
-  "title": "LA CAIDA DE CARTAGO",
-  "coverImage": "/src/assets/ensayos/la-caida-de-cartago/coverImage.png",
-  "generador": "Gemini-1.5-Pro",
-  "date": "2026-04-26",
-  "category": "HISTORIA ANTIGUA",
-  "themeColor": "old-navy",
-  "draft": false,
-  "notasInvestigador": ""
+    "title":  "LA CAIDA DE CARTAGO",
+    "coverImage":  "/src/assets/ensayos/la-caida-de-cartago/coverImage.png",
+    "generador":  "Gemini-1.5-Pro",
+    "date":  "2026-04-26",
+    "category":  "HISTORIA ANTIGUA",
+    "themeColor":  "old-navy",
+    "draft":  false,
+    "notasInvestigador":  "",
+    "dek":  "El asedio romano del 146 a.C. y la destrucciÃ³n definitiva de la gran potencia pÃºnica."
 }

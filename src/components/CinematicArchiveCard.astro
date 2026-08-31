@@ -34,8 +34,8 @@ const safeImg = sanitizeImageUrl(img);
 const sitio = entry.sitioGeohistorico || null;
 const relatedTags = getRelatedCategories(entry.category, sitio, entry.title);
 const year = formatYear(entry.date);
-const excerpt = entry.excerpt || "";
-const dek = entry.dek || null;
+const dek = entry.dek || entry.excerpt || null;
+const cleanExcerpt = (entry.excerpt || entry.dek || "").replace(/\*\*/g, "").trim();
 
 const isCinematic = isCinematicGSAP || (entry as any)?.isCinematicGSAP || entry.category === 'Ensayos Cinemáticos' || entry.category === 'ensayos-cinematicos' || normalizeCategory(entry.category) === 'ensayos-cinematicos';
 const href = customHref || (isCinematic ? `/ensayos-cinematicos/${slug}/` : `/hemeroteca/${slug}/`);
@@ -62,147 +62,173 @@ if (entry.youtubeLink) {
 const isHero = variant === "hero";
 const isDuo40 = variant === "duo-40";
 
-const minHeightClass = isHero
-  ? "min-h-[460px] sm:min-h-[520px] md:min-h-[560px] lg:min-h-[600px] aspect-[16/9] md:aspect-auto"
+// Relación de aspecto de la imagen según variante
+const imageAspectClass = isHero
+  ? "aspect-video sm:aspect-21/9"
   : isDuo40
-    ? "min-h-[380px] sm:min-h-[420px] md:min-h-[450px] aspect-[16/9] md:aspect-auto"
-    : "min-h-[400px] sm:min-h-[440px] md:min-h-[480px] aspect-[16/9] md:aspect-auto";
+    ? "aspect-[4/3] sm:aspect-16/10"
+    : "aspect-[4/3] sm:aspect-video";
 
-const paddingClass = isHero
-  ? "p-6 sm:p-8 md:p-12 lg:p-14"
-  : isDuo40
-    ? "p-5 sm:p-6 md:p-7"
-    : "p-5 sm:p-7 md:p-8";
-
+// Tamaño tipográfico del H1 interior (+1px global para máxima presencia)
 const titleClass = isHero
-  ? "text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black leading-[1.12]"
+  ? "text-[1.65rem] sm:text-3xl md:text-4xl lg:text-[3.25rem] font-black leading-[1.12]"
   : isDuo40
-    ? "text-lg sm:text-xl md:text-2xl font-extrabold leading-[1.2]"
-    : "text-xl sm:text-2xl md:text-3xl font-extrabold leading-[1.16]";
+    ? "text-[1.2rem] sm:text-[1.4rem] md:text-[1.65rem] font-extrabold leading-[1.2]"
+    : "text-[1.35rem] sm:text-[1.65rem] md:text-[2rem] font-extrabold leading-[1.16]";
 
 const excerptClass = isHero
-  ? "text-xs sm:text-sm md:text-base text-white/80 line-clamp-2 max-w-3xl font-light"
+  ? "text-xs sm:text-sm md:text-base text-white/90 line-clamp-2 max-w-3xl font-light"
   : isDuo40
-    ? "text-[11px] sm:text-xs text-white/70 line-clamp-1 max-w-xl font-light"
-    : "text-xs sm:text-sm text-white/75 line-clamp-2 max-w-2xl font-light";
+    ? "text-[11px] sm:text-xs text-white/80 line-clamp-1 max-w-xl font-light"
+    : "text-xs sm:text-sm text-white/85 line-clamp-2 max-w-2xl font-light";
 
 const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
   entry.title || "",
 );
 
+// Mapeo dinámico de acento según categoría / themeColor heredado
+const categoryAccentClass = (() => {
+  const t = (entry.themeColor || '').toLowerCase();
+  const c = (entry.category || '').toLowerCase();
+  if (t === 'bordeaux' || c.includes('mitolog') || c.includes('simbol')) return 'text-[#df7a7e]';
+  if (t === 'british-green' || c.includes('historia antigua') || c.includes('prehistoria')) return 'text-[#68b68f]';
+  if (t === 'old-navy' || c.includes('filosof') || c.includes('gnos')) return 'text-[#8ab7e0]';
+  if (t === 'vintage-yellow' || c.includes('arte') || c.includes('arquitectura')) return 'text-[#f0e2a8]';
+  if (t === 'rust-orange' || c.includes('arquetip') || c.includes('arqueosemi') || c.includes('georref')) return 'text-rust-orange';
+  return 'text-rust-orange';
+})();
+
 const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-card";
 ---
 
 <article
-  class={`cinematic-archive-card cinematic-card-lantern card-hover-cinematic group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/5 bg-theme-dark/80 shadow-2xl flex flex-col justify-end w-full transform-gpu isolate ${minHeightClass}`}
+  class={`cinematic-archive-card flex flex-col gap-4 group w-full h-full`}
   data-category={normalizeCategory(entry.category)}
   data-year={year}
 >
-  {/* 1. Imagen de fondo */}
-  {
-    safeImg ? (
-      <Image
-        src={safeImg}
-        alt={entry.title || "Dossier del Archivo"}
-        inferSize={true}
-        format="webp"
-        widths={[400, 768, 1200, 1920]}
-        sizes="(max-width: 768px) 400px, (max-width: 1200px) 768px, 1200px"
-        loading={isEager ? "eager" : "lazy"}
-        fetchpriority={isEager ? "high" : undefined}
-        decoding="async"
-        class={`absolute inset-0 w-full h-full object-cover object-center brightness-90 contrast-[1.03] pointer-events-none -z-10 ${
-          enableCinemagraph
-            ? "cinemagraph-ken-burns"
-            : "group-hover:scale-[1.018] group-hover:brightness-95 transition-transform duration-700 delay-75 ease-out"
-        }`}
-      />
-    ) : (
-      <div class="fallback-background absolute inset-0 bg-stone-900 pointer-events-none -z-10" />
-    )
-  }
-
-  {/* 2. Efecto Dynamis (Solo si está habilitado) */}
-  {
-    enableCinemagraph && (
-      <div class="absolute inset-0 pointer-events-none cinemagraph-dynamis z-0" />
-    )
-  }
-
-  {/* 3. Gradiente inferior nítido sin desenfoque — scrim reforzado para imágenes claras */}
-  <div
-    class={`absolute inset-0 pointer-events-none z-10 ${
-      enableCinemagraph ? "cinemagraph-museum-fade" : ""
-    }`}
-    style="background: linear-gradient(to top, rgba(12,10,9,0.95) 0%, rgba(12,10,9,0.6) 45%, transparent 100%);"
+  {/* 1. IMAGEN SUPERIOR CON H1 INTERIOR (CON CINZEL STEEL GRADIENT + GSAP FADE IN) */}
+  <a
+    href={href}
+    class={`relative w-full ${imageAspectClass} rounded-xl md:rounded-2xl overflow-hidden block bg-stone-900/60 border border-white/10 shadow-xl shrink-0`}
   >
-  </div>
-
-  {/* 4. Contenido Editorial con z-index superior */}
-  <div class={`relative z-20 ${paddingClass} w-full max-w-7xl`}>
-    <div class="flex flex-col w-full h-full justify-end">
-      
-      {/* Excerpt (Arriba de H1, centrado) */}
-      {excerpt && (
-        <p class={`font-sans leading-relaxed text-center max-w-[66ch] tracking-wider mx-auto mb-4 line-clamp-2 ch-excerpt-container ${excerptClass}`}>
-          {excerpt.split(' ').filter((w: string) => w.trim() !== '').map((word: string, i: number) => {
-            const isAmber = word.startsWith('**') && word.endsWith('**');
-            const cleanWord = isAmber ? word.replace(/\*\*/g, '') : word;
-            return (
-              <>
-                <span class={`ch-excerpt-word ${isAmber ? 'amber-neon' : ''}`} style={`--word-delay: ${3.0 + i * 0.65}s`}>{cleanWord}</span>{" "}
-              </>
-            );
-          })}
-        </p>
-      )}
-
-      {/* Fila Central: H1 (izq) y CTA (der) */}
-      <div class="flex flex-row justify-between items-end w-full border-b border-transparent pb-3 relative z-30 ch-h1-cta">
-        <h2 class={`font-cinzel tracking-tight drop-shadow-lg transition-all duration-300 max-w-3xl ch-h1-container ${titleClass}`}>
-          <a href={href} class:list={[cardGradientClass, "hover:opacity-90 transition-opacity block"]}>
-            {titlePrefix}<span class="title-keyword-shine-fade">{titleKeyword}</span>
-          </a>
-        </h2>
-        
-        <div class="relative min-h-10 flex items-center shrink-0 ml-4 pb-1 ch-cta-container">
-          <a
-            href={secondaryHref}
-            target={isExternal ? "_blank" : undefined}
-            rel={isExternal ? "noopener noreferrer" : undefined}
-            class="ch-cta-btn inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-[#151718]/90 md:backdrop-blur-sm border border-white/10 text-[#E0E0E0]/75 font-metadata font-medium text-xs tracking-widest uppercase rounded-lg hover:bg-white/10 hover:border-white/30 hover:text-white transition-all duration-400 active:translate-y-0.5"
-          >
-            <span>{secondaryLabel}</span>
-            <span class="text-[10px] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">&#9656;</span>
-          </a>
+    {
+      safeImg ? (
+        <Image
+          src={safeImg}
+          alt={entry.title || "Dossier del Archivo"}
+          inferSize={true}
+          format="webp"
+          widths={[400, 768, 1200, 1920]}
+          sizes="(max-width: 768px) 400px, (max-width: 1200px) 768px, 1200px"
+          loading={isEager ? "eager" : "lazy"}
+          fetchpriority={isEager ? "high" : undefined}
+          decoding="async"
+          class={`w-full h-full object-cover object-center brightness-90 group-hover:brightness-100 transition-transform duration-700 ease-out group-hover:scale-[1.04] ${
+            enableCinemagraph ? "cinemagraph-ken-burns" : ""
+          }`}
+        />
+      ) : (
+        <div class="w-full h-full bg-stone-900 flex items-center justify-center text-stone-600 font-metadata text-xs uppercase tracking-widest">
+          Sin imagen
         </div>
-      </div>
+      )
+    }
 
-      {/* Dek / Bajada Editorial — Mobile: siempre visible. Desktop: reveal en hover */}
-      {dek && (
-        <p class="card-dek font-serif italic text-xs md:text-sm text-stone-300 leading-relaxed line-clamp-2 mt-2 mb-0.5 max-w-[56ch]">
-          {dek}
+    {/* Dynamis overlay sutil */}
+    {
+      enableCinemagraph && (
+        <div class="absolute inset-0 pointer-events-none cinemagraph-dynamis z-0" />
+      )
+    }
+
+    {/* Scrim gradiente inferior suave para contraste óptimo */}
+    <div
+      class="absolute inset-0 pointer-events-none z-10"
+      style="background: linear-gradient(to top, rgba(12,10,9,0.92) 0%, rgba(12,10,9,0.45) 45%, transparent 100%);"
+    >
+    </div>
+
+    {/* ✦ H1 INTERIOR DENTRO DE LA CARD (Con Cinzel Steel Gradient + GSAP Fade In) */}
+    <div class="absolute inset-0 z-20 flex flex-col justify-end p-4 sm:p-6 md:p-8 pointer-events-none">
+      {cleanExcerpt && (
+        <p class={`font-sans leading-relaxed text-left max-w-[66ch] tracking-wider mb-2 line-clamp-2 ch-excerpt-container opacity-0 ${excerptClass}`}>
+          <span class="ch-excerpt-line inline-block">{cleanExcerpt}</span>
         </p>
       )}
 
-      {/* Tags de Categorías Relacionadas (Debajo del H1/CTA) */}
-      {/* F2: text-xs (12px WCAG) + text-white/70. F6: siempre visible, sin hover-reveal */}
-      <div class="flex flex-wrap items-center gap-6 mt-3 font-metadata text-xs uppercase tracking-[0.4em] text-white/70 w-full justify-start">
-        {relatedTags.map((tag, idx) => (
-          <>
-            <span class="ch-tag">{tag}</span>
-            {idx < relatedTags.length - 1 && (
-              <span class="font-bold opacity-50 ch-tag">•</span>
-            )}
-          </>
-        ))}
-        {year && (
-          <>
-            {relatedTags.length > 0 && <span class="font-bold opacity-50 ch-tag">•</span>}
-            <span class="ch-tag text-xs text-white/50">{year}</span>
-          </>
-        )}
+      <h2 class={`font-cinzel tracking-tight drop-shadow-xl transition-all duration-300 ch-h1-container ${titleClass}`}>
+        <span class:list={[cardGradientClass, "block"]}>
+          {titlePrefix}<span class="title-keyword-shine-fade">{titleKeyword}</span>
+        </span>
+      </h2>
+    </div>
+  </a>
+
+  {/* 2. BLOQUE DE TEXTO EDITORIAL EXTERIOR (ESTILO NAUTILUS) */}
+  <div class="flex flex-col w-full grow pt-1">
+    {/* Categoría y Tags con Color Heredado */}
+    <div class="flex flex-wrap items-center gap-2 mb-2 font-metadata text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-stone-400">
+      <span class={`${categoryAccentClass} font-semibold`}>
+        {entry.category ? entry.category.toUpperCase() : 'ARCHIVO'}
+      </span>
+      {sitio && (
+        <>
+          <span class="opacity-40">•</span>
+          <span class="text-stone-400">{sitio}</span>
+        </>
+      )}
+      {year && (
+        <>
+          <span class="opacity-40">•</span>
+          <span class="text-stone-500">{year}</span>
+        </>
+      )}
+    </div>
+
+    {/* Fila: Título Exterior con Steel Gradient Heredado y CTA */}
+    <div class="flex flex-row justify-between items-start gap-4 mb-2 ch-h1-cta">
+      <a href={href} class="hover:opacity-80 transition-opacity block flex-1">
+        <h3 class={`font-cinzel font-bold text-lg sm:text-xl md:text-2xl tracking-tight leading-snug ${cardGradientClass}`}>
+          {titlePrefix}<span class="title-keyword-shine-fade">{titleKeyword}</span>
+        </h3>
+      </a>
+
+      <div class="relative flex items-center shrink-0 ch-cta-container">
+        <a
+          href={secondaryHref}
+          target={isExternal ? "_blank" : undefined}
+          rel={isExternal ? "noopener noreferrer" : undefined}
+          class="ch-cta-btn inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/5 border border-white/15 text-stone-300 font-metadata font-medium text-xs tracking-wider uppercase rounded-lg hover:bg-white/15 hover:border-white/30 hover:text-white transition-all duration-300 active:translate-y-0.5 whitespace-nowrap"
+        >
+          <span>{secondaryLabel}</span>
+          <span class="text-[10px] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">&#9656;</span>
+        </a>
       </div>
+    </div>
+
+    {/* Dek / Bajada Editorial (Línea directa y limpia siempre debajo de la card) */}
+    {dek && (
+      <p class="card-dek ch-dek-container font-serif italic text-xs md:text-sm text-stone-300 leading-relaxed line-clamp-2 md:line-clamp-3 mb-2 max-w-[56ch]">
+        {dek}
+      </p>
+    )}
+
+    {/* Tags de Categorías Relacionadas */}
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 font-metadata text-[10px] uppercase tracking-[0.3em] text-white/50 w-full justify-start">
+      {relatedTags.map((tag, idx) => (
+        <>
+          <span class="ch-tag">{tag}</span>
+          {idx < relatedTags.length - 1 && (
+            <span class="font-bold opacity-40 ch-tag">•</span>
+          )}
+        </>
+      ))}
+      {year && (
+        <>
+          {relatedTags.length > 0 && <span class="font-bold opacity-40 ch-tag">•</span>}
+          <span class="ch-tag text-[10px] text-white/40">{year}</span>
+        </>
+      )}
     </div>
   </div>
 </article>
@@ -210,8 +236,6 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
 <style>
   /* ─────────────────────────────────────────────────────────────
    * DEK — Bajada Editorial
-   * Mobile (< 768px): siempre visible
-   * Desktop (>= 768px): oculto en reposo, reveal suave en hover
    * ───────────────────────────────────────────────────────────── */
   .card-dek {
     opacity: 1;
@@ -219,18 +243,7 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
     transition: opacity 300ms ease-out, transform 300ms ease-out;
   }
 
-  @media (min-width: 768px) {
-    .card-dek {
-      opacity: 0;
-      transform: translateY(6px);
-    }
-    .cinematic-archive-card:hover .card-dek {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* Se conservan las animaciones intactas */
+  /* Ken Burns para la imagen interna */
   @keyframes kenBurnsAscent {
     0% {
       transform: scale(1.02) translateY(2.5%) translateZ(0);
@@ -240,18 +253,6 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
     }
     100% {
       transform: scale(1.14) translateY(-3%) translateZ(0);
-    }
-  }
-
-  @keyframes museumFade {
-    0% {
-      opacity: 0.7;
-    }
-    50% {
-      opacity: 0.9;
-    }
-    100% {
-      opacity: 0.65;
     }
   }
 
@@ -274,17 +275,11 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
   }
 
   .cinemagraph-ken-burns {
-    animation: kenBurnsAscent 24s cubic-bezier(0.4, 0, 0.6, 1) infinite
-      alternate;
+    animation: kenBurnsAscent 24s cubic-bezier(0.4, 0, 0.6, 1) infinite alternate;
     will-change: transform;
     transform-origin: center center;
-    /* Ancla esta capa en GPU para evitar Z-fighting con el texto animado */
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-  }
-
-  .cinemagraph-museum-fade {
-    animation: museumFade 14s ease-in-out infinite alternate;
   }
 
   .cinemagraph-dynamis {
@@ -297,14 +292,12 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
     mix-blend-mode: screen;
     animation: dynamisLoop 16s ease-in-out infinite alternate;
     will-change: transform, opacity, filter;
-    /* Ancla el dynamis en su propia capa para que no compita con el texto */
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .cinemagraph-ken-burns,
-    .cinemagraph-museum-fade,
     .cinemagraph-dynamis {
       animation: none !important;
     }
@@ -326,13 +319,11 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
       const h1Container = card.querySelector<HTMLElement>(".ch-h1-container");
       const ctaBtn = card.querySelector<HTMLElement>(".ch-cta-btn");
       const excerptContainer = card.querySelector<HTMLElement>(".ch-excerpt-container");
-      const words = Array.from(card.querySelectorAll<HTMLElement>(".ch-excerpt-word"));
+      const dekContainer = card.querySelector<HTMLElement>(".ch-dek-container");
       const tags = Array.from(card.querySelectorAll<HTMLElement>(".ch-tag"));
 
       const tl = gsap.timeline({
         onComplete: () => {
-          // Reactivar el sweep del gradiente (pausado por CSS) ahora que
-          // la tarjeta está estable — evita Z-fighting durante la animación
           card.classList.add('card-settled');
           resolve();
         },
@@ -349,82 +340,88 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
         tl.fromTo(
           tags,
           { opacity: 0, filter: "blur(2px)" },
-          { opacity: 1, filter: "blur(0px)", duration: 0.8, stagger: 0.04, ease: "power2.out" },
+          { opacity: 1, filter: "blur(0px)", duration: 0.6, stagger: 0.03, ease: "power2.out" },
           0
-        ).to(tags, { opacity: 0.7, duration: 0.6 }, 0.8);
+        ).to(tags, { opacity: 0.7, duration: 0.4 }, 0.6);
       }
 
       // ── 2. H1 zoom-out para ceder el escenario al excerpt ──
-      if (h1Container) {
+      if (h1Container && excerptContainer) {
         tl.to(
           h1Container,
           {
-            scale: 1.10,
+            scale: 1.06,
             y: -4,
-            filter: "blur(10px)",
+            filter: "blur(8px)",
             opacity: 0,
-            duration: 1.2,
+            duration: 0.9,
             ease: "power2.inOut",
-            force3D: true, // GPU path para evitar parpadeos en mobile
+            force3D: true,
           },
-          0.5
+          0.3
         );
       }
 
-      // ── 3. Excerpt escribe palabra por palabra con TypeMagic ──
-      if (excerptContainer && words.length) {
-        tl.set(excerptContainer, { opacity: 1 }, 1.6);
-        tl.set(words, { opacity: 0, filter: "blur(14px)", y: 6 });
-
-        // Cada palabra emerge pausadamente con su gradiente y desenfoque
-        tl.to(
-          words,
+      // ── 3. Excerpt escribe toda la línea a la vez (Línea por línea rápida y fluida) ──
+      if (excerptContainer) {
+        tl.fromTo(
+          excerptContainer,
+          { opacity: 0, filter: "blur(12px)", y: 8 },
           {
             opacity: 1,
             filter: "blur(0px)",
             y: 0,
-            duration: 0.7,
-            stagger: 0.45,
-            ease: "power2.out",
+            duration: 0.8,
+            ease: "power3.out",
           },
-          1.8
+          0.8
         );
 
-        // ── 4. Pausa de lectura completa tras aparecer la ÚLTIMA palabra ──
-        tl.to({}, { duration: 3.5 });
+        // ── 4. Pausa de lectura completa ──
+        tl.to({}, { duration: 2.8 });
 
-        // ── 5. Disolución fluida del excerpt completo (gota en medio denso) ──
-        tl.to(words, {
+        // ── 5. Disolución fluida del excerpt ──
+        tl.to(excerptContainer, {
           opacity: 0,
           filter: "blur(10px)",
-          scale: 0.95,
-          y: -6,
-          duration: 1.4,
+          scale: 0.98,
+          y: -4,
+          duration: 0.8,
           ease: "power2.inOut",
         });
       }
 
-      // ── 6. ¡SOLO CUANDO EL EXCERPT TERMINÓ Y SE DISOLVIÓ! ──
-      // Re-escritura y materialización líquida TypeMagic del H1
+      // ── 6. Re-materialización líquida del H1 ──
       if (h1Container) {
         tl.fromTo(
           h1Container,
-          { opacity: 0, filter: "blur(16px)", scale: 0.97, y: 8 },
-          { opacity: 1, filter: "blur(0px)", scale: 1, y: 0, duration: 1.8, ease: "power3.out", force3D: true } // GPU path
+          { opacity: 0, filter: "blur(14px)", scale: 0.98, y: 6 },
+          { opacity: 1, filter: "blur(0px)", scale: 1, y: 0, duration: 1.2, ease: "power3.out", force3D: true },
+          excerptContainer ? "-=0.2" : "0"
         );
       }
 
-      // ── 7. Pase 2 del Metal Sweep (ULTRA LENTO) en el CTA ──
+      // ── 7. Dek exterior: revelado suave y presencia visual ──
+      if (dekContainer) {
+        tl.fromTo(
+          dekContainer,
+          { opacity: 0.7, y: 2 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+          0.4
+        );
+      }
+
+      // ── 8. Pase 2 del Metal Sweep (ULTRA LENTO) en el CTA ──
       if (ctaBtn) {
         tl.add(() => {
           ctaBtn.classList.remove("sweep-fast", "sweep-slow");
           void ctaBtn.offsetWidth;
           ctaBtn.classList.add("sweep-slow");
-        }, "-=0.8");
+        }, "-=0.6");
       }
 
-      // Margen final de reposo antes de dar paso a la siguiente tarjeta
-      tl.to({}, { duration: 3.2 });
+      // Margen final de reposo
+      tl.to({}, { duration: 2.5 });
     });
   };
 
@@ -449,7 +446,7 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
         );
       });
 
-      // Observer secuencial: una por una, esperando a que termine cada tarjeta
+      // Observer secuencial
       const queue: HTMLElement[] = [];
       let isRunning = false;
 
