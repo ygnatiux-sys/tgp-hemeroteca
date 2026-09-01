@@ -206,9 +206,15 @@ const coleccionesSlides = collections
 
                 <div class="relative z-20 p-5 md:p-6 lg:p-8 flex flex-col justify-end h-full">
                   {/* F2: text-xs (WCAG). F6: siempre visible sin group-hover reveal */}
-                  <span class="font-mono text-xs uppercase tracking-widest text-rust-orange font-bold mb-2">Colección TGP</span>
-                  <h2 class="gradient-general-h2 text-2xl md:text-3xl lg:text-4xl mb-2 leading-tight">{col.label}</h2>
-                  <p class="font-sans text-xs md:text-sm text-white/80">{col.count} {col.count === 1 ? 'Documento' : 'Documentos'}</p>
+                  <span class="font-mono text-xs uppercase tracking-widest text-rust-orange font-bold mb-1">Colección TGP</span>
+                  <h2 class="gradient-general-h2 text-2xl md:text-3xl lg:text-4xl mb-1 leading-tight">{col.label}</h2>
+                  {/* Último artículo como hook visual: muestra el título del cover essay */}
+                  {col.coverEssay?.entry?.title && (
+                    <p class="font-serif italic text-white/55 text-xs md:text-sm line-clamp-1 mb-1.5">
+                      {col.coverEssay.entry.title}
+                    </p>
+                  )}
+                  <p class="font-sans text-xs text-white/50">{col.count} {col.count === 1 ? 'Documento' : 'Documentos'}</p>
                 </div>
               </a>
             );

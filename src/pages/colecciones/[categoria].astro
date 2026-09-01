@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
+import CinematicGalleryEngine from '../../components/CinematicGalleryEngine.astro';
 import Marquee from '../../components/Marquee.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import AguaNieve from '../../components/AguaNieve.astro';
@@ -77,6 +78,21 @@ const coverPosition2 =
   || (resolvedEssays[1]?.entry as any)?.imagePosition
   || 'center center';
 
+// ─── SLIDES PARA EL HERO GALLERY ENGINE ─────────────────────────────────────
+// Toma las primeras 8 imágenes de la colección para el carrusel del Hero
+const heroGallerySlides = resolvedEssays
+  .filter((e: typeof resolvedEssays[0]) => e.img)
+  .slice(0, 8)
+  .map((e: typeof resolvedEssays[0]) => ({
+    id:            e.slug,
+    title:         e.entry.title || 'Sin Título',
+    subtitle:      e.entry.volanta || e.entry.dek || undefined,
+    image:         (e.img as any)?.src ?? e.img,
+    imagePosition: (e.entry as any)?.coverImagePosition ||
+                   (e.entry as any)?.imagePosition ||
+                   'center center',
+  }));
+
 // ─── TEXTOS DE POLVO DORADO POR CATEGORÍA ────────────────────────────────────────────
 const categoryDustTexts: Record<string, string> = {
   'antropologia':       '[[Anthropos]] y su memoria inscrita. **El ser humano** como primer archivo, portador de rítos, lenguas y saberes que anteceden toda escritura. Aquí cada hallazgo es un espejo roto que refleja lo que fuimos antes de saber que éramos.',
@@ -124,15 +140,26 @@ const sequences = createPremierSequences(resolvedEssays);
 >
   <div class="text-white min-h-screen pb-32">
 
-    {/* ── HERO PRINCIPAL CINEMÁTICO DARK GLOOCK (H1) ── */}
-    <Marquee
-      title={label.toUpperCase()}
-      subtitle="Colección Documental · TGP"
-      imageUrl={(coverImage as any)?.src ?? coverImage ?? ''}
-      vibeClass="vibe-travel-senses"
-      isH1={true}
-      fontClass="font-serif font-black"
-    />
+    {/* ── HERO: SEO h1 invisible ── */}
+    <h1 class="sr-only">{label} | Colecciones TGP</h1>
+
+    {/* ── HERO: Gallery Engine con imágenes de la colección ── */}
+    {heroGallerySlides.length > 0 ? (
+      <CinematicGalleryEngine
+        slides={heroGallerySlides}
+        heightClass="h-[90vh] md:h-dvh"
+        maxSlides={8}
+      />
+    ) : (
+      <Marquee
+        title={label.toUpperCase()}
+        subtitle="Colección Documental · TGP"
+        imageUrl={(coverImage as any)?.src ?? coverImage ?? ''}
+        vibeClass="vibe-travel-senses"
+        isH1={true}
+        fontClass="font-serif font-black"
+      />
+    )}
 
     {/* ── RESPIRO VISUAL / EXCERPT DOBLE SCROLL POLVO DORADO & TYPEMAGIC EN BG-MAIN ── */}
     <CinematicExcerptRest 

@@ -13,6 +13,7 @@ interface Props {
   footerVariant?: "full" | "minimal";
   /** Home cinematográfico: nav transparente al tope, sólido tras 50px de scroll */
   headerTransparentUntilScroll?: boolean;
+  bodyStyle?: string;
 }
 
 const {
@@ -22,6 +23,7 @@ const {
   hideHeader = false,
   footerVariant = "full",
   headerTransparentUntilScroll = true,
+  bodyStyle = "",
 } = Astro.props;
 
 const defaultDescription = "Hemeroteca digital, archivo epistémico, ensayos cinemáticos, arqueosemiótica e investigaciones profundas de The Great Puzzle Project.";
@@ -159,6 +161,7 @@ const globalSchema = {
   </head>
   <body
     class="bg-(--bg-main) text-(--text-body) antialiased transition-colors duration-400 flex flex-col min-h-screen"
+    style={bodyStyle || undefined}
   >
     {
       !hideHeader && (
