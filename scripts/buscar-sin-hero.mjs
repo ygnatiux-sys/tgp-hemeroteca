@@ -2,14 +2,21 @@
 /**
  * scripts/buscar-sin-hero.mjs
  * 
- * TGP Hemeroteca — Auditor de Portadas (Hero) para 'ensayosCinematicos'
+ * TGP Hemeroteca — Auditor y Asignador de Portadas (Hero) para 'ensayosCinematicos'
  * 
  * Escanea la colección 'ensayosCinematicos' (src/content/ensayos-cinematicos/)
  * y detecta los posts que no tienen una imagen de portada (hero) asignada
  * o cuya imagen de portada no existe en el disco.
  * 
+ * Opciones:
+ *   --auto-fix       Extrae automáticamente las imágenes base64 de IA de generadorTexto
+ *                    hacia archivos físicos en src/assets/ensayos-cinematicos/<slug>/coverImage.jpg
+ *                    y asigna el campo 'coverImage' formal en index.json.
+ *   --allow-ai       No devuelve código de error si el post tiene imagen de IA en generadorTexto.
+ * 
  * Uso:
  *   node scripts/buscar-sin-hero.mjs
+ *   node scripts/buscar-sin-hero.mjs --auto-fix
  *   npm run audit:hero
  */
 
@@ -20,6 +27,10 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, '..');
 const CINEMATIC_DIR = path.join(ROOT_DIR, 'src', 'content', 'ensayos-cinematicos');
+const ASSETS_CINEMATIC_DIR = path.join(ROOT_DIR, 'src', 'assets', 'ensayos-cinematicos');
+
+const AUTO_FIX = process.argv.includes('--auto-fix') || process.argv.includes('--fix');
+const ALLOW_AI = process.argv.includes('--allow-ai');
 
 // ─── COLORES ANSI ─────────────────────────────────────────────────────────────
 const C = {
@@ -35,9 +46,6 @@ const C = {
 };
 
 // ─── PARSERS ──────────────────────────────────────────────────────────────────
-/**
- * Parsea frontmatter básico de archivos Markdown/MDX/MDOC
- */
 function parseFrontmatter(text) {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return {};
@@ -51,7 +59,6 @@ function parseFrontmatter(text) {
     if (colonIdx !== -1) {
       const key = trimmed.slice(0, colonIdx).trim();
       let val = trimmed.slice(colonIdx + 1).trim();
-      // Quitar comillas
       if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
         val = val.slice(1, -1);
       }
@@ -66,17 +73,13 @@ function parseFrontmatter(text) {
  * Extrae y valida la información de un post cinemático
  */
 function auditCinematicPost(entryName, postPath) {
-  let isDirectory = false;
   let slug = entryName;
   let data = {};
   let rawContent = '';
 
   const stat = fs.statSync(postPath);
   if (stat.isDirectory()) {
-    isDirectory = true;
     slug = entryName;
-
-    // 1. Intentar leer index.json (estándar Keystatic format: { data: 'json' })
     const jsonPath = path.join(postPath, 'index.json');
     if (fs.existsSync(jsonPath)) {
       try {
@@ -91,7 +94,6 @@ function auditCinematicPost(entryName, postPath) {
       }
     }
 
-    // 2. Si hay archivo .mdoc, .md o .mdx en la carpeta con frontmatter adicional
     const mdocPath = path.join(postPath, 'content.mdoc');
     if (fs.existsSync(mdocPath)) {
       rawContent = fs.readFileSync(mdocPath, 'utf8');
@@ -103,39 +105,105 @@ function auditCinematicPost(entryName, postPath) {
     rawContent = fs.readFileSync(postPath, 'utf8');
     data = parseFrontmatter(rawContent);
   } else {
-    // Archivos sueltos no relevantes (.gitkeep, etc.)
     return null;
   }
 
   const title = data.title || slug;
 
-  // Campo de portada en el esquema de Keystatic: 'coverImage'
-  // También verificamos fallbacks comunes ('image', 'portada', 'gallery[0]')
+  // Campo de portada en Keystatic: 'coverImage'
   let coverImage = data.coverImage || data.image || data.portada || null;
   if (!coverImage && Array.isArray(data.gallery) && data.gallery.length > 0) {
     coverImage = data.gallery[0];
   }
 
   // Verificar si hay imagen en generadorTexto (Gemini Cinematic)
-  let hasAiGeneratedImage = false;
+  let aiImagePayload = null;
   if (typeof data.generadorTexto === 'string' && data.generadorTexto.trim().startsWith('{')) {
     try {
       const parsed = JSON.parse(data.generadorTexto);
       if (parsed?.image && typeof parsed.image === 'string' && parsed.image.length > 20) {
-        hasAiGeneratedImage = true;
+        aiImagePayload = parsed.image;
       }
     } catch (e) {}
   }
 
+  // Caso especial: si es 'el-tapir' y existe el asset en 'el-tapir-sudamericano'
+  const altAssetDir = path.join(ASSETS_CINEMATIC_DIR, `${slug}-sudamericano`);
+  const hasAltAsset = fs.existsSync(path.join(altAssetDir, 'coverImage.jpg'));
+
+  // AUTO-FIX: Extraer base64 a archivo físico o sincronizar asset existente
+  if (AUTO_FIX && (!coverImage || typeof coverImage !== 'string' || coverImage.trim() === '')) {
+    const targetAssetDir = path.join(ASSETS_CINEMATIC_DIR, slug);
+    const targetImgPath = path.join(targetAssetDir, 'coverImage.jpg');
+    const relativeAssetPath = `/src/assets/ensayos-cinematicos/${slug}/coverImage.jpg`;
+
+    let fixApplied = false;
+
+    if (aiImagePayload && aiImagePayload.startsWith('data:image/')) {
+      if (!fs.existsSync(targetAssetDir)) {
+        fs.mkdirSync(targetAssetDir, { recursive: true });
+      }
+      const base64Data = aiImagePayload.replace(/^data:image\/\w+;base64,/, '');
+      fs.writeFileSync(targetImgPath, Buffer.from(base64Data, 'base64'));
+
+      // Actualizar index.json
+      const jsonPath = path.join(postPath, 'index.json');
+      if (fs.existsSync(jsonPath)) {
+        try {
+          const parsedGen = JSON.parse(data.generadorTexto);
+          parsedGen.image = relativeAssetPath;
+          data.coverImage = relativeAssetPath;
+          data.generadorTexto = JSON.stringify(parsedGen);
+          fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2), 'utf8');
+          coverImage = relativeAssetPath;
+          fixApplied = true;
+        } catch (e) {}
+      }
+    } else if (hasAltAsset) {
+      if (!fs.existsSync(targetAssetDir)) {
+        fs.mkdirSync(targetAssetDir, { recursive: true });
+      }
+      fs.copyFileSync(path.join(altAssetDir, 'coverImage.jpg'), targetImgPath);
+      const jsonPath = path.join(postPath, 'index.json');
+      if (fs.existsSync(jsonPath)) {
+        data.coverImage = relativeAssetPath;
+        fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2), 'utf8');
+        coverImage = relativeAssetPath;
+        fixApplied = true;
+      }
+    }
+
+    if (fixApplied) {
+      return {
+        slug,
+        title,
+        status: 'OK',
+        detail: `[AUTO-FIXED] Portada extraída y asignada: ${coverImage}`,
+        coverImage,
+      };
+    }
+  }
+
   // Evaluación de estado
   if (!coverImage || (typeof coverImage === 'string' && coverImage.trim() === '')) {
-    if (hasAiGeneratedImage) {
+    if (aiImagePayload) {
       return {
         slug,
         title,
         status: 'AI_FALLBACK_ONLY',
-        detail: 'Sin coverImage en Keystatic (usa imagen generada por IA en generadorTexto)',
+        detail: 'Sin coverImage formal en Keystatic (usa imagen IA de generadorTexto)',
         coverImage: null,
+        canAutoFix: aiImagePayload.startsWith('data:image/'),
+      };
+    }
+    if (hasAltAsset) {
+      return {
+        slug,
+        title,
+        status: 'AI_FALLBACK_ONLY',
+        detail: `Existe asset alternativo en ${slug}-sudamericano/coverImage.jpg`,
+        coverImage: null,
+        canAutoFix: true,
       };
     }
     return {
@@ -144,6 +212,7 @@ function auditCinematicPost(entryName, postPath) {
       status: 'MISSING_HERO',
       detail: 'Sin ninguna imagen asignada (Hero vacío)',
       coverImage: null,
+      canAutoFix: false,
     };
   }
 
@@ -179,7 +248,9 @@ function main() {
   console.log(`${C.bold}${C.cyan}  TGP Hemeroteca — Auditoría de Portadas (Hero)      ${C.reset}`);
   console.log(`${C.bold}${C.cyan}  Colección: 'ensayosCinematicos'                     ${C.reset}`);
   console.log(`${C.bold}${C.cyan}======================================================${C.reset}`);
-  console.log(`${C.dim}Directorio: ${CINEMATIC_DIR}${C.reset}\n`);
+  console.log(`${C.dim}Directorio: ${CINEMATIC_DIR}${C.reset}`);
+  if (AUTO_FIX) console.log(`${C.green}${C.bold}Modo AUTO-FIX activado: Extrayendo imágenes base64 a disco...${C.reset}`);
+  console.log('');
 
   if (!fs.existsSync(CINEMATIC_DIR)) {
     console.error(`${C.red}✗ Error: El directorio no existe: ${CINEMATIC_DIR}${C.reset}`);
@@ -227,7 +298,7 @@ function main() {
       console.log(`  ${C.magenta}• [${p.slug}]${C.reset} ${C.bold}"${p.title}"${C.reset}`);
       console.log(`    ${C.dim}└─ ${p.detail}${C.reset}`);
     });
-    console.log('');
+    console.log(`  ${C.cyan}💡 Tip: Puedes ejecutar ${C.bold}npm run audit:hero -- --auto-fix${C.reset}${C.cyan} para extraer estas imágenes a archivos físicos en disco y asignarlas automáticamente.${C.reset}\n`);
   }
 
   if (okHero.length > 0) {
@@ -248,11 +319,17 @@ function main() {
   console.log(`  ${C.red}✗ Sin ninguna imagen (Hero vacío):  ${missingHero.length}${C.reset}`);
   console.log(`${C.bold}------------------------------------------------------${C.reset}\n`);
 
-  if (missingHero.length > 0 || brokenHero.length > 0) {
-    console.log(`${C.bold}${C.yellow}Para corregir los posts en Keystatic:${C.reset}`);
-    console.log(`1. Inicia Keystatic: ${C.cyan}npm run dev${C.reset}`);
-    console.log(`2. Entra a: ${C.cyan}http://localhost:4321/keystatic/collection/ensayosCinematicos${C.reset}`);
-    console.log(`3. Abre cada slug listado arriba y sube una imagen en el campo "Imagen de Portada (Opcional)".\n`);
+  if (missingHero.length > 0 || brokenHero.length > 0 || (!ALLOW_AI && aiFallbackOnly.length > 0)) {
+    if (missingHero.length > 0 || brokenHero.length > 0) {
+      console.log(`${C.bold}${C.yellow}Para corregir los posts en Keystatic:${C.reset}`);
+      console.log(`1. Inicia Keystatic: ${C.cyan}npm run dev${C.reset}`);
+      console.log(`2. Entra a: ${C.cyan}http://localhost:4321/keystatic/collection/ensayosCinematicos${C.reset}`);
+      console.log(`3. Abre cada slug listado arriba y sube una imagen en el campo "Imagen de Portada (Opcional)".\n`);
+    }
+    // Si solo hay posts con imagen IA y no faltan fotos críticas
+    if (missingHero.length === 0 && brokenHero.length === 0) {
+      process.exit(0);
+    }
     process.exit(1);
   } else {
     console.log(`${C.green}${C.bold}🎉 ¡Todos los ensayos cinemáticos cuentan con imagen disponible!${C.reset}\n`);

@@ -14,6 +14,7 @@
     "generar": "node scripts/generar-post.js",
     "audit": "node scripts/audit-content.mjs",
     "audit:hero": "node scripts/buscar-sin-hero.mjs",
+    "audit:hero:fix": "node scripts/buscar-sin-hero.mjs --auto-fix",
     "check-images": "node check-images.mjs",
     "generate-types": "wrangler types",
     "upload:assets": "node scripts/sync-assets-r2.mjs",
