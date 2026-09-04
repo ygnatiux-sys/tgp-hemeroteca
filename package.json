@@ -23,7 +23,7 @@
     "optimize:r2": "node scripts/optimizar-r2.mjs",
     "optimize:r2:dry": "node scripts/optimizar-r2.mjs --dry-run",
     "clean:urls": "node scripts/limpiar-urls-contenido.mjs",
-    "sync": "git pull origin main && git add . && git commit -m \"TGP Sync: Actualización unificada de arquitectura y contenido\" && git push origin main"
+    "sync": "git pull origin main && git add . && (git diff --staged --quiet || git commit -m \"TGP Sync: Actualización unificada de arquitectura y contenido\") && git push origin main"
   },
   "dependencies": {
     "@0no-co/graphql.web": "^1.2.0",
