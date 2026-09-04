@@ -1,4 +1,4 @@
-﻿/**
+/**
  * sync-assets-r2.mjs
  * ─────────────────────────────────────────────────────────────────────────────
  * Sincroniza el directorio local src/assets/ con el bucket Cloudflare R2
