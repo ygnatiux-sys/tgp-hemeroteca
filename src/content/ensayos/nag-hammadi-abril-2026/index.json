@@ -1,10 +1,10 @@
 {
-    "title":  "nag hammadi abril 2026",
-    "date":  "2026-04-25",
-    "themeColor":  "bordeaux",
-    "draft":  false,
-    "coverImage":  "/src/assets/ensayos/nag-hammadi-abril-2026/coverImage.png",
-    "generador":  "Gemini-1.5-Pro",
-    "notasInvestigador":  "",
-    "dek":  "El hallazgo de los evangelios gnÃ³sticos que reescribieron la historia del cristianismo temprano."
+    "title": "nag hammadi abril 2026",
+    "date": "2026-04-25",
+    "themeColor": "bordeaux",
+    "draft": false,
+    "coverImage": "/src/assets/ensayos/nag-hammadi-abril-2026/coverImage.png",
+    "generador": "Gemini-1.5-Pro",
+    "notasInvestigador": "",
+    "dek": "El hallazgo de los evangelios gnósticos que reescribieron la historia del cristianismo temprano."
 }

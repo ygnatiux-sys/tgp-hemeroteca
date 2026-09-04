@@ -1,9 +1,9 @@
 {
-    "title":  "The Mask",
-    "category":  "Sociología",
-    "themeColor":  "british-green",
-    "coverImage":  "/src/assets/ensayos/the-mask/coverImage.png",
-    "generador":  "Gemini-1.5-Pro",
-    "notasInvestigador":  "",
-    "dek":  "AntropologÃ­a del rostro cubierto: ocultamiento, transformaciÃ³n y poder sagrado en el ritual."
+    "title": "The Mask",
+    "category": "Sociología",
+    "themeColor": "british-green",
+    "coverImage": "/src/assets/ensayos/the-mask/coverImage.png",
+    "generador": "Gemini-1.5-Pro",
+    "notasInvestigador": "",
+    "dek": "Antropología del rostro cubierto: ocultamiento, transformación y poder sagrado en el ritual."
 }

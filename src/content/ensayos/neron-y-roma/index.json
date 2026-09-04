@@ -1,11 +1,11 @@
 {
-    "title":  "Nerón y Roma",
-    "coverImage":  "/src/assets/ensayos/neron-y-roma/coverImage.png",
-    "generador":  "Gemini-1.5-Pro",
-    "date":  "2026-04-26",
-    "category":  "Historia Antigua",
-    "themeColor":  "bordeaux",
-    "draft":  false,
-    "notasInvestigador":  "",
-    "dek":  "Poder, exceso y el incendio que transformÃ³ el destino del Imperio Romano."
+    "title": "Nerón y Roma",
+    "coverImage": "/src/assets/ensayos/neron-y-roma/coverImage.png",
+    "generador": "Gemini-1.5-Pro",
+    "date": "2026-04-26",
+    "category": "Historia Antigua",
+    "themeColor": "bordeaux",
+    "draft": false,
+    "notasInvestigador": "",
+    "dek": "Poder, exceso y el incendio que transformó el destino del Imperio Romano."
 }

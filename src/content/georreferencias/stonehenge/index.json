@@ -1,14 +1,14 @@
 {
-    "title":  "Stonehenge",
-    "sitioGeohistorico":  "Stonehenge",
-    "volantaHook":  "¿Un calendario estelar fosilizado en la piedra o el epicentro ritual de una civilización perdida en la bruma de Albión?",
-    "saberMasDato":  "En 1915, el abogado local Cecil Chubb compró Stonehenge en una subasta por 6.600 libras como un regalo impulsivo para su esposa. Tres años después, lo donó a la nación británica, salvando al monumento de la ruina y la especulación privada.",
-    "date":  "2026-08-04",
-    "category":  "Arqueosemiótica",
-    "publicarConImagen":  false,
-    "draft":  false,
-    "coverImage":  "/src/assets/georreferencias/stonehenge/coverImage.jpg",
-    "bancoImagenesWikimedia":  null,
-    "excerpt":  "Un análisis multidisciplinario del círculo megalítico más icónico del mundo, explorando su arquitectura arqueoastronómica, sus raíces geológicas y el impacto de las narrativas mítico-contemporáneas.",
-    "dek":  "El cÃ­rculo megalÃ­tico de Salisbury: astronomÃ­a sagrada, arquitectura de piedra y culto solar."
+    "title": "Stonehenge",
+    "sitioGeohistorico": "Stonehenge",
+    "volantaHook": "¿Un calendario estelar fosilizado en la piedra o el epicentro ritual de una civilización perdida en la bruma de Albión?",
+    "saberMasDato": "En 1915, el abogado local Cecil Chubb compró Stonehenge en una subasta por 6.600 libras como un regalo impulsivo para su esposa. Tres años después, lo donó a la nación británica, salvando al monumento de la ruina y la especulación privada.",
+    "date": "2026-08-04",
+    "category": "Arqueosemiótica",
+    "publicarConImagen": false,
+    "draft": false,
+    "coverImage": "/src/assets/georreferencias/stonehenge/coverImage.jpg",
+    "bancoImagenesWikimedia": null,
+    "excerpt": "Un análisis multidisciplinario del círculo megalítico más icónico del mundo, explorando su arquitectura arqueoastronómica, sus raíces geológicas y el impacto de las narrativas mítico-contemporáneas.",
+    "dek": "El círculo megalítico de Salisbury: astronomía sagrada, arquitectura de piedra y culto solar."
 }

@@ -1,13 +1,13 @@
 {
-    "title":  "tikal",
-    "date":  "2026-08-02",
-    "category":  "Arqueosemiótica",
-    "themeColor":  "british-green",
-    "draft":  false,
-    "sitioGeohistorico":  "tikal",
-    "publicarConImagen":  true,
-    "coverImage":  "/src/assets/ensayos/tikal/coverImage.jpeg",
-    "excerpt":  "Una exploración multidimensional de Tikal, la gran metrópolis maya, donde la arquitectura monumental y las estelas grabadas actúan como testimonios líticos que entrelazan la geopolítica del periodo Clásico, la selva tropical del Petén y la cosmovisión viva de su legado astronómico.",
-    "generador":  "Gemini-3.1-Pro",
-    "dek":  "Las pirÃ¡mides que se elevan sobre el dosel de la selva en el corazÃ³n del reino maya."
+    "title": "tikal",
+    "date": "2026-08-02",
+    "category": "Arqueosemiótica",
+    "themeColor": "british-green",
+    "draft": false,
+    "sitioGeohistorico": "tikal",
+    "publicarConImagen": true,
+    "coverImage": "/src/assets/ensayos/tikal/coverImage.jpeg",
+    "excerpt": "Una exploración multidimensional de Tikal, la gran metrópolis maya, donde la arquitectura monumental y las estelas grabadas actúan como testimonios líticos que entrelazan la geopolítica del periodo Clásico, la selva tropical del Petén y la cosmovisión viva de su legado astronómico.",
+    "generador": "Gemini-3.1-Pro",
+    "dek": "Las pirámides que se elevan sobre el dosel de la selva en el corazón del reino maya."
 }
