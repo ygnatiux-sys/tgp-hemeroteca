@@ -1,5 +1,5 @@
 ---
-import { sanitizeImageUrl } from '../../lib/content-filter';
+import { sanitizeImageUrl, isValidImageSrc } from '../../lib/content-filter';
 import Layout from '../Layout.astro';
 import TypeMagyk from '../../components/TypeMagyk.astro';
 
@@ -12,19 +12,19 @@ interface Props {
 
 const { frontmatter, config } = Astro.props;
 
-// Construir el array de imágenes: gallery, coverImage, o imagen AI base64
+// Construir el array de imágenes: gallery, coverImage/image/portada, o imagen AI base64
 const rawImages: any[] = [
   ...(Array.isArray(frontmatter.gallery) ? frontmatter.gallery : []),
 ];
-// coverImage puede ser ImageMetadata o string (base64)
-if (frontmatter.coverImage && !rawImages.length) {
-  rawImages.push(frontmatter.coverImage);
+const directCover = frontmatter.coverImage || frontmatter.image || frontmatter.portada;
+if (directCover && !rawImages.length) {
+  rawImages.push(directCover);
 }
 
 const title = frontmatter.title || 'Dossier — Obsidiana';
 const excerpt = frontmatter.excerpt || '';
 const rawCover = rawImages[0];
-const coverImgUrl = sanitizeImageUrl(rawCover) || undefined;
+const coverImgUrl = (rawCover && isValidImageSrc(rawCover)) ? (sanitizeImageUrl(rawCover) || undefined) : undefined;
 ---
 
 <Layout title={title} description={excerpt} image={coverImgUrl} headerTransparentUntilScroll={true} footerVariant="minimal">
@@ -51,7 +51,7 @@ const coverImgUrl = sanitizeImageUrl(rawCover) || undefined;
             loading={i === 0 ? "eager" : "lazy"}
             fetchpriority={i === 0 ? "high" : undefined}
             decoding="async"
-            class="obsidiana-img absolute inset-0 w-full h-full object-cover object-center opacity-0 will-change-[opacity,transform]"
+            class={`obsidiana-img absolute inset-0 w-full h-full object-cover object-center ${i === 0 ? 'opacity-70' : 'opacity-0'} will-change-[opacity,transform]`}
             data-index={i}
           />
         ) : null;
@@ -73,6 +73,19 @@ const coverImgUrl = sanitizeImageUrl(rawCover) || undefined;
           <p class="font-serif text-white/60 text-lg italic leading-relaxed max-w-2xl">
             {excerpt}
           </p>
+        )}
+        {coverImgUrl && (
+          <div class="relative w-full aspect-video md:aspect-21/9 rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] mt-4 group">
+            <img
+              src={coverImgUrl}
+              alt={title}
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+              class="w-full h-full object-cover object-center transition-transform duration-1000 group-hover:scale-105"
+            />
+            <div class="absolute inset-0 bg-linear-to-t from-[#0b0c0d] via-transparent to-transparent opacity-40"></div>
+          </div>
         )}
       </div>
     </header>

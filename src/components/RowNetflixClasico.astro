@@ -46,7 +46,8 @@ let displayItems = items.slice(0, max).map((item) => {
   const cat = item.collectionLabel || formatCategory(item.category || item.entry?.category) || "Ensayo";
   const rawImg = item.img || item.image || resolveEssayImage(item.entry || item, item.slug);
   const image = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '')) || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop';
-  const link = item.link || (item.slug ? `/hemeroteca/${item.slug}/` : '#');
+  const isCinematic = (item as any)?.isCinematicGSAP || (item.entry as any)?.isCinematicGSAP;
+  const link = item.link || (item.slug ? (isCinematic ? `/ensayos-cinematicos/${item.slug}` : `/hemeroteca/${item.slug}/`) : '#');
   const d = item.date || item.entry?.date ? formatDate(item.date || item.entry?.date) : '';
 
   return {

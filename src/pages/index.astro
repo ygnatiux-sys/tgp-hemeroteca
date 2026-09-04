@@ -1,5 +1,7 @@
 ---
 export const prerender = true;
+import fs from 'node:fs';
+import path from 'node:path';
 import Image from '../components/SafeImage.astro';
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
@@ -18,6 +20,7 @@ import {
   resolveEssayImage,
   sortEssaysByVisualFirst,
   sanitizeImageUrl,
+  isValidImageSrc,
 } from '../lib/content-filter';
 
 // ─── CARGA Y FILTRADO CENTRALIZADO ───────────────────────────────────────────
@@ -26,6 +29,7 @@ const allEssaysRaw = await getCollection('ensayos').catch(err => {
   return [];
 });
 
+// 1. Consulta la colección 'ensayosCinematicos'
 const allCinematicosRaw = await getCollection('ensayosCinematicos').catch(err => {
   console.error("[INDEX] Falló carga de ensayos cinemáticos:", err);
   return [];
@@ -40,33 +44,90 @@ const allArquetiposRaw = await getCollection('arquetiposGlobales').catch(() => [
 
 const isProd = import.meta.env.PROD;
 const publishableEssays = getPublishableEssays(allEssaysRaw, isProd);
+
+// 2. Filtra y procesa los posts con fecha real (mtime o item.data.date) y ordena de forma descendente
 const publishableCinematicos: EssayEntry[] = allCinematicosRaw.map(item => {
+  const slug = item.id.replace(/\/index$/, '');
+  const data = item.data as any;
+
+  // Extracción del nombre de archivo o ruta de imagen directa (ej: coverImage, image, portada o gallery[0])
+  let directCover = data.coverImage || data.image || data.portada || null;
+  if (!directCover && Array.isArray(data.gallery) && data.gallery.length > 0) {
+    directCover = data.gallery[0];
+  }
+
   let aiImage = null;
-  let aiText = item.data.generadorTexto;
-  try {
-    if (item.data.generadorTexto && item.data.generadorTexto.startsWith('{')) {
-      const parsed = JSON.parse(item.data.generadorTexto);
-      aiImage = parsed.image || null;
-      aiText = parsed.text || '';
-    }
-  } catch (e) {}
+  let aiText = data.generadorTexto || '';
+  if (typeof data.generadorTexto === 'string' && data.generadorTexto.trim().startsWith('{')) {
+    try {
+      const parsed = JSON.parse(data.generadorTexto);
+      if (parsed?.image && typeof parsed.image === 'string' && isValidImageSrc(parsed.image)) {
+        aiImage = parsed.image;
+      }
+      if (parsed?.text && typeof parsed.text === 'string') {
+        aiText = parsed.text;
+      }
+    } catch (e) {}
+  }
+
+  // Priorizar archivo directo y validar que sea una imagen genuina (nunca un prompt)
+  const dynamicCoverImage = (directCover && isValidImageSrc(typeof directCover === 'object' ? directCover.src : directCover))
+    ? directCover
+    : aiImage;
+
+  // Determinar fecha de publicación real (item.data.date o mtime del archivo index.json)
+  let postDate: string | null = (item.data as any).date || null;
+  if (!postDate) {
+    try {
+      const jsonPath = path.join(process.cwd(), 'src', 'content', 'ensayos-cinematicos', slug, 'index.json');
+      if (fs.existsSync(jsonPath)) {
+        postDate = fs.statSync(jsonPath).mtime.toISOString();
+      }
+    } catch (e) {}
+  }
+  if (!postDate) {
+    postDate = new Date(0).toISOString();
+  }
+
+  // Excerpt dinámico: dek/excerpt del autor o extracción limpia de los primeros caracteres del texto
+  const cleanExcerpt = ((item.data as any).dek ||
+    (item.data as any).excerpt ||
+    (aiText ? aiText.replace(/[#*_`>\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 180) + '…' : '')) as string;
 
   return {
-    slug: item.id.replace(/\/index$/, ''),
+    slug,
     isCinematicGSAP: true,
     entry: {
       title: item.data.title || 'Dossier Cinemático',
       category: 'Ensayos Cinemáticos',
-      coverImage: item.data.coverImage || (Array.isArray(item.data.gallery) && item.data.gallery.length > 0 ? item.data.gallery[0] : aiImage),
-      excerpt: ((item.data as any).dek || 'Experiencia inmersiva GSAP a pantalla completa con diseño atmosférico.') as string,
-      dek: ((item.data as any).dek || 'Experiencia inmersiva GSAP a pantalla completa con diseño atmosférico.') as string,
-      date: new Date().toISOString(),
+      coverImage: dynamicCoverImage,
+      image: dynamicCoverImage,
+      portada: dynamicCoverImage,
+      excerpt: cleanExcerpt,
+      dek: cleanExcerpt,
+      date: postDate,
       themeColor: 'obsidiana',
       spotifyLink: null,
       youtubeLink: null,
     }
   };
+}).sort((a, b) => {
+  const dateA = a.entry.date ? new Date(a.entry.date).getTime() : 0;
+  const dateB = b.entry.date ? new Date(b.entry.date).getTime() : 0;
+  return dateB - dateA;
 });
+
+// 3. Extrae el primer elemento (índice [0]) — El último post publicado
+const latestCinematicPost = publishableCinematicos[0] ?? null;
+
+// 4. Inyección de variables dinámicas del último post para el Hero principal
+const heroTitle = latestCinematicPost?.entry.title || 'Dossier Cinemático';
+const heroExcerpt = latestCinematicPost?.entry.excerpt || latestCinematicPost?.entry.dek || '';
+const rawHeroCover = resolveEssayImage(latestCinematicPost?.entry, latestCinematicPost?.slug);
+const heroCoverImage = isValidImageSrc(rawHeroCover) ? rawHeroCover : '';
+const heroSlug = latestCinematicPost?.slug || '';
+const heroHref = `/ensayos-cinematicos/${heroSlug}`;
+
 const publishableGeorefs = getPublishableEssays(allGeorefsRaw, isProd);
 const publishableArquetipos = getPublishableEssays(allArquetiposRaw, isProd);
 
@@ -86,18 +147,41 @@ const publishable: EssayEntry[] = [
 
 const HERO_MAX     = 6;
 const HERO_COUNT   = Math.min(HERO_MAX, publishable.length);
-const heroSlides   = publishable.slice(0, HERO_COUNT).map(e => ({
-  id: e.slug,
-  title: e.entry.title || '',
-  subtitle: (e.entry.dek || e.entry.excerpt || undefined) as string | undefined,
-  category: formatCategory(e.entry.category),
-  date: formatDate(e.entry.date),
-  readTime: undefined as string | undefined,
-  image: resolveEssayImage(e.entry, e.slug) || '',
-  imagePosition: (e.entry as any).coverImagePosition || (e.entry as any).imagePosition || 'center center',
-  link: (e as any).isCinematicGSAP ? `/ensayos-cinematicos/${e.slug}` : `/hemeroteca/${e.slug}`,
-  papersLink: (e.entry as any).papersSlug ? `/papers/${(e.entry as any).papersSlug}` : undefined,
-}));
+const heroSlides   = publishable.slice(0, HERO_COUNT).map((e, index) => {
+  // Asegurar que el primer slide (índice 0) refleje exactamente las variables del último post cinemático
+  const rawSlideImg = (index === 0 && latestCinematicPost)
+    ? heroCoverImage
+    : resolveEssayImage(e.entry, e.slug);
+  const slideImage = isValidImageSrc(rawSlideImg) ? rawSlideImg : '';
+
+  if (index === 0 && latestCinematicPost) {
+    return {
+      id: heroSlug,
+      title: heroTitle,
+      subtitle: heroExcerpt || undefined,
+      category: formatCategory(latestCinematicPost.entry.category),
+      date: formatDate(latestCinematicPost.entry.date),
+      readTime: undefined as string | undefined,
+      image: slideImage,
+      imagePosition: (latestCinematicPost.entry as any).coverImagePosition || (latestCinematicPost.entry as any).imagePosition || 'center center',
+      link: heroHref,
+      papersLink: (latestCinematicPost.entry as any).papersSlug ? `/papers/${(latestCinematicPost.entry as any).papersSlug}` : undefined,
+    };
+  }
+
+  return {
+    id: e.slug,
+    title: e.entry.title || '',
+    subtitle: (e.entry.dek || e.entry.excerpt || undefined) as string | undefined,
+    category: formatCategory(e.entry.category),
+    date: formatDate(e.entry.date),
+    readTime: undefined as string | undefined,
+    image: slideImage,
+    imagePosition: (e.entry as any).coverImagePosition || (e.entry as any).imagePosition || 'center center',
+    link: (e as any).isCinematicGSAP ? `/ensayos-cinematicos/${e.slug}` : `/hemeroteca/${e.slug}`,
+    papersLink: (e.entry as any).papersSlug ? `/papers/${(e.entry as any).papersSlug}` : undefined,
+  };
+});
 
 // ─── DISTRIBUCIÓN EDITORIAL (offset desde el Hero) ───────────────────────────
 // Posts disponibles después del Hero (nunca vacío si hay contenido)

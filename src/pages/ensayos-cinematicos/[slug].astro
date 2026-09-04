@@ -4,6 +4,7 @@ import LayoutObsidiana from '../../layouts/CinematicFX/LayoutObsidiana.astro';
 import LayoutDeriva from '../../layouts/CinematicFX/LayoutDeriva.astro';
 import LayoutUmbral from '../../layouts/CinematicFX/LayoutUmbral.astro';
 import { parseLLMText } from '../../lib/parseLLMText';
+import { isValidImageSrc } from '../../lib/content-filter';
 import PolvoDorado from '../../components/PolvoDorado.astro';
 import PostCinematicStyle from '../../components/PostCinematicStyle.astro';
 
@@ -41,14 +42,21 @@ if (entry.data.generadorTexto && entry.data.generadorTexto.startsWith('{')) {
   try {
     const parsed = JSON.parse(entry.data.generadorTexto);
     aiText = parsed.text || '';
-    aiImage = parsed.image || null;
+    if (parsed?.image && isValidImageSrc(parsed.image)) {
+      aiImage = parsed.image;
+    }
   } catch (e) {}
 }
 
+const directCover = (entry.data as any).coverImage || (entry.data as any).image || (entry.data as any).portada || null;
+const validDirectCover = (directCover && isValidImageSrc(typeof directCover === 'object' ? directCover.src : directCover)) ? directCover : null;
+
 const finalFrontmatter = {
   ...entry.data,
-  // Si no hay coverImage manual, inyectamos la generada por Gemini Flash
-  coverImage: entry.data.coverImage || aiImage,
+  // Si no hay coverImage/image/portada manual válido, inyectamos la generada por Gemini Flash (si es válida)
+  coverImage: validDirectCover || aiImage,
+  image: validDirectCover || aiImage,
+  portada: validDirectCover || aiImage,
   // Excerpt de los primeros 200 chars del texto IA si no hay ninguno
   excerpt: (entry.data as any).excerpt || (aiText ? aiText.replace(/[#*_`]/g, '').slice(0, 200) + '…' : ''),
 };

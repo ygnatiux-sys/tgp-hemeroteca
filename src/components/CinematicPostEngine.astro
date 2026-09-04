@@ -1,6 +1,6 @@
 ---
 import Image from './SafeImage.astro';
-import { sanitizeImageUrl } from "../lib/content-filter";
+import { sanitizeImageUrl, isValidImageSrc } from "../lib/content-filter";
 /**
  * CinematicPostEngine.astro
  * ──────────────────────────────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
       {/* ── SLIDES ── */}
       <div class="cpe-slides absolute inset-0">
         {safeSlides.map((slide, i) => {
-          const safeSrc = sanitizeImageUrl(slide.image);
+          const safeSrc = (slide.image && isValidImageSrc(slide.image)) ? sanitizeImageUrl(slide.image) : "";
           return (
             <article
               class={`cpe-slide absolute inset-0 flex items-end justify-start pb-24 md:pb-32 backface-hidden transform-3d will-change-transform [content-visibility:auto] contain-content ${i === 0 ? "z-20" : "z-10 opacity-0 pointer-events-none"}`}

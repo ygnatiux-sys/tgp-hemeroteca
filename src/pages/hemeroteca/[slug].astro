@@ -114,16 +114,16 @@ if (rawMdocText && rawMdocText.trim().length > 0) {
 
 // Desanidado universal si el texto almacenado contenía un payload JSON de Gemini
 let finalMarkdownText = rawSourceText;
-if (
-  rawSourceText.startsWith("{") &&
-  (rawSourceText.includes('"informeMarkdown"') ||
-    rawSourceText.includes('"content"') ||
-    rawSourceText.includes('"volantaHook"'))
-) {
+if (rawSourceText.startsWith("{")) {
   try {
     const unnested = JSON.parse(rawSourceText);
-    if (unnested.informeMarkdown || unnested.content) {
+    if (unnested.text) {
+      finalMarkdownText = unnested.text;
+    } else if (unnested.informeMarkdown || unnested.content) {
       finalMarkdownText = unnested.informeMarkdown || unnested.content;
+    }
+    if (unnested.image && !doc.coverImage) {
+      doc.coverImage = unnested.image;
     }
     if (!doc.volantaHook && unnested.volantaHook) {
       doc.volantaHook = unnested.volantaHook;
@@ -148,8 +148,10 @@ if (
       );
       return match ? match[1].replace(/\\n/g, "\n").replace(/\\"/g, '"') : null;
     };
-    const extractedContent = extract("informeMarkdown") || extract("content");
+    const extractedContent = extract("text") || extract("informeMarkdown") || extract("content");
     if (extractedContent) finalMarkdownText = extractedContent;
+    const extractedImage = extract("image");
+    if (extractedImage && !doc.coverImage) doc.coverImage = extractedImage;
     if (!doc.volantaHook) doc.volantaHook = extract("volantaHook") || "";
     if (!doc.saberMasDato) doc.saberMasDato = extract("saberMasDato") || "";
     if (!doc.excerpt) doc.excerpt = extract("excerpt") || "";

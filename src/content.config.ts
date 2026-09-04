@@ -154,6 +154,7 @@ const ensayosCinematicos = defineCollection({
     generadorTexto: z.string().optional().nullable().catch(null),
     excerpt: z.string().optional().nullable().catch(null),
     dek: z.string().optional().nullable().catch(null),
+    date: z.string().optional().nullable().catch(null),
   })
 });
 

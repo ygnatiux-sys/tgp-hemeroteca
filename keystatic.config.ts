@@ -585,6 +585,10 @@ export default config({
           multiline: true,
           description: 'Síntesis editorial de 1 a 2 líneas para la tarjeta de portada.'
         }),
+        date: fields.date({
+          label: 'Fecha de Publicación',
+          defaultValue: { kind: 'today' },
+        }),
 
         // 3. CAMPO DE CONTENIDO
         content: fields.document({

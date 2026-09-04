@@ -37,6 +37,72 @@ export interface EssayEntry {
 export const R2_STORAGE_BASE_URL = 'https://storage.thegreatpuzzleproject.com';
 
 /**
+ * Valida estrictamente si un string o valor representa una ruta/URL de imagen válida
+ * y NO un prompt de texto de IA, párrafo descriptivo o cadena sin extensión.
+ */
+export function isValidImageSrc(src: any): boolean {
+  if (!src) return false;
+  if (typeof src === 'object' && src.src && typeof src.src === 'string') {
+    return isValidImageSrc(src.src);
+  }
+  if (typeof src !== 'string') return false;
+  const trimmed = src.trim();
+  if (!trimmed) return false;
+
+  // 1. Data URLs de imágenes (base64)
+  if (trimmed.startsWith('data:image/')) return true;
+
+  // Si contiene saltos de línea, es un prompt/texto, nunca una URL
+  if (trimmed.includes('\n') || trimmed.includes('\r')) return false;
+
+  // Si contiene directivas clásicas de prompts generativos (Midjourney, DALL-E, etc.)
+  if (
+    trimmed.includes('--ar ') ||
+    trimmed.includes('--v ') ||
+    trimmed.includes('--style ') ||
+    trimmed.includes('8k resolution') ||
+    trimmed.includes('cinematography') ||
+    trimmed.includes('establishing shot')
+  ) {
+    return false;
+  }
+
+  // 2. URLs remotas válidas (http:// o https://)
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    // Si contiene espacios libres y longitud de párrafo, es texto, no URL
+    if (trimmed.includes(' ') && !trimmed.includes('%20')) return false;
+    return true;
+  }
+
+  // 3. Rutas de assets locales de Astro / Keystatic
+  const isPathPrefix =
+    trimmed.startsWith('/src/assets/') ||
+    trimmed.startsWith('src/assets/') ||
+    trimmed.startsWith('@assets/') ||
+    trimmed.startsWith('/ensayos/') ||
+    trimmed.startsWith('/georreferencias/') ||
+    trimmed.startsWith('/arquetipos-globales/') ||
+    trimmed.startsWith('/ensayos-cinematicos/') ||
+    trimmed.startsWith('ensayos/') ||
+    trimmed.startsWith('georreferencias/') ||
+    trimmed.startsWith('arquetipos-globales/') ||
+    trimmed.startsWith('ensayos-cinematicos/') ||
+    trimmed.startsWith('/images/') ||
+    trimmed.startsWith('/assets/');
+
+  const hasImageExtension = /\.(jpe?g|png|webp|avif|gif|svg)(\?.*)?$/i.test(trimmed);
+
+  // Si tiene espacios y es largo (más de 80 chars), es una descripción/prompt, no un path
+  if (trimmed.includes(' ') && trimmed.length > 80) return false;
+
+  if (isPathPrefix || (trimmed.startsWith('/') && hasImageExtension) || hasImageExtension) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
  * Transforma rutas locales (/src/assets/...) generadas por Keystatic o el entorno de desarrollo
  * a URLs públicas absolutas del CDN Cloudflare R2 (https://storage.thegreatpuzzleproject.com/...).
  */
@@ -49,7 +115,7 @@ export function resolveR2ImageUrl(pathOrUrl: string | any): string {
     return '';
   }
   const trimmed = rawStr.trim();
-  if (!trimmed) return '';
+  if (!trimmed || !isValidImageSrc(trimmed)) return '';
 
   // 1. Data URLs o URLs absolutas remotas (Wikimedia, R2, CDNs externos) → sin cambio
   if (trimmed.startsWith('data:') || trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
@@ -98,10 +164,22 @@ export function resolveR2ImageUrl(pathOrUrl: string | any): string {
  */
 export function sanitizeImageUrl(imgUrl: string | any): string {
   if (!imgUrl) return '';
-  const resolved = resolveR2ImageUrl(imgUrl);
-  if (!resolved || typeof resolved !== 'string') return '';
+  if (typeof imgUrl === 'object' && imgUrl.src) {
+    imgUrl = imgUrl.src;
+  }
+  if (typeof imgUrl !== 'string') return '';
+  const trimmed = imgUrl.trim();
+  if (!trimmed || !isValidImageSrc(trimmed)) return '';
+
+  if (trimmed.startsWith('data:image/')) {
+    return trimmed;
+  }
+
+  const resolved = resolveR2ImageUrl(trimmed);
+  if (!resolved || typeof resolved !== 'string' || !isValidImageSrc(resolved)) return '';
   let str = resolved.trim();
   if (!str) return '';
+  if (str.startsWith('data:image/')) return str;
 
   // 1. Decodificación recursiva para desenrollar cualquier doble o triple encoding (%252C -> %2C -> ,)
   try {
@@ -133,29 +211,31 @@ export function sanitizeImageUrl(imgUrl: string | any): string {
 
 /**
  * Retorna la imagen principal del ensayo o recurso (URL absoluta de R2 / CDN o null).
- * Si no tiene coverImage directo, busca inteligentemente en sus imágenes asignadas de Wikimedia o galería.
+ * Si no tiene coverImage directo, busca inteligentemente en sus imágenes asignadas de Wikimedia, galería o generador IA.
+ * NUNCA extrae generadorImagen (es el prompt textual) ni prompts como URLs.
  */
 export function resolveEssayImage(coverOrEntry?: any, slug?: string): any {
   if (!coverOrEntry) return null;
 
   // Si ya es un ImageMetadata de Astro (objeto con .src) o string directo
-  if (typeof coverOrEntry === 'string' && coverOrEntry.trim().length > 0) {
-    return sanitizeImageUrl(coverOrEntry);
+  if (typeof coverOrEntry === 'string') {
+    return isValidImageSrc(coverOrEntry) ? sanitizeImageUrl(coverOrEntry) : null;
   }
   if (typeof coverOrEntry === 'object' && coverOrEntry.src && typeof coverOrEntry.src === 'string') {
-    return sanitizeImageUrl(coverOrEntry.src);
+    return isValidImageSrc(coverOrEntry.src) ? sanitizeImageUrl(coverOrEntry.src) : null;
   }
 
   // Si es una entrada completa (e.entry o item.data o item)
   const doc = coverOrEntry.entry || coverOrEntry.data || coverOrEntry;
 
-  // 1. Portada asignada directa
-  if (doc?.coverImage) {
-    if (typeof doc.coverImage === 'string' && doc.coverImage.trim().length > 0) {
-      return sanitizeImageUrl(doc.coverImage);
+  // 1. Portada asignada directa (revisar coverImage, image, portada, foto, imagen)
+  const directCandidate = doc?.coverImage || doc?.image || doc?.portada || doc?.foto || doc?.imagen;
+  if (directCandidate) {
+    if (typeof directCandidate === 'string' && isValidImageSrc(directCandidate)) {
+      return sanitizeImageUrl(directCandidate);
     }
-    if (typeof doc.coverImage === 'object' && doc.coverImage.src) {
-      return sanitizeImageUrl(doc.coverImage.src);
+    if (typeof directCandidate === 'object' && directCandidate.src && isValidImageSrc(directCandidate.src)) {
+      return sanitizeImageUrl(directCandidate.src);
     }
   }
 
@@ -167,16 +247,31 @@ export function resolveEssayImage(coverOrEntry?: any, slug?: string): any {
       if (parsed?.selectedItems && Array.isArray(parsed.selectedItems) && parsed.selectedItems.length > 0) {
         const hero = parsed.selectedItems.find((item: any) => item.role === 'HERO') || parsed.selectedItems[0];
         const url = hero?.thumbUrl || hero?.url;
-        if (url) return sanitizeImageUrl(url);
+        if (url && isValidImageSrc(url)) return sanitizeImageUrl(url);
       }
     } catch (e) {}
   }
 
-  // 3. Array de galería
+  // 3. Array de galería (primera imagen válida)
   if (Array.isArray(doc?.gallery) && doc.gallery.length > 0) {
     const firstGal = doc.gallery[0];
-    if (typeof firstGal === 'string') return sanitizeImageUrl(firstGal);
-    if (typeof firstGal === 'object' && firstGal?.src) return sanitizeImageUrl(firstGal.src);
+    if (typeof firstGal === 'string' && isValidImageSrc(firstGal)) return sanitizeImageUrl(firstGal);
+    if (typeof firstGal === 'object' && firstGal?.src && isValidImageSrc(firstGal.src)) return sanitizeImageUrl(firstGal.src);
+  }
+
+  // 4. Imagen generada por IA (payload JSON con propiedad .image que sea URL válida o data:image/)
+  // IMPORTANTE: NUNCA extraer generadorImagen (es el prompt de IA) ni texto plano de generadorTexto
+  const rawGen = doc?.generadorTexto || doc?.generadorGeoref || doc?.generador;
+  if (rawGen && typeof rawGen === 'string' && rawGen.trim().startsWith('{')) {
+    try {
+      const parsed = JSON.parse(rawGen);
+      if (parsed?.image && typeof parsed.image === 'string' && isValidImageSrc(parsed.image)) {
+        return sanitizeImageUrl(parsed.image);
+      }
+    } catch (e) {}
+  }
+  if (doc?.imagenBase64 && typeof doc.imagenBase64 === 'string' && isValidImageSrc(doc.imagenBase64)) {
+    return sanitizeImageUrl(doc.imagenBase64);
   }
 
   return null;
