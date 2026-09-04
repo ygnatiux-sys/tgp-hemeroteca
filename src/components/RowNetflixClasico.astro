@@ -63,16 +63,7 @@ let displayItems = items.slice(0, max).map((item) => {
 // Sanitización segura de caracteres
 displayItems = displayItems.map(item => ({
   ...item,
-  title: (item.title || '')
-    .replaceAll('Ã±', 'ñ')
-    .replaceAll('Ã¡', 'á')
-    .replaceAll('Ã©', 'é')
-    .replaceAll('Ã\u00AD', 'í')
-    .replaceAll('Ã\xAD', 'í')
-    .replaceAll('Ã³', 'ó')
-    .replaceAll('Ãº', 'ú')
-    .replaceAll('Ã‘', 'Ñ')
-    .replaceAll('Â', ''),
+  title: item.title || '',
 }));
 
 const uid = `row-${Math.random().toString(36).substring(2, 8)}`;

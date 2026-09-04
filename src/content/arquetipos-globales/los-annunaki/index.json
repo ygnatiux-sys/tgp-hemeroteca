@@ -1,15 +1,13 @@
 {
-    "title":  "Los Annunaki",
-    "generadorTexto":  "",
-    "agenteErudito":  "",
-    "bancoImagenesWikimedia":  "",
-    "category":  "Arquetipos Globales",
-    "themeColor":  "rust-orange",
-    "publicarConImagen":  true,
-    "draft":  false,
-    "isCinematic":  false,
-    "gallery":  [
-
-                ],
-    "dek":  "Los dioses mesopotÃ¡micos del panteÃ³n sumerio y su reinterpretaciÃ³n contemporÃ¡nea."
+    "title": "Los Annunaki",
+    "generadorTexto": "",
+    "agenteErudito": "",
+    "bancoImagenesWikimedia": "",
+    "category": "Arquetipos Globales",
+    "themeColor": "rust-orange",
+    "publicarConImagen": true,
+    "draft": false,
+    "isCinematic": false,
+    "gallery": [],
+    "dek": "Los dioses mesopotámicos del panteón sumerio y su reinterpretación contemporánea."
 }

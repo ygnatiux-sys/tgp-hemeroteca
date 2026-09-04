@@ -1,14 +1,12 @@
 {
-    "title":  "Carl Jung . biografia",
-    "generadorTexto":  "",
-    "bancoImagenesWikimedia":  "{\n  \"query\": \"carl jung\",\n  \"count\": 1,\n  \"selectedItems\": [\n    {\n      \"id\": \"35027304\",\n      \"title\": \"CGJung.jpg\",\n      \"url\": \"https://storage.thegreatpuzzleproject.com/CGJung.jpg\",\n      \"thumbUrl\": \"https://storage.thegreatpuzzleproject.com/CGJung.jpg\",\n      \"width\": 2604,\n      \"height\": 3909,\n      \"aspectRatio\": 0.67,\n      \"mime\": \"image/jpeg\",\n      \"role\": \"SECUNDARIA\",\n      \"roleLabel\": \"Imagen Secundaria (Editorial)\",\n      \"author\": \"unknown, upload by Adrian Michael\",\n      \"license\": \"Public domain\",\n      \"licenseUrl\": \"https://commons.wikimedia.org\",\n      \"description\": \"Carl G. Jung\",\n      \"credit\": \"Ortsmuseum Zollikon\",\n      \"pageUrl\": \"https://commons.wikimedia.org/wiki/File:CGJung.jpg\"\n    }\n  ]\n}",
-    "category":  "Arquetipos Globales",
-    "themeColor":  "bordeaux",
-    "publicarConImagen":  true,
-    "draft":  false,
-    "isCinematic":  false,
-    "gallery":  [
-
-                ],
-    "dek":  "Vida, mÃ©todo y descubrimientos del pionero de la psicologÃ­a analÃ­tica."
+    "title": "Carl Jung . biografia",
+    "generadorTexto": "",
+    "bancoImagenesWikimedia": "{\n  \"query\": \"carl jung\",\n  \"count\": 1,\n  \"selectedItems\": [\n    {\n      \"id\": \"35027304\",\n      \"title\": \"CGJung.jpg\",\n      \"url\": \"https://storage.thegreatpuzzleproject.com/CGJung.jpg\",\n      \"thumbUrl\": \"https://storage.thegreatpuzzleproject.com/CGJung.jpg\",\n      \"width\": 2604,\n      \"height\": 3909,\n      \"aspectRatio\": 0.67,\n      \"mime\": \"image/jpeg\",\n      \"role\": \"SECUNDARIA\",\n      \"roleLabel\": \"Imagen Secundaria (Editorial)\",\n      \"author\": \"unknown, upload by Adrian Michael\",\n      \"license\": \"Public domain\",\n      \"licenseUrl\": \"https://commons.wikimedia.org\",\n      \"description\": \"Carl G. Jung\",\n      \"credit\": \"Ortsmuseum Zollikon\",\n      \"pageUrl\": \"https://commons.wikimedia.org/wiki/File:CGJung.jpg\"\n    }\n  ]\n}",
+    "category": "Arquetipos Globales",
+    "themeColor": "bordeaux",
+    "publicarConImagen": true,
+    "draft": false,
+    "isCinematic": false,
+    "gallery": [],
+    "dek": "Vida, método y descubrimientos del pionero de la psicología analítica."
 }
