@@ -1,6 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
+import { env } from 'cloudflare:workers';
 import {
   resolveIntelligentDirection,
   resolveManualDirection,
@@ -11,14 +12,14 @@ import {
 } from '../../lib/arte-tgp';
 import type { IntelligentDirectorInput, ManualLabInput, ResolvedArtDirection } from '../../lib/arte-tgp/types';
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
   const headers = { 'Content-Type': 'application/json' };
 
   try {
     const data = await request.json();
     const slug = data.slug || null;
 
-    const geminiKey = (locals as any)?.runtime?.env?.GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
+    const geminiKey = env?.GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
     if (!geminiKey) {
       return new Response(JSON.stringify({
         success: false,

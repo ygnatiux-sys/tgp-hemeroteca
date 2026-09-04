@@ -3,6 +3,8 @@ import { tgpIntegrations, tgpViteConfig } from './src/config/integrations.js';
 import cloudflare from '@astrojs/cloudflare';
 import sitemap from '@astrojs/sitemap';
 
+import { fileURLToPath } from 'node:url';
+
 // DETECCIÓN BLINDADA CORREGIDA
 const isCloudflare = process.env.CF_PAGES === '1';
 const isBuild = process.argv.includes('build') || process.env.npm_lifecycle_event === 'build';
@@ -29,6 +31,12 @@ export default defineConfig({
   // EL ESCUDO VITE: En local aislamos React como external puro; en build forzamos empaquetado para Cloudflare
   vite: {
     ...tgpViteConfig,
+    resolve: {
+      alias: {
+        ...(tgpViteConfig.resolve?.alias || {}),
+        ...(isDev ? { 'cloudflare:workers': fileURLToPath(new URL('./src/lib/cloudflare-workers-mock.ts', import.meta.url)) } : {})
+      }
+    },
     ssr: isDev
       ? { external: ['react', 'react-dom'] }
       : { noExternal: true }

@@ -1,6 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
+import { env } from 'cloudflare:workers';
 import { GoogleGenAI } from '@google/genai';
 
 const CATEGORIAS_TGP = [
@@ -16,7 +17,7 @@ const CATEGORIAS_TGP = [
 // Carga estática bundled de estilos visuales para compatibilidad total con Cloudflare Workers
 const visualStyles = import.meta.glob<{ default: any }>('/src/content/estilos-visuales/*.json', { eager: true });
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
   const headers = { 'Content-Type': 'application/json' };
 
   try {
@@ -27,7 +28,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       return new Response(JSON.stringify({ error: 'Falta el título.' }), { status: 400, headers });
     }
 
-    const geminiKey = (locals as any)?.runtime?.env?.GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
+    const geminiKey = env?.GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
     if (!geminiKey) {
       return new Response(JSON.stringify({ error: 'Falta GEMINI_API_KEY en las variables de entorno de Cloudflare / servidor.' }), { status: 500, headers });
     }
