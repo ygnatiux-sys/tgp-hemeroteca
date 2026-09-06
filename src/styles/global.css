@@ -1,6 +1,14 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@theme {
+  --font-sans: "Proza Libre", "Inter", sans-serif;
+  --font-mono: "IBM Plex Mono", "Space Mono", monospace;
+  --font-serif: "Newsreader", "Gloock", serif;
+  --font-cinzel: "Cinzel", serif;
+  --font-alegreya: "Alegreya Sans", sans-serif;
+}
+
 /* ═════════════════════════════════════════════════════════════════════════
    PALETA Y VARIABLES DE TEMA (DARK ACADEMIA / MODO DÍA PAPIRO FRÍO)
 ═════════════════════════════════════════════════════════════════════════ */
@@ -9,8 +17,8 @@
   --bg-main: #121413; /* Fondo Dark Academia idéntico a sección About */
   --bg-alt: #1A1D1C;  /* Tono sutilmente elevado para contraste */
   --bg-surface: rgba(255, 255, 255, 0.04);
-  --text-main: #E0E0E0;
-  --text-body: #E0E0E0;
+  --text-main: #C4C4C4;
+  --text-body: #B4B4B0;
   --accent-primary: #EFEBE3;
   --accent-secondary: #EFEBE3;
   --accent-silver: #94A3B8;
@@ -46,6 +54,12 @@
 /* Transición suave global entre temas — solo elementos semánticos de texto y layout */
 body, header, footer, article, section, nav, aside, p, span, h1, h2, h3, h4, a {
   transition: var(--theme-transition);
+}
+
+/* Estándar de la industria para font-smoothing en modo oscuro */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ═════════════════════════════════════════════════════════════════════════
