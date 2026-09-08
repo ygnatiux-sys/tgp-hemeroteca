@@ -1,0 +1,66 @@
+---
+/**
+ * test-modal.astro
+ * Página de test aislada para probar el modal expandible y el retorno espacial de GSAP FLIP.
+ */
+import RowNetflixClasico from '../components/RowNetflixClasico.astro';
+
+const testItems = [
+  {
+    title: "El Oráculo de Delfos y la Geopolítica Antigua",
+    collectionLabel: "Arqueosemiótica",
+    excerpt: "Un recorrido por el santuario panhelénico donde la voz de Apolo definía guerras y alianzas dinásticas.",
+    image: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop",
+    link: "/hemeroteca/el-oraculo-de-delfos/",
+    date: "2026",
+  },
+  {
+    title: "Pazuzu y la Demonología Protectora",
+    collectionLabel: "Mitología",
+    excerpt: "El demonio mesopotámico del viento que defendía a las madres contra los estragos de Lamashtu.",
+    image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop",
+    link: "/hemeroteca/pazuzu/",
+    date: "2026",
+  },
+  {
+    title: "La Piedra de Ingá y la Petroglifia Sagrada",
+    collectionLabel: "Arqueología",
+    excerpt: "El misterioso monolito de Paraíba con incisiones astronómicas milenarias.",
+    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop",
+    link: "/hemeroteca/pedra-inga/",
+    date: "2026",
+  },
+  {
+    title: "Júpiter y la Astrología Dinástica",
+    collectionLabel: "Filosofía",
+    excerpt: "El gran benefactor del cosmos y su influencia en la arquitectura de poder del Renacimiento.",
+    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop",
+    link: "/hemeroteca/jupiter-y-la-astrologia-el-benigno/",
+    date: "2026",
+  }
+];
+---
+
+<!DOCTYPE html>
+<html lang="es" class="bg-black text-white">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test Modal Expandible FLIP</title>
+</head>
+<body class="min-h-screen bg-stone-950 p-6 md:p-12 flex flex-col justify-center">
+  <div class="max-w-6xl mx-auto w-full">
+    <div class="mb-8 border-b border-white/10 pb-4">
+      <span class="text-xs uppercase tracking-[0.3em] text-rust-orange font-mono">Test Suite</span>
+      <h1 class="text-3xl font-cinzel font-bold text-white mt-1">Modal Expandible — Retorno Espacial Exacto</h1>
+      <p class="text-stone-400 text-sm mt-1">Haz clic en cualquier tarjeta para abrir el modal, y luego ciérralo para verificar que vuelva exactamente a su origen.</p>
+    </div>
+
+    <RowNetflixClasico 
+      title="Galería de Prueba FLIP"
+      eyebrow="Netflix Row Cards"
+      items={testItems}
+    />
+  </div>
+</body>
+</html>
