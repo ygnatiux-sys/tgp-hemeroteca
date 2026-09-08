@@ -1,5 +1,6 @@
 ---
 import Image from './SafeImage.astro';
+import ExpandableModal from './ExpandableModal.astro';
 import {
   getRelatedCategories,
   formatYear,
@@ -99,17 +100,26 @@ const categoryAccentClass = (() => {
 })();
 
 const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-card";
+const cardId = `cac-${slug || 'item'}-${Math.random().toString(36).substring(2, 7)}`;
+const imgUrl = safeImg || '';
 ---
 
 <article
   class={`cinematic-archive-card flex flex-col gap-4 group w-full h-full`}
   data-category={normalizeCategory(entry.category)}
   data-year={year}
+  data-card-id={cardId}
+  data-title={entry.title || ''}
+  data-eyebrow={entry.category ? entry.category.toUpperCase() : 'ARCHIVO'}
+  data-excerpt={cleanExcerpt || dek || ''}
+  data-image={imgUrl}
+  data-link={href}
+  data-flip-id={`card-container-${cardId}`}
 >
   {/* 1. IMAGEN SUPERIOR CON H1 INTERIOR (CON CINZEL STEEL GRADIENT + GSAP FADE IN) */}
   <a
     href={href}
-    class={`relative w-full ${imageAspectClass} rounded-xl md:rounded-2xl overflow-hidden block bg-stone-900/60 border border-white/10 shadow-xl shrink-0`}
+    class={`relative w-full ${imageAspectClass} rounded-xl md:rounded-2xl overflow-hidden block bg-stone-900/60 border border-white/10 shadow-xl shrink-0 cac-modal-trigger`}
   >
     {
       safeImg ? (
@@ -123,9 +133,10 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
           loading={isEager ? "eager" : "lazy"}
           fetchpriority={isEager ? "high" : undefined}
           decoding="async"
-          class={`w-full h-full object-cover object-center brightness-90 group-hover:brightness-100 transition-transform duration-700 ease-out group-hover:scale-[1.04] ${
+          class={`w-full h-full object-cover object-center brightness-90 group-hover:brightness-100 transition-transform duration-700 ease-out group-hover:scale-[1.04] cac-card-img ${
             enableCinemagraph ? "cinemagraph-ken-burns" : ""
           }`}
+          data-flip-id={`card-image-${cardId}`}
         />
       ) : (
         <div class="w-full h-full bg-stone-900 flex items-center justify-center text-stone-600 font-metadata text-xs uppercase tracking-widest">
@@ -156,7 +167,7 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
         </p>
       )}
 
-      <h2 class={`font-cinzel tracking-tight drop-shadow-xl transition-all duration-300 ch-h1-container ${titleClass}`}>
+      <h2 class={`font-cinzel tracking-tight drop-shadow-xl transition-all duration-300 ch-h1-container cac-card-title ${titleClass}`} data-flip-id={`card-title-${cardId}`}>
         <span class:list={[cardGradientClass, "block"]}>
           {titlePrefix}<span class="title-keyword-shine-fade">{titleKeyword}</span>
         </span>
@@ -187,8 +198,8 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
 
     {/* Fila: Título Exterior con Steel Gradient Heredado y CTA */}
     <div class="flex flex-row justify-between items-start gap-4 mb-2 ch-h1-cta">
-      <a href={href} class="hover:opacity-80 transition-opacity block flex-1">
-        <h3 class={`font-cinzel font-bold text-lg sm:text-xl md:text-2xl tracking-tight leading-snug ${cardGradientClass}`}>
+      <a href={href} class="hover:opacity-80 transition-opacity block flex-1 cac-modal-trigger">
+        <h3 class={`font-cinzel font-bold text-lg sm:text-xl md:text-2xl tracking-tight leading-snug cac-card-title ${cardGradientClass}`}>
           {titlePrefix}<span class="title-keyword-shine-fade">{titleKeyword}</span>
         </h3>
       </a>
@@ -198,7 +209,7 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
           href={secondaryHref}
           target={isExternal ? "_blank" : undefined}
           rel={isExternal ? "noopener noreferrer" : undefined}
-          class="ch-cta-btn inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/5 border border-white/15 text-stone-300 font-metadata font-medium text-xs tracking-wider uppercase rounded-lg hover:bg-white/15 hover:border-white/30 hover:text-white transition-all duration-300 active:translate-y-0.5 whitespace-nowrap"
+          class={`ch-cta-btn inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/5 border border-white/15 text-stone-300 font-metadata font-medium text-xs tracking-wider uppercase rounded-lg hover:bg-white/15 hover:border-white/30 hover:text-white transition-all duration-300 active:translate-y-0.5 whitespace-nowrap ${!isExternal ? 'cac-modal-trigger' : ''}`}
         >
           <span>{secondaryLabel}</span>
           <span class="text-[10px] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">&#9656;</span>
@@ -230,6 +241,7 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
       )}
     </div>
   </div>
+  <ExpandableModal />
 </article>
 
 <style>
@@ -305,6 +317,9 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
 
 <script>
   import { gsap } from "gsap";
+  import { Flip } from "gsap/Flip";
+
+  gsap.registerPlugin(Flip);
 
   const runCardSequence = (card: HTMLElement): Promise<void> => {
     return new Promise((resolve) => {
@@ -488,10 +503,125 @@ const cardGradientClass = isHero ? "gradient-acero-ios" : "gradient-metal-steel-
     });
   };
 
-  document.addEventListener("astro:page-load", initChoreography);
-  if (document.readyState === "complete" || document.readyState === "interactive") {
+  const initCardModals = () => {
+    const cards = Array.from(document.querySelectorAll<HTMLElement>(".cinematic-archive-card"));
+
+    cards.forEach((card) => {
+      if (card.dataset.modalInit === "true") return;
+      card.dataset.modalInit = "true";
+
+      const triggers = card.querySelectorAll<HTMLAnchorElement>(".cac-modal-trigger");
+      const modal = card.querySelector<HTMLDialogElement>(".expandable-modal");
+      if (!modal) return;
+
+      const closeBtn = modal.querySelector<HTMLButtonElement>(".close-modal-btn");
+      const mContainer = modal.querySelector<HTMLElement>(".modal-container");
+      const mImage = modal.querySelector<HTMLImageElement>(".modal-image");
+      const mTitle = modal.querySelector<HTMLElement>(".modal-title");
+      const mEyebrow = modal.querySelector<HTMLElement>(".modal-eyebrow");
+      const mExcerpt = modal.querySelector<HTMLElement>(".modal-excerpt");
+      const mCta = modal.querySelector<HTMLAnchorElement>(".modal-cta");
+
+      if (!mContainer || !mImage || !mTitle) return;
+
+      let currentFlipTween: gsap.core.Timeline | null = null;
+      let activeCard: HTMLElement | null = null;
+      let activeImg: HTMLElement | null = null;
+      let activeTitle: HTMLElement | null = null;
+
+      triggers.forEach((trigger) => {
+        trigger.addEventListener("click", (e) => {
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+          if (trigger.getAttribute("target") === "_blank") return;
+
+          e.preventDefault();
+
+          const cardId = card.dataset.cardId || "";
+          const img = card.querySelector<HTMLElement>(".cac-card-img");
+          const title = card.querySelector<HTMLElement>(".cac-card-title");
+
+          activeCard = card;
+          activeImg = img;
+          activeTitle = title;
+
+          mImage.src = card.dataset.image || "";
+          mTitle.innerHTML = card.dataset.title || "";
+          if (mEyebrow) {
+            mEyebrow.innerHTML = card.dataset.eyebrow || "";
+            mEyebrow.style.display = card.dataset.eyebrow ? "block" : "none";
+          }
+          if (mExcerpt) mExcerpt.innerHTML = card.dataset.excerpt || "";
+          if (mCta) mCta.href = card.dataset.link || "#";
+
+          const extraContent = mContainer.querySelectorAll(".modal-excerpt, .modal-cta, .close-modal-btn, .modal-eyebrow");
+          gsap.set(extraContent, { clearProps: "all" });
+          gsap.set([mContainer, mImage, mTitle], { clearProps: "all" });
+
+          mContainer.dataset.flipId = `card-container-${cardId}`;
+          mImage.dataset.flipId = `card-image-${cardId}`;
+          mTitle.dataset.flipId = `card-title-${cardId}`;
+
+          const targetsToFlip = [card, img, title].filter((el): el is HTMLElement => el !== null);
+          const state = Flip.getState(targetsToFlip);
+
+          modal.showModal();
+
+          currentFlipTween = Flip.from(state, {
+            targets: [mContainer, mImage, mTitle],
+            duration: 0.5,
+            ease: "power3.inOut",
+            absolute: true,
+          });
+        });
+      });
+
+      const closeModal = () => {
+        if (!modal.open) return;
+
+        const extraContent = mContainer.querySelectorAll(".modal-excerpt, .modal-cta, .close-modal-btn, .modal-eyebrow");
+        gsap.to(extraContent, { opacity: 0, duration: 0.15 });
+
+        if (currentFlipTween) {
+          currentFlipTween.timeScale(1.3).reverse();
+          currentFlipTween.eventCallback("onReverseComplete", () => {
+            modal.close();
+            gsap.set([mContainer, mImage, mTitle, ...Array.from(extraContent)], { clearProps: "all" });
+            currentFlipTween = null;
+            activeCard = null;
+            activeImg = null;
+            activeTitle = null;
+          });
+        } else {
+          modal.close();
+        }
+      };
+
+      if (closeBtn) {
+        closeBtn.addEventListener("click", closeModal);
+      }
+
+      modal.addEventListener("cancel", (e) => {
+        e.preventDefault();
+        closeModal();
+      });
+
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+    });
+  };
+
+  const initAll = () => {
     initChoreography();
+    initCardModals();
+  };
+
+  document.addEventListener("astro:page-load", initAll);
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    initAll();
   } else {
-    document.addEventListener("DOMContentLoaded", initChoreography);
+    document.addEventListener("DOMContentLoaded", initAll);
   }
 </script>

@@ -5,6 +5,7 @@
  * 4 Columnas visibles en Desktop con soporte para colecciones de TGP.
  */
 import Image from './SafeImage.astro';
+import ExpandableModal from './ExpandableModal.astro';
 import { resolveEssayImage, sanitizeImageUrl, formatCategory, formatDate } from "../lib/content-filter";
 
 interface Props {
@@ -127,10 +128,20 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     <div class="track-wrapper overflow-visible py-4">
       <div class="netflix-track flex gap-3 md:gap-4 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]">
         
-        {displayItems.map((item) => (
-          <article class="netflix-card relative flex-none rounded-xl md:rounded-2xl overflow-hidden cursor-pointer">
-            <a href={item.link} class="block w-full h-full" aria-label={`Ver: ${item.title}`}>
-              <div class="w-full h-full bg-black/40 overflow-hidden">
+        {displayItems.map((item, index) => {
+          const cardId = `${uid}-${index}`;
+          return (
+          <article class="netflix-card relative flex-none rounded-xl md:rounded-2xl overflow-hidden cursor-pointer" data-flip-id={`card-container-${cardId}`}>
+            <a href={item.link} 
+               class="block w-full h-full netflix-card-link" 
+               aria-label={`Ver: ${item.title}`}
+               data-card-id={cardId}
+               data-title={item.title}
+               data-eyebrow={item.collectionLabel}
+               data-excerpt={item.subtitle}
+               data-image={item.image}
+               data-link={item.link}>
+              <div class="w-full h-full bg-black/40 overflow-hidden relative">
                 <Image 
                   src={item.image} 
                   alt={item.title} 
@@ -141,6 +152,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
                   class="netflix-card-img w-full h-full object-cover"
                   loading="lazy"
                   decoding="async"
+                  data-flip-id={`card-image-${cardId}`}
                 />
               </div>
               
@@ -152,17 +164,19 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
                 <span class="text-[7.5px] tracking-[0.3em] uppercase text-rust-orange/90 font-metadata mb-1 block">
                   {item.collectionLabel}
                 </span>
-                <h4 class="netflix-card-title font-cinzel font-medium line-clamp-2 leading-snug gradient-metal-steel-card">
+                <h4 class="netflix-card-title font-cinzel font-medium line-clamp-2 leading-snug gradient-metal-steel-card" data-flip-id={`card-title-${cardId}`}>
                   {item.title}
                 </h4>
               </div>
             </a>
           </article>
-        ))}
+        )})}
 
       </div>
     </div>
   </div>
+
+  <ExpandableModal />
 </section>
 
 <style>
@@ -268,6 +282,11 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
 </style>
 
 <script>
+  import { gsap } from "gsap";
+  import { Flip } from "gsap/Flip";
+
+  gsap.registerPlugin(Flip);
+
   function initNetflixRows() {
     const rows = document.querySelectorAll<HTMLElement>('.netflix-row-root');
 
@@ -325,6 +344,110 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
       });
 
       updateButtons();
+
+      // GSAP FLIP Interception
+      const cards = row.querySelectorAll('.netflix-card-link');
+      const modal = row.querySelector('.expandable-modal') as HTMLDialogElement;
+      const closeBtn = row.querySelector('.close-modal-btn');
+      
+      const mContainer = row.querySelector('.modal-container') as HTMLElement;
+      const mImage = row.querySelector('.modal-image') as HTMLImageElement;
+      const mTitle = row.querySelector('.modal-title') as HTMLElement;
+      const mEyebrow = row.querySelector('.modal-eyebrow') as HTMLElement;
+      const mExcerpt = row.querySelector('.modal-excerpt') as HTMLElement;
+      const mCta = row.querySelector('.modal-cta') as HTMLAnchorElement;
+
+      if (!modal || !mContainer || !mImage || !mTitle) return;
+
+      let currentFlipTween: gsap.core.Timeline | null = null;
+      let activeArticle: HTMLElement | null = null;
+      let activeImg: HTMLElement | null = null;
+      let activeTitle: HTMLElement | null = null;
+
+      cards.forEach(card => {
+        card.addEventListener('click', (e) => {
+          e.preventDefault();
+          
+          const a = e.currentTarget as HTMLElement;
+          const article = a.closest('.netflix-card') as HTMLElement;
+          const img = article.querySelector('.netflix-card-img') as HTMLElement;
+          const title = article.querySelector('.netflix-card-title') as HTMLElement;
+          
+          activeArticle = article;
+          activeImg = img;
+          activeTitle = title;
+
+          const cardId = a.dataset.cardId;
+          
+          // Inject data into modal
+          mImage.src = a.dataset.image || '';
+          mTitle.innerHTML = a.dataset.title || '';
+          if (mEyebrow) {
+             mEyebrow.innerHTML = a.dataset.eyebrow || '';
+             mEyebrow.style.display = a.dataset.eyebrow ? 'block' : 'none';
+          }
+          if (mExcerpt) mExcerpt.innerHTML = a.dataset.excerpt || '';
+          if (mCta) mCta.href = a.dataset.link || '#';
+          
+          const extraContent = mContainer.querySelectorAll('.modal-excerpt, .modal-cta, .close-modal-btn, .modal-eyebrow');
+          gsap.set(extraContent, { clearProps: "all" });
+          gsap.set([mContainer, mImage, mTitle], { clearProps: "all" });
+
+          // Match Flip IDs
+          mContainer.dataset.flipId = `card-container-${cardId}`;
+          mImage.dataset.flipId = `card-image-${cardId}`;
+          mTitle.dataset.flipId = `card-title-${cardId}`;
+
+          // Get state of card elements
+          const state = Flip.getState([article, img, title]);
+          
+          // Show modal
+          modal.showModal();
+          
+          currentFlipTween = Flip.from(state, {
+            targets: [mContainer, mImage, mTitle],
+            duration: 0.5,
+            ease: "power3.inOut",
+            absolute: true,
+          });
+        });
+      });
+
+      const closeModal = () => {
+        if (!modal.open) return;
+
+        const extraContent = mContainer.querySelectorAll('.modal-excerpt, .modal-cta, .close-modal-btn, .modal-eyebrow');
+        gsap.to(extraContent, { opacity: 0, duration: 0.15 });
+
+        if (currentFlipTween) {
+          currentFlipTween.timeScale(1.3).reverse();
+          currentFlipTween.eventCallback("onReverseComplete", () => {
+            modal.close();
+            gsap.set([mContainer, mImage, mTitle, ...Array.from(extraContent)], { clearProps: "all" });
+            currentFlipTween = null;
+            activeArticle = null;
+            activeImg = null;
+            activeTitle = null;
+          });
+        } else {
+          modal.close();
+        }
+      };
+
+      if (closeBtn) {
+        closeBtn.addEventListener('click', closeModal);
+      }
+
+      modal.addEventListener('cancel', (e) => {
+        e.preventDefault();
+        closeModal();
+      });
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
     });
   }
 
