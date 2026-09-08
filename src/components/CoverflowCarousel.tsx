@@ -88,7 +88,7 @@ export default function CoverflowCarousel({
               </span>
             )}
             {title && (
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif tracking-tight text-white uppercase font-cinzel">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-cinzel tracking-tight text-white uppercase">
                 {title}
               </h2>
             )}
@@ -105,14 +105,14 @@ export default function CoverflowCarousel({
 
       {/* ── REGLA ESTRUCTURAL: Contenedor Padre Coverflow Ampliado a los Costados ── */}
       <div 
-        className="relative w-full h-[540px] sm:h-[620px] md:h-[680px] lg:h-[740px] flex justify-center items-center overflow-hidden bg-black"
+        className="relative w-full h-135 sm:h-155 md:h-170 lg:h-185 flex justify-center items-center overflow-hidden bg-black"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
         {/* ── FUNDIDOS LATERALES CON EL FONDO (Melt with black background as in sample) ── */}
-        <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-44 md:w-72 lg:w-96 bg-gradient-to-r from-black via-black/85 via-40% to-transparent pointer-events-none z-30" />
-        <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-44 md:w-72 lg:w-96 bg-gradient-to-l from-black via-black/85 via-40% to-transparent pointer-events-none z-30" />
+        <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-44 md:w-72 lg:w-96 bg-linear-to-r from-black via-black/85 via-40% to-transparent pointer-events-none z-30" />
+        <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-44 md:w-72 lg:w-96 bg-linear-to-l from-black via-black/85 via-40% to-transparent pointer-events-none z-30" />
 
         {/* Pista de Tarjetas Coverflow Ampliada */}
         <div className="relative w-full h-full flex justify-center items-center">
@@ -174,7 +174,7 @@ export default function CoverflowCarousel({
                 onClick={() => {
                   if (!isActive) setActiveIndex(idx);
                 }}
-                className={`absolute w-[280px] sm:w-[340px] md:w-[400px] lg:w-[440px] aspect-2/3 rounded-2xl md:rounded-3xl overflow-hidden border-0 transition-all duration-500 ease-out ${positionClasses} ${visualClasses}`}
+                className={`absolute w-70 sm:w-85 md:w-100 lg:w-110 aspect-2/3 rounded-2xl md:rounded-3xl overflow-hidden border-0 transition-all duration-500 ease-out ${positionClasses} ${visualClasses}`}
               >
                 {/* Imagen de Portada */}
                 <img
@@ -186,7 +186,7 @@ export default function CoverflowCarousel({
                 />
 
                 {/* Scrim localizado en degradado hacia la base */}
-                <div className="absolute bottom-0 left-0 w-full h-3/5 bg-gradient-to-t from-black via-black/85 via-50% to-transparent pointer-events-none z-10" />
+                <div className="absolute bottom-0 left-0 w-full h-3/5 bg-linear-to-t from-black via-black/85 via-50% to-transparent pointer-events-none z-10" />
 
                 {/* Capa de oscurecimiento progresivo para fundir las tarjetas laterales con el fondo */}
                 <div className={`absolute inset-0 ${overlayOpacity} pointer-events-none transition-all duration-500 z-10`} />
@@ -220,7 +220,7 @@ export default function CoverflowCarousel({
                   )}
 
                   {/* Botón Call to Action Cinemático estilo Sample (≡ WATCH NOW / EXPLORAR) */}
-                  <div className="mt-2 w-full max-w-[280px]">
+                  <div className="mt-2 w-full max-w-70">
                     {isActive ? (
                       <a
                         href={post.link}
