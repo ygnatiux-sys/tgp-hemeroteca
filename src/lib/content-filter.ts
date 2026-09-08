@@ -351,7 +351,9 @@ export function normalizeCategory(cat?: string | null): string {
     .replace(/[\u0300-\u036f]/g, "");
 
   if (raw === 'arqueologia' || raw === 'arqueo') return 'arqueologia';
-  if (raw === 'arqueosemiotica' || raw === 'arqueosemiotica') return 'arqueosemiotica';
+  if (raw === 'arqueosemiotica') return 'arqueosemiotica';
+  if (raw.includes('cinematico') || raw.includes('cinematica') || raw === 'ensayos cinematicos' || raw === 'dossier cinematico') return 'ensayos-cinematicos';
+  if (raw.includes('arquetipo') || raw === 'arquetipos globales') return 'arquetipos-globales';
   if (raw.includes('semiotica') || raw.includes('semiotic')) return 'semiotica-cultural';
   if (raw === 'historia' || raw === 'historia antigua') return 'historia';
   if (raw.includes('religiones') || raw.includes('religios')) return 'historia-religiones';
@@ -359,8 +361,13 @@ export function normalizeCategory(cat?: string | null): string {
   if (raw.includes('filosofia') || raw.includes('filosofic')) return 'filosofia';
   if (raw.includes('cahier')) return 'cahiers';
   if (raw.includes('georreferencia') || raw.includes('georeferencia') || raw.includes('geohistoric') || raw.includes('geocultura')) return 'georreferencias';
-  
-  return raw;
+  if (raw.includes('mitolog') || raw === 'mitologia') return 'mitologia';
+  if (raw.includes('prehistor')) return 'prehistoria';
+  if (raw.includes('linguist') || raw.includes('lingueist') || raw.includes('lengua')) return 'linguistica';
+  if (raw.includes('antropolog')) return 'antropologia';
+
+  // Convertir cualquier categoría no mapeada a slug-con-guiones (sin espacios)
+  return raw.replace(/\s+/g, '-');
 }
 
 /** Formatea una categoría para visualización sobria y nítida. */
@@ -369,6 +376,8 @@ export function formatCategory(cat?: string | null): string {
   const map: Record<string, string> = {
     'arqueologia': 'Arqueología',
     'arqueosemiotica': 'Arqueosemiótica',
+    'ensayos-cinematicos': 'Ensayos Cinemáticos',
+    'arquetipos-globales': 'Arquetipos Globales',
     'semiotica-cultural': 'Semiótica Cultural',
     'historia': 'Historia',
     'historia-religiones': 'Historia de las Religiones',
@@ -376,11 +385,15 @@ export function formatCategory(cat?: string | null): string {
     'filosofia': 'Filosofía',
     'cahiers': 'Cahiers Épistémiques',
     'georreferencias': 'Georreferencias',
-    'arquetipos-globales': 'Arquetipos Globales',
+    'mitologia': 'Mitología',
+    'prehistoria': 'Prehistoria',
+    'linguistica': 'Lingüística',
+    'antropologia': 'Antropología',
     'ensayo': 'Ensayo',
   };
   if (map[normalized]) return map[normalized];
-  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+  // Capitalizar y convertir guiones a espacios para legibilidad
+  return normalized.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 /** 
@@ -396,6 +409,8 @@ export function getRelatedCategories(
   const baseMap: Record<string, string[]> = {
     'arqueologia': ['ARQUEOLOGÍA', 'CIVILIZACIONES', 'VESTIGIOS'],
     'arqueosemiotica': ['ARQUEOSEMIÓTICA', 'HERMENÉUTICA', 'CARTOGRAFÍA'],
+    'ensayos-cinematicos': ['DOSSIER CINEMÁTICO', 'EXPERIENCIA GSAP', 'ARCHIVO'],
+    'arquetipos-globales': ['ARQUETIPOS GLOBALES', 'SIMBOLISMO', 'PSIQUE COLECTIVA'],
     'semiotica-cultural': ['SEMIÓTICA CULTURAL', 'SIMBOLISMO', 'ANTROPOLOGÍA'],
     'historia': ['HISTORIA', 'CULTURA', 'CIVILIZACIONES'],
     'historia-religiones': ['HISTORIA DE LAS RELIGIONES', 'MITOLOGÍA', 'GNOSIS'],
@@ -403,6 +418,10 @@ export function getRelatedCategories(
     'filosofia': ['FILOSOFÍA', 'ONTOLOGÍA', 'HERMENÉUTICA'],
     'cahiers': ['CAHIERS ÉPISTÉMIQUES', 'CUADERNO DE CAMPO', 'ARCHIVO'],
     'georreferencias': ['GEOCULTURA', 'PAISAJE SAGRADO', 'CARTOGRAFÍA'],
+    'mitologia': ['MITOLOGÍA', 'SIMBOLISMO', 'RITO'],
+    'prehistoria': ['PREHISTORIA', 'CIVILIZACIONES', 'VESTIGIOS'],
+    'linguistica': ['LINGÜÍSTICA', 'LENGUA', 'EPISTEMOLOGÍA'],
+    'antropologia': ['ANTROPOLOGÍA', 'CULTURA', 'CIVILIZACIONES'],
     'ensayo': ['INVESTIGACIÓN', 'CARTOGRAFÍA EPISTÉMICA', 'CULTURA'],
   };
 
