@@ -11,6 +11,7 @@ import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../components/CinematicPostEngine.astro';
 import SliderCinematico from '../components/SliderCinematico.astro';
 import RowNetflixClasico from '../components/RowNetflixClasico.astro';
+import SpotlightHero from '../components/SpotlightHero.astro';
 import {
   type EssayEntry,
   getPublishableEssays,
@@ -238,6 +239,16 @@ const resolvedRecent = recentEssays.map(e => ({
 const resolvedArchiveRows = archiveRows.map(e => ({
   ...e,
   img: resolveEssayImage(e.entry, e.slug),
+}));
+
+// ─── POSTS PARA SPOTLIGHT HERO CON MEDIA TRAY (ESTILO NAT GEO / DISNEY+) ───
+const spotlightPosts = publishableCinematicos.map(item => ({
+  title: item.entry.title,
+  excerpt: item.entry.dek || item.entry.excerpt || '',
+  slug: item.slug,
+  coverImage: resolveEssayImage(item.entry, item.slug),
+  category: formatCategory(item.entry.category),
+  isCinematicGSAP: true,
 }));
 
 const resolvedCollections = collections.map(c => ({
@@ -485,6 +496,18 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
             actionText={`Ver Catálogo Completo (${publishable.length}) →`}
             actionHref="/archivo/"
             cardAspect="horizontal"
+          />
+        </section>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          BLOQUE 3B: SPOTLIGHT HERO CON MEDIA TRAY (ESTILO NAT GEO / DISNEY+)
+      ═══════════════════════════════════════════════════════════════════ */}
+      {spotlightPosts.length > 0 && (
+        <section class="flex flex-col gap-6 md:gap-8 reveal-item -mx-4 px-4 md:mx-0 md:px-0">
+          <SpotlightHero 
+            posts={spotlightPosts} 
+            eyebrow="EXPLORAR COLECCIÓN RECIENTE"
           />
         </section>
       )}
