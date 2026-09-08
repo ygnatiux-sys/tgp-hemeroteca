@@ -1,8 +1,5 @@
 ---
-/**
- * test-modal.astro
- * Página de test aislada para probar el modal expandible y el retorno espacial de GSAP FLIP.
- */
+import Layout from '../layouts/Layout.astro';
 import RowNetflixClasico from '../components/RowNetflixClasico.astro';
 
 const testItems = [
@@ -41,26 +38,20 @@ const testItems = [
 ];
 ---
 
-<!DOCTYPE html>
-<html lang="es" class="bg-black text-white">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Test Modal Expandible FLIP</title>
-</head>
-<body class="min-h-screen bg-stone-950 p-6 md:p-12 flex flex-col justify-center">
-  <div class="max-w-6xl mx-auto w-full">
-    <div class="mb-8 border-b border-white/10 pb-4">
-      <span class="text-xs uppercase tracking-[0.3em] text-rust-orange font-mono">Test Suite</span>
-      <h1 class="text-3xl font-cinzel font-bold text-white mt-1">Modal Expandible — Retorno Espacial Exacto</h1>
-      <p class="text-stone-400 text-sm mt-1">Haz clic en cualquier tarjeta para abrir el modal, y luego ciérralo para verificar que vuelva exactamente a su origen.</p>
-    </div>
+<Layout title="Test Modal Expandible FLIP" hideHeader={true} footerVariant="minimal">
+  <main class="min-h-screen bg-stone-950 px-4 py-12 flex flex-col justify-center">
+    <div class="max-w-6xl mx-auto w-full">
+      <div class="mb-8 border-b border-white/10 pb-4">
+        <span class="text-xs uppercase tracking-[0.3em] text-rust-orange font-mono font-bold">Laboratorio de Animación</span>
+        <h1 class="text-3xl font-cinzel font-bold text-white mt-1">Modal Expandible — Retorno Espacial Exacto</h1>
+        <p class="text-stone-400 text-sm mt-1">Prueba interactiva del modal con GSAP Flip hacia el punto de origen exacto de la tarjeta.</p>
+      </div>
 
-    <RowNetflixClasico 
-      title="Galería de Prueba FLIP"
-      eyebrow="Netflix Row Cards"
-      items={testItems}
-    />
-  </div>
-</body>
-</html>
+      <RowNetflixClasico 
+        title="Galería de Prueba FLIP"
+        eyebrow="Row Netflix Cards"
+        items={testItems}
+      />
+    </div>
+  </main>
+</Layout>

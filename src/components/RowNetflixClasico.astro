@@ -452,7 +452,11 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
   }
 
   if (typeof document !== 'undefined') {
-    initNetflixRows();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initNetflixRows);
+    } else {
+      initNetflixRows();
+    }
     document.addEventListener('astro:page-load', initNetflixRows);
   }
 </script>
