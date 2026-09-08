@@ -4,7 +4,7 @@
  * "Spotlight Hero con Media Tray" inspirado en la interfaz de National Geographic / Disney+.
  * 
  * Props:
- *  - posts: Array<{ title: string; excerpt?: string; slug: string; coverImage: any; category?: string; isCinematicGSAP?: boolean }>
+ *  - posts: Array<{ title?: string; excerpt?: string; slug: string; coverImage: any; category?: string; isCinematicGSAP?: boolean }>
  *  - eyebrow?: string
  */
 import Image from './SafeImage.astro';
@@ -49,7 +49,7 @@ const uid = `spotlight-${Math.random().toString(36).substring(2, 8)}`;
 {safePosts.length > 0 && (
   <section 
     id={uid}
-    class="spotlight-hero-root relative min-h-[90vh] flex flex-col justify-between overflow-hidden bg-black py-12 px-6 rounded-2xl md:rounded-3xl select-none"
+    class="spotlight-hero-root relative min-h-[90vh] flex flex-col justify-between overflow-hidden bg-black py-8 md:py-12 px-4 md:px-8 rounded-2xl md:rounded-3xl select-none"
     aria-label="Spotlight Hero"
   >
     {/* ── BACKDROP DINÁMICO (FONDO AMBIENTAL) ── */}
@@ -93,8 +93,8 @@ const uid = `spotlight-${Math.random().toString(36).substring(2, 8)}`;
       </div>
     </div>
 
-    {/* ── EMBEDDED MEDIA TRAY (BANDEJA INFERIOR ANCLADA CON MT-AUTO Y MÁX 30% DEL ESPACIO) ── */}
-    <div class="spotlight-tray w-full max-w-6xl mx-auto z-10 mt-auto shrink-0 pt-4 pb-6 md:pb-8">
+    {/* ── EMBEDDED MEDIA TRAY (BANDEJA INFERIOR SLIDER CON MOVIMIENTO TIPO ROW NETFLIX) ── */}
+    <div class="spotlight-tray w-full max-w-6xl mx-auto z-10 mt-auto shrink-0 pt-4 pb-4 md:pb-6">
       <div class="flex items-center justify-between mb-3 px-1">
         <span class="font-metadata text-[10px] sm:text-xs uppercase tracking-[0.35em] text-rust-orange/90 font-bold block">
           {eyebrow}
@@ -104,55 +104,121 @@ const uid = `spotlight-${Math.random().toString(36).substring(2, 8)}`;
         </span>
       </div>
 
-      {/* Fila de tarjetas con scroll horizontal suave y altura contenida (h-36 sm:h-44) */}
-      <div class="spotlight-track flex gap-3.5 sm:gap-4 overflow-x-auto pb-2 scrollbar-none snap-x py-1 px-1">
-        {safePosts.map((post, idx) => {
-          const isActive = idx === 0;
-          return (
-            <button
-              type="button"
-              class:list={[
-                "spotlight-card aspect-2/3 h-36 sm:h-44 w-auto shrink-0 rounded-lg overflow-hidden cursor-pointer relative border transition-all duration-300 snap-start text-left focus:outline-none",
-                isActive 
-                  ? "spotlight-card-active border-amber-500/80 scale-105 shadow-lg shadow-black/50 ring-1 ring-amber-500/50" 
-                  : "border-white/10 opacity-70 hover:opacity-100 hover:scale-100"
-              ]}
-              data-index={idx}
-              data-title={post.title}
-              data-excerpt={post.excerpt}
-              data-cover={post.coverUrl}
-              data-link={post.link}
-              data-category={post.category}
-              aria-label={`Seleccionar: ${post.title}`}
-            >
-              {/* Imagen 100% nítida, sin filtros oscuros globales */}
-              <img 
-                src={post.coverUrl}
-                alt={post.title}
-                class="w-full h-full object-cover pointer-events-none"
-                loading="lazy"
-                decoding="async"
-              />
-            </button>
-          );
-        })}
+      {/* Contenedor Maestro de Navegación */}
+      <div class="relative w-full">
+        {/* Botón Anterior Flotante en Cápsula */}
+        <button 
+          type="button"
+          class="nav-btn prev-btn absolute -left-2 md:-left-4 top-1/2 -translate-y-1/2 z-30 w-8 md:w-10 h-14 md:h-18 rounded-full bg-black/75 hover:bg-black/95 text-white/70 hover:text-white border border-white/15 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-xl"
+          aria-label="Anterior"
+        >
+          <svg class="w-4 h-4 md:w-5 md:h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+        </button>
+
+        {/* Botón Siguiente Flotante en Cápsula */}
+        <button 
+          type="button"
+          class="nav-btn next-btn absolute -right-2 md:-right-4 top-1/2 -translate-y-1/2 z-30 w-8 md:w-10 h-14 md:h-18 rounded-full bg-black/75 hover:bg-black/95 text-white/70 hover:text-white border border-white/15 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-xl"
+          aria-label="Siguiente"
+        >
+          <svg class="w-4 h-4 md:w-5 md:h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
+
+        {/* Pista de Deslizamiento Animada Tipo Netflix */}
+        <div class="spotlight-track-wrapper overflow-hidden py-3 px-1">
+          <div class="spotlight-track flex gap-3.5 sm:gap-4 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]">
+            {safePosts.map((post, idx) => {
+              const isActive = idx === 0;
+              return (
+                <button
+                  type="button"
+                  class:list={[
+                    "spotlight-card aspect-2/3 h-36 sm:h-44 w-auto shrink-0 rounded-lg overflow-hidden cursor-pointer relative border text-left focus:outline-none",
+                    isActive 
+                      ? "spotlight-card-active border-amber-500/90 scale-105 shadow-xl shadow-black/70 ring-1 ring-amber-500/60 opacity-100" 
+                      : "border-white/10 opacity-70 hover:opacity-100"
+                  ]}
+                  data-index={idx}
+                  data-title={post.title}
+                  data-excerpt={post.excerpt}
+                  data-cover={post.coverUrl}
+                  data-link={post.link}
+                  data-category={post.category}
+                  aria-label={`Seleccionar: ${post.title}`}
+                >
+                  {/* Imagen 100% nítida, sin filtros oscuros globales */}
+                  <img 
+                    src={post.coverUrl}
+                    alt={post.title}
+                    class="w-full h-full object-cover pointer-events-none transition-transform duration-500 ease-out"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  {/* Overlay sutil en hover */}
+                  <div class="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   </section>
 )}
 
 <style>
-  /* Ocultar barra de scroll estándar en la bandeja horizontal */
-  .scrollbar-none::-webkit-scrollbar {
-    display: none;
-  }
-  .scrollbar-none {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  .spotlight-track-wrapper {
+    width: 100%;
   }
 
+  .spotlight-track {
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* ── MOVIMIENTO Y HOVER TIPO ROW NETFLIX ── */
   .spotlight-card {
-    will-change: transform, opacity, border-color;
+    transform: translate3d(0, 0, 0) scale(1);
+    transform-origin: center center;
+    transition: 
+      transform 340ms cubic-bezier(0.25, 1, 0.5, 1), 
+      opacity 300ms ease,
+      box-shadow 300ms ease, 
+      border-color 300ms ease;
+    will-change: transform, opacity;
+  }
+
+  .spotlight-card:not(.spotlight-card-active):hover {
+    transform: translate3d(0, -6px, 0) scale(1.08);
+    z-index: 20;
+    opacity: 1;
+    border-color: rgba(245, 158, 11, 0.85);
+    box-shadow: 0 16px 32px -4px rgba(0, 0, 0, 0.8);
+    transition-delay: 100ms;
+  }
+
+  .spotlight-card-active {
+    transform: translate3d(0, -4px, 0) scale(1.06);
+    z-index: 10;
+  }
+
+  /* Sibling push sutil en la bandeja horizontal */
+  .spotlight-track:has(.spotlight-card:hover) .spotlight-card:not(:hover):has(~ .spotlight-card:hover) {
+    transform: translate3d(-6px, 0, 0);
+    transition-delay: 100ms;
+  }
+
+  .spotlight-card:hover ~ .spotlight-card {
+    transform: translate3d(6px, 0, 0);
+    transition-delay: 100ms;
+  }
+
+  .spotlight-track:not(:hover) .spotlight-card:not(.spotlight-card-active) {
+    transition-delay: 0ms;
   }
 </style>
 
@@ -171,22 +237,78 @@ const uid = `spotlight-${Math.random().toString(36).substring(2, 8)}`;
       const ctaEl = root.querySelector('.spotlight-cta') as HTMLAnchorElement | null;
       const cards = root.querySelectorAll<HTMLButtonElement>('.spotlight-card');
 
+      const track = root.querySelector('.spotlight-track') as HTMLElement | null;
+      const trackWrapper = root.querySelector('.spotlight-track-wrapper') as HTMLElement | null;
+      const prevBtn = root.querySelector('.prev-btn') as HTMLButtonElement | null;
+      const nextBtn = root.querySelector('.next-btn') as HTMLButtonElement | null;
+
       if (!bgImg || !titleEl || !ctaEl || cards.length === 0) return;
 
+      // ─── CONTROL DEL CARRUSEL SLIDER TIPO ROW NETFLIX ───
+      let currentTransform = 0;
+
+      function updateButtons() {
+        if (!track || !trackWrapper || !prevBtn || !nextBtn) return;
+        const trackWidth = track.scrollWidth;
+        const containerWidth = trackWrapper.offsetWidth;
+
+        prevBtn.disabled = currentTransform >= 0;
+        nextBtn.disabled = Math.abs(currentTransform) + containerWidth >= trackWidth - 10;
+      }
+
+      function slide(direction: 'next' | 'prev') {
+        if (!track || !trackWrapper) return;
+        const containerWidth = trackWrapper.offsetWidth;
+        const moveAmount = containerWidth * 0.75;
+
+        if (direction === 'next') {
+          currentTransform -= moveAmount;
+        } else {
+          currentTransform += moveAmount;
+        }
+
+        const maxScroll = -(track.scrollWidth - containerWidth);
+        if (currentTransform > 0) currentTransform = 0;
+        if (currentTransform < maxScroll) currentTransform = maxScroll;
+
+        track.style.transform = `translate3d(${currentTransform}px, 0, 0)`;
+        updateButtons();
+      }
+
+      if (nextBtn) nextBtn.addEventListener('click', () => slide('next'));
+      if (prevBtn) prevBtn.addEventListener('click', () => slide('prev'));
+
+      window.addEventListener('resize', () => {
+        currentTransform = 0;
+        if (track) track.style.transform = 'translate3d(0px, 0, 0)';
+        updateButtons();
+      });
+
+      updateButtons();
+
+      // ─── SELECCIÓN INTERACTIVA DE POST ───
       cards.forEach(card => {
         card.addEventListener('click', () => {
           // Desactivar tarjeta previa
           cards.forEach(c => {
-            c.classList.remove('spotlight-card-active', 'border-amber-500/80', 'scale-105', 'shadow-lg', 'shadow-black/50', 'ring-1', 'ring-amber-500/50');
+            c.classList.remove('spotlight-card-active', 'border-amber-500/90', 'scale-105', 'shadow-xl', 'shadow-black/70', 'ring-1', 'ring-amber-500/60', 'opacity-100');
             c.classList.add('border-white/10', 'opacity-70');
           });
 
           // Activar tarjeta seleccionada
           card.classList.remove('border-white/10', 'opacity-70');
-          card.classList.add('spotlight-card-active', 'border-amber-500/80', 'scale-105', 'shadow-lg', 'shadow-black/50', 'ring-1', 'ring-amber-500/50');
+          card.classList.add('spotlight-card-active', 'border-amber-500/90', 'scale-105', 'shadow-xl', 'shadow-black/70', 'ring-1', 'ring-amber-500/60', 'opacity-100');
 
-          // Suave centrado de la tarjeta en la bandeja
-          card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+          // Auto-ajustar posición si la tarjeta está en el extremo oculto
+          if (track && trackWrapper) {
+            const cardRect = card.getBoundingClientRect();
+            const wrapperRect = trackWrapper.getBoundingClientRect();
+            if (cardRect.left < wrapperRect.left + 20) {
+              slide('prev');
+            } else if (cardRect.right > wrapperRect.right - 20) {
+              slide('next');
+            }
+          }
 
           const newCover = card.dataset.cover || '';
           const newTitle = card.dataset.title || '';
@@ -210,7 +332,6 @@ const uid = `spotlight-${Math.random().toString(36).substring(2, 8)}`;
               bgImg.style.opacity = '0.4';
             };
             bgImg.src = newCover;
-            // Fallback por si la imagen está en caché
             if (bgImg.complete) {
               bgImg.style.opacity = '0.4';
             }
