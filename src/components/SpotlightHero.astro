@@ -66,8 +66,8 @@ const uid = `spotlight-${Math.random().toString(36).substring(2, 8)}`;
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.6)_0%,rgba(0,0,0,0.95)_100%)]" />
     </div>
 
-    {/* ── BLOQUE EDITORIAL CENTRAL (z-10, expandido con flex-grow y centrado) ── */}
-    <div class="spotlight-editorial relative z-10 w-full max-w-3xl mx-auto text-center flex-grow flex flex-col justify-center items-center py-6 md:py-10 space-y-4 px-4">
+    {/* ── BLOQUE EDITORIAL CENTRAL (z-10, expandido con grow y centrado) ── */}
+    <div class="spotlight-editorial relative z-10 w-full max-w-3xl mx-auto text-center grow flex flex-col justify-center items-center py-6 md:py-10 space-y-4 px-4">
       {initialPost?.category && (
         <span class="spotlight-category font-metadata text-[10px] md:text-xs uppercase tracking-[0.4em] text-rust-orange font-bold block transition-opacity duration-300">
           {initialPost.category}
