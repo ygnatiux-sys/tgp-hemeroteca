@@ -243,7 +243,7 @@ const resolvedArchiveRows = archiveRows.map(e => ({
 
 // ─── POSTS PARA SPOTLIGHT HERO CON MEDIA TRAY (ESTILO NAT GEO / DISNEY+) ───
 const spotlightPosts = publishableCinematicos.map(item => ({
-  title: item.entry.title,
+  title: item.entry.title || 'Ensayo Cinemático',
   excerpt: item.entry.dek || item.entry.excerpt || '',
   slug: item.slug,
   coverImage: resolveEssayImage(item.entry, item.slug),

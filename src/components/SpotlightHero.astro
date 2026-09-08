@@ -11,7 +11,7 @@ import Image from './SafeImage.astro';
 import { sanitizeImageUrl, isValidImageSrc, resolveEssayImage } from '../lib/content-filter';
 
 export interface SpotlightPost {
-  title: string;
+  title?: string;
   excerpt?: string;
   slug: string;
   coverImage?: any;
@@ -112,7 +112,7 @@ const uid = `spotlight-${Math.random().toString(36).substring(2, 8)}`;
             <button
               type="button"
               class:list={[
-                "spotlight-card aspect-[2/3] h-36 sm:h-44 w-auto flex-shrink-0 rounded-lg overflow-hidden cursor-pointer relative border transition-all duration-300 snap-start text-left focus:outline-none",
+                "spotlight-card aspect-2/3 h-36 sm:h-44 w-auto shrink-0 rounded-lg overflow-hidden cursor-pointer relative border transition-all duration-300 snap-start text-left focus:outline-none",
                 isActive 
                   ? "spotlight-card-active border-amber-500/80 scale-105 shadow-lg shadow-black/50 ring-1 ring-amber-500/50" 
                   : "border-white/10 opacity-70 hover:opacity-100 hover:scale-100"
