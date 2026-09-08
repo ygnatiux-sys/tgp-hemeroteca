@@ -190,8 +190,29 @@ const remaining    = publishable.slice(HERO_COUNT);
 const leadStory    = remaining[0]           ?? null;
 const secondaryA   = remaining[1]           ?? null;
 const secondaryB   = remaining[2]           ?? null;
-const recentEssays = remaining.slice(3, 6);        // hasta 3 posts en "Recientes"
-const archiveRows  = remaining.slice(6, 16);       // hasta 10 posts en "Del Archivo"
+
+// Slugs ya destacados en Hero y Bloque 2 (Lead y Secundarios)
+const topFeaturedSlugs = new Set([
+  heroSlug,
+  leadStory?.slug,
+  secondaryA?.slug,
+  secondaryB?.slug,
+].filter(Boolean));
+
+// Completar "Ensayos Recientes" con 4 cards de Ensayos Cinemáticos
+const availableCinematics = publishableCinematicos.filter(c => !topFeaturedSlugs.has(c.slug));
+
+const recentEssays: EssayEntry[] = [
+  ...availableCinematics,
+  ...remaining.filter(e => !topFeaturedSlugs.has(e.slug) && !availableCinematics.some(c => c.slug === e.slug))
+].slice(0, 4);
+
+const recentSlugs = new Set(recentEssays.map(e => e.slug));
+
+// Posts restantes para "Del Archivo" (sin duplicar los mostrados arriba ni en recientes)
+const archiveRows = remaining
+  .filter(e => !topFeaturedSlugs.has(e.slug) && !recentSlugs.has(e.slug))
+  .slice(0, 10);
 
 // ─── COLECCIONES DESTACADAS (§5.4) ────────────────────────────────────────────
 const categoryGroups = groupByCategory(publishable, 2);
@@ -257,8 +278,8 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
       </div>
     )}
 
-    {/* Lienzo / grilla: se desliza sobre el Hero ya oscurecido */}
-    <div id="home-canvas" class="relative z-20 bg-transparent shadow-[0_-24px_60px_rgba(0,0,0,0.85)]">
+    {/* Lienzo / grilla: se desliza sobre el Hero con fondo sólido (--bg-main) */}
+    <div id="home-canvas" class="relative z-20 bg-(--bg-main) shadow-[0_-24px_60px_rgba(0,0,0,0.85)]" style="background-color: var(--bg-main, #121413);">
     <div class="container-editorial max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-32 md:gap-48 lg:gap-60 pt-20 md:pt-32 pb-28 md:pb-44">
 
       {/* ═══════════════════════════════════════════════════════════════════
