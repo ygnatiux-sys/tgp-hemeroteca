@@ -239,20 +239,20 @@ const coverflowPosts: CoverflowPost[] = collections
           })}
         </div>
       </section>
-
-      {/* ── SECCIÓN FINAL: COVERFLOW CAROUSEL 3D DE COLECCIONES ── */}
-      {coverflowPosts.length > 0 && (
-        <section class="mt-20 md:mt-28 px-4 md:px-8 max-w-7xl mx-auto">
-          <CoverflowCarousel 
-            client:visible 
-            posts={coverflowPosts}
-            title="Explorador de Colecciones"
-            eyebrow="Galería 3D Coverflow"
-          />
-        </section>
-      )}
-
     </div>
+
+    {/* ── SECCIÓN FINAL: COVERFLOW CAROUSEL 3D DE COLECCIONES (FULL WIDTH / EDGE-TO-EDGE) ── */}
+    {coverflowPosts.length > 0 && (
+      <section class="mt-20 md:mt-32 w-full bg-black relative overflow-hidden">
+        <CoverflowCarousel 
+          client:visible 
+          posts={coverflowPosts}
+          title="Explorador de Colecciones"
+          eyebrow="Galería 3D Coverflow"
+        />
+      </section>
+    )}
+
   </div>
 
   <script>

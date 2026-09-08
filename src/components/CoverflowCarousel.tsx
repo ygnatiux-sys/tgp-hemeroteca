@@ -77,18 +77,18 @@ export default function CoverflowCarousel({
   if (!posts || posts.length === 0) return null;
 
   return (
-    <div className="w-full py-12 md:py-16 bg-[#0a0c0b] text-[#E3DDD3] select-none rounded-2xl md:rounded-3xl border border-white/5 shadow-2xl">
-      {/* Header Editorial Opcional */}
+    <div className="w-full py-12 md:py-20 bg-black text-[#E3DDD3] select-none relative overflow-hidden">
+      {/* Header Editorial */}
       {(title || eyebrow) && (
-        <div className="max-w-7xl mx-auto px-6 mb-8 flex items-end justify-between">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-8 flex items-end justify-between">
           <div>
             {eyebrow && (
-              <span className="text-[9px] tracking-[0.45em] uppercase font-mono text-amber-500/90 block mb-2 font-bold">
+              <span className="text-[9.5px] tracking-[0.45em] uppercase font-mono text-amber-500/90 block mb-2 font-bold">
                 {eyebrow}
               </span>
             )}
             {title && (
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif tracking-tight text-white uppercase font-cinzel">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif tracking-tight text-white uppercase font-cinzel">
                 {title}
               </h2>
             )}
@@ -103,49 +103,69 @@ export default function CoverflowCarousel({
         </div>
       )}
 
-      {/* ── REGLA ESTRUCTURAL: Contenedor Padre ── */}
+      {/* ── REGLA ESTRUCTURAL: Contenedor Padre Coverflow Ampliado a los Costados ── */}
       <div 
-        className="relative w-full h-[480px] sm:h-[540px] md:h-[600px] flex justify-center items-center overflow-hidden"
+        className="relative w-full h-[540px] sm:h-[620px] md:h-[680px] lg:h-[740px] flex justify-center items-center overflow-hidden bg-black"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* Pista de Tarjetas Coverflow */}
+        {/* ── FUNDIDOS LATERALES CON EL FONDO (Melt with black background as in sample) ── */}
+        <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-44 md:w-72 lg:w-96 bg-gradient-to-r from-black via-black/85 via-40% to-transparent pointer-events-none z-30" />
+        <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-44 md:w-72 lg:w-96 bg-gradient-to-l from-black via-black/85 via-40% to-transparent pointer-events-none z-30" />
+
+        {/* Pista de Tarjetas Coverflow Ampliada */}
         <div className="relative w-full h-full flex justify-center items-center">
           {posts.map((post, idx) => {
             const diff = idx - activeIndex;
             const isActive = diff === 0;
             const absDiff = Math.abs(diff);
 
-            // Ocultar tarjetas muy alejadas para optimizar DOM
-            if (absDiff > 2) {
+            // Permitir hasta 3 de cada lado (7 visibles en desktop)
+            if (absDiff > 3) {
               return null;
             }
 
-            // Cálculo dinámico de transformaciones según reglas estrictas
+            // Cálculo dinámico de transformaciones con abanico amplio lateral y fundido al fondo
             let positionClasses = '';
             let visualClasses = '';
+            let overlayOpacity = '';
 
             if (isActive) {
-              // ── REGLA: Tarjeta Central (Activa) ──
-              positionClasses = 'scale-100 z-30 translate-x-0 cursor-default shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] border-amber-400/40';
+              // ── Tarjeta Central (Activa) — Grande, destacada, nítida ──
+              positionClasses = 'scale-100 z-30 translate-x-0 cursor-default shadow-[0_30px_80px_-10px_rgba(0,0,0,0.98)]';
               visualClasses = 'opacity-100';
+              overlayOpacity = 'bg-black/0';
             } else if (diff === -1) {
-              // Inmediata izquierda: -translate-x-1/4 o -translate-x-[45%] en móviles para visibilidad
-              positionClasses = 'scale-75 z-20 -translate-x-[45%] sm:-translate-x-1/3 md:-translate-x-1/4 cursor-pointer border-white/10 hover:border-white/30';
-              visualClasses = 'opacity-40 brightness-50';
+              // Inmediata izquierda: fanned out hacia el costado
+              positionClasses = 'scale-[0.88] z-20 -translate-x-[68%] sm:-translate-x-[74%] md:-translate-x-[78%] lg:-translate-x-[82%] cursor-pointer shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9)]';
+              visualClasses = 'opacity-85 brightness-80 hover:brightness-95';
+              overlayOpacity = 'bg-black/25';
             } else if (diff === 1) {
-              // Inmediata derecha: translate-x-1/4
-              positionClasses = 'scale-75 z-20 translate-x-[45%] sm:translate-x-1/3 md:translate-x-1/4 cursor-pointer border-white/10 hover:border-white/30';
-              visualClasses = 'opacity-40 brightness-50';
+              // Inmediata derecha: fanned out hacia el costado
+              positionClasses = 'scale-[0.88] z-20 translate-x-[68%] sm:translate-x-[74%] md:translate-x-[78%] lg:translate-x-[82%] cursor-pointer shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9)]';
+              visualClasses = 'opacity-85 brightness-80 hover:brightness-95';
+              overlayOpacity = 'bg-black/25';
             } else if (diff === -2) {
-              // Segunda tarjeta a la izquierda
-              positionClasses = 'scale-[0.62] z-10 -translate-x-[85%] sm:-translate-x-[65%] md:-translate-x-[50%] cursor-pointer border-white/5';
-              visualClasses = 'opacity-25 brightness-40 hidden sm:block';
+              // Segunda tarjeta a la izquierda: se funde más con el fondo
+              positionClasses = 'scale-[0.76] z-10 -translate-x-[132%] sm:-translate-x-[144%] md:-translate-x-[152%] lg:-translate-x-[160%] cursor-pointer shadow-[0_15px_40px_-10px_rgba(0,0,0,0.85)]';
+              visualClasses = 'opacity-60 brightness-50 hover:brightness-70';
+              overlayOpacity = 'bg-black/50';
             } else if (diff === 2) {
-              // Segunda tarjeta a la derecha
-              positionClasses = 'scale-[0.62] z-10 translate-x-[85%] sm:translate-x-[65%] md:translate-x-[50%] cursor-pointer border-white/5';
-              visualClasses = 'opacity-25 brightness-40 hidden sm:block';
+              // Segunda tarjeta a la derecha: se funde más con el fondo
+              positionClasses = 'scale-[0.76] z-10 translate-x-[132%] sm:translate-x-[144%] md:translate-x-[152%] lg:translate-x-[160%] cursor-pointer shadow-[0_15px_40px_-10px_rgba(0,0,0,0.85)]';
+              visualClasses = 'opacity-60 brightness-50 hover:brightness-70';
+              overlayOpacity = 'bg-black/50';
+            } else if (diff === -3) {
+              // Tercera tarjeta a la izquierda (extremo): casi disuelta en negro
+              positionClasses = 'scale-[0.64] z-0 -translate-x-[192%] sm:-translate-x-[210%] md:-translate-x-[222%] lg:-translate-x-[234%] cursor-pointer shadow-none';
+              visualClasses = 'opacity-30 brightness-30 hidden sm:block';
+              overlayOpacity = 'bg-black/75';
+            } else if (diff === 3) {
+              // Tercera tarjeta a la derecha (extremo): casi disuelta en negro
+              positionClasses = 'scale-[0.64] z-0 translate-x-[192%] sm:translate-x-[210%] md:translate-x-[222%] lg:translate-x-[234%] cursor-pointer shadow-none';
+              visualClasses = 'opacity-30 brightness-30 hidden sm:block';
+              overlayOpacity = 'bg-black/75';
             }
 
             return (
@@ -154,9 +174,9 @@ export default function CoverflowCarousel({
                 onClick={() => {
                   if (!isActive) setActiveIndex(idx);
                 }}
-                className={`absolute w-[270px] sm:w-80 md:w-90 aspect-2/3 rounded-2xl md:rounded-3xl overflow-hidden border transition-all duration-500 ease-out ${positionClasses} ${visualClasses}`}
+                className={`absolute w-[280px] sm:w-[340px] md:w-[400px] lg:w-[440px] aspect-2/3 rounded-2xl md:rounded-3xl overflow-hidden border-0 transition-all duration-500 ease-out ${positionClasses} ${visualClasses}`}
               >
-                {/* ── REGLA ESTRICTA: Imagen al 100% de brillo en la activa, sin overlays globales ── */}
+                {/* Imagen de Portada */}
                 <img
                   src={post.image}
                   alt={post.title}
@@ -165,81 +185,110 @@ export default function CoverflowCarousel({
                   decoding="async"
                 />
 
-                {/* ── REGLA ESTRICTA: Scrim Localizado (w-full h-1/2 from-black via-black/80 to-transparent) ── */}
-                <div className="absolute bottom-0 left-0 w-full h-1/2 bg-linear-to-t from-black via-black/80 to-transparent pointer-events-none" />
+                {/* Scrim localizado en degradado hacia la base */}
+                <div className="absolute bottom-0 left-0 w-full h-3/5 bg-gradient-to-t from-black via-black/85 via-50% to-transparent pointer-events-none z-10" />
+
+                {/* Capa de oscurecimiento progresivo para fundir las tarjetas laterales con el fondo */}
+                <div className={`absolute inset-0 ${overlayOpacity} pointer-events-none transition-all duration-500 z-10`} />
 
                 {/* Badge de Categoría Superior */}
                 <div className="absolute top-4 left-4 z-20">
-                  <span className="px-3 py-1 rounded-full text-[7.5px] tracking-[0.3em] uppercase font-mono bg-black/70 backdrop-blur-md text-amber-400 border border-amber-400/30">
-                    {post.collectionLabel || 'Editorial'}
+                  <span className="px-3.5 py-1 rounded-full text-[8px] tracking-[0.3em] uppercase font-mono bg-black/80 backdrop-blur-md text-amber-400 border border-amber-400/30 font-bold">
+                    {post.collectionLabel || 'Colección'}
                   </span>
                 </div>
 
-                {/* Contenedor del Texto */}
-                <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 flex flex-col justify-end z-20">
+                {/* Contenedor del Texto & CTA */}
+                <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 flex flex-col justify-end items-center text-center z-20">
                   {post.date && (
-                    <span className="text-[8px] font-mono tracking-widest text-white/50 mb-1.5 uppercase block">
+                    <span className="text-[8.5px] font-mono tracking-widest text-white/60 mb-1 uppercase block">
                       {post.date}
                     </span>
                   )}
 
-                  {/* ── REGLA ESTRICTA: Título con fuente Cinzel, mix-blend-mode, font-semibold, tracking-wide. CERO text-shadow ── */}
                   <h3 
                     style={{ fontFamily: "'Cinzel', 'Libre Bodoni', Georgia, serif" }}
-                    className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-wide text-white mix-blend-plus-lighter leading-tight uppercase line-clamp-2 mb-4"
+                    className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-wider text-white mix-blend-plus-lighter leading-tight uppercase line-clamp-2 mb-2"
                   >
                     {post.title}
                   </h3>
 
                   {post.subtitle && (
-                    <p className="text-xs text-white/70 font-light line-clamp-2 mb-4 leading-relaxed font-alegreya">
+                    <p className="text-xs sm:text-sm text-white/70 font-light line-clamp-2 mb-3 leading-relaxed font-alegreya max-w-xs">
                       {post.subtitle}
                     </p>
                   )}
 
-                  {/* Botón Call to Action Cinemático */}
-                  {isActive && (
-                    <a
-                      href={post.link}
-                      className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-mono font-bold text-[9px] uppercase tracking-[0.25em] transition-colors shadow-lg"
-                    >
-                      <span>Explorar Colección</span>
-                      <span>&rarr;</span>
-                    </a>
-                  )}
+                  {/* Botón Call to Action Cinemático estilo Sample (≡ WATCH NOW / EXPLORAR) */}
+                  <div className="mt-2 w-full max-w-[280px]">
+                    {isActive ? (
+                      <a
+                        href={post.link}
+                        className="inline-flex items-center justify-center gap-2.5 w-full py-2.5 sm:py-3 px-5 rounded-md bg-amber-500 hover:bg-amber-400 text-black font-mono font-bold text-[10px] sm:text-xs uppercase tracking-[0.25em] transition-all duration-300 shadow-xl shadow-black/80 active:scale-95 cursor-pointer"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                        </svg>
+                        <span>Explorar Colección</span>
+                      </a>
+                    ) : (
+                      <div className="inline-flex items-center justify-center gap-2.5 w-full py-2.5 sm:py-3 px-5 rounded-md bg-amber-500/80 text-black font-mono font-bold text-[10px] sm:text-xs uppercase tracking-[0.25em] pointer-events-none">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                        </svg>
+                        <span>Explorar Colección</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* ── Botón Anterior (<) Flotante ── */}
+        {/* ── Botón Anterior (<) Flotante — Más grande y limpio como en el sample ── */}
         <button
           type="button"
           onClick={handlePrev}
           aria-label="Anterior"
-          className="absolute left-3 sm:left-8 md:left-12 z-40 p-3 sm:p-4 rounded-full bg-black/60 hover:bg-black/90 text-white/80 hover:text-white border border-white/20 backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer shadow-2xl"
+          className="group absolute left-3 sm:left-6 md:left-10 lg:left-14 top-1/2 -translate-y-1/2 z-40 p-2 text-white/90 hover:text-white drop-shadow-[0_4px_24px_rgba(0,0,0,1)] hover:scale-115 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none"
         >
-          <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          <svg
+            className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6" />
           </svg>
         </button>
 
-        {/* ── Botón Siguiente (>) Flotante ── */}
+        {/* ── Botón Siguiente (>) Flotante — Más grande y limpio como en el sample ── */}
         <button
           type="button"
           onClick={handleNext}
           aria-label="Siguiente"
-          className="absolute right-3 sm:right-8 md:right-12 z-40 p-3 sm:p-4 rounded-full bg-black/60 hover:bg-black/90 text-white/80 hover:text-white border border-white/20 backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer shadow-2xl"
+          className="group absolute right-3 sm:right-6 md:right-10 lg:right-14 top-1/2 -translate-y-1/2 z-40 p-2 text-white/90 hover:text-white drop-shadow-[0_4px_24px_rgba(0,0,0,1)] hover:scale-115 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none"
         >
-          <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          <svg
+            className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6" />
           </svg>
         </button>
       </div>
 
       {/* Indicadores de Puntos (Dots) Inferiores */}
-      <div className="flex justify-center items-center gap-2 mt-6">
+      <div className="flex justify-center items-center gap-2 mt-8">
         {posts.map((_, idx) => (
           <button
             key={idx}
@@ -247,8 +296,8 @@ export default function CoverflowCarousel({
             aria-label={`Ir a publicación ${idx + 1}`}
             className={`transition-all duration-300 rounded-full cursor-pointer ${
               idx === activeIndex
-                ? 'w-7 h-1.5 bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]'
-                : 'w-1.5 h-1.5 bg-white/25 hover:bg-white/50'
+                ? 'w-8 h-1.5 bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.7)]'
+                : 'w-1.5 h-1.5 bg-white/20 hover:bg-white/50'
             }`}
           />
         ))}
