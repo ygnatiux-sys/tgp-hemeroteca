@@ -7,6 +7,7 @@ import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../../components/CinematicPostEngine.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import Marquee from '../../components/Marquee.astro';
+import CoverflowCarousel, { type CoverflowPost } from '../../components/CoverflowCarousel';
 import {
   getPublishableEssays,
   groupByCategory,
@@ -88,6 +89,23 @@ const coleccionesSlides = collections
                    'center center',
     link: `/colecciones/${col.key}`,
   }));
+
+// ─── ITEMS PARA COVERFLOW 3D (UN COVER DE CADA COLECCIÓN) ────────────────────
+const coverflowPosts: CoverflowPost[] = collections
+  .filter(col => col.coverEssay?.img)
+  .map(col => {
+    const rawImg = col.coverEssay.img;
+    const imgUrl = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : ''));
+    return {
+      id: col.key,
+      title: col.label,
+      subtitle: `${col.count} artículo${col.count > 1 ? 's' : ''} en esta colección`,
+      image: imgUrl || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop',
+      link: `/colecciones/${col.key}/`,
+      collectionLabel: 'Colección TGP',
+      date: col.coverEssay?.entry?.date ? formatYear(col.coverEssay.entry.date) : undefined,
+    };
+  });
 ---
 
 <Layout
@@ -222,11 +240,16 @@ const coleccionesSlides = collections
         </div>
       </section>
 
-      {/* Fallback si no hay colecciones */}
-      {collections.length === 0 && (
-        <p class="font-mono text-xs uppercase tracking-[0.3em] text-white/30 text-center py-20">
-          No hay colecciones disponibles.
-        </p>
+      {/* ── SECCIÓN FINAL: COVERFLOW CAROUSEL 3D DE COLECCIONES ── */}
+      {coverflowPosts.length > 0 && (
+        <section class="mt-20 md:mt-28 px-4 md:px-8 max-w-7xl mx-auto">
+          <CoverflowCarousel 
+            client:visible 
+            posts={coverflowPosts}
+            title="Explorador de Colecciones"
+            eyebrow="Galería 3D Coverflow"
+          />
+        </section>
       )}
 
     </div>
