@@ -76,7 +76,7 @@ const indexCoverPosition =
   || (collections[0]?.coverEssay?.entry as any)?.imagePosition
   || 'center center';
 
-// ─── COLECCIONES PARA SPOTLIGHT MEDIA TRAY (ESTILO ROW NETFLIX EN CONTINUACIÓN DE COVER) ───
+// ─── COLECCIONES PARA SPOTLIGHT MEDIA TRAY (NORMALIZADO A HEREDADOS DE LA PÁGINA) ───
 const coleccionesTrayItems: TrayCollectionItem[] = collections
   .filter(col => col.coverEssay?.img)
   .map(col => {
@@ -84,9 +84,10 @@ const coleccionesTrayItems: TrayCollectionItem[] = collections
     return {
       slug: col.key,
       title: col.label,
-      excerpt: `${col.count} artículo${col.count > 1 ? 's' : ''} en esta colección`,
+      excerpt: col.coverEssay?.entry?.title || undefined,
       coverImage: rawImg,
-      category: `Colección TGP · ${col.count} Doc${col.count > 1 ? 's' : ''}`,
+      category: 'Colección TGP',
+      count: col.count,
       link: `/colecciones/${col.key}/`,
     };
   });
@@ -216,7 +217,7 @@ const coverflowPosts: CoverflowPost[] = collections
             return (
               <a
                 href={`/colecciones/${col.key}/`}
-                class={`group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/5 bg-theme-dark/80 shadow-2xl flex flex-col justify-end w-full isolate mx-4 md:mx-0 ${spanClass} ${mobileHeightClass}`}
+                class={`group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/5 bg-theme-dark/80 hover:border-rust-orange/50 transition-all duration-500 shadow-2xl flex flex-col justify-end w-full isolate mx-4 md:mx-0 ${spanClass} ${mobileHeightClass}`}
               >
                 {col.coverEssay?.img ? (
                   <Image
@@ -258,7 +259,7 @@ const coverflowPosts: CoverflowPost[] = collections
 
     {/* ── SECCIÓN FINAL: COVERFLOW CAROUSEL 3D DE COLECCIONES (FULL WIDTH / EDGE-TO-EDGE) ── */}
     {coverflowPosts.length > 0 && (
-      <section class="mt-20 md:mt-32 w-full bg-black relative overflow-hidden">
+      <section class="mt-20 md:mt-32 w-full bg-transparent relative overflow-hidden">
         <CoverflowCarousel 
           client:visible 
           posts={coverflowPosts}

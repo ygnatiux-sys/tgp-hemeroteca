@@ -77,18 +77,18 @@ export default function CoverflowCarousel({
   if (!posts || posts.length === 0) return null;
 
   return (
-    <div className="w-full py-12 md:py-20 bg-black text-[#E3DDD3] select-none relative overflow-hidden">
-      {/* Header Editorial */}
+    <div className="w-full py-12 md:py-20 bg-transparent text-[#E3DDD3] select-none relative overflow-hidden">
+      {/* Header Editorial con degradado general H1 y rust-orange heredado */}
       {(title || eyebrow) && (
         <div className="max-w-7xl mx-auto px-6 md:px-12 mb-8 flex items-end justify-between">
           <div>
             {eyebrow && (
-              <span className="text-[9.5px] tracking-[0.45em] uppercase font-mono text-amber-500/90 block mb-2 font-bold">
+              <span className="text-xs tracking-[0.4em] uppercase font-mono text-rust-orange block mb-2 font-bold">
                 {eyebrow}
               </span>
             )}
             {title && (
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-cinzel tracking-tight text-white uppercase">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-black gradient-general-h1 tracking-tight leading-tight uppercase">
                 {title}
               </h2>
             )}
@@ -96,7 +96,7 @@ export default function CoverflowCarousel({
 
           {/* Contador de posición */}
           <div className="hidden sm:flex items-center gap-2 text-xs font-mono tracking-widest text-white/40">
-            <span className="text-amber-400 font-bold">{String(activeIndex + 1).padStart(2, '0')}</span>
+            <span className="text-rust-orange font-bold">{String(activeIndex + 1).padStart(2, '0')}</span>
             <span>/</span>
             <span>{String(posts.length).padStart(2, '0')}</span>
           </div>
@@ -105,14 +105,14 @@ export default function CoverflowCarousel({
 
       {/* ── REGLA ESTRUCTURAL: Contenedor Padre Coverflow Ampliado a los Costados ── */}
       <div 
-        className="relative w-full h-135 sm:h-155 md:h-170 lg:h-185 flex justify-center items-center overflow-hidden bg-black"
+        className="relative w-full h-135 sm:h-155 md:h-170 lg:h-185 flex justify-center items-center overflow-hidden bg-transparent"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* ── FUNDIDOS LATERALES CON EL FONDO (Melt with black background as in sample) ── */}
-        <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-44 md:w-72 lg:w-96 bg-linear-to-r from-black via-black/85 via-40% to-transparent pointer-events-none z-30" />
-        <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-44 md:w-72 lg:w-96 bg-linear-to-l from-black via-black/85 via-40% to-transparent pointer-events-none z-30" />
+        {/* ── FUNDIDOS LATERALES CON EL FONDO HEREDADO ── */}
+        <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-44 md:w-72 lg:w-96 bg-linear-to-r from-theme-dark via-theme-dark/85 via-40% to-transparent pointer-events-none z-30" />
+        <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-44 md:w-72 lg:w-96 bg-linear-to-l from-theme-dark via-theme-dark/85 via-40% to-transparent pointer-events-none z-30" />
 
         {/* Pista de Tarjetas Coverflow Ampliada */}
         <div className="relative w-full h-full flex justify-center items-center">
@@ -193,7 +193,7 @@ export default function CoverflowCarousel({
 
                 {/* Badge de Categoría Superior */}
                 <div className="absolute top-4 left-4 z-20">
-                  <span className="px-3.5 py-1 rounded-full text-[8px] tracking-[0.3em] uppercase font-mono bg-black/80 backdrop-blur-md text-amber-400 border border-amber-400/30 font-bold">
+                  <span className="px-3.5 py-1 rounded-full text-[8.5px] tracking-[0.3em] uppercase font-mono bg-theme-dark/90 backdrop-blur-md text-rust-orange border border-rust-orange/30 font-bold">
                     {post.collectionLabel || 'Colección'}
                   </span>
                 </div>
@@ -206,10 +206,7 @@ export default function CoverflowCarousel({
                     </span>
                   )}
 
-                  <h3 
-                    style={{ fontFamily: "'Cinzel', 'Libre Bodoni', Georgia, serif" }}
-                    className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-wider text-white mix-blend-plus-lighter leading-tight uppercase line-clamp-2 mb-2"
-                  >
+                  <h3 className="gradient-general-h2 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif font-extrabold tracking-wide leading-tight mb-2">
                     {post.title}
                   </h3>
 
@@ -219,12 +216,12 @@ export default function CoverflowCarousel({
                     </p>
                   )}
 
-                  {/* Botón Call to Action Cinemático estilo Sample (≡ WATCH NOW / EXPLORAR) */}
+                  {/* Botón Call to Action Cinemático con color rust-orange heredado */}
                   <div className="mt-2 w-full max-w-70">
                     {isActive ? (
                       <a
                         href={post.link}
-                        className="inline-flex items-center justify-center gap-2.5 w-full py-2.5 sm:py-3 px-5 rounded-md bg-amber-500 hover:bg-amber-400 text-black font-mono font-bold text-[10px] sm:text-xs uppercase tracking-[0.25em] transition-all duration-300 shadow-xl shadow-black/80 active:scale-95 cursor-pointer"
+                        className="inline-flex items-center justify-center gap-2.5 w-full py-2.5 sm:py-3 px-5 rounded-md bg-rust-orange hover:bg-white text-black font-mono font-bold text-[10px] sm:text-xs uppercase tracking-[0.25em] transition-all duration-300 shadow-xl shadow-black/80 active:scale-95 cursor-pointer"
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
@@ -232,7 +229,7 @@ export default function CoverflowCarousel({
                         <span>Explorar Colección</span>
                       </a>
                     ) : (
-                      <div className="inline-flex items-center justify-center gap-2.5 w-full py-2.5 sm:py-3 px-5 rounded-md bg-amber-500/80 text-black font-mono font-bold text-[10px] sm:text-xs uppercase tracking-[0.25em] pointer-events-none">
+                      <div className="inline-flex items-center justify-center gap-2.5 w-full py-2.5 sm:py-3 px-5 rounded-md bg-rust-orange/80 text-black font-mono font-bold text-[10px] sm:text-xs uppercase tracking-[0.25em] pointer-events-none">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                         </svg>
