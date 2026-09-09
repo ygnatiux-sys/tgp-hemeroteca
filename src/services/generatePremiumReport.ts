@@ -24,6 +24,7 @@ export interface InformePremiumPayload {
   fuenteVisual: FuenteVisual;
   directrices?: string;
   tags?: string[];
+  modoPiloto?: boolean;
 }
 
 export interface InformePremiumResult {
@@ -31,6 +32,12 @@ export interface InformePremiumResult {
   mdxPath: string;
   imagenR2Url: string;
   contenido: string;
+  metadataInferred?: {
+    coleccion: string;
+    fuenteVisual: string;
+    tags: string[];
+    volanta: string;
+  };
 }
 
 // ── Helpers de entorno ─────────────────────────────────────────────────────────
@@ -83,10 +90,32 @@ function slugify(text: string): string {
 
 // ── FASE 2: Motor Cognitivo (Cloud Run TGP Mind) ──────────────────────────────
 
-async function generarTexto(payload: InformePremiumPayload): Promise<string> {
+async function generarTexto(payload: InformePremiumPayload): Promise<{ texto: string, metadata?: any }> {
   const mindUrl = getEnv('PUBLIC_TGP_MIND_URL');
 
-  const prompt = `Eres un investigador-ensayista especializado en historia profunda, arqueosemiótica y análisis cultural de alto nivel.
+  let prompt = '';
+
+  if (payload.modoPiloto) {
+    prompt = `Eres un investigador-ensayista especializado en historia profunda y arqueosemiótica.
+El usuario ha proporcionado ÚNICAMENTE el siguiente TÍTULO para un nuevo ensayo:
+TÍTULO: "${payload.titulo}"
+
+Debes deducir todo el contexto y generar un ensayo de densidad académica.
+INSTRUCCIONES DE ESTRUCTURA DEL ENSAYO:
+1. Apertura ensayística impactante (2-3 párrafos).
+2. Desarrollo (5-7 párrafos) con marcadores <!-- IMAGEN_1 --> y <!-- IMAGEN_2 -->.
+3. Cierre analítico (2 párrafos).
+
+CRÍTICO: Debes devolver tu respuesta EXCLUSIVAMENTE como un objeto JSON válido (sin bloques \`\`\`json de markdown, solo el JSON crudo), con la siguiente estructura exacta:
+{
+  "coleccion": "elige estrictamente una de: liminal, heterodoxia, anomalias, apocrifa",
+  "fuenteVisual": "elige estrictamente una de: wikimedia, sintetica",
+  "tags": ["3 o 4 tags", "relevantes"],
+  "volanta": "Excerpt poético-académico de 2 líneas sobre el tema",
+  "cuerpo": "Aquí va el texto completo del ensayo en formato Markdown..."
+}`;
+  } else {
+    prompt = `Eres un investigador-ensayista especializado en historia profunda, arqueosemiótica y análisis cultural de alto nivel.
 
 Escribe un ensayo de densidad académica sobre el siguiente tema:
 
@@ -102,6 +131,7 @@ INSTRUCCIONES DE ESTRUCTURA:
 
 El tono debe ser literario-académico. Evita clichés. Usa el lenguaje con precisión quirúrgica.
 Devuelve SOLO el texto en formato Markdown, sin ningún bloque de código envolvente.`;
+  }
 
   const response = await fetch(mindUrl, {
     method: 'POST',
@@ -121,13 +151,34 @@ Devuelve SOLO el texto en formato Markdown, sin ningún bloque de código envolv
   }
 
   const data = await response.json() as { text?: string; content?: string; result?: string };
-  const texto = data.text || data.content || data.result || '';
+  let texto = data.text || data.content || data.result || '';
 
   if (!texto.trim()) {
     throw new Error('TGP Mind devolvió contenido vacío.');
   }
 
-  return texto;
+  if (payload.modoPiloto) {
+    // Intentar parsear el JSON extraído
+    try {
+      // Limpiar posibles bloques de markdown residuales
+      const jsonStr = texto.replace(/^```(json)?|```$/gi, '').trim();
+      const parsed = JSON.parse(jsonStr);
+      return {
+        texto: parsed.cuerpo,
+        metadata: {
+          coleccion: parsed.coleccion || 'liminal',
+          fuenteVisual: parsed.fuenteVisual || 'sintetica',
+          tags: parsed.tags || [],
+          volanta: parsed.volanta || ''
+        }
+      };
+    } catch (e) {
+      console.error("Error parseando JSON de piloto automático:", e, "\nTexto recibido:", texto);
+      throw new Error("El motor no devolvió un JSON válido en Modo Piloto.");
+    }
+  }
+
+  return { texto };
 }
 
 // ── FASE 3A: Adquisición Visual — Wikimedia ───────────────────────────────────
@@ -214,15 +265,21 @@ async function subirAR2(buffer: Buffer, slug: string): Promise<string> {
 
 // ── FASE 6: Ensamblaje MDX ────────────────────────────────────────────────────
 
-function ensamblarMDX(payload: InformePremiumPayload, contenido: string, imagenUrl: string, slug: string): string {
+function ensamblarMDX(payload: InformePremiumPayload, contenido: string, imagenUrl: string, slug: string, metadataInferred?: any): string {
   const fechaISO = new Date().toISOString().split('T')[0];
-  const tags = (payload.tags || [payload.coleccion]).map(t => `  - "${t}"`).join('\n');
+  
+  // Usamos los inferidos si existen, si no los del payload
+  const tagsList = metadataInferred?.tags || payload.tags || [payload.coleccion];
+  const tags = tagsList.map((t: string) => `  - "${t}"`).join('\n');
+  const coleccionFinal = metadataInferred?.coleccion || payload.coleccion;
+  const fuenteVisualFinal = metadataInferred?.fuenteVisual || payload.fuenteVisual;
+  const volantaStr = metadataInferred?.volanta ? `\nvolanta: "${metadataInferred.volanta.replace(/"/g, '\\"')}"` : '';
 
   const frontmatter = `---
 titulo: "${payload.titulo.replace(/"/g, '\\"')}"
-slug: "${slug}"
-coleccion: "${payload.coleccion}"
-fuenteVisual: "${payload.fuenteVisual}"
+slug: "${slug}"${volantaStr}
+coleccion: "${coleccionFinal}"
+fuenteVisual: "${fuenteVisualFinal}"
 imagenDestacada: "${imagenUrl}"
 date: "${fechaISO}"
 tags:
@@ -244,11 +301,19 @@ export async function generatePremiumReport(payload: InformePremiumPayload): Pro
   const slug = slugify(payload.titulo);
   const mdxPath = `src/content/informes/${slug}/index.mdx`;
 
-  console.log(`[InformePremium] Iniciando pipeline para: "${payload.titulo}" (${slug})`);
+  console.log(`[InformePremium] Iniciando pipeline para: "${payload.titulo}" (${slug}) | Piloto: ${payload.modoPiloto}`);
 
   // FASE 2: Motor Cognitivo
   console.log('[InformePremium] Fase 2: Generando texto con TGP Mind...');
-  const contenido = await generarTexto(payload);
+  const { texto: contenido, metadata } = await generarTexto(payload);
+
+  if (metadata) {
+    console.log('[InformePremium] Metadata inferida:', metadata);
+    // Sobreescribir payload con las decisiones de TGP Mind para que la Fase 3 sepa qué hacer
+    payload.coleccion = metadata.coleccion as any;
+    payload.fuenteVisual = metadata.fuenteVisual as any;
+    payload.tags = metadata.tags;
+  }
 
   // FASE 3: Adquisición Visual
   let imagenBuffer: Buffer;
@@ -269,7 +334,7 @@ export async function generatePremiumReport(payload: InformePremiumPayload): Pro
 
   // FASE 6: Ensamblaje MDX
   console.log('[InformePremium] Fase 6: Ensamblando MDX...');
-  const mdxContent = ensamblarMDX(payload, contenido, imagenR2Url, slug);
+  const mdxContent = ensamblarMDX(payload, contenido, imagenR2Url, slug, metadata);
 
   console.log(`[InformePremium] ✓ Pipeline completado. Ruta: ${mdxPath}`);
 
@@ -278,5 +343,6 @@ export async function generatePremiumReport(payload: InformePremiumPayload): Pro
     mdxPath,
     imagenR2Url,
     contenido: mdxContent,
+    metadataInferred: metadata
   };
 }

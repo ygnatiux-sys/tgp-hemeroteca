@@ -36,7 +36,7 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  const { titulo, coleccion, fuenteVisual, directrices, tags } = body;
+  const { titulo, coleccion, fuenteVisual, directrices, tags, modoPiloto } = body;
 
   // ── Validación de campos requeridos ───────────────────────────────────────
   if (!titulo || typeof titulo !== 'string' || !titulo.trim()) {
@@ -46,31 +46,35 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  if (!coleccion || !COLECCIONES_VALIDAS.includes(coleccion as any)) {
-    return new Response(
-      JSON.stringify({
-        error: `El campo "coleccion" debe ser uno de: ${COLECCIONES_VALIDAS.join(', ')}.`,
-      }),
-      { status: 400, headers: HEADERS }
-    );
-  }
+  // Si NO estamos en modo piloto, validamos estrictamente los campos manuales
+  if (!modoPiloto) {
+    if (!coleccion || !COLECCIONES_VALIDAS.includes(coleccion as any)) {
+      return new Response(
+        JSON.stringify({
+          error: `El campo "coleccion" debe ser uno de: ${COLECCIONES_VALIDAS.join(', ')}.`,
+        }),
+        { status: 400, headers: HEADERS }
+      );
+    }
 
-  if (!fuenteVisual || !FUENTES_VALIDAS.includes(fuenteVisual as FuenteVisual)) {
-    return new Response(
-      JSON.stringify({
-        error: `El campo "fuenteVisual" debe ser uno de: ${FUENTES_VALIDAS.join(', ')}.`,
-      }),
-      { status: 400, headers: HEADERS }
-    );
+    if (!fuenteVisual || !FUENTES_VALIDAS.includes(fuenteVisual as FuenteVisual)) {
+      return new Response(
+        JSON.stringify({
+          error: `El campo "fuenteVisual" debe ser uno de: ${FUENTES_VALIDAS.join(', ')}.`,
+        }),
+        { status: 400, headers: HEADERS }
+      );
+    }
   }
 
   // ── Invocación del Orquestador ────────────────────────────────────────────
   const payload: InformePremiumPayload = {
     titulo: (titulo as string).trim(),
-    coleccion: coleccion as InformePremiumPayload['coleccion'],
-    fuenteVisual: fuenteVisual as FuenteVisual,
+    coleccion: (coleccion as InformePremiumPayload['coleccion']) || 'liminal', // Default si es piloto
+    fuenteVisual: (fuenteVisual as FuenteVisual) || 'sintetica', // Default si es piloto
     directrices: typeof directrices === 'string' ? directrices : undefined,
     tags: Array.isArray(tags) ? tags.filter((t): t is string => typeof t === 'string') : undefined,
+    modoPiloto: !!modoPiloto
   };
 
   try {
@@ -82,6 +86,8 @@ export const POST: APIRoute = async ({ request }) => {
         slug: result.slug,
         mdxPath: result.mdxPath,
         imagenR2Url: result.imagenR2Url,
+        contenido: result.contenido,
+        metadataInferred: result.metadataInferred,
         mensaje: `Informe "${payload.titulo}" generado exitosamente en ${result.mdxPath}`,
       }),
       { status: 200, headers: HEADERS }

@@ -8,6 +8,7 @@ import {
   SelectorCategoriaTGP,
   GeneradorGeorreferenciaTGP,
   AgenteEruditoTGP,
+  GeneradorInformePremium,
   componentBlocks 
 } from './src/components';
 import { geminiCinematicField } from './src/keystatic/geminiCinematic';
@@ -608,7 +609,27 @@ export default config({
       path: 'src/content/informes/*/',
       format: { contentField: 'contenido' },
       schema: {
+        // ── ⚡ BOTÓN DISPARADOR ──
+        generador: {
+          kind: 'form',
+          label: '⚡ Generador de Informe Premium',
+          Input: GeneradorInformePremium,
+          defaultValue: () => '',
+          parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || '') }),
+          validate: (v: any) => v,
+          reader: {
+            parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+          },
+        } as any,
+
         titulo: fields.slug({ name: { label: 'Título del Informe' } }),
+
+        volanta: fields.text({
+          label: 'Volanta / Excerpt',
+          description: 'Aparecerá en tipografía Mono por encima del título principal.',
+          multiline: true,
+        }),
 
         coleccion: fields.select({
           label: 'Colección Temática',
