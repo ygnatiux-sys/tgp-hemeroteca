@@ -4,7 +4,7 @@ import Image from '../../components/SafeImage.astro';
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
-import CinematicPostEngine from '../../components/CinematicPostEngine.astro';
+import SpotlightMediaTray, { type TrayCollectionItem } from '../../components/SpotlightMediaTray.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import Marquee from '../../components/Marquee.astro';
 import CoverflowCarousel, { type CoverflowPost } from '../../components/CoverflowCarousel';
@@ -70,25 +70,26 @@ const collections = Array.from(categoryGroups.entries())
   .sort((a, b) => b.count - a.count);
 
 const indexCover = collections[0]?.coverEssay?.img ?? null;
+const indexCoverUrl = sanitizeImageUrl((indexCover as any)?.src ?? indexCover ?? '');
 const indexCoverPosition =
   (collections[0]?.coverEssay?.entry as any)?.coverImagePosition
   || (collections[0]?.coverEssay?.entry as any)?.imagePosition
   || 'center center';
 
-// ─── SLIDES PARA EL ENGINE: una slide por coleccion en orden de tamaño ────────
-const coleccionesSlides = collections
+// ─── COLECCIONES PARA SPOTLIGHT MEDIA TRAY (ESTILO ROW NETFLIX EN CONTINUACIÓN DE COVER) ───
+const coleccionesTrayItems: TrayCollectionItem[] = collections
   .filter(col => col.coverEssay?.img)
-  .map(col => ({
-    id: col.key,
-    title: col.label,
-    subtitle: `${col.count} artículo${col.count > 1 ? 's' : ''}`,
-    category: 'Colección TGP',
-    image: (col.coverEssay.img as any)?.src ?? col.coverEssay.img,
-    imagePosition: (col.coverEssay.entry as any).coverImagePosition ||
-                   (col.coverEssay.entry as any).imagePosition ||
-                   'center center',
-    link: `/colecciones/${col.key}`,
-  }));
+  .map(col => {
+    const rawImg = col.coverEssay.img;
+    return {
+      slug: col.key,
+      title: col.label,
+      excerpt: `${col.count} artículo${col.count > 1 ? 's' : ''} en esta colección`,
+      coverImage: rawImg,
+      category: `Colección TGP · ${col.count} Doc${col.count > 1 ? 's' : ''}`,
+      link: `/colecciones/${col.key}/`,
+    };
+  });
 
 // ─── ITEMS PARA COVERFLOW 3D (UN COVER DE CADA COLECCIÓN) ────────────────────
 const coverflowPosts: CoverflowPost[] = collections
@@ -111,7 +112,7 @@ const coverflowPosts: CoverflowPost[] = collections
 <Layout
   title="Colecciones Temáticas | The Great Puzzle Project"
   description="Colecciones temáticas, arqueología, antropología, semiología y análisis documental de The Great Puzzle Project."
-  image={(collections[0]?.coverEssay?.img as any)?.src ?? collections[0]?.coverEssay?.img}
+  image={indexCoverUrl}
 >
   <div class="text-white min-h-screen pb-32">
 
@@ -119,21 +120,54 @@ const coverflowPosts: CoverflowPost[] = collections
     <Marquee
       title="COLECCIONES DESTACADAS"
       subtitle="The Great Puzzle Project"
-      imageUrl={(collections[0]?.coverEssay?.img as any)?.src ?? collections[0]?.coverEssay?.img ?? ''}
+      imageUrl={indexCoverUrl}
       vibeClass="vibe-travel-senses"
       isH1={true}
       fontClass="font-serif font-black"
+      heightClass="h-[calc(68vh-2rem)] min-h-[460px] md:min-h-[520px]"
+      marginClass="mb-0"
+      roundedClass="rounded-t-3xl rounded-b-none"
+      showSocialInTitle={true}
     />
+
+    {/* ── BANDEJA AL PIE DEL COVER: CONTINUACIÓN DE MASK DE LA IMAGEN DE COVER ── */}
+    <section class="cover-foot-continuation relative w-[calc(100%-2rem)] mx-auto overflow-hidden -mt-px mb-14 md:mb-20 z-20">
+      {/* Fondo con la misma imagen de Cover continuando hacia abajo con mask fade cinemático */}
+      <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
+        {indexCoverUrl && (
+          <img
+            src={indexCoverUrl}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            class="w-full h-full object-cover object-bottom opacity-55 contrast-105 brightness-90"
+            style="
+              mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 35%, rgba(0,0,0,0.3) 70%, transparent 100%);
+              -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 35%, rgba(0,0,0,0.3) 70%, transparent 100%);
+            "
+          />
+        )}
+        <div 
+          class="absolute inset-0"
+          style="background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 40%, var(--bg-current) 100%);"
+        ></div>
+        <div class="texture-grain opacity-35"></div>
+      </div>
+
+      {/* Bandeja de Medios Spotlight con Chevrons estilo Row Netflix Clásico */}
+      <div class="relative z-10 pt-2 pb-8 sm:pb-10 px-3 sm:px-6 md:px-8">
+        <SpotlightMediaTray 
+          collections={coleccionesTrayItems}
+          eyebrow="COLECCIONES DESTACADAS"
+          allLink="/colecciones/"
+        />
+      </div>
+    </section>
 
     {/* ── RESPIRO VISUAL / EXCERPT DOBLE SCROLL POLVO DORADO & TYPEMAGIC EN BG-MAIN ── */}
     <CinematicExcerptRest 
       text="Un [[mapa de fragmentos]] desgastados por el tiempo. **Cada colección**, un intento humano de arrebatarle el sentido al olvido absoluto."
     />
-
-    {/* ── ENGINE AUTO CINEMÁTICO: cicla colecciones full-viewport ── */}
-    {coleccionesSlides.length > 0 && (
-      <CinematicPostEngine slides={coleccionesSlides} maxSlides={15} />
-    )}
 
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">
 

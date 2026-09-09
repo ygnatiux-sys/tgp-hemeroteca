@@ -10,6 +10,8 @@ interface Props {
   fontClass?: string;
   heightClass?: string;
   marginClass?: string;
+  roundedClass?: string;
+  showSocialInTitle?: boolean;
 }
 const {
   title,
@@ -20,6 +22,8 @@ const {
   fontClass = "font-serif",
   heightClass = "h-[calc(80vh-2rem)] min-h-150",
   marginClass = "mb-[25vh] md:mb-[35vh]",
+  roundedClass = "rounded-3xl",
+  showSocialInTitle = false,
 } = Astro.props;
 
 const safeImageUrl = sanitizeImageUrl(imageUrl);
@@ -28,7 +32,7 @@ const gradientClass = isSerif ? "gradient-general-h1" : "gradient-acero-ios";
 ---
 
 <section
-  class={`dark-hero relative w-[calc(100%-2rem)] ${heightClass} mx-auto mt-4 ${marginClass} flex flex-col items-center justify-center overflow-hidden rounded-3xl ${vibeClass}`}
+  class={`dark-hero relative w-[calc(100%-2rem)] ${heightClass} mx-auto mt-4 ${marginClass} flex flex-col items-center justify-center overflow-hidden ${roundedClass} ${vibeClass}`}
   style="background-color: var(--bg-current);"
 >
   <div class="absolute inset-0 z-0 opacity-70 marquee-bg-pin flex">
@@ -114,8 +118,8 @@ const gradientClass = isSerif ? "gradient-general-h1" : "gradient-acero-ios";
       TGP Editorial // {vibeClass.replace("vibe-", "").replace(/-/g, " ")}
     </h3>
 
-    {/* Spotify & YouTube Discrete Links within title-container when slot is present */}
-    {Astro.slots.has('default') && (
+    {/* Spotify & YouTube Discrete Links within title-container when slot is present OR showSocialInTitle is true */}
+    {(Astro.slots.has('default') || showSocialInTitle) && (
       <div class="flex items-center gap-5 justify-center mt-3 pointer-events-auto">
         <a
           href="https://open.spotify.com/show/3zFq9ab980MamMHW48Sqxy"
@@ -147,8 +151,8 @@ const gradientClass = isSerif ? "gradient-general-h1" : "gradient-acero-ios";
     )}
   </div>
 
-  {/* Spotify & YouTube Discrete Links at the Hero Base ONLY if NO slot */}
-  {!Astro.slots.has('default') && (
+  {/* Spotify & YouTube Discrete Links at the Hero Base ONLY if NO slot and NOT showSocialInTitle */}
+  {!Astro.slots.has('default') && !showSocialInTitle && (
     <div class="absolute bottom-5 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-5 justify-center pointer-events-auto">
       <a
         href="https://open.spotify.com/show/3zFq9ab980MamMHW48Sqxy"
