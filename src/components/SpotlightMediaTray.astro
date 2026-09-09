@@ -32,21 +32,21 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
 ---
 
 {collections.length > 0 && (
-  <div id={uid} class="spotlight-media-tray-root w-full max-w-6xl mx-auto z-20 select-none">
+  <div id={uid} class="spotlight-media-tray-root w-full max-w-7xl mx-auto z-20 select-none">
     {/* Encabezado discreto de la bandeja */}
-    <div class="flex items-center justify-between mb-2.5 px-2">
+    <div class="flex items-center justify-between mb-3 px-2">
       <div class="flex items-center gap-3">
-        <span class="text-[9px] sm:text-[10px] uppercase tracking-[0.35em] font-mono text-rust-orange font-bold">
+        <span class="text-[9.5px] sm:text-[11px] uppercase tracking-[0.35em] font-mono text-rust-orange font-bold">
           {eyebrow}
         </span>
-        <span class="text-[8px] sm:text-[8.5px] uppercase tracking-[0.25em] font-mono text-white/40 hidden sm:inline-block">
+        <span class="text-[8.5px] sm:text-[9.5px] uppercase tracking-[0.25em] font-mono text-white/40 hidden sm:inline-block">
           • {collections.length} Colecciones
         </span>
       </div>
       {allLink && (
         <a 
           href={allLink} 
-          class="text-[8.5px] sm:text-[9.5px] uppercase tracking-[0.25em] font-mono text-white/50 hover:text-amber-400 transition-colors"
+          class="text-[9px] sm:text-[10px] uppercase tracking-[0.25em] font-mono text-white/50 hover:text-amber-400 transition-colors"
         >
           Ver Todas →
         </a>
@@ -58,7 +58,7 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
       {/* Botón Anterior Flotante en Cápsula */}
       <button 
         type="button"
-        class="tray-nav-btn prev-btn absolute -left-2 md:-left-4 top-1/2 -translate-y-1/2 z-30 w-8 md:w-9 h-14 md:h-16 rounded-full bg-black/80 hover:bg-black text-white/80 hover:text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-75 hover:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-2xl"
+        class="tray-nav-btn prev-btn absolute -left-2 md:-left-4 top-1/2 -translate-y-1/2 z-30 w-8 md:w-10 h-16 md:h-20 rounded-full bg-black/80 hover:bg-black text-white/80 hover:text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-75 hover:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-2xl"
         aria-label="Colecciones anteriores"
       >
         <svg class="w-4 h-4 md:w-5 md:h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -69,7 +69,7 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
       {/* Botón Siguiente Flotante en Cápsula */}
       <button 
         type="button"
-        class="tray-nav-btn next-btn absolute -right-2 md:-right-4 top-1/2 -translate-y-1/2 z-30 w-8 md:w-9 h-14 md:h-16 rounded-full bg-black/80 hover:bg-black text-white/80 hover:text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-75 hover:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-2xl"
+        class="tray-nav-btn next-btn absolute -right-2 md:-right-4 top-1/2 -translate-y-1/2 z-30 w-8 md:w-10 h-16 md:h-20 rounded-full bg-black/80 hover:bg-black text-white/80 hover:text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-75 hover:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-2xl"
         aria-label="Siguientes colecciones"
       >
         <svg class="w-4 h-4 md:w-5 md:h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -78,8 +78,8 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
       </button>
 
       {/* Pista de Deslizamiento con Sibling Push (Row Netflix Clásico) */}
-      <div class="tray-track-wrapper overflow-hidden py-2.5 px-1">
-        <div class="tray-track flex gap-3 sm:gap-4 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]">
+      <div class="tray-track-wrapper overflow-hidden py-3 px-1">
+        <div class="tray-track flex gap-3.5 sm:gap-4.5 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]">
           {collections.map((col) => {
             const rawImg = col.coverImage;
             const imgUrl = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '')) || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop';
@@ -88,7 +88,7 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
             return (
               <a
                 href={linkUrl}
-                class="tray-card aspect-2/3 h-32 sm:h-36 md:h-40 w-auto shrink-0 rounded-xl overflow-hidden cursor-pointer relative border border-white/15 bg-black/60 shadow-lg group/traycard focus:outline-none"
+                class="tray-card aspect-2/3 h-42 sm:h-46 md:h-52 lg:h-56 w-auto shrink-0 rounded-xl overflow-hidden cursor-pointer relative border border-white/15 bg-black/60 shadow-lg group/traycard focus:outline-none"
                 aria-label={`Explorar colección: ${col.title}`}
               >
                 {/* Imagen 100% nítida */}
@@ -104,15 +104,20 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
                 <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/45 via-45% to-transparent pointer-events-none" />
 
                 {/* Información Editorial en la base de la tarjeta */}
-                <div class="absolute inset-x-0 bottom-0 p-2 sm:p-2.5 flex flex-col justify-end pointer-events-none z-10">
+                <div class="absolute inset-x-0 bottom-0 p-2.5 sm:p-3 flex flex-col justify-end pointer-events-none z-10">
                   {col.category && (
-                    <span class="text-[7.5px] sm:text-[8px] tracking-[0.25em] font-mono text-rust-orange font-bold uppercase truncate mb-0.5">
+                    <span class="text-[8px] sm:text-[9px] tracking-[0.25em] font-mono text-rust-orange font-bold uppercase truncate mb-0.5">
                       {col.category}
                     </span>
                   )}
-                  <h4 class="font-cinzel text-[10.5px] sm:text-xs text-white font-semibold line-clamp-2 leading-tight group-hover/traycard:text-amber-400 transition-colors">
+                  <h4 class="font-cinzel text-xs sm:text-[13px] md:text-sm text-white font-semibold line-clamp-2 leading-snug group-hover/traycard:text-amber-400 transition-colors">
                     {col.title}
                   </h4>
+                  {col.excerpt && (
+                    <p class="text-[8.5px] sm:text-[9.5px] text-white/70 line-clamp-1 font-sans mt-0.5 hidden sm:block">
+                      {col.excerpt}
+                    </p>
+                  )}
                 </div>
               </a>
             );

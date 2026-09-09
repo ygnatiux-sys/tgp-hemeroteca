@@ -12,6 +12,7 @@ interface Props {
   marginClass?: string;
   roundedClass?: string;
   showSocialInTitle?: boolean;
+  maskBottom?: boolean;
 }
 const {
   title,
@@ -24,6 +25,7 @@ const {
   marginClass = "mb-[25vh] md:mb-[35vh]",
   roundedClass = "rounded-3xl",
   showSocialInTitle = false,
+  maskBottom = false,
 } = Astro.props;
 
 const safeImageUrl = sanitizeImageUrl(imageUrl);
@@ -33,7 +35,7 @@ const gradientClass = isSerif ? "gradient-general-h1" : "gradient-acero-ios";
 
 <section
   class={`dark-hero relative w-[calc(100%-2rem)] ${heightClass} mx-auto mt-4 ${marginClass} flex flex-col items-center justify-center overflow-hidden ${roundedClass} ${vibeClass}`}
-  style="background-color: var(--bg-current);"
+  style={maskBottom ? "background-color: var(--bg-current); mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);" : "background-color: var(--bg-current);"}
 >
   <div class="absolute inset-0 z-0 opacity-70 marquee-bg-pin flex">
     <div class="marquee-track flex h-full w-[200vw]">
