@@ -7,6 +7,8 @@ interface ImportMetaEnv {
   readonly PUBLIC_TGP_MIND_URL: string;      // TGP Mind — Cloud Run (motor cognitivo Gemini)
   readonly PUBLIC_GOOGLE_PICKER_API_KEY: string;
   readonly PUBLIC_GOOGLE_CLIENT_ID: string;
+  readonly PUBLIC_TGP_VEO_API_URL: string;
+  readonly TGP_MIND_TOKEN: string;
 }
 
 interface ImportMeta {

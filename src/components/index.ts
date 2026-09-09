@@ -9,3 +9,4 @@ export * from './MagazineBookzineGallery';
 export * from './component-blocks';
 export * from './AgenteEruditoTGP';
 export * from './GeneradorCinematicosTGP';
+export * from './GeneradorInformePremium';
