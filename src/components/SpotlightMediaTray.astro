@@ -32,21 +32,21 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
 ---
 
 {collections.length > 0 && (
-  <div id={uid} class="spotlight-media-tray-root w-full max-w-7xl mx-auto z-20 select-none">
-    {/* Encabezado discreto de la bandeja */}
-    <div class="flex items-center justify-between mb-3 px-2">
+  <div id={uid} class="spotlight-media-tray-root w-full z-20 select-none">
+    {/* Encabezado discreto de la bandeja a ancho total */}
+    <div class="flex items-center justify-between mb-2 px-3 sm:px-6 md:px-8">
       <div class="flex items-center gap-3">
-        <span class="text-[9.5px] sm:text-[11px] uppercase tracking-[0.35em] font-mono text-rust-orange font-bold">
+        <span class="text-[10px] sm:text-[11.5px] uppercase tracking-[0.35em] font-mono text-rust-orange font-bold">
           {eyebrow}
         </span>
-        <span class="text-[8.5px] sm:text-[9.5px] uppercase tracking-[0.25em] font-mono text-white/40 hidden sm:inline-block">
+        <span class="text-[9px] sm:text-[10px] uppercase tracking-[0.25em] font-mono text-white/50 hidden sm:inline-block">
           • {collections.length} Colecciones
         </span>
       </div>
       {allLink && (
         <a 
           href={allLink} 
-          class="text-[9px] sm:text-[10px] uppercase tracking-[0.25em] font-mono text-white/50 hover:text-amber-400 transition-colors"
+          class="text-[9.5px] sm:text-[10.5px] uppercase tracking-[0.25em] font-mono text-white/60 hover:text-amber-400 transition-colors"
         >
           Ver Todas →
         </a>
@@ -58,10 +58,10 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
       {/* Botón Anterior Flotante en Cápsula */}
       <button 
         type="button"
-        class="tray-nav-btn prev-btn absolute -left-2 md:-left-4 top-1/2 -translate-y-1/2 z-30 w-8 md:w-10 h-16 md:h-20 rounded-full bg-black/80 hover:bg-black text-white/80 hover:text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-75 hover:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-2xl"
+        class="tray-nav-btn prev-btn absolute left-1 sm:left-2 md:left-4 top-1/2 -translate-y-1/2 z-40 w-9 md:w-11 h-20 md:h-24 rounded-full bg-black/85 hover:bg-black text-white/80 hover:text-white border border-white/25 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-80 hover:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-2xl"
         aria-label="Colecciones anteriores"
       >
-        <svg class="w-4 h-4 md:w-5 md:h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <svg class="w-5 h-5 md:w-6 md:h-6 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
         </svg>
       </button>
@@ -69,7 +69,7 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
       {/* Botón Siguiente Flotante en Cápsula */}
       <button 
         type="button"
-        class="tray-nav-btn next-btn absolute -right-2 md:-right-4 top-1/2 -translate-y-1/2 z-30 w-8 md:w-10 h-16 md:h-20 rounded-full bg-black/80 hover:bg-black text-white/80 hover:text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-75 hover:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-2xl"
+        class="tray-nav-btn next-btn absolute right-1 sm:right-2 md:right-4 top-1/2 -translate-y-1/2 z-40 w-9 md:w-11 h-20 md:h-24 rounded-full bg-black/85 hover:bg-black text-white/80 hover:text-white border border-white/25 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-80 hover:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-2xl"
         aria-label="Siguientes colecciones"
       >
         <svg class="w-4 h-4 md:w-5 md:h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -77,9 +77,9 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
         </svg>
       </button>
 
-      {/* Pista de Deslizamiento con Sibling Push (Row Netflix Clásico) */}
-      <div class="tray-track-wrapper overflow-hidden py-3 px-1">
-        <div class="tray-track flex gap-3.5 sm:gap-4.5 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]">
+      {/* Pista de Deslizamiento con Sibling Push y margen vertical para hover al 25% */}
+      <div class="tray-track-wrapper py-6 sm:py-8 px-3 sm:px-6 md:px-8">
+        <div class="tray-track flex gap-4 sm:gap-5 md:gap-6 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]">
           {collections.map((col) => {
             const rawImg = col.coverImage;
             const imgUrl = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '')) || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop';
@@ -88,7 +88,7 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
             return (
               <a
                 href={linkUrl}
-                class="tray-card aspect-2/3 h-42 sm:h-46 md:h-52 lg:h-56 w-auto shrink-0 rounded-xl overflow-hidden cursor-pointer relative border border-white/15 bg-black/60 shadow-lg group/traycard focus:outline-none"
+                class="tray-card aspect-2/3 h-52 sm:h-60 md:h-68 lg:h-76 w-auto shrink-0 rounded-2xl overflow-hidden cursor-pointer relative border border-white/15 bg-black/60 shadow-xl group/traycard focus:outline-none"
                 aria-label={`Explorar colección: ${col.title}`}
               >
                 {/* Imagen 100% nítida */}
@@ -104,17 +104,17 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
                 <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/45 via-45% to-transparent pointer-events-none" />
 
                 {/* Información Editorial en la base de la tarjeta */}
-                <div class="absolute inset-x-0 bottom-0 p-2.5 sm:p-3 flex flex-col justify-end pointer-events-none z-10">
+                <div class="absolute inset-x-0 bottom-0 p-3 sm:p-4 flex flex-col justify-end pointer-events-none z-10">
                   {col.category && (
-                    <span class="text-[8px] sm:text-[9px] tracking-[0.25em] font-mono text-rust-orange font-bold uppercase truncate mb-0.5">
+                    <span class="text-[8.5px] sm:text-[9.5px] tracking-[0.25em] font-mono text-rust-orange font-bold uppercase truncate mb-1">
                       {col.category}
                     </span>
                   )}
-                  <h4 class="font-cinzel text-xs sm:text-[13px] md:text-sm text-white font-semibold line-clamp-2 leading-snug group-hover/traycard:text-amber-400 transition-colors">
+                  <h4 class="font-cinzel text-xs sm:text-sm md:text-base text-white font-semibold line-clamp-2 leading-snug group-hover/traycard:text-amber-400 transition-colors">
                     {col.title}
                   </h4>
                   {col.excerpt && (
-                    <p class="text-[8.5px] sm:text-[9.5px] text-white/70 line-clamp-1 font-sans mt-0.5 hidden sm:block">
+                    <p class="text-[9px] sm:text-[10px] md:text-[11px] text-white/80 line-clamp-2 font-sans mt-1">
                       {col.excerpt}
                     </p>
                   )}
@@ -131,6 +131,8 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
 <style>
   .tray-track-wrapper {
     width: 100%;
+    overflow-x: clip;
+    overflow-y: visible;
   }
 
   .tray-track {
@@ -138,35 +140,48 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
     transform: translate3d(0, 0, 0);
   }
 
-  /* ── MOVIMIENTO Y HOVER TIPO ROW NETFLIX (SIBLING PUSH) ── */
+  /* ── MOVIMIENTO Y HOVER TIPO ROW NETFLIX (EXPANSIÓN 25% + SIBLING PUSH) ── */
   .tray-card {
     transform: translate3d(0, 0, 0) scale(1);
     transform-origin: center center;
     transition: 
-      transform 320ms cubic-bezier(0.25, 1, 0.5, 1), 
+      transform 300ms cubic-bezier(0.25, 1, 0.5, 1), 
       opacity 250ms ease,
-      box-shadow 250ms ease, 
+      box-shadow 280ms ease, 
       border-color 250ms ease;
     will-change: transform, opacity;
   }
 
-  .tray-card:hover {
-    transform: translate3d(0, -6px, 0) scale(1.08);
-    z-index: 25;
-    border-color: rgba(245, 158, 11, 0.9);
-    box-shadow: 0 16px 32px -4px rgba(0, 0, 0, 0.9);
-    transition-delay: 80ms;
+  .tray-card:first-child {
+    transform-origin: left center;
   }
 
-  /* Sibling push sutil en la bandeja horizontal */
+  .tray-card:last-child {
+    transform-origin: right center;
+  }
+
+  /* Aumento de 25% en hover (scale 1.25) */
+  .tray-card:hover {
+    transform: translate3d(0, -8px, 0) scale(1.25);
+    z-index: 40 !important;
+    border-color: rgba(245, 158, 11, 1);
+    box-shadow: 
+      0 20px 40px -6px rgba(0, 0, 0, 0.95), 
+      0 0 25px rgba(245, 158, 11, 0.3);
+    transition-delay: 60ms;
+  }
+
+  /* Sibling push sutil en la fila para la tarjeta con aumento del 25% */
   .tray-track:has(.tray-card:hover) .tray-card:not(:hover):has(~ .tray-card:hover) {
-    transform: translate3d(-6px, 0, 0);
-    transition-delay: 80ms;
+    transform: translate3d(-14px, 0, 0) scale(0.96);
+    opacity: 0.8;
+    transition-delay: 60ms;
   }
 
   .tray-card:hover ~ .tray-card {
-    transform: translate3d(6px, 0, 0);
-    transition-delay: 80ms;
+    transform: translate3d(14px, 0, 0) scale(0.96);
+    opacity: 0.8;
+    transition-delay: 60ms;
   }
 
   .tray-track:not(:hover) .tray-card {
