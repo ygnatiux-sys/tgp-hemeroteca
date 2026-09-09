@@ -160,28 +160,28 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
     transform-origin: right center;
   }
 
-  /* Aumento de 25% en hover (scale 1.25) */
+  /* Aumento de 15% en hover (scale 1.15) */
   .tray-card:hover {
-    transform: translate3d(0, -8px, 0) scale(1.25);
+    transform: translate3d(0, -6px, 0) scale(1.15);
     z-index: 40 !important;
     border-color: rgba(245, 158, 11, 1);
     box-shadow: 
-      0 20px 40px -6px rgba(0, 0, 0, 0.95), 
-      0 0 25px rgba(245, 158, 11, 0.3);
-    transition-delay: 60ms;
+      0 18px 36px -6px rgba(0, 0, 0, 0.95), 
+      0 0 20px rgba(245, 158, 11, 0.25);
+    transition-delay: 50ms;
   }
 
-  /* Sibling push sutil en la fila para la tarjeta con aumento del 25% */
+  /* Sibling push sutil en la fila para la tarjeta con aumento del 15% */
   .tray-track:has(.tray-card:hover) .tray-card:not(:hover):has(~ .tray-card:hover) {
-    transform: translate3d(-14px, 0, 0) scale(0.96);
-    opacity: 0.8;
-    transition-delay: 60ms;
+    transform: translate3d(-10px, 0, 0) scale(0.98);
+    opacity: 0.85;
+    transition-delay: 50ms;
   }
 
   .tray-card:hover ~ .tray-card {
-    transform: translate3d(14px, 0, 0) scale(0.96);
-    opacity: 0.8;
-    transition-delay: 60ms;
+    transform: translate3d(10px, 0, 0) scale(0.98);
+    opacity: 0.85;
+    transition-delay: 50ms;
   }
 
   .tray-track:not(:hover) .tray-card {
