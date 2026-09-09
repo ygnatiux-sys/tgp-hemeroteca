@@ -8,6 +8,8 @@ interface Props {
   vibeClass?: string;
   isH1?: boolean;
   fontClass?: string;
+  heightClass?: string;
+  marginClass?: string;
 }
 const {
   title,
@@ -16,6 +18,8 @@ const {
   vibeClass = "",
   isH1 = false,
   fontClass = "font-serif",
+  heightClass = "h-[calc(80vh-2rem)] min-h-150",
+  marginClass = "mb-[25vh] md:mb-[35vh]",
 } = Astro.props;
 
 const safeImageUrl = sanitizeImageUrl(imageUrl);
@@ -24,7 +28,7 @@ const gradientClass = isSerif ? "gradient-general-h1" : "gradient-acero-ios";
 ---
 
 <section
-  class={`dark-hero relative w-[calc(100%-2rem)] h-[calc(80vh-2rem)] min-h-150 mx-auto mt-4 mb-[25vh] md:mb-[35vh] flex flex-col items-center justify-center overflow-hidden rounded-3xl ${vibeClass}`}
+  class={`dark-hero relative w-[calc(100%-2rem)] ${heightClass} mx-auto mt-4 ${marginClass} flex flex-col items-center justify-center overflow-hidden rounded-3xl ${vibeClass}`}
   style="background-color: var(--bg-current);"
 >
   <div class="absolute inset-0 z-0 opacity-70 marquee-bg-pin flex">

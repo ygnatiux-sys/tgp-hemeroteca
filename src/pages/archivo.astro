@@ -4,7 +4,7 @@ import Image from '../components/SafeImage.astro';
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
-import CinematicPostEngine from '../components/CinematicPostEngine.astro';
+import SpotlightHero, { type SpotlightPost } from '../components/SpotlightHero.astro';
 import CinematicExcerptRest from '../components/CinematicExcerptRest.astro';
 import Marquee from '../components/Marquee.astro';
 import {
@@ -126,19 +126,34 @@ const archiveCover = archiveCoverEssay
     }
   : null;
 
-// ─── SLIDES PARA EL ENGINE: todos los posts en orden de categoría ─────────────
-const archiveSlides = essaysByCategory.flatMap(group =>
-  group.essays.map(e => ({
-    id: e.slug,
-    title: e.entry.title || 'Dossier',
-    subtitle: e.entry.excerpt || '',
-    category: group.catLabel,
-    date: e.entry.date ? formatYear(e.entry.date) : '',
-    image: (e.img as any)?.src ?? e.img,
-    imagePosition: (e.entry as any).coverImagePosition || (e.entry as any).imagePosition || 'center center',
-    link: `/hemeroteca/${e.slug}`,
-  }))
-).filter(s => s.image);
+// ─── COLECCIONES DEL ARCHIVO PARA SPOTLIGHT HERO (ESTILO ROW NETFLIX) ────────
+const archiveCollectionSpotlights: SpotlightPost[] = essaysByCategory.map(group => {
+  const leadEssay = group.essays.find(e => e.img) || group.essays[0];
+  const rawImg = leadEssay?.img;
+  const count = group.essays.length;
+
+  const yearRange = group.essays
+    .map(e => e.entry.date ? new Date(e.entry.date).getFullYear() : null)
+    .filter(Boolean)
+    .sort((a, b) => (a as number) - (b as number));
+  const yearLabel = yearRange.length > 0
+    ? yearRange[0] === yearRange[yearRange.length - 1]
+      ? `${yearRange[0]}`
+      : `${yearRange[0]}–${yearRange[yearRange.length - 1]}`
+    : '';
+
+  const excerptText = leadEssay?.entry?.excerpt 
+    || `Colección especializada con ${count} investigaciones documentadas y resguardadas en el Archivo General${yearLabel ? ` (${yearLabel})` : ''}.`;
+
+  return {
+    slug: group.catKey,
+    title: group.catLabel,
+    excerpt: excerptText,
+    coverImage: rawImg,
+    category: `Colección Archivo · ${count} Documento${count > 1 ? 's' : ''}`,
+    link: `/colecciones/${group.catKey}/`,
+  };
+});
 
 // Helper para mapear essays a SlideData de CinematicPostEngine
 function mapToSlideData(essays: typeof resolvedEssays) {
@@ -178,7 +193,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
   description="Archivo general y catálogo cronológico de investigaciones, dossiers y ensayos de The Great Puzzle Project."
   image={archiveCover?.src}
 >
-  {/* ── HERO PRINCIPAL CINEMÁTICO DARK GLOOCK (H1) ── */}
+  {/* ── HERO PRINCIPAL CINEMÁTICO DARK GLOOCK (H1) — Ampliado hacia abajo ── */}
   <Marquee
     title="ARCHIVO GENERAL"
     subtitle="Registros documentales e investigaciones cartografiadas"
@@ -186,6 +201,8 @@ function createPremierSequences(essays: typeof resolvedEssays) {
     vibeClass="vibe-travel-senses"
     isH1={true}
     fontClass="font-serif font-black"
+    heightClass="h-[calc(90vh-2rem)] min-h-[580px] md:min-h-[720px]"
+    marginClass="mb-[15vh] md:mb-[22vh]"
   />
 
   {/* ── RESPIRO VISUAL / EXCERPT DOBLE SCROLL POLVO DORADO & TYPEMAGIC EN BG-MAIN ── */}
@@ -193,8 +210,15 @@ function createPremierSequences(essays: typeof resolvedEssays) {
     text="El repositorio del [[tiempo transcurrido]]. **Huellas epistémicas** clasificadas y resguardadas, listas para el escrutinio del alma humana."
   />
 
-  {archiveSlides.length > 0 && (
-    <CinematicPostEngine slides={archiveSlides} maxSlides={15} />
+  {/* ── SPOTLIGHT HERO CON MEDIA TRAY TIPO ROW NETFLIX: COLECCIONES DEL ARCHIVO ── */}
+  {archiveCollectionSpotlights.length > 0 && (
+    <section class="w-full max-w-360 mx-auto px-4 md:px-8 lg:px-12 my-10 md:my-16">
+      <SpotlightHero 
+        posts={archiveCollectionSpotlights}
+        eyebrow="COLECCIONES DEL ARCHIVO GENERAL"
+        ctaText="EXPLORAR COLECCIÓN"
+      />
+    </section>
   )}
 
   <div class="min-h-screen pb-32 pt-12">
