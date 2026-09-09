@@ -1,0 +1,255 @@
+---
+/**
+ * SpotlightMediaTray.astro
+ * Bandeja horizontal estilo Row Netflix Clásico (Sibling Push + Chevrons + Hover Delay)
+ * Diseñada para anclarse en el 25% inferior del Hero Cover de Archivo General.
+ */
+import { sanitizeImageUrl } from '../lib/content-filter';
+
+export interface TrayCollectionItem {
+  slug: string;
+  title: string;
+  excerpt?: string;
+  coverImage?: any;
+  category?: string;
+  count?: number;
+  link?: string;
+}
+
+interface Props {
+  collections: TrayCollectionItem[];
+  eyebrow?: string;
+  allLink?: string;
+}
+
+const { 
+  collections = [], 
+  eyebrow = "COLECCIONES DEL ARCHIVO",
+  allLink = "/colecciones/"
+} = Astro.props;
+
+const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
+---
+
+{collections.length > 0 && (
+  <div id={uid} class="spotlight-media-tray-root w-full max-w-6xl mx-auto z-20 select-none">
+    {/* Encabezado discreto de la bandeja */}
+    <div class="flex items-center justify-between mb-2.5 px-2">
+      <div class="flex items-center gap-3">
+        <span class="text-[9px] sm:text-[10px] uppercase tracking-[0.35em] font-mono text-rust-orange font-bold">
+          {eyebrow}
+        </span>
+        <span class="text-[8px] sm:text-[8.5px] uppercase tracking-[0.25em] font-mono text-white/40 hidden sm:inline-block">
+          • {collections.length} Colecciones
+        </span>
+      </div>
+      {allLink && (
+        <a 
+          href={allLink} 
+          class="text-[8.5px] sm:text-[9.5px] uppercase tracking-[0.25em] font-mono text-white/50 hover:text-amber-400 transition-colors"
+        >
+          Ver Todas →
+        </a>
+      )}
+    </div>
+
+    {/* Contenedor del Carrusel con Chevrons */}
+    <div class="relative w-full">
+      {/* Botón Anterior Flotante en Cápsula */}
+      <button 
+        type="button"
+        class="tray-nav-btn prev-btn absolute -left-2 md:-left-4 top-1/2 -translate-y-1/2 z-30 w-8 md:w-9 h-14 md:h-16 rounded-full bg-black/80 hover:bg-black text-white/80 hover:text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-75 hover:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-2xl"
+        aria-label="Colecciones anteriores"
+      >
+        <svg class="w-4 h-4 md:w-5 md:h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+
+      {/* Botón Siguiente Flotante en Cápsula */}
+      <button 
+        type="button"
+        class="tray-nav-btn next-btn absolute -right-2 md:-right-4 top-1/2 -translate-y-1/2 z-30 w-8 md:w-9 h-14 md:h-16 rounded-full bg-black/80 hover:bg-black text-white/80 hover:text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-75 hover:opacity-100 hover:scale-105 active:scale-95 disabled:opacity-0 disabled:pointer-events-none cursor-pointer shadow-2xl"
+        aria-label="Siguientes colecciones"
+      >
+        <svg class="w-4 h-4 md:w-5 md:h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      </button>
+
+      {/* Pista de Deslizamiento con Sibling Push (Row Netflix Clásico) */}
+      <div class="tray-track-wrapper overflow-hidden py-2.5 px-1">
+        <div class="tray-track flex gap-3 sm:gap-4 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]">
+          {collections.map((col) => {
+            const rawImg = col.coverImage;
+            const imgUrl = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '')) || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop';
+            const linkUrl = col.link || `/colecciones/${col.slug}/`;
+
+            return (
+              <a
+                href={linkUrl}
+                class="tray-card aspect-2/3 h-32 sm:h-36 md:h-40 w-auto shrink-0 rounded-xl overflow-hidden cursor-pointer relative border border-white/15 bg-black/60 shadow-lg group/traycard focus:outline-none"
+                aria-label={`Explorar colección: ${col.title}`}
+              >
+                {/* Imagen 100% nítida */}
+                <img 
+                  src={imgUrl}
+                  alt={col.title}
+                  class="w-full h-full object-cover pointer-events-none transition-transform duration-500 ease-out group-hover/traycard:scale-105"
+                  loading="lazy"
+                  decoding="async"
+                />
+
+                {/* Scrim degradado estilo Row Netflix Clásico */}
+                <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/45 via-45% to-transparent pointer-events-none" />
+
+                {/* Información Editorial en la base de la tarjeta */}
+                <div class="absolute inset-x-0 bottom-0 p-2 sm:p-2.5 flex flex-col justify-end pointer-events-none z-10">
+                  {col.category && (
+                    <span class="text-[7.5px] sm:text-[8px] tracking-[0.25em] font-mono text-rust-orange font-bold uppercase truncate mb-0.5">
+                      {col.category}
+                    </span>
+                  )}
+                  <h4 class="font-cinzel text-[10.5px] sm:text-xs text-white font-semibold line-clamp-2 leading-tight group-hover/traycard:text-amber-400 transition-colors">
+                    {col.title}
+                  </h4>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+<style>
+  .tray-track-wrapper {
+    width: 100%;
+  }
+
+  .tray-track {
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* ── MOVIMIENTO Y HOVER TIPO ROW NETFLIX (SIBLING PUSH) ── */
+  .tray-card {
+    transform: translate3d(0, 0, 0) scale(1);
+    transform-origin: center center;
+    transition: 
+      transform 320ms cubic-bezier(0.25, 1, 0.5, 1), 
+      opacity 250ms ease,
+      box-shadow 250ms ease, 
+      border-color 250ms ease;
+    will-change: transform, opacity;
+  }
+
+  .tray-card:hover {
+    transform: translate3d(0, -6px, 0) scale(1.08);
+    z-index: 25;
+    border-color: rgba(245, 158, 11, 0.9);
+    box-shadow: 0 16px 32px -4px rgba(0, 0, 0, 0.9);
+    transition-delay: 80ms;
+  }
+
+  /* Sibling push sutil en la bandeja horizontal */
+  .tray-track:has(.tray-card:hover) .tray-card:not(:hover):has(~ .tray-card:hover) {
+    transform: translate3d(-6px, 0, 0);
+    transition-delay: 80ms;
+  }
+
+  .tray-card:hover ~ .tray-card {
+    transform: translate3d(6px, 0, 0);
+    transition-delay: 80ms;
+  }
+
+  .tray-track:not(:hover) .tray-card {
+    transition-delay: 0ms;
+  }
+</style>
+
+<script>
+  function initSpotlightMediaTrays() {
+    const trays = document.querySelectorAll<HTMLElement>('.spotlight-media-tray-root');
+
+    trays.forEach(root => {
+      if (root.hasAttribute('data-init')) return;
+      root.setAttribute('data-init', 'true');
+
+      const track = root.querySelector('.tray-track') as HTMLElement | null;
+      const trackWrapper = root.querySelector('.tray-track-wrapper') as HTMLElement | null;
+      const prevBtn = root.querySelector('.prev-btn') as HTMLButtonElement | null;
+      const nextBtn = root.querySelector('.next-btn') as HTMLButtonElement | null;
+
+      if (!track || !trackWrapper || !prevBtn || !nextBtn) return;
+
+      let currentTransform = 0;
+
+      function updateButtons() {
+        if (!track || !trackWrapper || !prevBtn || !nextBtn) return;
+        const trackWidth = track.scrollWidth;
+        const containerWidth = trackWrapper.offsetWidth;
+
+        prevBtn.disabled = currentTransform >= 0;
+        nextBtn.disabled = Math.abs(currentTransform) + containerWidth >= trackWidth - 10;
+      }
+
+      function slide(direction: 'next' | 'prev') {
+        if (!track || !trackWrapper) return;
+        const containerWidth = trackWrapper.offsetWidth;
+        const moveAmount = containerWidth * 0.78;
+
+        if (direction === 'next') {
+          currentTransform -= moveAmount;
+        } else {
+          currentTransform += moveAmount;
+        }
+
+        const maxScroll = -(track.scrollWidth - containerWidth);
+        if (currentTransform > 0) currentTransform = 0;
+        if (currentTransform < maxScroll) currentTransform = maxScroll;
+
+        track.style.transform = `translate3d(${currentTransform}px, 0, 0)`;
+        updateButtons();
+      }
+
+      nextBtn.addEventListener('click', () => slide('next'));
+      prevBtn.addEventListener('click', () => slide('prev'));
+
+      window.addEventListener('resize', () => {
+        currentTransform = 0;
+        if (track) track.style.transform = 'translate3d(0px, 0, 0)';
+        updateButtons();
+      });
+
+      // Swipe en móvil
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      trackWrapper.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+
+      trackWrapper.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        const diff = touchStartX - touchEndX;
+        if (Math.abs(diff) > 40) {
+          if (diff > 0) slide('next');
+          else slide('prev');
+        }
+      }, { passive: true });
+
+      updateButtons();
+    });
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initSpotlightMediaTrays);
+    } else {
+      initSpotlightMediaTrays();
+    }
+    document.addEventListener('astro:page-load', initSpotlightMediaTrays);
+  }
+</script>

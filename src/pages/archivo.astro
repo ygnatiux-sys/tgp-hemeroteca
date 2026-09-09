@@ -4,7 +4,7 @@ import Image from '../components/SafeImage.astro';
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
-import SpotlightHero, { type SpotlightPost } from '../components/SpotlightHero.astro';
+import SpotlightMediaTray, { type TrayCollectionItem } from '../components/SpotlightMediaTray.astro';
 import CinematicExcerptRest from '../components/CinematicExcerptRest.astro';
 import Marquee from '../components/Marquee.astro';
 import {
@@ -126,8 +126,8 @@ const archiveCover = archiveCoverEssay
     }
   : null;
 
-// ─── COLECCIONES DEL ARCHIVO PARA SPOTLIGHT HERO (ESTILO ROW NETFLIX) ────────
-const archiveCollectionSpotlights: SpotlightPost[] = essaysByCategory.map(group => {
+// ─── COLECCIONES DEL ARCHIVO PARA SPOTLIGHT MEDIA TRAY (ESTILO ROW NETFLIX) ───
+const archiveCollectionSpotlights: TrayCollectionItem[] = essaysByCategory.map(group => {
   const leadEssay = group.essays.find(e => e.img) || group.essays[0];
   const rawImg = leadEssay?.img;
   const count = group.essays.length;
@@ -193,7 +193,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
   description="Archivo general y catálogo cronológico de investigaciones, dossiers y ensayos de The Great Puzzle Project."
   image={archiveCover?.src}
 >
-  {/* ── HERO PRINCIPAL CINEMÁTICO DARK GLOOCK (H1) — Ampliado hacia abajo ── */}
+  {/* ── HERO PRINCIPAL CINEMÁTICO DARK GLOOCK (H1) — LIENZO GENERAL CON TRAY 75/25 ── */}
   <Marquee
     title="ARCHIVO GENERAL"
     subtitle="Registros documentales e investigaciones cartografiadas"
@@ -201,25 +201,20 @@ function createPremierSequences(essays: typeof resolvedEssays) {
     vibeClass="vibe-travel-senses"
     isH1={true}
     fontClass="font-serif font-black"
-    heightClass="h-[calc(90vh-2rem)] min-h-[580px] md:min-h-[720px]"
-    marginClass="mb-[15vh] md:mb-[22vh]"
-  />
+    heightClass="h-[calc(92vh-2rem)] min-h-[640px] md:min-h-[780px] lg:min-h-[820px]"
+    marginClass="mb-[12vh] md:mb-[16vh]"
+  >
+    <SpotlightMediaTray 
+      collections={archiveCollectionSpotlights}
+      eyebrow="COLECCIONES DEL ARCHIVO"
+      allLink="/colecciones/"
+    />
+  </Marquee>
 
   {/* ── RESPIRO VISUAL / EXCERPT DOBLE SCROLL POLVO DORADO & TYPEMAGIC EN BG-MAIN ── */}
   <CinematicExcerptRest 
     text="El repositorio del [[tiempo transcurrido]]. **Huellas epistémicas** clasificadas y resguardadas, listas para el escrutinio del alma humana."
   />
-
-  {/* ── SPOTLIGHT HERO CON MEDIA TRAY TIPO ROW NETFLIX: COLECCIONES DEL ARCHIVO ── */}
-  {archiveCollectionSpotlights.length > 0 && (
-    <section class="w-full max-w-360 mx-auto px-4 md:px-8 lg:px-12 my-10 md:my-16">
-      <SpotlightHero 
-        posts={archiveCollectionSpotlights}
-        eyebrow="COLECCIONES DEL ARCHIVO GENERAL"
-        ctaText="EXPLORAR COLECCIÓN"
-      />
-    </section>
-  )}
 
   <div class="min-h-screen pb-32 pt-12">
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16">
