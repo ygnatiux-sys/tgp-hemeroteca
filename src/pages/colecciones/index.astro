@@ -135,7 +135,7 @@ const coverflowPosts: CoverflowPost[] = collections
       {/* ── BANDEJA SPOTLIGHT MEDIA TRAY: JUSTO DEBAJO INMEDIATO AL PIE DE IMAGEN CON MASK BLACK A ANCHO TOTAL ── */}
       <div class="relative z-20 -mt-24 sm:-mt-32 md:-mt-40 mb-16 md:mb-24 w-full overflow-x-clip">
         {/* Scrim / Black Mask suave que difumina la transición del pie de imagen con el componente a ancho total */}
-        <div class="absolute -top-24 inset-x-0 bottom-0 bg-gradient-to-b from-transparent via-black/85 via-40% to-[var(--bg-current)] pointer-events-none -z-10"></div>
+        <div class="absolute -top-24 inset-x-0 bottom-0 bg-linear-to-b from-transparent via-black/85 via-40% to-(--bg-current) pointer-events-none -z-10"></div>
 
         <SpotlightMediaTray 
           collections={coleccionesTrayItems}
