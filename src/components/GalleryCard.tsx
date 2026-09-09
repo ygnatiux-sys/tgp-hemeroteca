@@ -48,7 +48,7 @@ export default function GalleryCard({
   return (
     <div 
       ref={cardRef}
-      className="relative group w-full aspect-16/9 cursor-pointer select-none"
+      className="relative group w-full aspect-video cursor-pointer select-none"
       onClick={() => setIsExpanded(prev => !prev)}
     >
       {/* ── 1. ESTADO REPOSO (Mantiene la cuadrícula fija sin saltos de layout) ── */}
@@ -82,7 +82,7 @@ export default function GalleryCard({
         onClick={(e) => e.stopPropagation()} // Evita cerrar si interactúa dentro del panel
       >
         {/* Área Visual */}
-        <div className="relative w-full aspect-16/9 bg-black overflow-hidden">
+        <div className="relative w-full aspect-video bg-black overflow-hidden">
           <img 
             src={image} 
             alt={title} 
