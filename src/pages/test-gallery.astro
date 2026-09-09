@@ -1,0 +1,73 @@
+---
+import Layout from '../layouts/Layout.astro';
+import GalleryCard from '../components/GalleryCard';
+
+const sampleCards = [
+  {
+    image: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop",
+    title: "EL ORÁCULO DE DELFOS Y LA FISURA DE KASTALIA",
+    author: "ARCHIVO DE ARQUEOSEMIÓTICA TGP",
+    region: "GRECIA CLÁSICA",
+    year: "S. VIII A.C.",
+    excerpt: "Bajo el templo apolíneo de Delfos convergían fallas tectónicas activas y emanaciones de gases hidrocarburados. El estado trance de la Pitia no constituyó un mero artificio sacerdotal, sino un dispositivo geo-oracular donde la tectónica del Mediterráneo dictaba la geopolítica del mundo helénico.",
+    tags: "4K | ENSAYO VISUAL | GEOHISTORIA | ESPAÑOL",
+    link: "/ensayos/el-oraculo-de-delfos/"
+  },
+  {
+    image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop",
+    title: "ARAMU MURU: LA PUERTA INTERDIMENSIONAL DE HAYU MARCA",
+    author: "EQUIPO CURATORIAL TGP",
+    region: "ALTIPLANO PERUANO",
+    year: "PERIODO PRE-INCA",
+    excerpt: "Labrada directamente en la arenisca viva frente al lago Titicaca, esta hornacina ciega de siete metros carece de propósito habitacional o funerario. Las tradiciones aymaras la codificaron como un umbral estelar, preservando una memoria de resonancia acústica anterior a la expansión solar inka.",
+    tags: "HD | DOSSIER ARQUEOLÓGICO | ANOMALÍAS | ESPAÑOL",
+    link: "/colecciones/sitios-arqueohistoricos/"
+  },
+  {
+    image: "https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?q=80&w=1200&auto=format&fit=crop",
+    title: "GÖBEKLI TEPE: LA LITURGIA QUE PREFIRIÓ EL GRANO",
+    author: "DEPARTAMENTO DE ANTROPOLOGÍA PROFUNDA",
+    region: "ALTA MESOPOTAMIA",
+    year: "9600 A.C.",
+    excerpt: "Los megalitos antropomorfos en círculo no fueron consecuencia del excedente agrícola, sino su detonante. La necesidad ritual y simbólica de congregar clanes obligó a domesticar el trigo silvestre, revelando que la mente mitológica precedió y fundó la civilización técnica.",
+    tags: "4K | REGISTRO MONUMENTAL | PRE-CERÁMICO | ESPAÑOL",
+    link: "/colecciones/arqueosemiotica/"
+  }
+];
+---
+
+<Layout
+  title="Galería de Lectura Curatorial | Muestra GalleryCard"
+  description="Muestra interactiva de GalleryCard con arquitectura de pop-out / click para lectura de metadata histórica."
+>
+  <main class="min-h-screen text-white pt-28 pb-36 px-6 sm:px-12 max-w-7xl mx-auto">
+    <div class="mb-12 border-b border-white/10 pb-8">
+      <span class="text-xs uppercase font-mono tracking-[0.4em] text-amber-400 font-bold block mb-2">
+        ARQUITECTURA POP-OUT INTERACTIVA
+      </span>
+      <h1 class="text-3xl sm:text-5xl font-serif font-black tracking-tight leading-tight">
+        Muestra Curatorial GalleryCard
+      </h1>
+      <p class="text-white/60 font-serif text-sm sm:text-base mt-2 max-w-2xl">
+        Haz <strong>clic</strong> sobre cualquier tarjeta para expandir el panel y leer cómodamente la metadata e información del posteo, o pasa el cursor con un ligero retraso (delay-200) sin alterar el flujo de la grilla.
+      </p>
+    </div>
+
+    {/* Grilla de Cards */}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+      {sampleCards.map((card) => (
+        <GalleryCard
+          client:load
+          image={card.image}
+          title={card.title}
+          author={card.author}
+          region={card.region}
+          year={card.year}
+          excerpt={card.excerpt}
+          tags={card.tags}
+          link={card.link}
+        />
+      ))}
+    </div>
+  </main>
+</Layout>
