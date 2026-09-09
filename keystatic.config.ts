@@ -591,7 +591,7 @@ export default config({
         }),
 
         // 3. CAMPO DE CONTENIDO
-        content: fields.document({
+      content: fields.document({
           label: 'Contenido',
           formatting: true,
           links: true,
@@ -600,5 +600,67 @@ export default config({
         }),
       },
     }),
+
+    // ── COLECCIÓN: INFORMES PREMIUM ─────────────────────────────────────────
+    informesPremium: collection({
+      label: '🧪 Informes Premium',
+      slugField: 'titulo',
+      path: 'src/content/informes/*/',
+      format: { contentField: 'contenido' },
+      schema: {
+        titulo: fields.slug({ name: { label: 'Título del Informe' } }),
+
+        coleccion: fields.select({
+          label: 'Colección Temática',
+          options: [
+            { label: 'Liminal', value: 'liminal' },
+            { label: 'Heterodoxia', value: 'heterodoxia' },
+            { label: 'Anomalías', value: 'anomalias' },
+            { label: 'Apócrifa', value: 'apocrifa' },
+          ],
+          defaultValue: 'liminal',
+        }),
+
+        fuenteVisual: fields.select({
+          label: 'Motor Gráfico',
+          options: [
+            { label: 'Histórica (Wikimedia Commons)', value: 'wikimedia' },
+            { label: 'Sintética (VEO3 / Imagen 3)', value: 'sintetica' },
+          ],
+          defaultValue: 'wikimedia',
+        }),
+
+        directrices: fields.text({
+          label: 'Directrices Temáticas',
+          description: 'Instrucciones adicionales para el motor cognitivo. Ej: "Enfocarse en la dimensión simbólica y la memoria colectiva."',
+          multiline: true,
+        }),
+
+        tags: fields.multiselect({
+          label: 'Tags',
+          options: [
+            { label: 'Liminal', value: 'liminal' },
+            { label: 'Heterodoxia', value: 'heterodoxia' },
+            { label: 'Anomalías', value: 'anomalias' },
+            { label: 'Apócrifa', value: 'apocrifa' },
+            { label: 'Arqueosemiótica', value: 'arqueosemiotica' },
+            { label: 'Historia Profunda', value: 'historia-profunda' },
+            { label: 'Simbología', value: 'simbologia' },
+            { label: 'Gnosis', value: 'gnosis' },
+          ],
+        }),
+
+        imagenDestacada: fields.text({
+          label: 'URL de Imagen en R2 (Generada Automáticamente)',
+          description: 'El orquestador llenará este campo tras procesar y subir la imagen en WebP a Cloudflare R2. No editar manualmente.',
+          validation: { isRequired: false },
+        }),
+
+        contenido: fields.markdoc({
+          label: 'Cuerpo del Ensayo',
+          extension: 'mdoc',
+        }),
+      },
+    }),
   },
-});
+});
