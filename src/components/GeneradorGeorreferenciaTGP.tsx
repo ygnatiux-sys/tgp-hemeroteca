@@ -234,13 +234,17 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
         if (unnested.saberMasDato) setSaberMas(unnested.saberMasDato);
         if (unnested.excerpt) setExcerpt(unnested.excerpt);
         if (unnested.titulosSugeridos) setTitulosSugeridos(unnested.titulosSugeridos);
-        syncAllKeystaticFields({
-          volanta: unnested.volantaHook,
-          saberMas: unnested.saberMasDato,
-          excerpt: unnested.excerpt,
-          sitio: lugar || effectiveTitle,
-          contentMarkdown: unnested.informeMarkdown
-        });
+        // DIFERIR la inyección de DOM 800ms para que Slate/Keystatic termine de inicializar
+        // y evitar el crash "Cannot resolve a Slate node from DOM node"
+        setTimeout(() => {
+          syncAllKeystaticFields({
+            volanta: unnested.volantaHook,
+            saberMas: unnested.saberMasDato,
+            excerpt: unnested.excerpt,
+            sitio: lugar || effectiveTitle,
+            contentMarkdown: unnested.informeMarkdown
+          });
+        }, 800);
         onChange(unnested.informeMarkdown);
         setStatusFeedback('Campos separados y desanidados correctamente');
       } else if (value !== informe) {
@@ -456,9 +460,9 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
     });
   };
 
-  // Activar lock al montar si no hay contenido sinc.
-  useEffect(() => { if (!isSynced) lockKeystatiSave(true); }, []);
-  useEffect(() => { lockKeystatiSave(!isSynced); }, [isSynced]);
+  // Activar lock al montar si no hay contenido sinc. — diferido para no interferir con Slate.
+  useEffect(() => { setTimeout(() => { if (!isSynced) lockKeystatiSave(true); }, 1200); }, []);
+  useEffect(() => { setTimeout(() => { lockKeystatiSave(!isSynced); }, 300); }, [isSynced]);
 
   // 3. Acción Manual de Inyección / Traspasar Todo
   const handleTraspasarTodo = () => {
