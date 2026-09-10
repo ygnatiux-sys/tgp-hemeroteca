@@ -113,7 +113,7 @@ const categoryHighlightCards = essaysByCategory.slice(0, 4).map(group => {
 });
 
 // ─── PORTADA DEL HERO: Imagen Wikimedia representativa del Archivo General ────
-const ARCHIVE_WIKI_COVER = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_%28Vienna%29_-_Google_Art_Project_-_edited.jpg/2560px-Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_%28Vienna%29_-_Google_Art_Project_-_edited.jpg';
+const ARCHIVE_WIKI_COVER = '/src/assets/remotas/pieter-bruegel-the-elder-the-tower-of-babel-vienna.webp';
 
 const arquetiposConImg = publishableArquetipos
   .map(e => ({ ...e, img: resolveEssayImage(e.entry, e.slug) }))
