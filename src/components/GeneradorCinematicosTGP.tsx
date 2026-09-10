@@ -389,8 +389,41 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
 
   const isBusy = isGeneratingText || isGeneratingArt;
 
+  // Guardado seguro a disco: SOLO opera si hay un slug confirmado de URL.
+  const handleSaveDirectlyToDisk = async (overrides?: { text?: string; excerpt?: string; image?: string }) => {
+    const slugToUse = getSlugFromUrl();
+    if (!slugToUse) {
+      console.info('[TGP] Post nuevo detectado: Keystatic manejará el save inicial.');
+      return null;
+    }
+
+    const topic = getEffectiveTopic();
+    const textToUse = overrides?.text !== undefined ? overrides.text : generatedText;
+    const excToUse = overrides?.excerpt !== undefined ? overrides.excerpt : excerptIA;
+    const imgToUse = overrides?.image !== undefined ? overrides.image : previewImage;
+
+    try {
+      const res = await fetch('/api/guardar-cinematico', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug: slugToUse,
+          title: topic || slugToUse.replace(/-/g, ' '),
+          content: textToUse,
+          excerpt: excToUse,
+          imageUrl: imgToUse,
+        })
+      });
+      const data = await res.json();
+      return data;
+    } catch (e) {
+      console.error('[TGP] Error guardando ensayo cinemático:', e);
+      return null;
+    }
+  };
+
   // 4. Traspasar Todo a Keystatic (inyecta en campos nativos y editor ProseMirror)
-  const handleTraspasarTodo = () => {
+  const handleTraspasarTodo = async () => {
     const topic = getEffectiveTopic();
     if (!generatedText && !previewImage) {
       setStatusMsg({ type: 'error', text: 'No hay contenido generado para traspasar. Generá primero.' });
@@ -403,7 +436,18 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
     syncToKeystatic(generatedText, previewImage);
     setIsSynced(true);
     lockKeystatiSave(false);
-    setStatusMsg({ type: 'success', text: '✅ Contenido inyectado en campos nativos y editor de Keystatic. Podés hacer Save.' });
+
+    const slugConfirmado = getSlugFromUrl();
+    if (slugConfirmado) {
+      const saveRes = await handleSaveDirectlyToDisk();
+      if (saveRes?.productionMode) {
+        setStatusMsg({ type: 'success', text: `✅ Contenido preparado. Presioná el botón azul "Save" de Keystatic arriba para publicar en GitHub.` });
+      } else {
+        setStatusMsg({ type: 'success', text: `✅ Ensayo cinemático guardado en disco y traspasado al editor.` });
+      }
+    } else {
+      setStatusMsg({ type: 'success', text: '✅ Contenido inyectado en campos nativos y editor de Keystatic. Podés hacer Save.' });
+    }
   };
 
   const hasContent = !!(generatedText || previewImage);
@@ -615,15 +659,108 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
         </div>
       )}
 
+      {/* ÁREA DE TEXTO DEL ENSAYO CINEMÁTICO */}
+      {generatedText && (
+        <div style={{ marginTop: '14px', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
+            <label style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#D4AF37', fontWeight: 700 }}>
+              CONTENIDO DEL ENSAYO CINEMÁTICO (GSAP):
+            </label>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    navigator.clipboard.writeText(generatedText).then(() => {
+                      alert('✓ Ensayo copiado al portapapeles.');
+                    }).catch(() => {
+                      const el = document.querySelector<HTMLTextAreaElement>('textarea[placeholder*="cinemático"]');
+                      if (el) { el.select(); document.execCommand('copy'); }
+                      alert('✓ Texto seleccionado — usá Ctrl+C para copiar.');
+                    });
+                  } catch { alert('Usá Ctrl+A y Ctrl+C en el textarea para copiar.'); }
+                }}
+                style={{ padding: '4px 10px', background: '#14283c', color: '#90caf9', border: '1px solid #285484', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
+              >
+                📋 Copiar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    const slug = getSlugFromUrl() || 'ensayo-cinematico-tgp';
+                    const blob = new Blob([generatedText], { type: 'text/markdown;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${slug}-${new Date().toISOString().slice(0, 10)}.md`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  } catch (e) { alert('No se pudo descargar. Copiá el texto manualmente.'); }
+                }}
+                style={{ padding: '4px 10px', background: '#1b3a1b', color: '#81c784', border: '1px solid #2e7d32', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
+                title="Descarga el ensayo cinemático como archivo .md en tu carpeta de Descargas"
+              >
+                ⬇️ Descargar .md
+              </button>
+            </div>
+          </div>
+          <textarea
+            value={generatedText}
+            placeholder="Cuerpo del ensayo cinemático..."
+            onChange={(e) => {
+              const newText = e.target.value;
+              setGeneratedText(newText);
+              syncToKeystatic(newText, previewImage);
+            }}
+            rows={10}
+            style={{
+              width: '100%',
+              backgroundColor: '#16171a',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '6px',
+              padding: '12px',
+              color: '#fff',
+              fontSize: '13px',
+              lineHeight: '1.6',
+              fontFamily: 'Consolas, Monaco, monospace',
+              boxSizing: 'border-box',
+              resize: 'vertical'
+            }}
+          />
+        </div>
+      )}
+
       {/* Vista previa de imagen generada */}
       {previewImage && (
         <div style={{ marginTop: '12px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', overflow: 'hidden', backgroundColor: '#000' }}>
           <img src={previewImage} alt="Arte Generado" style={{ width: '100%', height: 'auto', display: 'block' }} />
-          {previewPrompt && (
-            <p style={{ padding: '8px 12px', margin: 0, fontSize: '11px', color: 'rgba(239,235,227,0.6)', fontStyle: 'italic' }}>
-              Prompt: {previewPrompt}
-            </p>
-          )}
+          <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.03)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <span style={{ fontSize: '11px', color: 'rgba(239,235,227,0.6)', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
+              {previewPrompt ? `Prompt: ${previewPrompt}` : 'Portada cinemática generada'}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  const slug = getSlugFromUrl() || 'portada-cinematica';
+                  const a = document.createElement('a');
+                  a.href = previewImage;
+                  a.download = `${slug}-portada.jpg`;
+                  a.target = '_blank';
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                } catch { window.open(previewImage, '_blank'); }
+              }}
+              style={{ padding: '4px 10px', background: '#3a2a10', color: '#ffb74d', border: '1px solid #ff9800', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
+              title="Descarga la imagen de portada generada"
+            >
+              ⬇️ Descargar Portada
+            </button>
+          </div>
         </div>
       )}
 

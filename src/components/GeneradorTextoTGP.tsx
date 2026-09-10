@@ -445,13 +445,17 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
     const slugConfirmado = getSlugFromUrl();
     if (slugConfirmado) {
       // Post existente: guardar directamente a disco
-      await handleSaveDirectlyToDisk({
+      const saveRes = await handleSaveDirectlyToDisk({
         text: pendingRef.current.text ?? ensayo,
         excerpt: pendingRef.current.excerpt ?? excerptIA,
         category: pendingRef.current.category ?? categoryIA,
         image: pendingRef.current.imageUrl ?? arteResult?.imageUrl ?? undefined
       });
-      alert('ENSAYO, EXCERPT, CATEGORÍA Y PORTADA GUARDADOS EXITOSAMENTE!');
+      if (saveRes?.productionMode) {
+        alert(`✓ CONTENIDO SINCRONIZADO\n\n${saveRes.message || 'Presioná el botón azul "Save" de Keystatic arriba para guardar en GitHub.'}`);
+      } else {
+        alert('ENSAYO, EXCERPT, CATEGORÍA Y PORTADA GUARDADOS EXITOSAMENTE!');
+      }
     } else {
       // Post nuevo: solo sincronizar con Keystatic, el Save lo hace el usuario
       alert('DATOS SINCRONIZADOS CON KEYSTATIC.\n\nAhora presiona el botón "Save" / "Create" de Keystatic para crear el post en el sistema de archivos.');
@@ -857,9 +861,55 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
 
       {/* ÁREA DE TEXTO DEL ENSAYO */}
       <div style={{ marginBottom: '24px' }}>
-        <label style={{ fontSize: '0.75rem', color: '#aaa', display: 'block', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.05em' }}>
-          CONTENIDO DEL ENSAYO:
-        </label>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
+          <label style={{ fontSize: '0.75rem', color: '#aaa', fontWeight: 700, letterSpacing: '0.05em' }}>
+            CONTENIDO DEL ENSAYO:
+          </label>
+          {ensayo && (
+            <div style={{ display: 'flex', gap: '6px' }}>
+              {/* Botón copiar con fallback silencioso */}
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    navigator.clipboard.writeText(ensayo).then(() => {
+                      alert('✓ Ensayo copiado al portapapeles.');
+                    }).catch(() => {
+                      const el = document.querySelector<HTMLTextAreaElement>('textarea[placeholder*="ensayo"]');
+                      if (el) { el.select(); document.execCommand('copy'); }
+                      alert('✓ Texto seleccionado — usá Ctrl+C para copiar.');
+                    });
+                  } catch { alert('Usá Ctrl+A y Ctrl+C en el textarea para copiar.'); }
+                }}
+                style={{ padding: '4px 10px', background: '#14283c', color: '#90caf9', border: '1px solid #285484', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
+              >
+                📋 Copiar
+              </button>
+              {/* ⬇️ Descargar .md — SEGURO NUCLEAR */}
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    const slug = getSlugFromUrl() || 'ensayo-tgp';
+                    const blob = new Blob([ensayo], { type: 'text/markdown;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${slug}-${new Date().toISOString().slice(0, 10)}.md`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  } catch (e) { alert('No se pudo descargar. Copiá el texto manualmente.'); }
+                }}
+                style={{ padding: '4px 10px', background: '#1b3a1b', color: '#81c784', border: '1px solid #2e7d32', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
+                title="Descarga el ensayo como archivo .md en tu carpeta de Descargas"
+              >
+                ⬇️ Descargar .md
+              </button>
+            </div>
+          )}
+        </div>
         <textarea
           value={ensayo}
           onChange={(e) => {

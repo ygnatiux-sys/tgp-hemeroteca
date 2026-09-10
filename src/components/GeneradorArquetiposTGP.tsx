@@ -533,12 +533,33 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
             )}
           </div>
           <div className="flex flex-col sm:flex-row gap-4 items-start">
-            <img
-              src={arteResult.imageUrl}
-              alt="Portada IA"
-              className="w-full sm:w-52 h-32 object-cover rounded-lg border border-white/10 shadow-lg"
-              style={{ maxHeight: '140px' }}
-            />
+            <div className="w-full sm:w-52 flex flex-col gap-2">
+              <img
+                src={arteResult.imageUrl}
+                alt="Portada IA"
+                className="w-full h-32 object-cover rounded-lg border border-white/10 shadow-lg"
+                style={{ maxHeight: '140px' }}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    const slug = getSlugFromUrl() || 'arquetipo-tgp';
+                    const a = document.createElement('a');
+                    a.href = arteResult.imageUrl;
+                    a.download = `${slug}-portada.jpg`;
+                    a.target = '_blank';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                  } catch { window.open(arteResult.imageUrl, '_blank'); }
+                }}
+                className="w-full py-1 px-2 bg-amber-900/30 hover:bg-amber-900/50 border border-amber-500/40 text-amber-300 rounded text-[10px] font-mono font-bold cursor-pointer transition-all flex items-center justify-center gap-1"
+                title="Descargar imagen de portada a tu computadora"
+              >
+                ⬇️ Descargar Portada
+              </button>
+            </div>
             <div className="text-xs text-stone-300 space-y-2 overflow-hidden flex-1">
               <p className="line-clamp-2 text-stone-200">
                 <strong className="text-amber-400/80 font-mono uppercase text-[11px] block">Concepto Curatorial:</strong> 
@@ -704,17 +725,47 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
               <span>✓</span> Texto sincronizado con Keystatic (listo para guardar)
             </span>
 
-            <div className="flex gap-2">
-              {/* Copiar Cuerpo: para pegar manualmente en el editor Markdoc nativo */}
+            <div className="flex flex-wrap gap-2">
+              {/* Copiar Cuerpo */}
               <button
                 type="button"
                 onClick={() => {
-                  navigator.clipboard.writeText(informe);
-                  alert('✓ Cuerpo del arquetipo copiado. Pegá (Ctrl+V) directamente en el editor Markdoc de Keystatic para que se guarde en content.mdoc.');
+                  try {
+                    navigator.clipboard.writeText(informe).then(() => {
+                      alert('✓ Cuerpo del arquetipo copiado. Pegá (Ctrl+V) directamente en el editor Markdoc de Keystatic.');
+                    }).catch(() => {
+                      const el = document.querySelector<HTMLTextAreaElement>('textarea');
+                      if (el) { el.select(); document.execCommand('copy'); }
+                      alert('✓ Texto seleccionado — usá Ctrl+C para copiar.');
+                    });
+                  } catch { alert('Usá Ctrl+A y Ctrl+C en el textarea para copiar.'); }
                 }}
                 className="px-3 py-1.5 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 rounded-lg text-[11px] font-mono uppercase tracking-wider transition-all cursor-pointer font-bold"
               >
-                ⌘ Copiar Cuerpo al Portapapeles
+                ⌘ Copiar
+              </button>
+
+              {/* ⬇️ Descargar .md — SEGURO NUCLEAR, funciona sin permisos */}
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    const slug = getSlugFromUrl() || 'arquetipo-tgp';
+                    const blob = new Blob([informe], { type: 'text/markdown;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${slug}-${new Date().toISOString().slice(0, 10)}.md`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  } catch (e) { alert('No se pudo descargar. Copiá el texto manualmente.'); }
+                }}
+                className="px-3 py-1.5 bg-emerald-900/40 hover:bg-emerald-900/60 border border-emerald-700/50 text-emerald-300 rounded-lg text-[11px] font-mono uppercase tracking-wider transition-all cursor-pointer font-bold"
+                title="Descarga el arquetipo como archivo .md en tu carpeta de Descargas"
+              >
+                ⬇️ Descargar .md
               </button>
 
               <button
@@ -802,7 +853,11 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
                 const data = await res.json();
                 if (data.success) {
                   setIsSaved(true);
-                  alert(`✦ ARQUETIPO GUARDADO EN LA HEMEROTECA\n\n• Metadatos: ${data.indexPath}\n• Contenido: ${data.mdocPath}\n• Caracteres escritos: ${data.charactersWritten}`);
+                  if (data.productionMode) {
+                    alert(`✓ CONTENIDO SINCRONIZADO\n\n${data.message || 'Presioná el botón azul "Save" de Keystatic arriba para guardar en GitHub.'}`);
+                  } else {
+                    alert(`✦ ARQUETIPO GUARDADO EN DISCO\n\n• Metadatos: ${data.indexPath}\n• Contenido: ${data.mdocPath}\n• Caracteres escritos: ${data.charactersWritten}`);
+                  }
                   setTimeout(() => setIsSaved(false), 5000);
                 } else {
                   alert(`Error guardando: ${data.error}`);

@@ -9,6 +9,11 @@ export function GeneradorInformePremium({ value, onChange }: any) {
   // Toggle para el Modo Piloto Automático
   const [modoPiloto, setModoPiloto] = useState(true);
 
+  // Estados de resguardo nuclear (evitan pérdida de tokens)
+  const [ultimoContenido, setUltimoContenido] = useState<string | null>(null);
+  const [ultimaImagen, setUltimaImagen] = useState<string | null>(null);
+  const [ultimoSlug, setUltimoSlug] = useState<string | null>(null);
+
   const handleGenerate = async () => {
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -110,11 +115,26 @@ export function GeneradorInformePremium({ value, onChange }: any) {
         }
       }
 
-      // 5. Inyectar el cuerpo Markdown
+      // 5. Inyectar el cuerpo Markdown y resguardar en estado / localStorage
       if (data.contenido) {
         const cuerpoPuro = data.contenido.replace(/^---[\s\S]+?---\n*/, '');
         injectIntoKeystaticDocumentEditor(cuerpoPuro);
+        setUltimoContenido(cuerpoPuro);
       }
+      if (data.imagenR2Url) {
+        setUltimaImagen(data.imagenR2Url);
+      }
+      if (data.slug) {
+        setUltimoSlug(data.slug);
+      }
+      try {
+        localStorage.setItem('tgp_informe_premium_backup', JSON.stringify({
+          slug: data.slug || titulo,
+          contenido: data.contenido,
+          imagenR2Url: data.imagenR2Url,
+          updatedAt: new Date().toISOString()
+        }));
+      } catch (e) {}
 
       setSuccessMsg(
         <div>
@@ -223,6 +243,85 @@ export function GeneradorInformePremium({ value, onChange }: any) {
       {successMsg && (
         <div style={{ color: '#10b981', fontSize: '14px', padding: '12px', background: '#064e3b', borderRadius: '4px' }}>
           ✓ {successMsg}
+        </div>
+      )}
+
+      {/* BARRA DE EXPORTACIÓN Y RESGUARDO NUCLEAR */}
+      {ultimoContenido && (
+        <div style={{
+          marginTop: '8px',
+          padding: '12px 14px',
+          background: '#14171f',
+          border: '1px solid #1e293b',
+          borderRadius: '6px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '8px'
+        }}>
+          <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            🛡️ Resguardo Seguro del Informe:
+          </span>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  navigator.clipboard.writeText(ultimoContenido).then(() => {
+                    alert('✓ Informe copiado al portapapeles.');
+                  }).catch(() => {
+                    alert('Usá Ctrl+A y Ctrl+C en el editor de Keystatic para copiar.');
+                  });
+                } catch { alert('Copiá el texto desde el editor.'); }
+              }}
+              style={{ padding: '6px 12px', background: '#1e293b', color: '#93c5fd', border: '1px solid #3b82f6', borderRadius: '4px', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 600 }}
+            >
+              📋 Copiar
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  const slug = ultimoSlug || 'informe-premium-tgp';
+                  const blob = new Blob([ultimoContenido], { type: 'text/markdown;charset=utf-8' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `${slug}-${new Date().toISOString().slice(0, 10)}.md`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                } catch (e) { alert('No se pudo descargar. Copiá el texto manualmente.'); }
+              }}
+              style={{ padding: '6px 12px', background: '#064e3b', color: '#86efac', border: '1px solid #10b981', borderRadius: '4px', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 600 }}
+              title="Descarga el informe completo como archivo .md en tu carpeta de Descargas"
+            >
+              ⬇️ Descargar .md
+            </button>
+            {ultimaImagen && (
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    const slug = ultimoSlug || 'portada-premium';
+                    const a = document.createElement('a');
+                    a.href = ultimaImagen;
+                    a.download = `${slug}-portada.webp`;
+                    a.target = '_blank';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                  } catch { window.open(ultimaImagen, '_blank'); }
+                }}
+                style={{ padding: '6px 12px', background: '#451a03', color: '#fdba74', border: '1px solid #f97316', borderRadius: '4px', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 600 }}
+                title="Descarga la imagen destacada"
+              >
+                ⬇️ Portada WebP
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
