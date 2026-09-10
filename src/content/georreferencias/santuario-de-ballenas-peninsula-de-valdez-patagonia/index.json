@@ -1,14 +1,14 @@
 {
-    "title": "Santuario de Ballenas, peninsula de Valdez, patagonia",
-    "sitioGeohistorico": "Santuario de Ballenas, peninsula de Valdez, patagonia",
-    "volantaHook": "Georreferencia Arqueosemiótica e investigación geohistórica sobre Santuario de Ballenas, peninsula de Valdez, patagonia.",
-    "saberMasDato": "Tradición etnográfica local documentada en las inmediaciones de Santuario de Ballenas, peninsula de Valdez, patagonia.",
-    "date": "2026-08-05",
-    "category": "Arqueosemiótica",
-    "publicarConImagen": false,
-    "draft": false,
-    "coverImage": null,
-    "bancoImagenesWikimedia": null,
-    "excerpt": "Informe geohistórico y etnográfico sobre Santuario de Ballenas, peninsula de Valdez, patagonia.",
-    "dek": "Conservación y ciclo reproductivo de la fauna marina en Península Valdés."
+  "title": "Santuario de Ballenas, peninsula de Valdez, patagonia",
+  "sitioGeohistorico": "Santuario de Ballenas, peninsula de Valdez, patagonia",
+  "volantaHook": "Georreferencia Arqueosemiótica e investigación geohistórica sobre Santuario de Ballenas, peninsula de Valdez, patagonia.",
+  "saberMasDato": "Tradición etnográfica local documentada en las inmediaciones de Santuario de Ballenas, peninsula de Valdez, patagonia.",
+  "date": "2026-08-05",
+  "category": "Arqueosemiótica",
+  "publicarConImagen": false,
+  "draft": false,
+  "coverImage": null,
+  "bancoImagenesWikimedia": "{\"selectedItems\":[{\"id\":\"Tail_of_a_whale_near_Valdes_Peninsula.jpg\",\"url\":\"https://upload.wikimedia.org/wikipedia/commons/b/b9/Tail_of_a_whale_near_Valdes_Peninsula.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original\",\"thumbUrl\":\"https://upload.wikimedia.org/wikipedia/commons/b/b9/Tail_of_a_whale_near_Valdes_Peninsula.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled\",\"title\":\"Tail of a whale near Valdes Peninsula.jpg\",\"caption\":\"Santuario de Ballenas, Patagonia\",\"author\":\"Wikimedia Commons\",\"license\":\"Dominio Público / Licencia Libre\",\"width\":1200,\"height\":900,\"aspectRatio\":1.33,\"role\":\"HERO\"}]}",
+  "excerpt": "Informe geohistórico y etnográfico sobre Santuario de Ballenas, peninsula de Valdez, patagonia.",
+  "dek": "Conservación y ciclo reproductivo de la fauna marina en Península Valdés."
 }
