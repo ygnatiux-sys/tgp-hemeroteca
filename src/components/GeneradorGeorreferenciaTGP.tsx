@@ -869,30 +869,75 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
 
       {/* ÁREA DE TEXTO DEL INFORME */}
       <div style={{ marginBottom: '18px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
           <label style={{ fontSize: '0.75rem', color: '#aaa', fontWeight: 700 }}>
             INFORME GEOHISTÓRICO (MARKDOWN):
           </label>
           {informe && (
-            <button
-              type="button"
-              onClick={() => {
-                navigator.clipboard.writeText(informe);
-                alert('✓ Informe copiado al portapapeles.');
-              }}
-              style={{
-                padding: '4px 10px',
-                background: '#14283c',
-                color: '#90caf9',
-                border: '1px solid #285484',
-                borderRadius: '4px',
-                fontSize: '0.72rem',
-                cursor: 'pointer',
-                fontWeight: 600
-              }}
-            >
-              📋 Copiar Markdown
-            </button>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              {/* Botón copiar con fallback silencioso */}
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    navigator.clipboard.writeText(informe).then(() => {
+                      alert('✓ Informe copiado al portapapeles.');
+                    }).catch(() => {
+                      // Fallback: seleccionar texto manualmente
+                      const el = document.querySelector<HTMLTextAreaElement>('textarea[placeholder*="informe"]');
+                      if (el) { el.select(); document.execCommand('copy'); }
+                      alert('✓ Texto seleccionado — usá Ctrl+C para copiar.');
+                    });
+                  } catch { alert('Usá Ctrl+A y Ctrl+C en el textarea para copiar.'); }
+                }}
+                style={{ padding: '4px 10px', background: '#14283c', color: '#90caf9', border: '1px solid #285484', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
+              >
+                📋 Copiar
+              </button>
+              {/* Botón descarga — funciona sin permisos, guarda en Escritorio/Descargas */}
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    const slug = getSlugFromUrl() || 'informe-tgp';
+                    const blob = new Blob([informe], { type: 'text/markdown;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${slug}-${new Date().toISOString().slice(0, 10)}.md`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  } catch (e) { alert('No se pudo descargar. Copiá el texto manualmente.'); }
+                }}
+                style={{ padding: '4px 10px', background: '#1b3a1b', color: '#81c784', border: '1px solid #2e7d32', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
+                title="Descarga el informe como archivo .md en tu carpeta de Descargas"
+              >
+                ⬇️ Descargar .md
+              </button>
+              {/* Imagen descargable si existe */}
+              {imageUrl && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      const a = document.createElement('a');
+                      a.href = imageUrl;
+                      a.download = `${getSlugFromUrl() || 'portada-tgp'}-cover.jpg`;
+                      a.target = '_blank';
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                    } catch { window.open(imageUrl, '_blank'); }
+                  }}
+                  style={{ padding: '4px 10px', background: '#1a1030', color: '#ba68c8', border: '1px solid #6f42c1', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
+                  title="Descarga la imagen de portada generada"
+                >
+                  🖼️ Portada
+                </button>
+              )}
+            </div>
           )}
         </div>
         <textarea
