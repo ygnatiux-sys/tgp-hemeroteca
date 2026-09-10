@@ -79,7 +79,6 @@ export default defineConfig({
   // Redirecciones seguras para rutas deshabilitadas globalmente
   redirects: {
     '/papers': '/hemeroteca',
-    '/papers/[...slug]': '/hemeroteca',
     '/codice': '/',
   },
 

@@ -1,0 +1,3 @@
+# Redirecciones para Cloudflare Pages / Workers
+/papers/*   /hemeroteca   302
+/codice/*   /             302
