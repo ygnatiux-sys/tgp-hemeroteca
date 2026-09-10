@@ -112,19 +112,22 @@ const categoryHighlightCards = essaysByCategory.slice(0, 4).map(group => {
   };
 });
 
-// ─── PORTADA DEL HERO: primer arquetipoGlobal con imagen ────────────────────
+// ─── PORTADA DEL HERO: Imagen Wikimedia representativa del Archivo General ────
+const ARCHIVE_WIKI_COVER = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_%28Vienna%29_-_Google_Art_Project_-_edited.jpg/2560px-Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_%28Vienna%29_-_Google_Art_Project_-_edited.jpg';
+
 const arquetiposConImg = publishableArquetipos
   .map(e => ({ ...e, img: resolveEssayImage(e.entry, e.slug) }))
   .filter(e => e.img);
 const archiveCoverEssay = arquetiposConImg[0] ?? resolvedEssays.find(e => e.img);
 const archiveCover = archiveCoverEssay
   ? {
-      src: (archiveCoverEssay.img as any)?.src ?? archiveCoverEssay.img,
+      src: ARCHIVE_WIKI_COVER || ((archiveCoverEssay.img as any)?.src ?? archiveCoverEssay.img),
       position: (archiveCoverEssay.entry as any).coverImagePosition ||
                 (archiveCoverEssay.entry as any).imagePosition ||
                 'center center',
     }
   : null;
+const archiveCoverUrl = sanitizeImageUrl(ARCHIVE_WIKI_COVER || archiveCover?.src || '');
 
 // ─── COLECCIONES DEL ARCHIVO PARA SPOTLIGHT MEDIA TRAY (ESTILO ROW NETFLIX) ───
 const archiveCollectionSpotlights: TrayCollectionItem[] = essaysByCategory.map(group => {
@@ -191,25 +194,36 @@ function createPremierSequences(essays: typeof resolvedEssays) {
 <Layout
   title="Archivo General | The Great Puzzle Project"
   description="Archivo general y catálogo cronológico de investigaciones, dossiers y ensayos de The Great Puzzle Project."
-  image={archiveCover?.src}
+  image={archiveCoverUrl}
 >
-  {/* ── HERO PRINCIPAL CINEMÁTICO DARK GLOOCK (H1) — LIENZO GENERAL CON TRAY 75/25 ── */}
-  <Marquee
-    title="ARCHIVO GENERAL"
-    subtitle="Registros documentales e investigaciones cartografiadas"
-    imageUrl={archiveCover?.src ?? ''}
-    vibeClass="vibe-travel-senses"
-    isH1={true}
-    fontClass="font-serif font-black"
-    heightClass="h-[calc(92vh-2rem)] min-h-[640px] md:min-h-[780px] lg:min-h-[820px]"
-    marginClass="mb-[12vh] md:mb-[16vh]"
-  >
-    <SpotlightMediaTray 
-      collections={archiveCollectionSpotlights}
-      eyebrow="COLECCIONES DEL ARCHIVO"
-      allLink="/colecciones/"
+  {/* ── HERO PRINCIPAL CINEMÁTICO (H1) CON MASK BLACK AL PIE (SIMÉTRICO CON COLECCIONES) ── */}
+  <div class="relative w-full">
+    <Marquee
+      title="ARCHIVO GENERAL"
+      subtitle="Registros documentales e investigaciones cartografiadas"
+      imageUrl={archiveCoverUrl}
+      vibeClass="vibe-travel-senses"
+      isH1={true}
+      fontClass="font-serif font-black"
+      heightClass="h-[calc(62vh-2rem)] min-h-[420px] md:min-h-[480px]"
+      marginClass="mb-0"
+      roundedClass="rounded-t-3xl rounded-b-none"
+      showSocialInTitle={true}
+      maskBottom={true}
     />
-  </Marquee>
+
+    {/* ── BANDEJA SPOTLIGHT MEDIA TRAY: JUSTO DEBAJO INMEDIATO AL PIE DE IMAGEN CON MASK BLACK A ANCHO TOTAL ── */}
+    <div class="relative z-20 -mt-24 sm:-mt-32 md:-mt-40 mb-16 md:mb-24 w-full overflow-x-clip">
+      {/* Scrim / Black Mask suave que difumina la transición del pie de imagen con el componente a ancho total */}
+      <div class="absolute -top-24 inset-x-0 bottom-0 bg-linear-to-b from-transparent via-black/85 via-40% to-(--bg-current) pointer-events-none -z-10"></div>
+
+      <SpotlightMediaTray 
+        collections={archiveCollectionSpotlights}
+        eyebrow="COLECCIONES DEL ARCHIVO"
+        allLink="/colecciones/"
+      />
+    </div>
+  </div>
 
   {/* ── RESPIRO VISUAL / EXCERPT DOBLE SCROLL POLVO DORADO & TYPEMAGIC EN BG-MAIN ── */}
   <CinematicExcerptRest 

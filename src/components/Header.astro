@@ -86,14 +86,14 @@ const { transparentUntilScroll = false } = Astro.props;
       <button
         id="nav-mobile-btn"
         type="button"
-        class="xl:hidden w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg border border-white/12 bg-white/4 hover:bg-white/10 active:scale-95 text-[#EFEBE3] flex flex-col items-center justify-center gap-[5px] transition-all duration-300 cursor-pointer"
+        class="xl:hidden w-11 h-11 min-w-11 min-h-11 rounded-lg border border-white/12 bg-white/4 hover:bg-white/10 active:scale-95 text-[#EFEBE3] flex flex-col items-center justify-center gap-1.25 transition-all duration-300 cursor-pointer"
         aria-label="Alternar menú de navegación"
         aria-expanded="false"
         aria-controls="nav-drawer"
       >
-        <span class="hamburger-line block w-[18px] h-[1.5px] bg-current rounded-full transition-all duration-300 origin-center"></span>
-        <span class="hamburger-line block w-[18px] h-[1.5px] bg-current rounded-full transition-all duration-300 origin-center"></span>
-        <span class="hamburger-line block w-[12px] h-[1.5px] bg-current rounded-full transition-all duration-300 origin-center self-start ml-[3px]"></span>
+        <span class="hamburger-line block w-4.5 h-[1.5px] bg-current rounded-full transition-all duration-300 origin-center"></span>
+        <span class="hamburger-line block w-4.5 h-[1.5px] bg-current rounded-full transition-all duration-300 origin-center"></span>
+        <span class="hamburger-line block w-3 h-[1.5px] bg-current rounded-full transition-all duration-300 origin-center self-start ml-0.75"></span>
       </button>
     </div>
   </div>
@@ -107,7 +107,7 @@ const { transparentUntilScroll = false } = Astro.props;
 {/* Backdrop */}
 <div
   id="nav-backdrop"
-  class="fixed inset-0 z-[9980] bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-400 xl:hidden"
+  class="fixed inset-0 z-9980 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-400 xl:hidden"
   aria-hidden="true"
 ></div>
 
@@ -117,10 +117,10 @@ const { transparentUntilScroll = false } = Astro.props;
   role="dialog"
   aria-modal="true"
   aria-label="Navegación principal"
-  class="fixed top-0 right-0 h-full w-[min(88vw,340px)] z-[9990] xl:hidden
+  class="fixed top-0 right-0 h-full w-[min(88vw,340px)] z-9990 xl:hidden
          bg-[#0e1110]/97 backdrop-blur-2xl border-l border-white/8
          flex flex-col
-         translate-x-full transition-transform duration-400 ease-[cubic-bezier(0.4,0,0.2,1)]
+         translate-x-full transition-transform duration-400 ease-in-out
          overflow-y-auto overscroll-contain"
 >
   {/* Cabecera del drawer */}
@@ -131,7 +131,7 @@ const { transparentUntilScroll = false } = Astro.props;
     <button
       id="nav-drawer-close"
       type="button"
-      class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-white/6 hover:bg-white/12 active:scale-95 text-white/60 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer"
+      class="w-11 h-11 min-w-11 min-h-11 rounded-full bg-white/6 hover:bg-white/12 active:scale-95 text-white/60 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer"
       aria-label="Cerrar menú"
     >
       {/* X icon — 16px */}
