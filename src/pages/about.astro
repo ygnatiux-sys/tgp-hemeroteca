@@ -5,30 +5,45 @@ import m1 from '../assets/manifiesto/m1.png';
 import m2 from '../assets/manifiesto/m2.png';
 import m3 from '../assets/manifiesto/m3.png';
 import KitLeadMagnet from '../components/KitLeadMagnet.astro';
+import Marquee from '../components/Marquee.astro';
+import CinematicExcerptRest from '../components/CinematicExcerptRest.astro';
+import { sanitizeImageUrl } from '../lib/content-filter';
+
+// Portada Hero Cinemática (Monjes Novicios Leyendo en el Templo - Wikimedia Commons)
+const ABOUT_WIKI_COVER = 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Monks-1822569_1280.jpg';
+const aboutCoverUrl = sanitizeImageUrl(ABOUT_WIKI_COVER);
 ---
 
-<Layout title="About | The Great Puzzle Project">
-  <div class="min-h-screen pb-32 pt-28 bg-theme-dark text-white">
-    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16">
+<Layout
+  title="About | The Great Puzzle Project"
+  description="Dirección editorial, marco teórico, manifiesto y principios fundacionales de The Great Puzzle Project."
+  image={aboutCoverUrl}
+>
+  <div class="text-white min-h-screen pb-32">
 
-      {/* ══════════════════════════════════════════════════════════════════
-          ENCABEZADO EDITORIAL
-      ══════════════════════════════════════════════════════════════════ */}
-      <header class="relative w-full flex flex-col justify-end pt-8 pb-4">
-        <nav class="mb-4 flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
-          <a href="/" class="hover:text-white transition-colors">Hemeroteca</a>
-          <span>/</span>
-          <span class="text-rust-orange">About</span>
-        </nav>
+    {/* ── HERO PRINCIPAL CINEMÁTICO (H1) CON MASK BLACK AL PIE (SIMÉTRICO CON COLECCIONES Y ARCHIVO) ── */}
+    <div class="relative w-full">
+      <Marquee
+        title="ABOUT"
+        subtitle="Dirección editorial, marco teórico y principios fundacionales"
+        imageUrl={aboutCoverUrl}
+        vibeClass="vibe-travel-senses"
+        isH1={true}
+        fontClass="font-serif font-black"
+        heightClass="h-[calc(62vh-2rem)] min-h-[420px] md:min-h-[480px]"
+        marginClass="mb-0"
+        roundedClass="rounded-t-3xl rounded-b-none"
+        showSocialInTitle={true}
+        maskBottom={true}
+      />
+    </div>
 
-        <h1 class="text-6xl md:text-8xl gradient-general-h1 leading-[0.95] tracking-tighter mb-4">
-          ABOUT
-        </h1>
+    {/* ── RESPIRO VISUAL / EXCERPT DOBLE SCROLL POLVO DORADO & TYPEMAGIC EN BG-MAIN ── */}
+    <CinematicExcerptRest 
+      text="Una plataforma de [[investigación independiente]] y cartografía epistémica. **La verdad** no es algo que se encuentra, es algo que se recuerda."
+    />
 
-        <h2 class="text-xl md:text-2xl lg:text-3xl h2-thin-hook text-white/70 max-w-4xl leading-relaxed">
-          DIRECCIÓN, MANIFIESTO & CÓDICE FUNDACIONAL
-        </h2>
-      </header>
+    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">
 
       {/* ══════════════════════════════════════════════════════════════════
           SISTEMA DE SOLAPAS (TABS)
