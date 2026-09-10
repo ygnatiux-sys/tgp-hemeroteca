@@ -326,16 +326,27 @@ function createPremierSequences(essays: typeof resolvedEssays) {
 
             return (
               <div class="category-block flex flex-col gap-8" data-category-group={group.catKey}>
-                {/* Barra Editorial de Categoría */}
+                {/* Barra Editorial de Categoría con enlace a colección exclusiva */}
                 <div class="editorial-bar flex items-center justify-between pb-2 border-b border-white/10">
                   <div class="flex items-center gap-3">
-                    <h2 class="gradient-general-h2 text-xl md:text-2xl">
-                      • {group.catLabel.toUpperCase()}
-                    </h2>
+                    <a href={`/colecciones/${group.catKey}/`} class="group/cattitle flex items-center gap-2">
+                      <h2 class="gradient-general-h2 text-xl md:text-2xl group-hover/cattitle:text-rust-orange transition-colors">
+                        • {group.catLabel.toUpperCase()}
+                      </h2>
+                    </a>
                   </div>
-                  <span class="font-metadata text-[9px] uppercase tracking-[0.25em] text-white/40">
-                    {group.essays.length} DOSSIERES EN CATEGORÍA
-                  </span>
+                  <div class="flex items-center gap-4">
+                    <span class="font-metadata text-[9px] uppercase tracking-[0.25em] text-white/40 hidden sm:inline">
+                      {group.essays.length} DOSSIERES EN CATEGORÍA
+                    </span>
+                    <a
+                      href={`/colecciones/${group.catKey}/`}
+                      class="font-metadata text-[10px] uppercase tracking-[0.25em] text-rust-orange hover:text-white transition-colors flex items-center gap-1.5"
+                    >
+                      <span>Ver Colección</span>
+                      <span>→</span>
+                    </a>
+                  </div>
                 </div>
 
                 {/* Secuencias Cinematográficas Premier: 1 Hero Full Bleed + Dúo 60/40 */}

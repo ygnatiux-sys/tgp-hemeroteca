@@ -9,21 +9,52 @@ import {
 } from "../lib/content-filter";
 
 const allEssaysRaw = await getCollection('ensayos').catch(() => []);
-const publishable = getPublishableEssays(allEssaysRaw);
+const allArquetiposRaw = await getCollection('arquetiposGlobales').catch(() => []);
+const allCinematicosRaw = await getCollection('ensayosCinematicos').catch(() => []);
+const allGeorefsRaw = await getCollection('georreferencias').catch(() => []);
 
-// Reutilizamos la lógica de colecciones del home
-const categoryGroups = groupByCategory(publishable, 2);
+const publishableCinematicos = allCinematicosRaw.map(item => ({
+  slug: item.id.replace(/\/index$/, ''),
+  isCinematicGSAP: true,
+  entry: {
+    title: item.data.title || 'Dossier Cinemático',
+    category: 'Ensayos Cinemáticos',
+    coverImage: item.data.coverImage || (Array.isArray(item.data.gallery) && item.data.gallery.length > 0 ? item.data.gallery[0] : null),
+    excerpt: 'Experiencia inmersiva GSAP a pantalla completa.',
+    date: new Date().toISOString(),
+    themeColor: 'obsidiana',
+    isCinematicGSAP: true,
+  }
+}));
+
+const publishable = [
+  ...publishableCinematicos,
+  ...getPublishableEssays(allEssaysRaw),
+  ...getPublishableEssays(allArquetiposRaw),
+  ...getPublishableEssays(allGeorefsRaw)
+];
+
+// Agrupamos todas las colecciones con al menos 1 artículo
+const categoryGroups = groupByCategory(publishable, 1);
 const collections = Array.from(categoryGroups.entries())
-  .map(([key, essays]) => ({
-    key,
-    label: formatCategory(essays[0].entry.category),
-    count: essays.length,
-    coverEssay: essays[0],
-  }));
+  .map(([key, essays]) => {
+    const resolved = essays.map(e => ({
+      ...e,
+      img: resolveEssayImage(e.entry, e.slug),
+    }));
+    const coverEssay = resolved.find(e => e.img) || resolved[0];
+    return {
+      key,
+      label: formatCategory(essays[0].entry.category || key),
+      count: essays.length,
+      coverEssay,
+    };
+  })
+  .sort((a, b) => b.count - a.count);
   
 const resolvedCollections = collections.map(c => ({
   ...c,
-  img: sanitizeImageUrl(resolveEssayImage(c.coverEssay.entry, c.coverEssay.slug)),
+  img: sanitizeImageUrl(c.coverEssay?.img ? ((c.coverEssay.img as any)?.src ?? c.coverEssay.img) : ''),
 }));
 ---
 

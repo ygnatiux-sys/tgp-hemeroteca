@@ -1,12 +1,12 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
+import Image from '../../components/SafeImage.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import CinematicGalleryEngine from '../../components/CinematicGalleryEngine.astro';
 import Marquee from '../../components/Marquee.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import AguaNieve from '../../components/AguaNieve.astro';
-import RowNetflixClasico from '../../components/RowNetflixClasico.astro';
 
 import {
   getPublishableEssays,
@@ -16,6 +16,7 @@ import {
   formatDate,
   formatYear,
   resolveEssayImage,
+  sanitizeImageUrl,
 } from '../../lib/content-filter';
 
 // ─── GENERACIÓN ESTÁTICA DE RUTAS ────────────────────────────────────────────
@@ -49,37 +50,40 @@ export async function getStaticPaths() {
   ];
   const groups = groupByCategory(publishable, 1);
 
-  return Array.from(groups.entries()).map(([key, essays]) => ({
+  const paths = Array.from(groups.entries()).map(([key, essays]) => ({
     params: { categoria: key },
     props: { essays, key },
   }));
+
+  // Alias compatible para georreferencias / sitios arqueohistóricos
+  if (groups.has('arqueosemiotica') && !groups.has('sitios-arqueohistoricos')) {
+    paths.push({
+      params: { categoria: 'sitios-arqueohistoricos' },
+      props: { essays: groups.get('arqueosemiotica')!, key: 'arqueosemiotica' },
+    });
+  }
+
+  return paths;
 }
 
-// ─── PROPS ───────────────────────────────────────────────────────────────────
+// ─── PROPS & RESOLUCIÓN ───────────────────────────────────────────────────────
 const { essays, key } = Astro.props;
-const label = formatCategory(essays[0]?.entry.category);
+const label = formatCategory(essays[0]?.entry.category || key);
 
-// ─── IMÁGENES CON RESOLUCIÓN INTELIGENTE ──────────────────────────────────────
+// Resuelve imágenes de forma inteligente para cada ensayo
 const resolvedEssays = essays.map((e: typeof essays[0]) => ({
   ...e,
   img: resolveEssayImage(e.entry, e.slug),
 }));
 
 const coverImage = resolvedEssays[0]?.img ?? '/images/placeholder-cover.png';
+const coverImageUrl = sanitizeImageUrl((coverImage as any)?.src ?? coverImage ?? '');
 const coverPosition =
   (resolvedEssays[0]?.entry as any)?.coverImagePosition
   || (resolvedEssays[0]?.entry as any)?.imagePosition
   || 'center center';
 
-// Segunda imagen para parallax de contrapunto
-const coverImage2 = resolvedEssays[1]?.img ?? '/images/placeholder-cover.png';
-const coverPosition2 =
-  (resolvedEssays[1]?.entry as any)?.coverImagePosition
-  || (resolvedEssays[1]?.entry as any)?.imagePosition
-  || 'center center';
-
-// ─── SLIDES PARA EL HERO GALLERY ENGINE ─────────────────────────────────────
-// Toma las primeras 8 imágenes de la colección para el carrusel del Hero
+// Slides para el carrusel cinematográfico superior (hasta 8 imágenes destacadas)
 const heroGallerySlides = resolvedEssays
   .filter((e: typeof resolvedEssays[0]) => e.img)
   .slice(0, 8)
@@ -87,35 +91,45 @@ const heroGallerySlides = resolvedEssays
     id:            e.slug,
     title:         e.entry.title || 'Sin Título',
     subtitle:      e.entry.volanta || e.entry.dek || undefined,
-    image:         (e.img as any)?.src ?? e.img,
+    image:         sanitizeImageUrl((e.img as any)?.src ?? e.img),
     imagePosition: (e.entry as any)?.coverImagePosition ||
                    (e.entry as any)?.imagePosition ||
                    'center center',
   }));
 
-// ─── TEXTOS DE POLVO DORADO POR CATEGORÍA ────────────────────────────────────────────
+// ─── TEXTOS DE POLVO DORADO POR CATEGORÍA ────────────────────────────────────
 const categoryDustTexts: Record<string, string> = {
-  'antropologia':        '[[Anthropos]] y su memoria inscrita. **El ser humano** como primer archivo, portador de rítos, lenguas y saberes que anteceden toda escritura. Aquí cada hallazgo es un espejo roto que refleja lo que fuimos antes de saber que éramos.',
+  'antropologia':        '[[Anthropos]] y su memoria inscrita. **El ser humano** como primer archivo, portador de ritos, lenguas y saberes que anteceden toda escritura. Aquí cada hallazgo es un espejo roto que refleja lo que fuimos antes de saber que éramos.',
   'arqueologia':         'La piedra **guarda más** que el papel. Cada capa de tierra es un párrafo de historia no escrita, un silencio que la [[arqueología]] aprende a leer. Los objetos hablan cuando se les da el tiempo y la atención que merecen.',
-  'arqueosemiotica':     'Los símbolos preexisten al lenguaje. [[Arqueosemiótica]] es la disciplina que rastrea cómo el sentido se depositó en formas, gestos y grafismos antes de que existieran palabras para nombrarlos.',
+  'arqueosemiotica':     'Los símbolos preexisten al lenguaje. [[Arqueosemiótica]] es la disciplina que rastrea cómo el sentido se depositó en formas, gestos y relieves geográficos antes de que existieran palabras para nombrarlos.',
   'arquetipos-globales': 'Hay figuras que **trascienden culturas** y épocas. Los [[arquetipos]] son el ADN simbólico de la humanidad: patrones que emergen en mitos, ritos y sombras, repitiéndose en civilizaciones que jamás se conocieron.',
   'ensayos-cinematicos': 'La imagen no ilustra: **construye.** Cada [[dossier cinemático]] es una experiencia de lectura a pantalla completa: atmósfera, tipografía y movimiento al servicio de la idea. Un nuevo contrato entre ensayo e imagen.',
-  'historia-medieval':   'La Edad Media no fue oscura. Fue un **laboratorio de formas** donde se forjó la Europa moderna entre [[scriptorios]], catedrales y cruzadas. Sus rastros herénticos aguardan aún nuevas lecturas.',
+  'historia-medieval':   'La Edad Media no fue oscura. Fue un **laboratorio de formas** donde se forjó la Europa moderna entre [[scriptorios]], catedrales y cruzadas. Sus rastros herméticos aguardan aún nuevas lecturas.',
   'historia-moderna':    '**Ruptura y continuidad.** La [[historia moderna]] es el escenario donde el mundo occidental aprendió a mirarse a sí mismo: imprenta, Reforma, Razón. Todo comenzó aquí, en ese umbral vertiginoso.',
   'historia-antigua':    'Las primeras ciudades, los primeros [[códigos]], las primeras guerras de registro. La historia antigua es el origen del contrato humano con el tiempo: la decisión de **no olvidar.**',
+  'historia':            'La historia no es el pasado: es la **tensión viva** entre lo que aconteció y el modo en que decidimos recordarlo. [[Archivos, testimonios y fracturas]] donde el tiempo cobra espesor.',
   'linguistica':         'El lenguaje no describe el mundo. Lo [[construye.]] Cada estructura gramatical es una forma de ver, y cada lengua perdida lleva consigo una manera irrecuperable de nombrar la realidad. **Las palabras son los últimos fósiles.**',
   'semiotica-cultural':  'Nada es solo lo que parece. La [[semiótica]] es la ciencia del significado: estudia cómo los signos crean mundos, cómo un color puede ser una orden y cómo **el silencio también habla.**',
   'filosofia':           '[[Filosofar]] es atreverse a no tener respuesta. Es la práctica más antigua de la humanidad consciente: dudar, preguntar, construir sistemas y destruirlos. Cada gran filósofo es un naufragio **que ilumina.**',
   'mitologia':           'El mito no miente. **Habla de otra verdad,** una que la historia no puede tocar. Los [[mitos]] son el lenguaje del alma colectiva: relatos que explican lo que la ciencia aún no puede y que el olvido todavía no se ha llevado.',
   'prehistoria':         'Antes de la escritura, hubo [[pintura]]. Antes de la ciudad, hubo rito. La prehistoria es el capítulo más largo del libro humano, escrito en hueso, pigmento y piedra. **Todo lo que somos nació allí.**',
+  'georreferencias':     'Cartografía viva de [[lugares sagrados]] y coordenadas liminales. Hitos geohistóricos que anclan el mito a la roca, desafiando las cronologías convencionales con su muda presencia.',
 };
 
-// Texto por defecto si la categoría no está mapeada
 const defaultDustText = `La colección [[${label}]] concentra investigaciones que excavan más allá de la superficie. **Cada documento es un umbral.** Un conjunto de rastros que aguardan la mirada que los vuelva a nombrar, trazar y comprender.`;
-
 const dustText = categoryDustTexts[key] ?? defaultDustText;
 
-// ─── HELPER PARA SECUENCIAS CINE PREMIER (1 HERO FULL + DÚO 60/40) ──────────
+// ─── TIPO DE LAYOUT EXCLUSIVO POR COLECCIÓN ─────────────────────────────────
+type LayoutType = 'mosaico-arquetipos' | 'bitacora-arqueosemiotica' | 'cronica-historia' | 'teatro-cinematico' | 'premier-default';
+
+const layoutType: LayoutType =
+  key === 'arquetipos-globales' ? 'mosaico-arquetipos' :
+  (key === 'arqueosemiotica' || key === 'georreferencias' || key === 'sitios-arqueohistoricos') ? 'bitacora-arqueosemiotica' :
+  key === 'ensayos-cinematicos' ? 'teatro-cinematico' :
+  key.startsWith('historia') ? 'cronica-historia' :
+  'premier-default';
+
+// Helper para secuencias Premier (usado en premier-default y como respaldo)
 function createPremierSequences(items: typeof resolvedEssays) {
   const sequences: Array<{
     hero: typeof resolvedEssays[0];
@@ -135,114 +149,464 @@ const sequences = createPremierSequences(resolvedEssays);
 ---
 
 <Layout
-  title={`${label} | Colecciones TGP`}
-  description={`Colección temática especializada sobre ${label} en The Great Puzzle Project.`}
-  image={(coverImage as any)?.src ?? coverImage}
+  title={`${label} | Colección Exclusiva TGP`}
+  description={`Colección temática especializada sobre ${label} en The Great Puzzle Project. Catálogo completo con ${resolvedEssays.length} investigaciones documentadas.`}
+  image={coverImageUrl}
 >
   <div class="text-white min-h-screen pb-32">
 
-    {/* ── HERO: SEO h1 invisible ── */}
-    <h1 class="sr-only">{label} | Colecciones TGP</h1>
+    {/* ── HERO: SEO H1 INVISIBLE ── */}
+    <h1 class="sr-only">{label} | Colección Exclusiva TGP</h1>
 
-    {/* ── HERO: Gallery Engine con imágenes de la colección ── */}
+    {/* ── HERO CABECERA: GALLERY ENGINE CON IMÁGENES DE LA COLECCIÓN ── */}
     {heroGallerySlides.length > 0 ? (
       <CinematicGalleryEngine
         slides={heroGallerySlides}
-        heightClass="h-[90vh] md:h-dvh"
+        heightClass="h-[82vh] min-h-[540px] md:h-[90vh]"
         maxSlides={8}
       />
     ) : (
       <Marquee
         title={label.toUpperCase()}
         subtitle="Colección Documental · TGP"
-        imageUrl={(coverImage as any)?.src ?? coverImage ?? ''}
+        imageUrl={coverImageUrl}
         vibeClass="vibe-travel-senses"
         isH1={true}
         fontClass="font-serif font-black"
       />
     )}
 
-    {/* ── RESPIRO VISUAL / EXCERPT DOBLE SCROLL POLVO DORADO & TYPEMAGIC EN BG-MAIN ── */}
-    <CinematicExcerptRest 
-      text={dustText}
-    />
+    {/* ── RESPIRO VISUAL / EXCERPT DOBLE SCROLL POLVO DORADO & TYPEMAGIC ── */}
+    <CinematicExcerptRest text={dustText} />
 
-    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">
+    {/* ── AGUANIEVE CRISTALINO NARRATIVO ── */}
+    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 -mt-4 mb-8">
+      <AguaNieve category={key} />
+    </div>
 
-      {/* ═══════════════════════════════════════════════════════════════════
-          GRILLA CINEMÁTICA PREMIER: 1 HERO + DÚO 60/40
-      ═══════════════════════════════════════════════════════════════════ */}
-      <section class="flex flex-col gap-12 md:gap-16">
-        {sequences.map((seq, seqIdx) => (
-          <div class="premier-sequence flex flex-col gap-6 md:gap-8">
-            {/* 1. Hero Cinemático Full Bleed */}
+    {/* ── CONTENIDO PRINCIPAL SEGÚN EL LAYOUT EXCLUSIVO DE LA COLECCIÓN ── */}
+    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-4">
+
+      {/* ═════════════════════════════════════════════════════════════════════
+          CASO 1: ARQUETIPOS GLOBALES (MOSAICO SIMBÓLICO TIPO CÓDEX / TAROT)
+      ═════════════════════════════════════════════════════════════════════ */}
+      {layoutType === 'mosaico-arquetipos' && (
+        <section class="flex flex-col gap-8 md:gap-12">
+          <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-5 gap-3">
+            <div>
+              <span class="font-mono text-xs uppercase tracking-[0.4em] text-rust-orange font-bold block mb-1">
+                Colección Simbólica · Cartografía de la Psique
+              </span>
+              <h2 class="text-3xl md:text-4xl lg:text-5xl font-serif font-black gradient-general-h1">
+                Arquetipos Globales
+              </h2>
+            </div>
+            <span class="font-mono text-xs uppercase tracking-[0.25em] text-white/50">
+              {resolvedEssays.length} {resolvedEssays.length === 1 ? 'Arquetipo' : 'Arquetipos Documentados'}
+            </span>
+          </div>
+
+          {/* Grilla Mosaico Simbólico: 3 columnas simétricas con proporción vertical editorial */}
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {resolvedEssays.map((item, idx) => {
+              const itemImg = item.img ? sanitizeImageUrl((item.img as any)?.src ?? item.img) : null;
+              const linkUrl = `/hemeroteca/${item.slug}/`;
+
+              return (
+                <a
+                  href={linkUrl}
+                  class="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 bg-theme-dark/90 hover:border-amber-400/50 hover:shadow-2xl hover:shadow-amber-900/20 transition-all duration-500 flex flex-col justify-end isolate min-h-110 md:min-h-125"
+                >
+                  {itemImg ? (
+                    <Image
+                      src={itemImg}
+                      alt={item.entry.title}
+                      inferSize={true}
+                      format="webp"
+                      loading={idx < 3 ? "eager" : "lazy"}
+                      decoding="async"
+                      class="absolute inset-0 w-full h-full object-cover object-center brightness-85 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.03] group-hover:brightness-95"
+                    />
+                  ) : (
+                    <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1b1c24] via-theme-dark to-black -z-10" />
+                  )}
+
+                  {/* Scrim degradado para legibilidad del códex */}
+                  <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/55 via-45% to-transparent pointer-events-none z-10" />
+
+                  <div class="relative z-20 p-6 md:p-8 flex flex-col justify-end h-full">
+                    {/* Badge de Arquetipo */}
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-amber-400 font-bold">
+                        Arquetipo {String(idx + 1).padStart(2, '0')}
+                      </span>
+                      {item.entry.date && (
+                        <span class="font-mono text-[10px] text-white/40 tracking-wider">
+                          {formatYear(item.entry.date)}
+                        </span>
+                      )}
+                    </div>
+
+                    <h3 class="text-2xl md:text-3xl font-serif font-black text-white group-hover:text-amber-300 transition-colors leading-tight mb-2">
+                      {item.entry.title}
+                    </h3>
+
+                    {item.entry.excerpt && (
+                      <p class="font-serif text-white/70 text-xs md:text-sm line-clamp-3 mb-4 leading-relaxed font-light">
+                        {item.entry.excerpt}
+                      </p>
+                    )}
+
+                    <div class="pt-3 border-t border-white/10 flex items-center justify-between">
+                      <span class="font-mono text-[10px] uppercase tracking-[0.25em] text-white/50 group-hover:text-amber-300 transition-colors">
+                        Explorar Arquetipo →
+                      </span>
+                      <span class="text-amber-400/60 group-hover:translate-x-1 group-hover:text-amber-300 transition-transform">
+                        ✦
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* ═════════════════════════════════════════════════════════════════════
+          CASO 2: ARQUEOSEMIÓTICA & GEORREFERENCIAS (BITÁCORA DE EXPEDICIÓN)
+      ═════════════════════════════════════════════════════════════════════ */}
+      {layoutType === 'bitacora-arqueosemiotica' && (
+        <section class="flex flex-col gap-10 md:gap-14">
+          <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-5 gap-3">
+            <div>
+              <span class="font-mono text-xs uppercase tracking-[0.4em] text-rust-orange font-bold block mb-1">
+                Bitácora de Campo · Cartografía Lítica & Simbólica
+              </span>
+              <h2 class="text-3xl md:text-4xl lg:text-5xl font-serif font-black gradient-general-h1">
+                Arqueosemiótica & Georreferencias
+              </h2>
+            </div>
+            <span class="font-mono text-xs uppercase tracking-[0.25em] text-white/50">
+              {resolvedEssays.length} {resolvedEssays.length === 1 ? 'Sitio' : 'Sitios & Investigaciones'}
+            </span>
+          </div>
+
+          {/* 1. Sitio Principal Destacado (Hero Panorámico con Coordenadas) */}
+          {resolvedEssays[0] && (
             <div class="w-full">
               <CinematicArchiveCard
-                slug={seq.hero.slug}
-                entry={seq.hero.entry}
-                img={seq.hero.img}
+                slug={resolvedEssays[0].slug}
+                entry={resolvedEssays[0].entry}
+                img={resolvedEssays[0].img}
                 variant="hero"
                 enableCinemagraph={true}
               />
             </div>
+          )}
 
-            {/* 1.5. Excerpt AguaNieve (sleet + conversational 2-line chunks) */}
-            {seqIdx === 0 && (
-              <AguaNieve category={key} />
-            )}
+          {/* 2. Grid de Expediciones: 2 columnas asimétricas con datos geohistóricos */}
+          {resolvedEssays.length > 1 && (
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+              {resolvedEssays.slice(1).map((item, idx) => {
+                const itemImg = item.img ? sanitizeImageUrl((item.img as any)?.src ?? item.img) : null;
+                const sitio = (item.entry as any)?.sitioGeohistorico;
+                const volanta = item.entry.volanta || (item.entry as any)?.volantaHook;
+                const linkUrl = `/hemeroteca/${item.slug}/`;
 
-            {/* 2. Dúo 60/40 */}
-            {seq.duo.length > 0 && (
-              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-                {seq.duo[0] && (
-                  <div class={seq.duo.length > 1 ? "lg:col-span-7 flex flex-col" : "lg:col-span-12 flex flex-col"}>
-                    <CinematicArchiveCard
-                      slug={seq.duo[0].slug}
-                      entry={seq.duo[0].entry}
-                      img={seq.duo[0].img}
-                      variant={seq.duo.length > 1 ? "duo-60" : "hero"}
-                      enableCinemagraph={true}
-                    />
-                  </div>
-                )}
-                {seq.duo[1] && (
-                  <div class="lg:col-span-5 flex flex-col">
-                    <CinematicArchiveCard
-                      slug={seq.duo[1].slug}
-                      entry={seq.duo[1].entry}
-                      img={seq.duo[1].img}
-                      variant="duo-40"
-                      enableCinemagraph={true}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        ))}
-      </section>
+                return (
+                  <a
+                    href={linkUrl}
+                    class="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 bg-theme-dark/80 hover:border-rust-orange/50 transition-all duration-500 flex flex-col justify-end p-6 md:p-8 min-h-95 md:min-h-105 isolate"
+                  >
+                    {itemImg ? (
+                      <Image
+                        src={itemImg}
+                        alt={item.entry.title}
+                        inferSize={true}
+                        format="webp"
+                        loading="lazy"
+                        decoding="async"
+                        class="absolute inset-0 w-full h-full object-cover object-center brightness-75 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.025] group-hover:brightness-90"
+                      />
+                    ) : (
+                      <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#161a1d] via-theme-dark to-[#090b0c] -z-10" />
+                    )}
 
-      {resolvedEssays.length > 4 && (
-        <section class="flex flex-col gap-4 border-t border-white/10 pt-10">
-          <RowNetflixClasico
-            items={resolvedEssays}
-            title={`${label} — Galería`}
-            eyebrow="Explorar Colección"
-            max={15}
-          />
+                    <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/60 via-50% to-transparent pointer-events-none z-10" />
+
+                    <div class="relative z-20 flex flex-col justify-end h-full">
+                      {/* Badge de Sitio Geohistórico / Ubicación */}
+                      {sitio && (
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-rust-orange/20 border border-rust-orange/40 text-rust-orange font-mono text-[10px] uppercase tracking-[0.25em] font-bold w-fit mb-3">
+                          <span>📍</span>
+                          <span>{sitio}</span>
+                        </div>
+                      )}
+
+                      {volanta && (
+                        <span class="font-mono text-[10px] md:text-xs uppercase tracking-[0.3em] text-[#E0E0E0]/80 mb-1 line-clamp-1">
+                          {volanta}
+                        </span>
+                      )}
+
+                      <h3 class="text-2xl md:text-3xl font-serif font-black text-white group-hover:text-rust-orange transition-colors leading-tight mb-2">
+                        {item.entry.title}
+                      </h3>
+
+                      {item.entry.excerpt && (
+                        <p class="font-serif text-white/70 text-xs md:text-sm line-clamp-2 mb-4 leading-relaxed">
+                          {item.entry.excerpt}
+                        </p>
+                      )}
+
+                      <div class="pt-3 border-t border-white/10 flex items-center justify-between">
+                        <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-white/60 group-hover:text-rust-orange transition-colors">
+                          Explorar Yacimiento →
+                        </span>
+                        <span class="font-mono text-[10px] text-white/40">
+                          {formatYear(item.entry.date)}
+                        </span>
+                      </div>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          )}
         </section>
       )}
 
-      {/* ═══════════════════════════════════════════════════════════════════
-          ÍNDICE INTERNO & NAVEGACIÓN
-      ═══════════════════════════════════════════════════════════════════ */}
-      <section class="flex flex-col gap-6 border-t border-white/10 pt-10">
-        <div class="reveal-item">
-          <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-[#EFEBE3] block mb-2">Índice</span>
-          <h2 class="text-2xl md:text-3xl gradient-general-h2">{label} — Catálogo Completo</h2>
+      {/* ═════════════════════════════════════════════════════════════════════
+          CASO 3: HISTORIA & CRÓNICA DOCUMENTAL (LÍNEA DE TIEMPO / CRÓNICA)
+      ═════════════════════════════════════════════════════════════════════ */}
+      {layoutType === 'cronica-historia' && (
+        <section class="flex flex-col gap-10 md:gap-14">
+          <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-5 gap-3">
+            <div>
+              <span class="font-mono text-xs uppercase tracking-[0.4em] text-rust-orange font-bold block mb-1">
+                Crónica Documental · Archivo Histórico
+              </span>
+              <h2 class="text-3xl md:text-4xl lg:text-5xl font-serif font-black gradient-general-h1">
+                {label}
+              </h2>
+            </div>
+            <span class="font-mono text-xs uppercase tracking-[0.25em] text-white/50">
+              {resolvedEssays.length} {resolvedEssays.length === 1 ? 'Registro' : 'Registros Documentales'}
+            </span>
+          </div>
+
+          {/* Secuencias Cinematográficas Premier: 1 Hero Full Bleed + Dúo 60/40 */}
+          <div class="flex flex-col gap-12 md:gap-16">
+            {sequences.map((seq) => (
+              <div class="premier-sequence flex flex-col gap-6 md:gap-8">
+                {/* 1. Hero Cinemático */}
+                <div class="w-full">
+                  <CinematicArchiveCard
+                    slug={seq.hero.slug}
+                    entry={seq.hero.entry}
+                    img={seq.hero.img}
+                    variant="hero"
+                    enableCinemagraph={true}
+                  />
+                </div>
+
+                {/* 2. Dúo 60/40 */}
+                {seq.duo.length > 0 && (
+                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+                    {seq.duo[0] && (
+                      <div class={seq.duo.length > 1 ? "lg:col-span-7 flex flex-col" : "lg:col-span-12 flex flex-col"}>
+                        <CinematicArchiveCard
+                          slug={seq.duo[0].slug}
+                          entry={seq.duo[0].entry}
+                          img={seq.duo[0].img}
+                          variant={seq.duo.length > 1 ? "duo-60" : "hero"}
+                          enableCinemagraph={true}
+                        />
+                      </div>
+                    )}
+                    {seq.duo[1] && (
+                      <div class="lg:col-span-5 flex flex-col">
+                        <CinematicArchiveCard
+                          slug={seq.duo[1].slug}
+                          entry={seq.duo[1].entry}
+                          img={seq.duo[1].img}
+                          variant="duo-40"
+                          enableCinemagraph={true}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ═════════════════════════════════════════════════════════════════════
+          CASO 4: ENSAYOS CINEMÁTICOS (TEATRO OSCURO / DOSSIERES GSAP)
+      ═════════════════════════════════════════════════════════════════════ */}
+      {layoutType === 'teatro-cinematico' && (
+        <section class="flex flex-col gap-10 md:gap-14">
+          <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-5 gap-3">
+            <div>
+              <span class="font-mono text-xs uppercase tracking-[0.4em] text-rust-orange font-bold block mb-1">
+                Experiencias a Pantalla Completa · Dossieres GSAP
+              </span>
+              <h2 class="text-3xl md:text-4xl lg:text-5xl font-serif font-black gradient-general-h1">
+                Ensayos Cinemáticos
+              </h2>
+            </div>
+            <span class="font-mono text-xs uppercase tracking-[0.25em] text-white/50">
+              {resolvedEssays.length} {resolvedEssays.length === 1 ? 'Dossier' : 'Dossieres Cinemáticos'}
+            </span>
+          </div>
+
+          {/* Grilla de Posters Cinemáticos Panorámicos */}
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+            {resolvedEssays.map((item, idx) => {
+              const itemImg = item.img ? sanitizeImageUrl((item.img as any)?.src ?? item.img) : null;
+              const linkUrl = `/ensayos-cinematicos/${item.slug}/`;
+
+              return (
+                <a
+                  href={linkUrl}
+                  class="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 bg-theme-dark hover:border-rust-orange/60 hover:shadow-2xl hover:shadow-black/80 transition-all duration-500 flex flex-col justify-end aspect-16/10 min-h-90 md:min-h-105 isolate"
+                >
+                  {itemImg ? (
+                    <Image
+                      src={itemImg}
+                      alt={item.entry.title}
+                      inferSize={true}
+                      format="webp"
+                      loading={idx < 4 ? "eager" : "lazy"}
+                      decoding="async"
+                      class="absolute inset-0 w-full h-full object-cover object-center brightness-75 contrast-[1.08] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.03] group-hover:brightness-90"
+                    />
+                  ) : (
+                    <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#101316] via-theme-dark to-black -z-10" />
+                  )}
+
+                  <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/50 via-40% to-transparent pointer-events-none z-10" />
+
+                  <div class="relative z-20 p-6 md:p-8 flex flex-col justify-end h-full">
+                    <div class="flex items-center gap-3 mb-2">
+                      <span class="font-mono text-[9px] md:text-[10px] uppercase tracking-[0.35em] text-rust-orange font-bold px-2.5 py-1 rounded bg-black/60 border border-rust-orange/30 backdrop-blur-sm">
+                        GSAP Inmersivo
+                      </span>
+                      {item.entry.date && (
+                        <span class="font-mono text-[10px] text-white/50 tracking-wider">
+                          {formatYear(item.entry.date)}
+                        </span>
+                      )}
+                    </div>
+
+                    <h3 class="text-2xl md:text-3xl lg:text-4xl font-serif font-black text-white group-hover:text-rust-orange transition-colors leading-tight mb-2">
+                      {item.entry.title}
+                    </h3>
+
+                    {item.entry.dek && (
+                      <p class="font-serif text-white/75 text-xs md:text-sm line-clamp-2 mb-4 leading-relaxed font-light">
+                        {item.entry.dek}
+                      </p>
+                    )}
+
+                    <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.25em] text-white/70 group-hover:text-white transition-colors">
+                      <span>Iniciar Experiencia Cinemática</span>
+                      <span class="group-hover:translate-x-1.5 transition-transform">→</span>
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* ═════════════════════════════════════════════════════════════════════
+          CASO 5: PREMIER DEFAULT (ARQUEOLOGÍA, FILOSOFÍA, ENSAYO, ETC.)
+      ═════════════════════════════════════════════════════════════════════ */}
+      {layoutType === 'premier-default' && (
+        <section class="flex flex-col gap-10 md:gap-14">
+          <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-5 gap-3">
+            <div>
+              <span class="font-mono text-xs uppercase tracking-[0.4em] text-rust-orange font-bold block mb-1">
+                Colección Especializada · Archivo TGP
+              </span>
+              <h2 class="text-3xl md:text-4xl lg:text-5xl font-serif font-black gradient-general-h1">
+                {label}
+              </h2>
+            </div>
+            <span class="font-mono text-xs uppercase tracking-[0.25em] text-white/50">
+              {resolvedEssays.length} {resolvedEssays.length === 1 ? 'Documento' : 'Documentos'}
+            </span>
+          </div>
+
+          <div class="flex flex-col gap-12 md:gap-16">
+            {sequences.map((seq) => (
+              <div class="premier-sequence flex flex-col gap-6 md:gap-8">
+                {/* 1. Hero Cinemático */}
+                <div class="w-full">
+                  <CinematicArchiveCard
+                    slug={seq.hero.slug}
+                    entry={seq.hero.entry}
+                    img={seq.hero.img}
+                    variant="hero"
+                    enableCinemagraph={true}
+                  />
+                </div>
+
+                {/* 2. Dúo 60/40 */}
+                {seq.duo.length > 0 && (
+                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+                    {seq.duo[0] && (
+                      <div class={seq.duo.length > 1 ? "lg:col-span-7 flex flex-col" : "lg:col-span-12 flex flex-col"}>
+                        <CinematicArchiveCard
+                          slug={seq.duo[0].slug}
+                          entry={seq.duo[0].entry}
+                          img={seq.duo[0].img}
+                          variant={seq.duo.length > 1 ? "duo-60" : "hero"}
+                          enableCinemagraph={true}
+                        />
+                      </div>
+                    )}
+                    {seq.duo[1] && (
+                      <div class="lg:col-span-5 flex flex-col">
+                        <CinematicArchiveCard
+                          slug={seq.duo[1].slug}
+                          entry={seq.duo[1].entry}
+                          img={seq.duo[1].img}
+                          variant="duo-40"
+                          enableCinemagraph={true}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ═════════════════════════════════════════════════════════════════════
+          ÍNDICE INTERNO & NAVEGACIÓN COMPLETA (SIN REPETICIONES CONFUSAS)
+      ═════════════════════════════════════════════════════════════════════ */}
+      <section class="flex flex-col gap-6 border-t border-white/10 pt-12 mt-8">
+        <div class="reveal-item flex items-end justify-between">
+          <div>
+            <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Catálogo Exhaustivo</span>
+            <h2 class="text-2xl md:text-3xl font-serif font-black gradient-general-h2">
+              {label} — Índice Completo
+            </h2>
+          </div>
+          <span class="font-mono text-xs text-white/40">
+            {resolvedEssays.length} {resolvedEssays.length === 1 ? 'Entrada' : 'Entradas'}
+          </span>
         </div>
 
-        <ol class="flex flex-col divide-y divide-white/5">
+        <ol class="flex flex-col divide-y divide-white/5 mt-2">
           {resolvedEssays.map(({ slug, entry, isCinematicGSAP }: { slug: string; entry: typeof essays[0]['entry']; isCinematicGSAP?: boolean }, i: number) => {
             const isCine = isCinematicGSAP || entry.category === 'Ensayos Cinemáticos' || (entry as any)?.isCinematicGSAP;
             const linkHref = isCine ? `/ensayos-cinematicos/${slug}/` : `/hemeroteca/${slug}/`;
@@ -250,35 +614,38 @@ const sequences = createPremierSequences(resolvedEssays);
               <li>
                 <a
                   href={linkHref}
-                  class="group flex items-baseline gap-4 md:gap-6 py-3.5 hover:text-[#EFEBE3] transition-colors duration-300"
+                  class="group flex items-baseline gap-4 md:gap-6 py-4 hover:text-[#EFEBE3] transition-colors duration-300"
                 >
-                  <span class="font-metadata text-[10px] text-white/30 tracking-[0.2em] tabular-nums shrink-0 w-6 text-right">
+                  <span class="font-mono text-xs text-white/30 tracking-wider tabular-nums shrink-0 w-8 text-right">
                     {String(i + 1).padStart(2, '0')}
                   </span>
-                  <span class="font-metadata text-[9px] text-[#EFEBE3]/70 tracking-[0.2em] shrink-0 hidden sm:inline">
+                  <span class="font-mono text-[10px] text-rust-orange/80 tracking-[0.2em] shrink-0 hidden sm:inline">
                     {formatYear(entry.date)}
                   </span>
-                  <span class="font-cinzel text-sm md:text-base text-white/80 group-hover:text-[#EFEBE3] transition-colors leading-snug line-clamp-1 flex-1 font-bold">
+                  <span class="font-serif text-sm md:text-base text-white/80 group-hover:text-white transition-colors leading-snug line-clamp-1 flex-1 font-semibold">
                     {entry.title}
                   </span>
-                  <span class="font-metadata text-[9px] text-white/20 shrink-0 group-hover:text-[#EFEBE3]/60 group-hover:translate-x-1 transition-all">→</span>
+                  <span class="font-mono text-[10px] uppercase text-white/30 shrink-0 group-hover:text-rust-orange group-hover:translate-x-1 transition-all">
+                    {isCine ? 'GSAP →' : 'Leer →'}
+                  </span>
                 </a>
               </li>
             );
           })}
         </ol>
 
-        <div class="pt-6 flex items-center justify-between border-t border-white/5 font-metadata text-[10px] uppercase tracking-[0.3em]">
+        {/* Barra de Retorno y Exploración Cruzada */}
+        <div class="pt-8 flex items-center justify-between border-t border-white/10 font-mono text-[11px] uppercase tracking-[0.3em]">
           <a
             href="/colecciones/"
-            class="text-white/40 hover:text-[#EFEBE3] transition-colors flex items-center gap-2"
+            class="text-white/50 hover:text-rust-orange transition-colors flex items-center gap-2 py-2"
           >
             <span>←</span>
             <span>Todas las colecciones</span>
           </a>
           <a
             href="/archivo/"
-            class="text-white/40 hover:text-[#EFEBE3] transition-colors flex items-center gap-2"
+            class="text-white/50 hover:text-rust-orange transition-colors flex items-center gap-2 py-2"
           >
             <span>Archivo general</span>
             <span>→</span>
