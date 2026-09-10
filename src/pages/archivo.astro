@@ -166,7 +166,7 @@ function mapToSlideData(essays: typeof resolvedEssays) {
     image: (e.img as any)?.src ?? e.img,
     imagePosition: (e.entry as any).coverImagePosition || (e.entry as any).imagePosition || 'center center',
     link: `/hemeroteca/${e.slug}`,
-    papersLink: (e.entry as any).papersSlug ? `/papers/${(e.entry as any).papersSlug}` : undefined,
+    papersLink: undefined, // Deshabilitado globalmente: (e.entry as any).papersSlug ? `/papers/${(e.entry as any).papersSlug}` : undefined,
   }));
 }
 

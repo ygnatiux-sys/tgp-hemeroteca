@@ -1,5 +1,6 @@
 ---
 // Header Component Institucional (Dark Academia Premium)
+// Refactored: WCV touch targets 44px+, hamburger ≤lg, side-drawer moderno
 import { BuscadorModal } from './BuscadorModal';
 import ThemeToggle from './ThemeToggle.astro';
 
@@ -14,12 +15,13 @@ const { transparentUntilScroll = false } = Astro.props;
   id="site-header"
   class="fixed top-0 w-full z-50 transition-all duration-500 bg-transparent border-b border-transparent"
 >
-  <div class="w-full px-4 md:px-6 lg:px-8 xl:px-12 py-3.5 md:py-4 flex justify-between items-center relative">
-    {/* Izquierda: Marca — compact para no invadir nav centrada */}
+  {/* Barra principal: altura mínima 56px mobile, 60px desktop → WCV */}
+  <div class="w-full px-4 md:px-6 lg:px-8 xl:px-12 flex items-center justify-between relative" style="min-height:56px; height:56px;">
+
+    {/* ── IZQUIERDA: Marca ── */}
     <div class="flex items-center shrink-0 z-10">
       <div class="flex items-center gap-2 md:gap-2.5">
-        {/* Logo y Título principal */}
-        {/* Logo y Título principal unificados en formato 3 líneas idéntico al Footer */}
+        {/* Logo marca 3 líneas */}
         <a href="https://ediciones.thegreatpuzzleproject.com" class="group/brand flex flex-col text-left justify-center select-none" title="Ir a Ediciones de The Great Puzzle Project">
           <span class="font-['Gloock'] font-black text-[11px] md:text-[12px] lg:text-[13px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-1">
             THE GREAT
@@ -41,34 +43,32 @@ const { transparentUntilScroll = false } = Astro.props;
           </span>
         </a>
         
-        {/* Separador vertical sutil adaptado al alto de las 3 líneas */}
+        {/* Separador vertical */}
         <div class="w-px h-8 md:h-9 bg-white/15 mx-0.5 rounded-full"></div>
 
-        {/* HEMEROTECA: compacto, sin pisar la nav */}
-        <a href="/" class="brand-hemeroteca header-subtitle-hemeroteca font-['Gloock'] font-black text-xs md:text-sm lg:text-[15px] tracking-widest uppercase px-1.5 py-0.5 rounded-md transition-all duration-500 border border-transparent leading-none gradient-steel-line-3" title="Volver al Inicio de la Hemeroteca">
+        {/* HEMEROTECA — badge */}
+        <a href="/" class="brand-hemeroteca header-subtitle-hemeroteca font-['Gloock'] font-black text-xs md:text-[13px] lg:text-[14px] tracking-widest uppercase px-1.5 py-0.5 rounded-md transition-all duration-500 border border-transparent leading-none gradient-steel-line-3" title="Volver al Inicio de la Hemeroteca">
           HEMEROTECA
         </a>
       </div>
     </div>
-    
-    {/* Centro: Navegación Compacta Absoluta con tamaño aumentado (+2px) */}
-    <nav class="toolbar-element hidden xl:flex absolute left-1/2 -translate-x-1/2 items-center gap-4 xl:gap-5 2xl:gap-6 shrink-0 font-metadata text-sm xl:text-[15px] tracking-[-0.015em] whitespace-nowrap z-0 transition-all duration-500">
 
-      <a href="/" class="header-nav-link transition-colors">Inicio</a>
-      <a href="/colecciones/" class="header-nav-link transition-colors">Colecciones</a>
-      <a href="/archivo/" class="header-nav-link transition-colors">Archivo</a>
-      <a href="/papers/" class="header-nav-link transition-colors">Papers</a>
-      <a href="/about/" class="header-nav-link transition-colors">About</a>
-      <a href="/codice/" class="header-nav-link transition-colors">El Códice</a>
+    {/* ── CENTRO: Nav desktop (solo xl+) ── */}
+    <nav class="toolbar-element hidden xl:flex absolute left-1/2 -translate-x-1/2 items-center gap-5 2xl:gap-6 shrink-0 font-metadata text-[14px] xl:text-[15px] tracking-[-0.01em] whitespace-nowrap z-0 transition-all duration-500">
+
+      <a href="/" class="header-nav-link transition-colors py-1">Inicio</a>
+      <a href="/colecciones/" class="header-nav-link transition-colors py-1">Colecciones</a>
+      <a href="/archivo/" class="header-nav-link transition-colors py-1">Archivo</a>
+      <a href="/about/" class="header-nav-link transition-colors py-1">About</a>
 
       {/* Divisor */}
-      <span class="w-px h-3 bg-white/15 rounded-full"></span>
+      <span class="w-px h-3.5 bg-white/15 rounded-full"></span>
 
       <a
         href="https://ediciones.thegreatpuzzleproject.com"
         target="_blank"
         rel="noopener noreferrer"
-        class="header-nav-link transition-colors flex items-center gap-1"
+        class="header-nav-link transition-colors flex items-center gap-1.5 py-1"
         title="Editorial TGP — Archivo Editorial"
       >
         Editorial
@@ -76,114 +76,147 @@ const { transparentUntilScroll = false } = Astro.props;
       </a>
     </nav>
 
-    {/* Derecha: Acciones (Tema, Lupa, Menú Hamburguesa en móvil) */}
-    <div class="flex items-center gap-2 md:gap-2.5 ml-auto z-10">
+    {/* ── DERECHA: Acciones ── */}
+    {/* Touch targets mínimo 44×44px (WCV) */}
+    <div class="flex items-center gap-1 md:gap-1.5 ml-auto z-10">
       <ThemeToggle />
       <BuscadorModal client:load />
 
-      {/* Botón Hamburguesa Cinemático (Visible solo en < xl) */}
+      {/* Botón Hamburguesa — visible en < xl */}
       <button
         id="nav-mobile-btn"
         type="button"
-        class="xl:hidden w-12 h-12 min-w-12 min-h-12 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 text-[#EFEBE3] flex flex-col items-center justify-center gap-1.25 transition-all duration-300 cursor-pointer"
+        class="xl:hidden w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg border border-white/12 bg-white/4 hover:bg-white/10 active:scale-95 text-[#EFEBE3] flex flex-col items-center justify-center gap-[5px] transition-all duration-300 cursor-pointer"
         aria-label="Alternar menú de navegación"
         aria-expanded="false"
+        aria-controls="nav-drawer"
       >
-        <span class="hamburger-line w-4.5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center"></span>
-        <span class="hamburger-line w-4.5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center"></span>
-        <span class="hamburger-line w-4.5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center"></span>
+        <span class="hamburger-line block w-[18px] h-[1.5px] bg-current rounded-full transition-all duration-300 origin-center"></span>
+        <span class="hamburger-line block w-[18px] h-[1.5px] bg-current rounded-full transition-all duration-300 origin-center"></span>
+        <span class="hamburger-line block w-[12px] h-[1.5px] bg-current rounded-full transition-all duration-300 origin-center self-start ml-[3px]"></span>
       </button>
-    </div>
-  </div>
-
-  {/* Overlay de Navegación Móvil Cinemático (Glassmorphism Dark) */}
-  <div
-    id="nav-mobile-overlay"
-    class="fixed inset-0 z-9990 bg-black/92 backdrop-blur-2xl opacity-0 pointer-events-none transition-all duration-500 flex flex-col justify-between p-8 sm:p-12 xl:hidden"
-    aria-hidden="true"
-  >
-    {/* Cabecera del overlay móvil */}
-    <div class="flex items-center justify-between border-b border-white/10 pb-6 pt-2">
-      <span class="font-metadata text-xs uppercase tracking-[0.3em] text-rust-orange font-bold">
-        Hemeroteca TGP · Navegación
-      </span>
-      <button
-        id="nav-mobile-close"
-        type="button"
-        class="w-12 h-12 min-w-12 min-h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center font-metadata text-base transition-colors cursor-pointer"
-        aria-label="Cerrar menú"
-      >
-        ✕
-      </button>
-    </div>
-
-    {/* Enlaces Principales Grandes */}
-    <nav class="flex flex-col gap-5 sm:gap-6 my-auto py-6">
-      <a href="/" class="mobile-nav-link font-['Gloock'] text-2xl sm:text-3xl text-[#EFEBE3] hover:text-rust-orange transition-colors">
-        Inicio
-      </a>
-      <a href="/colecciones/" class="mobile-nav-link font-['Gloock'] text-2xl sm:text-3xl text-[#EFEBE3] hover:text-rust-orange transition-colors">
-        Colecciones
-      </a>
-      <a href="/archivo/" class="mobile-nav-link font-['Gloock'] text-2xl sm:text-3xl text-[#EFEBE3] hover:text-rust-orange transition-colors">
-        Archivo
-      </a>
-      <a href="/papers/" class="mobile-nav-link font-['Gloock'] text-2xl sm:text-3xl text-[#EFEBE3] hover:text-rust-orange transition-colors">
-        Papers
-      </a>
-      <a href="/about/" class="mobile-nav-link font-['Gloock'] text-2xl sm:text-3xl text-[#EFEBE3] hover:text-rust-orange transition-colors">
-        About
-      </a>
-      <a href="/codice/" class="mobile-nav-link font-['Gloock'] text-2xl sm:text-3xl text-[#EFEBE3] hover:text-rust-orange transition-colors">
-        El Códice
-      </a>
-      <a
-        href="https://ediciones.thegreatpuzzleproject.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="mobile-nav-link font-['Gloock'] text-xl sm:text-2xl text-[#EFEBE3]/70 hover:text-white transition-colors flex items-center gap-2 pt-2 border-t border-white/10"
-      >
-        Editorial TGP
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
-      </a>
-    </nav>
-
-    {/* Pie del overlay */}
-    <div class="border-t border-white/10 pt-4 flex items-center justify-between font-metadata text-[10px] uppercase tracking-widest text-white/40">
-      <span>The Great Puzzle Project</span>
-      <span>Patrimonio & Archivo</span>
     </div>
   </div>
 </header>
 
+{/* ═══════════════════════════════════════════════════════════
+    DRAWER DE NAVEGACIÓN MÓVIL — Lado Derecho
+    Referencia: The Atlantic · Monocle · Kinfolk · NYT
+    ═══════════════════════════════════════════════════════════ */}
+
+{/* Backdrop */}
+<div
+  id="nav-backdrop"
+  class="fixed inset-0 z-[9980] bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-400 xl:hidden"
+  aria-hidden="true"
+></div>
+
+{/* Drawer */}
+<aside
+  id="nav-drawer"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Navegación principal"
+  class="fixed top-0 right-0 h-full w-[min(88vw,340px)] z-[9990] xl:hidden
+         bg-[#0e1110]/97 backdrop-blur-2xl border-l border-white/8
+         flex flex-col
+         translate-x-full transition-transform duration-400 ease-[cubic-bezier(0.4,0,0.2,1)]
+         overflow-y-auto overscroll-contain"
+>
+  {/* Cabecera del drawer */}
+  <div class="flex items-center justify-between px-6 py-4 border-b border-white/8 shrink-0">
+    <span class="font-metadata text-[9px] uppercase tracking-[0.4em] text-rust-orange font-bold select-none">
+      TGP · Menú
+    </span>
+    <button
+      id="nav-drawer-close"
+      type="button"
+      class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-white/6 hover:bg-white/12 active:scale-95 text-white/60 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer"
+      aria-label="Cerrar menú"
+    >
+      {/* X icon — 16px */}
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  {/* ── Nav principal ── */}
+  <nav class="flex flex-col px-6 pt-8 pb-4 gap-1" aria-label="Navegación principal">
+    <a href="/" class="drawer-nav-link group flex items-center gap-3 py-3.5 text-[22px] font-['Gloock'] font-bold text-[#EFEBE3]/90 hover:text-white border-b border-white/5 hover:border-rust-orange/20 transition-all duration-300">
+      <span class="drawer-nav-indicator w-0.5 h-5 bg-rust-orange rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 shrink-0"></span>
+      Inicio
+    </a>
+    <a href="/colecciones/" class="drawer-nav-link group flex items-center gap-3 py-3.5 text-[22px] font-['Gloock'] font-bold text-[#EFEBE3]/90 hover:text-white border-b border-white/5 hover:border-rust-orange/20 transition-all duration-300">
+      <span class="drawer-nav-indicator w-0.5 h-5 bg-rust-orange rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 shrink-0"></span>
+      Colecciones
+    </a>
+    <a href="/archivo/" class="drawer-nav-link group flex items-center gap-3 py-3.5 text-[22px] font-['Gloock'] font-bold text-[#EFEBE3]/90 hover:text-white border-b border-white/5 hover:border-rust-orange/20 transition-all duration-300">
+      <span class="drawer-nav-indicator w-0.5 h-5 bg-rust-orange rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 shrink-0"></span>
+      Archivo
+    </a>
+    <a href="/about/" class="drawer-nav-link group flex items-center gap-3 py-3.5 text-[22px] font-['Gloock'] font-bold text-[#EFEBE3]/90 hover:text-white border-b border-white/5 hover:border-rust-orange/20 transition-all duration-300">
+      <span class="drawer-nav-indicator w-0.5 h-5 bg-rust-orange rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 shrink-0"></span>
+      About
+    </a>
+  </nav>
+
+  {/* ── Nav secundaria ── */}
+  <div class="px-6 pt-2 pb-4">
+    <p class="font-metadata text-[8.5px] uppercase tracking-[0.4em] text-white/25 mb-3">Plataformas</p>
+    <a
+      href="https://ediciones.thegreatpuzzleproject.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="drawer-nav-link group flex items-center justify-between py-3 text-[14px] font-['Gloock'] text-[#EFEBE3]/50 hover:text-[#EFEBE3]/90 border-b border-white/5 transition-all duration-300"
+    >
+      <span>Editorial TGP</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40 group-hover:opacity-80 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+    </a>
+    <a
+      href="https://thegreatpuzzleproject.substack.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="drawer-nav-link group flex items-center justify-between py-3 text-[14px] font-['Gloock'] text-[#EFEBE3]/50 hover:text-[#EFEBE3]/90 transition-all duration-300"
+    >
+      <span>Newsletter</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40 group-hover:opacity-80 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+    </a>
+  </div>
+
+  {/* ── Spacer flex ── */}
+  <div class="flex-1"></div>
+
+  {/* ── Footer del drawer ── */}
+  <div class="px-6 py-5 border-t border-white/8 flex items-end justify-between shrink-0">
+    <div class="flex flex-col gap-0.5">
+      <span class="font-['Gloock'] font-black text-[10px] uppercase tracking-widest gradient-steel-line-1">
+        The Great Puzzle Project
+      </span>
+      <span class="font-metadata text-[8px] uppercase tracking-[0.3em] text-white/25">Patrimonio · Archivo · Memoria</span>
+    </div>
+    {/* Logo pequeño */}
+    <div class="w-7 h-7 rounded-full overflow-hidden border border-white/10 shrink-0 opacity-50">
+      <img src="/images/favicon.TGP.webp" alt="TGP" class="w-full h-full object-cover" />
+    </div>
+  </div>
+</aside>
+
 <script is:inline>
-  const setupHeaderScroll = () => {
+  const setupHeader = () => {
     const header = document.getElementById('site-header');
     if (!header) return;
 
-    // Destacar la pestaña activa según la URL actual
+    // ── Active links ──
     const currentPath = window.location.pathname;
-    const navLinks = header.querySelectorAll('.header-nav-link');
+    const allNavLinks = header.querySelectorAll('.header-nav-link');
     
-    navLinks.forEach(link => {
+    allNavLinks.forEach(link => {
       const href = link.getAttribute('href');
-      if (href) {
-        // Normalizar trailing slashes para evitar problemas de coincidencia
+      if (href && !href.startsWith('http')) {
         const normalizedPath = currentPath.endsWith('/') && currentPath !== '/' ? currentPath.slice(0, -1) : currentPath;
         const normalizedHref = href.endsWith('/') && href !== '/' ? href.slice(0, -1) : href;
-
-        let isActive = false;
-        
-        if (normalizedHref === '/') {
-          isActive = normalizedPath === '/';
-        } else if (normalizedHref === '/papers') {
-          // Para /papers, activar también si estamos en un subdirectorio o en /hemeroteca
-          isActive = normalizedPath.startsWith('/papers') || normalizedPath.startsWith('/hemeroteca');
-        } else {
-          // Para el resto, coincidencia por prefijo
-          isActive = normalizedPath.startsWith(normalizedHref);
-        }
-
+        const isActive = normalizedHref === '/' ? normalizedPath === '/' : normalizedPath.startsWith(normalizedHref);
         if (isActive) {
           link.classList.add('active');
           link.setAttribute('data-active', 'true');
@@ -194,11 +227,28 @@ const { transparentUntilScroll = false } = Astro.props;
       }
     });
 
-    // Limpiar event listeners previos si existen en `window.tgpHeaderState` para evitar fugas de memoria
+    // ── Drawer links active ──
+    const drawerLinks = document.querySelectorAll('.drawer-nav-link');
+    drawerLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && !href.startsWith('http')) {
+        const normalizedPath = currentPath.endsWith('/') && currentPath !== '/' ? currentPath.slice(0, -1) : currentPath;
+        const normalizedHref = href.endsWith('/') && href !== '/' ? href.slice(0, -1) : href;
+        const isActive = normalizedHref === '/' ? normalizedPath === '/' : normalizedPath.startsWith(normalizedHref);
+        if (isActive) {
+          const indicator = link.querySelector('.drawer-nav-indicator');
+          if (indicator) {
+            indicator.style.opacity = '1';
+          }
+          link.style.color = '#EFEBE3';
+        }
+      }
+    });
+
+    // ── Limpiar listeners previos ──
     if (window.tgpHeaderState) {
       window.removeEventListener('scroll', window.tgpHeaderState.scrollHandler);
       document.removeEventListener('click', window.tgpHeaderState.clickHandler);
-      
       const oldTrigger = document.getElementById('header-hover-trigger');
       if (oldTrigger && window.tgpHeaderState.hoverEnterHandler) {
         oldTrigger.removeEventListener('mouseenter', window.tgpHeaderState.hoverEnterHandler);
@@ -210,7 +260,7 @@ const { transparentUntilScroll = false } = Astro.props;
       window.tgpHeaderState = {};
     }
 
-    // Crear o buscar el trigger invisible en el tope de la pantalla para hover
+    // ── Hover trigger para revelar header en scroll ──
     let trigger = document.getElementById('header-hover-trigger');
     if (!trigger) {
       trigger = document.createElement('div');
@@ -224,128 +274,109 @@ const { transparentUntilScroll = false } = Astro.props;
         header.classList.add('is-hovered-revealed');
       }
     };
-    
     const hoverLeaveHandler = () => {
       header.classList.remove('is-hovered-revealed');
     };
 
     trigger.addEventListener('mouseenter', hoverEnterHandler);
     header.addEventListener('mouseleave', hoverLeaveHandler);
-    
     window.tgpHeaderState.hoverEnterHandler = hoverEnterHandler;
     window.tgpHeaderState.hoverLeaveHandler = hoverLeaveHandler;
 
     let lastScrollY = window.scrollY;
-
     const scrollHandler = () => {
       const currentScrollY = window.scrollY;
-      
-      // Al hacer scroll, se quita la revelación por click o hover previo
       if (Math.abs(currentScrollY - lastScrollY) > 5) {
-        header.classList.remove('is-clicked-revealed');
-        header.classList.remove('is-hovered-revealed');
+        header.classList.remove('is-clicked-revealed', 'is-hovered-revealed');
       }
       lastScrollY = currentScrollY;
-
-      // Con scroll (> 20px) se oculta la barra
       if (currentScrollY > 20) {
         header.classList.add('is-scrolled');
       } else {
-        header.classList.remove('is-scrolled');
-        header.classList.remove('is-clicked-revealed');
-        header.classList.remove('is-hovered-revealed');
+        header.classList.remove('is-scrolled', 'is-clicked-revealed', 'is-hovered-revealed');
       }
     };
 
-    // Si el usuario clickea en cualquier parte de la pantalla, el menú/navbar aparece
     const clickHandler = (e) => {
       if (window.scrollY > 20) {
-        const isClickInsideHeader = header.contains(e.target);
-        if (!isClickInsideHeader) {
-          if (header.classList.contains('is-clicked-revealed')) {
-            header.classList.remove('is-clicked-revealed');
-          } else {
-            header.classList.add('is-clicked-revealed');
-          }
+        if (!header.contains(e.target)) {
+          header.classList.toggle('is-clicked-revealed');
         }
       }
     };
 
     window.addEventListener('scroll', scrollHandler, { passive: true });
     document.addEventListener('click', clickHandler);
-    
     window.tgpHeaderState.scrollHandler = scrollHandler;
     window.tgpHeaderState.clickHandler = clickHandler;
-    
-    // ── Menú Móvil Cinemático (Hamburguesa + Overlay) ──
+
+    // ── Drawer Móvil ──
     const mobileBtn = document.getElementById('nav-mobile-btn');
-    const mobileOverlay = document.getElementById('nav-mobile-overlay');
-    const mobileClose = document.getElementById('nav-mobile-close');
-    const mobileLinks = document.querySelectorAll('.mobile-nav-link');
+    const drawer    = document.getElementById('nav-drawer');
+    const backdrop  = document.getElementById('nav-backdrop');
+    const closeBtn  = document.getElementById('nav-drawer-close');
+    const drawerNavLinks = document.querySelectorAll('.drawer-nav-link');
 
-    if (mobileBtn && mobileOverlay) {
-      let isMobileMenuOpen = false;
+    if (mobileBtn && drawer && backdrop) {
+      let isDrawerOpen = false;
 
-      const setMobileMenuState = (open) => {
-        isMobileMenuOpen = open;
-        mobileBtn.setAttribute('aria-expanded', String(open));
-        mobileOverlay.setAttribute('aria-hidden', String(!open));
-
-        if (open) {
-          mobileOverlay.classList.remove('opacity-0', 'pointer-events-none');
-          mobileOverlay.classList.add('opacity-100', 'pointer-events-auto');
-          mobileBtn.classList.add('is-active');
-          document.body.style.overflow = 'hidden';
-        } else {
-          mobileOverlay.classList.remove('opacity-100', 'pointer-events-auto');
-          mobileOverlay.classList.add('opacity-0', 'pointer-events-none');
-          mobileBtn.classList.remove('is-active');
-          document.body.style.overflow = '';
-        }
+      const openDrawer = () => {
+        isDrawerOpen = true;
+        mobileBtn.setAttribute('aria-expanded', 'true');
+        drawer.setAttribute('aria-hidden', 'false');
+        drawer.classList.remove('translate-x-full');
+        backdrop.classList.remove('opacity-0', 'pointer-events-none');
+        backdrop.classList.add('opacity-100', 'pointer-events-auto');
+        mobileBtn.classList.add('is-active');
+        document.body.style.overflow = 'hidden';
+        // foco al drawer para accesibilidad
+        drawer.focus();
       };
 
-      mobileBtn.onclick = (e) => {
+      const closeDrawer = () => {
+        isDrawerOpen = false;
+        mobileBtn.setAttribute('aria-expanded', 'false');
+        drawer.setAttribute('aria-hidden', 'true');
+        drawer.classList.add('translate-x-full');
+        backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+        backdrop.classList.add('opacity-0', 'pointer-events-none');
+        mobileBtn.classList.remove('is-active');
+        document.body.style.overflow = '';
+        mobileBtn.focus();
+      };
+
+      mobileBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        setMobileMenuState(!isMobileMenuOpen);
-      };
+        isDrawerOpen ? closeDrawer() : openDrawer();
+      });
 
-      if (mobileClose) {
-        mobileClose.onclick = (e) => {
-          e.stopPropagation();
-          setMobileMenuState(false);
-        };
-      }
+      if (closeBtn) closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeDrawer(); });
+      backdrop.addEventListener('click', closeDrawer);
 
-      mobileLinks.forEach((link) => {
+      drawerNavLinks.forEach(link => {
         link.addEventListener('click', () => {
-          setMobileMenuState(false);
+          if (link.getAttribute('target') !== '_blank') closeDrawer();
         });
       });
 
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && isMobileMenuOpen) {
-          setMobileMenuState(false);
-        }
+        if (e.key === 'Escape' && isDrawerOpen) closeDrawer();
       });
     }
 
     scrollHandler();
   };
 
-  const initHeader = () => {
-    setupHeaderScroll();
-  };
-
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initHeader);
+    document.addEventListener('DOMContentLoaded', setupHeader);
   } else {
-    initHeader();
+    setupHeader();
   }
-  document.addEventListener('astro:page-load', initHeader);
+  document.addEventListener('astro:page-load', setupHeader);
 </script>
 
 <style>
-  /* Header totalmente transparente — sin franja ni bordes en ninguna sección */
+  /* ── Estado base: totalmente transparente ── */
   #site-header {
     background-color: transparent !important;
     border-bottom-color: transparent !important;
@@ -355,49 +386,88 @@ const { transparentUntilScroll = false } = Astro.props;
     transition: opacity 0.35s ease, transform 0.35s ease;
   }
 
-  /* Con scroll inmediato se va (fade out + desplazamiento sutil) en todas las secciones */
+  /* ── Con scroll: se oculta ── */
   #site-header.is-scrolled {
     opacity: 0 !important;
     pointer-events: none;
     transform: translateY(-10px);
   }
 
-  /* Si se revela por hover, foco o click, tiene visibilidad total */
+  /* ── Revelado por hover, foco o click ── */
   #site-header.is-scrolled:focus-within,
   #site-header.is-hovered-revealed,
   #site-header.is-clicked-revealed {
     opacity: 1 !important;
     pointer-events: auto !important;
     transform: translateY(0) !important;
+    /* Fondo glassmorphism cuando visible sobre contenido */
+    background-color: rgba(14, 17, 16, 0.88) !important;
+    border-bottom-color: rgba(255,255,255,0.07) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
   }
 
-  /* Animación del botón hamburguesa activo */
+  /* ── Hamburger → X animado ── */
   #nav-mobile-btn.is-active .hamburger-line:nth-child(1) {
-    transform: translateY(5.5px) rotate(45deg);
+    transform: translateY(6.5px) rotate(45deg);
   }
   #nav-mobile-btn.is-active .hamburger-line:nth-child(2) {
     opacity: 0;
     transform: scaleX(0);
   }
   #nav-mobile-btn.is-active .hamburger-line:nth-child(3) {
-    transform: translateY(-5.5px) rotate(-45deg);
+    width: 18px;
+    transform: translateY(-6.5px) rotate(-45deg);
+    margin-left: 0 !important;
+    align-self: center;
   }
 
-  /* NOTA: El estado activo (.active / [data-active]) está definido en global.css
-     con la especificidad necesaria para superar las reglas !important del header. */
+  /* ── Drawer: foco para a11y ── */
+  #nav-drawer:focus {
+    outline: none;
+  }
 
+  /* ── Nav activa en desktop ──
+     (El estado .active / [data-active] se complementa en global.css) */
+
+  /* Light theme ajustes */
   [data-theme='light'] #site-header .header-brand-title,
   [data-theme='light'] #site-header .header-nav-link,
-  [data-theme='light'] #site-header .header-btn-codice,
   [data-theme='light'] #site-header .header-action-btn {
     color: #F5F5F7 !important;
   }
-
+  [data-theme='light'] #site-header.is-scrolled:focus-within,
+  [data-theme='light'] #site-header.is-hovered-revealed,
+  [data-theme='light'] #site-header.is-clicked-revealed {
+    background-color: rgba(245, 244, 240, 0.94) !important;
+    border-bottom-color: rgba(0,0,0,0.08) !important;
+  }
   [data-theme='light'] #site-header .header-action-btn svg {
     stroke: #F5F5F7 !important;
     color: #F5F5F7 !important;
   }
 
+  /* ── Brand / Hemeroteca subtle hover ── */
+  .header-subtitle-hemeroteca {
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+  .header-subtitle-hemeroteca:hover {
+    background-color: rgba(239, 235, 227, 0.04);
+    border-color: rgba(26, 28, 29, 0.8);
+  }
+  [data-theme='light'] .header-subtitle-hemeroteca:hover {
+    border-color: rgba(239, 235, 227, 0.3);
+    background-color: rgba(239, 235, 227, 0.08);
+  }
+
+  /* ── Nav link hover subtle glow ── */
+  .header-nav-link:hover {
+    text-shadow: 0 0 12px rgba(239, 235, 227, 0.08);
+  }
+
+  /* ── Animación logo ── */
   @keyframes soft-pulse {
     0%, 100% { transform: scale(1.05); }
     50% { transform: scale(1.08); }
@@ -406,28 +476,8 @@ const { transparentUntilScroll = false } = Astro.props;
     animation: soft-pulse 3.5s ease-in-out infinite;
   }
 
-  .header-subtitle-hemeroteca {
-    background-color: transparent;
-    border-color: transparent;
-    box-shadow: none;
-  }
-
-  .header-subtitle-hemeroteca:hover {
-    background-color: rgba(239, 235, 227, 0.04);
-    border-color: rgba(26, 28, 29, 0.8);
-    box-shadow: 0 0 12px rgba(239, 235, 227, 0.04);
-  }
-
-  [data-theme='light'] .header-subtitle-hemeroteca:hover {
-    border-color: rgba(239, 235, 227, 0.3);
-    background-color: rgba(239, 235, 227, 0.08);
-  }
-
-  .header-nav-link:hover {
-    text-shadow: 0 0 10px rgba(239, 235, 227, 0.06);
-  }
-
-  @media (max-width: 1200px) {
+  /* ── Ocultar nav desktop en < xl ── */
+  @media (max-width: 1279px) {
     nav.toolbar-element {
       display: none !important;
     }

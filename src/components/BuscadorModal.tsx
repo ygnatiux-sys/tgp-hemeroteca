@@ -177,9 +177,7 @@ export function BuscadorModal() {
               { label: 'Inicio', href: '/' },
               { label: 'Colecciones', href: '/colecciones' },
               { label: 'Archivo', href: '/archivo' },
-              { label: 'Papers', href: '/papers' },
               { label: 'About', href: '/about' },
-              { label: 'El Códice', href: '/codice' },
               { label: 'Editorial ↗', href: 'https://ediciones.thegreatpuzzleproject.com', external: true },
             ].map(link => (
               <a

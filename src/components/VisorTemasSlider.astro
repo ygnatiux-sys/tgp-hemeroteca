@@ -1,0 +1,374 @@
+---
+/**
+ * src/components/VisorTemasSlider.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Visor Cinemático Horizontal (Cinema Stage) con Slider GSAP y Chevrons Exteriores.
+ * 
+ * Basado en el diseño "Continuar la Lectura" (Imagen 1):
+ * - Imagen panorámica a la izquierda con fundido gradual a negro (fade-to-black).
+ * - Tipografía editorial con gradiente exacto (Gloock con gradient-general-h2 o Cinzel con steel gradient).
+ * - Chevrons discretos fuera de la card (en la barra superior) respetando el tamaño y disimulo de los controles heredados.
+ * - Sincronizado bidireccionalmente con el Índice Completo inferior.
+ */
+import Image from './SafeImage.astro';
+import { formatCategory, formatYear, sanitizeImageUrl } from '../lib/content-filter';
+
+interface EssayItem {
+  slug: string;
+  entry: any;
+  img?: any;
+  isCinematicGSAP?: boolean;
+}
+
+interface Props {
+  items: EssayItem[];
+  label?: string;
+  id?: string;
+}
+
+const {
+  items = [],
+  label = "Catálogo",
+  id = "visor-" + Math.random().toString(36).substring(2, 8),
+} = Astro.props;
+
+const sanitizedItems = items.map((item, idx) => {
+  const isCine = item.isCinematicGSAP || item.entry?.category === 'Ensayos Cinemáticos' || (item.entry as any)?.isCinematicGSAP;
+  const linkHref = isCine ? `/ensayos-cinematicos/${item.slug}/` : `/hemeroteca/${item.slug}/`;
+  const papersHref = null; // Deshabilitado globalmente: (item.entry as any)?.papersSlug ? `/papers/${(item.entry as any).papersSlug}/` : null;
+  const rawImg = item.img ? ((item.img as any)?.src ?? item.img) : null;
+  const imgUrl = rawImg ? sanitizeImageUrl(rawImg) : null;
+  const sitio = (item.entry as any)?.sitioGeohistorico || null;
+  const volanta = item.entry?.volanta || (item.entry as any)?.volantaHook || null;
+  const dek = item.entry?.dek || item.entry?.excerpt || '';
+
+  // Detección de fuente y gradiente: Cinzel (Steel Gradient) vs Gloock (Didone Gradient)
+  const catLower = (item.entry?.category || label || '').toLowerCase();
+  const isCinzel = item.entry?.font === 'cinzel' || catLower.includes('arquetipo') || catLower.includes('mitolog') || catLower.includes('arqueolog');
+
+  return {
+    ...item,
+    idx,
+    isCine,
+    isCinzel,
+    linkHref,
+    papersHref,
+    imgUrl,
+    sitio,
+    volanta,
+    dek,
+    year: formatYear(item.entry?.date),
+    categoryLabel: formatCategory(item.entry?.category || label),
+  };
+});
+---
+
+{sanitizedItems.length > 0 && (
+  <div id={id} class="visor-cinematico-root w-full flex flex-col gap-4 select-none" data-total-slides={sanitizedItems.length}>
+    
+    {/* ── ENCABEZADO DISCRETO FUERA DE LA CARD CON CHEVRONS HEREDADOS ── */}
+    <div class="flex items-center justify-between px-2 pt-1">
+      <div class="flex items-center gap-3">
+        <span class="font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-rust-orange font-bold">
+          [ Visor de Archivo ]
+        </span>
+        <span class="font-mono text-[10px] text-white/40 tracking-wider">
+          • <span class="current-slide-num text-white/90 font-bold">01</span> / {String(sanitizedItems.length).padStart(2, '0')}
+        </span>
+      </div>
+
+      {/* Controles de Chevrons Exteriores Discretos (Tamaño y estilo heredado) */}
+      <div class="flex items-center gap-1.5">
+        <button
+          type="button"
+          class="visor-prev-btn w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 hover:border-rust-orange/50 text-white/60 hover:text-rust-orange transition-all duration-300 flex items-center justify-center cursor-pointer disabled:opacity-20 disabled:pointer-events-none"
+          aria-label="Tema anterior"
+        >
+          <svg class="w-3.5 h-3.5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+        </button>
+
+        <button
+          type="button"
+          class="visor-next-btn w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 hover:border-rust-orange/50 text-white/60 hover:text-rust-orange transition-all duration-300 flex items-center justify-center cursor-pointer disabled:opacity-20 disabled:pointer-events-none"
+          aria-label="Tema siguiente"
+        >
+          <svg class="w-3.5 h-3.5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    {/* ── ESCENARIO DEL VISOR HORIZONTAL CINEMATOGRÁFICO (SIN BOTONES INTERNOS INVASIVOS) ── */}
+    <div class="visor-stage relative w-full overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 bg-[#0e1013] shadow-2xl min-h-95 md:min-h-110">
+      
+      {/* Contenedor de Diapositivas (Cinema Cards Track) */}
+      <div class="visor-slides-track relative w-full h-full min-h-95 md:min-h-110">
+        {sanitizedItems.map((item, idx) => (
+          <article
+            class={`visor-slide absolute inset-0 w-full h-full flex flex-col lg:flex-row items-stretch transition-opacity duration-500 ${idx === 0 ? 'opacity-100 z-10' : 'opacity-0 pointer-events-none z-0'}`}
+            data-index={idx}
+            data-slug={item.slug}
+          >
+            {/* 1. Imagen Panorámica con Fade to Black Gradual a la Derecha */}
+            <div class="relative overflow-hidden lg:w-[50%] shrink-0 aspect-video lg:aspect-auto min-h-56 lg:min-h-full bg-black">
+              {item.imgUrl ? (
+                <Image
+                  src={item.imgUrl}
+                  alt={item.entry.title}
+                  inferSize={true}
+                  format="webp"
+                  loading={idx === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                  class="w-full h-full object-cover object-center brightness-80 contrast-[1.05] transition-transform duration-1000 ease-out"
+                />
+              ) : (
+                <div class="w-full h-full bg-linear-to-br from-[#1b1c24] via-theme-dark to-black flex items-center justify-center">
+                  <span class="font-mono text-xs uppercase tracking-widest text-white/30">TGP Archivo</span>
+                </div>
+              )}
+
+              {/* Fundidos Cinematográficos (Edge Feathering) */}
+              <div class="absolute inset-0 shadow-[inset_0_0_90px_rgba(0,0,0,0.85)] pointer-events-none" />
+              <div class="absolute inset-0 bg-linear-to-r from-transparent via-[#0e1013]/40 to-[#0e1013] hidden lg:block pointer-events-none" />
+              <div class="absolute inset-0 bg-linear-to-t from-[#0e1013] via-[#0e1013]/60 to-transparent lg:hidden pointer-events-none" />
+            </div>
+
+            {/* 2. Información Editorial con Gradientes de Letra Correspondientes */}
+            <div class="flex flex-col justify-between p-6 sm:p-8 lg:p-10 flex-1 min-w-0 bg-[#0e1013] z-10">
+              <div class="flex flex-col gap-3 md:gap-4">
+                {/* Metadatos superiores */}
+                <div class="flex items-center gap-3 flex-wrap">
+                  <span class="font-mono text-[9px] md:text-[10px] uppercase tracking-[0.35em] text-rust-orange font-bold">
+                    {item.categoryLabel}
+                  </span>
+                  {item.sitio && (
+                    <span class="inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-wider text-white/50 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                      📍 {item.sitio}
+                    </span>
+                  )}
+                  {item.year && (
+                    <span class="font-mono text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/35">
+                      · {item.year}
+                    </span>
+                  )}
+                </div>
+
+                {/* Título Principal con Gradiente Correspondiente (Steel para Cinzel / General para Gloock) */}
+                {item.isCinzel ? (
+                  <h3 class="font-cinzel font-bold text-2xl sm:text-3xl lg:text-4xl leading-tight tracking-wide">
+                    <a href={item.linkHref} class="gradient-steel-brand inline-block hover:brightness-110 transition-all duration-300">
+                      {item.entry.title}
+                    </a>
+                  </h3>
+                ) : (
+                  <h3 class="font-gloock text-2xl sm:text-3xl lg:text-4xl leading-tight tracking-tight">
+                    <a href={item.linkHref} class="gradient-general-h2 inline-block hover:brightness-110 transition-all duration-300">
+                      {item.entry.title}
+                    </a>
+                  </h3>
+                )}
+
+                {/* Subtítulo o Dek */}
+                {item.dek && (
+                  <p class="font-serif text-[#E0E0E0]/80 text-sm md:text-base leading-relaxed line-clamp-2 md:line-clamp-3 max-w-prose tracking-wide font-light">
+                    "{item.dek}"
+                  </p>
+                )}
+              </div>
+
+              {/* Botones de Acción (Leer Artículo & Ver Dossier Paper) */}
+              <div class="mt-6 pt-5 border-t border-white/10 flex items-center flex-wrap gap-3 sm:gap-4">
+                <a
+                  href={item.linkHref}
+                  aria-label={`Leer artículo: ${item.entry.title}`}
+                  class="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-rust-orange border border-white/15 hover:border-rust-orange text-[#E0E0E0] hover:text-white font-mono font-bold text-[10px] md:text-[11px] tracking-[0.25em] uppercase rounded-xl transition-all duration-300 shadow-lg"
+                >
+                  <span>{item.isCine ? 'Iniciar GSAP' : 'Leer Artículo'}</span>
+                  <span class="text-xs">▸</span>
+                </a>
+
+                {item.papersHref && (
+                  <a
+                    href={item.papersHref}
+                    aria-label={`Ver dossier académico: ${item.entry.title}`}
+                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-transparent hover:bg-white/5 border border-white/10 hover:border-white/30 text-white/60 hover:text-white font-mono text-[10px] tracking-[0.2em] uppercase rounded-xl transition-all duration-300"
+                  >
+                    <span>Ver Dossier Paper</span>
+                    <span class="text-xs opacity-60">↗</span>
+                  </a>
+                )}
+
+                <div class="ml-auto font-mono text-[10px] text-white/30 tracking-widest hidden md:block">
+                  REGISTRO {String(idx + 1).padStart(2, '0')}
+                </div>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+
+    {/* ── BARRA DE PROGRESO DE PUNTOS DISCRETA ── */}
+    {sanitizedItems.length > 1 && (
+      <div class="flex items-center justify-center gap-1.5 pt-1">
+        {sanitizedItems.map((_, i) => (
+          <button
+            type="button"
+            class={`visor-dot h-1.5 rounded-full transition-all duration-300 cursor-pointer ${i === 0 ? 'w-6 bg-rust-orange' : 'w-1.5 bg-white/20 hover:bg-white/40'}`}
+            data-dot-index={i}
+            aria-label={`Ir al slide ${i + 1}`}
+          />
+        ))}
+      </div>
+    )}
+
+  </div>
+)}
+
+<script>
+  import gsap from 'gsap';
+
+  function initVisoresCinematicos() {
+    const roots = document.querySelectorAll<HTMLElement>('.visor-cinematico-root');
+
+    roots.forEach(root => {
+      if (root.hasAttribute('data-init')) return;
+      root.setAttribute('data-init', 'true');
+
+      const slides = root.querySelectorAll<HTMLElement>('.visor-slide');
+      const dots = root.querySelectorAll<HTMLElement>('.visor-dot');
+      const currentNumEl = root.querySelector('.current-slide-num');
+      const total = slides.length;
+      if (total <= 1) return;
+
+      let currentIndex = 0;
+      let isAnimating = false;
+
+      function goToSlide(newIndex: number, direction: 'next' | 'prev' = 'next') {
+        if (isAnimating || newIndex === currentIndex) return;
+        if (newIndex < 0) newIndex = total - 1;
+        if (newIndex >= total) newIndex = 0;
+
+        isAnimating = true;
+        const currentSlide = slides[currentIndex];
+        const nextSlide = slides[newIndex];
+
+        // Actualizar números y dots
+        if (currentNumEl) {
+          currentNumEl.textContent = String(newIndex + 1).padStart(2, '0');
+        }
+        dots.forEach((dot, dIdx) => {
+          if (dIdx === newIndex) {
+            dot.classList.remove('w-1.5', 'bg-white/20');
+            dot.classList.add('w-6', 'bg-rust-orange');
+          } else {
+            dot.classList.remove('w-6', 'bg-rust-orange');
+            dot.classList.add('w-1.5', 'bg-white/20');
+          }
+        });
+
+        // Sincronizar con el índice de la lista inferior si existe en la página
+        const listItems = document.querySelectorAll<HTMLElement>('.catalogo-indice-item');
+        listItems.forEach((li) => {
+          const liIdx = parseInt(li.getAttribute('data-item-index') || '-1', 10);
+          if (liIdx === newIndex) {
+            li.classList.add('bg-white/5', 'text-white');
+            li.style.borderLeft = '3px solid #e07a5f';
+          } else {
+            li.classList.remove('bg-white/5', 'text-white');
+            li.style.borderLeft = 'transparent';
+          }
+        });
+
+        // Animación fluida con GSAP
+        const xOffset = direction === 'next' ? 35 : -35;
+
+        gsap.to(currentSlide, {
+          opacity: 0,
+          x: -xOffset,
+          duration: 0.4,
+          ease: 'power2.inOut',
+          onComplete: () => {
+            currentSlide.style.pointerEvents = 'none';
+            currentSlide.style.zIndex = '0';
+          }
+        });
+
+        nextSlide.style.pointerEvents = 'auto';
+        nextSlide.style.zIndex = '10';
+        gsap.fromTo(
+          nextSlide,
+          { opacity: 0, x: xOffset },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.45,
+            ease: 'power2.out',
+            onComplete: () => {
+              currentIndex = newIndex;
+              isAnimating = false;
+            }
+          }
+        );
+      }
+
+      // Eventos de botones exteriores en la cabecera
+      root.querySelectorAll('.visor-prev-btn').forEach(btn => {
+        btn.addEventListener('click', () => goToSlide(currentIndex - 1, 'prev'));
+      });
+
+      root.querySelectorAll('.visor-next-btn').forEach(btn => {
+        btn.addEventListener('click', () => goToSlide(currentIndex + 1, 'next'));
+      });
+
+      // Eventos de Dots
+      dots.forEach((dot, dotIdx) => {
+        dot.addEventListener('click', () => {
+          const dir = dotIdx > currentIndex ? 'next' : 'prev';
+          goToSlide(dotIdx, dir);
+        });
+      });
+
+      // Conexión con los elementos del índice inferior en la misma página
+      const listItems = document.querySelectorAll<HTMLElement>('.catalogo-indice-item');
+      listItems.forEach((item) => {
+        item.addEventListener('click', (e) => {
+          const target = e.target as HTMLElement;
+          if (!target.closest('a')) {
+            const itemIdx = parseInt(item.getAttribute('data-item-index') || '0', 10);
+            const dir = itemIdx > currentIndex ? 'next' : 'prev';
+            goToSlide(itemIdx, dir);
+            root.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        });
+      });
+
+      // Soporte Swipe táctil
+      let touchStartX = 0;
+      root.querySelector('.visor-stage')?.addEventListener('touchstart', (e: any) => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+
+      root.querySelector('.visor-stage')?.addEventListener('touchend', (e: any) => {
+        const touchEndX = e.changedTouches[0].screenX;
+        const diff = touchStartX - touchEndX;
+        if (Math.abs(diff) > 45) {
+          if (diff > 0) goToSlide(currentIndex + 1, 'next');
+          else goToSlide(currentIndex - 1, 'prev');
+        }
+      }, { passive: true });
+    });
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initVisoresCinematicos);
+    } else {
+      initVisoresCinematicos();
+    }
+    document.addEventListener('astro:page-load', initVisoresCinematicos);
+  }
+</script>

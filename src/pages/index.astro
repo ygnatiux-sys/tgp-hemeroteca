@@ -166,7 +166,7 @@ const heroSlides   = publishable.slice(0, HERO_COUNT).map((e, index) => {
       image: slideImage,
       imagePosition: (latestCinematicPost.entry as any).coverImagePosition || (latestCinematicPost.entry as any).imagePosition || 'center center',
       link: heroHref,
-      papersLink: (latestCinematicPost.entry as any).papersSlug ? `/papers/${(latestCinematicPost.entry as any).papersSlug}` : undefined,
+      papersLink: undefined, // Deshabilitado globalmente: (latestCinematicPost.entry as any).papersSlug ? `/papers/${(latestCinematicPost.entry as any).papersSlug}` : undefined,
     };
   }
 
@@ -180,7 +180,7 @@ const heroSlides   = publishable.slice(0, HERO_COUNT).map((e, index) => {
     image: slideImage,
     imagePosition: (e.entry as any).coverImagePosition || (e.entry as any).imagePosition || 'center center',
     link: (e as any).isCinematicGSAP ? `/ensayos-cinematicos/${e.slug}` : `/hemeroteca/${e.slug}`,
-    papersLink: (e.entry as any).papersSlug ? `/papers/${(e.entry as any).papersSlug}` : undefined,
+    papersLink: undefined, // Deshabilitado globalmente: (e.entry as any).papersSlug ? `/papers/${(e.entry as any).papersSlug}` : undefined,
   };
 });
 

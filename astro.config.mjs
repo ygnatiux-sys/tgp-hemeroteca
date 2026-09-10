@@ -70,13 +70,18 @@ export default defineConfig({
           '/outro_cinematic.wav',
           // Páginas con export const prerender = true → archivos HTML estáticos
           '/hemeroteca/*',
-          '/papers',
-          '/papers/*',
           '/ensayos-cinematicos/*',
         ],
       },
     }
   }),
+
+  // Redirecciones seguras para rutas deshabilitadas globalmente
+  redirects: {
+    '/papers': '/hemeroteca',
+    '/papers/[...slug]': '/hemeroteca',
+    '/codice': '/',
+  },
 
   integrations: [
     sitemap(),

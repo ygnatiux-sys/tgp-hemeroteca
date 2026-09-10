@@ -7,6 +7,7 @@ import CinematicGalleryEngine from '../../components/CinematicGalleryEngine.astr
 import Marquee from '../../components/Marquee.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import AguaNieve from '../../components/AguaNieve.astro';
+import VisorTemasSlider from '../../components/VisorTemasSlider.astro';
 
 import {
   getPublishableEssays,
@@ -591,14 +592,14 @@ const sequences = createPremierSequences(resolvedEssays);
       )}
 
       {/* ═════════════════════════════════════════════════════════════════════
-          ÍNDICE INTERNO & NAVEGACIÓN COMPLETA (SIN REPETICIONES CONFUSAS)
+          ÍNDICE INTERNO & VISOR CINEMÁTICO SINCRONIZADO
       ═════════════════════════════════════════════════════════════════════ */}
-      <section class="flex flex-col gap-6 border-t border-white/10 pt-12 mt-8">
+      <section class="flex flex-col gap-8 border-t border-white/10 pt-12 mt-8">
         <div class="reveal-item flex items-end justify-between">
           <div>
             <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Catálogo Exhaustivo</span>
             <h2 class="text-2xl md:text-3xl font-serif font-black gradient-general-h2">
-              {label} — Índice Completo
+              {label} — Visor &amp; Índice Completo
             </h2>
           </div>
           <span class="font-mono text-xs text-white/40">
@@ -606,33 +607,58 @@ const sequences = createPremierSequences(resolvedEssays);
           </span>
         </div>
 
-        <ol class="flex flex-col divide-y divide-white/5 mt-2">
-          {resolvedEssays.map(({ slug, entry, isCinematicGSAP }: { slug: string; entry: typeof essays[0]['entry']; isCinematicGSAP?: boolean }, i: number) => {
-            const isCine = isCinematicGSAP || entry.category === 'Ensayos Cinemáticos' || (entry as any)?.isCinematicGSAP;
-            const linkHref = isCine ? `/ensayos-cinematicos/${slug}/` : `/hemeroteca/${slug}/`;
-            return (
-              <li>
-                <a
-                  href={linkHref}
-                  class="group flex items-baseline gap-4 md:gap-6 py-4 hover:text-[#EFEBE3] transition-colors duration-300"
+        {/* Visor Cinemático Horizontal (Cinema Stage con Slider GSAP y Chevrons) */}
+        <VisorTemasSlider items={resolvedEssays} label={label} />
+
+        {/* Lista Exhaustiva Sincronizada con el Visor */}
+        <div class="flex flex-col gap-2 mt-4">
+          <div class="flex items-center justify-between px-3 pb-2 border-b border-white/10 text-white/40 font-mono text-[10px] uppercase tracking-widest">
+            <span>N° · Temas del Catálogo (Haz clic en una fila para proyectar en el visor)</span>
+            <span class="hidden sm:inline">Acción</span>
+          </div>
+
+          <ol class="flex flex-col divide-y divide-white/5">
+            {resolvedEssays.map(({ slug, entry, isCinematicGSAP }: { slug: string; entry: typeof essays[0]['entry']; isCinematicGSAP?: boolean }, i: number) => {
+              const isCine = isCinematicGSAP || entry.category === 'Ensayos Cinemáticos' || (entry as any)?.isCinematicGSAP;
+              const linkHref = isCine ? `/ensayos-cinematicos/${slug}/` : `/hemeroteca/${slug}/`;
+              return (
+                <li
+                  class={`catalogo-indice-item group flex items-center justify-between py-3.5 px-3 md:px-4 rounded-xl transition-all duration-300 hover:bg-white/5 cursor-pointer ${i === 0 ? 'bg-white/5 text-white' : 'text-white/80'}`}
+                  data-item-index={i}
+                  style={i === 0 ? 'border-left: 3px solid #e07a5f;' : 'border-left: 3px solid transparent;'}
                 >
-                  <span class="font-mono text-xs text-white/30 tracking-wider tabular-nums shrink-0 w-8 text-right">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span class="font-mono text-[10px] text-rust-orange/80 tracking-[0.2em] shrink-0 hidden sm:inline">
-                    {formatYear(entry.date)}
-                  </span>
-                  <span class="font-serif text-sm md:text-base text-white/80 group-hover:text-white transition-colors leading-snug line-clamp-1 flex-1 font-semibold">
-                    {entry.title}
-                  </span>
-                  <span class="font-mono text-[10px] uppercase text-white/30 shrink-0 group-hover:text-rust-orange group-hover:translate-x-1 transition-all">
-                    {isCine ? 'GSAP →' : 'Leer →'}
-                  </span>
-                </a>
-              </li>
-            );
-          })}
-        </ol>
+                  <div class="flex items-center gap-4 md:gap-6 min-w-0 flex-1">
+                    <span class="font-mono text-xs text-white/30 tracking-wider tabular-nums shrink-0 w-8 text-right group-hover:text-rust-orange transition-colors">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span class="font-mono text-[10px] text-rust-orange/80 tracking-[0.2em] shrink-0 hidden sm:inline">
+                      {formatYear(entry.date)}
+                    </span>
+                    <span class="font-serif text-sm md:text-base group-hover:text-white transition-colors leading-snug line-clamp-1 font-medium">
+                      {entry.title}
+                    </span>
+                  </div>
+
+                  <div class="flex items-center gap-3 shrink-0 ml-4">
+                    <button
+                      type="button"
+                      class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-white/60 hover:text-white font-mono text-[9px] uppercase tracking-wider transition-colors hidden md:inline-block"
+                    >
+                      Proyectar ✦
+                    </button>
+                    <a
+                      href={linkHref}
+                      class="font-mono text-[10px] uppercase text-white/40 group-hover:text-rust-orange group-hover:translate-x-1 transition-all py-1 px-2"
+                      aria-label={`Abrir ${entry.title}`}
+                    >
+                      {isCine ? 'GSAP →' : 'Leer →'}
+                    </a>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
 
         {/* Barra de Retorno y Exploración Cruzada */}
         <div class="pt-8 flex items-center justify-between border-t border-white/10 font-mono text-[11px] uppercase tracking-[0.3em]">

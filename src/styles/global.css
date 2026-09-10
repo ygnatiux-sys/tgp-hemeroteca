@@ -521,6 +521,52 @@ html[data-nav-state="2"] header:hover .brand-element {
   color: #EFEBE3 !important;
 }
 
+/* ═════════════════════════════════════════════════════════════════════════
+   DRAWER NAV MÓVIL — Estado activo y light mode
+═════════════════════════════════════════════════════════════════════════ */
+
+/* Light theme: drawer con fondo claro */
+[data-theme='light'] #nav-drawer {
+  background-color: rgba(245, 244, 240, 0.97) !important;
+  border-left-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme='light'] #nav-backdrop {
+  background-color: rgba(28, 30, 33, 0.3) !important;
+}
+
+[data-theme='light'] #nav-drawer .drawer-nav-link {
+  color: rgba(28, 30, 33, 0.7) !important;
+}
+
+[data-theme='light'] #nav-drawer a[href]:not([target='_blank']).drawer-nav-link:hover,
+[data-theme='light'] #nav-drawer a[href]:not([target='_blank']).drawer-nav-link:focus {
+  color: #1C1E21 !important;
+}
+
+[data-theme='light'] #nav-drawer .drawer-nav-link.active,
+[data-theme='light'] #nav-drawer a[href]:not([target='_blank'])[data-active='true'] {
+  color: #1C1E21 !important;
+}
+
+[data-theme='light'] #nav-drawer .drawer-nav-indicator {
+  background-color: #6E2424 !important;
+}
+
+[data-theme='light'] #nav-drawer-close {
+  color: rgba(28, 30, 33, 0.5) !important;
+  background-color: rgba(28, 30, 33, 0.06) !important;
+}
+
+[data-theme='light'] #nav-drawer-close:hover {
+  color: #1C1E21 !important;
+  background-color: rgba(28, 30, 33, 0.12) !important;
+}
+
+[data-theme='light'] #nav-drawer .font-metadata {
+  color: rgba(28, 30, 33, 0.3) !important;
+}
+
 /* ─── 1. ESCALA DE TEXTO PRINCIPAL Y MATICES (CARBÓN & PLOMO OSCURO) ─────── */
 [data-theme='light'] body {
   background-color: var(--bg-main) !important;
