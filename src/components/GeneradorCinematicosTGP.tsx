@@ -744,16 +744,18 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
             <button
               type="button"
               onClick={() => {
+                const img = previewImage;
+                if (!img) return;
                 try {
                   const slug = getSlugFromUrl() || 'portada-cinematica';
                   const a = document.createElement('a');
-                  a.href = previewImage;
+                  a.href = img;
                   a.download = `${slug}-portada.jpg`;
                   a.target = '_blank';
                   document.body.appendChild(a);
                   a.click();
                   document.body.removeChild(a);
-                } catch { window.open(previewImage, '_blank'); }
+                } catch { window.open(img, '_blank'); }
               }}
               style={{ padding: '4px 10px', background: '#3a2a10', color: '#ffb74d', border: '1px solid #ff9800', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
               title="Descarga la imagen de portada generada"

@@ -282,9 +282,11 @@ export function GeneradorInformePremium({ value, onChange }: any) {
             <button
               type="button"
               onClick={() => {
+                const contenido = ultimoContenido;
+                if (!contenido) return;
                 try {
                   const slug = ultimoSlug || 'informe-premium-tgp';
-                  const blob = new Blob([ultimoContenido], { type: 'text/markdown;charset=utf-8' });
+                  const blob = new Blob([contenido], { type: 'text/markdown;charset=utf-8' });
                   const url = URL.createObjectURL(blob);
                   const a = document.createElement('a');
                   a.href = url;
@@ -304,16 +306,18 @@ export function GeneradorInformePremium({ value, onChange }: any) {
               <button
                 type="button"
                 onClick={() => {
+                  const img = ultimaImagen;
+                  if (!img) return;
                   try {
                     const slug = ultimoSlug || 'portada-premium';
                     const a = document.createElement('a');
-                    a.href = ultimaImagen;
+                    a.href = img;
                     a.download = `${slug}-portada.webp`;
                     a.target = '_blank';
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
-                  } catch { window.open(ultimaImagen, '_blank'); }
+                  } catch { window.open(img, '_blank'); }
                 }}
                 style={{ padding: '6px 12px', background: '#451a03', color: '#fdba74', border: '1px solid #f97316', borderRadius: '4px', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 600 }}
                 title="Descarga la imagen destacada"

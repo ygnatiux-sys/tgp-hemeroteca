@@ -543,16 +543,18 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
               <button
                 type="button"
                 onClick={() => {
+                  const imgUrl = arteResult.imageUrl;
+                  if (!imgUrl) return;
                   try {
                     const slug = getSlugFromUrl() || 'arquetipo-tgp';
                     const a = document.createElement('a');
-                    a.href = arteResult.imageUrl;
+                    a.href = imgUrl;
                     a.download = `${slug}-portada.jpg`;
                     a.target = '_blank';
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
-                  } catch { window.open(arteResult.imageUrl, '_blank'); }
+                  } catch { window.open(imgUrl, '_blank'); }
                 }}
                 className="w-full py-1 px-2 bg-amber-900/30 hover:bg-amber-900/50 border border-amber-500/40 text-amber-300 rounded text-[10px] font-mono font-bold cursor-pointer transition-all flex items-center justify-center gap-1"
                 title="Descargar imagen de portada a tu computadora"
