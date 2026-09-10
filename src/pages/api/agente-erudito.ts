@@ -1,23 +1,23 @@
-﻿import 'dotenv/config';
 import type { APIRoute } from 'astro';
 import { GoogleGenAI } from '@google/genai';
 import {
   ERUDITO_DIVULGATIVO_PROMPT,
   AGENTE_ERUDITO_ACADEMICO_PROMPT,
-} from '../config/geminiPrompts';
+} from '../../config/geminiPrompts';
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   const headers = { 'Content-Type': 'application/json' };
 
   try {
     const body = await request.json();
     const { modo = 'divulgativo', titulo = '', textoActual = '' } = body;
 
-    const API_KEY = import.meta.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+    const env = (locals as any)?.runtime?.env;
+    const API_KEY = env?.GEMINI_API_KEY || (process.env as any)?.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
     if (!API_KEY) {
-      return new Response(JSON.stringify({ error: 'Falta GEMINI_API_KEY en el servidor.' }), { status: 500, headers });
+      return new Response(JSON.stringify({ error: 'Falta GEMINI_API_KEY en las variables de entorno de Cloudflare / servidor.' }), { status: 500, headers });
     }
 
     const ai = new GoogleGenAI({ apiKey: API_KEY });

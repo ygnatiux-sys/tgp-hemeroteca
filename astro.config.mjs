@@ -81,16 +81,5 @@ export default defineConfig({
   integrations: [
     sitemap(),
     ...tgpIntegrations,
-    {
-      name: 'gemini-motor-local',
-      hooks: {
-        'astro:config:setup': ({ injectRoute, command }) => {
-          if (command === 'dev' || isDev) {
-            injectRoute({ pattern: '/api/guardar-ensayo', entrypoint: './src/api/_guardar-ensayo.ts' });
-            injectRoute({ pattern: '/api/agente-erudito', entrypoint: './src/api/agente-erudito.ts' });
-          }
-        }
-      }
-    }
   ],
 });
