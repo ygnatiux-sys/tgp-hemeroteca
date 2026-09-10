@@ -217,9 +217,10 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       sitioEls.forEach((el) => setNativeValue(el, sitioVal));
     }
 
-    // 7. Inyección Forzada en el Editor ProseMirror / fields.document (OBLIGATORIO - SIEMPRE)
+    // 7. Actualizar el campo custom de Keystatic (generadorGeoref) vía onChange.
+    // NOTA: No inyectamos en ProseMirror/Slate directamente — causa crashes en producción.
+    // El contenido queda guardado en el campo generadorGeoref y Keystatic lo commitea a GitHub al presionar Save.
     if (contentVal) {
-      injectIntoKeystaticDocumentEditor(contentVal);
       onChange(contentVal);
     }
   };
@@ -518,14 +519,25 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       const data = await res.json();
       if (data.success) {
         setIsSaved(true);
-        setStatusFeedback('¡Publicación guardada exitosamente en disco!');
-        alert(`¡PUBLICACIÓN GUARDADA EXITOSAMENTE EN DISCO!\n\nArtículo: "${temaToUse}"\nRuta: src/content/georreferencias/${slugConfirmado}/`);
-        setTimeout(() => setIsSaved(false), 5000);
+        if (data.productionMode) {
+          // Estamos en Cloudflare — el guardado real lo hace Keystatic al presionar Save
+          setStatusFeedback('✅ Listo. Presioná el botón azul «Save» de Keystatic para publicar en GitHub.');
+          setIsSynced(true);
+          lockKeystatiSave(false);
+        } else {
+          // Modo local — guardado directo en disco
+          setStatusFeedback('¡Publicación guardada exitosamente en disco!');
+          alert(`¡PUBLICACIÓN GUARDADA EN DISCO!\n\nArtículo: "${temaToUse}"\nRuta: src/content/georreferencias/${slugConfirmado}/`);
+        }
+        setTimeout(() => setIsSaved(false), 8000);
       } else {
-        alert(`Aviso: ${data.error || 'Sincronizado con Keystatic. Presiona Save arriba.'}`);
+        setStatusFeedback(data.error || 'Sincronizado. Presioná Save en Keystatic.');
       }
     } catch (e: any) {
-      alert(`Sincronizado con Keystatic. Presiona el botón "Save" de Keystatic arriba.`);
+      // Fallback: aunque falle la API, el onChange ya actualizó el campo de KS
+      setIsSynced(true);
+      lockKeystatiSave(false);
+      setStatusFeedback('✅ Contenido listo en el formulario. Presioná «Save» en Keystatic.');
     }
   };
 
@@ -994,7 +1006,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
             boxShadow: '0 4px 12px rgba(21, 101, 192, 0.35)'
           }}
         >
-          {isSaved ? '¡PUBLICACIÓN GUARDADA EN DISCO!' : '💾 CONFIRMAR & GUARDAR EN DISCO'}
+          {isSaved ? '✅ ¡LISTO! Presioná Save en Keystatic' : '💾 CONFIRMAR & PREPARAR PARA SAVE'}
         </button>
       </div>
     </div>
