@@ -92,13 +92,20 @@ async function processUrl(url) {
 
   console.log(`\n📥 Descargando: ${url}`);
   try {
-    const res = await fetch(url);
+    // Retardo para respetar las políticas de Wikimedia y evitar 429 Too Many Requests
+    await new Promise(r => setTimeout(r, 400));
+
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'TgpImageOptimizer/1.0 (https://tupatagoniaglobal.com; admin@tupatagoniaglobal.com)'
+      }
+    });
     if (!res.ok) throw new Error(`Status ${res.status}`);
     const arrayBuffer = await res.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
     console.log(`✨ Optimizando a WebP: ${filename}`);
-    await sharp(buffer)
+    await sharp(buffer, { limitInputPixels: false })
       .resize({ width: 1920, withoutEnlargement: true, fit: 'inside' })
       .webp({ quality: 80, effort: 4 })
       .toFile(destPath);
