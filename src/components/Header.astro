@@ -107,7 +107,7 @@ const { transparentUntilScroll = false } = Astro.props;
 {/* Backdrop */}
 <div
   id="nav-backdrop"
-  class="fixed inset-0 z-[9980] bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-400 xl:hidden"
+  class="fixed inset-0 z-9980 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-400 xl:hidden"
   aria-hidden="true"
 ></div>
 
@@ -117,7 +117,7 @@ const { transparentUntilScroll = false } = Astro.props;
   role="dialog"
   aria-modal="true"
   aria-label="Navegación principal"
-  class="fixed top-0 right-0 h-full w-[min(88vw,340px)] z-[9990] xl:hidden
+  class="fixed top-0 right-0 h-full w-[min(88vw,340px)] z-9990 xl:hidden
          bg-[#0e1110]/97 backdrop-blur-2xl border-l border-white/8
          flex flex-col
          translate-x-full transition-transform duration-400 ease-in-out

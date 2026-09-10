@@ -8,7 +8,7 @@
   "publicarConImagen": false,
   "draft": false,
   "coverImage": null,
-  "bancoImagenesWikimedia": "{\"selectedItems\":[{\"id\":\"Tail_of_a_whale_near_Valdes_Peninsula.jpg\",\"url\":\"https://upload.wikimedia.org/wikipedia/commons/b/b9/Tail_of_a_whale_near_Valdes_Peninsula.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original\",\"thumbUrl\":\"https://upload.wikimedia.org/wikipedia/commons/b/b9/Tail_of_a_whale_near_Valdes_Peninsula.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled\",\"title\":\"Tail of a whale near Valdes Peninsula.jpg\",\"caption\":\"Santuario de Ballenas, Patagonia\",\"author\":\"Wikimedia Commons\",\"license\":\"Dominio Público / Licencia Libre\",\"width\":1200,\"height\":900,\"aspectRatio\":1.33,\"role\":\"HERO\"}]}",
+  "bancoImagenesWikimedia": "{\"selectedItems\":[{\"id\":\"Tail_of_a_whale_near_Valdes_Peninsula.jpg\",\"url\":\"/src/assets/remotas/tail-of-a-whale-near-valdes-peninsula.webp",\"thumbUrl\":\"/src/assets/remotas/tail-of-a-whale-near-valdes-peninsula.webp",\"title\":\"Tail of a whale near Valdes Peninsula.jpg\",\"caption\":\"Santuario de Ballenas, Patagonia\",\"author\":\"Wikimedia Commons\",\"license\":\"Dominio Público / Licencia Libre\",\"width\":1200,\"height\":900,\"aspectRatio\":1.33,\"role\":\"HERO\"}]}",
   "excerpt": "Informe geohistórico y etnográfico sobre Santuario de Ballenas, peninsula de Valdez, patagonia.",
   "dek": "Conservación y ciclo reproductivo de la fauna marina en Península Valdés."
 }

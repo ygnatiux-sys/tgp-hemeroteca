@@ -6,7 +6,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "astro dev",
+    "dev": "npm run optimize:remote && astro dev",
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
@@ -24,7 +24,8 @@
     "optimize:r2": "node scripts/optimizar-r2.mjs",
     "optimize:r2:dry": "node scripts/optimizar-r2.mjs --dry-run",
     "clean:urls": "node scripts/limpiar-urls-contenido.mjs",
-    "sync": "git pull origin main && git add . && (git diff --staged --quiet || git commit -m \"TGP Sync: Actualización unificada de arquitectura y contenido\") && git push origin main",
+    "optimize:remote": "node scripts/optimizar-remotas.mjs",
+    "sync": "npm run optimize:remote && npm run upload:assets && git pull origin main && git add . && (git diff --staged --quiet || git commit -m \"TGP Sync: Actualización unificada de arquitectura y contenido\") && git push origin main",
     "analisis": "node scripts/analisis-distribucion.mjs",
     "sanear": "node scripts/sanear-hemeroteca.mjs",
     "sanear:preview": "node scripts/sanear-hemeroteca.mjs --dry-run",
