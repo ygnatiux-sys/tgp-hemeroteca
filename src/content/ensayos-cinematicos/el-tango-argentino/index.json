@@ -1,5 +1,6 @@
 {
   "title": "El Tango Argentino",
+  "date": "2026-09-10",
   "coverImage": "/src/assets/ensayos-cinematicos/el-tango-argentino/coverImage.jpg",
   "generadorTexto": "",
   "agenteErudito": "",
@@ -7,5 +8,6 @@
     "discriminant": "obsidiana"
   },
   "gallery": [],
-  "dek": "Del arrabal portuario a símbolo universal: la evolución musical y poética del arrabal rioplatense."
+  "dek": "Del arrabal portuario a símbolo universal: la evolución musical y poética del arrabal rioplatense.",
+  "excerpt": "Del arrabal portuario a símbolo universal: la evolución musical y poética del arrabal rioplatense."
 }

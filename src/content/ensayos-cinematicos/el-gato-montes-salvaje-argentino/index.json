@@ -1,10 +1,12 @@
 {
-  "title": "El Gato Montes salvaje argentino",
+  "title": "El Gato Montés Salvaje Argentino",
+  "date": "2026-09-10",
   "coverImage": "/src/assets/ensayos-cinematicos/el-gato-montes-salvaje-argentino/coverImage.jpg",
   "generadorTexto": "",
   "atmosfera": {
     "discriminant": "obsidiana"
   },
   "gallery": [],
-  "dek": "El sigiloso felino de monte: adaptabilidad, territorio y presencia en la fauna nativa."
+  "dek": "El sigiloso felino de monte: adaptabilidad, territorio y presencia en la fauna nativa argentina.",
+  "excerpt": "El sigiloso felino de monte: adaptabilidad, territorio y presencia en la fauna nativa argentina."
 }
