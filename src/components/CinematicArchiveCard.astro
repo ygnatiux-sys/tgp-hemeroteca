@@ -18,6 +18,9 @@ interface Props {
   isEager?: boolean;
   href?: string;
   isCinematicGSAP?: boolean;
+  hideExteriorTitle?: boolean;
+  centerCtaBelow?: boolean;
+  ctaLabel?: string;
 }
 
 const {
@@ -29,6 +32,9 @@ const {
   isEager = false,
   href: customHref,
   isCinematicGSAP = false,
+  hideExteriorTitle = false,
+  centerCtaBelow = false,
+  ctaLabel,
 } = Astro.props;
 
 const safeImg = sanitizeImageUrl(img);
@@ -175,71 +181,98 @@ const imgUrl = safeImg || '';
     </div>
   </a>
 
-  {/* 2. BLOQUE DE TEXTO EDITORIAL EXTERIOR (ESTILO NAUTILUS) */}
-  <div class="flex flex-col w-full grow pt-1">
-    {/* Categoría y Tags con Color Heredado */}
-    <div class="flex flex-wrap items-center gap-2 mb-2 font-metadata text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-stone-400">
-      <span class={`${categoryAccentClass} font-semibold`}>
-        {entry.category ? entry.category.toUpperCase() : 'ARCHIVO'}
-      </span>
-      {sitio && (
-        <>
-          <span class="opacity-40">•</span>
-          <span class="text-stone-400">{sitio}</span>
-        </>
-      )}
-      {year && (
-        <>
-          <span class="opacity-40">•</span>
-          <span class="text-stone-500">{year}</span>
-        </>
-      )}
-    </div>
-
-    {/* Fila: Título Exterior con Steel Gradient Heredado y CTA */}
-    <div class="flex flex-row justify-between items-start gap-4 mb-2 ch-h1-cta">
-      <a href={href} class="hover:opacity-80 transition-opacity block flex-1 cac-modal-trigger">
-        <h3 class={`font-cinzel font-bold text-lg sm:text-xl md:text-2xl tracking-tight leading-snug cac-card-title ${cardGradientClass}`}>
-          {titlePrefix}<span class="title-keyword-shine-fade">{titleKeyword}</span>
-        </h3>
-      </a>
-
-      <div class="relative flex items-center shrink-0 ch-cta-container">
-        <a
-          href={secondaryHref}
-          target={isExternal ? "_blank" : undefined}
-          rel={isExternal ? "noopener noreferrer" : undefined}
-          class={`ch-cta-btn inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/5 border border-white/15 text-stone-300 font-metadata font-medium text-xs tracking-wider uppercase rounded-lg hover:bg-white/15 hover:border-white/30 hover:text-white transition-all duration-300 active:translate-y-0.5 whitespace-nowrap ${!isExternal ? 'cac-modal-trigger' : ''}`}
-        >
-          <span>{secondaryLabel}</span>
-          <span class="text-[10px] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">&#9656;</span>
-        </a>
+  {/* 2. BLOQUE DE TEXTO EDITORIAL EXTERIOR (ESTILO NAUTILUS / EDITORIAL COVER) */}
+  <div class={`flex flex-col w-full grow ${hideExteriorTitle ? 'pt-4 items-center text-center' : 'pt-1'}`}>
+    {/* En modo normal: Categoría y Tags arriba */}
+    {!hideExteriorTitle && (
+      <div class="flex flex-wrap items-center gap-2 mb-2 font-metadata text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-stone-400">
+        <span class={`${categoryAccentClass} font-semibold`}>
+          {entry.category ? entry.category.toUpperCase() : 'ARCHIVO'}
+        </span>
+        {sitio && (
+          <>
+            <span class="opacity-40">•</span>
+            <span class="text-stone-400">{sitio}</span>
+          </>
+        )}
+        {year && (
+          <>
+            <span class="opacity-40">•</span>
+            <span class="text-stone-500">{year}</span>
+          </>
+        )}
       </div>
-    </div>
+    )}
 
+    {/* Fila: Título Exterior con Steel Gradient Heredado y CTA (Oculto si hideExteriorTitle) */}
+    {!hideExteriorTitle && (
+      <div class="flex flex-row justify-between items-start gap-4 mb-2 ch-h1-cta">
+        <a href={href} class="hover:opacity-80 transition-opacity block flex-1 cac-modal-trigger">
+          <h3 class={`font-cinzel font-bold text-lg sm:text-xl md:text-2xl tracking-tight leading-snug cac-card-title ${cardGradientClass}`}>
+            {titlePrefix}<span class="title-keyword-shine-fade">{titleKeyword}</span>
+          </h3>
+        </a>
+
+        <div class="relative flex items-center shrink-0 ch-cta-container">
+          <a
+            href={secondaryHref}
+            target={isExternal ? "_blank" : undefined}
+            rel={isExternal ? "noopener noreferrer" : undefined}
+            class={`ch-cta-btn inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/5 border border-white/15 text-stone-300 font-metadata font-medium text-xs tracking-wider uppercase rounded-lg hover:bg-white/15 hover:border-white/30 hover:text-white transition-all duration-300 active:translate-y-0.5 whitespace-nowrap ${!isExternal ? 'cac-modal-trigger' : ''}`}
+          >
+            <span>{secondaryLabel}</span>
+            <span class="text-[10px] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">&#9656;</span>
+          </a>
+        </div>
+      </div>
+    )}
+
+    {/* Excerpt en Sans-Serif Proza Libre */}
     {dek && (
-      <p class="card-dek ch-dek-container font-serif text-xs md:text-sm text-stone-300 leading-relaxed tracking-wide line-clamp-2 md:line-clamp-3 mb-2 max-w-[56ch]">
+      <p class={`card-dek ch-dek-container font-sans text-xs sm:text-sm md:text-base text-[#E3DDD3]/85 leading-relaxed tracking-normal mb-3 ${hideExteriorTitle ? 'max-w-3xl text-center' : 'max-w-[56ch]'}`}>
         {dek}
       </p>
     )}
 
-    {/* Tags de Categorías Relacionadas */}
-    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 font-metadata text-[10px] uppercase tracking-[0.3em] text-white/50 w-full justify-start">
-      {relatedTags.map((tag, idx) => (
+    {/* Tags de Categorías y Metadatos en color default */}
+    <div class={`flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 font-metadata text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-white/50 w-full ${hideExteriorTitle ? 'justify-center' : 'justify-start'}`}>
+      {entry.category && (
+        <span class="ch-tag">{entry.category.toUpperCase()}</span>
+      )}
+      {sitio && (
         <>
+          <span class="font-bold opacity-40 ch-tag">•</span>
+          <span class="ch-tag">{sitio}</span>
+        </>
+      )}
+      {relatedTags.map((tag) => (
+        <>
+          <span class="font-bold opacity-40 ch-tag">•</span>
           <span class="ch-tag">{tag}</span>
-          {idx < relatedTags.length - 1 && (
-            <span class="font-bold opacity-40 ch-tag">•</span>
-          )}
         </>
       ))}
       {year && (
         <>
-          {relatedTags.length > 0 && <span class="font-bold opacity-40 ch-tag">•</span>}
-          <span class="ch-tag text-[10px] text-white/40">{year}</span>
+          <span class="font-bold opacity-40 ch-tag">•</span>
+          <span class="ch-tag text-white/40">{year}</span>
         </>
       )}
     </div>
+
+    {/* Botón CTA Grande Centrado "VER REGISTRO" / "VER MÁS" */}
+    {centerCtaBelow && (
+      <div class="flex justify-center mt-6 sm:mt-8 mb-2">
+        <a
+          href={secondaryHref}
+          target={isExternal ? "_blank" : undefined}
+          rel={isExternal ? "noopener noreferrer" : undefined}
+          class={`inline-flex items-center justify-center gap-3 px-8 sm:px-10 py-3 sm:py-3.5 rounded-full bg-[#EFEBE3] hover:bg-white text-theme-dark font-mono font-bold text-xs uppercase tracking-[0.25em] shadow-xl shadow-black/80 hover:scale-105 active:scale-95 transition-all duration-300 ${!isExternal ? 'cac-modal-trigger' : ''}`}
+        >
+          <span>{ctaLabel || secondaryLabel}</span>
+          <span class="text-xs transition-transform group-hover:translate-x-1">→</span>
+        </a>
+      </div>
+    )}
   </div>
   <ExpandableModal />
 </article>
