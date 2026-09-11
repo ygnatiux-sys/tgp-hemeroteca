@@ -79,7 +79,7 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
 
       {/* Pista de Deslizamiento con Sibling Push y margen vertical para hover al 15% */}
       <div class="tray-track-wrapper py-6 sm:py-8 px-3 sm:px-6 md:px-8">
-        <div class="tray-track flex gap-4 sm:gap-5 md:gap-6 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]">
+        <div class="tray-track flex w-max gap-4 sm:gap-5 md:gap-6 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]">
           {collections.map((col) => {
             const rawImg = col.coverImage;
             const imgUrl = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '')) || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop';
@@ -243,8 +243,8 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
         updateButtons();
       }
 
-      nextBtn.addEventListener('click', () => slide('next'));
-      prevBtn.addEventListener('click', () => slide('prev'));
+      nextBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); slide('next'); });
+      prevBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); slide('prev'); });
 
       window.addEventListener('resize', () => {
         currentTransform = 0;
