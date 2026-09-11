@@ -340,25 +340,25 @@ function createPremierSequences(essays: typeof resolvedEssays) {
 
             return (
               <div class="category-block flex flex-col gap-8" data-category-group={group.catKey}>
-                {/* Barra Editorial de Categoría con enlace a colección exclusiva */}
-                <div class="editorial-bar flex items-center justify-between pb-2 border-b border-white/10">
-                  <div class="flex items-center gap-3">
-                    <a href={`/colecciones/${group.catKey}/`} class="group/cattitle flex items-center gap-2">
-                      <h2 class="gradient-general-h2 text-xl md:text-2xl group-hover/cattitle:text-rust-orange transition-colors">
-                        • {group.catLabel.toUpperCase()}
-                      </h2>
-                    </a>
-                  </div>
-                  <div class="flex items-center gap-4">
-                    <span class="font-metadata text-[9px] uppercase tracking-[0.25em] text-white/40 hidden sm:inline">
-                      {group.essays.length} DOSSIERES EN CATEGORÍA
-                    </span>
+                {/* Presentación Editorial de Colección Centrada (Tipografía Gloock con Gradiente Metálico Cálido) */}
+                <div class="editorial-bar flex flex-col items-center justify-center text-center pb-8 pt-4 border-b border-white/10 gap-3 w-full max-w-4xl mx-auto">
+                  <span class="font-metadata text-[10px] sm:text-[11px] uppercase tracking-[0.35em] text-rust-orange font-bold">
+                    Colección Especializada · {group.essays.length} {group.essays.length === 1 ? 'Dossier' : 'Dossieres'}
+                  </span>
+
+                  <a href={`/colecciones/${group.catKey}/`} class="group/cattitle inline-block">
+                    <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-black tracking-tight leading-[1.05] gradient-general-h1 glow-metallic-gloock uppercase transition-transform duration-500 group-hover/cattitle:scale-[1.02]">
+                      {group.catLabel}
+                    </h2>
+                  </a>
+
+                  <div class="flex items-center gap-4 justify-center mt-1">
                     <a
                       href={`/colecciones/${group.catKey}/`}
-                      class="font-metadata text-[10px] uppercase tracking-[0.25em] text-rust-orange hover:text-white transition-colors flex items-center gap-1.5"
+                      class="font-metadata text-[10.5px] sm:text-[11.5px] uppercase tracking-[0.25em] text-white/60 hover:text-rust-orange transition-colors flex items-center gap-2 group/arrow"
                     >
-                      <span>Ver Colección</span>
-                      <span>→</span>
+                      <span>Explorar Colección Completa</span>
+                      <span class="text-rust-orange group-hover/arrow:translate-x-1 transition-transform">→</span>
                     </a>
                   </div>
                 </div>
@@ -478,13 +478,14 @@ function createPremierSequences(essays: typeof resolvedEssays) {
 
               return (
                 <div class="archive-year-cinematic-group flex flex-col gap-10 md:gap-14" data-year-group={year}>
-                  {/* Divisor de Año Editorial con Amplio Tracking y Espacio Negativo */}
-                  <div class="flex items-center justify-between border-b border-white/10 pb-4 pt-2">
-                    <div class="flex items-center gap-3">
-                      <h2 class="gradient-general-h2 text-2xl md:text-3xl">
-                        AÑO {year}
-                      </h2>
-                    </div>
+                  {/* Divisor de Año Editorial Centrado (Tipografía Gloock con Gradiente Metálico Cálido) */}
+                  <div class="flex flex-col items-center justify-center text-center border-b border-white/10 pb-8 pt-4 gap-3 w-full max-w-4xl mx-auto">
+                    <span class="font-metadata text-[10px] sm:text-[11px] uppercase tracking-[0.35em] text-rust-orange font-bold">
+                      Hemeroteca Histórica · {yearEssays.length} {yearEssays.length === 1 ? 'Dossier' : 'Dossieres'}
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-black tracking-tight leading-[1.05] gradient-general-h1 glow-metallic-gloock uppercase">
+                      AÑO {year}
+                    </h2>
                   </div>
 
                   {/* Secuencias Cinematográficas Premier: 1 Hero Full Bleed + Dúo 60/40 con Cinemagraph */}
