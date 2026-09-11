@@ -22,7 +22,7 @@ const normalizePost = (item: any, defaultCat: string, isCine = false) => {
   return {
     slug,
     title: item.data?.title || "Sin Título",
-    subtitle: item.data?.excerpt || item.data?.volanta || "",
+    subtitle: item.data?.subtitle || item.data?.excerpt || item.data?.dek || item.data?.volanta || "",
     category: item.data?.category || defaultCat,
     img: resolveEssayImage(item.data, slug),
     date: item.data?.date ? String(item.data.date) : "",
@@ -85,7 +85,7 @@ const rowItems = candidates.slice(1, 16);
 
     {/* ── 1. CARD HERO PROTAGONISTA (Arriba) ── */}
     {lead && (
-      <article class="group w-full relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/8 bg-white/2 hover:border-rust-orange/30 transition-all duration-700 shadow-2xl">
+      <article class="group w-full relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/8 bg-white/2 hover:border-white/20 transition-all duration-700 shadow-2xl">
         <div class="flex flex-col lg:flex-row items-stretch">
           
           {/* Imagen lateral / superior */}

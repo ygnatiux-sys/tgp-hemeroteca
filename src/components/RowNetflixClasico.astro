@@ -51,13 +51,28 @@ let displayItems = items.slice(0, max).map((item) => {
   const link = item.link || (item.slug ? (isCinematic ? `/ensayos-cinematicos/${item.slug}` : `/hemeroteca/${item.slug}/`) : '#');
   const d = item.date || item.entry?.date ? formatDate(item.date || item.entry?.date) : '';
 
+  const entry = item.entry || (item as any);
+  const font = (entry?.font || '').toLowerCase();
+  const themeColor = (entry?.themeColor || '').toLowerCase();
+  const isGloock = font === 'gloock';
+
+  let customColorClass = '';
+  if (themeColor === 'bordeaux') customColorClass = 'text-[#df7a7e]';
+  else if (themeColor === 'british-green') customColorClass = 'text-[#68b68f]';
+  else if (themeColor === 'old-navy') customColorClass = 'text-[#8ab7e0]';
+  else if (themeColor === 'vintage-yellow') customColorClass = 'text-[#f0e2a8]';
+  else if (themeColor === 'rust-orange') customColorClass = 'text-[#e07a5f]';
+  else if (themeColor === 'bus-red') customColorClass = 'text-[#e55353]';
+
   return {
     title: t,
-    subtitle: item.subtitle || item.excerpt || item.entry?.excerpt || '',
+    subtitle: item.subtitle || item.excerpt || item.entry?.excerpt || item.entry?.dek || item.entry?.volanta || '',
     image,
     link,
     collectionLabel: cat,
     date: d,
+    isGloock,
+    customColorClass,
   };
 });
 
@@ -134,13 +149,13 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
           return (
           <article 
             class:list={[
-              "netflix-card relative flex-none cursor-pointer",
-              isHorizontal ? "netflix-card-natgeo flex flex-col" : "rounded-xl md:rounded-2xl overflow-hidden"
+              "netflix-card relative flex-none cursor-pointer rounded-xl md:rounded-2xl overflow-hidden",
+              isHorizontal ? "netflix-card-natgeo flex flex-col" : "flex flex-col"
             ]} 
             data-flip-id={`card-container-${cardId}`}
           >
             <a href={item.link} 
-               class="block w-full h-full netflix-card-link group/card" 
+               class="flex flex-col w-full h-full netflix-card-link group/card" 
                aria-label={`Ver: ${item.title}`}
                data-card-id={cardId}
                data-title={item.title}
@@ -149,55 +164,67 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
                data-image={item.image}
                data-link={item.link}>
               
-              {/* Contenedor de Imagen */}
+              {/* ── 80% ZONA DE IMAGEN (Estricto en galería vertical) ── */}
               <div class:list={[
-                "w-full bg-black/40 overflow-hidden relative transition-all duration-500",
+                "w-full overflow-hidden relative transition-all duration-500 bg-[#0a0c0f]",
                 isHorizontal 
-                  ? "aspect-4/3 md:aspect-16/10 rounded-xl md:rounded-2xl border border-white/10 group-hover/card:border-rust-orange/60 shadow-xl" 
-                  : "h-full"
+                  ? "aspect-4/3 md:aspect-16/10 rounded-xl md:rounded-2xl border border-white/10 group-hover/card:border-white/30 shadow-xl shrink-0" 
+                  : "basis-[80%] h-[80%] shrink-0"
               ]}>
                 <Image 
                   src={item.image} 
                   alt={item.title} 
                   inferSize={true}
                   format="webp"
-                  widths={[400, 768, 1200, 1920]}
-                  sizes="(max-width: 768px) 400px, (max-width: 1200px) 768px, 1200px"
-                  class="netflix-card-img w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105"
+                  widths={[400, 768, 1200]}
+                  sizes="(max-width: 768px) 360px, 480px"
+                  class:list={[
+                    "netflix-card-img object-cover object-center transition-transform duration-700 ease-out group-hover/card:scale-105",
+                    isHorizontal ? "w-full h-full" : "absolute inset-0 w-full h-full"
+                  ]}
                   loading="lazy"
                   decoding="async"
                   data-flip-id={`card-image-${cardId}`}
                 />
                 
-                {/* Viñeta degradada solo en formato vertical */}
+                {/* Franja de Scrim local en el 20% vertical de transición */}
                 {!isHorizontal && (
-                  <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/40 to-transparent pointer-events-none" />
+                  <div class="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-[#0a0c0f] via-[#0a0c0f]/75 to-transparent pointer-events-none z-10" />
                 )}
               </div>
 
-              {/* Información Editorial: Debajo en horizontal (estilo Nat Geo), sobrepuesta en vertical */}
+              {/* ── 20% ZONA EDITORIAL (METADATA + TÍTULO + SUBTÍTULO) ── */}
               <div class:list={[
                 "card-info",
                 isHorizontal 
-                  ? "pt-3.5 pb-1 px-1 flex flex-col gap-1.5"
-                  : "absolute inset-x-0 bottom-0 p-3.5 md:p-4 flex flex-col justify-end"
+                  ? "pt-3.5 pb-1 px-1 flex flex-col gap-1.5 flex-1"
+                  : "basis-[20%] h-[20%] w-full bg-[#0a0c0f] px-3.5 py-1.5 sm:px-4 sm:py-2 flex flex-col justify-center gap-0.5 z-10 border-t border-white/6 relative"
               ]}>
                 <span class:list={[
-                  "uppercase font-metadata font-bold block",
+                  "uppercase font-metadata font-bold block line-clamp-1",
                   isHorizontal 
                     ? "text-[8.5px] md:text-[9.5px] tracking-[0.35em] text-rust-orange" 
-                    : "text-[7.5px] tracking-[0.3em] text-rust-orange/90 mb-1"
+                    : "text-[7.5px] sm:text-[8px] tracking-[0.28em] text-rust-orange/90"
                 ]}>
                   {item.collectionLabel}
                 </span>
+
                 <h4 class:list={[
-                  "netflix-card-title font-cinzel line-clamp-2 leading-snug transition-colors duration-300",
+                  "netflix-card-title line-clamp-1 leading-tight transition-all duration-300",
                   isHorizontal
-                    ? "text-base md:text-lg font-bold text-white/95 group-hover/card:text-rust-orange"
-                    : "font-medium gradient-metal-steel-card text-[0.85rem] lg:text-[0.95rem]"
+                    ? "text-base md:text-lg font-bold text-white/95 group-hover/card:text-rust-orange font-cinzel"
+                    : (item.isGloock
+                        ? `font-gloock font-bold text-[14px] sm:text-[15.5px] ${item.customColorClass || 'text-white/95'}`
+                        : "font-cinzel font-extrabold text-[14px] sm:text-[15.5px] md:text-[16.5px] tracking-tight gradient-acero-ios drop-shadow-md")
                 ]} data-flip-id={`card-title-${cardId}`}>
                   {item.title}
                 </h4>
+
+                {!isHorizontal && item.subtitle && (
+                  <p class="font-serif font-light text-[10px] sm:text-[10.5px] md:text-[11px] text-white/55 line-clamp-1 leading-tight tracking-normal">
+                    {item.subtitle}
+                  </p>
+                )}
               </div>
             </a>
           </article>
@@ -239,20 +266,32 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     will-change: transform, opacity;
   }
 
-  /* Aspecto Vertical (Modo clásico póster 2:3) */
+  /* Aspecto Vertical (Modo clásico póster 2:3 con proporción 80/20 estricta) */
   .netflix-row-root[data-aspect="vertical"] .netflix-card {
     aspect-ratio: 2 / 3;
   }
 
-  .netflix-card-img {
-    filter: brightness(0.85) contrast(1.04);
+  .netflix-row-root[data-aspect="vertical"] .netflix-card-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+  }
+
+  .netflix-row-root[data-aspect="vertical"] .netflix-card-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: brightness(0.88) contrast(1.04);
     transition: filter 340ms ease, transform 500ms ease;
   }
 
-  .netflix-card-title {
-    font-size: 0.85rem;
-    opacity: 0.85;
-    transition: opacity 300ms ease, color 300ms ease;
+  .netflix-row-root[data-aspect="vertical"] .netflix-card-title {
+    opacity: 0.92;
+    transition: opacity 300ms ease, filter 300ms ease;
   }
 
   @media (min-width: 640px) {
@@ -265,9 +304,6 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     .netflix-row-root[data-aspect="vertical"] .netflix-card {
       width: calc(25% - 12px); /* 4 columnas visibles exactas en desktop */
     }
-    .netflix-row-root[data-aspect="vertical"] .netflix-card-title {
-      font-size: 0.95rem;
-    }
   }
 
   /* ── 2. EFECTO HOVER PARA ASPECTO VERTICAL (ZOOM 1.18 + SIBLING PUSH) ── */
@@ -275,21 +311,21 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     transform: translate3d(0, 0, 0) scale(1.18);
     z-index: 30;
     opacity: 1;
-    border-color: rgba(184, 115, 51, 0.6);
+    border-color: rgba(255, 255, 255, 0.25);
     box-shadow: 
       0 18px 38px -10px rgba(0, 0, 0, 0.75),
-      0 0 0 1px rgba(184, 115, 51, 0.4);
+      0 0 0 1px rgba(255, 255, 255, 0.15);
     transition-delay: 260ms; 
   }
 
   .netflix-row-root[data-aspect="vertical"] .netflix-card:hover .netflix-card-img {
-    filter: brightness(0.95) contrast(1.04);
+    filter: brightness(0.98) contrast(1.04);
     transition-delay: 260ms;
   }
 
   .netflix-row-root[data-aspect="vertical"] .netflix-card:hover .netflix-card-title {
     opacity: 1;
-    color: #ffffff;
+    filter: brightness(1.2);
     transition-delay: 260ms;
   }
 
