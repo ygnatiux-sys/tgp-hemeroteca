@@ -1,0 +1,230 @@
+---
+/**
+ * CollectionEpigraph.astro
+ *
+ * Franja de epigrafe cinematografico entre colecciones en la pagina /colecciones/.
+ * Version compacta de CinematicExcerptRest: misma tipografia Gloock y degradados,
+ * sin canvas de polvo, con fundido inferior cinematico para la transicion a la siguiente card.
+ *
+ * Sintaxis del prop `text`:
+ *   **palabra**   → blanco brillante (glow)
+ *   [[letra]]     → dorado TGP (acento)
+ *   texto normal  → gradiente metalico Gloock (#E3DDD3 / papiro suave)
+ */
+
+interface Props {
+  text: string;
+  id?: string;
+}
+
+const {
+  text,
+  id = "epigraph-" + Math.random().toString(36).substring(2, 9),
+} = Astro.props;
+
+// ─── Tokenizador identico al de CinematicExcerptRest ─────────────────────────
+const rawWords = text.trim().split(/\s+/);
+let currentMode: 'normal' | 'glow' | 'accent' = 'normal';
+
+const wordsData = rawWords.map((rawWord, wordIdx) => {
+  let word = rawWord;
+  let type: 'normal' | 'glow' | 'accent' = currentMode;
+
+  if (word.startsWith('**')) {
+    currentMode = 'glow';
+    type = 'glow';
+    word = word.slice(2);
+  } else if (word.startsWith('[[')) {
+    currentMode = 'accent';
+    type = 'accent';
+    word = word.slice(2);
+  }
+
+  let endsGlow = false;
+  let endsAccent = false;
+
+  if (word.endsWith('**')) {
+    endsGlow = true;
+    word = word.slice(0, -2);
+  } else if (word.includes('**')) {
+    word = word.replace(/\*\*/g, '');
+    endsGlow = true;
+  }
+
+  if (word.endsWith(']]') || word.includes(']].') || word.includes(']],') || word.includes(']]:') || word.includes(']];')) {
+    endsAccent = true;
+    word = word.replace(/\]\]/g, '');
+  } else if (word.includes(']]')) {
+    word = word.replace(/\]\]/g, '');
+    endsAccent = true;
+  }
+
+  const cleanWord = word.replace(/\[\[/g, '').replace(/\]\]/g, '').replace(/\*\*/g, '');
+
+  if (endsGlow || endsAccent) {
+    currentMode = 'normal';
+  }
+
+  return {
+    word: cleanWord,
+    type,
+    index: wordIdx
+  };
+});
+---
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gloock&display=swap');
+</style>
+
+<section
+  id={id}
+  class="col-epigraph relative w-full overflow-hidden select-none py-16 sm:py-20 md:py-24 flex flex-col justify-center items-center"
+>
+  {/* Mascara superior: difumina el borde desde arriba */}
+  <div class="absolute inset-x-0 top-0 h-28 sm:h-36 bg-linear-to-b from-(--bg-main,#121413) to-transparent pointer-events-none z-10" />
+
+  {/* Mascara inferior cinematica: difumina hacia la siguiente card */}
+  <div class="absolute inset-x-0 bottom-0 h-40 sm:h-56 bg-linear-to-t from-(--bg-main,#121413) to-transparent pointer-events-none z-10" />
+
+  {/* Contenedor central de lectura */}
+  <div class="relative z-20 max-w-[52ch] mx-auto px-4 sm:px-6 md:px-8 text-center">
+    <p class="epigraph-headline glow-metallic-gloock" id={`${id}-headline`}>
+      {
+        wordsData.map((wd, idx) => (
+          <span class="epigraph-word-wrapper">
+            <span
+              class:list={[
+                "epigraph-word",
+                wd.type === "glow" ? "word-glow" : "",
+                wd.type === "accent" ? "word-accent" : "word-normal",
+              ]}
+              style={`transition-delay: ${idx * 60}ms;`}
+            >
+              {wd.word}
+            </span>
+            <span class="epigraph-space" aria-hidden="true">&nbsp;</span>
+          </span>
+        ))
+      }
+    </p>
+  </div>
+</section>
+
+<style>
+  /* ── Tipografia Gloock compacta — entre cards ── */
+  .epigraph-headline {
+    font-family: 'Gloock', serif;
+    font-size: clamp(1.25rem, 2.5vw, 2rem);
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+    max-width: 52ch;
+    margin-left: auto;
+    margin-right: auto;
+    text-wrap: balance;
+    padding: 0;
+  }
+
+  .epigraph-word-wrapper {
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .epigraph-space {
+    display: inline-block;
+  }
+
+  /* ── Aparicion cinematica: De-blur optico + elevacion suave ── */
+  .epigraph-word {
+    display: inline-block;
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateY(18px) scale(0.95);
+    will-change: opacity, filter, transform;
+    transition:
+      opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+      filter 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .col-epigraph.is-revealed .epigraph-word {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0) scale(1);
+  }
+
+  /* ── Degradados Gloock ── */
+  .word-normal {
+    background-image: linear-gradient(to bottom, #E3DDD3 0%, rgba(227, 221, 211, 0.58) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .word-glow {
+    background-image: linear-gradient(to bottom, #FFFFFF 0%, #F4EFE6 55%, rgba(227, 221, 211, 0.88) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.28));
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .word-accent {
+    background-image: linear-gradient(to bottom, #F9ECC8 0%, #DFCA9D 50%, #C9A86C 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+    filter: drop-shadow(0 0 12px rgba(201, 168, 108, 0.32));
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .glow-metallic-gloock {
+    filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 16px rgba(227, 221, 211, 0.15));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .epigraph-word {
+      opacity: 1 !important;
+      filter: none !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+
+<script>
+  const setupEpigraph = (section: HTMLElement) => {
+    if (section.dataset.epInit === 'true') return;
+    section.dataset.epInit = 'true';
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          observer.unobserve(section);
+          section.classList.add('is-revealed');
+        }
+      });
+    }, { threshold: 0.2 });
+
+    observer.observe(section);
+  };
+
+  const initEpigraphs = () => {
+    document.querySelectorAll<HTMLElement>('.col-epigraph').forEach(setupEpigraph);
+  };
+
+  document.addEventListener('astro:page-load', initEpigraphs);
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initEpigraphs();
+  } else {
+    document.addEventListener('DOMContentLoaded', initEpigraphs);
+  }
+</script>

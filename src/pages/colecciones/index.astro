@@ -8,6 +8,7 @@ import SpotlightMediaTray, { type TrayCollectionItem } from '../../components/Sp
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import Marquee from '../../components/Marquee.astro';
 import CoverflowCarousel, { type CoverflowPost } from '../../components/CoverflowCarousel';
+import CollectionEpigraph from '../../components/CollectionEpigraph.astro';
 import {
   getPublishableEssays,
   groupByCategory,
@@ -126,11 +127,13 @@ const coverflowPosts: CoverflowPost[] = collections
         vibeClass="vibe-travel-senses"
         isH1={true}
         fontClass="font-serif font-black"
-        heightClass="h-[calc(78vh-2rem)] min-h-[520px] md:min-h-[600px]"
-        marginClass="mb-0"
-        roundedClass="rounded-t-3xl rounded-b-none"
+        heightClass="h-[100vh]"
+        marginClass="mt-0 mb-0"
+        roundedClass="rounded-none"
         showSocialInTitle={true}
         maskBottom={true}
+        fullWidth={true}
+        disableParallax={true}
       />
 
       {/* ── BANDEJA SPOTLIGHT MEDIA TRAY: JUSTO DEBAJO INMEDIATO AL PIE DE IMAGEN CON MASK BLACK A ANCHO TOTAL ── */}
@@ -194,30 +197,48 @@ const coverflowPosts: CoverflowPost[] = collections
         </a>
       </section>
 
+      {/* ─── EPIGRAFE CINEMATICO: entre Sitios Geohistóricos y las Colecciones Temáticas ─── */}
+      <CollectionEpigraph
+        text="[[Coordenadas]] del pasado. El espacio como **texto cifrado,** la piedra como memoria viva de lo que fuimos."
+      />
+
       {/* ═══════════════════════════════════════════════════════════════════
           COLECCIONES TEMÁTICAS GENERALES — F5: Bento Asimétrico
           F6: grid-cols-1 en móvil, lg:grid-cols-12 en desktop
           F6: Texto siempre visible, sin group-hover reveal en touch
       ═══════════════════════════════════════════════════════════════════ */}
-      <section class="flex flex-col gap-6 md:gap-8 w-full">
-        {/* F5: CSS Grid Bento Asimétrico — F6: cols-1 en mobile */}
-        <div class="grid grid-cols-1 lg:grid-cols-12 auto-rows-[minmax(280px,auto)] gap-4 md:gap-6 lg:gap-8 w-full">
-          {collections.map((col, index) => {
-            // F5: distribución asimétrica según posición
-            let spanClass = "lg:col-span-4 lg:row-span-1";
-            if (index === 0) spanClass = "lg:col-span-12 lg:row-span-2";
-            else if (index === 1) spanClass = "lg:col-span-7 lg:row-span-1";
-            else if (index === 2) spanClass = "lg:col-span-5 lg:row-span-1";
+      <section class="flex flex-col gap-0 w-full">
+        {/* ─── Primera card (hero): sin epigrafe previo ─── */}
+        {collections.map((col, index) => {
+          // Todas las cards son hero full-width: misma altura que la card de Arqueosemiotica
+          const mobileHeightClass = "min-h-[55vh] md:min-h-[420px] lg:min-h-[480px]";
 
-            // Mobile height control: card hero ocupa menos en móvil para no saturar el viewport
-            const mobileHeightClass = index === 0
-              ? "min-h-[48vh] md:min-h-[75px]"  // hero: ~mitad del viewport en móvil
-              : "min-h-[42vh] md:min-h-[280px]"; // resto: ~40% en móvil
+          // ─── Frases evocativas por coleccion (clave → texto) ───
+          const epigraphMap: Record<string, string> = {
+            "arqueosemiotica":   "Los [[signos]] sobreviven a los imperios. **Cada glifo,** un mensaje lanzado a la eternidad sin destinatario conocido.",
+            "filosofia":         "El pensamiento como [[territorio.]] Las **ideas no mueren:** se transforman, se heredan, se contradicen.",
+            "mitologia":         "Antes del dato, existió el [[mito.]] El relato que **une cielo y tierra** antes de que la ciencia los separara.",
+            "historia":          "El [[tiempo]] no es lineal. Es una **red de causas** que la memoria humana teje y desteje sin cesar.",
+            "ensayos-cinematicos": "Imágenes que **piensan.** El [[cine]] como forma de conocimiento antes de que el conocimiento fuera escrito.",
+            "arquetipos":        "Figuras que reaparecen en cada cultura. Los [[arquetipos]] son la gramática **secreta del ser humano.**",
+            "historia-natural":  "La vida como **archivo.** Cada especie, un [[capítulo]] de una historia que empezó mucho antes que nosotros.",
+            "historia-antigua":  "Las [[civilizaciones]] no colapsan: **se transforman.** Sus ruinas son preguntas, no respuestas.",
+            "historia-medieval": "Entre el [[fin del mundo]] romano y el alba del moderno, **siglos de invención** que el olvido llama oscuros.",
+            "religion":          "Lo [[sagrado]] como necesidad primaria. **Cada fe,** un intento humano de darle nombre al misterio.",
+          };
 
-            return (
+          const epigraphText = epigraphMap[col.key] || `**${col.label}:** una [[colección]] de registros del pensamiento humano en expansión.`;
+
+          return (
+            <>
+              {/* Epigrafe cinematico antes de cada card (excepto la primera) */}
+              {index > 0 && (
+                <CollectionEpigraph text={epigraphText} />
+              )}
+
               <a
                 href={`/colecciones/${col.key}/`}
-                class={`group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/5 bg-theme-dark/80 hover:border-white/25 transition-all duration-500 shadow-2xl flex flex-col justify-end w-full isolate mx-4 md:mx-0 ${spanClass} ${mobileHeightClass}`}
+                class={`reveal-brote group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/5 bg-theme-dark/80 hover:border-white/25 transition-all duration-500 shadow-2xl flex flex-col justify-end w-full isolate ${mobileHeightClass}`}
               >
                 {col.coverEssay?.img ? (
                   <Image
@@ -235,14 +256,11 @@ const coverflowPosts: CoverflowPost[] = collections
                 )}
 
                 {/* Gradiente nítido sin desenfoque */}
-                {/* F6: Texto siempre visible — NO depende de :hover para revelar contenido en touch */}
                 <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 via-45% to-transparent pointer-events-none z-10"></div>
 
                 <div class="relative z-20 p-5 md:p-6 lg:p-8 flex flex-col justify-end h-full">
-                  {/* F2: text-xs (WCAG). F6: siempre visible sin group-hover reveal */}
                   <span class="font-mono text-xs uppercase tracking-widest text-rust-orange font-bold mb-1">Colección TGP</span>
                   <h2 class="gradient-general-h2 text-2xl md:text-3xl lg:text-4xl mb-1 leading-tight">{col.label}</h2>
-                  {/* Último artículo como hook visual: muestra el título del cover essay */}
                   {col.coverEssay?.entry?.title && (
                     <p class="font-serif text-white/55 text-xs md:text-sm line-clamp-1 mb-1.5 tracking-wide">
                       {col.coverEssay.entry.title}
@@ -251,9 +269,9 @@ const coverflowPosts: CoverflowPost[] = collections
                   <p class="font-sans text-xs text-white/50">{col.count} {col.count === 1 ? 'Documento' : 'Documentos'}</p>
                 </div>
               </a>
-            );
-          })}
-        </div>
+            </>
+          );
+        })}
       </section>
     </div>
 
@@ -272,11 +290,32 @@ const coverflowPosts: CoverflowPost[] = collections
   </div>
 
   <script>
-    const h1 = document.querySelector('h1');
-    if (h1) setTimeout(() => h1.classList.add('revealed'), 200);
-    document.addEventListener('astro:page-load', () => {
+    const setupRevealBrote = () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+
+      document.querySelectorAll('.reveal-brote').forEach(el => {
+        observer.observe(el);
+      });
+    };
+
+    const initPage = () => {
       const h1 = document.querySelector('h1');
       if (h1) setTimeout(() => h1.classList.add('revealed'), 200);
-    });
+      setupRevealBrote();
+    };
+
+    document.addEventListener('astro:page-load', initPage);
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      initPage();
+    } else {
+      document.addEventListener('DOMContentLoaded', initPage);
+    }
   </script>
 </Layout>

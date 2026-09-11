@@ -2,14 +2,14 @@
 /**
  * CinematicExcerptRest
  *
- * Franja negra de respiro visual con texto cinemático carácter a carácter.
- * Desarrollado con timeline puro (sin GSAP), con tipografía Libre Bodoni/Antique Didone,
- * motas de polvo de fondo llevadas por el viento (canvas) y efecto disolución de agua al finalizar.
+ * Franja cinemática de respiro visual con tipografía Proza Libre en tamaño H1.
+ * Aparición suave desde el fondo con fade, de-blur y escala cinemática moderna.
+ * Hereda los gradientes y resplandor de Gloock (#E3DDD3 a transparent / oro TGP).
  *
  * Sintaxis del prop `text`:
- *   **palabra**   → blanco brillante (glow)
+ *   **palabra**   → blanco brillante titanium/gloock glow
  *   [[letra]]     → dorado TGP (acento)
- *   texto normal  → blanco tenue
+ *   texto normal  → gradiente metálico Gloock (#E3DDD3 / papiro suave)
  */
 
 interface Props {
@@ -65,148 +65,142 @@ const wordsData = rawWords.map((rawWord, wordIdx) => {
     currentMode = 'normal';
   }
 
-  // Desglosar en caracteres
-  const chars = Array.from(cleanWord).map((ch, charIdx) => ({
-    char: ch,
-    globalIdx: `${wordIdx}-${charIdx}`
-  }));
-
   return {
-    chars,
+    word: cleanWord,
     type,
-    original: rawWord
+    index: wordIdx
   };
 });
 ---
 
-<!-- Import de fuente Libre Bodoni para el componente -->
+<!-- Import de fuente Gloock -->
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Libre+Bodoni:ital,wght@0,400..700;1,400..700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Gloock&display=swap');
 </style>
 
 <section
   id={id}
-  class="cinematic-excerpt-rest relative w-full bg-(--bg-main) overflow-hidden select-none min-h-[85vh] flex flex-col justify-center"
+  class="cinematic-excerpt-rest relative w-full bg-(--bg-main) overflow-hidden select-none py-12 sm:py-16 md:py-20 flex flex-col justify-center items-center"
   style="background-color: var(--bg-main);"
   data-text={text}
 >
   <!-- Lienzo de partículas de polvo en movimiento (viento) -->
   <canvas class="excerpt-dust-canvas absolute inset-0 z-0 pointer-events-none" id={`${id}-canvas`}></canvas>
 
-  {/* Breathing room superior — doble scroll de aire y tracking */}
-  <div class="h-[22vh] md:h-[30vh]" aria-hidden="true"></div>
-
-  {/* Contenedor central de lectura */}
-  <div class="excerpt-content relative z-10 max-w-3xl mx-auto px-6 md:px-16 text-center">
-    <p class="excerpt-headline leading-[1.85] tracking-wide text-balance" id={`${id}-headline`}>
+  {/* Contenedor central de lectura con max-w-[66ch] en tamaño H2 */}
+  <div class="excerpt-content relative z-10 max-w-[66ch] mx-auto px-4 sm:px-6 md:px-8 text-center">
+    <h2 class="excerpt-headline glow-metallic-gloock" id={`${id}-headline`}>
       {
-        wordsData.map((wd) => (
+        wordsData.map((wd, idx) => (
           <span class="excerpt-word-wrapper">
-            {wd.chars.map((c) => (
-              <span
-                class={[
-                  "excerpt-char",
-                  wd.type === "glow" ? "char-glow" : "",
-                  wd.type === "accent" ? "char-accent" : "",
-                ].filter(Boolean).join(" ")}
-                data-char-id={c.globalIdx}
-              >
-                {c.char}
-              </span>
-            ))}
-            {/* Espacio invisible después de cada palabra, mantenido dentro del flujo */}
+            <span
+              class:list={[
+                "excerpt-word",
+                wd.type === "glow" ? "word-glow" : "",
+                wd.type === "accent" ? "word-accent" : "word-normal",
+              ]}
+              style={`transition-delay: ${idx * 72}ms;`}
+            >
+              {wd.word}
+            </span>
             <span class="excerpt-space" aria-hidden="true">&nbsp;</span>
           </span>
         ))
       }
-      {/* Cursor parpadeante minimalista */}
-      <span class="excerpt-cursor" id={`${id}-cursor`} aria-hidden="true">|</span>
-    </p>
+    </h2>
   </div>
-
-  {/* Breathing room inferior */}
-  <div class="h-[22vh] md:h-[30vh]" aria-hidden="true"></div>
 </section>
 
 <style>
-  /* ── Tipografía estilizada estilo Antique Didone / Libre Bodoni ── */
+  /* ── Tipografía Gloock en escala Cine Premier para exactamente 4 renglones ── */
   .excerpt-headline {
-    font-family: 'Libre Bodoni', 'Antique Didone', Georgia, serif;
-    font-size: clamp(1.15rem, 2.3vw, 1.7rem);
-    font-weight: 500;
-    color: rgba(212, 201, 188, 0.48); /* Blanco hueso / papiro apagado */
-    letter-spacing: 0.02em;
-    position: relative;
-    /* Transición suave global de disolución */
-    transition: opacity 2.8s ease-in-out, filter 2.8s ease-in-out, transform 2.8s ease-in-out;
+    font-family: 'Gloock', serif;
+    font-size: clamp(1.75rem, 3.4vw, 2.85rem);
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    max-width: 33ch;
+    margin-left: auto;
+    margin-right: auto;
+    text-wrap: balance;
+    padding: 0;
   }
 
-  /* Evita que las palabras se corten a la mitad (ej. pro-yecto) */
+  /* Evita que palabras se dividan de forma antinatural */
   .excerpt-word-wrapper {
     display: inline-block;
     white-space: nowrap;
   }
 
-  /* ── Caracteres individuales: ocultos y borrosos al inicio ── */
-  .excerpt-char {
-    display: inline-block;
-    opacity: 0;
-    filter: blur(10px);
-    transform: translateY(2px);
-    will-change: opacity, filter, transform;
-    transition: opacity 0.5s ease-out, filter 0.5s ease-out, transform 0.5s ease-out;
-  }
-
-  /* ── Estilos de segmentos ── */
-  .char-glow {
-    color: rgba(255, 255, 255, 0.95);
-    font-weight: 700;
-    text-shadow: 0 0 16px rgba(255, 255, 255, 0.15);
-  }
-
-  .char-accent {
-    color: #c9a86c; /* Dorado TGP */
-    font-weight: 700;
-  }
-
-  /* Espacio separable */
+  /* Espaciado natural entre palabras */
   .excerpt-space {
     display: inline-block;
   }
 
-  /* ── Cursor parpadeante ── */
-  .excerpt-cursor {
+  /* ── Aparición Cinemática estilo Cine Premier (De-blur óptico + escala convergente + elevación suave) ── */
+  .excerpt-word {
     display: inline-block;
-    font-weight: 100;
-    color: rgba(201, 168, 108, 0.85);
-    margin-left: 2px;
-    animation: cursor-blink-rest 0.75s step-end infinite;
-    will-change: opacity;
-    transition: opacity 0.6s ease;
+    opacity: 0;
+    filter: blur(18px);
+    transform: translateY(24px) scale(0.93);
+    will-change: opacity, filter, transform;
+    transition: 
+      opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1),
+      filter 1.4s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  @keyframes cursor-blink-rest {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+  /* Estado activo cuando entra en pantalla */
+  .cinematic-excerpt-rest.is-revealed .excerpt-word {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0) scale(1);
   }
 
-  /* ── EFECTO AGUA: disolución suave en el medio líquido al finalizar ── */
-  .excerpt-headline.c-dissolve {
-    opacity: 0 !important;
-    filter: blur(12px) !important;
-    transform: scale(0.97) translateY(-3px) !important;
-    pointer-events: none;
+  /* ── Degradados heredados del estilo Gloock ── */
+  .word-normal {
+    background-image: linear-gradient(to bottom, #E3DDD3 0%, rgba(227, 221, 211, 0.58) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 
-  /* Fallback sin JS */
+  .word-glow {
+    background-image: linear-gradient(to bottom, #FFFFFF 0%, #F4EFE6 55%, rgba(227, 221, 211, 0.88) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+    filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.3));
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .word-accent {
+    background-image: linear-gradient(to bottom, #F9ECC8 0%, #DFCA9D 50%, #C9A86C 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+    filter: drop-shadow(0 0 16px rgba(201, 168, 108, 0.35));
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  /* Resplandor metálico sutil Gloock */
+  .glow-metallic-gloock {
+    filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 18px rgba(227, 221, 211, 0.18));
+  }
+
+  /* Accesibilidad / Reducción de movimiento */
   @media (prefers-reduced-motion: reduce) {
-    .excerpt-char {
+    .excerpt-word {
       opacity: 1 !important;
       filter: none !important;
       transform: none !important;
-    }
-    .excerpt-cursor {
-      display: none;
+      transition: none !important;
     }
   }
 </style>
@@ -246,7 +240,7 @@ const wordsData = rawWords.map((rawWord, wordIdx) => {
       if (this.isRunning) return;
       this.isRunning = true;
       this.motes = [];
-      const count = 18; // Cantidad sobria de motas
+      const count = 18;
 
       for (let i = 0; i < count; i++) {
         this.motes.push({
@@ -254,7 +248,7 @@ const wordsData = rawWords.map((rawWord, wordIdx) => {
           y: Math.random() * this.canvas.height,
           radius: 0.6 + Math.random() * 1.5,
           opacity: 0.05 + Math.random() * 0.18,
-          speedX: 0.15 + Math.random() * 0.35, // viento soplando a la derecha
+          speedX: 0.15 + Math.random() * 0.35,
           speedY: (Math.random() - 0.5) * 0.1,
           angle: Math.random() * Math.PI * 2,
           angleSpeed: 0.005 + Math.random() * 0.01
@@ -278,18 +272,15 @@ const wordsData = rawWords.map((rawWord, wordIdx) => {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
       this.motes.forEach(m => {
-        // Movimiento llevado por el viento
         m.x += m.speedX;
         m.y += m.speedY + Math.sin(m.angle) * 0.08;
         m.angle += m.angleSpeed;
 
-        // Si se sale por la derecha, vuelve por la izquierda
         if (m.x > this.canvas.width + 10) {
           m.x = -10;
           m.y = Math.random() * this.canvas.height;
         }
 
-        // Dibujar mota de polvo brillante sutil
         this.ctx.beginPath();
         const grad = this.ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.radius * 2);
         grad.addColorStop(0, `rgba(239, 235, 227, ${m.opacity})`);
@@ -307,51 +298,19 @@ const wordsData = rawWords.map((rawWord, wordIdx) => {
     if (section.dataset.cerInit === 'true') return;
     section.dataset.cerInit = 'true';
 
-    const canvas = section.querySelector<HTMLCanvasElement>('.excerpt-dust-canvas')!;
-    const headline = section.querySelector<HTMLElement>('.excerpt-headline')!;
-    const cursor = section.querySelector<HTMLElement>('.excerpt-cursor')!;
-    const chars = Array.from(section.querySelectorAll<HTMLElement>('.excerpt-char'));
+    const canvas = section.querySelector<HTMLCanvasElement>('.excerpt-dust-canvas');
+    let dustEffect: DustMotesEffect | null = null;
+    if (canvas) {
+      dustEffect = new DustMotesEffect(canvas);
+    }
 
-    const dustEffect = new DustMotesEffect(canvas);
-
-    // Escribir carácter por carácter con retraso dinámico
-    const typeCharacters = () => {
-      let idx = 0;
-      const type = () => {
-        if (idx >= chars.length) {
-          // Finaliza escritura: apaga cursor
-          if (cursor) cursor.style.opacity = '0';
-
-          // Espera 4.5 segundos de reposo contemplativo
-          setTimeout(() => {
-            // Disolver en agua
-            headline.classList.add('c-dissolve');
-            // Apagar partículas lentamente al final de la disolución
-            setTimeout(() => dustEffect.stop(), 2800);
-          }, 4500);
-          return;
-        }
-
-        const ch = chars[idx];
-        ch.style.opacity = '1';
-        ch.style.filter = 'blur(0px)';
-        ch.style.transform = 'translateY(0)';
-        idx++;
-
-        // Velocidad de escritura: entre 38ms y 55ms por carácter
-        setTimeout(type, 38 + Math.random() * 17);
-      };
-
-      type();
-    };
-
-    // IntersectionObserver para iniciar la presentación al aparecer en pantalla
+    // IntersectionObserver para activar la aparición cinemática (fade + de-blur)
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           observer.unobserve(section);
-          dustEffect.start();
-          typeCharacters();
+          if (dustEffect) dustEffect.start();
+          section.classList.add('is-revealed');
         }
       });
     }, { threshold: 0.15 });

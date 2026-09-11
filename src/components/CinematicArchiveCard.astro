@@ -227,15 +227,15 @@ const imgUrl = safeImg || '';
       </div>
     )}
 
-    {/* Excerpt en Sans-Serif Proza Libre */}
+    {/* Excerpt con estilo Cartelera de Cine */}
     {dek && (
-      <p class={`card-dek ch-dek-container font-sans text-xs sm:text-sm md:text-base text-[#E3DDD3]/85 leading-relaxed tracking-normal mb-4 sm:mb-5 ${hideExteriorTitle ? 'max-w-3xl text-center' : 'max-w-[56ch]'}`}>
+      <p class={`card-dek ch-dek-container ${hideExteriorTitle ? 'font-serif text-lg sm:text-xl md:text-2xl text-[#EFEBE3]/95 leading-relaxed tracking-wide max-w-4xl text-center mb-10 sm:mb-14 mx-auto drop-shadow-lg' : 'font-sans text-xs sm:text-sm md:text-base text-[#E3DDD3]/85 leading-relaxed tracking-normal mb-4 sm:mb-5 max-w-[56ch]'}`}>
         {dek}
       </p>
     )}
 
-    {/* Tags de Categorías y Metadatos en color default */}
-    <div class={`flex flex-wrap items-center gap-x-4 gap-y-1.5 font-metadata text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-white/50 w-full ${hideExteriorTitle ? 'justify-center' : 'justify-start'}`}>
+    {/* Tags de Categorías y Metadatos en color default — separación limpia respecto al excerpt en modo cinemático */}
+    <div class={`flex flex-wrap items-center gap-x-4 gap-y-1.5 font-metadata text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-white/50 w-full ${hideExteriorTitle ? 'justify-center pt-6 sm:pt-8 border-t border-white/10 mx-auto max-w-xl' : 'justify-start'}`}>
       {entry.category && (
         <span class="ch-tag">{entry.category.toUpperCase()}</span>
       )}
@@ -261,15 +261,17 @@ const imgUrl = safeImg || '';
 
     {/* Botón CTA Grande Centrado "VER REGISTRO" / "VER MÁS" con amplio aire */}
     {centerCtaBelow && (
-      <div class="flex justify-center mt-12 sm:mt-16 md:mt-20 mb-16 sm:mb-24 md:mb-28">
+      <div class="flex justify-center mt-14 sm:mt-20 md:mt-24 mb-16 sm:mb-24 md:mb-28">
         <a
           href={secondaryHref}
           target={isExternal ? "_blank" : undefined}
           rel={isExternal ? "noopener noreferrer" : undefined}
-          class={`inline-flex items-center justify-center gap-3 px-8 sm:px-10 py-3 sm:py-3.5 rounded-full bg-[#EFEBE3] hover:bg-white text-theme-dark font-mono font-bold text-xs uppercase tracking-[0.25em] shadow-xl shadow-black/80 hover:scale-105 active:scale-95 transition-all duration-300 ${!isExternal ? 'cac-modal-trigger' : ''}`}
+          class={`group relative inline-flex items-center justify-center gap-4 px-10 sm:px-14 py-4 sm:py-5 rounded-full bg-transparent border border-[#E3DDD3]/25 text-[#EFEBE3] font-metadata font-bold text-[10.5px] sm:text-xs uppercase tracking-[0.35em] backdrop-blur-md shadow-[0_0_30px_-5px_rgba(255,255,255,0.05)] hover:bg-[#EFEBE3]/10 hover:border-[#EFEBE3]/50 hover:shadow-[0_0_40px_-5px_rgba(227,221,211,0.2)] hover:scale-[1.02] active:scale-95 transition-all duration-500 overflow-hidden ${!isExternal ? 'cac-modal-trigger' : ''}`}
         >
-          <span>{ctaLabel || secondaryLabel}</span>
-          <span class="text-xs transition-transform group-hover:translate-x-1">→</span>
+          {/* Brillo interno cinematico */}
+          <div class="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none" />
+          <span class="relative z-10">{ctaLabel || secondaryLabel}</span>
+          <span class="relative z-10 text-[10px] sm:text-xs transition-transform duration-500 group-hover:translate-x-1.5">&#9656;</span>
         </a>
       </div>
     )}
@@ -285,6 +287,12 @@ const imgUrl = safeImg || '';
     opacity: 1;
     transform: translateY(0);
     transition: opacity 300ms ease-out, transform 300ms ease-out;
+  }
+
+  /* Shimmer sweep para el brillo del CTA cinemático */
+  @keyframes shimmer {
+    0%   { transform: translateX(-120%); }
+    100% { transform: translateX(120%); }
   }
 
   /* Ken Burns para la imagen interna */

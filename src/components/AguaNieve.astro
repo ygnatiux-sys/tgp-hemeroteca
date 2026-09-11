@@ -128,18 +128,12 @@ const categoryTexts: Record<string, string[]> = {
 // Obtener las líneas correspondientes (3-4 líneas)
 const cleanKey = category.toLowerCase().replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u').replace(/ñ/g, 'n');
 const activeLines = customLines || categoryTexts[cleanKey] || categoryTexts['general'];
-
-// Dividir las líneas de a dos
-const pair1 = activeLines.slice(0, 2);
-const pair2 = activeLines.slice(2, 4);
 ---
 
 <div
   id={id}
   class="aguanieve-root relative w-full overflow-hidden select-none py-16 md:py-24 bg-(--bg-main)"
   style="background-color: var(--bg-main);"
-  data-pair1={JSON.stringify(pair1)}
-  data-pair2={JSON.stringify(pair2)}
 >
   {/* Canvas de aguanieve blanca/cristalina */}
   <canvas
@@ -149,10 +143,10 @@ const pair2 = activeLines.slice(2, 4);
   ></canvas>
 
   {/* Contenedor del texto (66ch para legibilidad óptima) */}
-  <div class="aguanieve-container relative z-10 max-w-3xl mx-auto px-6 md:px-16 text-center flex flex-col justify-center min-h-36">
-    <p class="aguanieve-text-block text-balance" id={`${id}-text`}>
-      <span class="aguanieve-cursor" id={`${id}-cursor`} aria-hidden="true">|</span>
-    </p>
+  <div class="aguanieve-container relative z-10 max-w-4xl mx-auto px-6 md:px-16 text-center flex flex-col justify-center gap-6 min-h-36">
+    {activeLines.map(line => (
+      <p class="aguanieve-text-block text-balance reveal-item" set:html={line}></p>
+    ))}
   </div>
 </div>
 
@@ -168,57 +162,9 @@ const pair2 = activeLines.slice(2, 4);
     font-family: var(--font-editorial, 'Newsreader', Georgia, serif);
     font-size: clamp(1.15rem, 2.3vw, 1.55rem);
     font-weight: 400;
-    line-height: 1.8;
+    line-height: 1.6;
     color: rgba(227, 221, 211, 0.78); /* #E3DDD3 con brillo bajado */
     letter-spacing: 0.015em;
-    min-height: 3.8em;
-    transition: opacity 1.8s ease-in-out, filter 1.8s ease-in-out;
-  }
-
-  .aguanieve-text-block.an-dissolve {
-    opacity: 0 !important;
-    filter: blur(8px) !important;
-  }
-
-  /* Animación de condensación cristalina para cada palabra */
-  :global(.an-word) {
-    display: inline-block;
-    opacity: 0;
-    filter: blur(8px);
-    animation: an-emerge var(--dur, 1.2s) cubic-bezier(0.19, 1, 0.22, 1) forwards;
-    background: linear-gradient(
-      to bottom,
-      #E3DDD3 0%,
-      rgba(227, 221, 211, 0.55) 100%
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  @keyframes an-emerge {
-    0% {
-      opacity: 0;
-      filter: blur(8px);
-      transform: translateY(4px);
-    }
-    100% {
-      opacity: 1;
-      filter: blur(0);
-      transform: translateY(0);
-    }
-  }
-
-  .aguanieve-cursor {
-    display: inline;
-    color: #E3DDD3;
-    opacity: 0.6;
-    animation: an-blink 1s step-end infinite;
-  }
-
-  @keyframes an-blink {
-    from, to { opacity: 0; }
-    50% { opacity: 0.8; }
   }
 </style>
 
@@ -307,115 +253,12 @@ const pair2 = activeLines.slice(2, 4);
       root.dataset.animId = animationFrameId;
     };
 
-    // ─── TypeMagic: Narrativa de a 2 renglones ───
-    const wordDelay = (word) => 240 + word.replace(/[^a-záéíóúüñ]/gi, '').length * 15;
-
-    const writeLines = (textBlock, lines) => new Promise((resolve) => {
-      textBlock.innerHTML = '';
-      textBlock.classList.remove('an-dissolve');
-
-      // Unir las líneas con salto de línea html
-      const fullText = lines.join('<br />');
-      const words = fullText.split(' ');
-
-      // Cursor minimalista
-      const cursor = document.createElement('span');
-      cursor.className = 'aguanieve-cursor';
-      cursor.textContent = '|';
-      textBlock.appendChild(cursor);
-
-      let i = 0;
-
-      const writeNext = () => {
-        if (i >= words.length) {
-          if (cursor) cursor.style.opacity = '0';
-          resolve();
-          return;
-        }
-
-        const rawWord = words[i];
-        
-        // Manejar etiquetas <br /> dentro del texto para los saltos
-        if (rawWord.includes('<br')) {
-          const parts = rawWord.split(/<br\s*\/?>/i);
-          for (let pIdx = 0; pIdx < parts.length; pIdx++) {
-            if (parts[pIdx]) {
-              const span = document.createElement('span');
-              span.className = 'an-word';
-              span.textContent = parts[pIdx] + '\u00A0';
-              span.style.setProperty('--dur', (0.8 + parts[pIdx].length * 0.03).toFixed(2) + 's');
-              textBlock.insertBefore(span, cursor);
-            }
-            if (pIdx < parts.length - 1) {
-              const br = document.createElement('br');
-              textBlock.insertBefore(br, cursor);
-            }
-          }
-        } else {
-          const span = document.createElement('span');
-          span.className = 'an-word';
-          span.textContent = rawWord + '\u00A0';
-          span.style.setProperty('--dur', (0.8 + rawWord.length * 0.03).toFixed(2) + 's');
-          textBlock.insertBefore(span, cursor);
-        }
-
-        i++;
-        setTimeout(writeNext, wordDelay(rawWord));
-      };
-
-      writeNext();
-    });
-
-    const dissolveBlock = (textBlock) => new Promise((resolve) => {
-      textBlock.classList.add('an-dissolve');
-      setTimeout(resolve, 1800);
-    });
-
-    const runAguaNieveTypeMagic = async (root, pair1, pair2) => {
-      const textBlock = root.querySelector('.aguanieve-text-block');
-      if (!textBlock) return;
-
-      // 1. Escribir primer bloque de 2 renglones
-      await writeLines(textBlock, pair1);
-      await new Promise(r => setTimeout(r, 4500)); // Pausa lectura
-
-      // 2. Disolver
-      await dissolveBlock(textBlock);
-
-      // 3. Escribir segundo bloque de 2 renglones
-      if (pair2 && pair2.length > 0) {
-        await writeLines(textBlock, pair2);
-        await new Promise(r => setTimeout(r, 4500));
-        await dissolveBlock(textBlock);
-      }
-
-      textBlock.innerHTML = '';
-      textBlock.classList.remove('an-dissolve');
-    };
-
     // Orquestación
     const initAguaNieve = () => {
       document.querySelectorAll('.aguanieve-root').forEach((root) => {
         if (root.dataset.anInit === 'true') return;
         root.dataset.anInit = 'true';
-
         initAguaNieveCanvas(root);
-
-        const pair1 = JSON.parse(root.dataset.pair1 || '[]');
-        const pair2 = JSON.parse(root.dataset.pair2 || '[]');
-
-        let triggered = false;
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting && !triggered) {
-              triggered = true;
-              observer.unobserve(root);
-              runAguaNieveTypeMagic(root, pair1, pair2);
-            }
-          });
-        }, { threshold: 0.15 });
-
-        observer.observe(root);
       });
     };
 

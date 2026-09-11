@@ -54,10 +54,10 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
         {essays.length > 1 && (
           <button
             type="button"
-            class="tray-btn prev-btn group absolute left-3 sm:left-5 md:left-8 lg:left-10 top-[38%] sm:top-[40%] -translate-y-1/2 z-40 w-9 sm:w-10 md:w-11 h-16 sm:h-20 rounded-full bg-black/60 hover:bg-black/85 text-white/80 hover:text-white border border-white/20 hover:border-white/50 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-85 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl focus:outline-none"
+            class="tray-btn prev-btn group absolute left-3 sm:left-5 md:left-8 lg:left-10 top-[38%] sm:top-[40%] -translate-y-1/2 z-40 w-9 sm:w-10 md:w-11 h-16 sm:h-20 rounded-full bg-black/40 hover:bg-black/85 text-[#E3DDD3]/40 hover:text-[#EFEBE3] border border-[#E3DDD3]/10 hover:border-[#E3DDD3]/30 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl focus:outline-none"
             aria-label="Post anterior"
           >
-            <svg class="w-4 h-4 md:w-5 md:h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <svg class="w-4 h-4 md:w-5 md:h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
           </button>
@@ -67,10 +67,10 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
         {essays.length > 1 && (
           <button
             type="button"
-            class="tray-btn next-btn group absolute right-3 sm:right-5 md:right-8 lg:right-10 top-[38%] sm:top-[40%] -translate-y-1/2 z-40 w-9 sm:w-10 md:w-11 h-16 sm:h-20 rounded-full bg-black/60 hover:bg-black/85 text-white/80 hover:text-white border border-white/20 hover:border-white/50 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-85 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl focus:outline-none"
+            class="tray-btn next-btn group absolute right-3 sm:right-5 md:right-8 lg:right-10 top-[38%] sm:top-[40%] -translate-y-1/2 z-40 w-9 sm:w-10 md:w-11 h-16 sm:h-20 rounded-full bg-black/40 hover:bg-black/85 text-[#E3DDD3]/40 hover:text-[#EFEBE3] border border-[#E3DDD3]/10 hover:border-[#E3DDD3]/30 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl focus:outline-none"
             aria-label="Siguiente post"
           >
-            <svg class="w-4 h-4 md:w-5 md:h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <svg class="w-4 h-4 md:w-5 md:h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
             </svg>
           </button>
@@ -111,13 +111,6 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
               {/* Capa de atenuación para tarjetas secundarias en perspectiva */}
               <div class="card-side-dimmer absolute inset-0 bg-black/45 pointer-events-none transition-opacity duration-500 z-15" />
 
-              {/* Badge Centrado Superior Estilo Sample */}
-              <div class="absolute top-3.5 sm:top-5 inset-x-0 flex justify-center z-20 pointer-events-none">
-                <span class="px-3.5 py-1 rounded-full text-[8.5px] sm:text-[9.5px] tracking-[0.25em] uppercase font-mono bg-black/60 backdrop-blur-md text-white/80 border border-white/15 font-semibold shadow-lg">
-                  {entry.category ? entry.category.toUpperCase() : categoryLabel.toUpperCase()}
-                </span>
-              </div>
-
               {/* Bloque Editorial Centrado al Pie Estilo Presentación de Colección */}
               <div class="relative z-20 p-5 sm:p-7 md:p-8 flex flex-col items-center justify-end text-center w-full pointer-events-none">
                 {year && (
@@ -137,11 +130,11 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
                   </p>
                 )}
 
-                {/* Botón Call to Action Centrado Estilo Sample con fondo translúcido que hereda el background */}
+                {/* Botón Call to Action Centrado con color del fondo en default y tono oscurecido elegante en selección */}
                 <div class="mt-1 w-full max-w-64 flex justify-center">
                   <a
                     href={href}
-                    class="card-cta-btn inline-flex items-center justify-center gap-2.5 w-full py-2.5 sm:py-3 px-6 rounded-lg bg-black/35 hover:bg-black/60 text-[#EFEBE3] hover:text-white border border-white/20 hover:border-white/40 backdrop-blur-md font-mono font-semibold text-[9.5px] sm:text-xs uppercase tracking-[0.25em] transition-all duration-300 shadow-xl shadow-black/60 hover:scale-105 active:scale-95 cursor-pointer"
+                    class="card-cta-btn inline-flex items-center justify-center gap-2.5 w-full py-2.5 sm:py-3 px-6 rounded-lg font-mono font-semibold text-[9.5px] sm:text-xs uppercase tracking-[0.25em] transition-all duration-300 shadow-xl shadow-black/60 hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md"
                   >
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
@@ -187,11 +180,19 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
     opacity: 0;
   }
 
+  /* Estado seleccionado / activo: Oscurecido sutilmente para evitar brillo excesivo */
   .rest-tray-card.is-active .card-cta-btn {
     pointer-events: auto;
-    background-color: #EFEBE3;
-    color: #121413;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.8), 0 0 15px rgba(227, 221, 211, 0.2);
+    background-color: rgba(28, 30, 29, 0.92);
+    color: #EFEBE3;
+    border: 1px solid rgba(227, 221, 211, 0.35);
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.85), 0 0 10px rgba(227, 221, 211, 0.08);
+  }
+
+  .rest-tray-card.is-active .card-cta-btn:hover {
+    background-color: rgba(40, 43, 41, 0.98);
+    border-color: rgba(227, 221, 211, 0.55);
+    color: #FFFFFF;
   }
 
   .rest-tray-card:not(.is-active) {
@@ -203,9 +204,10 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
     opacity: 0.55;
   }
 
+  /* Estado default: El botón toma el color del fondo */
   .rest-tray-card:not(.is-active) .card-cta-btn {
     pointer-events: none;
-    background-color: rgba(30, 31, 30, 0.85);
+    background-color: var(--bg-current, var(--bg-main, #121413));
     color: rgba(227, 221, 211, 0.45);
     border: 1px solid rgba(255, 255, 255, 0.08);
   }

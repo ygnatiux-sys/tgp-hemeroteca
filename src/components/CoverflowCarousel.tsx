@@ -191,13 +191,6 @@ export default function CoverflowCarousel({
                 {/* Capa de oscurecimiento progresivo para fundir las tarjetas laterales con el fondo */}
                 <div className={`absolute inset-0 ${overlayOpacity} pointer-events-none transition-all duration-500 z-10`} />
 
-                {/* Badge de Categoría Superior */}
-                <div className="absolute top-4 left-4 z-20">
-                  <span className="px-3.5 py-1 rounded-full text-[8.5px] tracking-[0.3em] uppercase font-mono bg-theme-dark/90 backdrop-blur-md text-rust-orange border border-rust-orange/30 font-bold">
-                    {post.collectionLabel || 'Colección'}
-                  </span>
-                </div>
-
                 {/* Contenedor del Texto & CTA */}
                 <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 flex flex-col justify-end items-center text-center z-20">
                   {post.date && (
@@ -216,12 +209,12 @@ export default function CoverflowCarousel({
                     </p>
                   )}
 
-                  {/* Botón Call to Action Cinemático con color rust-orange heredado */}
+                  {/* Botón Call to Action Cinemático con color del fondo en default y oscurecido en selección */}
                   <div className="mt-2 w-full max-w-70">
                     {isActive ? (
                       <a
                         href={post.link}
-                        className="inline-flex items-center justify-center gap-2.5 w-full py-2.5 sm:py-3 px-5 rounded-md bg-rust-orange hover:bg-white text-black font-mono font-bold text-[10px] sm:text-xs uppercase tracking-[0.25em] transition-all duration-300 shadow-xl shadow-black/80 active:scale-95 cursor-pointer"
+                        className="inline-flex items-center justify-center gap-2.5 w-full py-2.5 sm:py-3 px-5 rounded-md bg-[#1c1e1d] hover:bg-[#282b29] text-[#EFEBE3] hover:text-white border border-white/25 hover:border-white/45 font-mono font-bold text-[10px] sm:text-xs uppercase tracking-[0.25em] transition-all duration-300 shadow-xl shadow-black/80 active:scale-95 cursor-pointer backdrop-blur-md"
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
@@ -229,7 +222,7 @@ export default function CoverflowCarousel({
                         <span>Explorar Colección</span>
                       </a>
                     ) : (
-                      <div className="inline-flex items-center justify-center gap-2.5 w-full py-2.5 sm:py-3 px-5 rounded-md bg-rust-orange/80 text-black font-mono font-bold text-[10px] sm:text-xs uppercase tracking-[0.25em] pointer-events-none">
+                      <div className="inline-flex items-center justify-center gap-2.5 w-full py-2.5 sm:py-3 px-5 rounded-md bg-theme-dark text-white/35 border border-white/8 font-mono font-bold text-[10px] sm:text-xs uppercase tracking-[0.25em] pointer-events-none">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                         </svg>
@@ -244,18 +237,19 @@ export default function CoverflowCarousel({
         </div>
 
         {/* ── Botón Anterior (<) Flotante — Más grande y limpio como en el sample ── */}
+        {/* ── Botón Anterior (<) Flotante con tono atenuado Gloock (#E3DDD3) ── */}
         <button
           type="button"
           onClick={handlePrev}
           aria-label="Anterior"
-          className="group absolute left-3 sm:left-6 md:left-10 lg:left-14 top-1/2 -translate-y-1/2 z-40 p-2 text-white/90 hover:text-white drop-shadow-[0_4px_24px_rgba(0,0,0,1)] hover:scale-115 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none"
+          className="group absolute left-3 sm:left-6 md:left-10 lg:left-14 top-1/2 -translate-y-1/2 z-40 p-2 text-[#E3DDD3]/50 hover:text-[#E3DDD3]/90 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none"
         >
           <svg
-            className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20"
+            className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 transition-colors"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2.2"
+            strokeWidth="1.9"
             strokeLinecap="round"
             strokeLinejoin="round"
           >
@@ -263,19 +257,19 @@ export default function CoverflowCarousel({
           </svg>
         </button>
 
-        {/* ── Botón Siguiente (>) Flotante — Más grande y limpio como en el sample ── */}
+        {/* ── Botón Siguiente (>) Flotante con tono atenuado Gloock (#E3DDD3) ── */}
         <button
           type="button"
           onClick={handleNext}
           aria-label="Siguiente"
-          className="group absolute right-3 sm:right-6 md:right-10 lg:right-14 top-1/2 -translate-y-1/2 z-40 p-2 text-white/90 hover:text-white drop-shadow-[0_4px_24px_rgba(0,0,0,1)] hover:scale-115 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none"
+          className="group absolute right-3 sm:right-6 md:right-10 lg:right-14 top-1/2 -translate-y-1/2 z-40 p-2 text-[#E3DDD3]/50 hover:text-[#E3DDD3]/90 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none"
         >
           <svg
-            className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20"
+            className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 transition-colors"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2.2"
+            strokeWidth="1.9"
             strokeLinecap="round"
             strokeLinejoin="round"
           >

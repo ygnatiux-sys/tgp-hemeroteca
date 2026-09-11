@@ -13,6 +13,8 @@ interface Props {
   roundedClass?: string;
   showSocialInTitle?: boolean;
   maskBottom?: boolean;
+  fullWidth?: boolean;
+  disableParallax?: boolean;
 }
 const {
   title,
@@ -26,6 +28,8 @@ const {
   roundedClass = "rounded-3xl",
   showSocialInTitle = false,
   maskBottom = false,
+  fullWidth = false,
+  disableParallax = false,
 } = Astro.props;
 
 const safeImageUrl = sanitizeImageUrl(imageUrl);
@@ -34,37 +38,21 @@ const gradientClass = isSerif ? "gradient-general-h1" : "gradient-acero-ios";
 ---
 
 <section
-  class={`dark-hero relative w-[calc(100%-2rem)] ${heightClass} mx-auto mt-4 ${marginClass} flex flex-col items-center justify-center overflow-hidden ${roundedClass} ${vibeClass}`}
+  class={`dark-hero relative ${fullWidth ? 'w-full' : 'w-[calc(100%-2rem)] mx-auto mt-4'} ${heightClass} ${marginClass} flex flex-col items-center justify-center overflow-hidden ${fullWidth ? 'rounded-none' : roundedClass} ${vibeClass}`}
   style={maskBottom ? "background-color: var(--bg-current); mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);" : "background-color: var(--bg-current);"}
+  data-disable-parallax={disableParallax ? "true" : undefined}
 >
-  <div class="absolute inset-0 z-0 opacity-70 marquee-bg-pin flex">
-    <div class="marquee-track flex h-full w-[200vw]">
-      <div class="cine-wrapper">
-        {safeImageUrl ? (
-          <img
-            src={safeImageUrl}
-            alt="Background Marquee 1"
-            loading="eager"
-            fetchpriority="high"
-            decoding="async"
-            class="dark-img-target w-full h-full object-cover"
-            style="transform-origin: center center;"
-          />
-        ) : null}
-      </div>
-      <div class="cine-wrapper">
-        {safeImageUrl ? (
-          <img
-            src={safeImageUrl}
-            alt="Background Marquee 2"
-            loading="lazy"
-            decoding="async"
-            class="dark-img-target w-full h-full object-cover"
-            style="transform-origin: center center;"
-          />
-        ) : null}
-      </div>
-    </div>
+  <div class="absolute inset-0 z-0 opacity-70 marquee-bg-pin overflow-hidden">
+    {safeImageUrl ? (
+      <img
+        src={safeImageUrl}
+        alt={title}
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        class="dark-img-target ken-burns-hero w-full h-full object-cover"
+      />
+    ) : null}
   </div>
 
   <div class="texture-grain"></div>
@@ -194,42 +182,24 @@ const gradientClass = isSerif ? "gradient-general-h1" : "gradient-acero-ios";
 </section>
 
 <style>
-  @keyframes cine-drift {
+  @keyframes kenBurnsIntro {
     0% {
-      transform: scale(1.06) translate(0%, 0%);
-    }
-    25% {
-      transform: scale(1.09) translate(-0.4%, 0.3%);
-    }
-    50% {
-      transform: scale(1.07) translate(-0.8%, -0.2%);
-    }
-    75% {
-      transform: scale(1.09) translate(-0.35%, 0.35%);
+      transform: scale(1.04) translateY(2px);
+      filter: brightness(0.85);
     }
     100% {
-      transform: scale(1.06) translate(0%, 0%);
+      transform: scale(1.0) translateY(0);
+      filter: brightness(1);
     }
   }
 
-  .cine-wrapper {
-    width: 100vw;
-    height: 110%;
-    flex-shrink: 0;
-    position: relative;
-    top: -5%;
-    animation: cine-drift 90s ease-in-out infinite;
-    will-change: transform;
-  }
-
-  .cine-wrapper img {
+  .ken-burns-hero {
     width: 100%;
     height: 100%;
     object-fit: cover;
-  }
-
-  .dark-hero:hover .cine-wrapper {
-    animation-duration: 45s;
+    transform-origin: center center;
+    animation: kenBurnsIntro 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    will-change: transform, filter;
   }
 
   .dark-hero:hover .dark-img-target {
@@ -247,66 +217,65 @@ const gradientClass = isSerif ? "gradient-general-h1" : "gradient-acero-ios";
 
   const initDarkHero = () => {
     const heroSection = document.querySelector(".dark-hero");
-    const marqueeTrack = document.querySelector(".dark-hero .marquee-track");
     const bgPin = document.querySelector(".dark-hero .marquee-bg-pin");
     const titleContainer = document.querySelector(
       ".dark-hero .title-container",
     );
-    const images = document.querySelectorAll(".dark-hero .dark-img-target");
+    const image = document.querySelector(".dark-hero .dark-img-target");
 
-    if (marqueeTrack) {
-      gsap.to(marqueeTrack, {
-        xPercent: -50,
-        ease: "none",
-        repeat: -1,
-        duration: 90,
-      });
-    }
-
-    if (heroSection && bgPin) {
+    if (heroSection && !heroSection.dataset.disableParallax) {
       // 1. ZOOM-OUT & FADE OUT TO BLACK ON SCROLL
-      gsap.to(images, {
-        scrollTrigger: {
-          trigger: heroSection,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
-        scale: 0.78,
-        opacity: 0,
-        ease: "power2.inOut",
-      });
-
-      // 2. PARALLAX DRIFT
-      gsap.to(bgPin, {
-        scrollTrigger: {
-          trigger: heroSection,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
-        y: 100,
-        ease: "none",
-      });
-
-      // 3. TITLE TRANSITION (IN-PLACE SOFT GRADUAL FADE)
-      if (titleContainer) {
-        gsap.to(titleContainer, {
+      if (image) {
+        gsap.to(image, {
           scrollTrigger: {
             trigger: heroSection,
             start: "top top",
-            end: "70% top",
-            scrub: 1.2,
+            end: "bottom top",
+            scrub: true,
           },
-          y: 35,
-          opacity: 0,
-          scale: 0.94,
-          ease: "power2.out",
+          scale: 0.85,
+          opacity: 0.2,
+          ease: "power2.inOut",
         });
       }
+
+      // 2. PARALLAX DRIFT
+      if (bgPin) {
+        gsap.to(bgPin, {
+          scrollTrigger: {
+            trigger: heroSection,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+          y: 80,
+          ease: "none",
+        });
+      }
+    }
+
+    // 3. TITLE TRANSITION (IN-PLACE SOFT GRADUAL FADE)
+    if (heroSection && titleContainer) {
+      gsap.to(titleContainer, {
+        scrollTrigger: {
+          trigger: heroSection,
+          start: "top top",
+          end: "70% top",
+          scrub: 1.2,
+        },
+        y: 35,
+        opacity: 0,
+        scale: 0.94,
+        ease: "power2.out",
+      });
     }
   };
 
   // Lifecycle Protocol
   document.addEventListener("astro:page-load", initDarkHero);
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    initDarkHero();
+  } else {
+    document.addEventListener("DOMContentLoaded", initDarkHero);
+  }
 </script>
