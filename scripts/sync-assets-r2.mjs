@@ -30,6 +30,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
+import sharp from 'sharp';
 import {
   S3Client,
   PutObjectCommand,
@@ -40,10 +41,13 @@ dotenv.config();
 
 // ── Configuración ─────────────────────────────────────────────────────────────
 
-const ASSETS_DIR    = path.resolve('src/assets');
-const BUCKET_NAME   = process.env.R2_BUCKET_NAME || 'tgp-storage';
-const R2_PUBLIC_URL = 'https://storage.thegreatpuzzleproject.com';
-const CONCURRENCY   = 5;
+const ASSETS_DIR       = path.resolve('src/assets');
+const BUCKET_NAME      = process.env.R2_BUCKET_NAME || 'tgp-storage';
+const R2_PUBLIC_URL    = 'https://storage.thegreatpuzzleproject.com';
+const CONCURRENCY      = 5;
+const MAX_WIDTH        = 1920;
+const WEBP_QUALITY     = 80;
+const SHARP_IMAGE_EXTS = /\.(jpe?g|png|webp|avif|tiff?)$/i;
 
 const args      = process.argv.slice(2);
 const FORCE     = args.includes('--force');
@@ -201,13 +205,36 @@ async function main() {
       return;
     }
 
+    let uploadBuffer = buffer;
+    let uploadMime = mime;
+    let wasOptimized = false;
+
+    // Optimizar imágenes a WebP ultraliviano (max 1920px, q80)
+    if (SHARP_IMAGE_EXTS.test(filePath)) {
+      try {
+        uploadBuffer = await sharp(buffer, { limitInputPixels: false })
+          .resize({ width: MAX_WIDTH, withoutEnlargement: true, fit: 'inside' })
+          .webp({ quality: WEBP_QUALITY, effort: 4 })
+          .toBuffer();
+        uploadMime = 'image/webp';
+        wasOptimized = true;
+      } catch (err) {
+        // En caso de excepción de sharp, fallback al buffer y MIME original
+        uploadBuffer = buffer;
+        uploadMime = mime;
+      }
+    }
+
     if (DRY_RUN) {
-      console.log('  [DRY-RUN] Subiria: ' + key + ' (' + (buffer.length / 1024).toFixed(1) + ' KB)');
+      const origKb = (buffer.length / 1024).toFixed(1);
+      const optKb = (uploadBuffer.length / 1024).toFixed(1);
+      const note = wasOptimized ? ` (WebP: ${origKb} KB → ${optKb} KB)` : ` (${origKb} KB)`;
+      console.log('  [DRY-RUN] Subiria: ' + key + note);
       stats.uploaded++;
       return;
     }
 
-    const must = await needsUpload(key, buffer);
+    const must = await needsUpload(key, uploadBuffer);
     if (!must) {
       console.log('  [OK-IGUAL]  ' + key);
       stats.skipped++;
@@ -215,11 +242,13 @@ async function main() {
     }
 
     try {
-      await uploadFile(key, buffer, mime);
-      const kb = (buffer.length / 1024).toFixed(1);
-      console.log('  [SUBIDO] ' + kb + ' KB  →  ' + key);
+      await uploadFile(key, uploadBuffer, uploadMime);
+      const origKb = (buffer.length / 1024).toFixed(1);
+      const optKb = (uploadBuffer.length / 1024).toFixed(1);
+      const note = wasOptimized ? ` [WebP ${origKb} KB → ${optKb} KB]` : ` [${optKb} KB]`;
+      console.log('  [SUBIDO] ' + key + note);
       stats.uploaded++;
-      stats.bytes += buffer.length;
+      stats.bytes += uploadBuffer.length;
       if (!stats.firstKey) stats.firstKey = key;
     } catch (err) {
       console.log('  [ERROR UPLOAD] ' + key + ' — ' + err.message);
