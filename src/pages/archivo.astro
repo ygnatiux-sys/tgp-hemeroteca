@@ -5,6 +5,7 @@ import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
 import SpotlightMediaTray, { type TrayCollectionItem } from '../components/SpotlightMediaTray.astro';
+import CollectionRestTray from '../components/CollectionRestTray.astro';
 import CinematicExcerptRest from '../components/CinematicExcerptRest.astro';
 import Marquee from '../components/Marquee.astro';
 import {
@@ -336,7 +337,8 @@ function createPremierSequences(essays: typeof resolvedEssays) {
         {/* Lista de Categorías con estructura cinemática Premier Unificada */}
         <section class="flex flex-col gap-16 md:gap-24" id="archive-list">
           {essaysByCategory.map(group => {
-            const premierSequences = createPremierSequences(group.essays);
+            const coverEssay = group.essays[0];
+            const restEssays = group.essays.slice(1);
 
             return (
               <div class="category-block flex flex-col gap-8" data-category-group={group.catKey}>
@@ -363,63 +365,27 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                   </div>
                 </div>
 
-                {/* Secuencias Cinematográficas Premier: 1 Hero Full Bleed + Dúo 60/40 */}
-                <div class="flex flex-col gap-12 md:gap-16">
-                  {premierSequences.map((seq, seqIdx) => (
-                    <div class={`premier-sequence flex flex-col gap-6 md:gap-8 ${seqIdx >= 5 ? "hidden archive-extra-seq" : ""}`}>
-                      {/* 1. Hero Cinemático Full Bleed */}
-                      <div class="w-full">
-                        <CinematicArchiveCard
-                          slug={seq.hero.slug}
-                          entry={seq.hero.entry}
-                          img={seq.hero.img}
-                          variant="hero"
-                          enableCinemagraph={true}
-                        />
-                      </div>
+                {/* 1. Post Cover Cinemático de la Colección (Hero Full Bleed) */}
+                {coverEssay && (
+                  <div class="w-full">
+                    <CinematicArchiveCard
+                      slug={coverEssay.slug}
+                      entry={coverEssay.entry}
+                      img={coverEssay.img}
+                      variant="hero"
+                      enableCinemagraph={true}
+                    />
+                  </div>
+                )}
 
-                      {/* 2. Dúo 60/40 */}
-                      {seq.duo.length > 0 && (
-                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-                          {seq.duo[0] && (
-                            <div class={seq.duo.length > 1 ? "lg:col-span-7 flex flex-col" : "lg:col-span-12 flex flex-col"}>
-                              <CinematicArchiveCard
-                                slug={seq.duo[0].slug}
-                                entry={seq.duo[0].entry}
-                                img={seq.duo[0].img}
-                                variant={seq.duo.length > 1 ? "duo-60" : "hero"}
-                                enableCinemagraph={true}
-                              />
-                            </div>
-                          )}
-
-                          {seq.duo[1] && (
-                            <div class="lg:col-span-5 flex flex-col">
-                              <CinematicArchiveCard
-                                slug={seq.duo[1].slug}
-                                entry={seq.duo[1].entry}
-                                img={seq.duo[1].img}
-                                variant="duo-40"
-                                enableCinemagraph={true}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Botón Cargar Más Hemeroteca (si hay más de 5 secuencias / 15 tarjetas) */}
-                {premierSequences.length > 5 && (
-                  <div class="flex justify-center pt-10 pb-4 archive-load-more-wrap">
-                    <button
-                      type="button"
-                      class="archive-load-more-btn group inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-[#151718]/90 hover:bg-white/10 border border-white/15 hover:border-white/40 text-[#E0E0E0]/80 hover:text-white font-metadata text-[10px] tracking-[0.3em] uppercase transition-all duration-300 active:scale-95 cursor-pointer shadow-lg"
-                    >
-                      <span>Cargar más hemeroteca</span>
-                      <span class="text-rust-orange group-hover:translate-y-0.5 transition-transform">↓</span>
-                    </button>
+                {/* 2. Resto de la Colección: Tray Mode Horizontal de 3 Cards con amplio padding y separación */}
+                {restEssays.length > 0 && (
+                  <div class="w-full pt-16 sm:pt-24 md:pt-32 pb-8 md:pb-16 border-t border-white/10 flex flex-col items-center">
+                    <CollectionRestTray
+                      essays={restEssays}
+                      categoryKey={group.catKey}
+                      categoryLabel={group.catLabel}
+                    />
                   </div>
                 )}
               </div>
@@ -474,7 +440,8 @@ function createPremierSequences(essays: typeof resolvedEssays) {
               const yearEssays = resolvedEssays.filter(e =>
                 e.entry.date && new Date(e.entry.date).getFullYear().toString() === year
               );
-              const premierSequences = createPremierSequences(yearEssays);
+              const coverYearEssay = yearEssays[0];
+              const restYearEssays = yearEssays.slice(1);
 
               return (
                 <div class="archive-year-cinematic-group flex flex-col gap-10 md:gap-14" data-year-group={year}>
@@ -488,52 +455,29 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                     </h2>
                   </div>
 
-                  {/* Secuencias Cinematográficas Premier: 1 Hero Full Bleed + Dúo 60/40 con Cinemagraph */}
-                  <div class="flex flex-col gap-16 md:gap-24">
-                    {premierSequences.map((seq, seqIdx) => (
-                      <div class="premier-sequence flex flex-col gap-8 md:gap-12">
-                        {/* 1. Hero Cinemático Full Bleed */}
-                        <div class="w-full">
-                          <CinematicArchiveCard
-                            slug={seq.hero.slug}
-                            entry={seq.hero.entry}
-                            img={seq.hero.img}
-                            variant="hero"
-                            enableCinemagraph={true}
-                          />
-                        </div>
+                  {/* 1. Hero Cinemático Full Bleed */}
+                  {coverYearEssay && (
+                    <div class="w-full">
+                      <CinematicArchiveCard
+                        slug={coverYearEssay.slug}
+                        entry={coverYearEssay.entry}
+                        img={coverYearEssay.img}
+                        variant="hero"
+                        enableCinemagraph={true}
+                      />
+                    </div>
+                  )}
 
-                        {/* 2. Dúo de Films Secundarios con Aire, Espaciado y Proporción 60/40 */}
-                        {seq.duo.length > 0 && (
-                          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
-                            {seq.duo[0] && (
-                              <div class={seq.duo.length > 1 ? "lg:col-span-7 flex flex-col" : "lg:col-span-12 flex flex-col"}>
-                                <CinematicArchiveCard
-                                  slug={seq.duo[0].slug}
-                                  entry={seq.duo[0].entry}
-                                  img={seq.duo[0].img}
-                                  variant={seq.duo.length > 1 ? "duo-60" : "hero"}
-                                  enableCinemagraph={true}
-                                />
-                              </div>
-                            )}
-
-                            {seq.duo[1] && (
-                              <div class="lg:col-span-5 flex flex-col">
-                                <CinematicArchiveCard
-                                  slug={seq.duo[1].slug}
-                                  entry={seq.duo[1].entry}
-                                  img={seq.duo[1].img}
-                                  variant="duo-40"
-                                  enableCinemagraph={true}
-                                />
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                  {/* 2. Resto del Año: Tray Mode Horizontal de 3 Cards con amplio padding y separación */}
+                  {restYearEssays.length > 0 && (
+                    <div class="w-full pt-16 sm:pt-24 md:pt-32 pb-8 md:pb-16 border-t border-white/10 flex flex-col items-center">
+                      <CollectionRestTray
+                        essays={restYearEssays}
+                        categoryKey={`year-${year}`}
+                        categoryLabel={`Año ${year}`}
+                      />
+                    </div>
+                  )}
                 </div>
               );
             })}
