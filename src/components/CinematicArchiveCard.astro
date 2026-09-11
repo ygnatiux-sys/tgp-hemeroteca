@@ -166,15 +166,15 @@ const imgUrl = safeImg || '';
     </div>
 
     {/* ✦ H1 INTERIOR DENTRO DE LA CARD (Con Cinzel Steel Gradient + GSAP Fade In) */}
-    <div class="absolute inset-0 z-20 flex flex-col justify-end p-4 sm:p-6 md:p-8 pointer-events-none">
+    <div class={`absolute inset-0 z-20 flex flex-col justify-end p-4 sm:p-6 md:p-8 pointer-events-none ${hideExteriorTitle ? 'items-center text-center pb-8 sm:pb-12' : 'items-start text-left'}`}>
       {cleanExcerpt && (
-        <p class={`font-sans leading-relaxed text-left max-w-[66ch] tracking-wider mb-2 line-clamp-2 ch-excerpt-container opacity-0 ${excerptClass}`}>
+        <p class={`font-sans leading-relaxed max-w-[66ch] tracking-wider mb-2 line-clamp-2 ch-excerpt-container opacity-0 ${hideExteriorTitle ? 'text-center mx-auto' : 'text-left'} ${excerptClass}`}>
           <span class="ch-excerpt-line inline-block">{cleanExcerpt}</span>
         </p>
       )}
 
-      <h2 class={`font-cinzel tracking-tight drop-shadow-xl transition-all duration-300 ch-h1-container cac-card-title ${titleClass}`} data-flip-id={`card-title-${cardId}`}>
-        <span class:list={[cardGradientClass, "block"]}>
+      <h2 class={`font-cinzel tracking-tight drop-shadow-xl transition-all duration-300 ch-h1-container cac-card-title ${hideExteriorTitle ? 'text-center w-full mx-auto' : ''} ${titleClass}`} data-flip-id={`card-title-${cardId}`}>
+        <span class:list={[cardGradientClass, "block", hideExteriorTitle ? "text-center mx-auto" : ""]}>
           {titlePrefix}<span class="title-keyword-shine-fade">{titleKeyword}</span>
         </span>
       </h2>
@@ -182,7 +182,7 @@ const imgUrl = safeImg || '';
   </a>
 
   {/* 2. BLOQUE DE TEXTO EDITORIAL EXTERIOR (ESTILO NAUTILUS / EDITORIAL COVER) */}
-  <div class={`flex flex-col w-full grow ${hideExteriorTitle ? 'pt-4 items-center text-center' : 'pt-1'}`}>
+  <div class={`flex flex-col w-full grow ${hideExteriorTitle ? 'pt-6 sm:pt-8 items-center text-center' : 'pt-1'}`}>
     {/* En modo normal: Categoría y Tags arriba */}
     {!hideExteriorTitle && (
       <div class="flex flex-wrap items-center gap-2 mb-2 font-metadata text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-stone-400">
@@ -229,13 +229,13 @@ const imgUrl = safeImg || '';
 
     {/* Excerpt en Sans-Serif Proza Libre */}
     {dek && (
-      <p class={`card-dek ch-dek-container font-sans text-xs sm:text-sm md:text-base text-[#E3DDD3]/85 leading-relaxed tracking-normal mb-3 ${hideExteriorTitle ? 'max-w-3xl text-center' : 'max-w-[56ch]'}`}>
+      <p class={`card-dek ch-dek-container font-sans text-xs sm:text-sm md:text-base text-[#E3DDD3]/85 leading-relaxed tracking-normal mb-4 sm:mb-5 ${hideExteriorTitle ? 'max-w-3xl text-center' : 'max-w-[56ch]'}`}>
         {dek}
       </p>
     )}
 
     {/* Tags de Categorías y Metadatos en color default */}
-    <div class={`flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 font-metadata text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-white/50 w-full ${hideExteriorTitle ? 'justify-center' : 'justify-start'}`}>
+    <div class={`flex flex-wrap items-center gap-x-4 gap-y-1.5 font-metadata text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-white/50 w-full ${hideExteriorTitle ? 'justify-center' : 'justify-start'}`}>
       {entry.category && (
         <span class="ch-tag">{entry.category.toUpperCase()}</span>
       )}
@@ -259,9 +259,9 @@ const imgUrl = safeImg || '';
       )}
     </div>
 
-    {/* Botón CTA Grande Centrado "VER REGISTRO" / "VER MÁS" */}
+    {/* Botón CTA Grande Centrado "VER REGISTRO" / "VER MÁS" con amplio aire */}
     {centerCtaBelow && (
-      <div class="flex justify-center mt-6 sm:mt-8 mb-2">
+      <div class="flex justify-center mt-12 sm:mt-16 md:mt-20 mb-16 sm:mb-24 md:mb-28">
         <a
           href={secondaryHref}
           target={isExternal ? "_blank" : undefined}

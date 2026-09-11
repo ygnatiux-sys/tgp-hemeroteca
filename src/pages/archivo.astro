@@ -4,7 +4,7 @@ import Image from '../components/SafeImage.astro';
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
-import SpotlightMediaTray, { type TrayCollectionItem } from '../components/SpotlightMediaTray.astro';
+import CoverflowCarousel, { type CoverflowPost } from '../components/CoverflowCarousel';
 import CollectionRestTray from '../components/CollectionRestTray.astro';
 import CinematicExcerptRest from '../components/CinematicExcerptRest.astro';
 import Marquee from '../components/Marquee.astro';
@@ -130,34 +130,23 @@ const archiveCover = archiveCoverEssay
   : null;
 const archiveCoverUrl = sanitizeImageUrl(ARCHIVE_WIKI_COVER || archiveCover?.src || '');
 
-// ─── COLECCIONES DEL ARCHIVO PARA SPOTLIGHT MEDIA TRAY (ESTILO ROW NETFLIX) ───
-const archiveCollectionSpotlights: TrayCollectionItem[] = essaysByCategory.map(group => {
-  const leadEssay = group.essays.find(e => e.img) || group.essays[0];
-  const rawImg = leadEssay?.img;
-  const count = group.essays.length;
-
-  const yearRange = group.essays
-    .map(e => e.entry.date ? new Date(e.entry.date).getFullYear() : null)
-    .filter(Boolean)
-    .sort((a, b) => (a as number) - (b as number));
-  const yearLabel = yearRange.length > 0
-    ? yearRange[0] === yearRange[yearRange.length - 1]
-      ? `${yearRange[0]}`
-      : `${yearRange[0]}–${yearRange[yearRange.length - 1]}`
-    : '';
-
-  const excerptText = leadEssay?.entry?.excerpt 
-    || `Colección especializada con ${count} investigaciones documentadas y resguardadas en el Archivo General${yearLabel ? ` (${yearLabel})` : ''}.`;
-
-  return {
-    slug: group.catKey,
-    title: group.catLabel,
-    excerpt: excerptText,
-    coverImage: rawImg,
-    category: `Colección Archivo · ${count} Documento${count > 1 ? 's' : ''}`,
-    link: `/colecciones/${group.catKey}/`,
-  };
-});
+// ─── ITEMS PARA COVERFLOW 3D / MODE TRAY AL FINAL DEL ARCHIVO (UN COVER DE CADA COLECCIÓN) ───
+const coverflowPosts: CoverflowPost[] = essaysByCategory
+  .filter(group => group.essays.length > 0 && group.essays[0].img)
+  .map(group => {
+    const coverEssay = group.essays[0];
+    const rawImg = coverEssay.img || coverEssay.entry?.coverImage;
+    const imgUrl = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : ''));
+    return {
+      id: group.catKey,
+      title: group.catLabel,
+      subtitle: `${group.essays.length} ${group.essays.length === 1 ? 'dossier' : 'dossieres'} en esta colección`,
+      image: imgUrl || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop',
+      link: `/colecciones/${group.catKey}/`,
+      collectionLabel: 'Colección Especializada',
+      date: coverEssay.entry?.date ? formatYear(coverEssay.entry.date) : undefined,
+    };
+  });
 
 // Helper para mapear essays a SlideData de CinematicPostEngine
 function mapToSlideData(essays: typeof resolvedEssays) {
@@ -197,7 +186,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
   description="Archivo general y catálogo cronológico de investigaciones, dossiers y ensayos de The Great Puzzle Project."
   image={archiveCoverUrl}
 >
-  {/* ── HERO PRINCIPAL CINEMÁTICO (H1) CON MASK BLACK AL PIE (SIMÉTRICO CON COLECCIONES) ── */}
+  {/* ── HERO PRINCIPAL CINEMÁTICO (H1) CON MASK BLACK AL PIE ── */}
   <div class="relative w-full">
     <Marquee
       title="ARCHIVO GENERAL"
@@ -207,23 +196,11 @@ function createPremierSequences(essays: typeof resolvedEssays) {
       isH1={true}
       fontClass="font-serif font-black"
       heightClass="h-[calc(62vh-2rem)] min-h-[420px] md:min-h-[480px]"
-      marginClass="mb-0"
-      roundedClass="rounded-t-3xl rounded-b-none"
+      marginClass="mb-4 sm:mb-8"
+      roundedClass="rounded-3xl"
       showSocialInTitle={true}
       maskBottom={true}
     />
-
-    {/* ── BANDEJA SPOTLIGHT MEDIA TRAY: JUSTO DEBAJO INMEDIATO AL PIE DE IMAGEN CON MASK BLACK A ANCHO TOTAL ── */}
-    <div class="relative z-20 -mt-24 sm:-mt-32 md:-mt-40 mb-16 md:mb-24 w-full overflow-x-clip">
-      {/* Scrim / Black Mask suave que difumina la transición del pie de imagen con el componente a ancho total */}
-      <div class="absolute -top-24 inset-x-0 bottom-0 bg-linear-to-b from-transparent via-black/85 via-40% to-(--bg-current) pointer-events-none -z-10"></div>
-
-      <SpotlightMediaTray 
-        collections={archiveCollectionSpotlights}
-        eyebrow="COLECCIONES DEL ARCHIVO"
-        allLink="/colecciones/"
-      />
-    </div>
   </div>
 
   {/* ── RESPIRO VISUAL / EXCERPT DOBLE SCROLL POLVO DORADO & TYPEMAGIC EN BG-MAIN ── */}
@@ -383,7 +360,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
 
                 {/* 2. Resto de la Colección: Tray Mode Horizontal de 3 Cards con amplio padding y separación */}
                 {restEssays.length > 0 && (
-                  <div class="w-full pt-16 sm:pt-24 md:pt-32 pb-8 md:pb-16 border-t border-white/10 flex flex-col items-center">
+                  <div class="w-full pt-20 sm:pt-28 md:pt-36 pb-12 sm:pb-20 border-t border-white/10 flex flex-col items-center">
                     <CollectionRestTray
                       essays={restEssays}
                       categoryKey={group.catKey}
@@ -476,7 +453,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
 
                   {/* 2. Resto del Año: Tray Mode Horizontal de 3 Cards con amplio padding y separación */}
                   {restYearEssays.length > 0 && (
-                    <div class="w-full pt-16 sm:pt-24 md:pt-32 pb-8 md:pb-16 border-t border-white/10 flex flex-col items-center">
+                    <div class="w-full pt-20 sm:pt-28 md:pt-36 pb-12 sm:pb-20 border-t border-white/10 flex flex-col items-center">
                       <CollectionRestTray
                         essays={restYearEssays}
                         categoryKey={`year-${year}`}
@@ -490,8 +467,19 @@ function createPremierSequences(essays: typeof resolvedEssays) {
           </section>
         </div>
       )}
-
     </div>
+
+    {/* ── SECCIÓN FINAL: MODE TRAY / COVERFLOW CAROUSEL 3D DE COLECCIONES (FULL WIDTH / EDGE-TO-EDGE) ── */}
+    {coverflowPosts.length > 0 && (
+      <section class="mt-20 md:mt-32 w-full bg-transparent relative overflow-hidden">
+        <CoverflowCarousel 
+          client:visible 
+          posts={coverflowPosts}
+          title="Explorador de Colecciones"
+          eyebrow="Galería 3D del Archivo"
+        />
+      </section>
+    )}
   </div>
 
   <script>
