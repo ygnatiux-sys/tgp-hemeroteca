@@ -65,45 +65,32 @@ const sanitizedItems = items.map((item, idx) => {
 
 {sanitizedItems.length > 0 && (
   <div id={id} class="visor-cinematico-root w-full flex flex-col gap-4 select-none" data-total-slides={sanitizedItems.length}>
-    
-    {/* ── ENCABEZADO DISCRETO FUERA DE LA CARD CON CHEVRONS HEREDADOS ── */}
-    <div class="flex items-center justify-between px-2 pt-1">
-      <div class="flex items-center gap-3">
-        <span class="font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-rust-orange font-bold">
-          [ Visor de Archivo ]
-        </span>
-        <span class="font-mono text-[10px] text-white/40 tracking-wider">
-          • <span class="current-slide-num text-white/90 font-bold">01</span> / {String(sanitizedItems.length).padStart(2, '0')}
-        </span>
-      </div>
 
-      {/* Controles de Chevrons Exteriores Discretos (Tamaño y estilo heredado) */}
-      <div class="flex items-center gap-1.5">
-        <button
-          type="button"
-          class="visor-prev-btn w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 hover:border-rust-orange/50 text-white/60 hover:text-rust-orange transition-all duration-300 flex items-center justify-center cursor-pointer disabled:opacity-20 disabled:pointer-events-none"
-          aria-label="Tema anterior"
-        >
-          <svg class="w-3.5 h-3.5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-          </svg>
-        </button>
-
-        <button
-          type="button"
-          class="visor-next-btn w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 hover:border-rust-orange/50 text-white/60 hover:text-rust-orange transition-all duration-300 flex items-center justify-center cursor-pointer disabled:opacity-20 disabled:pointer-events-none"
-          aria-label="Tema siguiente"
-        >
-          <svg class="w-3.5 h-3.5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    {/* ── ESCENARIO DEL VISOR HORIZONTAL CINEMATOGRÁFICO (SIN BOTONES INTERNOS INVASIVOS) ── */}
-    <div class="visor-stage relative w-full overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 bg-[#0e1013] shadow-2xl min-h-95 md:min-h-110">
+    {/* ── ESCENARIO DEL VISOR HORIZONTAL CINEMATOGRÁFICO ── */}
+    <div class="visor-stage relative w-full overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 bg-[#0e1013] shadow-2xl min-h-95 md:min-h-110 group/visor">
       
+      {/* Botón Anterior Flotante en Cápsula (Estilo RowNetflixClasico) */}
+      <button 
+        type="button"
+        class="visor-prev-btn absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-30 w-8 md:w-9 h-14 md:h-16 rounded-full bg-black/65 hover:bg-black/95 text-white/70 hover:text-white border border-white/15 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl"
+        aria-label="Anterior"
+      >
+        <svg class="w-4 h-4 md:w-4.5 md:h-4.5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+
+      {/* Botón Siguiente Flotante en Cápsula (Estilo RowNetflixClasico) */}
+      <button 
+        type="button"
+        class="visor-next-btn absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-30 w-8 md:w-9 h-14 md:h-16 rounded-full bg-black/65 hover:bg-black/95 text-white/70 hover:text-white border border-white/15 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl"
+        aria-label="Siguiente"
+      >
+        <svg class="w-4 h-4 md:w-4.5 md:h-4.5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      </button>
+
       {/* Contenedor de Diapositivas (Cinema Cards Track) */}
       <div class="visor-slides-track relative w-full h-full min-h-95 md:min-h-110">
         {sanitizedItems.map((item, idx) => (
@@ -112,8 +99,8 @@ const sanitizedItems = items.map((item, idx) => {
             data-index={idx}
             data-slug={item.slug}
           >
-            {/* 1. Imagen Panorámica con Fade to Black Gradual a la Derecha */}
-            <div class="relative overflow-hidden lg:w-[50%] shrink-0 aspect-video lg:aspect-auto min-h-56 lg:min-h-full bg-black">
+            {/* 1. Imagen Panorámica 60% con Fade to Black Gradual a la Derecha */}
+            <div class="relative overflow-hidden lg:w-[60%] shrink-0 aspect-video lg:aspect-auto min-h-56 lg:min-h-full bg-black">
               {item.imgUrl ? (
                 <Image
                   src={item.imgUrl}
@@ -136,50 +123,37 @@ const sanitizedItems = items.map((item, idx) => {
               <div class="absolute inset-0 bg-linear-to-t from-[#0e1013] via-[#0e1013]/60 to-transparent lg:hidden pointer-events-none" />
             </div>
 
-            {/* 2. Información Editorial con Gradientes de Letra Correspondientes */}
-            <div class="flex flex-col justify-between p-6 sm:p-8 lg:p-10 flex-1 min-w-0 bg-[#0e1013] z-10">
-              <div class="flex flex-col gap-3 md:gap-4">
-                {/* Metadatos superiores */}
-                <div class="flex items-center gap-3 flex-wrap">
-                  <span class="font-mono text-[9px] md:text-[10px] uppercase tracking-[0.35em] text-rust-orange font-bold">
+            {/* 2. Zona de Texto 40% Editorial con Cinzel Extrabold y Steel Gradient */}
+            <div class="lg:w-[40%] flex flex-col justify-between p-6 sm:p-8 lg:p-10 flex-1 min-w-0 bg-[#0e1013] z-10">
+              <div class="flex flex-col gap-3 md:gap-3.5">
+                {/* Metadatos superiores limpios: sólo label y fecha */}
+                <div class="flex items-center gap-2.5 flex-wrap">
+                  <span class="font-mono text-[9.5px] md:text-[10px] uppercase tracking-[0.35em] text-rust-orange font-bold">
                     {item.categoryLabel}
                   </span>
-                  {item.sitio && (
-                    <span class="inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-wider text-white/50 bg-white/5 px-2 py-0.5 rounded border border-white/10">
-                      📍 {item.sitio}
-                    </span>
-                  )}
                   {item.year && (
-                    <span class="font-mono text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/35">
+                    <span class="font-mono text-[9.5px] md:text-[10px] uppercase tracking-[0.25em] text-white/40">
                       · {item.year}
                     </span>
                   )}
                 </div>
 
-                {/* Título Principal con Gradiente Correspondiente (Steel para Cinzel / General para Gloock) */}
-                {item.isCinzel ? (
-                  <h3 class="font-cinzel font-bold text-2xl sm:text-3xl lg:text-4xl leading-tight tracking-wide">
-                    <a href={item.linkHref} class="gradient-steel-brand inline-block hover:brightness-110 transition-all duration-300">
-                      {item.entry.title}
-                    </a>
-                  </h3>
-                ) : (
-                  <h3 class="font-gloock text-2xl sm:text-3xl lg:text-4xl leading-tight tracking-tight">
-                    <a href={item.linkHref} class="gradient-general-h2 inline-block hover:brightness-110 transition-all duration-300">
-                      {item.entry.title}
-                    </a>
-                  </h3>
-                )}
+                {/* Título Principal Compacto y Extrabold con Steel Gradient */}
+                <h3 class="font-cinzel font-extrabold text-2xl sm:text-3xl lg:text-[2.2rem] leading-[1.12] tracking-tight">
+                  <a href={item.linkHref} class="gradient-acero-ios inline-block hover:brightness-110 transition-all duration-300 drop-shadow-xl">
+                    {item.entry.title}
+                  </a>
+                </h3>
 
                 {/* Subtítulo o Dek */}
                 {item.dek && (
-                  <p class="font-serif text-[#E0E0E0]/80 text-sm md:text-base leading-relaxed line-clamp-2 md:line-clamp-3 max-w-prose tracking-wide font-light">
+                  <p class="font-serif text-[#E0E0E0]/80 text-xs sm:text-sm md:text-[15px] leading-relaxed line-clamp-2 md:line-clamp-3 max-w-prose tracking-wide font-light">
                     "{item.dek}"
                   </p>
                 )}
               </div>
 
-              {/* Botones de Acción (Leer Artículo & Ver Dossier Paper) */}
+              {/* Botón de Acción (Leer Artículo & Ver Dossier Paper) */}
               <div class="mt-6 pt-5 border-t border-white/10 flex items-center flex-wrap gap-3 sm:gap-4">
                 <a
                   href={item.linkHref}
@@ -200,10 +174,6 @@ const sanitizedItems = items.map((item, idx) => {
                     <span class="text-xs opacity-60">↗</span>
                   </a>
                 )}
-
-                <div class="ml-auto font-mono text-[10px] text-white/30 tracking-widest hidden md:block">
-                  REGISTRO {String(idx + 1).padStart(2, '0')}
-                </div>
               </div>
             </div>
           </article>

@@ -88,15 +88,21 @@ const coverPosition =
 const heroGallerySlides = resolvedEssays
   .filter((e: typeof resolvedEssays[0]) => e.img)
   .slice(0, 8)
-  .map((e: typeof resolvedEssays[0]) => ({
-    id:            e.slug,
-    title:         e.entry.title || 'Sin Título',
-    subtitle:      e.entry.volanta || e.entry.dek || undefined,
-    image:         sanitizeImageUrl((e.img as any)?.src ?? e.img),
-    imagePosition: (e.entry as any)?.coverImagePosition ||
-                   (e.entry as any)?.imagePosition ||
-                   'center center',
-  }));
+  .map((e: typeof resolvedEssays[0]) => {
+    const isCine = (e as any).isCinematicGSAP || e.entry?.category === 'Ensayos Cinemáticos';
+    return {
+      id:            e.slug,
+      title:         e.entry.title || 'Sin Título',
+      subtitle:      e.entry.volanta || e.entry.dek || undefined,
+      category:      formatCategory(e.entry.category || label),
+      year:          formatYear(e.entry.date),
+      link:          isCine ? `/ensayos-cinematicos/${e.slug}/` : `/hemeroteca/${e.slug}/`,
+      image:         sanitizeImageUrl((e.img as any)?.src ?? e.img),
+      imagePosition: (e.entry as any)?.coverImagePosition ||
+                     (e.entry as any)?.imagePosition ||
+                     'center center',
+    };
+  });
 
 // ─── TEXTOS DE POLVO DORADO POR CATEGORÍA ────────────────────────────────────
 const categoryDustTexts: Record<string, string> = {
@@ -161,11 +167,13 @@ const sequences = createPremierSequences(resolvedEssays);
 
     {/* ── HERO CABECERA: GALLERY ENGINE CON IMÁGENES DE LA COLECCIÓN ── */}
     {heroGallerySlides.length > 0 ? (
-      <CinematicGalleryEngine
-        slides={heroGallerySlides}
-        heightClass="h-[82vh] min-h-[540px] md:h-[90vh]"
-        maxSlides={8}
-      />
+      <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 pt-4 md:pt-6">
+        <CinematicGalleryEngine
+          slides={heroGallerySlides}
+          heightClass="h-[70vh] min-h-[500px] md:h-[80vh] lg:h-[84vh]"
+          maxSlides={8}
+        />
+      </div>
     ) : (
       <Marquee
         title={label.toUpperCase()}
