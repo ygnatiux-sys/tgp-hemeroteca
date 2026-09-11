@@ -23,12 +23,14 @@ interface Props {
   inferSize?: boolean;
   widths?: number[];
   sizes?: string;
+  'class:list'?: any;
 }
 
 const {
   src,
   alt = "",
   class: className = "",
+  'class:list': classList,
   style = "",
   id,
   loading = "lazy",
@@ -74,7 +76,7 @@ if (src && typeof src === 'string' && (src.startsWith('http://') || src.startsWi
       srcset={finalSrcSet}
       sizes={sizes}
       alt={alt}
-      class={className}
+      class:list={[className, classList]}
       style={style}
       id={id}
       width={finalWidth}
