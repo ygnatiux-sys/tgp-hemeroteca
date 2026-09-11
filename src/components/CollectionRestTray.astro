@@ -333,8 +333,8 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
       }
 
       // Event listeners para botones
-      if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); next(); });
-      if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prev(); });
+      if (nextBtn) nextBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); next(); });
+      if (prevBtn) prevBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); prev(); });
 
       // Click directo en tarjetas laterales para traerlas al centro
       cards.forEach((card, idx) => {
