@@ -12,6 +12,7 @@
 
 import Image from './SafeImage.astro';
 import { sanitizeImageUrl } from "../lib/content-filter";
+import { resolveMultivisionClass } from "../lib/multivision";
 
 interface Props {
   title: string;
@@ -53,7 +54,7 @@ const secondarySrc = secondaryImage ? sanitizeImageUrl(secondaryImage) : null;
     <div class="cch-panel-inner" id="cch-inner-left">
       {primarySrc ? (
         <Image
-          class="cch-img"
+          class={`cch-img ${resolveMultivisionClass(primarySrc)}`}
           id="cch-img-primary"
           src={primarySrc}
           alt={primaryAlt}
@@ -73,7 +74,7 @@ const secondarySrc = secondaryImage ? sanitizeImageUrl(secondaryImage) : null;
     <div class="cch-panel cch-panel--right" id="cch-panel-right">
       <div class="cch-panel-inner" id="cch-inner-right">
         <Image
-          class="cch-img"
+          class={`cch-img ${resolveMultivisionClass(secondarySrc)}`}
           id="cch-img-secondary"
           src={secondarySrc}
           alt={secondaryAlt}
@@ -145,9 +146,6 @@ const secondarySrc = secondaryImage ? sanitizeImageUrl(secondaryImage) : null;
     will-change: transform;
   }
   .cch-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
     display: block;
     will-change: transform;
     filter: brightness(0.88) contrast(1.05);

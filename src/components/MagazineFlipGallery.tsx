@@ -100,7 +100,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
             <img
               src={currentItem.url || currentItem.thumbUrl}
               alt={currentItem.title}
-              className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-[1.01]"
+              className="transition-transform duration-700 group-hover:scale-[1.01] img-nativa"
               loading="lazy"
             />
 
@@ -184,7 +184,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
                 }`}
                 title={`Ver registro #${idx + 1}: ${item.title}`}
               >
-                <img src={item.thumbUrl || item.url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
+                <img src={item.thumbUrl || item.url} alt={item.title} className=" img-nativa" loading="lazy" />
                 <span className="absolute bottom-0.5 right-1 px-1 rounded bg-black/80 font-metadata text-[8px] text-white/80">
                   {idx + 1}
                 </span>
@@ -210,7 +210,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
                 <img
                   src={item.thumbUrl || item.url}
                   alt={item.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
+                  className="group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100 img-nativa"
                   loading="lazy"
                 />
                 <div className="absolute top-2 right-2 p-1.5 rounded-full bg-black/70 text-white font-metadata text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
@@ -283,7 +283,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
               <img
                 src={currentItem.url || currentItem.thumbUrl}
                 alt={currentItem.title}
-                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-2xl transition-all duration-300"
+                className="max-w-full max-h-[70vh] rounded-lg shadow-2xl transition-all duration-300 img-nativa"
               />
 
               <button

@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../../lib/multivision";
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Image from '../../components/SafeImage.astro';
@@ -234,7 +235,7 @@ const sequences = createPremierSequences(resolvedEssays);
                       format="webp"
                       loading={idx < 3 ? "eager" : "lazy"}
                       decoding="async"
-                      class="absolute inset-0 w-full h-full object-cover object-center brightness-85 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.03] group-hover:brightness-95"
+                      class="absolute inset-0 object-center brightness-85 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.03] group-hover:brightness-95 img-nativa"
                     />
                   ) : (
                     <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1b1c24] via-theme-dark to-black -z-10" />
@@ -318,7 +319,7 @@ const sequences = createPremierSequences(resolvedEssays);
                         format="webp"
                         loading="lazy"
                         decoding="async"
-                        class="absolute inset-0 w-full h-full object-cover object-center brightness-75 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.025] group-hover:brightness-90"
+                        class="absolute inset-0 object-center brightness-75 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.025] group-hover:brightness-90 img-nativa"
                       />
                     ) : (
                       <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#161a1d] via-theme-dark to-[#090b0c] -z-10" />
@@ -454,7 +455,7 @@ const sequences = createPremierSequences(resolvedEssays);
                       format="webp"
                       loading={idx < 4 ? "eager" : "lazy"}
                       decoding="async"
-                      class="absolute inset-0 w-full h-full object-cover object-center brightness-75 contrast-[1.08] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.03] group-hover:brightness-90"
+                      class="absolute inset-0 object-center brightness-75 contrast-[1.08] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.03] group-hover:brightness-90 img-nativa"
                     />
                   ) : (
                     <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#101316] via-theme-dark to-black -z-10" />
@@ -649,7 +650,7 @@ const sequences = createPremierSequences(resolvedEssays);
                           format="webp"
                           loading="lazy"
                           decoding="async"
-                          class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                          class="absolute inset-0 group-hover:scale-105 transition-transform duration-700 ease-out img-nativa"
                         />
                       </div>
                     ) : (

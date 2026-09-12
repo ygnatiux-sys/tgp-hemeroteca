@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 /**
  * src/components/VisorTemasSlider.astro
  * ─────────────────────────────────────────────────────────────────────────────
@@ -109,7 +110,7 @@ const sanitizedItems = items.map((item, idx) => {
                   format="webp"
                   loading={idx === 0 ? "eager" : "lazy"}
                   decoding="async"
-                  class="w-full h-full object-cover object-center brightness-80 contrast-[1.05] transition-transform duration-1000 ease-out"
+                  class="object-center brightness-80 contrast-[1.05] transition-transform duration-1000 ease-out img-nativa"
                 />
               ) : (
                 <div class="w-full h-full bg-linear-to-br from-[#1b1c24] via-theme-dark to-black flex items-center justify-center">

@@ -1716,8 +1716,6 @@ html[data-nav-state="2"] header:hover .brand-element {
 
 /* ═════════════════════════════════════════════════════════════════════════
    IMAGEN PANORÁMICA ESTÁNDAR (16:9 · cover · center)
-   Sincronizada con la compresión Sharp de npm run sync:
-   → 1920 × 1080 px, WebP, fit: cover, position: center
 ═════════════════════════════════════════════════════════════════════════ */
 .img-panoramica {
   width: 100%;
@@ -1730,5 +1728,36 @@ html[data-nav-state="2"] header:hover .brand-element {
   background-color: #1a1a1a; /* Evita destello blanco mientras carga */
 }
 
+/* ═════════════════════════════════════════════════════════════════════════
+   IMAGEN VERTICAL (9:16 · cover)
+═════════════════════════════════════════════════════════════════════════ */
+.img-vertical {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+  display: block;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   IMAGEN CUADRADA (1:1 · cover)
+═════════════════════════════════════════════════════════════════════════ */
+.img-cuadrada {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   IMAGEN NATIVA (aspect ratio original · contain)
+═════════════════════════════════════════════════════════════════════════ */
+.img-nativa {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
 
 

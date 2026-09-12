@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 import Image from './SafeImage.astro';
 import ExpandableModal from './ExpandableModal.astro';
 import {
@@ -139,9 +140,7 @@ const imgUrl = safeImg || '';
           loading={isEager ? "eager" : "lazy"}
           fetchpriority={isEager ? "high" : undefined}
           decoding="async"
-          class={`w-full h-full object-cover object-center brightness-90 group-hover:brightness-100 transition-transform duration-700 ease-out group-hover:scale-[1.04] cac-card-img ${
-            enableCinemagraph ? "cinemagraph-ken-burns" : ""
-          }`}
+          class={`object-center brightness-90 group-hover:brightness-100 transition-transform duration-700 ease-out group-hover:scale-[1.04] cac-card-img ${ enableCinemagraph ? "cinemagraph-ken-burns" : "" } ${resolveMultivisionClass(img)}`}
           data-flip-id={`card-image-${cardId}`}
         />
       ) : (

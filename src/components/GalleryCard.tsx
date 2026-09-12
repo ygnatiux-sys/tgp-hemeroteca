@@ -56,7 +56,7 @@ export default function GalleryCard({
         <img 
           src={image} 
           alt={title} 
-          className="w-full h-full object-cover opacity-85 transition-transform duration-500 ease-out group-hover:scale-105" 
+          className="opacity-85 transition-transform duration-500 ease-out group-hover:scale-105 img-nativa" 
           loading="lazy"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-4">
@@ -86,7 +86,7 @@ export default function GalleryCard({
           <img 
             src={image} 
             alt={title} 
-            className="w-full h-full object-cover" 
+            className=" img-nativa" 
           />
           <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/30 to-transparent flex flex-col justify-between p-4">
             {/* Botón cerrar */}

@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 // Header Component Institucional (Dark Academia Premium)
 // Refactored: WCV touch targets 44px+, hamburger ≤lg, side-drawer moderno
 import { BuscadorModal } from './BuscadorModal';
@@ -31,7 +32,7 @@ const { transparentUntilScroll = false } = Astro.props;
               <img 
                 src="/images/favicon.TGP.webp" 
                 alt="The Great Puzzle Project Logo" 
-                class="w-full h-full object-cover scale-[1.05] animate-soft-pulse group-hover/brand:scale-[1.10] transition-transform duration-500"
+                class="scale-[1.05] animate-soft-pulse group-hover/brand:scale-[1.10] transition-transform duration-500 img-nativa"
               />
             </div>
             <span class="font-['Gloock'] font-black text-[11px] md:text-[12px] lg:text-[13px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-2">
@@ -197,7 +198,7 @@ const { transparentUntilScroll = false } = Astro.props;
     </div>
     {/* Logo pequeño */}
     <div class="w-7 h-7 rounded-full overflow-hidden border border-white/10 shrink-0 opacity-50">
-      <img src="/images/favicon.TGP.webp" alt="TGP" class="w-full h-full object-cover" />
+      <img src="/images/favicon.TGP.webp" alt="TGP" class=" img-nativa" />
     </div>
   </div>
 </aside>

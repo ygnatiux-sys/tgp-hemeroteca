@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../../lib/multivision";
 import Image from '../../components/SafeImage.astro';
 import { render, getEntry, getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
@@ -722,7 +723,7 @@ const metaImageUrl = typeof optimizedImage === 'object' && optimizedImage?.src ?
                         alt={wmItem.title}
                         inferSize={true}
                         format="webp"
-                        class="w-full h-full object-cover group-hover/img:scale-108 transition-transform duration-700 opacity-80 group-hover/img:opacity-100"
+                        class="group-hover/img:scale-108 transition-transform duration-700 opacity-80 group-hover/img:opacity-100 img-nativa"
                         loading="lazy"
                         decoding="async"
                       />
@@ -738,7 +739,7 @@ const metaImageUrl = typeof optimizedImage === 'object' && optimizedImage?.src ?
                   alt="Registro visual"
                   inferSize={true}
                   format="webp"
-                  class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out"
+                  class="group-hover:scale-105 transition-transform duration-700 ease-out img-nativa"
                   loading="lazy"
                   decoding="async"
                 />

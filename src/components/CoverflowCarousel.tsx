@@ -180,7 +180,7 @@ export default function CoverflowCarousel({
                 <img
                   src={post.image}
                   alt={post.title}
-                  className="w-full h-full object-cover"
+                  className=" img-nativa"
                   loading="lazy"
                   decoding="async"
                 />

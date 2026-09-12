@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 import Image from './SafeImage.astro';
 import { getCollection } from "astro:content";
 import { resolveEssayImage, formatCategory, formatDate, sanitizeImageUrl } from "../lib/content-filter";
@@ -98,7 +99,7 @@ const rowItems = candidates.slice(1, 16);
                 format="webp"
                 loading="lazy"
                 decoding="async"
-                class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03] brightness-75"
+                class="object-center transition-transform duration-700 group-hover:scale-[1.03] brightness-75 img-nativa"
               />
               <div class="absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.85)] pointer-events-none" />
               <div class="absolute inset-0 bg-linear-to-r from-transparent via-transparent to-(--bg-main) hidden lg:block pointer-events-none" />

@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 // src/components/VisorPanoramico.astro
 
 interface ImageRecord {
@@ -32,7 +33,7 @@ const { images } = Astro.props;
               alt={image.alt}
               loading={index === 0 ? "eager" : "lazy"}
               decoding={index === 0 ? "sync" : "async"}
-              class="w-full h-full object-cover transform-gpu"
+              class="transform-gpu img-nativa"
             />
             {/* Metadata superpuesta sutilmente abajo */}
             <div class="absolute bottom-4 left-6 pointer-events-none ui-fade-element transition-opacity duration-700">

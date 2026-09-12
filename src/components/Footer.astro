@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 // Componente Footer Editorial Cinemático — Variante Completa y Variante Minimalista (Interiores)
 interface Props {
   variant?: "full" | "minimal";
@@ -33,7 +34,7 @@ const isActive = (href: string) => {
               <img
                 src="/images/favicon.TGP.webp"
                 alt="TGP Logo"
-                class="w-full h-full object-cover scale-[1.05] animate-soft-pulse"
+                class="scale-[1.05] animate-soft-pulse img-nativa"
               />
             </div>
           </div>
@@ -138,7 +139,7 @@ const isActive = (href: string) => {
                     <img
                       src="/images/favicon.TGP.webp"
                       alt="TGP Logo"
-                      class="w-full h-full object-cover scale-[1.05] animate-soft-pulse group-hover:scale-[1.10] transition-transform duration-500"
+                      class="scale-[1.05] animate-soft-pulse group-hover:scale-[1.10] transition-transform duration-500 img-nativa"
                     />
                   </div>
                   <span class="font-['Gloock'] font-black text-base md:text-lg lg:text-xl tracking-tight leading-none gradient-steel-line-2">
@@ -337,7 +338,7 @@ const isActive = (href: string) => {
                 class="shrink-0 group/avatar block rounded-lg p-0.5 bg-linear-to-b from-rust-orange/30 to-white/5 border border-white/10 hover:border-[#c084fc] hover:shadow-[0_0_15px_rgba(192,132,252,0.4)] transition-all duration-300"
                 title="Ver perfil de Xavier Benítez en Gravatar"
               >
-                 <img src="/perfil.webp" alt="Xavier Benítez" width="56" height="56" loading="lazy" decoding="async" class="rounded-md object-cover w-14 h-14 grayscale group-hover/avatar:grayscale-0 transition-all duration-500" />
+                 <img src="/perfil.webp" alt="Xavier Benítez" width="56" height="56" loading="lazy" decoding="async" class="rounded-md w-14 h-14 grayscale group-hover/avatar:grayscale-0 transition-all duration-500 img-nativa" />
               </a>
               <div class="flex flex-col">
                 <a href="https://gravatar.com/xavierbeniteztgp" target="_blank" rel="noopener noreferrer" class="font-cinzel font-bold text-white tracking-wide text-sm hover:text-[#f5d0fe] transition-colors">Xavier Benítez</a>

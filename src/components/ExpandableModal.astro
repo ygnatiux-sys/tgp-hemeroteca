@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 /**
  * ExpandableModal.astro
  * Modal estilo Netflix preparado para GSAP FLIP.
@@ -19,7 +20,7 @@
     
     <!-- Imagen Limpia (Top) -->
     <div class="relative w-full h-[50vh] min-h-87.5">
-      <img class="modal-image absolute inset-0 w-full h-full object-cover" src="" alt="Modal Hero" data-flip-id="" />
+      <img class="modal-image absolute inset-0 img-nativa" src="" alt="Modal Hero" data-flip-id="" />
       
       <!-- Bottom Scrim Limitado para legibilidad del título -->
       <div class="absolute bottom-0 w-full h-1/2 bg-linear-to-t from-black via-black/80 to-transparent pointer-events-none"></div>

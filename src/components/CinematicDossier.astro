@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 // src/components/CinematicDossier.astro
 import SpotifyIcon from './icons/Spotify.astro';
 import YouTubeIcon from './icons/YouTube.astro';
@@ -47,7 +48,7 @@ const { fragments = [], isModal = false } = Astro.props;
            <img 
              src={sanitizeImageUrl(typeof fragment.image === 'string' ? fragment.image : (fragment.image?.src || ''))} 
              alt={fragment.highlight || "Registro Documental"} 
-             class="cpe-bg-img absolute inset-0 w-full h-full object-cover scale-100"
+             class="cpe-bg-img absolute inset-0 scale-100 img-nativa"
              style={`object-position: ${fragment.position || 'center center'}; transform-origin: ${fragment.origin || 'center center'};`} 
              loading={index === 0 ? 'eager' : 'lazy'}
              decoding="async"
@@ -259,7 +260,7 @@ const { fragments = [], isModal = false } = Astro.props;
   {/* PIP Thumbnail (cuadro dentro de cuadro) */}
   <div class="dossier-pip absolute bottom-28 right-4 md:right-10 z-40 opacity-0 transition-opacity duration-1000 pointer-events-none">
     <div class="relative w-36 h-24 md:w-56 md:h-36 overflow-hidden rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.8)] border border-white/15 bg-black">
-      <img class="pip-img w-full h-full object-cover" src="" alt="" />
+      <img class="pip-img img-nativa" src="" alt="" />
       <div class="absolute inset-0 shadow-[inset_0_0_30px_8px_rgba(0,0,0,0.6)] pointer-events-none rounded-2xl"></div>
       <div class="absolute top-1.5 left-2 font-metadata text-[8px] text-white/40 uppercase tracking-widest">vista previa</div>
     </div>
@@ -270,14 +271,14 @@ const { fragments = [], isModal = false } = Astro.props;
   {fragments.length > 1 && (
     <div class="dossier-filmstrip absolute bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 opacity-0 transition-opacity duration-700">
       <div class="filmstrip-slot filmstrip-prev relative w-12 h-9 md:w-16 md:h-11 rounded-xl overflow-hidden border border-white/15 bg-black/60" style="opacity:0.5">
-        <img class="filmstrip-prev-img w-full h-full object-cover" src="" alt="" />
+        <img class="filmstrip-prev-img img-nativa" src="" alt="" />
         <div class="absolute inset-0 bg-black/30"></div>
       </div>
       <div class="filmstrip-slot filmstrip-curr relative w-16 h-11 md:w-20 md:h-14 rounded-xl overflow-hidden border border-[#EFEBE3]/50 ring-1 ring-[#EFEBE3]/30 bg-black shadow-[0_0_12px_rgba(239, 235, 227,0.3)]" style="opacity:0.8">
-        <img class="filmstrip-curr-img w-full h-full object-cover" src="" alt="" />
+        <img class="filmstrip-curr-img img-nativa" src="" alt="" />
       </div>
       <div class="filmstrip-slot filmstrip-next relative w-12 h-9 md:w-16 md:h-11 rounded-xl overflow-hidden border border-white/15 bg-black/60" style="opacity:0.5">
-        <img class="filmstrip-next-img w-full h-full object-cover" src="" alt="" />
+        <img class="filmstrip-next-img img-nativa" src="" alt="" />
         <div class="absolute inset-0 bg-black/30"></div>
       </div>
     </div>

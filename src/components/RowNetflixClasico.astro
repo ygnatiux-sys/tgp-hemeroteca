@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 /**
  * RowNetflixClasico.astro
  * Componente de Carrusel Netflix Clásico Vertical (Sibling Push + Hover Delay + Paginación)
@@ -170,7 +171,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
                   format="webp"
                   widths={[400, 768, 1200]}
                   sizes="(max-width: 768px) 360px, 480px"
-                  class="netflix-card-img absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105"
+                  class="netflix-card-img absolute inset-0 transition-transform duration-700 ease-out group-hover/card:scale-105 img-nativa"
                   loading="lazy"
                   decoding="async"
                   data-flip-id={`card-image-${cardId}`}

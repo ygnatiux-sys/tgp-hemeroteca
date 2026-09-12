@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 import Image from './SafeImage.astro';
 import { sanitizeImageUrl, isValidImageSrc } from "../lib/content-filter";
 /**
@@ -71,7 +72,7 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
                   <Image
                     src={safeSrc}
                     alt={slide.title}
-                    class="cpe-bg-img absolute inset-0 w-full h-full object-cover scale-100"
+                    class="cpe-bg-img absolute inset-0 scale-100 img-nativa"
                     style={`object-position: ${slide.imagePosition || "center center"};`}
                     inferSize={true}
                     format="webp"

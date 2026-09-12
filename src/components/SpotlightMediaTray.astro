@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 /**
  * SpotlightMediaTray.astro
  * Bandeja horizontal estilo Row Netflix Clásico (Sibling Push + Chevrons + Hover Delay)
@@ -19,13 +20,17 @@ export interface TrayCollectionItem {
 interface Props {
   collections: TrayCollectionItem[];
   eyebrow?: string;
+  title?: string;
   allLink?: string;
+  cardAspect?: "landscape" | "portrait";
 }
 
 const { 
   collections = [], 
   eyebrow = "COLECCIONES DEL ARCHIVO",
-  allLink = "/colecciones/"
+  title = "COLECCIONES",
+  allLink = "/colecciones/",
+  cardAspect = "landscape"
 } = Astro.props;
 
 const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
@@ -34,23 +39,25 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
 {collections.length > 0 && (
   <div id={uid} class="spotlight-media-tray-root w-full z-20 select-none">
     {/* Encabezado discreto de la bandeja a ancho total con tokens heredados */}
-    <div class="flex items-center justify-between mb-3 px-3 sm:px-6 md:px-8">
-      <div class="flex items-center gap-3">
-        <span class="text-xs uppercase tracking-[0.4em] font-mono text-rust-orange font-bold">
+    <div class="flex flex-col mb-4 px-3 sm:px-6 md:px-8">
+      {eyebrow && (
+        <span class="text-[9.5px] sm:text-xs uppercase tracking-[0.4em] font-mono text-rust-orange font-bold mb-1">
           {eyebrow}
         </span>
-        <span class="text-xs font-sans text-white/50 hidden sm:inline-block">
-          • {collections.length} Colecciones
-        </span>
-      </div>
-      {allLink && (
-        <a 
-          href={allLink} 
-          class="text-xs uppercase tracking-[0.3em] font-mono text-white/50 hover:text-rust-orange transition-colors"
-        >
-          Ver Todas →
-        </a>
       )}
+      <div class="flex items-end justify-between gap-4">
+        <h2 class="font-cinzel font-extrabold text-2xl sm:text-3xl md:text-4xl tracking-tight gradient-general-h1 uppercase">
+          {title}
+        </h2>
+        {allLink && (
+          <a 
+            href={allLink} 
+            class="text-xs uppercase tracking-[0.3em] font-mono text-white/50 hover:text-rust-orange transition-colors pb-1"
+          >
+            Ver Todas →
+          </a>
+        )}
+      </div>
     </div>
 
     {/* Contenedor del Carrusel con Chevrons */}
@@ -88,14 +95,19 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
             return (
               <a
                 href={linkUrl}
-                class="tray-card aspect-2/3 h-52 sm:h-60 md:h-68 lg:h-76 w-auto shrink-0 rounded-2xl md:rounded-3xl overflow-hidden cursor-pointer relative border border-transparent bg-theme-dark/80 shadow-2xl group/traycard focus:outline-none"
+                class:list={[
+                  "tray-card shrink-0 rounded-2xl md:rounded-3xl overflow-hidden cursor-pointer relative border border-white/10 bg-theme-dark/80 shadow-2xl group/traycard focus:outline-none transition-all duration-300",
+                  cardAspect === "landscape"
+                    ? "w-65 sm:w-80 md:w-90 aspect-video"
+                    : "aspect-2/3 h-52 sm:h-60 md:h-68 lg:h-76 w-auto"
+                ]}
                 aria-label={`Explorar colección: ${col.title}`}
               >
                 {/* Imagen de Portada con zoom suave heredado */}
                 <img 
                   src={imgUrl}
                   alt={col.title}
-                  class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none brightness-90 contrast-[1.03] transition-transform duration-700 ease-out group-hover/traycard:scale-[1.02] group-hover/traycard:brightness-95 z-0"
+                  class="absolute inset-0 object-center pointer-events-none brightness-90 contrast-[1.03] transition-transform duration-700 ease-out group-hover/traycard:scale-[1.02] group-hover/traycard:brightness-95 z-0 img-nativa"
                   loading="lazy"
                   decoding="async"
                 />

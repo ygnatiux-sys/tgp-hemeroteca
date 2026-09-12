@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 export const prerender = true;
 import Layout from '../layouts/Layout.astro';
 import m1 from '../assets/manifiesto/m1.png';
@@ -112,7 +113,7 @@ const aboutCoverUrl = sanitizeImageUrl(ABOUT_WIKI_COVER);
                 <img
                   src="/perfil.webp"
                   alt="Xavier Benítez"
-                  class="w-full h-full object-cover transition-transform duration-1000 group-hover/avatar:scale-110"
+                  class="transition-transform duration-1000 group-hover/avatar:scale-110 img-nativa"
                 />
                 <div class="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-50 group-hover/avatar:opacity-10 transition-opacity duration-700"></div>
               </div>
@@ -252,7 +253,7 @@ const aboutCoverUrl = sanitizeImageUrl(ABOUT_WIKI_COVER);
           {/* Fragmento I */}
           <section class="relative min-h-[70vh] w-full flex items-center justify-center overflow-hidden">
             <div class="absolute inset-0 z-0">
-              <img src={m1.src} alt="Signals" loading="lazy" decoding="async" class="w-full h-full object-cover opacity-40" />
+              <img src={m1.src} alt="Signals" loading="lazy" decoding="async" class="opacity-40 img-nativa" />
               <div class="absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/80"></div>
             </div>
             <div class="relative z-10 text-center px-8 max-w-5xl py-20">
@@ -266,7 +267,7 @@ const aboutCoverUrl = sanitizeImageUrl(ABOUT_WIKI_COVER);
           {/* Fragmento II */}
           <section class="relative min-h-[70vh] w-full flex items-center justify-center overflow-hidden">
             <div class="absolute inset-0 z-0">
-              <img src={m2.src} alt="Stone & Algorithm" loading="lazy" decoding="async" class="w-full h-full object-cover opacity-40" />
+              <img src={m2.src} alt="Stone & Algorithm" loading="lazy" decoding="async" class="opacity-40 img-nativa" />
               <div class="absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/80"></div>
             </div>
             <div class="relative z-10 text-center px-8 max-w-5xl py-20">
@@ -280,7 +281,7 @@ const aboutCoverUrl = sanitizeImageUrl(ABOUT_WIKI_COVER);
           {/* Fragmento III */}
           <section class="relative min-h-[70vh] w-full flex items-center justify-center overflow-hidden">
             <div class="absolute inset-0 z-0">
-              <img src={m3.src} alt="The Puzzle" loading="lazy" decoding="async" class="w-full h-full object-cover opacity-40" />
+              <img src={m3.src} alt="The Puzzle" loading="lazy" decoding="async" class="opacity-40 img-nativa" />
               <div class="absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/80"></div>
             </div>
             <div class="relative z-10 text-center px-8 max-w-5xl py-20">

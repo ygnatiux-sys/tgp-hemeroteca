@@ -51,7 +51,7 @@ const coverImgUrl = (rawCover && isValidImageSrc(rawCover)) ? (sanitizeImageUrl(
             loading={i === 0 ? "eager" : "lazy"}
             fetchpriority={i === 0 ? "high" : undefined}
             decoding="async"
-            class={`obsidiana-img absolute inset-0 w-full h-full object-cover object-center ${i === 0 ? 'opacity-70' : 'opacity-0'} will-change-[opacity,transform]`}
+            class={`obsidiana-img absolute inset-0 object-center ${i === 0 ? 'opacity-70' : 'opacity-0'} will-change-[opacity,transform] ${resolveMultivisionClass(img)}`}
             data-index={i}
           />
         ) : null;
@@ -82,7 +82,7 @@ const coverImgUrl = (rawCover && isValidImageSrc(rawCover)) ? (sanitizeImageUrl(
               loading="eager"
               fetchpriority="high"
               decoding="async"
-              class="w-full h-full object-cover object-center transition-transform duration-1000 group-hover:scale-105"
+              class="object-center transition-transform duration-1000 group-hover:scale-105 img-nativa"
             />
             <div class="absolute inset-0 bg-linear-to-t from-[#0b0c0d] via-transparent to-transparent opacity-40"></div>
           </div>

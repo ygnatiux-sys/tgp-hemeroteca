@@ -184,7 +184,7 @@ export function TgpVisualLaboratory() {
             <img 
               src={imagenProcesada} 
               alt="Generada" 
-              className="max-h-72 max-w-full object-contain rounded border border-[#333]" 
+              className="max-h-72 max-w-full rounded border border-[#333] img-nativa" 
             />
           </div>
           

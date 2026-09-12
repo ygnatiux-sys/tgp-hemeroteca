@@ -178,7 +178,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                     <img
                       src={item.thumbUrl || item.url}
                       alt={item.title}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                      className="transition-transform duration-700 ease-out group-hover:scale-105 img-nativa"
                       loading="lazy"
                     />
                     
@@ -234,7 +234,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                   <img
                     src={currentItem.url || currentItem.thumbUrl}
                     alt={currentItem.title}
-                    className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-[1.01]"
+                    className="transition-transform duration-700 group-hover:scale-[1.01] img-nativa"
                   />
 
                   {/* Controles de Navegación Flotantes */}
@@ -326,7 +326,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                             : 'border-white/20 opacity-60 hover:opacity-100'
                         }`}
                       >
-                        <img src={img.thumbUrl || img.url} alt="" className="w-full h-full object-cover" />
+                        <img src={img.thumbUrl || img.url} alt="" className=" img-nativa" />
                       </button>
                     ))}
                   </div>
@@ -445,7 +445,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
               <img
                 src={currentItem.url || currentItem.thumbUrl}
                 alt={currentItem.title}
-                className="max-h-[calc(100dvh-9rem)] max-w-[92vw] object-contain select-none pointer-events-none"
+                className="max-h-[calc(100dvh-9rem)] max-w-[92vw] select-none pointer-events-none img-nativa"
                 draggable={false}
               />
             </div>

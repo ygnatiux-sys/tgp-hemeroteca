@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 /**
  * KitLeadMagnet.astro
  * Componente premium para captación de leads conectado a Kit (ConvertKit).
@@ -21,7 +22,7 @@
             <img 
               src="/images/lead-magnet/xavier.jpg" 
               alt="Xavier Benítez" 
-              class="w-full h-full object-cover scale-110 group-hover/xavier:scale-100 transition-transform duration-700"
+              class="scale-110 group-hover/xavier:scale-100 transition-transform duration-700 img-nativa"
             />
           </div>
           <div class="flex-1">
@@ -36,7 +37,7 @@
           <img 
             src="/images/lead-magnet/book-cover.jpg" 
             alt="El Códice Fundacional" 
-            class="w-full h-full object-cover transition-transform duration-1000 group-hover/book:scale-105"
+            class="transition-transform duration-1000 group-hover/book:scale-105 img-nativa"
           />
           <div class="absolute bottom-6 left-6 z-20">
             <span class="font-metadata text-[10px] text-white/50 uppercase tracking-[0.4em] block mb-2">Edición Limitada</span>
@@ -103,7 +104,7 @@
       <img 
         src="/images/lead-magnet/crowd.jpg" 
         alt="The Crowds" 
-        class="absolute inset-0 w-full h-full object-cover opacity-10 grayscale mix-blend-overlay"
+        class="absolute inset-0 opacity-10 grayscale mix-blend-overlay img-nativa"
       />
       
       <!-- Logo TGP Reveal -->

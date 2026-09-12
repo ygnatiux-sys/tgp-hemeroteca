@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 import Image from './SafeImage.astro';
 import type { CollectionEntry } from 'astro:content';
 import { sanitizeImageUrl } from '../lib/content-filter';
@@ -47,7 +48,7 @@ const { posts } = Astro.props;
                   format="webp"
                   loading="lazy"
                   decoding="async"
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                  class="group-hover:scale-105 transition-transform duration-700 ease-in-out img-nativa"
                 />
               </div>
             )}

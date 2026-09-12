@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 import Image from './SafeImage.astro';
 import { formatCategory, sanitizeImageUrl } from '../lib/content-filter';
 
@@ -38,7 +39,7 @@ const { ensayos = [] } = Astro.props;
               format="webp"
               loading="lazy"
               decoding="async"
-              class="w-full h-87.5 object-cover transition-transform duration-700"
+              class="h-87.5 transition-transform duration-700 img-nativa"
             />
           ) : (
             <div class="w-full h-87.5 bg-stone-900 flex items-center justify-center text-stone-500 font-mono text-xs">

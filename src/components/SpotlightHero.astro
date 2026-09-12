@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 /**
  * SpotlightHero.astro
  * "Spotlight Hero con Media Tray" inspirado en la interfaz de National Geographic / Disney+.
@@ -63,7 +64,7 @@ const uid = `spotlight-${Math.random().toString(36).substring(2, 8)}`;
       <img 
         src={initialPost?.coverUrl}
         alt={initialPost?.title || "Ambiente"}
-        class="spotlight-bg-image w-full h-full object-cover scale-105 filter blur-md opacity-40 transition-all duration-700 ease-out"
+        class="spotlight-bg-image scale-105 filter blur-md opacity-40 transition-all duration-700 ease-out img-nativa"
         loading="eager"
         decoding="async"
       />
@@ -160,7 +161,7 @@ const uid = `spotlight-${Math.random().toString(36).substring(2, 8)}`;
                   <img 
                     src={post.coverUrl}
                     alt={post.title}
-                    class="w-full h-full object-cover pointer-events-none transition-transform duration-500 ease-out"
+                    class="pointer-events-none transition-transform duration-500 ease-out img-nativa"
                     loading="lazy"
                     decoding="async"
                   />

@@ -14,8 +14,8 @@
  * CATEGORÍAS:
  *
  *  ① HERO / VIEWPORT 100vw   → hero- | cover- | pano-
- *     Cabeceras de artículos, portadas panorámicas (.img-panoramica en CSS).
- *     2560px · 16:9 · fit:cover · webp q88 effort6 smartSubsample
+ *     Cabeceras de artículos, portadas (sin recorte, ancho máximo).
+ *     2560px · webp q88 effort6 smartSubsample
  *
  *  ② INLINE / CONTENIDO      → img- | post- | figure-
  *     Imágenes dentro de párrafos (ancho de lectura).
@@ -25,11 +25,19 @@
  *     Grillas, tarjetas, previsualizaciones. Target sub-50 KB.
  *     800px · ratio original (inside) · webp q75 effort4
  *
- *  ④ UI / LOGOS / ÍCONOS     → logo- | ui- | icon-
+ *  ④ VERTICAL / REEL         → vert- | reel- | port-
+ *     Arte vertical, posters.
+ *     1440px · ratio original (inside) · webp q85
+ *
+ *  ⑤ CUADRADO                → sq- | cuad-
+ *     Arte 1:1, portadas cuadradas.
+ *     1600px · ratio original (inside) · webp q85
+ *
+ *  ⑥ UI / LOGOS / ÍCONOS     → logo- | ui- | icon-
  *     Marca, avatares, SVGs rasterizados. Sin recorte ni alteración de ratio.
  *     Max 400px · fit:inside · webp q90 (o .png si necesita transparencia)
  *
- *  ⑤ FALLBACK (sin prefijo reconocido)
+ *  ⑦ FALLBACK (sin prefijo reconocido)
  *     Conservador: comportamiento seguro igual al perfil INLINE.
  *     1200px · ratio original (inside) · webp q80 effort5
  */
@@ -45,16 +53,13 @@ const PROFILES = [
   {
     name: 'hero',
     prefixes: ['hero-', 'cover-', 'pano-'],
-    // Uso: .img-panoramica — viewport completo, 16:9
+    // Uso: .img-panoramica — viewport completo (sin recortes, respeta ratio)
     resize: {
       width: 2560,
-      height: 1440,      // 16:9 exacto a 2560px
-      fit: 'cover',
-      position: 'centre',
       withoutEnlargement: true,
     },
     webp: { quality: 88, effort: 6, smartSubsample: true },
-    log: '🎬 Hero/Pano 16:9 · 2560×1440 · q88',
+    log: '🎬 Hero/Pano · max 2560px · q88',
   },
   {
     name: 'inline',
@@ -79,6 +84,26 @@ const PROFILES = [
     },
     webp: { quality: 75, effort: 4 },
     log: '🃏 Thumb/Card · max 800px · q75',
+  },
+  {
+    name: 'vert',
+    prefixes: ['vert-', 'reel-', 'port-'],
+    resize: {
+      width: 1440,
+      withoutEnlargement: true,
+    },
+    webp: { quality: 85 },
+    log: '📱 Vertical/Reel · max 1440px · q85',
+  },
+  {
+    name: 'sq',
+    prefixes: ['sq-', 'cuad-'],
+    resize: {
+      width: 1600,
+      withoutEnlargement: true,
+    },
+    webp: { quality: 85 },
+    log: '⬛ Cuadrado · max 1600px · q85',
   },
   {
     name: 'ui',
@@ -133,11 +158,13 @@ export function getSharpProfile(filename) {
 export function printProfileSummary() {
   const lines = [
     '┌─ PERFILES SHARP ACTIVOS ────────────────────────────────────────────┐',
-    `│  ① Hero/Pano   [hero- cover- pano-]   2560×1440 cover · q88 effort6 │`,
+    `│  ① Hero/Pano   [hero- cover- pano-]   max 2560px inside · q88 effort6│`,
     `│  ② Inline      [img-  post-  figure-] max 1200px inside · q80 effort5│`,
     `│  ③ Thumb/Card  [thumb- card- min-]    max 800px  inside · q75 effort4│`,
-    `│  ④ UI/Logo     [logo-  ui-   icon-]   max 400px  inside · q90        │`,
-    `│  ⑤ Fallback    (sin prefijo)          max 1200px inside · q80 effort5│`,
+    `│  ④ Vertical    [vert- reel- port-]    max 1440px inside · q85        │`,
+    `│  ⑤ Cuadrado    [sq- cuad-]            max 1600px inside · q85        │`,
+    `│  ⑥ UI/Logo     [logo-  ui-   icon-]   max 400px  inside · q90        │`,
+    `│  ⑦ Fallback    (sin prefijo)          max 1200px inside · q80 effort5│`,
     '└─────────────────────────────────────────────────────────────────────┘',
   ];
   return lines.join('\n');

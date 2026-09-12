@@ -537,7 +537,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
               <img
                 src={arteResult.imageUrl}
                 alt="Portada IA"
-                className="w-full h-32 object-cover rounded-lg border border-white/10 shadow-lg"
+                className="h-32 rounded-lg border border-white/10 shadow-lg img-nativa"
                 style={{ maxHeight: '140px' }}
               />
               <button

@@ -1,4 +1,5 @@
 ---
+import { resolveMultivisionClass } from "../lib/multivision";
 import { sanitizeImageUrl } from "../lib/content-filter";
 
 interface Props {
@@ -51,7 +52,7 @@ const gradientClass = hasExplicitGradient ? "" : (isSerif ? "gradient-general-h1
         loading="eager"
         fetchpriority="high"
         decoding="async"
-        class="dark-img-target ken-burns-hero w-full h-full object-cover"
+        class="dark-img-target ken-burns-hero img-nativa"
       />
     ) : null}
   </div>
