@@ -439,7 +439,7 @@ const metaImageUrl = typeof optimizedImage === 'object' && optimizedImage?.src ?
     ) : (
       <div
         class="pointer-events-none absolute inset-0 opacity-15"
-        style="background: radial-gradient(circle at 50% 20%, var(--theme-accent) 0%, transparent 70%); mix-blend-screen;"
+        style="background: radial-gradient(circle at 50% 20%, var(--theme-accent) 0%, transparent 70%); mix-blend-mode: screen;"
       />
     )}
 

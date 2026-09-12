@@ -848,12 +848,12 @@ html[data-nav-state="2"] header:hover .brand-element {
     100% { background-position: 0% 50%; }
   }
 
-  /* Gradiente Elegido para H1 en Presentaciones Generales (Didone Gloock, tracking-tighter, fade vertical con base #E3DDD3) */
+  /* Gradiente Elegido para H1 en Presentaciones Generales (Didone Gloock, tracking-tighter, base pergamino con remate cobrizo sutil) */
   .gradient-general-h1 {
     font-family: "Gloock", serif;
     font-weight: 900;
     letter-spacing: -0.04em;
-    background-image: linear-gradient(to bottom, #E3DDD3 0%, rgba(227, 221, 211, 0.50) 100%);
+    background-image: linear-gradient(to bottom, #EFEBE3 0%, #E3DDD3 70%, #B87D4B 90%, rgba(166, 110, 65, 0.55) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -863,13 +863,13 @@ html[data-nav-state="2"] header:hover .brand-element {
     background-image: linear-gradient(to bottom, #1c1e21 0%, rgba(28, 30, 33, 0.4) 100%);
   }
 
-  /* Gradiente Elegido para H2/Labels en Presentaciones Generales (Didone Gloock, tracking y spacing optimizados para legibilidad con base sólida #E3DDD3) */
+  /* Gradiente Elegido para H2/Labels en Presentaciones Generales (Didone Gloock, base pergamino predominante 75% + matiz cobrizo sutil al final) */
   .gradient-general-h2 {
     font-family: "Gloock", serif;
     font-weight: 800;
     letter-spacing: 0.015em;
     word-spacing: 0.08em;
-    background-image: linear-gradient(to bottom, #E3DDD3 0%, #D4CDC2 50%, rgba(227, 221, 211, 0.60) 100%);
+    background-image: linear-gradient(to bottom, #EFEBE3 0%, #E3DDD3 75%, #B87D4B 92%, rgba(166, 110, 65, 0.60) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -910,6 +910,8 @@ html[data-nav-state="2"] header:hover .brand-element {
     background-clip: text;
     color: transparent;
     filter: brightness(0.96);
+    font-weight: 800 !important;
+    letter-spacing: -0.025em;
   }
   [data-theme='light'] .gradient-metal-steel-card {
     background-image: linear-gradient(to bottom, #1c1e21 0%, rgba(28, 30, 33, 0.45) 100%);
