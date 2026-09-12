@@ -223,7 +223,7 @@ const gradientClass = isSerif ? "gradient-general-h1" : "gradient-acero-ios";
     );
     const image = document.querySelector(".dark-hero .dark-img-target");
 
-    if (heroSection && !heroSection.dataset.disableParallax) {
+    if (heroSection && !(heroSection as HTMLElement).dataset.disableParallax) {
       // 1. ZOOM-OUT & FADE OUT TO BLACK ON SCROLL
       if (image) {
         gsap.to(image, {

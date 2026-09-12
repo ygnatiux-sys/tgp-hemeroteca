@@ -3,7 +3,6 @@ export const prerender = true;
 import Image from '../../components/SafeImage.astro';
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
-import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import SpotlightMediaTray, { type TrayCollectionItem } from '../../components/SpotlightMediaTray.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import Marquee from '../../components/Marquee.astro';
@@ -72,11 +71,6 @@ const collections = Array.from(categoryGroups.entries())
 
 const indexCover = collections[0]?.coverEssay?.img ?? null;
 const indexCoverUrl = sanitizeImageUrl((indexCover as any)?.src ?? indexCover ?? '');
-const indexCoverPosition =
-  (collections[0]?.coverEssay?.entry as any)?.coverImagePosition
-  || (collections[0]?.coverEssay?.entry as any)?.imagePosition
-  || 'center center';
-
 // ─── COLECCIONES PARA SPOTLIGHT MEDIA TRAY (NORMALIZADO A HEREDADOS DE LA PÁGINA) ───
 const coleccionesTrayItems: TrayCollectionItem[] = collections
   .filter(col => col.coverEssay?.img)
@@ -108,6 +102,8 @@ const coverflowPosts: CoverflowPost[] = collections
       collectionLabel: 'Colección TGP',
       date: col.coverEssay?.entry?.date ? formatYear(col.coverEssay.entry.date) : undefined,
     };
+  });
+
 // ─── FRASES EVOCATIVAS POR COLECCIÓN ───────────────────────────────────────────
 const epigraphMap: Record<string, string> = {
   "arqueosemiotica":   "Los [[signos]] sobreviven a los imperios. **Cada glifo,** un mensaje lanzado a la eternidad sin destinatario conocido.",
