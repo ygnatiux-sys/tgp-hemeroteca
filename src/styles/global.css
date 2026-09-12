@@ -955,27 +955,32 @@ html[data-nav-state="2"] header:hover .brand-element {
   .reveal-item {
     opacity: 0;
     transform: translateY(16px);
-    transition: opacity 1.2s ease-out, transform 1.2s var(--ease-cinematic);
+    filter: blur(8px);
+    transition: opacity 1.2s ease-out, transform 1.2s var(--ease-cinematic), filter 1.2s ease-out;
   }
 
   .reveal-item.revealed {
     opacity: 1;
     transform: translateY(0);
+    filter: blur(0px);
   }
 
   /* Reveal Brote desde el Fondo Dark Main (Cinematic Cover Emergence & Dissolve) */
   .reveal-brote {
     opacity: 0;
     transform: translateY(28px) scale(0.98);
+    filter: blur(12px);
     transition: 
       opacity 1.3s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, transform;
+      transform 1.3s cubic-bezier(0.16, 1, 0.3, 1),
+      filter 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform, filter;
   }
 
   .reveal-brote.revealed {
     opacity: 1;
     transform: translateY(0) scale(1);
+    filter: blur(0px);
   }
 
   /* Brote gradual de la imagen de portada desde la oscuridad del fondo main bg */

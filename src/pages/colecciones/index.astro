@@ -8,6 +8,7 @@ import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import Marquee from '../../components/Marquee.astro';
 import CoverflowCarousel, { type CoverflowPost } from '../../components/CoverflowCarousel';
 import CollectionEpigraph from '../../components/CollectionEpigraph.astro';
+import VerticalCollectionsStack from '../../components/VerticalCollectionsStack.astro';
 import {
   getPublishableEssays,
   groupByCategory,
@@ -215,7 +216,7 @@ const epigraphMap: Record<string, string> = {
       ═══════════════════════════════════════════════════════════════════ */}
       <section class="flex flex-col gap-8 sm:gap-12 md:gap-16 w-full">
         {/* ─── Primera card (hero): sin epigrafe previo ─── */}
-        {collections.map((col, index) => {
+        {collections.slice(0, 3).map((col, index) => {
           // Todas las cards son pantallas de cine hero de gran altura
           const mobileHeightClass = "min-h-[82vh] md:min-h-180 lg:min-h-205";
           const epigraphText = epigraphMap[col.key] || `**${col.label}:** una [[colección]] de registros del pensamiento humano en expansión.`;
@@ -264,6 +265,11 @@ const epigraphMap: Record<string, string> = {
           );
         })}
       </section>
+
+      {/* ─── RESTO DE COLECCIONES: VERTICAL STACK CON CHEVRON CTA ─── */}
+      {collections.length > 3 && (
+        <VerticalCollectionsStack collections={collections.slice(3)} />
+      )}
     </div>
 
     {/* ── SECCIÓN FINAL: COVERFLOW CAROUSEL 3D DE COLECCIONES (FULL WIDTH / EDGE-TO-EDGE) ── */}

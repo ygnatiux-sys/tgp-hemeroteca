@@ -1,0 +1,307 @@
+---
+import { sanitizeImageUrl } from '../lib/content-filter';
+
+interface Props {
+  collections: any[];
+}
+
+const { collections } = Astro.props;
+const uid = `v-slider-${Math.random().toString(36).substring(2, 8)}`;
+
+const epigraphMap: Record<string, string> = {
+  "arqueosemiotica":   "Los [[signos]] sobreviven a los imperios. **Cada glifo,** un mensaje lanzado a la eternidad sin destinatario conocido.",
+  "filosofia":         "El pensamiento como [[territorio.]] Las **ideas no mueren:** se transforman, se heredan, se contradicen.",
+  "mitologia":         "Antes del dato, existió el [[mito.]] El relato que **une cielo y tierra** antes de que la ciencia los separara.",
+  "historia":          "El [[tiempo]] no es lineal. Es una **red de causas** que la memoria humana teje y desteje sin cesar.",
+  "ensayos-cinematicos": "Imágenes que **piensan.** El [[cine]] como forma de conocimiento antes de que el conocimiento fuera escrito.",
+  "arquetipos-globales": "Figuras que reaparecen en cada cultura. Los [[arquetipos]] son la gramática **secreta del ser humano.**",
+  "historia-natural":  "La vida como **archivo.** Cada especie, un [[capítulo]] de una historia que empezó mucho antes que nosotros.",
+  "historia-antigua":  "Las [[civilizaciones]] no colapsan: **se transforman.** Sus ruinas son preguntas, no respuestas.",
+  "historia-medieval": "Entre el [[fin del mundo]] romano y el alba del moderno, **siglos de invención** que el olvido llama oscuros.",
+  "religion":          "Lo [[sagrado]] como necesidad primaria. **Cada fe,** un intento humano de darle nombre al misterio.",
+};
+---
+
+<div id={uid} class="v-slider-root w-full z-20 select-none relative mt-16 mb-32">
+  
+  {/* Encabezado */}
+  <div class="flex items-center justify-between mb-8">
+    <div class="flex items-center gap-3">
+      <span class="text-xs uppercase tracking-[0.4em] font-mono text-rust-orange font-bold">
+        MÁS COLECCIONES
+      </span>
+      <span class="text-xs font-sans text-white/50 hidden sm:inline-block">
+        • {collections.length} Disponibles
+      </span>
+    </div>
+  </div>
+
+  {/* Contenedor del visor (16:9 Widescreen) */}
+  <div class="relative w-full aspect-video max-h-[90vh] flex justify-center items-center overflow-hidden rounded-2xl md:rounded-3xl border border-white/5 shadow-2xl bg-theme-dark">
+    
+    {/* Máscaras OSCURAS intensas para destacar los chevrons */}
+    <div class="absolute top-0 left-0 right-0 h-48 bg-linear-to-b from-[#0a0b0b]/95 via-[#0a0b0b]/60 to-transparent z-40 pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-48 bg-linear-to-t from-[#0a0b0b]/95 via-[#0a0b0b]/60 to-transparent z-40 pointer-events-none"></div>
+
+    {/* Controles (Z-index 50) */}
+    <button 
+      type="button"
+      class="slider-prev-btn absolute top-6 left-1/2 -translate-x-1/2 z-50 w-24 h-10 md:w-32 md:h-12 rounded-full bg-black/40 hover:bg-black/85 text-[#E3DDD3]/40 hover:text-[#EFEBE3] border border-[#E3DDD3]/10 hover:border-[#E3DDD3]/30 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-80 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-0 disabled:pointer-events-none"
+      aria-label="Anterior"
+    >
+      <svg class="w-6 h-6 -translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+      </svg>
+    </button>
+
+    <button 
+      type="button"
+      class="slider-next-btn absolute bottom-6 left-1/2 -translate-x-1/2 z-50 w-24 h-10 md:w-32 md:h-12 rounded-full bg-black/40 hover:bg-black/85 text-[#E3DDD3]/40 hover:text-[#EFEBE3] border border-[#E3DDD3]/10 hover:border-[#E3DDD3]/30 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-80 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-0 disabled:pointer-events-none"
+      aria-label="Siguiente"
+    >
+      <svg class="w-6 h-6 translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+      </svg>
+    </button>
+
+    {/* Pista de tarjetas */}
+    <div class="v-slider-track flex flex-col w-full h-full transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] z-10">
+      {collections.map((col, idx) => {
+        const rawImg = col.coverEssay?.img;
+        const imgUrl = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '')) || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop';
+        const linkUrl = col.link || `/colecciones/${col.key}/`;
+        const epigraphText = epigraphMap[col.key] || `La memoria de la humanidad resguardada en ${col.label}.`;
+
+        return (
+          <a
+            href={linkUrl}
+            data-index={idx}
+            class="v-slider-card w-full h-full shrink-0 relative group focus:outline-none"
+          >
+            {/* Contenedor de Imagen con transición object-position cinemática */}
+            <div class="absolute inset-0 w-full h-full overflow-hidden bg-[#0a0b0b]">
+              <img 
+                src={imgUrl}
+                alt={col.label}
+                class="card-image absolute inset-0 w-full h-full object-cover pointer-events-none brightness-75 contrast-[1.05] z-0"
+                style="object-position: 50% 50%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+
+            {/* UI Normal (Título, Hero style) */}
+            <div class="normal-ui absolute inset-0 transition-opacity duration-1000 ease-in-out">
+              <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/50 via-45% to-transparent pointer-events-none z-10" />
+              <div class="relative z-20 p-8 md:p-14 lg:p-18 flex flex-col justify-end h-full pointer-events-none">
+                <span class="font-mono text-xs sm:text-sm uppercase tracking-[0.35em] text-rust-orange font-bold mb-2 block">
+                  Colección TGP
+                </span>
+                <h3 class="gradient-general-h2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-black leading-tight mb-2">
+                  {col.label}
+                </h3>
+                {col.coverEssay?.entry?.title && (
+                  <p class="font-serif text-white/70 text-sm sm:text-base md:text-lg line-clamp-1 mb-2 tracking-wide font-light">
+                    {col.coverEssay.entry.title}
+                  </p>
+                )}
+                <p class="font-mono text-xs sm:text-sm text-white/50 mt-1">
+                  {col.count ? `${col.count} ${col.count === 1 ? 'Documento' : 'Documentos'}` : ''}
+                </p>
+              </div>
+            </div>
+
+            {/* UI Cinemática (Frase 50/50) */}
+            <div class="cinematic-layer absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-1000 ease-in-out z-20 flex">
+              <div class="hidden md:block w-[40%] h-full"></div> {/* Zona transparente para la imagen */}
+              <div class="w-full md:w-[60%] h-full bg-linear-to-r from-black/80 md:from-transparent via-black/95 to-black flex items-center justify-center p-8 md:p-12 lg:p-20">
+                <p 
+                  class="cinematic-text font-serif text-3xl md:text-5xl lg:text-[3.5rem] text-[#E3DDD3]/90 leading-tight drop-shadow-2xl text-center text-balance max-w-[90%] md:max-w-[35ch] lg:max-w-[40ch]"
+                  data-phrase={epigraphText}
+                ></p>
+              </div>
+            </div>
+
+            {/* Máscara global Fade to Black */}
+            <div class="fade-mask absolute inset-0 bg-black opacity-0 pointer-events-none z-30 transition-opacity duration-700 ease-in-out"></div>
+          </a>
+        );
+      })}
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Animación de entrada cinemática */
+  @keyframes cinematicFadeIn {
+    0% { opacity: 0; transform: translateY(15px) scale(0.98); filter: blur(4px); }
+    100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  }
+  .type-char {
+    opacity: 0;
+    animation: cinematicFadeIn 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+</style>
+
+<script>
+  function initVSlider() {
+    const roots = document.querySelectorAll<HTMLElement>('.v-slider-root');
+    
+    roots.forEach(root => {
+      if (root.hasAttribute('data-init')) return;
+      root.setAttribute('data-init', 'true');
+
+      const track = root.querySelector<HTMLElement>('.v-slider-track');
+      const prevBtn = root.querySelector<HTMLButtonElement>('.slider-prev-btn');
+      const nextBtn = root.querySelector<HTMLButtonElement>('.slider-next-btn');
+
+      if (!track || !prevBtn || !nextBtn) return;
+
+      const itemsCount = track.children.length;
+      let currentIndex = 0;
+      let sequenceTimeouts: number[] = [];
+
+      // Función para parsear la frase (bold y links visuales)
+      function parsePhrase(text: string) {
+        return text
+          .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-black">$1</strong>')
+          .replace(/\[\[([^\]]+)\]\]/g, '<span class="text-rust-orange italic">$1</span>');
+      }
+
+      function clearCinematic() {
+        sequenceTimeouts.forEach(clearTimeout);
+        sequenceTimeouts = [];
+      }
+
+      function playCinematicFor(card: HTMLElement) {
+        clearCinematic();
+
+        const img = card.querySelector<HTMLElement>('.card-image');
+        const ui = card.querySelector<HTMLElement>('.normal-ui');
+        const cinematicLayer = card.querySelector<HTMLElement>('.cinematic-layer');
+        const textContainer = card.querySelector<HTMLElement>('.cinematic-text');
+        const fadeMask = card.querySelector<HTMLElement>('.fade-mask');
+
+        if (!img || !ui || !cinematicLayer || !textContainer || !fadeMask) return;
+
+        // Estado Inicial
+        img.style.objectPosition = '50% 50%';
+        img.style.transform = 'scale(1)';
+        ui.style.opacity = '1';
+        cinematicLayer.style.opacity = '0';
+        fadeMask.style.opacity = '0';
+        textContainer.innerHTML = '';
+
+        const phraseRaw = textContainer.getAttribute('data-phrase') || '';
+        const phraseHTML = parsePhrase(phraseRaw);
+
+        // 1. Esperar 1 segundo tras aparecer
+        sequenceTimeouts.push(setTimeout(() => {
+          
+          // Fase 1: Shift image & show dark zone
+          img.style.objectPosition = '20% 50%'; // Mover imagen más a la izquierda
+          img.style.transform = 'scale(1.08)';  // Zoom cinemático
+          ui.style.opacity = '0';               // Ocultar UI normal
+          cinematicLayer.style.opacity = '1';   // Mostrar capa oscura
+          
+          // Inyectamos el HTML parseado envuelto en un span animado
+          textContainer.innerHTML = `<span class="inline-block type-char">${phraseHTML}</span>`;
+
+          // 2. Esperar a que se lea (6 segundos para dar tiempo)
+          sequenceTimeouts.push(setTimeout(() => {
+            
+            // Fase 2: Fade to black global
+            fadeMask.style.opacity = '1';
+
+            // 3. Resetear bajo el negro y volver al centro
+            sequenceTimeouts.push(setTimeout(() => {
+              img.style.objectPosition = '50% 50%';
+              img.style.transform = 'scale(1)';
+              ui.style.opacity = '1';
+              cinematicLayer.style.opacity = '0';
+              textContainer.innerHTML = '';
+              
+              // Quitar el negro
+              fadeMask.style.opacity = '0';
+            }, 1000)); // tiempo del fade to black
+            
+          }, 6000)); // Tiempo largo de lectura cinemática
+
+        }, 1200));
+      }
+
+      function updateSlider(triggerCinematic = true) {
+        if (!track) return;
+        track.style.transform = `translate3d(0, -${currentIndex * 100}%, 0)`;
+        
+        // Actualizar botones
+        if (prevBtn) prevBtn.disabled = currentIndex === 0;
+        if (nextBtn) nextBtn.disabled = currentIndex === itemsCount - 1;
+
+        // Limpiar animaciones de otras cards
+        const allCards = Array.from(track.children) as HTMLElement[];
+        allCards.forEach(c => {
+          const fade = c.querySelector<HTMLElement>('.fade-mask');
+          const ui = c.querySelector<HTMLElement>('.normal-ui');
+          const cin = c.querySelector<HTMLElement>('.cinematic-layer');
+          const img = c.querySelector<HTMLElement>('.card-image');
+          if (fade) fade.style.opacity = '0';
+          if (ui) ui.style.opacity = '1';
+          if (cin) cin.style.opacity = '0';
+          if (img) {
+             img.style.objectPosition = '50% 50%';
+             img.style.transform = 'scale(1)';
+          }
+        });
+
+        // Marcar activa y disparar secuencia
+        allCards.forEach(c => c.classList.remove('active-card'));
+        const activeCard = allCards[currentIndex];
+        if (activeCard) {
+          activeCard.classList.add('active-card');
+          if (triggerCinematic) {
+            playCinematicFor(activeCard);
+          }
+        }
+      }
+
+      nextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (currentIndex < itemsCount - 1) {
+          currentIndex++;
+          updateSlider();
+        }
+      });
+
+      prevBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (currentIndex > 0) {
+          currentIndex--;
+          updateSlider();
+        }
+      });
+
+      // Inicializar (con cinemática en la primera carta si el usuario se detiene a verla)
+      // Para evitar reproducirlo solo cargando la página, podríamos usar IntersectionObserver
+      // pero por ahora lo lanzamos al inicio
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          updateSlider(true);
+          observer.disconnect(); // Solo iniciar cinemática la primera vez que se ve el slider
+        }
+      }, { threshold: 0.5 });
+      observer.observe(root);
+      
+      updateSlider(false); // Iniciar sin cinemática hasta que entre en viewport
+    });
+  }
+
+  if (typeof document !== 'undefined') {
+    document.addEventListener('astro:page-load', initVSlider);
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initVSlider);
+    } else {
+      setTimeout(initVSlider, 100);
+    }
+  }
+</script>
