@@ -57,9 +57,10 @@ body, header, footer, article, section, nav, aside, p, span, h1, h2, h3, h4, a {
 }
 
 /* Estándar de la industria para font-smoothing en modo oscuro */
-body {
+html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* ═════════════════════════════════════════════════════════════════════════
@@ -848,12 +849,19 @@ html[data-nav-state="2"] header:hover .brand-element {
     100% { background-position: 0% 50%; }
   }
 
-  /* Gradiente Elegido para H1 en Presentaciones Generales (Didone Gloock, tracking-tighter, base pergamino con remate cobrizo sutil) */
+  /* Gradiente Metálico Elegido para H1 (Didone Gloock, estructura especular multi-stop de Cinzel Steel adaptada a Pergamino/Cobre) */
   .gradient-general-h1 {
     font-family: "Gloock", serif;
     font-weight: 900;
     letter-spacing: -0.04em;
-    background-image: linear-gradient(to bottom, #EFEBE3 0%, #E3DDD3 70%, #B87D4B 90%, rgba(166, 110, 65, 0.55) 100%);
+    background-image: linear-gradient(
+      to bottom,
+      #FFFFFF 0%,        /* 1. Destello especular en el bisel superior */
+      #EFEBE3 22%,       /* 2. Cuerpo brillante de Pergamino / Vellum */
+      #D5C7B3 55%,       /* 3. Transición intermedia Níquel / Champagne */
+      #C88D58 82%,       /* 4. Reflejo del bisel Cobrizo Dorado */
+      rgba(110, 72, 47, 0.70) 100% /* 5. Profundidad metálica oscura al pie */
+    );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -863,17 +871,24 @@ html[data-nav-state="2"] header:hover .brand-element {
     background-image: linear-gradient(to bottom, #1c1e21 0%, rgba(28, 30, 33, 0.4) 100%);
   }
 
-  /* Gradiente Elegido para H2/Labels en Presentaciones Generales (Didone Gloock, base pergamino predominante 75% + matiz cobrizo sutil al final) */
+  /* Gradiente Metálico Elegido para H2/Labels (Didone Gloock, estructura especular multi-stop adaptada a Pergamino/Cobre) */
   .gradient-general-h2 {
     font-family: "Gloock", serif;
     font-weight: 800;
     letter-spacing: 0.015em;
     word-spacing: 0.08em;
-    background-image: linear-gradient(to bottom, #EFEBE3 0%, #E3DDD3 75%, #B87D4B 92%, rgba(166, 110, 65, 0.60) 100%);
+    background-image: linear-gradient(
+      to bottom,
+      #FFFFFF 0%,        /* 1. Destello especular superior */
+      #EFEBE3 25%,       /* 2. Cuerpo brillante de Pergamino */
+      #D5C7B3 60%,       /* 3. Transición intermedia Níquel / Champagne */
+      #C88D58 85%,       /* 4. Reflejo del bisel Cobrizo Dorado */
+      rgba(110, 72, 47, 0.75) 100% /* 5. Sombra de base metálica */
+    );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    filter: brightness(0.96);
+    filter: brightness(0.98);
   }
 
   [data-theme='light'] .gradient-general-h2 {
