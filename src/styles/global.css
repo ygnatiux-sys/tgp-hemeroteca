@@ -1767,4 +1767,12 @@ html[data-nav-state="2"] header:hover .brand-element {
   object-position: 50% 15% !important;
 }
 
+/* ═════════════════════════════════════════════════════════════════════════
+   WIKI COMPLETA (Fuerza contención íntegra para obras de arte en trays)
+═════════════════════════════════════════════════════════════════════════ */
+.wiki-completa {
+  object-fit: contain !important;
+  background-color: #08090a !important;
+}
+
 
