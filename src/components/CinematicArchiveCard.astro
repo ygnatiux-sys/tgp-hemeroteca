@@ -140,7 +140,7 @@ const imgUrl = safeImg || '';
           loading={isEager ? "eager" : "lazy"}
           fetchpriority={isEager ? "high" : undefined}
           decoding="async"
-          class={`object-center brightness-90 group-hover:brightness-100 transition-transform duration-700 ease-out group-hover:scale-[1.04] cac-card-img ${ enableCinemagraph ? "cinemagraph-ken-burns" : "" } ${resolveMultivisionClass(img)}`}
+          class={`absolute inset-0 w-full h-full object-center brightness-90 group-hover:brightness-100 transition-transform duration-700 ease-out group-hover:scale-[1.04] cac-card-img ${ enableCinemagraph ? "cinemagraph-ken-burns" : "" } ${resolveMultivisionClass(img)}`}
           data-flip-id={`card-image-${cardId}`}
         />
       ) : (
