@@ -294,193 +294,67 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
     <div class="container-editorial max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-32 md:gap-48 lg:gap-60 pt-20 md:pt-32 pb-28 md:pb-44">
 
       {/* ═══════════════════════════════════════════════════════════════════
-          BLOQUE 2A: DOSSIER DESTACADO — SECCIÓN AUTÓNOMA CON SOLAPA CINEMÁTICA
-          El post más reciente ocupa su propia franja editorial, separado del resto
+          BLOQUE 2: DOSSIERES DESTACADOS — MODELO EDITORIAL ARCHIVO GENERAL
       ═══════════════════════════════════════════════════════════════════ */}
-      {leadStory && (
-        <section class="flex flex-col gap-0 reveal-item">
+      <section class="flex flex-col gap-16 md:gap-24 lg:gap-32 reveal-item">
 
-          {/* ── SOLAPA / TAB CINEMÁTICA ── */}
-          <div class="relative flex items-end gap-6 pb-0 z-10">
-            <div class="flex items-center gap-3 bg-(--bg-main) border border-white/8 border-b-0 rounded-t-2xl px-6 py-3.5 shrink-0">
-              <span class="w-1.5 h-1.5 rounded-full bg-rust-orange shadow-[0_0_8px_#EFEBE3] shrink-0"></span>
-              <span class="font-metadata text-[9px] uppercase tracking-[0.45em] text-rust-orange font-bold whitespace-nowrap">Último Dossier</span>
-            </div>
-            <div class="flex-1 border-b border-white/8 mb-px"></div>
-            <span class="font-metadata text-[9px] uppercase tracking-[0.3em] text-white/30 pb-3.5 pr-1 shrink-0">{formatDate(leadStory.entry.date)}</span>
+        {/* ENCABEZADO EDITORIAL */}
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-4 border-b border-white/8">
+          <div>
+            <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Archivo Editorial</span>
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-cinzel font-extrabold tracking-tight gradient-acero-ios">
+              Dossieres Destacados
+            </h2>
           </div>
+          <a href="/archivo/" class="font-metadata text-[10px] uppercase tracking-[0.3em] text-white/40 hover:text-rust-orange transition-colors shrink-0 pb-1">
+            Ver todo el Archivo →
+          </a>
+        </div>
 
-          {/* ── CARD DESTACADA FULL-WIDTH CINEMÁTICA ── */}
-          <article class="card-hover-cinematic group w-full relative overflow-hidden rounded-b-2xl rounded-tr-2xl border border-white/8 border-t-0 bg-white/3 transition-all duration-700">
-            <div class="flex flex-col lg:flex-row lg:min-h-105 xl:min-h-120">
-
-              {/* Imagen lateral / superior en mobile */}
-              {leadImage && (
-                <div class="relative overflow-hidden lg:w-[55%] xl:w-[58%] aspect-video lg:aspect-auto shrink-0">
-                  <Image
-                    src={sanitizeImageUrl(leadImage)}
-                    alt={leadStory.entry.title || "Dossier Destacado"}
-                    inferSize={true}
-                    format="webp"
-                    loading="eager"
-                    fetchpriority="high"
-                    decoding="async"
-                    class="w-full h-full object-cover object-center transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-80"
-                  />
-                  <div class="absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.85)] pointer-events-none" />
-                  <div class="absolute inset-0 bg-linear-to-r from-transparent via-transparent to-(--bg-main) hidden lg:block pointer-events-none" />
-                  <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/85 via-transparent to-transparent lg:hidden pointer-events-none" />
-                </div>
-              )}
-
-              {/* Contenido Editorial */}
-              <div class={`flex flex-col justify-between p-6 md:p-10 lg:p-12 xl:p-14 ${leadImage ? 'lg:flex-1' : 'w-full'}`}>
-                <div class="flex flex-col gap-4 md:gap-6">
-                  <div class="flex items-center gap-3 font-metadata text-[9px] text-rust-orange/80 tracking-[0.25em] uppercase">
-                    <span>{formatCategory(leadStory.entry.category)}</span>
-                  </div>
-                  <h2 class="font-cinzel font-extrabold text-2xl sm:text-3xl md:text-4xl xl:text-5xl leading-[1.08] tracking-tight bg-linear-to-br from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent">
-                    <a href={`/hemeroteca/${leadStory.slug}/`} class="hover:opacity-80 transition-opacity">
-                      {leadStory.entry.title}
-                    </a>
-                  </h2>
-                  {(leadStory.entry.dek || leadStory.entry.excerpt) && (
-                    <p class="font-alegreya text-[#a3a3a3] text-base leading-relaxed line-clamp-3 font-light tracking-wide max-w-prose">
-                      "{leadStory.entry.dek || leadStory.entry.excerpt}"
-                    </p>
-                  )}
-                </div>
-
-                <div class="flex items-center justify-between gap-4 mt-8 pt-5 border-t border-white/5">
-                  <a
-                    href={`/hemeroteca/${leadStory.slug}/`}
-                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#151718]/90 backdrop-blur-sm border border-white/10 text-[#E0E0E0]/75 font-metadata font-bold text-[9px] tracking-[0.25em] uppercase rounded-lg hover:bg-rust-orange/10 hover:border-rust-orange/50 hover:text-rust-orange transition-all duration-400"
-                  >
-                    <span>Leer Dossier</span>
-                    <span class="opacity-60 group-hover:translate-x-0.5 transition-transform">▸</span>
-                  </a>
-                  {(leadStory.entry.spotifyLink || leadStory.entry.youtubeLink) && (
-                    <div class="flex items-center gap-3 text-white/30">
-                      {leadStory.entry.spotifyLink && <a href={leadStory.entry.spotifyLink} target="_blank" rel="noopener noreferrer" class="hover:text-rust-orange transition-colors"><SpotifyIcon class="w-4 h-4" /></a>}
-                      {leadStory.entry.youtubeLink && <a href={leadStory.entry.youtubeLink} target="_blank" rel="noopener noreferrer" class="hover:text-rust-orange transition-colors"><YouTubeIcon class="w-4 h-4" /></a>}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </article>
-        </section>
-      )}
-
-      {/* ═══════════════════════════════════════════════════════════════════
-          BLOQUE 2B: GRID EDITORIAL 1+2 — TIPO COLECCIONES
-          1 card central principal + 2 más pequeñas debajo
-      ═══════════════════════════════════════════════════════════════════ */}
-      {(secondaryA || secondaryB) && (
-        <section class="flex flex-col gap-6 reveal-item">
-
-          {/* ENCABEZADO */}
-          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-4">
-            <div>
-              <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Archivo Editorial</span>
-              <h2 class="text-2xl sm:text-3xl md:text-4xl font-cinzel font-extrabold tracking-tight bg-linear-to-b from-[#FFFFFF] via-[#8E8E93] to-[#1C1C1E] bg-clip-text text-transparent drop-shadow-md">
-                Dossieres Recientes
-              </h2>
-            </div>
-            <a href="/archivo/" class="font-metadata text-[10px] uppercase tracking-[0.3em] text-white/40 hover:text-rust-orange transition-colors shrink-0 pb-1">
-              Ver todo el Archivo →
-            </a>
+        {/* DOSSIER PRINCIPAL — HERO FULL BLEED (ESTILO ARCHIVO GENERAL) */}
+        {leadStory && (
+          <div class="w-full">
+            <CinematicArchiveCard
+              slug={leadStory.slug}
+              entry={leadStory.entry}
+              img={leadImage}
+              variant="hero"
+              enableCinemagraph={true}
+              isEager={true}
+              ctaLabel="VER REGISTRO"
+            />
           </div>
+        )}
 
-          {/* ──────────────────────────────────────────────────────────
-              GRID FATHER: 12 cols / auto-rows-min
-              secondaryA: fila completa (col-span-12)
-              Duo secondaryB: col-span-6 c/u, h-full (altura igualada)
-          ────────────────────────────────────────────────────────── */}
-          <div class="grid grid-cols-1 md:grid-cols-12 auto-rows-min gap-6 md:gap-8 w-full">
-
-            {/* CARD PRINCIPAL — col-span-12 (fila completa) */}
-            {secondaryA && (
-              <article class="col-span-1 md:col-span-12 card-hover-cinematic group w-full relative overflow-hidden rounded-2xl border border-white/8 bg-white/3 transition-all duration-500">
-                <div class="flex flex-col md:flex-row md:min-h-70">
-                  {secAImage && (
-                    <div class="relative overflow-hidden md:w-[45%] shrink-0 aspect-video md:aspect-auto">
-                      <Image
-                        src={sanitizeImageUrl(secAImage)}
-                        alt={secondaryA.entry.title || "Dossier"}
-                        inferSize={true}
-                        format="webp"
-                        loading="lazy"
-                        decoding="async"
-                        class="w-full h-full object-cover object-center transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-85"
-                      />
-                      <div class="absolute inset-0 bg-linear-to-r from-transparent to-(--bg-main)/70 hidden md:block pointer-events-none" />
-                      <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/60 via-transparent to-transparent md:hidden pointer-events-none" />
-                    </div>
-                  )}
-                  <div class="flex flex-col justify-between p-6 md:p-8 flex-1">
-                    <div class="flex flex-col gap-3">
-                      <span class="font-metadata text-xs uppercase tracking-[0.3em] text-rust-orange/70">{formatCategory(secondaryA.entry.category)}</span>
-                      <h3 class="font-cinzel font-extrabold tracking-tighter text-xl sm:text-2xl md:text-3xl leading-tight gradient-metal-steel-card">
-                        <a href={`/hemeroteca/${secondaryA.slug}/`}>{secondaryA.entry.title}</a>
-                      </h3>
-                      {(secondaryA.entry.dek || secondaryA.entry.excerpt) && (
-                        <p class="font-alegreya text-[#a3a3a3] text-base leading-relaxed line-clamp-2 font-light tracking-wide">{secondaryA.entry.dek || secondaryA.entry.excerpt}</p>
-                      )}
-                    </div>
-                    <div class="mt-5 pt-4 border-t border-white/5 font-metadata text-xs uppercase tracking-[0.3em]">
-                      <a href={`/hemeroteca/${secondaryA.slug}/`} aria-label={`Ver dossier: ${secondaryA.entry.title}`} class="text-white/40 hover:text-rust-orange transition-colors inline-flex items-center gap-1.5">Ver Dossier ▸</a>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            )}
-
-            {/* DUO CARDS MENORES — md:col-span-6 c/u, h-full para igualar alturas */}
-            {secondaryB && (
-              <>
-                <article class="col-span-1 md:col-span-6 w-full h-full card-hover-cinematic group relative overflow-hidden rounded-xl border border-white/8 bg-white/3 transition-all duration-500 flex flex-col">
-                  {secBImage && (
-                    <div class="relative overflow-hidden aspect-video">
-                      <Image
-                        src={sanitizeImageUrl(secBImage)}
-                        alt={secondaryB.entry.title || "Dossier"}
-                        inferSize={true}
-                        format="webp"
-                        loading="lazy"
-                        decoding="async"
-                        class="w-full h-full object-cover transition-transform duration-700 delay-75 group-hover:scale-[1.018] brightness-80"
-                      />
-                      <div class="absolute inset-0 bg-linear-to-t from-(--bg-main)/70 via-transparent to-transparent pointer-events-none" />
-                    </div>
-                  )}
-                  <div class="flex flex-col justify-between p-5 flex-1">
-                    <div class="flex flex-col gap-2">
-                      <span class="font-metadata text-xs uppercase tracking-[0.3em] text-rust-orange/70">{formatCategory(secondaryB.entry.category)}</span>
-                      <h3 class="font-cinzel font-extrabold tracking-tighter text-base sm:text-lg leading-snug gradient-metal-steel-card">
-                        <a href={`/hemeroteca/${secondaryB.slug}/`}>{secondaryB.entry.title}</a>
-                      </h3>
-                    </div>
-                    <div class="mt-4 pt-3 border-t border-white/5 font-metadata text-xs uppercase tracking-[0.25em]">
-                      <a href={`/hemeroteca/${secondaryB.slug}/`} aria-label={`Ver dossier: ${secondaryB.entry.title}`} class="text-white/35 hover:text-rust-orange transition-colors">Ver Dossier ▸</a>
-                    </div>
-                  </div>
-                </article>
-
-                {/* Placeholder/Teaser "Ver Archivo" como celda par del grid */}
-                <a
-                  href="/archivo/"
-                  class="col-span-1 md:col-span-6 w-full h-full group relative overflow-hidden rounded-xl border border-white/6 border-dashed bg-white/1 hover:border-rust-orange/40 hover:bg-rust-orange/3 transition-all duration-500 flex flex-col items-center justify-center min-h-50 p-6 text-center gap-3"
-                >
-                  <span class="font-metadata text-xs uppercase tracking-[0.4em] text-white/25 group-hover:text-rust-orange/60 transition-colors">Explorar</span>
-                  <span class="font-cinzel font-bold text-base text-white/40 group-hover:text-rust-orange/80 transition-colors">Todo el Archivo</span>
-                  <span class="text-white/20 group-hover:text-rust-orange/50 group-hover:translate-x-1 transition-all text-sm">→</span>
-                </a>
-              </>
-            )}
+        {/* DOSSIER 2 DESTACADO — SECUNDARIO A */}
+        {secondaryA && (
+          <div class="w-full">
+            <CinematicArchiveCard
+              slug={secondaryA.slug}
+              entry={secondaryA.entry}
+              img={secAImage}
+              variant="standard"
+              enableCinemagraph={true}
+              ctaLabel="VER REGISTRO"
+            />
           </div>
-        </section>
-      )}
+        )}
+
+        {/* DOSSIER 3 DESTACADO — SECUNDARIO B */}
+        {secondaryB && (
+          <div class="w-full">
+            <CinematicArchiveCard
+              slug={secondaryB.slug}
+              entry={secondaryB.entry}
+              img={secBImage}
+              variant="standard"
+              enableCinemagraph={true}
+              ctaLabel="VER REGISTRO"
+            />
+          </div>
+        )}
+
+      </section>
 
 
       {/* ═══════════════════════════════════════════════════════════════════
