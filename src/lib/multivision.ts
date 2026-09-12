@@ -27,8 +27,8 @@ export function resolveMultivisionClass(src: string | { src: string } | null | u
     baseClass += ' enfocar-rostro';
   }
   
-  if (s.includes('mercurio') || s.includes('homero') || s.includes('saturno') || s.includes('wiki') || s.includes('busto') || s.includes('estatua') || s.includes('retrato')) {
-    baseClass += ' wiki-completa';
+  if (s.includes('mercurio') || s.includes('homero') || s.includes('saturno') || s.includes('wiki') || s.includes('busto') || s.includes('estatua') || s.includes('retrato') || s.includes('piramide')) {
+    baseClass += ' object-contain! bg-[#08090a]';
   }
   
   return baseClass;
