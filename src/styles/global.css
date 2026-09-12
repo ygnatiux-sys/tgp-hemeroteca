@@ -1760,4 +1760,11 @@ html[data-nav-state="2"] header:hover .brand-element {
   display: block;
 }
 
+/* ═════════════════════════════════════════════════════════════════════════
+   MODIFICADOR DE ENFOQUE (Evita decapitar retratos y estatuas)
+═════════════════════════════════════════════════════════════════════════ */
+.enfocar-rostro {
+  object-position: 50% 15% !important;
+}
+
 

@@ -11,18 +11,21 @@ export function resolveMultivisionClass(src: string | { src: string } | null | u
   const srcString = typeof src === 'object' ? src.src : src;
   const s = srcString.toLowerCase();
   
+  let baseClass = 'img-nativa';
+
   if (s.includes('hero-') || s.includes('cover-') || s.includes('pano-')) {
-    return 'img-panoramica';
-  }
-  if (s.includes('vert-') || s.includes('reel-') || s.includes('port-')) {
-    return 'img-vertical';
-  }
-  if (s.includes('sq-') || s.includes('cuad-')) {
-    return 'img-cuadrada';
-  }
-  if (s.includes('logo-') || s.includes('ui-') || s.includes('icon-')) {
-    return ''; // UI no fuerza aspecto completo
+    baseClass = 'img-panoramica';
+  } else if (s.includes('vert-') || s.includes('reel-') || s.includes('port-')) {
+    baseClass = 'img-vertical';
+  } else if (s.includes('sq-') || s.includes('cuad-')) {
+    baseClass = 'img-cuadrada';
+  } else if (s.includes('logo-') || s.includes('ui-') || s.includes('icon-')) {
+    baseClass = ''; // UI no fuerza aspecto completo
   }
   
-  return 'img-nativa'; // Regla de seguridad (Legacy)
+  if (baseClass && (s.includes('-top') || s.includes('wiki'))) {
+    baseClass += ' enfocar-rostro';
+  }
+  
+  return baseClass;
 }
