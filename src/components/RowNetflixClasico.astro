@@ -44,10 +44,17 @@ const {
 
 // Normalizamos los items
 let displayItems = items.slice(0, max).map((item) => {
-  const t = item.title || item.titulo || item.entry?.title || "Sin título";
-  const cat = item.collectionLabel || formatCategory(item.category || item.entry?.category) || "Ensayo";
   const rawImg = item.img || item.image || resolveEssayImage(item.entry || item, item.slug);
   const image = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '')) || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop';
+  
+  if (import.meta.env.DEV) {
+    if (image.includes('hero-') || image.includes('pano-') || image.includes('cover-')) {
+      console.warn(`[TGP Vision] Advertencia: Se inyectó una imagen panorámica (${image.split('/').pop()}) en un contenedor vertical. Aplicando fallback cinemático.`);
+    }
+  }
+
+  const t = item.title || item.titulo || item.entry?.title || "Sin título";
+  const cat = item.collectionLabel || formatCategory(item.category || item.entry?.category) || "Ensayo";
   const isCinematic = (item as any)?.isCinematicGSAP || (item.entry as any)?.isCinematicGSAP;
   const link = item.link || (item.slug ? (isCinematic ? `/ensayos-cinematicos/${item.slug}` : `/hemeroteca/${item.slug}/`) : '#');
   const d = item.date || item.entry?.date ? formatDate(item.date || item.entry?.date) : '';
@@ -273,7 +280,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    object-fit: cover !important;
+    object-fit: contain !important;
     object-position: center !important;
     filter: brightness(0.88) contrast(1.04);
     transition: filter 340ms ease, transform 500ms ease;

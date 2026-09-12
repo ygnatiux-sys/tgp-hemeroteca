@@ -21,6 +21,16 @@ export default function CoverflowCarousel({
   eyebrow = 'Cinematografía Editorial',
   title = 'Publicaciones Recientes',
 }: CoverflowCarouselProps) {
+  
+  if (import.meta.env && import.meta.env.DEV) {
+    posts.forEach(post => {
+      const imgStr = post.image || '';
+      if (imgStr.includes('hero-') || imgStr.includes('pano-') || imgStr.includes('cover-')) {
+        console.warn(`[TGP Vision] Advertencia: Se inyectó una imagen panorámica (${imgStr.split('/').pop()}) en un contenedor vertical. Aplicando fallback cinemático.`);
+      }
+    });
+  }
+
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
@@ -176,11 +186,11 @@ export default function CoverflowCarousel({
                 }}
                 className={`absolute w-70 sm:w-85 md:w-100 lg:w-110 aspect-2/3 rounded-2xl md:rounded-3xl overflow-hidden border-0 transition-all duration-500 ease-out ${positionClasses} ${visualClasses}`}
               >
-                {/* Imagen de Portada */}
+                {/* Imagen de Portada Cinemática */}
                 <img
                   src={post.image}
                   alt={post.title}
-                  className=" img-nativa"
+                  className="w-full h-full object-contain bg-[#0a0c0f]"
                   loading="lazy"
                   decoding="async"
                 />

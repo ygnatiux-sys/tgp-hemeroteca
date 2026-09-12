@@ -92,6 +92,14 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
             const imgUrl = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '')) || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop';
             const linkUrl = col.link || `/colecciones/${col.slug}/`;
 
+            if (import.meta.env.DEV && cardAspect === "portrait") {
+              if (imgUrl.includes('hero-') || imgUrl.includes('pano-') || imgUrl.includes('cover-')) {
+                console.warn(`[TGP Vision] Advertencia: Se inyectó una imagen panorámica (${imgUrl.split('/').pop()}) en un contenedor vertical. Aplicando fallback cinemático.`);
+              }
+            }
+
+            const fallbackClass = cardAspect === "portrait" ? "w-full h-full object-contain bg-[#0a0c0f]" : "w-full h-full object-cover";
+
             return (
               <a
                 href={linkUrl}
@@ -107,7 +115,7 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
                 <img 
                   src={imgUrl}
                   alt={col.title}
-                  class="absolute inset-0 object-center pointer-events-none brightness-90 contrast-[1.03] transition-transform duration-700 ease-out group-hover/traycard:scale-[1.02] group-hover/traycard:brightness-95 z-0 img-nativa"
+                  class={`absolute inset-0 object-center pointer-events-none brightness-90 contrast-[1.03] transition-transform duration-700 ease-out group-hover/traycard:scale-[1.02] group-hover/traycard:brightness-95 z-0 ${fallbackClass}`}
                   loading="lazy"
                   decoding="async"
                 />
