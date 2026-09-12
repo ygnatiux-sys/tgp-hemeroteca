@@ -108,7 +108,19 @@ const coverflowPosts: CoverflowPost[] = collections
       collectionLabel: 'Colección TGP',
       date: col.coverEssay?.entry?.date ? formatYear(col.coverEssay.entry.date) : undefined,
     };
-  });
+// ─── FRASES EVOCATIVAS POR COLECCIÓN ───────────────────────────────────────────
+const epigraphMap: Record<string, string> = {
+  "arqueosemiotica":   "Los [[signos]] sobreviven a los imperios. **Cada glifo,** un mensaje lanzado a la eternidad sin destinatario conocido.",
+  "filosofia":         "El pensamiento como [[territorio.]] Las **ideas no mueren:** se transforman, se heredan, se contradicen.",
+  "mitologia":         "Antes del dato, existió el [[mito.]] El relato que **une cielo y tierra** antes de que la ciencia los separara.",
+  "historia":          "El [[tiempo]] no es lineal. Es una **red de causas** que la memoria humana teje y desteje sin cesar.",
+  "ensayos-cinematicos": "Imágenes que **piensan.** El [[cine]] como forma de conocimiento antes de que el conocimiento fuera escrito.",
+  "arquetipos":        "Figuras que reaparecen en cada cultura. Los [[arquetipos]] son la gramática **secreta del ser humano.**",
+  "historia-natural":  "La vida como **archivo.** Cada especie, un [[capítulo]] de una historia que empezó mucho antes que nosotros.",
+  "historia-antigua":  "Las [[civilizaciones]] no colapsan: **se transforman.** Sus ruinas son preguntas, no respuestas.",
+  "historia-medieval": "Entre el [[fin del mundo]] romano y el alba del moderno, **siglos de invención** que el olvido llama oscuros.",
+  "religion":          "Lo [[sagrado]] como necesidad primaria. **Cada fe,** un intento humano de darle nombre al misterio.",
+};
 ---
 
 <Layout
@@ -157,33 +169,33 @@ const coverflowPosts: CoverflowPost[] = collections
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">
 
       {/* BANNER DESTACADO: SITIOS GEOHISTÓRICOS (Hero Card Cinemática con Imagen) */}
-      <section class="reveal-item">
+      <section class="reveal-brote w-full">
         <a
           href="/colecciones/arqueosemiotica/"
-          class="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 bg-theme-dark/80 hover:border-white/25 transition-all duration-500 shadow-2xl min-h-60 md:min-h-72 flex flex-col justify-end p-8 md:p-12 isolate"
+          class="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 bg-theme-dark/80 hover:border-white/25 transition-all duration-500 shadow-2xl min-h-[82vh] md:min-h-180 lg:min-h-205 flex flex-col justify-end p-6 sm:p-10 md:p-14 lg:p-18 isolate"
         >
           {georefCoverEssay?.img && (
             <Image
-              src={sanitizeImageUrl(georefCoverEssay.img)}
+              src={sanitizeImageUrl(georefCoverEssay?.img)}
               alt="Sitios Geohistóricos & Arqueohistóricos"
               inferSize={true}
               format="webp"
               loading="lazy"
               decoding="async"
-              class="absolute inset-0 w-full h-full object-cover object-center brightness-60 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-75"
+              class="cover-brote-img absolute inset-0 w-full h-full object-cover object-center brightness-60 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-75"
             />
           )}
           <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/50 via-50% to-transparent pointer-events-none z-10"></div>
 
           <div class="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div class="flex flex-col gap-2 max-w-3xl">
-              <span class="font-mono text-xs uppercase tracking-[0.4em] text-rust-orange font-bold">
+            <div class="flex flex-col gap-2 max-w-4xl">
+              <span class="font-mono text-xs sm:text-sm uppercase tracking-[0.4em] text-rust-orange font-bold">
                 Colección Especializada · Georreferencias
               </span>
-              <h2 class="text-3xl md:text-5xl font-serif font-black gradient-general-h1 leading-tight">
+              <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-black gradient-general-h1 leading-tight">
                 Sitios Geohistóricos &amp; Arqueohistóricos
               </h2>
-              <p class="h2-thin-hook text-sm md:text-base text-white/80 tracking-[0.15em] mt-1">
+              <p class="h2-thin-hook text-sm sm:text-base md:text-lg text-white/80 tracking-[0.15em] mt-1">
                 Aramu Muru · Tikal · Bonampak · Cartago · Qapaq Ñan · Yonaguni
               </p>
             </div>
@@ -203,34 +215,17 @@ const coverflowPosts: CoverflowPost[] = collections
       />
 
       {/* ═══════════════════════════════════════════════════════════════════
-          COLECCIONES TEMÁTICAS GENERALES — F5: Bento Asimétrico
-          F6: grid-cols-1 en móvil, lg:grid-cols-12 en desktop
-          F6: Texto siempre visible, sin group-hover reveal en touch
+          COLECCIONES TEMÁTICAS GENERALES — PANTALLAS DE CINE FULL-HEIGHT
       ═══════════════════════════════════════════════════════════════════ */}
-      <section class="flex flex-col gap-0 w-full">
+      <section class="flex flex-col gap-8 sm:gap-12 md:gap-16 w-full">
         {/* ─── Primera card (hero): sin epigrafe previo ─── */}
         {collections.map((col, index) => {
-          // Todas las cards son hero full-width: misma altura que la card de Arqueosemiotica
-          const mobileHeightClass = "min-h-[55vh] md:min-h-[420px] lg:min-h-[480px]";
-
-          // ─── Frases evocativas por coleccion (clave → texto) ───
-          const epigraphMap: Record<string, string> = {
-            "arqueosemiotica":   "Los [[signos]] sobreviven a los imperios. **Cada glifo,** un mensaje lanzado a la eternidad sin destinatario conocido.",
-            "filosofia":         "El pensamiento como [[territorio.]] Las **ideas no mueren:** se transforman, se heredan, se contradicen.",
-            "mitologia":         "Antes del dato, existió el [[mito.]] El relato que **une cielo y tierra** antes de que la ciencia los separara.",
-            "historia":          "El [[tiempo]] no es lineal. Es una **red de causas** que la memoria humana teje y desteje sin cesar.",
-            "ensayos-cinematicos": "Imágenes que **piensan.** El [[cine]] como forma de conocimiento antes de que el conocimiento fuera escrito.",
-            "arquetipos":        "Figuras que reaparecen en cada cultura. Los [[arquetipos]] son la gramática **secreta del ser humano.**",
-            "historia-natural":  "La vida como **archivo.** Cada especie, un [[capítulo]] de una historia que empezó mucho antes que nosotros.",
-            "historia-antigua":  "Las [[civilizaciones]] no colapsan: **se transforman.** Sus ruinas son preguntas, no respuestas.",
-            "historia-medieval": "Entre el [[fin del mundo]] romano y el alba del moderno, **siglos de invención** que el olvido llama oscuros.",
-            "religion":          "Lo [[sagrado]] como necesidad primaria. **Cada fe,** un intento humano de darle nombre al misterio.",
-          };
-
+          // Todas las cards son pantallas de cine hero de gran altura
+          const mobileHeightClass = "min-h-[82vh] md:min-h-180 lg:min-h-205";
           const epigraphText = epigraphMap[col.key] || `**${col.label}:** una [[colección]] de registros del pensamiento humano en expansión.`;
 
           return (
-            <>
+            <div class="flex flex-col w-full">
               {/* Epigrafe cinematico antes de cada card (excepto la primera) */}
               {index > 0 && (
                 <CollectionEpigraph text={epigraphText} />
@@ -256,20 +251,20 @@ const coverflowPosts: CoverflowPost[] = collections
                 )}
 
                 {/* Gradiente nítido sin desenfoque */}
-                <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 via-45% to-transparent pointer-events-none z-10"></div>
+                <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/50 via-45% to-transparent pointer-events-none z-10"></div>
 
-                <div class="relative z-20 p-5 md:p-6 lg:p-8 flex flex-col justify-end h-full">
-                  <span class="font-mono text-xs uppercase tracking-widest text-rust-orange font-bold mb-1">Colección TGP</span>
-                  <h2 class="gradient-general-h2 text-2xl md:text-3xl lg:text-4xl mb-1 leading-tight">{col.label}</h2>
+                <div class="relative z-20 p-6 sm:p-10 md:p-14 lg:p-18 flex flex-col justify-end h-full">
+                  <span class="font-mono text-xs sm:text-sm uppercase tracking-[0.35em] text-rust-orange font-bold mb-2">Colección TGP</span>
+                  <h2 class="gradient-general-h2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-2 font-serif font-black tracking-tight leading-tight">{col.label}</h2>
                   {col.coverEssay?.entry?.title && (
-                    <p class="font-serif text-white/55 text-xs md:text-sm line-clamp-1 mb-1.5 tracking-wide">
+                    <p class="font-serif text-white/70 text-sm sm:text-base md:text-lg line-clamp-1 mb-2 tracking-wide font-light">
                       {col.coverEssay.entry.title}
                     </p>
                   )}
-                  <p class="font-sans text-xs text-white/50">{col.count} {col.count === 1 ? 'Documento' : 'Documentos'}</p>
+                  <p class="font-mono text-xs sm:text-sm text-white/50">{col.count} {col.count === 1 ? 'Documento' : 'Documentos'}</p>
                 </div>
               </a>
-            </>
+            </div>
           );
         })}
       </section>
@@ -295,10 +290,14 @@ const coverflowPosts: CoverflowPost[] = collections
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             entry.target.classList.add('revealed');
-            observer.unobserve(entry.target);
+          } else {
+            entry.target.classList.remove('revealed');
           }
         });
-      }, { threshold: 0.12 });
+      }, {
+        threshold: 0.12,
+        rootMargin: "-20px 0px -20px 0px"
+      });
 
       document.querySelectorAll('.reveal-brote').forEach(el => {
         observer.observe(el);
