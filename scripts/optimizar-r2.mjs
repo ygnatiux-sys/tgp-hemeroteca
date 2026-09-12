@@ -8,7 +8,8 @@
  * 2. Lista todos los objetos con soporte para paginación (ListObjectsV2Command).
  * 3. Filtra archivos con peso > 1.5 MB (1.5 * 1024 * 1024 bytes).
  * 4. Descarga el archivo a memoria (Buffer).
- * 5. Redimensiona con sharp a max 1920px de ancho (withoutEnlargement) y comprime a WebP (calidad 80).
+ * 5. Clasifica cada imagen por prefijo de nombre (hero-/thumb-/logo-/etc.) y aplica
+ *    el perfil Sharp correspondiente (scripts/lib/sharp-profiles.mjs).
  * 6. Sobrescribe el archivo en R2 con el buffer optimizado y ContentType: 'image/webp'.
  * 
  * Uso:
@@ -24,6 +25,7 @@ import {
   PutObjectCommand 
 } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
+import { resolveSharpParams, printProfileSummary } from './lib/sharp-profiles.mjs';
 
 // ── 1. CONFIGURACIÓN Y CREDENCIALES ──────────────────────────────────────────
 const accountId       = process.env.R2_ACCOUNT_ID;
@@ -34,8 +36,7 @@ const endpoint        = process.env.R2_ENDPOINT || (accountId ? `https://${accou
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const SIZE_LIMIT_BYTES = 1.5 * 1024 * 1024; // 1.5 MB
-const MAX_WIDTH = 1920;
-const WEBP_QUALITY = 80;
+const WEBP_QUALITY_LOG = '(por perfil: hero q88 / inline q80 / thumb q75 / ui q90)';
 
 if (!accessKeyId || !secretAccessKey || !endpoint) {
   console.error('\n❌ ERROR: Faltan credenciales de Cloudflare R2 en el archivo .env');
@@ -78,7 +79,8 @@ async function main() {
   console.log(`• Bucket:       ${bucketName}`);
   console.log(`• Endpoint:     ${endpoint}`);
   console.log(`• Límite:       > 1.5 MB (${formatBytes(SIZE_LIMIT_BYTES)})`);
-  console.log(`• Optimización: Max ${MAX_WIDTH}px (ancho) · WebP (q=${WEBP_QUALITY})`);
+  console.log(`• Optimización: ${WEBP_QUALITY_LOG}`);
+  console.log(printProfileSummary());
   if (DRY_RUN) {
     console.log('• MODO:         🔍 DRY RUN (Simulación, sin sobrescribir)\n');
   } else {
@@ -149,17 +151,15 @@ async function main() {
       const getRes = await s3Client.send(getCmd);
       const originalBuffer = await streamToBuffer(getRes.Body);
 
-      // Optimizar con sharp
+      // Clasificar por prefijo del nombre del key en R2
+      const basename = (key.split('/').pop()) || key;
+      const { profile, resizeOptions, webpOptions } = resolveSharpParams(basename);
+      console.log(`   → [${profile.name.toUpperCase()}] ${profile.log}`);
+
+      // Optimizar con sharp usando el perfil correspondiente
       const optimizedBuffer = await sharp(originalBuffer)
-        .resize({
-          width: MAX_WIDTH,
-          withoutEnlargement: true,
-          fit: 'inside',
-        })
-        .webp({
-          quality: WEBP_QUALITY,
-          effort: 4,
-        })
+        .resize(resizeOptions)
+        .webp(webpOptions)
         .toBuffer();
 
       const newSize = optimizedBuffer.length;

@@ -2,12 +2,15 @@
  * scripts/optimizar-remotas.mjs
  * ─────────────────────────────────────────────────────────────────────────────
  * Rastreador y Optimizador Automático de Imágenes Externas (TGP Proxy Local)
- * 
+ *
  * Funcionalidad:
  * 1. Escanea todos los archivos (.astro, .ts, .js, .md, .mdx, .json) en src/.
  * 2. Detecta URLs externas de imágenes (por ejemplo, Wikimedia Commons).
  * 3. Las descarga automáticamente.
- * 4. Las convierte a WebP optimizado con Sharp (máximo 1920px, calidad 80).
+ * 4. Las convierte a WebP usando el perfil Sharp según el prefijo del nombre local:
+ *    hero-/pano- → 2560×1440 cover q88 | img-/post- → 1200px inside q80
+ *    thumb-/card- → 800px inside q75   | logo-/ui- → 400px inside q90
+ *    Sin prefijo → 1200px inside q80 (fallback seguro)
  * 5. Las guarda en src/assets/remotas/ (u otro directorio local).
  * 6. Actualiza el código fuente para reemplazar la URL externa por la local
  *    (ej: /src/assets/remotas/imagen.webp), la cual luego será resuelta a R2
@@ -18,6 +21,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import sharp from 'sharp';
+import { resolveSharpParams, printProfileSummary } from './lib/sharp-profiles.mjs';
 
 // ── CONFIGURACIÓN ────────────────────────────────────────────────────────────
 const ASSETS_REMOTE_DIR = path.resolve('src/assets/remotas');
@@ -104,10 +108,13 @@ async function processUrl(url) {
     const arrayBuffer = await res.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    console.log(`✨ Optimizando a WebP: ${filename}`);
+    // Clasificar por prefijo del nombre local (no de la URL remota)
+    const { profile, resizeOptions, webpOptions } = resolveSharpParams(filename);
+    console.log(`✨ [${profile.name.toUpperCase()}] ${profile.log}: ${filename}`);
+
     await sharp(buffer, { limitInputPixels: false })
-      .resize({ width: 1920, withoutEnlargement: true, fit: 'inside' })
-      .webp({ quality: 80, effort: 4 })
+      .resize(resizeOptions)
+      .webp(webpOptions)
       .toFile(destPath);
       
     return localAssetUrl;
@@ -122,6 +129,7 @@ async function main() {
   console.log('======================================================');
   console.log('  🌐 TGP - AUTO-OPTIMIZADOR DE IMÁGENES EXTERNAS');
   console.log('======================================================');
+  console.log(printProfileSummary());
 
   let filesToScan = [];
   DIRS_TO_SCAN.forEach(dir => {

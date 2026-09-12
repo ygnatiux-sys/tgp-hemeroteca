@@ -31,6 +31,7 @@ import path from 'path';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import sharp from 'sharp';
+import { resolveSharpParams, printProfileSummary } from './lib/sharp-profiles.mjs';
 import {
   S3Client,
   PutObjectCommand,
@@ -45,8 +46,7 @@ const ASSETS_DIR       = path.resolve('src/assets');
 const BUCKET_NAME      = process.env.R2_BUCKET_NAME || 'tgp-storage';
 const R2_PUBLIC_URL    = 'https://storage.thegreatpuzzleproject.com';
 const CONCURRENCY      = 5;
-const MAX_WIDTH        = 1920;
-const WEBP_QUALITY     = 80;
+// Nota: MAX_WIDTH / WEBP_QUALITY eliminados — cada imagen usa su perfil en sharp-profiles.mjs
 const SHARP_IMAGE_EXTS = /\.(jpe?g|png|webp|avif|tiff?)$/i;
 
 const args      = process.argv.slice(2);
@@ -168,6 +168,7 @@ async function main() {
   console.log('  Endpoint: ' + endpoint);
   console.log('  Modo:     ' + (DRY_RUN ? 'DRY-RUN (sin cambios)' : FORCE ? 'FORCE (re-sube todo)' : 'Incremental'));
   if (PREFIX) console.log('  Prefijo:  ' + PREFIX);
+  console.log(printProfileSummary());
   console.log('');
 
   if (!fs.existsSync(ASSETS_DIR)) {
@@ -208,16 +209,20 @@ async function main() {
     let uploadBuffer = buffer;
     let uploadMime = mime;
     let wasOptimized = false;
+    let wasProfile = 'raw';
 
-    // Optimizar imágenes a WebP ultraliviano (max 1920px, q80)
+    // Clasificar por perfil según el prefijo del nombre del archivo
+    // (✋ Prohibido aplicar una config global: logos ≠ heroes ≠ thumbnails)
     if (SHARP_IMAGE_EXTS.test(filePath)) {
       try {
+        const { profile, resizeOptions, webpOptions } = resolveSharpParams(path.basename(filePath));
         uploadBuffer = await sharp(buffer, { limitInputPixels: false })
-          .resize({ width: MAX_WIDTH, withoutEnlargement: true, fit: 'inside' })
-          .webp({ quality: WEBP_QUALITY, effort: 4 })
+          .resize(resizeOptions)
+          .webp(webpOptions)
           .toBuffer();
         uploadMime = 'image/webp';
         wasOptimized = true;
+        wasProfile = profile.name;
       } catch (err) {
         // En caso de excepción de sharp, fallback al buffer y MIME original
         uploadBuffer = buffer;
@@ -228,7 +233,9 @@ async function main() {
     if (DRY_RUN) {
       const origKb = (buffer.length / 1024).toFixed(1);
       const optKb = (uploadBuffer.length / 1024).toFixed(1);
-      const note = wasOptimized ? ` (WebP: ${origKb} KB → ${optKb} KB)` : ` (${origKb} KB)`;
+      const note = wasOptimized
+        ? ` (WebP [${wasProfile}]: ${origKb} KB → ${optKb} KB)`
+        : ` (${origKb} KB)`;
       console.log('  [DRY-RUN] Subiria: ' + key + note);
       stats.uploaded++;
       return;
@@ -245,7 +252,9 @@ async function main() {
       await uploadFile(key, uploadBuffer, uploadMime);
       const origKb = (buffer.length / 1024).toFixed(1);
       const optKb = (uploadBuffer.length / 1024).toFixed(1);
-      const note = wasOptimized ? ` [WebP ${origKb} KB → ${optKb} KB]` : ` [${optKb} KB]`;
+      const note = wasOptimized
+        ? ` [WebP:${wasProfile} ${origKb} KB → ${optKb} KB]`
+        : ` [${optKb} KB]`;
       console.log('  [SUBIDO] ' + key + note);
       stats.uploaded++;
       stats.bytes += uploadBuffer.length;
