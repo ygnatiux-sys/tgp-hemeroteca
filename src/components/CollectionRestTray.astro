@@ -98,7 +98,7 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
               <img
                 src={imgUrl}
                 alt={title}
-                class="absolute inset-0 object-center pointer-events-none brightness-90 contrast-[1.03] transition-transform duration-700 ease-out z-0 img-nativa"
+                class={`absolute inset-0 w-full h-full !object-contain bg-[#08090a] pointer-events-none brightness-90 contrast-[1.03] transition-transform duration-700 ease-out z-0 ${resolveMultivisionClass(imgUrl)}`}
                 loading="lazy"
                 decoding="async"
               />
