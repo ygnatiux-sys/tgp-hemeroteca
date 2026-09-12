@@ -88,6 +88,9 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
           const isCinematic = entry.category === 'Ensayos Cinemáticos' || entry.category === 'ensayos-cinematicos' || normalizeCategory(entry.category) === 'ensayos-cinematicos';
           const href = isCinematic ? `/ensayos-cinematicos/${item.slug}/` : `/hemeroteca/${item.slug}/`;
 
+          const isPortraitArt = /mercurio|homero|saturno|wiki|busto|estatua|retrato|filosofia|hegel/i.test(imgUrl);
+          const fitClass = isPortraitArt ? 'object-contain! bg-[#08090a]' : 'object-cover';
+
           return (
             <div
               class="rest-tray-card absolute top-1/2 -translate-y-1/2 w-[82%] sm:w-[68%] md:w-[56%] lg:w-[48%] max-w-160 aspect-4/3 rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 bg-stone-950 shadow-2xl transition-all duration-600 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col justify-end"
@@ -98,7 +101,7 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
               <img
                 src={imgUrl}
                 alt={title}
-                class={`absolute inset-0 w-full h-full object-cover pointer-events-none brightness-90 contrast-[1.03] transition-transform duration-700 ease-out z-0 ${resolveMultivisionClass(imgUrl)}`}
+                class={`absolute inset-0 w-full h-full ${fitClass} pointer-events-none brightness-90 contrast-[1.03] transition-transform duration-700 ease-out z-0`}
                 loading="lazy"
                 decoding="async"
               />

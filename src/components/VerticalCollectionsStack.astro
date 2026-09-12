@@ -73,6 +73,9 @@ const epigraphMap: Record<string, string> = {
         const linkUrl = col.link || `/colecciones/${col.key}/`;
         const epigraphText = epigraphMap[col.key] || `La memoria de la humanidad resguardada en ${col.label}.`;
 
+        const isPortraitArt = /mercurio|homero|saturno|wiki|busto|estatua|retrato|filosofia|hegel/i.test(imgUrl) || /filosofia|hegel/i.test(col.key);
+        const fitClass = isPortraitArt ? 'object-contain! bg-[#08090a]' : 'object-cover';
+
         return (
           <a
             href={linkUrl}
@@ -84,7 +87,7 @@ const epigraphMap: Record<string, string> = {
               <img 
                 src={imgUrl}
                 alt={col.label}
-                class="card-image absolute inset-0 pointer-events-none brightness-75 contrast-[1.05] z-0 img-nativa"
+                class={`card-image absolute inset-0 w-full h-full pointer-events-none brightness-75 contrast-[1.05] z-0 ${fitClass}`}
                 style="object-position: 50% 50%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
                 loading="lazy"
                 decoding="async"
