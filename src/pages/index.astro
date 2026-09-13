@@ -13,6 +13,7 @@ import CinematicPostEngine from '../components/CinematicPostEngine.astro';
 import SliderCinematico from '../components/SliderCinematico.astro';
 import RowNetflixClasico from '../components/RowNetflixClasico.astro';
 import SpotlightHero from '../components/SpotlightHero.astro';
+import CinematicGrid from '../components/CinematicGrid.astro';
 import MorphIconPOC from '../components/MorphIconPOC.astro';
 import {
   type EssayEntry,
@@ -253,6 +254,18 @@ const spotlightPosts = publishableCinematicos.map(item => ({
   isCinematicGSAP: true,
 }));
 
+// ─── POSTS PARA CINEMATIC GRID (NUEVO) ───
+const gridItems = publishableCinematicos.map(item => {
+  const aiText = item.entry.generadorTexto || '';
+  const cleanExcerpt = ((item.entry as any).dek || (item.entry as any).excerpt || (aiText ? aiText.replace(/[#*_`>\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 180) + '…' : '')) as string;
+  return {
+    title: item.entry.title || 'Ensayo Cinemático',
+    excerpt: cleanExcerpt,
+    img: resolveEssayImage(item.entry, item.slug) as string,
+    link: `/ensayos-cinematicos/${item.slug}`,
+  };
+});
+
 const resolvedCollections = collections.map(c => ({
   ...c,
   img: resolveEssayImage(c.coverEssay.entry, c.coverEssay.slug),
@@ -377,15 +390,10 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════
-          BLOQUE 3B: SPOTLIGHT HERO CON MEDIA TRAY (ESTILO NAT GEO / DISNEY+)
+          BLOQUE 3B: VERTICAL CINEMATIC GRID (REEMPLAZO DE SPOTLIGHT HERO)
       ═══════════════════════════════════════════════════════════════════ */}
-      {spotlightPosts.length > 0 && (
-        <section class="flex flex-col gap-6 md:gap-8 reveal-item -mx-4 px-4 md:mx-0 md:px-0">
-          <SpotlightHero 
-            posts={spotlightPosts} 
-            eyebrow="EXPLORAR COLECCIÓN RECIENTE"
-          />
-        </section>
+      {gridItems.length > 0 && (
+        <CinematicGrid items={gridItems} title="Ensayos Cinemáticos" />
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════
