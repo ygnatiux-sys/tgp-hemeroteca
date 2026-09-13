@@ -9,7 +9,7 @@ import { resolveMultivisionClass } from "../lib/multivision";
 <dialog class="expandable-modal max-w-none max-h-none m-0 p-0 bg-transparent border-0 overflow-visible backdrop:bg-black/80 backdrop:backdrop-blur-sm z-50">
   
   <!-- Contenedor Base para FLIP -->
-  <div class="modal-container w-full max-w-4xl border border-white/10 rounded-xl overflow-hidden bg-black text-white shadow-2xl flex flex-col relative mx-4" data-flip-id="">
+  <div class="modal-container w-full max-w-5xl border border-white/10 rounded-xl overflow-hidden bg-black text-white shadow-2xl flex flex-col relative mx-4" data-flip-id="">
     
     <!-- Botón de Cerrar Flotante -->
     <button class="close-modal-btn absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/50 hover:bg-black/90 flex items-center justify-center text-white/70 hover:text-white transition-all backdrop-blur-md cursor-pointer" aria-label="Cerrar modal">
@@ -19,16 +19,16 @@ import { resolveMultivisionClass } from "../lib/multivision";
     </button>
     
     <!-- Imagen Limpia (Top) -->
-    <div class="relative w-full h-[50vh] min-h-87.5">
+    <div class="relative w-full h-[60vh] min-h-[400px]">
       <img class="modal-image absolute inset-0 img-nativa" src="" alt="Modal Hero" data-flip-id="" />
       
-      <!-- Bottom Scrim Limitado para legibilidad del título -->
-      <div class="absolute bottom-0 w-full h-1/2 bg-linear-to-t from-black via-black/80 to-transparent pointer-events-none"></div>
+      <!-- Bottom Scrim Limitado para legibilidad del título, más bajo y menos intrusivo -->
+      <div class="absolute bottom-0 w-full h-[40%] bg-linear-to-t from-black via-black/60 to-transparent pointer-events-none"></div>
       
       <!-- Información súper impuesta (Opcional, si queremos el título sobre la imagen) -->
-      <div class="absolute bottom-0 inset-x-0 p-8 pt-0 pointer-events-none z-10 flex flex-col gap-2">
+      <div class="absolute bottom-0 inset-x-0 px-8 pb-4 pointer-events-none z-10 flex flex-col gap-2">
         <span class="modal-eyebrow text-[10px] tracking-[0.3em] uppercase text-rust-orange font-metadata font-bold hidden"></span>
-        <h2 class="modal-title font-cinzel text-3xl md:text-5xl font-bold leading-tight drop-shadow-lg text-white" data-flip-id="">
+        <h2 class="modal-title font-cinzel text-4xl md:text-6xl font-extrabold leading-[1.05] tracking-tight drop-shadow-2xl gradient-acero-ios" data-flip-id="">
           <!-- Título dinámico -->
         </h2>
       </div>
