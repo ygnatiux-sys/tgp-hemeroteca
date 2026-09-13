@@ -10,7 +10,7 @@ import { resolveMultivisionClass } from "../lib/multivision";
   role="dialog"
 >
   {/* ── IMAGEN FULL BLEED 100% NÍTIDA (SIN FILTROS NI OSCURECIMIENTOS) ── */}
-  <div id="tgp-lightbox-bg-wrap" class="absolute inset-0 overflow-hidden pointer-events-none">
+  <div id="tgp-lightbox-bg-wrap" class="absolute inset-0 overflow-hidden cursor-move">
     <img
       id="tgp-lightbox-img"
       src=""
@@ -61,19 +61,36 @@ import { resolveMultivisionClass } from "../lib/multivision";
 </div>
 
 <script>
+  import Panzoom from '@panzoom/panzoom';
+
   let images: HTMLImageElement[] = [];
   let currentIndex = 0;
   let fadeTimeout: ReturnType<typeof setTimeout> | null = null;
   let autoplayTimer: ReturnType<typeof setTimeout> | null = null;
   let isAutoplayPaused = false;
+  let panzoomInstance: ReturnType<typeof Panzoom> | null = null;
   const AUTOPLAY_INTERVAL = 4500;
 
   const lightbox = document.getElementById("tgp-lightbox");
   const lightboxImg = document.getElementById("tgp-lightbox-img") as HTMLImageElement;
+  const bgWrap = document.getElementById("tgp-lightbox-bg-wrap");
   const prevBtn = document.getElementById("tgp-lightbox-prev");
   const nextBtn = document.getElementById("tgp-lightbox-next");
   const titleEl = document.getElementById("tgp-lightbox-title");
   const creditsEl = document.getElementById("tgp-lightbox-credits");
+
+  if (lightboxImg && bgWrap) {
+    panzoomInstance = Panzoom(lightboxImg, {
+      maxScale: 5,
+      contain: 'outside'
+    });
+    
+    bgWrap.addEventListener('wheel', (e) => {
+      if (lightbox && !lightbox.classList.contains('hidden')) {
+        panzoomInstance?.zoomWithWheel(e as WheelEvent);
+      }
+    });
+  }
 
   // Swipe táctil
   let touchStartX = 0;
@@ -217,6 +234,9 @@ import { resolveMultivisionClass } from "../lib/multivision";
     document.body.style.overflow = "";
     if (fadeTimeout) clearTimeout(fadeTimeout);
     stopAutoplay();
+    if (panzoomInstance) {
+      panzoomInstance.reset({ animate: false });
+    }
   }
 
   function showNext(isAuto = false) {
@@ -230,6 +250,7 @@ import { resolveMultivisionClass } from "../lib/multivision";
       currentIndex = (currentIndex + 1) % images.length;
       lightboxImg.src = images[currentIndex].src;
       updateImageMeta();
+      if (panzoomInstance) panzoomInstance.reset({ animate: false });
       lightboxImg.style.opacity = "1";
       triggerAutoFade();
       if (isAuto) startAutoplay();
@@ -247,6 +268,7 @@ import { resolveMultivisionClass } from "../lib/multivision";
       currentIndex = (currentIndex - 1 + images.length) % images.length;
       lightboxImg.src = images[currentIndex].src;
       updateImageMeta();
+      if (panzoomInstance) panzoomInstance.reset({ animate: false });
       lightboxImg.style.opacity = "1";
       triggerAutoFade();
     }, 280);

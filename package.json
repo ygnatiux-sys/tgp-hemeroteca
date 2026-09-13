@@ -42,6 +42,7 @@
     "@astrojs/sitemap": "^3.7.3",
     "@aws-sdk/client-s3": "^3.1121.0",
     "@google/genai": "^1.50.1",
+    "@panzoom/panzoom": "^4.5.1",
     "@google/generative-ai": "^0.24.1",
     "@keystatic/astro": "^6.0.0",
     "@keystatic/core": "^0.6.8",
