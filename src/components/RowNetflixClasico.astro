@@ -165,6 +165,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
                data-card-id={cardId}
                data-title={item.title}
                data-eyebrow={item.collectionLabel}
+               data-eyebrow-class={item.customColorClass || 'text-rust-orange'}
                data-excerpt={item.subtitle}
                data-image={item.image}
                data-link={item.link}>
@@ -454,7 +455,9 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
           mTitle.innerHTML = a.dataset.title || '';
           if (mEyebrow) {
              mEyebrow.innerHTML = a.dataset.eyebrow || '';
+             mEyebrow.className = `modal-eyebrow text-[10px] tracking-[0.3em] uppercase font-metadata font-bold mb-2 ${a.dataset.eyebrowClass || "text-rust-orange"}`;
              mEyebrow.style.display = a.dataset.eyebrow ? 'block' : 'none';
+             mEyebrow.style.opacity = '1';
           }
           if (mExcerpt) mExcerpt.innerHTML = a.dataset.excerpt || '';
           if (mCta) mCta.href = a.dataset.link || '#';
@@ -486,7 +489,11 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
       const closeModal = () => {
         if (!modal.open) return;
 
-        const extraContent = mContainer.querySelectorAll('.modal-excerpt, .modal-cta, .close-modal-btn, .modal-eyebrow');
+        // Hide eyebrow immediately to prevent layout jumps during FLIP reverse
+        const eyebrow = mContainer.querySelector(".modal-eyebrow") as HTMLElement | null;
+        if (eyebrow) eyebrow.style.display = "none";
+
+        const extraContent = mContainer.querySelectorAll('.modal-excerpt, .modal-cta, .close-modal-btn');
         gsap.to(extraContent, { opacity: 0, duration: 0.15 });
 
         if (currentFlipTween) {

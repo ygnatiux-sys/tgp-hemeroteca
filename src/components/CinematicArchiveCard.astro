@@ -118,6 +118,7 @@ const imgUrl = safeImg || '';
   data-card-id={cardId}
   data-title={entry.title || ''}
   data-eyebrow={entry.category ? entry.category.toUpperCase() : 'ARCHIVO'}
+  data-eyebrow-class={categoryAccentClass}
   data-excerpt={cleanExcerpt || dek || ''}
   data-image={imgUrl}
   data-link={href}
@@ -588,7 +589,9 @@ const imgUrl = safeImg || '';
           mTitle.innerHTML = card.dataset.title || "";
           if (mEyebrow) {
             mEyebrow.innerHTML = card.dataset.eyebrow || "";
+            mEyebrow.className = `modal-eyebrow text-[10px] tracking-[0.3em] uppercase font-metadata font-bold mb-2 ${card.dataset.eyebrowClass || "text-rust-orange"}`;
             mEyebrow.style.display = card.dataset.eyebrow ? "block" : "none";
+            mEyebrow.style.opacity = "1";
           }
           if (mExcerpt) mExcerpt.innerHTML = card.dataset.excerpt || "";
           if (mCta) mCta.href = card.dataset.link || "#";
@@ -618,7 +621,11 @@ const imgUrl = safeImg || '';
       const closeModal = () => {
         if (!modal.open) return;
 
-        const extraContent = mContainer.querySelectorAll(".modal-excerpt, .modal-cta, .close-modal-btn, .modal-eyebrow");
+        // Hide eyebrow immediately to prevent layout jumps during FLIP reverse
+        const eyebrow = mContainer.querySelector(".modal-eyebrow") as HTMLElement | null;
+        if (eyebrow) eyebrow.style.display = "none";
+
+        const extraContent = mContainer.querySelectorAll(".modal-excerpt, .modal-cta, .close-modal-btn");
         gsap.to(extraContent, { opacity: 0, duration: 0.15 });
 
         if (currentFlipTween) {
