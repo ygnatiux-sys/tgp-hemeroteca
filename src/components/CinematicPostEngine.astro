@@ -794,22 +794,22 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
   }
 
   /* 2. Optimización CSS H1: Gradiente estático en móvil (< md), animación de movimiento activa solo en escritorio (md+) */
-  .cpe-title a.gradient-acero-ios,
-  .cpe-title .gradient-acero-ios {
+  .cpe-title a.gradient-steel-titanium,
+  .cpe-title .gradient-steel-titanium {
     animation: none !important;
     will-change: auto !important;
   }
 
   @media (min-width: 768px) {
-    .cpe-title a.gradient-acero-ios,
-    .cpe-title .gradient-acero-ios {
+    .cpe-title a.gradient-steel-titanium,
+    .cpe-title .gradient-steel-titanium {
       animation: titaniumMetallicSweep 16s ease-in-out infinite !important;
       will-change: background-position !important;
     }
   }
 
   /* Título: Hover en degradado de titanio (Ash White con brillo suave) */
-  .cpe-title a.gradient-acero-ios:hover {
+  .cpe-title a.gradient-steel-titanium:hover {
     background: none !important;
     -webkit-text-fill-color: #EFEBE3 !important;
     color: #EFEBE3 !important;

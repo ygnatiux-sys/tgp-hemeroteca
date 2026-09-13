@@ -155,6 +155,13 @@ export function recommendMetallicGradient(
         gradientSpec: METALLIC_GRADIENTS_LIBRARY.silverBright,
       };
     }
+    if (explicit.includes('acero') || explicit.includes('steel')) {
+      return {
+        gradientClass: METALLIC_GRADIENTS_LIBRARY.steelTitanium.className,
+        strokeClass: METALLIC_GRADIENTS_LIBRARY.steelTitanium.strokeClass,
+        gradientSpec: METALLIC_GRADIENTS_LIBRARY.steelTitanium,
+      };
+    }
   }
 
   const cat = (category || '').toLowerCase();
