@@ -2,6 +2,7 @@
 import { resolveMultivisionClass } from "../lib/multivision";
 import Image from './SafeImage.astro';
 import { sanitizeImageUrl } from "../lib/content-filter";
+import { recommendMetallicGradient } from "../lib/metallic-gradients";
 
 /**
  * CinematicGalleryEngine.astro
@@ -20,6 +21,7 @@ export interface GallerySlideData {
   category?: string;
   year?: string;
   link?: string;
+  metallicGradient?: string;
 }
 
 interface Props {
@@ -42,6 +44,13 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
       <div class="cge-slides absolute inset-0">
         {safeSlides.map((slide, i) => {
           const safeSrc = sanitizeImageUrl(slide.image);
+          const { gradientClass, strokeClass } = recommendMetallicGradient(
+            slide.category || '',
+            slide.title || '',
+            'dark',
+            slide.metallicGradient || null
+          );
+
           return (
             <article
               class={`cge-slide absolute inset-0 flex items-end justify-start p-6 sm:p-10 md:p-14 [content-visibility:auto] contain-content ${i === 0 ? "z-20" : "z-10 opacity-0 pointer-events-none"}`}
@@ -76,12 +85,12 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
                 {/* Título Monumental en Cinzel Extrabold con Steel Gradient */}
                 {slide.link ? (
                   <a href={slide.link} class="group/title block">
-                    <h2 class="cge-title font-cinzel font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-[3.25rem] leading-[1.08] tracking-tight gradient-acero-ios title-stroke-dark-bg drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] group-hover/title:brightness-110 transition-all duration-300">
+                    <h2 class:list={["cge-title font-cinzel font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-[3.25rem] leading-[1.08] tracking-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] transition-all duration-300", gradientClass, strokeClass, "group-hover/title:brightness-110"]}>
                       {slide.title}
                     </h2>
                   </a>
                 ) : (
-                  <h2 class="cge-title font-cinzel font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-[3.25rem] leading-[1.08] tracking-tight gradient-acero-ios title-stroke-dark-bg drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)]">
+                  <h2 class:list={["cge-title font-cinzel font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-[3.25rem] leading-[1.08] tracking-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)]", gradientClass, strokeClass]}>
                     {slide.title}
                   </h2>
                 )}

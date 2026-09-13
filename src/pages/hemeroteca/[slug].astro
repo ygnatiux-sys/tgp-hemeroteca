@@ -29,6 +29,7 @@ import {
 } from "../../lib/content-filter";
 import CinematicDossier from "../../components/CinematicDossier.astro"; // reservado para uso futuro
 import CinematicGalleryEngine from "../../components/CinematicGalleryEngine.astro";
+import { recommendMetallicGradient } from "../../lib/metallic-gradients";
 
 export const prerender = true;
 export async function getStaticPaths() {
@@ -342,10 +343,16 @@ const articleSchema = {
   keywords: [
     doc.category,
     doc.sitioGeohistorico,
-    ...(doc.tags || [])
-  ].filter(Boolean).join(", ")
-};
 const metaImageUrl = typeof optimizedImage === 'object' && optimizedImage?.src ? optimizedImage.src : (typeof optimizedImage === 'string' ? optimizedImage : undefined);
+
+// Gradiente metálico adaptativo (Rojo Netflix, Azul Platinado, Titanio, Plata)
+const { gradientClass: heroGradientClass, strokeClass: heroStrokeClass } = recommendMetallicGradient(
+  doc.category || data.category || '',
+  doc.title || '',
+  'dark',
+  doc.metallicGradient || doc.gradientVariant || null
+);
+const heroTitleClass = `text-[clamp(2.25rem,5vw,4.5rem)] font-cinzel font-extrabold tracking-tight leading-[1.05] ${heroGradientClass} ${heroStrokeClass} text-center mx-auto`;
 ---
 
 <Layout
@@ -374,7 +381,7 @@ const metaImageUrl = typeof optimizedImage === 'object' && optimizedImage?.src ?
     imagePosition={imagePosition}
     eyebrow={doc.category || "Archivo clasificado"}
     subtitle={doc.volantaHook || (doc.excerpt ? `"${doc.excerpt}"` : undefined)}
-    titleClass="text-[clamp(2.25rem,5vw,4.5rem)] font-cinzel font-extrabold tracking-tight leading-[1.05] gradient-acero-ios text-center mx-auto"
+    titleClass={heroTitleClass}
   >
     <div slot="meta" class="flex flex-col items-center justify-center gap-2.5 w-full">
       <div
@@ -764,6 +771,8 @@ const metaImageUrl = typeof optimizedImage === 'object' && optimizedImage?.src ?
           license: img.license || undefined,
           image: img.url || img.thumbUrl || img.src || img,
           imagePosition: img.position || doc.coverImagePosition || 'center center',
+          category: doc.category || data.category,
+          metallicGradient: doc.metallicGradient || doc.gradientVariant,
         }))}
         heightClass="h-[80vh] md:h-dvh max-w-7xl mx-auto rounded-3xl my-16"
       />
