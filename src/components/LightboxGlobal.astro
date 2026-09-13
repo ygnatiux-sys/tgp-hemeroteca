@@ -274,8 +274,29 @@ import { resolveMultivisionClass } from "../lib/multivision";
     }, 280);
   }
 
-  // Clic en cualquier parte cierra el visor (salvo flechas)
+  let pointerDownX = 0;
+  let pointerDownY = 0;
+  let isDragging = false;
+
+  lightbox?.addEventListener("pointerdown", (e) => {
+    pointerDownX = e.clientX;
+    pointerDownY = e.clientY;
+    isDragging = false;
+  });
+
+  lightbox?.addEventListener("pointerup", (e) => {
+    const dist = Math.hypot(e.clientX - pointerDownX, e.clientY - pointerDownY);
+    if (dist > 5) {
+      isDragging = true;
+    }
+  });
+
+  // Clic en cualquier parte cierra el visor (salvo flechas y drags)
   lightbox?.addEventListener("click", (e) => {
+    if (isDragging) {
+      isDragging = false;
+      return;
+    }
     const target = e.target as HTMLElement | null;
     if (target?.closest("#tgp-lightbox-prev, #tgp-lightbox-next")) {
       return;
