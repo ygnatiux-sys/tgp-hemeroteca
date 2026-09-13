@@ -892,6 +892,23 @@ html[data-nav-state="2"] header:hover .brand-element {
     color: transparent;
   }
 
+  /* STEEL TITANIUM CEPILLADO (Hemeroteca Original — Slate azul-acero cálido)
+     La paleta clásica de la hemeroteca: #94A3B8 → #64748B → #94A3B8 → #475569 → #334155
+     Hermano azulado del Gloock gradient. Destello azul-acero especular en el centro. */
+  .gradient-steel-titanium {
+    background-image: linear-gradient(
+      to bottom,
+      #94A3B8 0%,
+      #64748B 30%,
+      #94A3B8 50%,
+      #475569 75%,
+      #334155 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
   /* Delineado ultra-mínimo 0.1px (simulado con precision sub-pixel y paint-order: stroke fill) */
   /* BG_MODE == "DARK": Filo Negro #000000 para cortar la luz sobre fondo oscuro */
   .stroke-dark-mode,

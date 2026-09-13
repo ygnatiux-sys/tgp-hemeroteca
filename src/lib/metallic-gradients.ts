@@ -97,9 +97,21 @@ export const METALLIC_GRADIENTS_LIBRARY: Record<string, MetallicGradientSpec> = 
     baseHex: "#E3DDD3",
     middleHex: "#D4CDC2",
     bottomHex: "#736C62",
-    stopsDescription: "#E3DDD3 (0%) ➔ #D4CDC2 (55%) ➔ rgba(227,221,211,0.50) (100%)",
+    stopsDescription: "#E3DDD3 (0%) ➡ #D4CDC2 (55%) ➡ rgba(227,221,211,0.50) (100%)",
     visualEffect: "Metal mate de tono marfil/acero pulido suave. Presencia física táctil para tarjetas menores sin competir con la portada hero.",
     recommendedFor: ["Tarjetas secundarias de archivo", "Grillas compactas"],
+  },
+  steelTitanium: {
+    id: "steelTitanium",
+    name: "Steel Titanium Cepillado (Hemeroteca Original)",
+    className: "gradient-steel-titanium",
+    strokeClass: "",
+    baseHex: "#94A3B8",
+    middleHex: "#94A3B8",
+    bottomHex: "#334155",
+    stopsDescription: "#94A3B8 (0%) ➡ #64748B (30%) ➡ #94A3B8 (50% Reflejo) ➡ #475569 (75%) ➡ #334155 (100%)",
+    visualEffect: "Acero cepillado azul-titanio con destello especular en el centro. Paleta Slate original de la Hemeroteca TGP. Hermano azulado del Gloock gradient pero en Cinzel.",
+    recommendedFor: ["Hero cinémático de inicio por defecto", "Títulos generales sobre fondo oscuro", "Sección principal Home"],
   },
 };
 
@@ -181,10 +193,10 @@ export function recommendMetallicGradient(
     };
   }
 
-  // 4. Fallback estándar Hero sobre fondo oscuro -> Plata Brillante
+  // 4. Fallback estándar Hero sobre fondo oscuro → Steel Titanium (Hemeroteca Original)
   return {
-    gradientClass: METALLIC_GRADIENTS_LIBRARY.silverBright.className,
-    strokeClass: METALLIC_GRADIENTS_LIBRARY.silverBright.strokeClass,
-    gradientSpec: METALLIC_GRADIENTS_LIBRARY.silverBright,
+    gradientClass: METALLIC_GRADIENTS_LIBRARY.steelTitanium.className,
+    strokeClass: METALLIC_GRADIENTS_LIBRARY.steelTitanium.strokeClass,
+    gradientSpec: METALLIC_GRADIENTS_LIBRARY.steelTitanium,
   };
 }
