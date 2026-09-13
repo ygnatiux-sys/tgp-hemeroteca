@@ -112,7 +112,9 @@ const imgUrl = safeImg || '';
 ---
 
 <article
-  class={`cinematic-archive-card flex flex-col gap-4 group w-full h-full`}
+  class={`cinematic-archive-card flex flex-col gap-4 group w-full h-full ${isHero ? 'is-hero-card' : ''}`}
+  data-variant={variant}
+  data-is-hero={isHero ? "true" : "false"}
   data-category={normalizeCategory(entry.category)}
   data-year={year}
   data-card-id={cardId}
@@ -237,7 +239,7 @@ const imgUrl = safeImg || '';
     )}
 
     {/* Tags de Categorías y Metadatos en color default — separación limpia respecto al excerpt en modo cinemático */}
-    <div class={`flex flex-wrap items-center gap-x-4 gap-y-1.5 font-metadata text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-white/50 w-full ${hideExteriorTitle ? 'justify-center pt-6 sm:pt-8 border-t border-white/10 mx-auto max-w-xl' : 'justify-start'}`}>
+    <div class={`flex flex-wrap items-center gap-x-4 gap-y-1.5 ${isHero ? "font-['Proza_Libre']" : "font-metadata"} text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-white/50 w-full ${hideExteriorTitle ? 'justify-center pt-6 sm:pt-8 border-t border-white/10 mx-auto max-w-xl' : 'justify-start'}`}>
       {entry.category && (
         <span class="ch-tag">{entry.category.toUpperCase()}</span>
       )}
@@ -387,54 +389,148 @@ const imgUrl = safeImg || '';
         },
       });
 
-      // ── 1. Pase 1 del Metal Sweep (Inicio Rápido) + Tags pulse ──
-      if (ctaBtn) {
-        ctaBtn.classList.remove("sweep-fast", "sweep-slow");
-        void ctaBtn.offsetWidth;
-        ctaBtn.classList.add("sweep-fast");
+      const isHeroCard = card.dataset.isHero === "true" || card.dataset.variant === "hero";
+
+      // ══════════════════════════════════════════════════════════════════
+      // CASO 1: TARJETAS ESTÁNDAR / NO-HERO (Lógica original intacta)
+      // ══════════════════════════════════════════════════════════════════
+      if (!isHeroCard) {
+        // 1. Pase 1 del Metal Sweep (Inicio Rápido) + Tags pulse
+        if (ctaBtn) {
+          ctaBtn.classList.remove("sweep-fast", "sweep-slow");
+          void ctaBtn.offsetWidth;
+          ctaBtn.classList.add("sweep-fast");
+        }
+
+        if (tags.length) {
+          tl.fromTo(
+            tags,
+            { opacity: 0, filter: "blur(2px)" },
+            { opacity: 1, filter: "blur(0px)", duration: 0.6, stagger: 0.03, ease: "power2.out" },
+            0
+          ).to(tags, { opacity: 0.7, duration: 0.4 }, 0.6);
+        }
+
+        // 2. H1 zoom-out para ceder el escenario al excerpt
+        if (h1Container && excerptContainer) {
+          tl.to(
+            h1Container,
+            {
+              scale: 1.06,
+              y: -4,
+              filter: "blur(8px)",
+              opacity: 0,
+              duration: 0.9,
+              ease: "power2.inOut",
+              force3D: true,
+            },
+            0.3
+          );
+        }
+
+        // 3. Excerpt escribe toda la línea a la vez
+        if (excerptContainer) {
+          tl.fromTo(
+            excerptContainer,
+            { opacity: 0, filter: "blur(12px)", y: 8 },
+            {
+              opacity: 1,
+              filter: "blur(0px)",
+              y: 0,
+              duration: 0.8,
+              ease: "power3.out",
+            },
+            0.8
+          );
+
+          // 4. Pausa de lectura
+          tl.to({}, { duration: 2.8 });
+
+          // 5. Disolución fluida del excerpt
+          tl.to(excerptContainer, {
+            opacity: 0,
+            filter: "blur(10px)",
+            scale: 0.98,
+            y: -4,
+            duration: 0.8,
+            ease: "power2.inOut",
+          });
+        }
+
+        // 6. Re-materialización líquida del H1
+        if (h1Container) {
+          tl.fromTo(
+            h1Container,
+            { opacity: 0, filter: "blur(14px)", scale: 0.98, y: 6 },
+            { opacity: 1, filter: "blur(0px)", scale: 1, y: 0, duration: 1.2, ease: "power3.out", force3D: true },
+            excerptContainer ? "-=0.2" : "0"
+          );
+        }
+
+        // 7. Dek exterior: revelado suave
+        if (dekContainer) {
+          tl.fromTo(
+            dekContainer,
+            { opacity: 0.7, y: 2 },
+            { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+            0.4
+          );
+        }
+
+        // 8. Pase 2 del Metal Sweep
+        if (ctaBtn) {
+          tl.add(() => {
+            ctaBtn.classList.remove("sweep-fast", "sweep-slow");
+            void ctaBtn.offsetWidth;
+            ctaBtn.classList.add("sweep-slow");
+          }, "-=0.6");
+        }
+
+        tl.to({}, { duration: 2.5 });
+        return;
       }
 
+      // ══════════════════════════════════════════════════════════════════
+      // CASO 2: HERO CARD CINEMÁTICO (Solo Heros de Archivo General)
+      // Dinámica sin superposición: título inicial se oculta -> entra excerpt ->
+      // se disuelve -> vuelve el título y queda fijo al final
+      // ══════════════════════════════════════════════════════════════════
+
+      // 1. Tags pulse sutil
       if (tags.length) {
         tl.fromTo(
           tags,
           { opacity: 0, filter: "blur(2px)" },
-          { opacity: 1, filter: "blur(0px)", duration: 0.6, stagger: 0.03, ease: "power2.out" },
+          { opacity: 1, filter: "blur(0px)", duration: 0.5, stagger: 0.03, ease: "power2.out" },
           0
-        ).to(tags, { opacity: 0.7, duration: 0.4 }, 0.6);
+        ).to(tags, { opacity: 0.7, duration: 0.3 }, 0.5);
       }
 
-      // ── 2. H1 zoom-out para ceder el escenario al excerpt ──
-      if (h1Container && excerptContainer) {
+      // 2. El título inicial se desvanece de inmediato (0s a 0.35s) para NUNCA pisarse con el excerpt
+      if (h1Container) {
         tl.to(
           h1Container,
           {
-            scale: 1.06,
-            y: -4,
-            filter: "blur(8px)",
             opacity: 0,
-            duration: 0.9,
+            filter: "blur(8px)",
+            scale: 0.98,
+            duration: 0.35,
             ease: "power2.inOut",
             force3D: true,
           },
-          0.3
+          0
         );
       }
 
-      // ── 3. Excerpt: reveal por palabras con SplitText en hero, simple fade en el resto ──
-      const cardArticle = card.closest('article.cinematic-archive-card') as HTMLElement | null;
-      const isHeroCard = card.getAttribute('data-variant') === 'hero' ||
-                         card.querySelector('.ch-excerpt-container')?.classList.contains('text-lg') ||
-                         card.querySelector('.ch-excerpt-container')?.classList.contains('text-xl');
-
+      // 3. Excerpt cinemático con SplitText: entra limpio a los 0.4s (cuando el título ya no está)
       if (excerptContainer) {
         let splitExcerpt: InstanceType<typeof SplitText> | null = null;
-
-        if (isHeroCard) {
+        try {
           splitExcerpt = new SplitText(excerptContainer, {
-            type: 'lines,words',
-            linesClass: 'overflow-hidden',
+            type: "lines,words",
+            linesClass: "overflow-hidden",
           });
-          // Estado inicial: palabras debajo de su línea (efecto máscara)
+          gsap.set(excerptContainer, { opacity: 1 });
           gsap.set(splitExcerpt.words, { yPercent: 110, opacity: 0 });
 
           tl.to(
@@ -442,70 +538,84 @@ const imgUrl = safeImg || '';
             {
               yPercent: 0,
               opacity: 1,
-              duration: 1.0,
-              stagger: 0.03,
-              ease: 'power3.out',
+              duration: 0.85,
+              stagger: 0.025,
+              ease: "power3.out",
             },
-            0.8
+            0.4
           );
-        } else {
+        } catch (e) {
           tl.fromTo(
             excerptContainer,
-            { opacity: 0, filter: 'blur(12px)', y: 8 },
-            { opacity: 1, filter: 'blur(0px)', y: 0, duration: 0.8, ease: 'power3.out' },
-            0.8
+            { opacity: 0, filter: "blur(12px)", y: 8 },
+            { opacity: 1, filter: "blur(0px)", y: 0, duration: 0.8, ease: "power3.out" },
+            0.4
           );
         }
 
-        // ── 4. Pausa de lectura ──
-        tl.to({}, { duration: 2.8 });
+        // 4. Pausa de lectura completa y cómoda
+        tl.to({}, { duration: 3.0 });
 
-        // ── 5. Disolución del excerpt ──
-        tl.to(excerptContainer, {
-          opacity: 0,
-          filter: 'blur(10px)',
-          scale: 0.98,
-          y: -4,
-          duration: 0.8,
-          ease: 'power2.inOut',
-          onComplete: () => { if (splitExcerpt) splitExcerpt.revert(); },
-        });
-      }
-
-
-      // ── 6. Re-materialización del H1: SplitText en hero (palabras caen desde arriba), simple en el resto ──
-      if (h1Container) {
-        const isHeroCard2 = !!card.querySelector('.ch-excerpt-container');
-        if (isHeroCard2) {
-          // Usar SplitText en el h1 para efecto cascade por palabras
-          const splitH1 = new SplitText(h1Container, {
-            type: 'words',
-          });
-          gsap.set(splitH1.words, { yPercent: -60, opacity: 0, filter: 'blur(8px)' });
-          tl.to(
-            splitH1.words,
-            {
-              yPercent: 0,
-              opacity: 1,
-              filter: 'blur(0px)',
-              duration: 1.4,
-              stagger: 0.06,
-              ease: 'power4.out',
-              onComplete: () => splitH1.revert(),
+        // 5. Disolución total del excerpt
+        if (splitExcerpt && splitExcerpt.words?.length) {
+          tl.to(splitExcerpt.words, {
+            opacity: 0,
+            filter: "blur(8px)",
+            yPercent: -20,
+            duration: 0.7,
+            stagger: 0.01,
+            ease: "power2.inOut",
+            onComplete: () => {
+              if (splitExcerpt) splitExcerpt.revert();
+              gsap.set(excerptContainer, { opacity: 0 });
             },
-            excerptContainer ? '-=0.2' : '0'
-          );
+          });
         } else {
-          tl.fromTo(
-            h1Container,
-            { opacity: 0, filter: 'blur(14px)', scale: 0.98, y: 6 },
-            { opacity: 1, filter: 'blur(0px)', scale: 1, y: 0, duration: 1.2, ease: 'power3.out', force3D: true },
-            excerptContainer ? '-=0.2' : '0'
-          );
+          tl.to(excerptContainer, {
+            opacity: 0,
+            filter: "blur(10px)",
+            scale: 0.98,
+            y: -4,
+            duration: 0.7,
+            ease: "power2.inOut",
+          });
         }
       }
 
-      // ── 7. Dek exterior: revelado suave y presencia visual ──
+      // 6. El título VUELVE y SE QUEDA FIJO al final de la dinámica (sin SplitText destructivo)
+      if (h1Container) {
+        tl.fromTo(
+          h1Container,
+          {
+            opacity: 0,
+            filter: "blur(14px)",
+            scale: 0.96,
+            y: 8,
+          },
+          {
+            opacity: 1,
+            filter: "blur(0px)",
+            scale: 1,
+            y: 0,
+            duration: 1.2,
+            ease: "power3.out",
+            force3D: true,
+            onComplete: () => {
+              // Dejarlo fijo y visible de manera permanente al terminar la dinámica
+              gsap.set(h1Container, {
+                opacity: 1,
+                filter: "none",
+                scale: 1,
+                y: 0,
+                clearProps: "filter,transform",
+              });
+            },
+          },
+          "+=0.08"
+        );
+      }
+
+      // 7. Dek exterior
       if (dekContainer) {
         tl.fromTo(
           dekContainer,
@@ -515,17 +625,16 @@ const imgUrl = safeImg || '';
         );
       }
 
-      // ── 8. Pase 2 del Metal Sweep (ULTRA LENTO) en el CTA ──
+      // 8. Pase del Metal Sweep
       if (ctaBtn) {
         tl.add(() => {
           ctaBtn.classList.remove("sweep-fast", "sweep-slow");
           void ctaBtn.offsetWidth;
           ctaBtn.classList.add("sweep-slow");
-        }, "-=0.6");
+        }, "-=0.4");
       }
 
-      // Margen final de reposo
-      tl.to({}, { duration: 2.5 });
+      tl.to({}, { duration: 1.5 });
     });
   };
 
