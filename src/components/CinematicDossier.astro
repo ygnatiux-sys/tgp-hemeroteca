@@ -290,7 +290,7 @@ const { fragments = [], isModal = false } = Astro.props;
 
 <script>
   import { gsap } from 'gsap';
-  import SplitType from 'split-type';
+  import { SplitText } from 'gsap/SplitText';
 
   function initCinematicDossier() {
     const wrapper = document.querySelector<HTMLElement>('.cinematic-dossier-wrapper');
@@ -330,10 +330,10 @@ const { fragments = [], isModal = false } = Astro.props;
         (subtitle as any)._splitInstance.revert();
       }
 
-      let splitTitle = title ? new SplitType(title as HTMLElement, { types: 'words,chars' }) : null;
+      let splitTitle = title ? new SplitText(title as HTMLElement, { type: 'lines,words,chars', linesClass: "overflow-hidden" }) : null;
       if (title) (title as any)._splitInstance = splitTitle;
       
-      let splitSubtitle = subtitle ? new SplitType(subtitle as HTMLElement, { types: 'words,chars' }) : null;
+      let splitSubtitle = subtitle ? new SplitText(subtitle as HTMLElement, { type: 'lines,words,chars', linesClass: "overflow-hidden" }) : null;
       if (subtitle) (subtitle as any)._splitInstance = splitSubtitle;
 
       // Ocultar textos de slides que no sean la primera
@@ -353,28 +353,38 @@ const { fragments = [], isModal = false } = Astro.props;
       const splitSubtitle = subtitle ? (subtitle as any)._splitInstance : null;
 
       const elementsToAnimate = [
-        ...(splitTitle ? splitTitle.chars || [] : []),
-        ...(splitSubtitle ? splitSubtitle.chars || [] : [])
+        ...(splitTitle ? splitTitle.words || [] : []),
+        ...(splitSubtitle ? splitSubtitle.words || [] : [])
       ];
 
       const extrasToAnimate = [tags, cta, icons].filter(Boolean);
 
-      // Set initial states
-      gsap.set(elementsToAnimate, { opacity: 0, y: 45, filter: 'blur(12px)' });
+      // Set initial states for cinematic mask effect
+      gsap.set(elementsToAnimate, { yPercent: 120, opacity: 0, rotationX: -20, transformOrigin: "0% 50% -50" });
       if (extrasToAnimate.length) gsap.set(extrasToAnimate, { opacity: 0, y: 20 });
 
       const tl = gsap.timeline({ delay: 0.2 });
 
-      if (splitTitle && splitTitle.chars && splitTitle.chars.length > 0) {
-        tl.to(splitTitle.chars, {
-          opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.5, ease: 'power3.out', stagger: 0.02
+      if (splitTitle && splitTitle.words && splitTitle.words.length > 0) {
+        tl.to(splitTitle.words, {
+          opacity: 1, 
+          yPercent: 0, 
+          rotationX: 0,
+          duration: 1.2, 
+          ease: 'power4.out', 
+          stagger: 0.04
         });
       }
 
-      if (splitSubtitle && splitSubtitle.chars && splitSubtitle.chars.length > 0) {
-        tl.to(splitSubtitle.chars, {
-          opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.5, ease: 'power3.out', stagger: 0.01
-        }, "-=1.0");
+      if (splitSubtitle && splitSubtitle.words && splitSubtitle.words.length > 0) {
+        tl.to(splitSubtitle.words, {
+          opacity: 1, 
+          yPercent: 0, 
+          rotationX: 0,
+          duration: 1.2, 
+          ease: 'power4.out', 
+          stagger: 0.02
+        }, "-=0.8");
       }
 
       if (extrasToAnimate.length > 0) {

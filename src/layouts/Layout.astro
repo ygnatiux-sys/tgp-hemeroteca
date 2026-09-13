@@ -174,20 +174,50 @@ const globalSchema = {
       )
     }
 
-    <main class="grow relative">
-      {/* F4: Único H1 semántico del sitio — sr-only para screen readers y crawlers (AOM/SEO) */}
-      {/* El logotipo visual en Header actúa como identidad; este H1 provee jerarquía accesible */}
-      <h1 class="sr-only">{title}</h1>
-      <slot />
-    </main>
+    <div id="smooth-wrapper">
+      <div id="smooth-content">
+        <main class="grow relative">
+          {/* F4: Único H1 semántico del sitio — sr-only para screen readers y crawlers (AOM/SEO) */}
+          {/* El logotipo visual en Header actúa como identidad; este H1 provee jerarquía accesible */}
+          <h1 class="sr-only">{title}</h1>
+          <slot />
+        </main>
 
-    <Footer variant={footerVariant} />
+        <Footer variant={footerVariant} />
+      </div>
+    </div>
 
     {/* Visor Inmersivo Global */}
     <LightboxGlobal />
 
     <script>
-      const setupGlobalReveal = () => {
+      import { gsap } from "gsap";
+      import { ScrollTrigger } from "gsap/ScrollTrigger";
+      import { ScrollSmoother } from "gsap/ScrollSmoother";
+      import { SplitText } from "gsap/SplitText";
+      import { MorphSVGPlugin } from "gsap/MorphSVG";
+
+      // Registro global obligatorio de plugins nativos
+      gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText, MorphSVGPlugin);
+
+      let smootherInstance: globalThis.ScrollSmoother | null = null;
+
+      const initGSAP = () => {
+        // Asegurarse de destruir instancia previa si existe (HMR o back navigation)
+        if (smootherInstance) {
+          smootherInstance.kill();
+        }
+
+        // Inicializar ScrollSmoother
+        smootherInstance = ScrollSmoother.create({
+          wrapper: "#smooth-wrapper",
+          content: "#smooth-content",
+          smooth: 1.5,
+          effects: true,
+          smoothTouch: 0.1,
+        });
+
+        // Revelado global de elementos
         const observer = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
@@ -199,7 +229,7 @@ const globalSchema = {
           },
           {
             threshold: 0.1,
-            rootMargin: "0px 0px -10% 0px", // Se activa un poco antes de llegar
+            rootMargin: "0px 0px -10% 0px",
           },
         );
 
@@ -208,8 +238,17 @@ const globalSchema = {
           .forEach((el) => observer.observe(el));
       };
 
-      document.addEventListener("DOMContentLoaded", setupGlobalReveal);
-      document.addEventListener("astro:page-load", setupGlobalReveal);
+      const cleanupGSAP = () => {
+        if (smootherInstance) {
+          smootherInstance.kill();
+          smootherInstance = null;
+        }
+        ScrollTrigger.getAll().forEach(t => t.kill());
+      };
+
+      document.addEventListener("DOMContentLoaded", initGSAP);
+      document.addEventListener("astro:page-load", initGSAP);
+      document.addEventListener("astro:before-swap", cleanupGSAP);
     </script>
   </body>
 </html>
