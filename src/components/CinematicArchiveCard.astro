@@ -85,7 +85,7 @@ const titleClass = isHero
     : "text-[1.5rem] sm:text-[1.85rem] md:text-[2.5rem] font-extrabold leading-[1.05]";
 
 const excerptClass = isHero
-  ? "text-xs sm:text-sm md:text-base text-white/90 line-clamp-2 max-w-3xl font-light"
+  ? "text-base sm:text-lg md:text-xl text-white/90 line-clamp-3 max-w-3xl leading-relaxed"
   : isDuo40
     ? "text-[11px] sm:text-xs text-white/80 line-clamp-1 max-w-xl font-light"
     : "text-xs sm:text-sm text-white/85 line-clamp-2 max-w-2xl font-light";
@@ -168,7 +168,7 @@ const imgUrl = safeImg || '';
     {/* ✦ H1 INTERIOR DENTRO DE LA CARD (Con Cinzel Steel Gradient + GSAP Fade In) */}
     <div class={`absolute inset-0 z-20 flex flex-col justify-end p-4 sm:p-6 md:p-8 pointer-events-none ${hideExteriorTitle ? 'items-center text-center pb-8 sm:pb-12' : 'items-start text-left'}`}>
       {cleanExcerpt && (
-        <p class={`font-sans leading-relaxed max-w-[66ch] tracking-wider mb-2 line-clamp-2 ch-excerpt-container opacity-0 ${hideExteriorTitle ? 'text-center mx-auto' : 'text-left'} ${excerptClass}`}>
+        <p class={`leading-relaxed max-w-[66ch] tracking-wider mb-2 line-clamp-3 ch-excerpt-container opacity-0 ${isHero ? 'font-[Alegreya_Sans] text-base sm:text-lg md:text-xl text-white/85' : 'font-sans'} ${hideExteriorTitle ? 'text-center mx-auto' : 'text-left'} ${excerptClass}`}>
           <span class="ch-excerpt-line inline-block">{cleanExcerpt}</span>
         </p>
       )}
@@ -229,7 +229,9 @@ const imgUrl = safeImg || '';
 
     {/* Excerpt con estilo Cartelera de Cine */}
     {dek && (
-      <p class={`card-dek ch-dek-container ${hideExteriorTitle ? 'font-serif text-lg sm:text-xl md:text-2xl text-[#EFEBE3]/95 leading-relaxed tracking-wide max-w-4xl text-center mb-10 sm:mb-14 mx-auto drop-shadow-lg' : 'font-sans text-xs sm:text-sm md:text-base text-[#E3DDD3]/85 leading-relaxed tracking-normal mb-4 sm:mb-5 max-w-[56ch]'}`}>
+      <p class={`card-dek ch-dek-container ${hideExteriorTitle
+        ? `font-['Proza_Libre'] text-lg sm:text-xl md:text-2xl text-[#EFEBE3]/95 leading-relaxed tracking-[0.01em] max-w-4xl text-center mb-10 sm:mb-14 mx-auto drop-shadow-lg`
+        : 'font-sans text-xs sm:text-sm md:text-base text-[#E3DDD3]/85 leading-relaxed tracking-normal mb-4 sm:mb-5 max-w-[56ch]'}`}>
         {dek}
       </p>
     )}
@@ -359,8 +361,9 @@ const imgUrl = safeImg || '';
 <script>
   import { gsap } from "gsap";
   import { Flip } from "gsap/Flip";
+  import { SplitText } from "gsap/SplitText";
 
-  gsap.registerPlugin(Flip);
+  gsap.registerPlugin(Flip, SplitText);
 
   const runCardSequence = (card: HTMLElement): Promise<void> => {
     return new Promise((resolve) => {
@@ -417,43 +420,89 @@ const imgUrl = safeImg || '';
         );
       }
 
-      // ── 3. Excerpt escribe toda la línea a la vez (Línea por línea rápida y fluida) ──
-      if (excerptContainer) {
-        tl.fromTo(
-          excerptContainer,
-          { opacity: 0, filter: "blur(12px)", y: 8 },
-          {
-            opacity: 1,
-            filter: "blur(0px)",
-            y: 0,
-            duration: 0.8,
-            ease: "power3.out",
-          },
-          0.8
-        );
+      // ── 3. Excerpt: reveal por palabras con SplitText en hero, simple fade en el resto ──
+      const cardArticle = card.closest('article.cinematic-archive-card') as HTMLElement | null;
+      const isHeroCard = card.getAttribute('data-variant') === 'hero' ||
+                         card.querySelector('.ch-excerpt-container')?.classList.contains('text-lg') ||
+                         card.querySelector('.ch-excerpt-container')?.classList.contains('text-xl');
 
-        // ── 4. Pausa de lectura completa ──
+      if (excerptContainer) {
+        let splitExcerpt: InstanceType<typeof SplitText> | null = null;
+
+        if (isHeroCard) {
+          splitExcerpt = new SplitText(excerptContainer, {
+            type: 'lines,words',
+            linesClass: 'overflow-hidden',
+          });
+          // Estado inicial: palabras debajo de su línea (efecto máscara)
+          gsap.set(splitExcerpt.words, { yPercent: 110, opacity: 0 });
+
+          tl.to(
+            splitExcerpt.words,
+            {
+              yPercent: 0,
+              opacity: 1,
+              duration: 1.0,
+              stagger: 0.03,
+              ease: 'power3.out',
+            },
+            0.8
+          );
+        } else {
+          tl.fromTo(
+            excerptContainer,
+            { opacity: 0, filter: 'blur(12px)', y: 8 },
+            { opacity: 1, filter: 'blur(0px)', y: 0, duration: 0.8, ease: 'power3.out' },
+            0.8
+          );
+        }
+
+        // ── 4. Pausa de lectura ──
         tl.to({}, { duration: 2.8 });
 
-        // ── 5. Disolución fluida del excerpt ──
+        // ── 5. Disolución del excerpt ──
         tl.to(excerptContainer, {
           opacity: 0,
-          filter: "blur(10px)",
+          filter: 'blur(10px)',
           scale: 0.98,
           y: -4,
           duration: 0.8,
-          ease: "power2.inOut",
+          ease: 'power2.inOut',
+          onComplete: () => { if (splitExcerpt) splitExcerpt.revert(); },
         });
       }
 
-      // ── 6. Re-materialización líquida del H1 ──
+
+      // ── 6. Re-materialización del H1: SplitText en hero (palabras caen desde arriba), simple en el resto ──
       if (h1Container) {
-        tl.fromTo(
-          h1Container,
-          { opacity: 0, filter: "blur(14px)", scale: 0.98, y: 6 },
-          { opacity: 1, filter: "blur(0px)", scale: 1, y: 0, duration: 1.2, ease: "power3.out", force3D: true },
-          excerptContainer ? "-=0.2" : "0"
-        );
+        const isHeroCard2 = !!card.querySelector('.ch-excerpt-container');
+        if (isHeroCard2) {
+          // Usar SplitText en el h1 para efecto cascade por palabras
+          const splitH1 = new SplitText(h1Container, {
+            type: 'words',
+          });
+          gsap.set(splitH1.words, { yPercent: -60, opacity: 0, filter: 'blur(8px)' });
+          tl.to(
+            splitH1.words,
+            {
+              yPercent: 0,
+              opacity: 1,
+              filter: 'blur(0px)',
+              duration: 1.4,
+              stagger: 0.06,
+              ease: 'power4.out',
+              onComplete: () => splitH1.revert(),
+            },
+            excerptContainer ? '-=0.2' : '0'
+          );
+        } else {
+          tl.fromTo(
+            h1Container,
+            { opacity: 0, filter: 'blur(14px)', scale: 0.98, y: 6 },
+            { opacity: 1, filter: 'blur(0px)', scale: 1, y: 0, duration: 1.2, ease: 'power3.out', force3D: true },
+            excerptContainer ? '-=0.2' : '0'
+          );
+        }
       }
 
       // ── 7. Dek exterior: revelado suave y presencia visual ──
