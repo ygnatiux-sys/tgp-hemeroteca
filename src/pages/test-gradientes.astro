@@ -1,0 +1,170 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
+import { METALLIC_GRADIENTS_LIBRARY } from '../lib/metallic-gradients';
+
+// 4 POSTS DUMP DE PRUEBA: UNO PARA CADA COLOR METÁLICO
+const testPosts = [
+  {
+    colorName: "1. ROJO NETFLIX METAL ANODIZADO",
+    tag: "HARD HISTORY / BÉLICO",
+    gradientClass: "gradient-rojo-netflix",
+    strokeClass: "title-stroke-dark-bg",
+    desc: "Bisel afilado blanco puro (#FFFFFF 45-55%) sobre rojo carmesí (#E50914) y base sangre profunda (#2B0002) con filo negro 0.15px.",
+    slug: "atila-y-el-papa",
+    entry: {
+      title: "Atila y el Papa",
+      category: "Historia",
+      themeColor: "bordeaux",
+      dek: "El encuentro en el río Mincio donde la espada de los hunos se detuvo ante la mística de Roma.",
+      excerpt: "En el año 452, el líder huno que asoló Europa retrocedió sin derramar una sola gota de sangre.",
+      date: "2026-08-10",
+      metallicGradient: "rojo-netflix",
+      bgContrast: "dark",
+      titlePosition: "bottom",
+    },
+    img: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=1200&auto=format&fit=crop",
+    href: "/hemeroteca/atila-y-el-papa/",
+  },
+  {
+    colorName: "2. AZUL PLATINADO METAL ANODIZADO",
+    tag: "GNOSIS / COSMOLOGÍA / FILOSOFÍA",
+    gradientClass: "gradient-azul-platinado",
+    strokeClass: "title-stroke-dark-bg",
+    desc: "Bisel de luz blanca (#FFFFFF 45-55%) sobre zafiro eléctrico (#38BDF8) y receso abisal (#030712) con filo negro 0.15px.",
+    slug: "del-cosmos-a-la-luna",
+    entry: {
+      title: "Del Cosmos a la Luna",
+      category: "Filosofía",
+      themeColor: "old-navy",
+      dek: "Cartografía del asombro: el viaje humano desde el mito astronómico hasta el silencio selenita.",
+      excerpt: "Mirar al cielo fue el primer acto de conciencia de la especie antes de inventar la palabra.",
+      date: "2026-07-28",
+      metallicGradient: "azul-platinado",
+      bgContrast: "dark",
+      titlePosition: "bottom",
+    },
+    img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop",
+    href: "/hemeroteca/del-cosmos-a-la-luna/",
+  },
+  {
+    colorName: "3. PLATA BRILLANTE (BRIGHT SILVER)",
+    tag: "PORTADA HERO OSCURA / DOSSIER ESTÁNDAR",
+    gradientClass: "gradient-silver-bright",
+    strokeClass: "title-stroke-dark-bg",
+    desc: "Aluminio cepillado Apple iOS (#D1D1D6 ➔ #FFFFFF 50% ➔ #8E8E93) con filo negro ultrafino de corte.",
+    slug: "bonampak",
+    entry: {
+      title: "Bonampak: El Fin Maya",
+      category: "Ensayos Cinemáticos",
+      themeColor: "british-green",
+      dek: "Los murales que revelaron la crudeza ceremonial y el ocaso de la dinastía de Chan Muan.",
+      excerpt: "Los frescos preservados en la selva lacandona desmantelaron el mito del pacifismo maya.",
+      date: "2026-09-01",
+      metallicGradient: "plata-brillante",
+      bgContrast: "dark",
+      titlePosition: "bottom",
+    },
+    img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop",
+    href: "/hemeroteca/bonampak/",
+  },
+  {
+    colorName: "4. TITANIO OSCURO (DARK TITANIUM)",
+    tag: "FONDOS CLAROS / CIELO DIURNO / BRUMA",
+    gradientClass: "gradient-titanium-dark",
+    strokeClass: "title-stroke-light-bg",
+    desc: "Grafito oscuro (#8E8E93 ➔ #E5E5EA 45% ➔ #1C1C1E) con filo blanco microscópico para contraste sobre luz.",
+    slug: "el-aguara-guazu-sudamericano",
+    entry: {
+      title: "El Aguará Guazú",
+      category: "Historia Natural",
+      themeColor: "rust-orange",
+      dek: "El cánido solitario de los pastizales sudamericanos entre la niebla del alba y el mito del lobisón.",
+      excerpt: "Zancadas silenciosas sobre la paja brava mientras la bruma matinal cubre el horizonte.",
+      date: "2026-09-12",
+      metallicGradient: "titanio-oscuro",
+      bgContrast: "light",
+      titlePosition: "top",
+    },
+    img: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop",
+    href: "/ensayos-cinematicos/el-aguara-guazu-sudamericano/",
+  },
+];
+---
+
+<Layout title="Laboratorio de Metales Tipográficos — TGP" hideHeader={false} footerVariant="minimal">
+  <main class="min-h-screen bg-[#070809] text-[#E0E0E0] px-4 sm:px-6 lg:px-12 py-16 max-w-7xl mx-auto">
+    
+    {/* ENCABEZADO DE PRESENTACIÓN */}
+    <header class="mb-16 pb-8 border-b border-white/10 text-center md:text-left">
+      <div class="inline-flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/15 text-[10px] uppercase font-mono tracking-[0.3em] text-rust-orange mb-4">
+        <span class="w-2 h-2 rounded-full bg-rust-orange animate-pulse" />
+        DUMP DE PRUEBA · GLOSARIO DE METALES TIPOGRÁFICOS
+      </div>
+      <h1 class="font-cinzel text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
+        Tipografía Cinzel Metal Anodizado
+      </h1>
+      <p class="text-stone-400 font-serif text-base sm:text-lg max-w-3xl mt-3 leading-relaxed">
+        Demostración en vivo de los 4 acabados metálicos de precisión Apple Hero con delineado ultra-mínimo de 0.15px sobre tarjetas cinemáticas activas.
+      </p>
+    </header>
+
+    {/* RESUMEN DE MUESTRAS EN TIPOGRAFÍA CINZEL PURA */}
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
+      {testPosts.map((item) => (
+        <div class="p-6 sm:p-8 rounded-2xl bg-stone-900/60 border border-white/10 backdrop-blur-md flex flex-col gap-4">
+          <div class="flex items-center justify-between text-xs font-mono uppercase tracking-widest text-stone-400">
+            <span class="text-white font-bold">{item.colorName}</span>
+            <span class="text-[10px] text-amber-300/80">{item.tag}</span>
+          </div>
+          
+          {/* Rótulo Monumental con el Gradiente Activo */}
+          <div class={`p-6 rounded-xl ${item.entry.bgContrast === 'light' ? 'bg-[#E5E5EA]' : 'bg-black'} border border-white/10 text-center`}>
+            <span class={`font-cinzel font-black text-3xl sm:text-4xl tracking-tight block ${item.gradientClass} ${item.strokeClass}`}>
+              {item.entry.title}
+            </span>
+          </div>
+
+          <p class="text-xs text-stone-400 font-sans leading-relaxed">
+            {item.desc}
+          </p>
+        </div>
+      ))}
+    </section>
+
+    {/* TARJETAS CINEMÁTICAS REALES CON INTERACCIÓN ACTIVA */}
+    <section class="mb-24">
+      <div class="mb-8">
+        <h2 class="font-cinzel text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          Comportamiento en Tarjetas Cinemáticas Reales
+        </h2>
+        <p class="text-sm text-stone-400 mt-1">
+          Pasa el cursor sobre cada tarjeta para activar la coreografía y comprobar la definición del bisel metálico sobre la imagen.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
+        {testPosts.map((item) => (
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center justify-between text-[11px] font-mono tracking-wider text-stone-400 px-1">
+              <span class="text-rust-orange font-bold uppercase">{item.colorName}</span>
+              <a href={item.href} class="hover:text-white underline underline-offset-4 transition-colors">
+                Ver en sitio ↗
+              </a>
+            </div>
+            <div class="w-full aspect-4/3 sm:aspect-16/10">
+              <CinematicArchiveCard 
+                slug={item.slug}
+                entry={item.entry}
+                img={item.img}
+                variant="duo-60"
+                href={item.href}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+  </main>
+</Layout>

@@ -9,6 +9,7 @@ import {
   splitTitleKeyword,
   sanitizeImageUrl,
 } from "../lib/content-filter";
+import { recommendMetallicGradient } from "../lib/metallic-gradients";
 
 interface Props {
   slug: string;
@@ -160,8 +161,15 @@ const isPortraitArt = /aguara|hegel|homero|saturno|busto|estatua|retrato|filosof
 const titlePos = explicitPos || (isPortraitArt ? "top" : "bottom");
 const explicitBgContrast = (entry as any)?.bgContrast || null;
 const bgContrast = explicitBgContrast || (titlePos === "top" ? "light" : "dark");
-const cardGradientClass = bgContrast === "light" ? "gradient-titanium-dark" : "gradient-silver-bright";
-const strokeClass = bgContrast === "light" ? "title-stroke-light-bg" : "title-stroke-dark-bg";
+
+// Recomendación inteligente de gradiente metálico anodizado (Rojo Netflix / Azul Platinado / Titanio / Plata)
+const explicitGradient = (entry as any)?.metallicGradient || (entry as any)?.gradientVariant || null;
+const { gradientClass: cardGradientClass, strokeClass } = recommendMetallicGradient(
+  entry?.category || '',
+  entry?.title || '',
+  bgContrast,
+  explicitGradient
+);
 
 const fitClass = (isHero && isPortraitArt) ? 'object-contain! bg-[#08090a]' : 'object-cover';
 ---

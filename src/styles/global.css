@@ -858,6 +858,40 @@ html[data-nav-state="2"] header:hover .brand-element {
     color: transparent;
   }
 
+  /* METAL ANODIZADO 1: ROJO NETFLIX (Hard History / Bélico / Imparable) */
+  .gradient-rojo-netflix,
+  .gradient-anodized-red {
+    background-image: linear-gradient(
+      to bottom,
+      #E50914 0%,
+      #E50914 30%,
+      #FFFFFF 45%,
+      #FFFFFF 55%,
+      #2B0002 60%,
+      #2B0002 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* METAL ANODIZADO 2: AZUL PLATINADO (Gnosis / Cosmología / Filosofía Profunda) */
+  .gradient-azul-platinado,
+  .gradient-anodized-blue {
+    background-image: linear-gradient(
+      to bottom,
+      #38BDF8 0%,
+      #38BDF8 30%,
+      #FFFFFF 45%,
+      #FFFFFF 55%,
+      #030712 60%,
+      #030712 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
   /* Delineado ultra-mínimo 0.1px (simulado con precision sub-pixel y paint-order: stroke fill) */
   /* BG_MODE == "DARK": Filo Negro #000000 para cortar la luz sobre fondo oscuro */
   .stroke-dark-mode,

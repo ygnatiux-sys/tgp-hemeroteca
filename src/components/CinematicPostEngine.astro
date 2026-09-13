@@ -2,6 +2,7 @@
 import { resolveMultivisionClass } from "../lib/multivision";
 import Image from './SafeImage.astro';
 import { sanitizeImageUrl, isValidImageSrc, normalizeCategory } from "../lib/content-filter";
+import { recommendMetallicGradient } from "../lib/metallic-gradients";
 
 // ─── FRASES EVOCATIVAS POR COLECCIÓN ─────────────────────────────────────────
 const epigraphMap: Record<string, string> = {
@@ -113,8 +114,11 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
           const titlePos = explicitPos || (isSubjectPortrait ? "top" : "bottom");
           const explicitBgContrast = slide.bgContrast || null;
           const bgContrast = explicitBgContrast || (titlePos === "top" ? "light" : "dark");
-          const gradientClass = bgContrast === "light" ? "gradient-titanium-dark" : "gradient-silver-bright";
-          const strokeClass = bgContrast === "light" ? "title-stroke-light-bg" : "title-stroke-dark-bg";
+          const { gradientClass, strokeClass } = recommendMetallicGradient(
+            slide.category || '',
+            slide.title || '',
+            bgContrast
+          );
           
           return (
             <article
