@@ -1,0 +1,50 @@
+---
+// src/components/MorphIconPOC.astro
+---
+
+<div class="morph-poc flex flex-col items-center justify-center p-8 border border-white/20 rounded-2xl bg-black/50 backdrop-blur-md w-full max-w-sm mx-auto my-8">
+  <p class="font-metadata text-[10px] tracking-[0.2em] uppercase text-rust-orange mb-4">GSAP MorphSVG POC</p>
+  
+  <svg id="morph-svg" viewBox="0 0 100 100" class="w-16 h-16 text-white cursor-pointer hover:text-rust-orange transition-colors">
+    <!-- Play Icon (Initial State) -->
+    <path id="morph-shape" fill="currentColor" d="M30 20 L80 50 L30 80 Z" />
+    
+    <!-- Pause Icon (Target State - Hidden) -->
+    <!-- Note: MorphSVG works best when paths have similar number of points, but it can handle complex interpolation -->
+    <path id="morph-target" d="M25 20 h15 v60 h-15 z M60 20 h15 v60 h-15 z" style="visibility: hidden;" />
+  </svg>
+  
+  <p class="text-sm font-serif text-white/50 mt-4 select-none text-center">Haz click en el icono para animar la mutación elástica</p>
+</div>
+
+<script>
+  import { gsap } from "gsap";
+  import { MorphSVGPlugin } from "gsap/MorphSVGPlugin";
+  
+  // Register GSAP Plugin
+  gsap.registerPlugin(MorphSVGPlugin);
+  
+  const initMorphPOC = () => {
+    const pocElement = document.querySelector('.morph-poc');
+    if (!pocElement) return;
+    
+    const shape = document.getElementById('morph-shape');
+    let isPlay = true;
+    
+    const shapeElement = document.getElementById('morph-shape');
+    if(shapeElement) {
+      shapeElement.parentElement?.addEventListener('click', () => {
+        if (isPlay) {
+          gsap.to(shape, { morphSVG: "#morph-target", duration: 0.6, ease: "elastic.out(1, 0.4)" });
+        } else {
+          // Revert to original path
+          gsap.to(shape, { morphSVG: "M30 20 L80 50 L30 80 Z", duration: 0.6, ease: "elastic.out(1, 0.4)" });
+        }
+        isPlay = !isPlay;
+      });
+    }
+  };
+  
+  document.addEventListener('DOMContentLoaded', initMorphPOC);
+  document.addEventListener('astro:page-load', initMorphPOC);
+</script>

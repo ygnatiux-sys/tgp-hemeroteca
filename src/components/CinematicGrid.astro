@@ -1,0 +1,142 @@
+---
+// src/components/CinematicGrid.astro
+
+interface CinematicItem {
+  title: string;
+  excerpt: string;
+  img: string;
+  link: string;
+}
+
+interface Props {
+  items?: CinematicItem[];
+  title?: string;
+}
+
+const { items, title = "Ensayos Cinemáticos" } = Astro.props;
+
+// Dummy data de fallback (9 items = 3 filas de 3)
+const defaultItems: CinematicItem[] = Array.from({ length: 9 }).map((_, i) => ({
+  title: `Ensayo Cinemático ${i + 1}`,
+  excerpt: `Explorando las profundidades del plano secuencia y la semiótica visual en la obra ${i + 1}.`,
+  img: `https://picsum.photos/seed/cine${i + 10}/800/600`,
+  link: "#",
+}));
+
+const displayItems = items && items.length > 0 ? items : defaultItems;
+
+// Agrupar en filas de 3
+const rows: CinematicItem[][] = [];
+for (let i = 0; i < displayItems.length; i += 3) {
+  rows.push(displayItems.slice(i, i + 3));
+}
+---
+
+<section id="cinematic-grid-section" class="h-screen w-full overflow-hidden relative bg-black text-white">
+  
+  {/* Header Flotante / Sticky */}
+  <div class="absolute top-0 left-0 w-full z-10 p-8 flex justify-between items-start pointer-events-none">
+    <div>
+      <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-2">Colección Exclusiva</span>
+      <h2 class="text-3xl md:text-5xl font-cinzel font-extrabold tracking-tight drop-shadow-md">
+        {title}
+      </h2>
+    </div>
+    <div class="cg-progress font-metadata text-[10px] tracking-[0.2em] text-white/50">
+      01 / {rows.length < 10 ? `0${rows.length}` : rows.length}
+    </div>
+  </div>
+
+  {/* Contenedor Animado (Track) */}
+  <div class="cg-track flex flex-col w-full h-full">
+    {rows.map((row, rowIndex) => (
+      <div class="cg-row h-screen w-full grid grid-cols-1 md:grid-cols-3 gap-6 p-8 items-center shrink-0">
+        {row.map((item) => (
+          <a 
+            href={item.link} 
+            class="group cg-card flex flex-col bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden transition-all duration-500 hover:border-rust-orange/50 hover:shadow-[0_0_30px_rgba(183,82,30,0.15)] relative h-[30vh] md:h-[45vh]"
+          >
+            {/* Imagen con Aspect Ratio Apaisado/Poster */}
+            <div class="relative w-full h-full overflow-hidden bg-black">
+              <img 
+                src={item.img} 
+                alt={item.title} 
+                loading="lazy" 
+                class="absolute inset-0 w-full h-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105 group-hover:opacity-100" 
+              />
+              <div class="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent"></div>
+              
+              {/* Contenido (Textos) */}
+              <div class="absolute bottom-0 left-0 w-full p-6 flex flex-col justify-end">
+                <h3 class="font-cinzel font-bold text-xl md:text-2xl text-white/90 group-hover:text-white mb-2 leading-tight drop-shadow-md">
+                  {item.title}
+                </h3>
+                <p class="font-serif text-sm text-white/60 line-clamp-3 group-hover:text-white/80 transition-colors">
+                  {item.excerpt}
+                </p>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    ))}
+  </div>
+</section>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const initCinematicGrid = () => {
+    const section = document.getElementById("cinematic-grid-section");
+    const track = section?.querySelector(".cg-track") as HTMLElement;
+    const rows = section?.querySelectorAll(".cg-row");
+    const progressText = section?.querySelector(".cg-progress");
+
+    if (!section || !track || !rows || rows.length <= 1) return;
+
+    // Encapsular en gsap.context() para limpieza (View Transitions)
+    let ctx = gsap.context(() => {
+      
+      const totalRows = rows.length;
+      
+      // Animación del Track (movimiento vertical)
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          pin: true,
+          scrub: 1, // Suavidad heredada de ScrollSmoother
+          snap: 1 / (totalRows - 1), // Frena exactamente en cada fila
+          start: "top top",
+          end: `+=${totalRows * 100}%`, // Scroll proporcional a cantidad de filas
+          onUpdate: (self) => {
+            if (progressText) {
+              const currentRow = Math.round(self.progress * (totalRows - 1)) + 1;
+              const formattedCurrent = currentRow < 10 ? `0${currentRow}` : currentRow;
+              const formattedTotal = totalRows < 10 ? `0${totalRows}` : totalRows;
+              progressText.innerHTML = `${formattedCurrent} / ${formattedTotal}`;
+            }
+          }
+        }
+      });
+
+      // Mover track hacia arriba
+      // Si el track mide N veces h-screen, necesitamos moverlo -(N-1)*100vh
+      // yPercent es sobre su propio height, así que -(N-1)/N * 100
+      tl.to(track, {
+        yPercent: -100 * ((totalRows - 1) / totalRows),
+        ease: "none" // Movimiento lineal para scrub perfecto
+      });
+
+    }, section);
+
+    document.addEventListener("astro:before-swap", () => {
+      ctx.revert();
+    }, { once: true });
+  };
+
+  document.addEventListener("DOMContentLoaded", initCinematicGrid);
+  document.addEventListener("astro:page-load", initCinematicGrid);
+</script>
