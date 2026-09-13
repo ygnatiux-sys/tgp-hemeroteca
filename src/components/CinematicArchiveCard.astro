@@ -143,7 +143,8 @@ const imgUrl = safeImg || '';
           loading={isEager ? "eager" : "lazy"}
           fetchpriority={isEager ? "high" : undefined}
           decoding="async"
-          class={`absolute inset-0 w-full h-full object-center brightness-90 group-hover:brightness-100 transition-transform duration-700 ease-out group-hover:scale-[1.04] cac-card-img ${ enableCinemagraph ? "cinemagraph-ken-burns" : "" } ${resolveMultivisionClass(img)}`}
+          class={`absolute inset-0 w-full h-full object-center brightness-90 group-hover:brightness-100 transition-transform duration-700 ease-out group-hover:scale-[1.04] cac-card-img ${ enableCinemagraph && !isHero ? "cinemagraph-ken-burns" : "" } ${resolveMultivisionClass(img)}`}
+          style={isHero ? "object-position: 50% 50%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);" : undefined}
           data-flip-id={`card-image-${cardId}`}
         />
       ) : (
@@ -167,10 +168,27 @@ const imgUrl = safeImg || '';
     >
     </div>
 
+    {/* ✦ CAPA CINEMÁTICA HERO (DIVISIÓN 40/60 - MODO TRAY VERTICAL) */}
+    {isHero && cleanExcerpt && (
+      <div class="cac-hero-cinematic-layer absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-1000 ease-in-out z-25 flex">
+        {/* Zona izquierda despejada para la imagen en desktop */}
+        <div class="hidden md:block w-[38%] lg:w-[40%] h-full" />
+
+        {/* Zona derecha con scrim oscuro para lectura del párrafo */}
+        <div class="w-full md:w-[62%] lg:w-[60%] h-full bg-linear-to-t md:bg-linear-to-r from-black/90 md:from-transparent via-black/95 to-black flex items-center justify-center p-6 sm:p-10 md:p-12 lg:p-16">
+          <p class="cac-hero-cinematic-text font-[Alegreya_Sans] text-xl sm:text-2xl md:text-3xl lg:text-[2.25rem] text-[#EFEBE3]/95 leading-relaxed tracking-wide text-center md:text-left max-w-2xl drop-shadow-2xl">
+            <span class="cac-hero-text-anim inline-block opacity-0">
+              {cleanExcerpt}
+            </span>
+          </p>
+        </div>
+      </div>
+    )}
+
     {/* ✦ H1 INTERIOR DENTRO DE LA CARD (Con Cinzel Steel Gradient + GSAP Fade In) */}
-    <div class={`absolute inset-0 z-20 flex flex-col justify-end p-4 sm:p-6 md:p-8 pointer-events-none ${hideExteriorTitle ? 'items-center text-center pb-8 sm:pb-12' : 'items-start text-left'}`}>
-      {cleanExcerpt && (
-        <p class={`leading-relaxed max-w-[66ch] tracking-wider mb-2 line-clamp-3 ch-excerpt-container opacity-0 ${isHero ? 'font-[Alegreya_Sans] text-base sm:text-lg md:text-xl text-white/85' : 'font-sans'} ${hideExteriorTitle ? 'text-center mx-auto' : 'text-left'} ${excerptClass}`}>
+    <div class={`cac-normal-ui absolute inset-0 z-20 flex flex-col justify-end p-4 sm:p-6 md:p-8 pointer-events-none transition-opacity duration-1000 ease-in-out ${hideExteriorTitle ? 'items-center text-center pb-8 sm:pb-12' : 'items-start text-left'}`}>
+      {!isHero && cleanExcerpt && (
+        <p class={`leading-relaxed max-w-[66ch] tracking-wider mb-2 line-clamp-3 ch-excerpt-container opacity-0 font-sans ${hideExteriorTitle ? 'text-center mx-auto' : 'text-left'} ${excerptClass}`}>
           <span class="ch-excerpt-line inline-block">{cleanExcerpt}</span>
         </p>
       )}
@@ -376,6 +394,10 @@ const imgUrl = safeImg || '';
       card.dataset.choreographyDone = "true";
       card.classList.add("choreography-active");
 
+      const img = card.querySelector<HTMLElement>(".cac-card-img");
+      const normalUi = card.querySelector<HTMLElement>(".cac-normal-ui");
+      const cinematicLayer = card.querySelector<HTMLElement>(".cac-hero-cinematic-layer");
+      const textAnim = card.querySelector<HTMLElement>(".cac-hero-text-anim");
       const h1Container = card.querySelector<HTMLElement>(".ch-h1-container");
       const ctaBtn = card.querySelector<HTMLElement>(".ch-cta-btn");
       const excerptContainer = card.querySelector<HTMLElement>(".ch-excerpt-container");
@@ -491,9 +513,9 @@ const imgUrl = safeImg || '';
       }
 
       // ══════════════════════════════════════════════════════════════════
-      // CASO 2: HERO CARD CINEMÁTICO (Solo Heros de Archivo General)
-      // Dinámica sin superposición: título inicial se oculta -> entra excerpt ->
-      // se disuelve -> vuelve el título y queda fijo al final
+      // CASO 2: HERO CARD CINEMÁTICO (Idéntico a Mode Tray Vertical)
+      // Paneo de imagen a la izq (20% 50%, scale 1.08) + apertura de capa
+      // lateral 40/60 + aparición cinemática del párrafo + retorno al centro
       // ══════════════════════════════════════════════════════════════════
 
       // 1. Tags pulse sutil
@@ -506,112 +528,72 @@ const imgUrl = safeImg || '';
         ).to(tags, { opacity: 0.7, duration: 0.3 }, 0.5);
       }
 
-      // 2. El título inicial se desvanece de inmediato (0s a 0.35s) para NUNCA pisarse con el excerpt
-      if (h1Container) {
-        tl.to(
-          h1Container,
-          {
-            opacity: 0,
-            filter: "blur(8px)",
-            scale: 0.98,
-            duration: 0.35,
-            ease: "power2.inOut",
-            force3D: true,
-          },
-          0
+      // 2. Pausa contemplativa inicial (1.2s como en VerticalCollectionsStack)
+      tl.to({}, { duration: 1.2 });
+
+      // 3. FASE 1: Shift de imagen a la izquierda + zoom sutil + ocultar UI normal + mostrar capa lateral
+      tl.add(() => {
+        if (img) {
+          img.style.objectPosition = "20% 50%";
+          img.style.transform = "scale(1.08)";
+        }
+      });
+
+      if (normalUi) {
+        tl.to(normalUi, { opacity: 0, duration: 0.9, ease: "power2.inOut" }, "<");
+      }
+
+      if (cinematicLayer) {
+        tl.to(cinematicLayer, { opacity: 1, duration: 0.9, ease: "power2.inOut" }, "<");
+      }
+
+      // 4. FASE 2: Aparición del párrafo cinemático en la zona derecha (ascenso + desenfoque progresivo)
+      if (textAnim) {
+        tl.fromTo(
+          textAnim,
+          { opacity: 0, y: 18, scale: 0.98, filter: "blur(6px)" },
+          { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 1.8, ease: "cubic-bezier(0.25, 1, 0.5, 1)" },
+          "-=0.3"
         );
       }
 
-      // 3. Excerpt cinemático con SplitText: entra limpio a los 0.4s (cuando el título ya no está)
-      if (excerptContainer) {
-        let splitExcerpt: InstanceType<typeof SplitText> | null = null;
-        try {
-          splitExcerpt = new SplitText(excerptContainer, {
-            type: "lines,words",
-            linesClass: "overflow-hidden",
-          });
-          gsap.set(excerptContainer, { opacity: 1 });
-          gsap.set(splitExcerpt.words, { yPercent: 110, opacity: 0 });
+      // 5. FASE 3: Pausa contemplativa de lectura completa (5.5s para lectura cómoda)
+      tl.to({}, { duration: 5.5 });
 
-          tl.to(
-            splitExcerpt.words,
-            {
-              yPercent: 0,
-              opacity: 1,
-              duration: 0.85,
-              stagger: 0.025,
-              ease: "power3.out",
-            },
-            0.4
-          );
-        } catch (e) {
-          tl.fromTo(
-            excerptContainer,
-            { opacity: 0, filter: "blur(12px)", y: 8 },
-            { opacity: 1, filter: "blur(0px)", y: 0, duration: 0.8, ease: "power3.out" },
-            0.4
-          );
-        }
-
-        // 4. Pausa de lectura completa y cómoda
-        tl.to({}, { duration: 3.0 });
-
-        // 5. Disolución total del excerpt
-        if (splitExcerpt && splitExcerpt.words?.length) {
-          tl.to(splitExcerpt.words, {
-            opacity: 0,
-            filter: "blur(8px)",
-            yPercent: -20,
-            duration: 0.7,
-            stagger: 0.01,
-            ease: "power2.inOut",
-            onComplete: () => {
-              if (splitExcerpt) splitExcerpt.revert();
-              gsap.set(excerptContainer, { opacity: 0 });
-            },
-          });
-        } else {
-          tl.to(excerptContainer, {
-            opacity: 0,
-            filter: "blur(10px)",
-            scale: 0.98,
-            y: -4,
-            duration: 0.7,
-            ease: "power2.inOut",
-          });
-        }
+      // 6. FASE 4: Retorno cinemático
+      // El párrafo lateral y la capa se disuelven suavemente
+      if (textAnim) {
+        tl.to(textAnim, { opacity: 0, filter: "blur(6px)", y: -10, duration: 0.7, ease: "power2.inOut" });
       }
 
-      // 6. El título VUELVE y SE QUEDA FIJO al final de la dinámica (sin SplitText destructivo)
-      if (h1Container) {
-        tl.fromTo(
-          h1Container,
-          {
-            opacity: 0,
-            filter: "blur(14px)",
-            scale: 0.96,
-            y: 8,
-          },
+      if (cinematicLayer) {
+        tl.to(cinematicLayer, { opacity: 0, duration: 0.8, ease: "power2.inOut" }, "<0.2");
+      }
+
+      // La imagen regresa al centro con su transición suave de 3s
+      tl.add(() => {
+        if (img) {
+          img.style.objectPosition = "50% 50%";
+          img.style.transform = "scale(1)";
+        }
+      });
+
+      // La UI normal reaparece y queda fijada permanentemente
+      if (normalUi) {
+        tl.to(
+          normalUi,
           {
             opacity: 1,
-            filter: "blur(0px)",
-            scale: 1,
-            y: 0,
             duration: 1.2,
-            ease: "power3.out",
-            force3D: true,
+            ease: "power2.out",
             onComplete: () => {
-              // Dejarlo fijo y visible de manera permanente al terminar la dinámica
-              gsap.set(h1Container, {
-                opacity: 1,
-                filter: "none",
-                scale: 1,
-                y: 0,
-                clearProps: "filter,transform",
-              });
+              gsap.set(normalUi, { opacity: 1, clearProps: "filter,transform" });
+              if (h1Container) {
+                gsap.set(h1Container, { opacity: 1, filter: "none", scale: 1, y: 0, clearProps: "filter,transform" });
+              }
             },
           },
-          "+=0.08"
+          "-=0.4"
         );
       }
 
