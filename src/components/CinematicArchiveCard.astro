@@ -212,19 +212,19 @@ const fitClass = (isHero && isPortraitArt) ? 'object-contain! bg-[#08090a]' : 'o
         {isPortraitArt ? (
           <>
             {/* 1. Modo Rostro / Retrato: Zona izquierda despejada para el rostro (Hegel) */}
-            <div class="hidden md:block w-[38%] lg:w-[40%] h-full shrink-0" />
+            <div class="hidden md:block w-[38%] lg:w-[40%] h-full shrink-0"></div>
 
             {/* Zona derecha con scrim degradado y frase con tipografía serif y peso cinematográfico */}
             <div class="w-full md:w-[62%] lg:w-[60%] h-full bg-linear-to-t md:bg-linear-to-r from-black/90 md:from-transparent via-black/95 to-black flex items-center justify-center p-6 sm:p-10 md:p-12 lg:p-16">
               <p class="cac-hero-cinematic-text font-serif text-2xl sm:text-3xl md:text-4xl lg:text-[3.25rem] text-[#E3DDD3]/95 leading-[1.15] tracking-tight drop-shadow-2xl text-center md:text-left text-balance max-w-[34ch]">
-                <span class="cac-hero-text-anim inline-block opacity-0" set:html={heroPhraseHTML} />
+                <span class="cac-hero-text-anim inline-block opacity-0" set:html={heroPhraseHTML}></span>
               </p>
             </div>
           </>
         ) : (
           <div class="w-full h-full flex items-center justify-center p-6 sm:p-10 md:p-14 lg:p-20 text-center bg-black/35 backdrop-blur-[1px]">
-            <p class="cac-hero-cinematic-text font-serif text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] text-[#EFEBE3] leading-[1.15] tracking-tight text-center text-balance max-w-4xl drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)] drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] [text-shadow:_0_2px_14px_rgb(0_0_0_/_95%),_0_1px_4px_rgb(0_0_0_/_90%)]">
-              <span class="cac-hero-text-anim inline-block opacity-0" set:html={heroPhraseHTML} />
+            <p class="cac-hero-cinematic-text font-serif text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] text-[#EFEBE3] leading-[1.15] tracking-tight text-center text-balance max-w-4xl drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)] [text-shadow:0_2px_14px_rgb(0_0_0/95%),0_1px_4px_rgb(0_0_0/90%)]">
+              <span class="cac-hero-text-anim inline-block opacity-0" set:html={heroPhraseHTML}></span>
             </p>
           </div>
         )}
