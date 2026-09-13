@@ -1,50 +1,207 @@
 ---
 // src/components/MorphIconPOC.astro
+// Prueba de Concepto: MorphSVGPlugin aplicado al isotipo de TGP
+// El logo (pieza de puzzle) muta entre dos estados: completo → simplificado
 ---
 
-<div class="morph-poc flex flex-col items-center justify-center p-8 border border-white/20 rounded-2xl bg-black/50 backdrop-blur-md w-full max-w-sm mx-auto my-8">
-  <p class="font-metadata text-[10px] tracking-[0.2em] uppercase text-rust-orange mb-4">GSAP MorphSVG POC</p>
+<div class="morph-poc flex flex-col items-center justify-center gap-6 p-10 border border-white/10 rounded-2xl bg-[#0A0A0B] w-full max-w-sm mx-auto my-12">
   
-  <svg id="morph-svg" viewBox="0 0 100 100" class="w-16 h-16 text-white cursor-pointer hover:text-rust-orange transition-colors">
-    <!-- Play Icon (Initial State) -->
-    <path id="morph-shape" fill="currentColor" d="M30 20 L80 50 L30 80 Z" />
-    
-    <!-- Pause Icon (Target State - Hidden) -->
-    <!-- Note: MorphSVG works best when paths have similar number of points, but it can handle complex interpolation -->
-    <path id="morph-target" d="M25 20 h15 v60 h-15 z M60 20 h15 v60 h-15 z" style="visibility: hidden;" />
+  <p class="font-metadata text-[9px] uppercase tracking-[0.25em] text-white/30">GSAP MorphSVG — Isotipo TGP</p>
+
+  <!-- SVG interactivo: el path activo es #tgp-logo, el objetivo es #tgp-target -->
+  <svg
+    id="morph-svg"
+    viewBox="0 0 120 120"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    class="w-20 h-20 cursor-pointer select-none"
+    role="button"
+    aria-label="Animar isotipo TGP"
+    title="Click para animar"
+  >
+    <!-- Backdrop circular del logo -->
+    <rect width="120" height="120" rx="28" fill="#0A0A0B" />
+    <rect x="1" y="1" width="118" height="118" rx="27" stroke="rgba(255,255,255,0.08)" stroke-width="1.5" />
+
+    <!-- PATH ACTIVO: pieza de puzzle TGP original -->
+    <path
+      id="tgp-logo"
+      d="M 40 32
+         L 51 32
+         C 54.5 32 52.5 27 50.5 24
+         C 48 20 50.5 14 60 14
+         C 69.5 14 72 20 69.5 24
+         C 67.5 27 65.5 32 69 32
+         L 80 32
+         A 8 8 0 0 1 88 40
+         L 88 80
+         A 8 8 0 0 1 80 88
+         L 69 88
+         C 65.5 88 67.5 93 69.5 96
+         C 72 100 69.5 106 60 106
+         C 50.5 106 48 100 50.5 96
+         C 52.5 93 54.5 88 51 88
+         L 40 88
+         A 8 8 0 0 1 32 80
+         L 32 69
+         C 32 65.5 37 67.5 40 69.5
+         C 44 72 50 69.5 50 60
+         C 50 50.5 44 48 40 50.5
+         C 37 52.5 32 54.5 32 51
+         L 32 40
+         A 8 8 0 0 1 40 32 Z"
+      stroke="#F5F5F7"
+      stroke-width="5.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+
+    <!-- PATH OBJETIVO: cuadrado redondeado simple (estado "cerrado/resuelto") -->
+    <!-- Mismo número de puntos de anclaje críticos para MorphSVG -->
+    <path
+      id="tgp-target"
+      d="M 40 32
+         L 51 32
+         C 55 32 55 32 55 32
+         C 55 32 55 32 60 32
+         C 65 32 65 32 65 32
+         C 65 32 65 32 69 32
+         L 80 32
+         A 8 8 0 0 1 88 40
+         L 88 80
+         A 8 8 0 0 1 80 88
+         L 69 88
+         C 65 88 65 88 65 88
+         C 65 88 65 88 60 88
+         C 55 88 55 88 55 88
+         C 55 88 55 88 51 88
+         L 40 88
+         A 8 8 0 0 1 32 80
+         L 32 69
+         C 32 65 32 65 32 65
+         C 32 65 32 60 32 60
+         C 32 55 32 55 32 55
+         C 32 55 32 51 32 51
+         L 32 40
+         A 8 8 0 0 1 40 32 Z"
+      stroke="transparent"
+      stroke-width="0"
+      fill="none"
+      visibility="hidden"
+    />
   </svg>
-  
-  <p class="text-sm font-serif text-white/50 mt-4 select-none text-center">Haz click en el icono para animar la mutación elástica</p>
+
+  <p class="font-serif text-[13px] text-white/40 text-center leading-relaxed">
+    Haz click en el isotipo para ver<br/>la mutación elástica del puzzle
+  </p>
+
+  <!-- Estado del botón (feedback visual) -->
+  <span id="morph-state" class="font-metadata text-[9px] uppercase tracking-[0.2em] text-white/20">
+    Estado: Puzzle completo
+  </span>
+
 </div>
 
 <script>
   import { gsap } from "gsap";
   import { MorphSVGPlugin } from "gsap/MorphSVGPlugin";
-  
-  // Register GSAP Plugin
+
   gsap.registerPlugin(MorphSVGPlugin);
-  
+
   const initMorphPOC = () => {
-    const pocElement = document.querySelector('.morph-poc');
-    if (!pocElement) return;
-    
-    const shape = document.getElementById('morph-shape');
-    let isPlay = true;
-    
-    const shapeElement = document.getElementById('morph-shape');
-    if(shapeElement) {
-      shapeElement.parentElement?.addEventListener('click', () => {
-        if (isPlay) {
-          gsap.to(shape, { morphSVG: "#morph-target", duration: 0.6, ease: "elastic.out(1, 0.4)" });
-        } else {
-          // Revert to original path
-          gsap.to(shape, { morphSVG: "M30 20 L80 50 L30 80 Z", duration: 0.6, ease: "elastic.out(1, 0.4)" });
-        }
-        isPlay = !isPlay;
-      });
-    }
+    const svg       = document.getElementById("morph-svg");
+    const logoPath  = document.getElementById("tgp-logo") as SVGPathElement | null;
+    const stateText = document.getElementById("morph-state");
+
+    if (!svg || !logoPath) return;
+
+    // Guardar el path original para poder revertir
+    const originalD = logoPath.getAttribute("d") ?? "";
+
+    // Path simplificado (cuadrado redondeado — pieza "resuelta")
+    const solvedD = `M 40 32
+       L 51 32
+       C 55 32 55 32 55 32
+       C 55 32 55 32 60 32
+       C 65 32 65 32 65 32
+       C 65 32 65 32 69 32
+       L 80 32
+       A 8 8 0 0 1 88 40
+       L 88 80
+       A 8 8 0 0 1 80 88
+       L 69 88
+       C 65 88 65 88 65 88
+       C 65 88 65 88 60 88
+       C 55 88 55 88 55 88
+       C 55 88 55 88 51 88
+       L 40 88
+       A 8 8 0 0 1 32 80
+       L 32 69
+       C 32 65 32 65 32 65
+       C 32 65 32 60 32 60
+       C 32 55 32 55 32 55
+       C 32 55 32 51 32 51
+       L 32 40
+       A 8 8 0 0 1 40 32 Z`;
+
+    let isSolved = false;
+    let isAnimating = false;
+
+    svg.addEventListener("click", () => {
+      if (isAnimating) return;
+      isAnimating = true;
+
+      if (!isSolved) {
+        // Puzzle → Resuelto (pieza encaja)
+        gsap.to(logoPath, {
+          morphSVG: solvedD,
+          duration: 0.9,
+          ease: "elastic.out(1, 0.55)",
+          onComplete: () => {
+            isSolved = true;
+            isAnimating = false;
+            if (stateText) stateText.textContent = "Estado: Puzzle resuelto";
+          },
+        });
+        // Pulso de color al resolver
+        gsap.to(logoPath, {
+          attr: { stroke: "#EFEBE3" },
+          duration: 0.3,
+          ease: "power2.out",
+          yoyo: true,
+          repeat: 1,
+        });
+      } else {
+        // Resuelto → Puzzle (se desarma)
+        gsap.to(logoPath, {
+          morphSVG: originalD,
+          duration: 1.1,
+          ease: "elastic.out(1.2, 0.4)",
+          onComplete: () => {
+            isSolved = false;
+            isAnimating = false;
+            if (stateText) stateText.textContent = "Estado: Puzzle completo";
+          },
+        });
+        gsap.to(logoPath, {
+          attr: { stroke: "#F5F5F7" },
+          duration: 0.3,
+          ease: "power2.out",
+        });
+      }
+    });
+
+    // Hover: glow suave
+    svg.addEventListener("mouseenter", () => {
+      if (isAnimating) return;
+      gsap.to(logoPath, { attr: { "stroke-width": "7" }, duration: 0.3, ease: "power2.out" });
+    });
+    svg.addEventListener("mouseleave", () => {
+      gsap.to(logoPath, { attr: { "stroke-width": "5.5" }, duration: 0.4, ease: "power2.inOut" });
+    });
   };
-  
-  document.addEventListener('DOMContentLoaded', initMorphPOC);
-  document.addEventListener('astro:page-load', initMorphPOC);
+
+  document.addEventListener("DOMContentLoaded", initMorphPOC);
+  document.addEventListener("astro:page-load", initMorphPOC);
 </script>
