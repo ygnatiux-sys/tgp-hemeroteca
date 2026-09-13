@@ -109,12 +109,47 @@ const categoryAccentClass = (() => {
 const cardGradientClass = "gradient-acero-ios";
 const cardId = `cac-${slug || 'item'}-${Math.random().toString(36).substring(2, 7)}`;
 const imgUrl = safeImg || '';
+
+// ─── FRASES EVOCATIVAS POR COLECCIÓN (MODO TRAY VERTICAL) ───────────────────
+const epigraphMap: Record<string, string> = {
+  "arqueosemiotica":    "Los [[signos]] sobreviven a los imperios. **Cada glifo,** un mensaje lanzado a la eternidad sin destinatario conocido.",
+  "filosofia":          "El pensamiento como [[territorio.]] Las **ideas no mueren:** se transforman, se heredan, se contradicen.",
+  "mitologia":          "Antes del dato, existió el [[mito.]] El relato que **une cielo y tierra** antes de que la ciencia los separara.",
+  "historia":           "El [[tiempo]] no es lineal. Es una **red de causas** que la memoria humana teje y desteje sin cesar.",
+  "ensayos-cinematicos": "Imágenes que **piensan.** El [[cine]] como forma de conocimiento antes de que el conocimiento fuera escrito.",
+  "arquetipos":         "Figuras que reaparecen en cada cultura. Los [[arquetipos]] son la gramática **secreta del ser humano.**",
+  "arquetipos-globales": "Figuras que reaparecen en cada cultura. Los [[arquetipos]] son la gramática **secreta del ser humano.**",
+  "historia-natural":   "La vida como **archivo.** Cada especie, un [[capítulo]] de una historia que empezó mucho antes que nosotros.",
+  "historia-antigua":   "Las [[civilizaciones]] no colapsan: **se transforman.** Sus ruinas son preguntas, no respuestas.",
+  "historia-medieval":  "Entre el [[fin del mundo]] romano y el alba del moderno, **siglos de invención** que el olvido llama oscuros.",
+  "religion":           "Lo [[sagrado]] como necesidad primaria. **Cada fe,** un intento humano de darle nombre al misterio.",
+};
+
+const categoryKey = normalizeCategory(entry.category || '');
+const heroPhraseRaw = epigraphMap[categoryKey] || entry.excerpt || entry.dek || null;
+
+function parseHeroPhrase(text: string) {
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-bold md:font-black">$1</strong>')
+    .replace(/\[\[([^\]]+)\]\]/g, '<span class="italic text-white/95">$1</span>')
+    .replace(/(^|[^*])\*([^*]+)\*([^*]|$)/g, '$1<span class="italic text-white/95">$2</span>$3');
+}
+
+const heroPhraseHTML = heroPhraseRaw ? parseHeroPhrase(heroPhraseRaw) : '';
+
+// Detección de retratos / rostros humanos (para paneo lateral 40/60) vs paisajes / escenas completas
+const isPortraitArt = /mercurio|homero|saturno|busto|estatua|retrato|filosofia|hegel|rostro|portrait/i.test(imgUrl) ||
+                      /filosofia|hegel|busto|retrato/i.test(slug || '') ||
+                      /filosofia|hegel/i.test(entry?.category || '');
+
+const fitClass = (isHero && isPortraitArt) ? 'object-contain! bg-[#08090a]' : 'object-cover';
 ---
 
 <article
   class={`cinematic-archive-card flex flex-col gap-4 group w-full h-full ${isHero ? 'is-hero-card' : ''}`}
   data-variant={variant}
   data-is-hero={isHero ? "true" : "false"}
+  data-is-portrait={isPortraitArt ? "true" : "false"}
   data-category={normalizeCategory(entry.category)}
   data-year={year}
   data-card-id={cardId}
@@ -129,7 +164,7 @@ const imgUrl = safeImg || '';
   {/* 1. IMAGEN SUPERIOR CON H1 INTERIOR (CON CINZEL STEEL GRADIENT + GSAP FADE IN) */}
   <a
     href={href}
-    class={`relative w-full ${imageAspectClass} rounded-xl md:rounded-2xl overflow-hidden block bg-stone-900/60 border border-white/10 shadow-xl shrink-0 cac-modal-trigger`}
+    class={`relative w-full ${imageAspectClass} rounded-xl md:rounded-2xl overflow-hidden block ${isHero && isPortraitArt ? 'bg-[#08090a]' : 'bg-stone-900/60'} border border-white/10 shadow-xl shrink-0 cac-modal-trigger`}
   >
     {
       safeImg ? (
@@ -143,7 +178,7 @@ const imgUrl = safeImg || '';
           loading={isEager ? "eager" : "lazy"}
           fetchpriority={isEager ? "high" : undefined}
           decoding="async"
-          class={`absolute inset-0 w-full h-full object-center brightness-90 group-hover:brightness-100 transition-transform duration-700 ease-out group-hover:scale-[1.04] cac-card-img ${ enableCinemagraph && !isHero ? "cinemagraph-ken-burns" : "" } ${resolveMultivisionClass(img)}`}
+          class={`absolute inset-0 w-full h-full object-center brightness-90 group-hover:brightness-100 transition-transform duration-700 ease-out group-hover:scale-[1.04] cac-card-img ${fitClass} ${ enableCinemagraph && !isHero ? "cinemagraph-ken-burns" : "" } ${resolveMultivisionClass(img)}`}
           style={isHero ? "object-position: 50% 50%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);" : undefined}
           data-flip-id={`card-image-${cardId}`}
         />
@@ -168,20 +203,31 @@ const imgUrl = safeImg || '';
     >
     </div>
 
-    {/* ✦ CAPA CINEMÁTICA HERO (DIVISIÓN 40/60 - MODO TRAY VERTICAL) */}
-    {isHero && cleanExcerpt && (
-      <div class="cac-hero-cinematic-layer absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-1000 ease-in-out z-25 flex">
-        {/* Zona izquierda despejada para la imagen en desktop */}
-        <div class="hidden md:block w-[38%] lg:w-[40%] h-full" />
+    {/* ✦ CAPA CINEMÁTICA HERO (DIVISIÓN 40/60 PARA ROSTROS / FULL BACKGROUND PARA PAISAJES) */}
+    {isHero && heroPhraseHTML && (
+      <div
+        class="cac-hero-cinematic-layer absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-1000 ease-in-out z-25 flex"
+        data-layout={isPortraitArt ? "portrait" : "cinematic"}
+      >
+        {isPortraitArt ? (
+          <>
+            {/* 1. Modo Rostro / Retrato: Zona izquierda despejada para el rostro (Hegel) */}
+            <div class="hidden md:block w-[38%] lg:w-[40%] h-full shrink-0" />
 
-        {/* Zona derecha con scrim oscuro para lectura del párrafo */}
-        <div class="w-full md:w-[62%] lg:w-[60%] h-full bg-linear-to-t md:bg-linear-to-r from-black/90 md:from-transparent via-black/95 to-black flex items-center justify-center p-6 sm:p-10 md:p-12 lg:p-16">
-          <p class="cac-hero-cinematic-text font-[Alegreya_Sans] text-xl sm:text-2xl md:text-3xl lg:text-[2.25rem] text-[#EFEBE3]/95 leading-relaxed tracking-wide text-center md:text-left max-w-2xl drop-shadow-2xl">
-            <span class="cac-hero-text-anim inline-block opacity-0">
-              {cleanExcerpt}
-            </span>
-          </p>
-        </div>
+            {/* Zona derecha con scrim degradado y frase con tipografía serif y peso cinematográfico */}
+            <div class="w-full md:w-[62%] lg:w-[60%] h-full bg-linear-to-t md:bg-linear-to-r from-black/90 md:from-transparent via-black/95 to-black flex items-center justify-center p-6 sm:p-10 md:p-12 lg:p-16">
+              <p class="cac-hero-cinematic-text font-serif text-2xl sm:text-3xl md:text-4xl lg:text-[3.25rem] text-[#E3DDD3]/95 leading-[1.15] tracking-tight drop-shadow-2xl text-center md:text-left text-balance max-w-[34ch]">
+                <span class="cac-hero-text-anim inline-block opacity-0" set:html={heroPhraseHTML} />
+              </p>
+            </div>
+          </>
+        ) : (
+          <div class="w-full h-full flex items-center justify-center p-6 sm:p-10 md:p-14 lg:p-20 text-center bg-black/35 backdrop-blur-[1px]">
+            <p class="cac-hero-cinematic-text font-serif text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] text-[#EFEBE3] leading-[1.15] tracking-tight text-center text-balance max-w-4xl drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)] drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] [text-shadow:_0_2px_14px_rgb(0_0_0_/_95%),_0_1px_4px_rgb(0_0_0_/_90%)]">
+              <span class="cac-hero-text-anim inline-block opacity-0" set:html={heroPhraseHTML} />
+            </p>
+          </div>
+        )}
       </div>
     )}
 
@@ -514,9 +560,11 @@ const imgUrl = safeImg || '';
 
       // ══════════════════════════════════════════════════════════════════
       // CASO 2: HERO CARD CINEMÁTICO (Idéntico a Mode Tray Vertical)
-      // Paneo de imagen a la izq (20% 50%, scale 1.08) + apertura de capa
-      // lateral 40/60 + aparición cinemática del párrafo + retorno al centro
+      // Si es rostro/portrait: Paneo lateral a la izq (20% 50%, scale 1.08) + zona 40/60
+      // Si es paisaje/escena cinemática: Mantiene 50% 50% + frase sobre fondo de la imagen con text-shadow
+      // Ambos: Aparece la frase cinemática con tipografía serif y peso -> Retorno al centro -> Título fijado
       // ══════════════════════════════════════════════════════════════════
+      const isPortrait = card.dataset.isPortrait === "true";
 
       // 1. Tags pulse sutil
       if (tags.length) {
@@ -531,11 +579,18 @@ const imgUrl = safeImg || '';
       // 2. Pausa contemplativa inicial (1.2s como en VerticalCollectionsStack)
       tl.to({}, { duration: 1.2 });
 
-      // 3. FASE 1: Shift de imagen a la izquierda + zoom sutil + ocultar UI normal + mostrar capa lateral
+      // 3. FASE 1: Movimiento de imagen según si es rostro o paisaje cinemático
       tl.add(() => {
         if (img) {
-          img.style.objectPosition = "20% 50%";
-          img.style.transform = "scale(1.08)";
+          if (isPortrait) {
+            // Rostro (ej. Hegel): se corre a la izquierda
+            img.style.objectPosition = "20% 50%";
+            img.style.transform = "scale(1.08)";
+          } else {
+            // Paisaje cinemático: no se corre, mantiene encuadre centrado con leve respiro
+            img.style.objectPosition = "50% 50%";
+            img.style.transform = "scale(1.04)";
+          }
         }
       });
 
@@ -547,7 +602,7 @@ const imgUrl = safeImg || '';
         tl.to(cinematicLayer, { opacity: 1, duration: 0.9, ease: "power2.inOut" }, "<");
       }
 
-      // 4. FASE 2: Aparición del párrafo cinemático en la zona derecha (ascenso + desenfoque progresivo)
+      // 4. FASE 2: Aparición de la frase cinemática en la zona derecha o centrada (ascenso + desenfoque progresivo)
       if (textAnim) {
         tl.fromTo(
           textAnim,
@@ -561,7 +616,7 @@ const imgUrl = safeImg || '';
       tl.to({}, { duration: 5.5 });
 
       // 6. FASE 4: Retorno cinemático
-      // El párrafo lateral y la capa se disuelven suavemente
+      // La frase y la capa se disuelven suavemente
       if (textAnim) {
         tl.to(textAnim, { opacity: 0, filter: "blur(6px)", y: -10, duration: 0.7, ease: "power2.inOut" });
       }
