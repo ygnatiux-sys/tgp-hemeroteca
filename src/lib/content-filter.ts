@@ -324,14 +324,40 @@ export function sortEssaysByVisualFirst(a: EssayEntry, b: EssayEntry): number {
  * @param isProd       true en producción → oculta draft:true
  */
 export function getPublishableEssays(
-  allEntries: Array<{ id: string; data: EssayEntry['entry'] }>,
+  allEntries: Array<{ id: string; data: EssayEntry['entry'], body?: string }>,
   isProd: boolean = false
 ): EssayEntry[] {
   return allEntries
-    .map(item => ({
-      slug: item.id.replace(/\/index$/, ''),
-      entry: item.data,
-    }))
+    .map(item => {
+      let extractedExcerpt = item.data.excerpt || item.data.dek || item.data.volanta;
+      
+      if (!extractedExcerpt) {
+        const rawContent = item.data.generadorGeoref || item.data.content || item.data.generadorTexto || item.body || '';
+        if (typeof rawContent === 'string' && rawContent.trim()) {
+           const lines = rawContent.split('\n').filter(l => {
+             const trimmed = l.trim();
+             return trimmed.length > 0 && !trimmed.startsWith('#') && !trimmed.startsWith('!') && !trimmed.startsWith('[') && !trimmed.startsWith('<');
+           });
+           if (lines.length > 0) {
+             let firstLine = lines[0].replace(/^>\s*/, '').trim();
+             // Limpiar sintaxis markdown residual
+             firstLine = firstLine.replace(/[*_`]/g, '');
+             if (firstLine.length > 250) {
+                firstLine = firstLine.slice(0, 247) + '...';
+             }
+             extractedExcerpt = firstLine;
+           }
+        }
+      }
+
+      return {
+        slug: item.id.replace(/\/index$/, ''),
+        entry: {
+          ...item.data,
+          excerpt: extractedExcerpt
+        },
+      };
+    })
     .filter(({ entry }) => {
       // Ocultar siempre los marcados explícitamente como borrador/eliminados
       if (entry.draft === true) return false;
