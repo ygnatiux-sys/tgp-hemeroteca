@@ -39,6 +39,15 @@ import { resolveMultivisionClass } from "../lib/multivision";
     <span class="drop-shadow-2xl">›</span>
   </button>
 
+  {/* ── BOTÓN DE CIERRE (X) ── */}
+  <button
+    id="tgp-lightbox-close"
+    class="tgp-ui-control absolute top-4 right-4 md:top-8 md:right-8 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center text-[#EFEBE3]/50 hover:text-[#EFEBE3] bg-black/20 hover:bg-black/60 rounded-full text-xl md:text-2xl font-light z-50 transition-all duration-300 cursor-pointer backdrop-blur-sm"
+    aria-label="Cerrar visor"
+  >
+    <span class="drop-shadow-lg leading-none">✕</span>
+  </button>
+
   {/* ── METADATA CENTRO INFERIOR (GOOGLE SANS, DARK DIFUMINADO SIN PILL, DURACIÓN 2 SEG) ── */}
   <div
     id="tgp-lightbox-content"
@@ -66,16 +75,14 @@ import { resolveMultivisionClass } from "../lib/multivision";
   let images: HTMLImageElement[] = [];
   let currentIndex = 0;
   let fadeTimeout: ReturnType<typeof setTimeout> | null = null;
-  let autoplayTimer: ReturnType<typeof setTimeout> | null = null;
-  let isAutoplayPaused = false;
   let panzoomInstance: ReturnType<typeof Panzoom> | null = null;
-  const AUTOPLAY_INTERVAL = 4500;
 
   const lightbox = document.getElementById("tgp-lightbox");
   const lightboxImg = document.getElementById("tgp-lightbox-img") as HTMLImageElement;
   const bgWrap = document.getElementById("tgp-lightbox-bg-wrap");
   const prevBtn = document.getElementById("tgp-lightbox-prev");
   const nextBtn = document.getElementById("tgp-lightbox-next");
+  const closeBtn = document.getElementById("tgp-lightbox-close");
   const titleEl = document.getElementById("tgp-lightbox-title");
   const creditsEl = document.getElementById("tgp-lightbox-credits");
 
@@ -113,34 +120,10 @@ import { resolveMultivisionClass } from "../lib/multivision";
   function triggerAutoFade() {
     setControlsVisibility(true);
     if (fadeTimeout) clearTimeout(fadeTimeout);
-    // Metadata dura 2 segundos y ejecuta fade-out suave
+    // Metadata y controles duran 2 segundos y ejecutan fade-out suave
     fadeTimeout = setTimeout(() => {
       setControlsVisibility(false);
     }, 2000);
-  }
-
-  function startAutoplay() {
-    stopAutoplay();
-    if (images.length <= 1) return;
-    autoplayTimer = setTimeout(() => {
-      if (!isAutoplayPaused && lightbox && !lightbox.classList.contains("hidden")) {
-        showNext(true);
-      }
-    }, AUTOPLAY_INTERVAL);
-  }
-
-  function stopAutoplay() {
-    if (autoplayTimer) clearTimeout(autoplayTimer);
-  }
-
-  function pauseAutoplayManual() {
-    isAutoplayPaused = true;
-    stopAutoplay();
-    // Reinicia autoplay tras 6 segundos de inactividad manual
-    setTimeout(() => {
-      isAutoplayPaused = false;
-      startAutoplay();
-    }, 6000);
   }
 
   function cleanImageTitle(raw: string): string {
@@ -224,7 +207,6 @@ import { resolveMultivisionClass } from "../lib/multivision";
     document.body.style.overflow = "hidden";
     
     triggerAutoFade();
-    startAutoplay();
   }
 
   function closeLightbox() {
@@ -233,15 +215,13 @@ import { resolveMultivisionClass } from "../lib/multivision";
     lightbox.classList.remove("flex");
     document.body.style.overflow = "";
     if (fadeTimeout) clearTimeout(fadeTimeout);
-    stopAutoplay();
     if (panzoomInstance) {
       panzoomInstance.reset({ animate: false });
     }
   }
 
-  function showNext(isAuto = false) {
+  function showNext() {
     if (images.length <= 1 || !lightboxImg) return;
-    if (!isAuto) pauseAutoplayManual();
 
     // Transición staggered fade-out / fade-in
     lightboxImg.style.opacity = "0";
@@ -253,13 +233,11 @@ import { resolveMultivisionClass } from "../lib/multivision";
       if (panzoomInstance) panzoomInstance.reset({ animate: false });
       lightboxImg.style.opacity = "1";
       triggerAutoFade();
-      if (isAuto) startAutoplay();
     }, 280);
   }
 
   function showPrev() {
     if (images.length <= 1 || !lightboxImg) return;
-    pauseAutoplayManual();
 
     // Transición staggered fade-out / fade-in
     lightboxImg.style.opacity = "0";
@@ -298,15 +276,20 @@ import { resolveMultivisionClass } from "../lib/multivision";
       return;
     }
     const target = e.target as HTMLElement | null;
-    if (target?.closest("#tgp-lightbox-prev, #tgp-lightbox-next")) {
+    if (target?.closest("#tgp-lightbox-prev, #tgp-lightbox-next, #tgp-lightbox-close")) {
       return;
     }
     closeLightbox();
   });
 
+  closeBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    closeLightbox();
+  });
+
   nextBtn?.addEventListener("click", (e) => {
     e.stopPropagation();
-    showNext(false);
+    showNext();
   });
 
   prevBtn?.addEventListener("click", (e) => {
@@ -323,7 +306,7 @@ import { resolveMultivisionClass } from "../lib/multivision";
     if (lightbox && !lightbox.classList.contains("hidden")) {
       if (e.key === "ArrowRight") {
         e.preventDefault();
-        showNext(false);
+        showNext();
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
         showPrev();
@@ -342,7 +325,7 @@ import { resolveMultivisionClass } from "../lib/multivision";
     const swipeDistance = touchEndX - touchStartX;
     if (Math.abs(swipeDistance) > minSwipeDistance) {
       if (swipeDistance > 0) showPrev();
-      else showNext(false);
+      else showNext();
     }
   }
 
