@@ -1,5 +1,7 @@
 ---
 // src/components/CinematicGrid.astro
+// Vertical Cinematic Grid — Pinned Scroll con GSAP ScrollTrigger
+// Estética: Dark UI "Obsidian Void" heredada del sistema TGP
 
 interface CinematicItem {
   title: string;
@@ -11,9 +13,10 @@ interface CinematicItem {
 interface Props {
   items?: CinematicItem[];
   title?: string;
+  eyebrow?: string;
 }
 
-const { items, title = "Ensayos Cinemáticos" } = Astro.props;
+const { items, title = "Ensayos Cinemáticos", eyebrow = "Colección Exclusiva" } = Astro.props;
 
 // Dummy data de fallback (9 items = 3 filas de 3)
 const defaultItems: CinematicItem[] = Array.from({ length: 9 }).map((_, i) => ({
@@ -25,62 +28,109 @@ const defaultItems: CinematicItem[] = Array.from({ length: 9 }).map((_, i) => ({
 
 const displayItems = items && items.length > 0 ? items : defaultItems;
 
-// Agrupar en filas de 3
+// Agrupar en filas de 3 (rellenando con items vacíos si la última fila queda incompleta)
 const rows: CinematicItem[][] = [];
 for (let i = 0; i < displayItems.length; i += 3) {
   rows.push(displayItems.slice(i, i + 3));
 }
+
+const totalRows = rows.length;
+const paddedTotal = totalRows < 10 ? `0${totalRows}` : `${totalRows}`;
 ---
 
-<section id="cinematic-grid-section" class="h-screen w-full overflow-hidden relative bg-black text-white">
-  
-  {/* Header Flotante / Sticky */}
-  <div class="absolute top-0 left-0 w-full z-10 p-8 flex justify-between items-start pointer-events-none">
+<!-- 
+  IMPORTANTE: Esta sección debe estar fuera del flujo del grid de la página.
+  El section ocupa `h-screen` + el pin de GSAP crea el espacio de scroll extra.
+  El overflow:hidden en el section es CRÍTICO para que el track vertical no se vea fuera.
+-->
+<section
+  id="cg-section"
+  class="cg-section relative w-full bg-[#080808] text-white"
+  style={`height: 100svh;`}
+>
+
+  <!-- ── Header Flotante Sticky ─────────────────────────────────── -->
+  <div class="absolute top-0 left-0 w-full z-20 px-8 pt-8 pb-4 flex justify-between items-start pointer-events-none bg-linear-to-b from-black/80 to-transparent">
     <div>
-      <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-2">Colección Exclusiva</span>
-      <h2 class="text-3xl md:text-5xl font-cinzel font-extrabold tracking-tight drop-shadow-md">
+      <!-- Eyebrow — igual que en todos los bloques del index -->
+      <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-[#EFEBE3]/60 block mb-2">
+        {eyebrow}
+      </span>
+      <!-- H2 con gradiente Cinzel heredado del sistema (from-white via-[#8E8E93] to-[#1C1C1E]) -->
+      <h2 class="text-3xl md:text-5xl font-cinzel font-extrabold tracking-tight bg-linear-to-b from-[#FFFFFF] via-[#8E8E93] to-[#1C1C1E] bg-clip-text text-transparent drop-shadow-md">
         {title}
       </h2>
     </div>
-    <div class="cg-progress font-metadata text-[10px] tracking-[0.2em] text-white/50">
-      01 / {rows.length < 10 ? `0${rows.length}` : rows.length}
+
+    <!-- Contador de Filas (actualizado via JS) -->
+    <div
+      id="cg-progress"
+      class="font-mono text-[11px] tracking-[0.15em] text-white/30 tabular-nums self-center"
+      aria-live="polite"
+    >
+      01&thinsp;/&thinsp;{paddedTotal}
     </div>
   </div>
 
-  {/* Contenedor Animado (Track) */}
-  <div class="cg-track flex flex-col w-full h-full">
-    {rows.map((row, rowIndex) => (
-      <div class="cg-row h-screen w-full grid grid-cols-1 md:grid-cols-3 gap-6 p-8 items-center shrink-0">
-        {row.map((item) => (
-          <a 
-            href={item.link} 
-            class="group cg-card flex flex-col bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden transition-all duration-500 hover:border-rust-orange/50 hover:shadow-[0_0_30px_rgba(183,82,30,0.15)] relative h-[30vh] md:h-[45vh]"
-          >
-            {/* Imagen con Aspect Ratio Apaisado/Poster */}
-            <div class="relative w-full h-full overflow-hidden bg-black">
-              <img 
-                src={item.img} 
-                alt={item.title} 
-                loading="lazy" 
-                class="absolute inset-0 w-full h-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105 group-hover:opacity-100" 
-              />
-              <div class="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent"></div>
-              
-              {/* Contenido (Textos) */}
-              <div class="absolute bottom-0 left-0 w-full p-6 flex flex-col justify-end">
-                <h3 class="font-cinzel font-bold text-xl md:text-2xl text-white/90 group-hover:text-white mb-2 leading-tight drop-shadow-md">
+  <!-- ── Overflow Clip: limita el track a h-screen ──────────────── -->
+  <div class="absolute inset-0 overflow-hidden">
+
+    <!-- ── Track: stack vertical de filas ────────────────────────── -->
+    <div id="cg-track" class="flex flex-col w-full" style={`height: ${totalRows * 100}svh;`}>
+
+      {rows.map((row, rowIndex) => (
+        <div
+          class="cg-row shrink-0 w-full grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 p-6 md:p-8 items-center"
+          style="height: 100svh;"
+          data-row-index={rowIndex}
+        >
+          {row.map((item) => (
+            <a
+              href={item.link}
+              class="group cg-card relative flex flex-col bg-zinc-900 border border-zinc-800/80 rounded-xl overflow-hidden transition-all duration-500 ease-out hover:border-white/20 hover:shadow-[0_8px_40px_-8px_rgba(0,0,0,0.8)] h-[28vh] md:h-[52vh]"
+            >
+              <!-- Imagen de fondo -->
+              <div class="absolute inset-0 overflow-hidden">
+                <img
+                  src={item.img}
+                  alt={item.title}
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-full object-cover opacity-50 transition-all duration-700 ease-out group-hover:opacity-75 group-hover:scale-[1.04]"
+                />
+              </div>
+
+              <!-- Scrim inferior -->
+              <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/30 to-transparent pointer-events-none"></div>
+
+              <!-- Borde superior sutil (detalle de cristal) -->
+              <div class="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/10 to-transparent"></div>
+
+              <!-- Contenido textual — base de la tarjeta -->
+              <div class="absolute bottom-0 left-0 w-full p-5 md:p-6 flex flex-col justify-end gap-2">
+                <!-- Título: Cinzel heredado, gradiente Acero/TGP en hover -->
+                <h3 class="font-cinzel font-bold text-lg md:text-xl leading-tight text-white/90 group-hover:text-white transition-colors drop-shadow-md line-clamp-2">
                   {item.title}
                 </h3>
-                <p class="font-serif text-sm text-white/60 line-clamp-3 group-hover:text-white/80 transition-colors">
+
+                <!-- Excerpt: Newsreader/Gloock, aireado y legible sobre fondo oscuro -->
+                <p class="font-serif text-[13px] md:text-sm leading-relaxed tracking-[0.01em] text-white/50 group-hover:text-white/70 transition-colors line-clamp-3">
                   {item.excerpt}
                 </p>
+
+                <!-- CTA discreta -->
+                <span class="font-metadata text-[9px] uppercase tracking-[0.3em] text-white/25 group-hover:text-[#EFEBE3]/60 transition-colors mt-1">
+                  Leer ensayo →
+                </span>
               </div>
-            </div>
-          </a>
-        ))}
-      </div>
-    ))}
-  </div>
+            </a>
+          ))}
+        </div>
+      ))}
+
+    </div><!-- /#cg-track -->
+  </div><!-- /overflow-hidden -->
+
 </section>
 
 <script>
@@ -89,53 +139,71 @@ for (let i = 0; i < displayItems.length; i += 3) {
 
   gsap.registerPlugin(ScrollTrigger);
 
+  let cgCtx: ReturnType<typeof gsap.context> | null = null;
+
   const initCinematicGrid = () => {
-    const section = document.getElementById("cinematic-grid-section");
-    const track = section?.querySelector(".cg-track") as HTMLElement;
-    const rows = section?.querySelectorAll(".cg-row");
-    const progressText = section?.querySelector(".cg-progress");
+    // Limpiar instancia previa si existe (View Transitions o HMR)
+    if (cgCtx) cgCtx.revert();
+
+    const section = document.getElementById("cg-section") as HTMLElement;
+    const track   = document.getElementById("cg-track")   as HTMLElement;
+    const rows    = section?.querySelectorAll(".cg-row");
+    const progress = document.getElementById("cg-progress");
 
     if (!section || !track || !rows || rows.length <= 1) return;
 
-    // Encapsular en gsap.context() para limpieza (View Transitions)
-    let ctx = gsap.context(() => {
-      
-      const totalRows = rows.length;
-      
-      // Animación del Track (movimiento vertical)
+    const totalRows = rows.length;
+
+    cgCtx = gsap.context(() => {
+
+      // El track mide totalRows * 100svh.
+      // Para mover la fila 0→N-1 necesitamos desplazar -(N-1) * 100svh.
+      // Con yPercent (relativo al height propio del track que es N*100svh):
+      //   -(N-1)*100svh / (N*100svh) * 100  =  -(N-1)/N * 100
+      // Pero es más limpio y robusto usar `y` con cálculo en px en onUpdate,
+      // o simplemente fijar translateY por filas. Usamos yPercent correcto:
+      const yPercentEnd = -100 * (totalRows - 1) / totalRows;
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
+          // ScrollSmoother requiere pinnedContainer para sincronizar el pin
+          // con el contenedor suavizado (#smooth-content)
+          pinnedContainer: document.getElementById("smooth-content") ?? undefined,
           pin: true,
-          scrub: 1, // Suavidad heredada de ScrollSmoother
-          snap: 1 / (totalRows - 1), // Frena exactamente en cada fila
+          scrub: 1,
+          snap: {
+            snapTo: 1 / (totalRows - 1),
+            duration: { min: 0.3, max: 0.6 },
+            ease: "power2.inOut",
+          },
           start: "top top",
-          end: `+=${totalRows * 100}%`, // Scroll proporcional a cantidad de filas
+          end: `+=${totalRows * 700}`, // ~700px de scroll por fila para suavidad óptima con ScrollSmoother
           onUpdate: (self) => {
-            if (progressText) {
-              const currentRow = Math.round(self.progress * (totalRows - 1)) + 1;
-              const formattedCurrent = currentRow < 10 ? `0${currentRow}` : currentRow;
-              const formattedTotal = totalRows < 10 ? `0${totalRows}` : totalRows;
-              progressText.innerHTML = `${formattedCurrent} / ${formattedTotal}`;
-            }
-          }
-        }
+            if (!progress) return;
+            const current = Math.round(self.progress * (totalRows - 1)) + 1;
+            const padded  = current < 10 ? `0${current}` : `${current}`;
+            const padTotal = totalRows < 10 ? `0${totalRows}` : `${totalRows}`;
+            progress.innerHTML = `${padded}&thinsp;/&thinsp;${padTotal}`;
+          },
+        },
       });
 
-      // Mover track hacia arriba
-      // Si el track mide N veces h-screen, necesitamos moverlo -(N-1)*100vh
-      // yPercent es sobre su propio height, así que -(N-1)/N * 100
       tl.to(track, {
-        yPercent: -100 * ((totalRows - 1) / totalRows),
-        ease: "none" // Movimiento lineal para scrub perfecto
+        yPercent: yPercentEnd,
+        ease: "none", // CRÍTICO: movimiento lineal para que scrub sea perfecto
       });
 
     }, section);
-
-    document.addEventListener("astro:before-swap", () => {
-      ctx.revert();
-    }, { once: true });
   };
+
+  // Limpieza para Astro View Transitions
+  document.addEventListener("astro:before-swap", () => {
+    if (cgCtx) {
+      cgCtx.revert();
+      cgCtx = null;
+    }
+  });
 
   document.addEventListener("DOMContentLoaded", initCinematicGrid);
   document.addEventListener("astro:page-load", initCinematicGrid);
