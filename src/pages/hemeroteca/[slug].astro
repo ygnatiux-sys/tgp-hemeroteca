@@ -343,6 +343,9 @@ const articleSchema = {
   keywords: [
     doc.category,
     doc.sitioGeohistorico,
+    ...(doc.tags || [])
+  ].filter(Boolean).join(", ")
+};
 const metaImageUrl = typeof optimizedImage === 'object' && optimizedImage?.src ? optimizedImage.src : (typeof optimizedImage === 'string' ? optimizedImage : undefined);
 
 // Gradiente metálico adaptativo (Rojo Netflix, Azul Platinado, Titanio, Plata)
