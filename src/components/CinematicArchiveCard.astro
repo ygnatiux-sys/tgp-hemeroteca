@@ -560,7 +560,7 @@ const imgUrl = safeImg || '';
       const mImage = modal.querySelector<HTMLImageElement>(".modal-image");
       const mTitle = modal.querySelector<HTMLElement>(".modal-title");
       const mEyebrow = modal.querySelector<HTMLElement>(".modal-eyebrow");
-      const mExcerpt = modal.querySelector<HTMLElement>(".modal-excerpt");
+      const mExcerpts = modal.querySelectorAll<HTMLElement>(".modal-excerpt");
       const mCta = modal.querySelector<HTMLAnchorElement>(".modal-cta");
 
       if (!mContainer || !mImage || !mTitle) return;
@@ -593,7 +593,7 @@ const imgUrl = safeImg || '';
             mEyebrow.style.display = card.dataset.eyebrow ? "block" : "none";
             mEyebrow.style.opacity = "1";
           }
-          if (mExcerpt) mExcerpt.innerHTML = card.dataset.excerpt || "";
+          mExcerpts.forEach(el => el.innerHTML = card.dataset.excerpt || "");
           if (mCta) mCta.href = card.dataset.link || "#";
 
           const extraContent = mContainer.querySelectorAll(".modal-excerpt, .modal-cta, .close-modal-btn, .modal-eyebrow");

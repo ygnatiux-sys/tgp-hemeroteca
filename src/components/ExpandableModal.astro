@@ -31,7 +31,7 @@ import { resolveMultivisionClass } from "../lib/multivision";
         <h2 class="modal-title font-cinzel text-4xl md:text-6xl font-extrabold leading-[1.05] tracking-tight drop-shadow-2xl gradient-acero-ios" data-flip-id="">
           <!-- Título dinámico -->
         </h2>
-        <p class="modal-excerpt font-serif text-sm md:text-base lg:text-[17px] text-[#EFEBE3]/95 leading-relaxed font-light tracking-tight max-w-4xl mt-3 drop-shadow-md">
+        <p class="modal-excerpt text-sm md:text-base lg:text-[17px] text-[#EFEBE3]/95 leading-relaxed font-light tracking-tight max-w-4xl mt-3 drop-shadow-md" style="font-family: 'Proza Libre', serif;">
           <!-- Extracto dinámico -->
         </p>
       </div>
@@ -40,8 +40,8 @@ import { resolveMultivisionClass } from "../lib/multivision";
     <!-- Zona de Lectura y "Scroll Invisible" -->
     <div class="px-8 pt-6 pb-8 bg-black flex-1 relative z-20">
       
-      <div class="flex items-center gap-4 mb-6">
-        <a class="modal-cta inline-flex items-center gap-2 px-5 py-2.5 bg-white text-black font-metadata font-bold text-[10px] tracking-[0.2em] uppercase rounded hover:bg-gray-200 transition-colors" href="#">
+      <div class="flex items-center gap-4 mb-8">
+        <a class="modal-cta inline-flex items-center gap-2 px-5 py-2.5 bg-white text-black font-metadata font-bold text-[10px] tracking-[0.2em] uppercase rounded hover:bg-gray-200 transition-colors shadow-lg" href="#">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
             <path d="M8 5v14l11-7z" />
           </svg>
@@ -49,8 +49,10 @@ import { resolveMultivisionClass } from "../lib/multivision";
         </a>
       </div>
 
-      <div class="max-h-64 overflow-y-auto hide-scrollbar text-white/70 font-serif leading-relaxed text-sm md:text-base pr-4">
-        <!-- Espacio reservado para texto adicional si fuera necesario -->
+      <div class="max-h-64 overflow-y-auto hide-scrollbar text-white/80 leading-loose text-lg md:text-xl pr-4 tracking-wide font-light py-2" style="font-family: 'Proza Libre', serif;">
+        <p class="modal-excerpt">
+          <!-- Segundo extracto dinámico para legibilidad -->
+        </p>
       </div>
     </div>
   </div>

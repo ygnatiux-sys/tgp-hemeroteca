@@ -425,7 +425,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
       const mImage = row.querySelector('.modal-image') as HTMLImageElement;
       const mTitle = row.querySelector('.modal-title') as HTMLElement;
       const mEyebrow = row.querySelector('.modal-eyebrow') as HTMLElement;
-      const mExcerpt = row.querySelector('.modal-excerpt') as HTMLElement;
+      const mExcerpts = row.querySelectorAll('.modal-excerpt');
       const mCta = row.querySelector('.modal-cta') as HTMLAnchorElement;
 
       if (!modal || !mContainer || !mImage || !mTitle) return;
@@ -459,7 +459,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
              mEyebrow.style.display = a.dataset.eyebrow ? 'block' : 'none';
              mEyebrow.style.opacity = '1';
           }
-          if (mExcerpt) mExcerpt.innerHTML = a.dataset.excerpt || '';
+          mExcerpts.forEach(el => el.innerHTML = a.dataset.excerpt || '');
           if (mCta) mCta.href = a.dataset.link || '#';
           
           const extraContent = mContainer.querySelectorAll('.modal-excerpt, .modal-cta, .close-modal-btn, .modal-eyebrow');
