@@ -311,7 +311,7 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
       {/* ═══════════════════════════════════════════════════════════════════
           BLOQUE 2: DOSSIERES DESTACADOS — MODELO EDITORIAL ARCHIVO GENERAL
       ═══════════════════════════════════════════════════════════════════ */}
-      <section class="flex flex-col gap-16 md:gap-24 lg:gap-32 reveal-item">
+      <section class="flex flex-col gap-32 md:gap-40 lg:gap-56 reveal-item">
 
         {/* ENCABEZADO EDITORIAL */}
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-4 border-b border-white/8">
@@ -336,6 +336,8 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
               variant="hero"
               enableCinemagraph={true}
               isEager={true}
+              hideExteriorTitle={true}
+              centerCtaBelow={true}
               ctaLabel="VER REGISTRO"
             />
           </div>
@@ -348,8 +350,10 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
               slug={secondaryA.slug}
               entry={secondaryA.entry}
               img={secAImage}
-              variant="standard"
+              variant="hero"
               enableCinemagraph={true}
+              hideExteriorTitle={true}
+              centerCtaBelow={true}
               ctaLabel="VER REGISTRO"
             />
           </div>
@@ -362,8 +366,10 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
               slug={secondaryB.slug}
               entry={secondaryB.entry}
               img={secBImage}
-              variant="standard"
+              variant="hero"
               enableCinemagraph={true}
+              hideExteriorTitle={true}
+              centerCtaBelow={true}
               ctaLabel="VER REGISTRO"
             />
           </div>
@@ -440,10 +446,10 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════
-          BLOQUE 5: ZONA ARCHIVOS (ESTRUCTURA CINE PREMIER: 1 HERO + DÚO 60/40)
+          BLOQUE 5: ZONA ARCHIVOS (HEROS FULL BLEED APILADOS COMO ARCHIVO GENERAL)
           Mapeo: publishable[10..19] con formato cinemático idéntico a Por Año
       ═══════════════════════════════════════════════════════════════════ */}
-      {archiveSequences.length > 0 && (
+      {resolvedArchiveRows.length > 0 && (
         <section class="flex flex-col gap-10 md:gap-14">
           <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4">
             <div>
@@ -457,49 +463,20 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
             </a>
           </div>
 
-          {/* Secuencias Cinematográficas Premier: 1 Hero Full Bleed + Dúo 60/40 con Cinemagraph */}
-          <div class="flex flex-col gap-20 md:gap-28">
-            {archiveSequences.map((seq) => (
-              <div class="premier-sequence flex flex-col gap-10 md:gap-14">
-                {/* 1. Hero Cinemático Full Bleed */}
-                <div class="w-full">
-                  <CinematicArchiveCard
-                    slug={seq.hero.slug}
-                    entry={seq.hero.entry}
-                    img={seq.hero.img}
-                    variant="hero"
-                    enableCinemagraph={true}
-                  />
-                </div>
-
-                {/* 2. Dúo de Films Secundarios con Aire, Espaciado y Proporción 60/40 */}
-                {seq.duo.length > 0 && (
-                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-10 gap-y-12 lg:gap-x-12 lg:gap-y-0 items-start">
-                    {seq.duo[0] && (
-                      <div class={seq.duo.length > 1 ? "lg:col-span-7 flex flex-col" : "lg:col-span-12 flex flex-col"}>
-                        <CinematicArchiveCard
-                          slug={seq.duo[0].slug}
-                          entry={seq.duo[0].entry}
-                          img={seq.duo[0].img}
-                          variant={seq.duo.length > 1 ? "duo-60" : "hero"}
-                          enableCinemagraph={true}
-                        />
-                      </div>
-                    )}
-
-                    {seq.duo[1] && (
-                      <div class="lg:col-span-5 flex flex-col">
-                        <CinematicArchiveCard
-                          slug={seq.duo[1].slug}
-                          entry={seq.duo[1].entry}
-                          img={seq.duo[1].img}
-                          variant="duo-40"
-                          enableCinemagraph={true}
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
+          {/* Secuencias Cinematográficas: Heros Full Bleed */}
+          <div class="flex flex-col gap-32 md:gap-40 lg:gap-56">
+            {resolvedArchiveRows.map((row) => (
+              <div class="w-full">
+                <CinematicArchiveCard
+                  slug={row.slug}
+                  entry={row.entry}
+                  img={row.img}
+                  variant="hero"
+                  enableCinemagraph={true}
+                  hideExteriorTitle={true}
+                  centerCtaBelow={true}
+                  ctaLabel="VER REGISTRO"
+                />
               </div>
             ))}
           </div>

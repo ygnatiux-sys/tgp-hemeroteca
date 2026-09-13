@@ -1,7 +1,45 @@
 ---
 import { resolveMultivisionClass } from "../lib/multivision";
 import Image from './SafeImage.astro';
-import { sanitizeImageUrl, isValidImageSrc } from "../lib/content-filter";
+import { sanitizeImageUrl, isValidImageSrc, normalizeCategory } from "../lib/content-filter";
+
+// ─── FRASES EVOCATIVAS POR COLECCIÓN ─────────────────────────────────────────
+const epigraphMap: Record<string, string> = {
+  "arqueosemiotica":    "Los [[signos]] sobreviven a los imperios. **Cada glifo,** un mensaje lanzado a la eternidad sin destinatario conocido.",
+  "filosofia":          "El pensamiento como [[territorio.]] Las **ideas no mueren:** se transforman, se heredan, se contradicen.",
+  "mitologia":          "Antes del dato, existió el [[mito.]] El relato que **une cielo y tierra** antes de que la ciencia los separara.",
+  "historia":           "El [[tiempo]] no es lineal. Es una **red de causas** que la memoria humana teje y desteje sin cesar.",
+  "ensayos-cinematicos": "Imágenes que **piensan.** El [[cine]] como forma de conocimiento antes de que el conocimiento fuera escrito.",
+  "arquetipos":         "Figuras que reaparecen en cada cultura. Los [[arquetipos]] son la gramática **secreta del ser humano.**",
+  "arquetipos-globales": "Figuras que reaparecen en cada cultura. Los [[arquetipos]] son la gramática **secreta del ser humano.**",
+  "historia-natural":   "La vida como **archivo.** Cada especie, un [[capítulo]] de una historia que empezó mucho antes que nosotros.",
+  "historia-antigua":   "Las [[civilizaciones]] no colapsan: **se transforman.** Sus ruinas son preguntas, no respuestas.",
+  "historia-medieval":  "Entre el [[fin del mundo]] romano y el alba del moderno, **siglos de invención** que el olvido llama oscuros.",
+  "religion":           "Lo [[sagrado]] como necesidad primaria. **Cada fe,** un intento humano de darle nombre al misterio.",
+};
+
+function parseHeroPhrase(text: string) {
+  if (!text) return '';
+  const clean = text.replace(/^[#*`>\s]+/, '').trim();
+  
+  if (clean.includes("[[") || clean.includes("**")) {
+    return clean
+      .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-bold md:font-black">$1</strong>')
+      .replace(/\[\[([^\]]+)\]\]/g, '<span class="italic text-amber-200/90 font-serif drop-shadow-[0_0_12px_rgba(245,158,11,0.5)]">$1</span>')
+      .replace(/(^|[^*])\*([^*]+)\*([^*]|$)/g, '$1<span class="italic text-white/95 font-serif">$2</span>$3');
+  }
+
+  // Estilizado suave para excerpts planos: resalta las primeras dos palabras con serif ámbar
+  const words = clean.split(' ');
+  if (words.length > 3) {
+    const firstTwo = words.slice(0, 2).join(' ');
+    const rest = words.slice(2).join(' ');
+    return `<span class="italic text-amber-200/90 font-serif">${firstTwo}</span> ${rest}`;
+  }
+
+  return clean;
+}
+
 /**
  * CinematicPostEngine.astro
  * ──────────────────────────────────────────────────────────────────────────────
@@ -30,11 +68,14 @@ export interface SlideData {
   id: string;
   title: string;
   subtitle?: string;
+  excerpt?: string;
+  description?: string;
   category?: string;
   date?: string;
   readTime?: string;
   image: any;
   imagePosition?: string;
+  titlePosition?: 'top' | 'bottom' | 'center';
   link: string;
   papersLink?: string;
 }
@@ -57,13 +98,31 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
     >
       {/* ── SLIDES ── */}
       <div class="cpe-slides absolute inset-0">
-        {safeSlides.map((slide, i) => {
+        {safeSlides.map((slide: SlideData, i: number) => {
           const safeSrc = (slide.image && isValidImageSrc(slide.image)) ? sanitizeImageUrl(slide.image) : "";
+          const categoryKey = normalizeCategory(slide.category || '');
+          const heroPhraseRaw = slide.subtitle || slide.excerpt || slide.description || epigraphMap[categoryKey] || null;
+          const heroPhraseHTML = heroPhraseRaw ? parseHeroPhrase(heroPhraseRaw) : '';
+          const mode = i % 3; // 0: Izquierda | 1: Derecha | 2: Base / Abajo
+
+          // Detección automática por RegEx para personajes/retratos centrados + lectura de propiedad explícita
+          const explicitPos = slide.titlePosition || null;
+          const isSubjectPortrait = /hegel|homero|saturno|busto|estatua|retrato|filosofia|moctezuma|gengis|tatu|rostro|portrait|escultura|venus|urano|arquetipo|personaje|aguara|fauna|animal/i.test(
+            `${slide.title} ${slide.id} ${slide.category || ''}`
+          );
+          const titlePos = explicitPos || (isSubjectPortrait ? "top" : "bottom");
+          const explicitBgContrast = slide.bgContrast || null;
+          const bgContrast = explicitBgContrast || (titlePos === "top" ? "light" : "dark");
+          const gradientClass = bgContrast === "light" ? "gradient-titanium-dark" : "gradient-silver-bright";
+          const strokeClass = bgContrast === "light" ? "title-stroke-light-bg" : "title-stroke-dark-bg";
+          
           return (
             <article
-              class={`cpe-slide absolute inset-0 flex items-end justify-start pb-24 md:pb-32 backface-hidden transform-3d will-change-transform [content-visibility:auto] contain-content ${i === 0 ? "z-20" : "z-10 opacity-0 pointer-events-none"}`}
+              class={`cpe-slide absolute inset-0 flex justify-center backface-hidden transform-3d will-change-transform [content-visibility:auto] contain-content ${titlePos === "top" ? "items-start pt-24 sm:pt-28 md:pt-36 pb-8" : "items-end pb-24 md:pb-32 pt-8"} ${i === 0 ? "z-20" : "z-10 opacity-0 pointer-events-none"}`}
               style={`z-index: ${100 - i}; transform: translateZ(1px);`}
               data-index={i}
+              data-title-pos={titlePos}
+              data-bg-contrast={bgContrast}
               {...(i !== 0 ? { "aria-hidden": "true" } : {})}
             >
               {/* Fondo: Ken Burns */}
@@ -85,18 +144,26 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
                 ) : (
                   <div class="fallback-background absolute inset-0 bg-stone-900 pointer-events-none -z-10" />
                 )}
-                {/* Gradiente editorial: oscurece laterales y base */}
-                <div class="absolute inset-0 bg-linear-to-r from-black/80 via-black/45 to-black/15 pointer-events-none" />
-                <div class="absolute inset-0 bg-linear-to-t from-black/75 via-transparent to-black/30 pointer-events-none" />
               </div>
 
-              {/* Contenido Editorial */}
-              <div class="cpe-content relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-20 pb-6 md:pb-10 flex flex-col md:flex-row md:justify-between md:items-end gap-6">
+              {/* Capa Cinemática (Frase / Excerpt) — Modo 0: Derecha | Modo 1: Izquierda | Modo 2: Base / Abajo */}
+              {heroPhraseHTML && (
+                <div class={`cpe-hero-cinematic-layer absolute inset-0 opacity-0 pointer-events-none z-15 flex ${mode === 0 ? "justify-end items-center" : mode === 1 ? "justify-start items-center" : "justify-center items-end"}`}>
+                  <div class={`${mode === 2 ? "w-full max-w-5xl px-6 md:px-12 text-center bg-linear-to-t from-black via-black/85 to-transparent pt-16 md:pt-24 pb-8 md:pb-12" : "w-full md:w-[48%] lg:w-[42%] h-full flex items-center justify-center p-6 sm:p-10 md:p-12 lg:p-16"} ${mode === 0 ? "bg-linear-to-t md:bg-linear-to-r from-transparent via-black/90 to-black" : mode === 1 ? "bg-linear-to-t md:bg-linear-to-l from-transparent via-black/90 to-black" : ""}`}>
+                    <p class={`cpe-hero-cinematic-text font-serif text-xl sm:text-2xl md:text-3xl ${mode === 2 ? "lg:text-[2.6rem]" : "lg:text-[2.75rem]"} text-[#E3DDD3]/95 leading-tight tracking-tight drop-shadow-2xl text-balance ${mode === 0 ? "text-center md:text-left max-w-[34ch]" : mode === 1 ? "text-center md:text-right max-w-[34ch]" : "text-center max-w-[42ch] mx-auto"}`}>
+                      <span class="cpe-hero-text-anim inline-block opacity-0" set:html={heroPhraseHTML}></span>
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Contenido Editorial — Siempre Centrado (Etapa 1 & 4 General) */}
+              <div class={`cpe-content relative z-20 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-20 flex flex-col gap-6 opacity-0 ${titlePos === "top" ? "pt-4 md:pt-8" : "pb-6 md:pb-10"}`}>
                 
-                {/* Bloque Izquierdo */}
-                <div class="flex flex-col items-start gap-2.5 max-w-3xl">
-                  {/* Metadatos superiores: Pulso suave GSAP */}
-                  <div class="cpe-meta flex items-center gap-3">
+                {/* Bloque Principal Centrado */}
+                <div class="flex flex-col items-center text-center mx-auto max-w-4xl gap-3 md:gap-5">
+                  {/* 1. Metadatos superiores: Pulso suave GSAP */}
+                  <div class="cpe-meta flex items-center justify-center gap-3">
                     <span class="inline-flex items-center gap-2 font-metadata text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-[#EFEBE3]">
                       <span class="cpe-meta-dot w-1.5 h-1.5 rounded-full bg-rust-orange inline-block shadow-[0_0_6px_rgba(239, 235, 227,0.8)]" />
                       {slide.category || "Investigación"}
@@ -116,45 +183,39 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
                     )}
                   </div>
 
-                  <h1 class="cpe-title font-cinzel font-bold text-xl md:text-3xl leading-snug tracking-wide text-pretty">
+                  {/* 2. Título Centrado */}
+                  <h1 class="cpe-title font-cinzel font-black text-3xl sm:text-4xl md:text-5xl lg:text-[4.5rem] leading-[1.05] tracking-tight text-pretty group-hover:scale-[1.01] transition-transform duration-700 ease-out origin-center text-center">
                     <a
                       href={slide.link}
-                      class="gradient-acero-ios inline-block drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)] transition-all duration-500"
+                      class:list={[gradientClass, strokeClass, "inline-block drop-shadow-[0_4px_28px_rgba(0,0,0,0.95)] transition-all duration-500"]}
                     >
                       {slide.title}
                     </a>
                   </h1>
 
-                  {/* Subtítulo / excerpt */}
-                  {slide.subtitle && (
-                    <p class="cpe-subtitle font-serif text-white/50 text-sm md:text-base max-w-xl leading-relaxed drop-shadow-md line-clamp-2 tracking-wide">
-                      "{slide.subtitle}"
-                    </p>
-                  )}
-                </div>
-
-                {/* Bloque Derecho: CTAs */}
-                <div class="cpe-cta flex items-center gap-3 md:pb-2 flex-wrap md:justify-end shrink-0">
-                  <a
-                    href={slide.link}
-                    class="group inline-flex items-center gap-2 px-5 py-2.5 bg-[#151718]/90 md:backdrop-blur-sm border border-white/15 text-[#E0E0E0]/80 font-metadata font-bold text-[9px] tracking-[0.25em] uppercase rounded-lg hover:bg-white/10 hover:border-white/40 hover:text-white transition-all duration-400 active:scale-95"
-                  >
-                    <span>Ver Hemeroteca</span>
-                    <span class="opacity-50 group-hover:translate-x-0.5 transition-transform">
-                      ▸
-                    </span>
-                  </a>
-                  {slide.papersLink && (
+                  {/* 3. CTA con Destaque Centrado */}
+                  <div class="cpe-cta flex items-center justify-center gap-4 mt-2 flex-wrap shrink-0">
                     <a
-                      href={slide.papersLink}
-                      class="group inline-flex items-center gap-2 px-5 py-2.5 bg-transparent border border-white/15 text-white/55 font-metadata font-bold text-[9px] tracking-[0.25em] uppercase rounded-lg hover:bg-white/5 hover:border-white/30 hover:text-white transition-all duration-400 active:scale-95"
+                      href={slide.link}
+                      class="group inline-flex items-center gap-3 px-6 py-3 md:px-8 md:py-3.5 bg-white/5 md:backdrop-blur-md border border-white/20 text-[#E0E0E0] font-metadata font-bold text-xs tracking-[0.25em] uppercase rounded-full hover:bg-white/10 hover:border-white/40 hover:text-white transition-all duration-400 active:scale-95"
                     >
-                      <span>Leer Dossier</span>
-                      <span class="opacity-40 group-hover:translate-x-0.5 transition-transform">
+                      <span>Ver Hemeroteca</span>
+                      <span class="opacity-50 group-hover:translate-x-1 transition-transform">
                         ▸
                       </span>
                     </a>
-                  )}
+                    {slide.papersLink && (
+                      <a
+                        href={slide.papersLink}
+                        class="group inline-flex items-center gap-3 px-6 py-3 md:px-8 md:py-3.5 bg-transparent border border-white/15 text-white/55 font-metadata font-bold text-xs tracking-[0.25em] uppercase rounded-full hover:bg-white/5 hover:border-white/30 hover:text-white transition-all duration-400 active:scale-95"
+                      >
+                        <span>Leer Dossier</span>
+                        <span class="opacity-40 group-hover:translate-x-1 transition-transform">
+                          ▸
+                        </span>
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             </article>
@@ -172,7 +233,7 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
             class="cpe-dots absolute bottom-7 md:bottom-8 left-1/2 -translate-x-1/2 flex flex-wrap justify-center items-center gap-1.5 md:gap-2 max-w-[92vw] pointer-events-auto z-50"
             aria-label="Indicadores de slide"
           >
-            {safeSlides.map((_, i) => (
+            {safeSlides.map((_: SlideData, i: number) => (
               <button
                 class={`cpe-dot h-1.5 rounded-full transition-all duration-500 cursor-pointer border-0 p-0 ${i === 0 ? 'w-6 md:w-8 bg-white' : 'w-1.5 md:w-2 bg-white/30 hover:bg-white/60'}`}
                 data-dot={i}
@@ -208,7 +269,7 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
 <script>
   import gsap from "gsap";
 
-  const SLIDE_DURATION = 7000; // ms por slide
+  const SLIDE_DURATION = 14500; // ms por slide
   const AUTO_RESUME = 8000; // ms de inactividad → retoma auto
   const KB_SCALE = 1.06; // Ken Burns scale destino
   const FADE_DUR = 1.1; // s para cross-fade entre slides
@@ -292,9 +353,11 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
           const bg = slide.querySelector<HTMLElement>(".cpe-bg-img");
           const metaEl = slide.querySelector<HTMLElement>(".cpe-meta");
           const titleEl = slide.querySelector<HTMLElement>(".cpe-title");
-          const subEl = slide.querySelector<HTMLElement>(".cpe-subtitle");
           const ctaEl = slide.querySelector<HTMLElement>(".cpe-cta");
           const dot = slide.querySelector<HTMLElement>(".cpe-meta-dot");
+          const cpeContent = slide.querySelector<HTMLElement>(".cpe-content");
+          const cinematicLayer = slide.querySelector<HTMLElement>(".cpe-hero-cinematic-layer");
+          const textAnim = slide.querySelector<HTMLElement>(".cpe-hero-text-anim");
 
           slide.classList.remove("pointer-events-none");
           slide.setAttribute("aria-hidden", "false");
@@ -302,11 +365,16 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
 
           if (reduceMotion) {
             gsap.set(slide, { opacity: 1 });
+            if (cpeContent) gsap.set(cpeContent, { opacity: 1 });
             done?.();
             return;
           }
 
+          if ((slide as any)._cpeTimeline) {
+            (slide as any)._cpeTimeline.kill();
+          }
           const tl = gsap.timeline();
+          (slide as any)._cpeTimeline = tl;
 
           /* Slide fade-in */
           tl.fromTo(
@@ -321,42 +389,130 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
             0,
           );
 
-          /* Ken Burns: escala milimétrica y ascenso vertical suave durante el slide */
+          /* Ken Burns: escala milimétrica y ascenso vertical suave */
           if (bg) {
             gsap.set(bg, { scale: 1, yPercent: 0 });
             gsap.to(bg, {
-              scale: 1.035,
+              scale: 1.045,
               yPercent: -2.5,
               duration: SLIDE_DURATION / 1000 + FADE_DUR,
               ease: "none",
             });
           }
 
-          /* Textos: stagger desde abajo y luego fade out ("desvanecen al ms") */
-          const textEls = [metaEl, titleEl, subEl, ctaEl].filter(
-            Boolean,
-          ) as HTMLElement[];
-          if (textEls.length > 0) {
+          const slideIdx = parseInt(slide.dataset.index || "0", 10);
+          const mode = slideIdx % 3;
+
+          const textIntroEls = [metaEl, titleEl].filter(Boolean) as HTMLElement[];
+          const textFullEls = [metaEl, titleEl, ctaEl].filter(Boolean) as HTMLElement[];
+
+          // ── PASO 1: Aparición inicial del Título + Metadatos con Staggering ──
+          if (cpeContent) gsap.set(cpeContent, { opacity: 1 });
+          if (ctaEl) gsap.set(ctaEl, { opacity: 0 }); // Oculta CTA inicialmente
+
+          if (textIntroEls.length > 0) {
             tl.fromTo(
-              textEls,
-              { opacity: 0, y: 20 },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.65,
-                stagger: 0.12,
-                ease: "power3.out",
-                clearProps: "transform",
-              },
-              0.35,
+              textIntroEls,
+              { opacity: 0, y: 22, filter: "blur(4px)" },
+              { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.75, stagger: 0.12, ease: "power3.out" },
+              0.25
             );
 
-            // Desvanecimiento rápido luego de 2.5s de permanencia
-            tl.to(
-              textEls,
-              { opacity: 0, duration: 1.2, ease: "power2.inOut" },
-              "+=2.5",
+            // Pausa de lectura inicial del título
+            tl.to({}, { duration: 1.4 });
+
+            // PASO 2: El Título se desvanece suavemente
+            tl.to(textIntroEls, {
+              opacity: 0,
+              y: -12,
+              filter: "blur(6px)",
+              duration: 0.6,
+              ease: "power2.in",
+            });
+          }
+
+          // ── PASO 3: Desplazamiento / Elevación de imagen + Aparición de Mask Shadow & Frase ──
+          if (cinematicLayer && textAnim) {
+            const panX = mode === 0 ? -7 : mode === 1 ? 7 : 0;
+            const panY = mode === 2 ? -12 : -2.5;
+
+            // Paneo lateral (Modos 0 y 1) o Elevación vertical (Modo 2) con escala 1.14 para despejar zona mask sin vacíos rectos negros
+            if (bg) {
+              tl.to(bg, { scale: 1.14, xPercent: panX, yPercent: panY, duration: 1.5, ease: "power2.out" }, "-=0.2");
+            }
+
+            // Capa de mask shadow entra rápido (0.45s) al instante que arranca la apertura para cubrir el gap de inmediato
+            tl.to(cinematicLayer, { opacity: 1, duration: 0.45, ease: "power2.out" }, "<");
+
+            // La frase se escribe en sincronía con el desplazamiento/elevación
+            tl.fromTo(
+              textAnim,
+              { opacity: 0, y: 14, scale: 0.98, filter: "blur(4px)" },
+              { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.65, ease: "power2.out" },
+              "<0.05"
             );
+
+            // Pausa contemplativa de la frase escrita en zona mask
+            tl.to({}, { duration: 3.2 });
+
+            // Salida sin gaps: la frase se desvanece rápido y la sombra protectora se desvanece suavemente MIENTRAS la imagen re-encuadra
+            tl.to(textAnim, { opacity: 0, filter: "blur(4px)", y: -6, duration: 0.35, ease: "power2.in" });
+            if (bg) {
+              tl.to(bg, { scale: 1.045, xPercent: 0, yPercent: -2.5, duration: 1.2, ease: "power2.inOut" }, "-=0.1");
+            }
+            tl.to(cinematicLayer, { opacity: 0, duration: 0.9, ease: "power2.inOut" }, "<");
+          }
+
+          // ── PASO 4: Aparece Título + Metadatos + CTA Destaque ──
+          if (textFullEls.length > 0) {
+            tl.set(ctaEl, { scale: 1, y: 0 });
+            tl.fromTo(
+              textFullEls,
+              { opacity: 0, y: 20, filter: "blur(4px)" },
+              { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.75, stagger: 0.12, ease: "power3.out" },
+              "+=0.1"
+            );
+
+            // Pausa con CTA destacado activo
+            tl.to({}, { duration: 2.2 });
+
+            // ✦ PASO 4.5 (NUEVO PASO): El Título y Metadatos se retiran,
+            // el CTA queda SOLO en tamaño 1px mayor (+luminosidad) antes de desvanecer
+            if (textIntroEls.length > 0) {
+              tl.to(textIntroEls, {
+                opacity: 0,
+                y: -14,
+                filter: "blur(6px)",
+                duration: 0.65,
+                ease: "power2.in",
+              });
+            }
+
+            if (ctaEl) {
+              tl.to(ctaEl, {
+                scale: 1.04, // 1px mayor en tamaño físico de forma armónica
+                y: -2,
+                filter: "drop-shadow(0 0 20px rgba(255,255,255,0.25))",
+                duration: 0.55,
+                ease: "power2.out",
+              }, "<0.1");
+
+              // Pausa con CTA solitario destacado activo
+              tl.to({}, { duration: 2.0 });
+
+              // El CTA se desvanece suavemente
+              tl.to(ctaEl, {
+                opacity: 0,
+                y: -8,
+                scale: 1.01,
+                filter: "blur(6px)",
+                duration: 0.75,
+                ease: "power2.inOut",
+              });
+            }
+
+            // ── PASO 5: IMAGEN NUDA (Protagonista visual pura, límpida y sin filtros) ──
+            tl.to({}, { duration: 2.2 });
           }
 
           /* Pulso del dot: yoyo opacidad */
@@ -375,6 +531,10 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
 
         /* ── Salida de slide ── */
         function slideOut(slide: HTMLElement, done: (() => void) | null) {
+          if ((slide as any)._cpeTimeline) {
+            (slide as any)._cpeTimeline.kill();
+          }
+          
           if (reduceMotion) {
             gsap.set(slide, { opacity: 0 });
             slide.classList.add("pointer-events-none");

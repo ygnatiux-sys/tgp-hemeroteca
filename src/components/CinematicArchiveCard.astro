@@ -106,7 +106,6 @@ const categoryAccentClass = (() => {
   return 'text-rust-orange';
 })();
 
-const cardGradientClass = "gradient-acero-ios";
 const cardId = `cac-${slug || 'item'}-${Math.random().toString(36).substring(2, 7)}`;
 const imgUrl = safeImg || '';
 
@@ -126,21 +125,43 @@ const epigraphMap: Record<string, string> = {
 };
 
 const categoryKey = normalizeCategory(entry.category || '');
-const heroPhraseRaw = epigraphMap[categoryKey] || entry.excerpt || entry.dek || null;
+const essayExcerpt = entry.excerpt || entry.dek || (entry as any).generadorTexto || null;
+const heroPhraseRaw = essayExcerpt || epigraphMap[categoryKey] || null;
 
 function parseHeroPhrase(text: string) {
-  return text
-    .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-bold md:font-black">$1</strong>')
-    .replace(/\[\[([^\]]+)\]\]/g, '<span class="italic text-white/95">$1</span>')
-    .replace(/(^|[^*])\*([^*]+)\*([^*]|$)/g, '$1<span class="italic text-white/95">$2</span>$3');
+  if (!text) return '';
+  const clean = text.replace(/^[#*`>\s]+/, '').trim();
+  
+  if (clean.includes("[[") || clean.includes("**")) {
+    return clean
+      .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-bold md:font-black">$1</strong>')
+      .replace(/\[\[([^\]]+)\]\]/g, '<span class="italic text-amber-200/90 font-serif drop-shadow-[0_0_12px_rgba(245,158,11,0.5)]">$1</span>')
+      .replace(/(^|[^*])\*([^*]+)\*([^*]|$)/g, '$1<span class="italic text-white/95 font-serif">$2</span>$3');
+  }
+
+  // Estilizado suave para excerpts planos: resalta las primeras dos palabras con serif ámbar
+  const words = clean.split(' ');
+  if (words.length > 3) {
+    const firstTwo = words.slice(0, 2).join(' ');
+    const rest = words.slice(2).join(' ');
+    return `<span class="italic text-amber-200/90 font-serif">${firstTwo}</span> ${rest}`;
+  }
+
+  return clean;
 }
 
 const heroPhraseHTML = heroPhraseRaw ? parseHeroPhrase(heroPhraseRaw) : '';
 
-// Detección de retratos / rostros humanos (para paneo lateral 40/60) vs paisajes / escenas completas
-const isPortraitArt = /mercurio|homero|saturno|busto|estatua|retrato|filosofia|hegel|rostro|portrait/i.test(imgUrl) ||
-                      /filosofia|hegel|busto|retrato/i.test(slug || '') ||
-                      /filosofia|hegel/i.test(entry?.category || '');
+// Detección de retratos / rostros humanos / fauna para alineación inteligente del título (Arriba vs Abajo)
+const explicitPos = (entry as any)?.titlePosition || null;
+const isPortraitArt = /aguara|hegel|homero|saturno|busto|estatua|retrato|filosofia|moctezuma|gengis|tatu|rostro|portrait|escultura|venus|urano|arquetipo|personaje|fauna|animal|tero|perdiz|tapir|vaca|hunza/i.test(
+  `${entry?.title || ''} ${slug || ''} ${entry?.category || ''}`
+);
+const titlePos = explicitPos || (isPortraitArt ? "top" : "bottom");
+const explicitBgContrast = (entry as any)?.bgContrast || null;
+const bgContrast = explicitBgContrast || (titlePos === "top" ? "light" : "dark");
+const cardGradientClass = bgContrast === "light" ? "gradient-titanium-dark" : "gradient-silver-bright";
+const strokeClass = bgContrast === "light" ? "title-stroke-light-bg" : "title-stroke-dark-bg";
 
 const fitClass = (isHero && isPortraitArt) ? 'object-contain! bg-[#08090a]' : 'object-cover';
 ---
@@ -150,6 +171,7 @@ const fitClass = (isHero && isPortraitArt) ? 'object-contain! bg-[#08090a]' : 'o
   data-variant={variant}
   data-is-hero={isHero ? "true" : "false"}
   data-is-portrait={isPortraitArt ? "true" : "false"}
+  data-title-pos={titlePos}
   data-category={normalizeCategory(entry.category)}
   data-year={year}
   data-card-id={cardId}
@@ -178,7 +200,7 @@ const fitClass = (isHero && isPortraitArt) ? 'object-contain! bg-[#08090a]' : 'o
           loading={isEager ? "eager" : "lazy"}
           fetchpriority={isEager ? "high" : undefined}
           decoding="async"
-          class={`absolute inset-0 w-full h-full object-center brightness-90 group-hover:brightness-100 transition-transform duration-700 ease-out group-hover:scale-[1.04] cac-card-img ${fitClass} ${ enableCinemagraph && !isHero ? "cinemagraph-ken-burns" : "" } ${resolveMultivisionClass(img)}`}
+          class={`absolute inset-0 w-full h-full object-center transition-transform duration-700 ease-out group-hover:scale-[1.04] cac-card-img ${isHero ? "brightness-100 contrast-100" : "brightness-90 group-hover:brightness-100"} ${fitClass} ${ enableCinemagraph && !isHero ? "cinemagraph-ken-burns" : "" } ${resolveMultivisionClass(img)}`}
           style={isHero ? "object-position: 50% 50%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);" : undefined}
           data-flip-id={`card-image-${cardId}`}
         />
@@ -191,56 +213,63 @@ const fitClass = (isHero && isPortraitArt) ? 'object-contain! bg-[#08090a]' : 'o
 
     {/* Dynamis overlay sutil */}
     {
-      enableCinemagraph && (
+      enableCinemagraph && !isHero && (
         <div class="absolute inset-0 pointer-events-none cinemagraph-dynamis z-0" />
       )
     }
 
-    {/* Scrim gradiente inferior suave para contraste óptimo */}
-    <div
-      class="absolute inset-0 pointer-events-none z-10"
-      style="background: linear-gradient(to top, rgba(12,10,9,0.92) 0%, rgba(12,10,9,0.45) 45%, transparent 100%);"
-    >
-    </div>
+    {/* Scrim gradiente adaptativo — solo en tarjetas menores; en Hero la imagen comienza límpida y el scrim solo se activa en el pasaje a frase */}
+    {!isHero && (
+      <div
+        class="absolute inset-0 pointer-events-none z-10"
+        style={titlePos === "top"
+          ? "background: linear-gradient(to bottom, rgba(12,10,9,0.92) 0%, rgba(12,10,9,0.45) 45%, transparent 100%);"
+          : "background: linear-gradient(to top, rgba(12,10,9,0.92) 0%, rgba(12,10,9,0.45) 45%, transparent 100%);"}
+      >
+      </div>
+    )}
 
-    {/* ✦ CAPA CINEMÁTICA HERO (DIVISIÓN 40/60 PARA ROSTROS / FULL BACKGROUND PARA PAISAJES) */}
+    {/* ✦ CAPA CINEMÁTICA HERO (DIVISIÓN 40/60 PARA ROSTROS / MODO BASE 75/25 PARA OBRAS Y PAISAJES) */}
     {isHero && heroPhraseHTML && (
       <div
         class="cac-hero-cinematic-layer absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-1000 ease-in-out z-25 flex"
-        data-layout={isPortraitArt ? "portrait" : "cinematic"}
+        data-layout={isPortraitArt ? "portrait" : "bottom"}
       >
         {isPortraitArt ? (
           <>
-            {/* 1. Modo Rostro / Retrato: Zona izquierda despejada para el rostro (Hegel) */}
+            {/* 1. Modo Rostro / Retrato: Zona izquierda despejada para el sujeto (Hegel) */}
             <div class="hidden md:block w-[38%] lg:w-[40%] h-full shrink-0"></div>
 
             {/* Zona derecha con scrim degradado y frase con tipografía serif y peso cinematográfico */}
             <div class="w-full md:w-[62%] lg:w-[60%] h-full bg-linear-to-t md:bg-linear-to-r from-black/90 md:from-transparent via-black/95 to-black flex items-center justify-center p-6 sm:p-10 md:p-12 lg:p-16">
-              <p class="cac-hero-cinematic-text font-serif text-2xl sm:text-3xl md:text-4xl lg:text-[3.25rem] text-[#E3DDD3]/95 leading-[1.15] tracking-tight drop-shadow-2xl text-center md:text-left text-balance max-w-[34ch]">
+              <p class="cac-hero-cinematic-text font-serif text-2xl sm:text-3xl md:text-4xl lg:text-[2.8rem] text-[#E3DDD3]/95 leading-[1.15] tracking-tight drop-shadow-2xl text-center md:text-left text-balance max-w-[34ch]">
                 <span class="cac-hero-text-anim inline-block opacity-0" set:html={heroPhraseHTML}></span>
               </p>
             </div>
           </>
         ) : (
-          <div class="w-full h-full flex items-center justify-center p-6 sm:p-10 md:p-14 lg:p-20 text-center bg-black/35 backdrop-blur-[1px]">
-            <p class="cac-hero-cinematic-text font-serif text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] text-[#EFEBE3] leading-[1.15] tracking-tight text-center text-balance max-w-4xl drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)] [text-shadow:0_2px_14px_rgb(0_0_0/95%),0_1px_4px_rgb(0_0_0/90%)]">
-              <span class="cac-hero-text-anim inline-block opacity-0" set:html={heroPhraseHTML}></span>
-            </p>
+          /* 2. Modo Base 75/25: Frase acomodada en el borde inferior con franja mask suave, dejando 100% despejada la obra visual */
+          <div class="w-full h-full flex justify-center items-end">
+            <div class="w-full bg-linear-to-t from-black via-black/95 to-transparent pt-16 md:pt-24 pb-8 md:pb-12 px-6 sm:px-12 text-center">
+              <p class="cac-hero-cinematic-text font-serif text-xl sm:text-2xl md:text-3xl lg:text-[2.5rem] text-[#E3DDD3]/95 leading-snug tracking-tight drop-shadow-2xl text-center max-w-[42ch] mx-auto">
+                <span class="cac-hero-text-anim inline-block opacity-0" set:html={heroPhraseHTML}></span>
+              </p>
+            </div>
           </div>
         )}
       </div>
     )}
 
-    {/* ✦ H1 INTERIOR DENTRO DE LA CARD (Con Cinzel Steel Gradient + GSAP Fade In) */}
-    <div class={`cac-normal-ui absolute inset-0 z-20 flex flex-col justify-end p-4 sm:p-6 md:p-8 pointer-events-none transition-opacity duration-1000 ease-in-out ${hideExteriorTitle ? 'items-center text-center pb-8 sm:pb-12' : 'items-start text-left'}`}>
+    {/* ✦ H1 INTERIOR DENTRO DE LA CARD (Con Cinzel Steel Gradient + Posición Inteligente Arriba/Abajo) */}
+    <div class={`cac-normal-ui absolute inset-0 z-20 flex flex-col p-4 sm:p-6 md:p-8 pointer-events-none transition-opacity duration-1000 ease-in-out ${titlePos === "top" ? 'justify-start pt-8 sm:pt-12 md:pt-14' : 'justify-end pb-8 sm:pb-12'} ${hideExteriorTitle ? 'items-center text-center' : 'items-start text-left'}`}>
       {!isHero && cleanExcerpt && (
         <p class={`leading-relaxed max-w-[66ch] tracking-wider mb-2 line-clamp-3 ch-excerpt-container opacity-0 font-sans ${hideExteriorTitle ? 'text-center mx-auto' : 'text-left'} ${excerptClass}`}>
           <span class="ch-excerpt-line inline-block">{cleanExcerpt}</span>
         </p>
       )}
 
-      <h2 class={`font-cinzel tracking-tight drop-shadow-xl transition-all duration-300 ch-h1-container cac-card-title ${hideExteriorTitle ? 'text-center w-full mx-auto' : ''} ${titleClass}`} data-flip-id={`card-title-${cardId}`}>
-        <span class:list={[cardGradientClass, "block", hideExteriorTitle ? "text-center mx-auto" : ""]}>
+      <h2 class={`font-cinzel tracking-tight drop-shadow-[0_4px_28px_rgba(0,0,0,0.95)] transition-all duration-300 ch-h1-container cac-card-title ${hideExteriorTitle ? 'text-center w-full mx-auto' : ''} ${titleClass}`} data-flip-id={`card-title-${cardId}`}>
+        <span class:list={[cardGradientClass, strokeClass, "block", hideExteriorTitle ? "text-center mx-auto" : ""]}>
           {titlePrefix}<span class="title-keyword-shine-fade">{titleKeyword}</span>
         </span>
       </h2>

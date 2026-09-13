@@ -825,16 +825,52 @@ html[data-nav-state="2"] header:hover .brand-element {
   }
 
   /* Gradiente Acero Cepillado / Titanium (3 stops top-to-bottom estático) */
+  /* ==========================================================================
+     TIPOGRAFÍA DE ALTA GAMA (APPLE iOS HERO - CINZEL EXTRABOLD METÁLICO)
+     ========================================================================== */
+
+  /* BG_MODE == "DARK" (Plata Brillante: #D1D1D6 -> #FFFFFF -> #8E8E93 + Filo Negro 0.1px) */
+  .gradient-silver-bright,
   .gradient-acero-ios {
     background-image: linear-gradient(
       to bottom,
-      #F8FAFC 0%,        /* Destello especular superior */
-      #94A3B8 45%,       /* Cuerpo brillante de Acero */
-      #334155 100%       /* Profundidad metálica oscura al pie */
+      #D1D1D6 0%,
+      #D1D1D6 45%,
+      #FFFFFF 50%,
+      #8E8E93 100%
     );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+  }
+
+  /* BG_MODE == "LIGHT_OR_COLOR" (Titanio Oscuro: #8E8E93 -> #E5E5EA -> #1C1C1E + Filo Blanco 0.1px) */
+  .gradient-titanium-dark {
+    background-image: linear-gradient(
+      to bottom,
+      #8E8E93 0%,
+      #8E8E93 40%,
+      #E5E5EA 45%,
+      #1C1C1E 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Delineado ultra-mínimo 0.1px (simulado con precision sub-pixel y paint-order: stroke fill) */
+  /* BG_MODE == "DARK": Filo Negro #000000 para cortar la luz sobre fondo oscuro */
+  .stroke-dark-mode,
+  .title-stroke-dark-bg {
+    -webkit-text-stroke: 0.15px #000000;
+    paint-order: stroke fill;
+  }
+
+  /* BG_MODE == "LIGHT_OR_COLOR": Filo Blanco #FFFFFF para resaltar metal oscuro sobre fondo claro/color */
+  .stroke-light-mode,
+  .title-stroke-light-bg {
+    -webkit-text-stroke: 0.15px #FFFFFF;
+    paint-order: stroke fill;
   }
 
   /* Gradiente Metálico Elegido para H1 (Didone Gloock, estructura especular multi-stop de Cinzel Steel adaptada a Pergamino/Cobre) */

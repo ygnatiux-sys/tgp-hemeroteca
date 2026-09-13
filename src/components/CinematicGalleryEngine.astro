@@ -76,12 +76,12 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
                 {/* Título Monumental en Cinzel Extrabold con Steel Gradient */}
                 {slide.link ? (
                   <a href={slide.link} class="group/title block">
-                    <h2 class="cge-title font-cinzel font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-[3.25rem] leading-[1.08] tracking-tight gradient-acero-ios drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] group-hover/title:brightness-110 transition-all duration-300">
+                    <h2 class="cge-title font-cinzel font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-[3.25rem] leading-[1.08] tracking-tight gradient-acero-ios title-stroke-dark-bg drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] group-hover/title:brightness-110 transition-all duration-300">
                       {slide.title}
                     </h2>
                   </a>
                 ) : (
-                  <h2 class="cge-title font-cinzel font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-[3.25rem] leading-[1.08] tracking-tight gradient-acero-ios drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)]">
+                  <h2 class="cge-title font-cinzel font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-[3.25rem] leading-[1.08] tracking-tight gradient-acero-ios title-stroke-dark-bg drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)]">
                     {slide.title}
                   </h2>
                 )}

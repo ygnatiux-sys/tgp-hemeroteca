@@ -1,0 +1,367 @@
+---
+/**
+ * CinematicCollectionCardEngine.astro
+ * Motor cinemático individual para las Hero Covers de cada Colección en /colecciones/.
+ * 
+ * Modos de Frase:
+ *  - "bottom-right": Cuadrante inferior derecho con soft gradient mask (ej. Historia, Filosofía).
+ *  - "bottom": Modo abajo 75/25 donde la imagen se eleva y la frase se acomoda en el gap black
+ *    inferior con franja mask suave (ej. Arqueosemiótica).
+ * 
+ * Dinámica y Timings GSAP:
+ *  - Paso 1: Entrada del Título + Metadatos (sin CTA).
+ *  - Paso 2: Título se desvanece suavemente.
+ *  - Paso 3: Movimiento 75/25 o paneo lateral + Aparición de Soft Mask y Frase en zona mask.
+ *  - Paso 4: Título + Metadatos + CTA Solitario Destacado juntos.
+ *  - Paso 4.5: NUEVO PASO → Título se retira, el CTA queda SOLO en tamaño 1px mayor (+luminosidad heredada).
+ *  - Paso 5: CTA se desvanece → IMAGEN NUDA (Protagonista visual pura).
+ */
+
+import Image from './SafeImage.astro';
+import { sanitizeImageUrl } from '../lib/content-filter';
+
+interface Props {
+  collectionKey: string;
+  label: string;
+  count: number;
+  coverImage?: any;
+  coverTitle?: string;
+  link: string;
+  index: number;
+  mode?: 'bottom' | 'bottom-right';
+  badge?: string;
+  ctaLabel?: string;
+}
+
+const {
+  collectionKey,
+  label,
+  count,
+  coverImage,
+  coverTitle,
+  link,
+  index,
+  mode,
+  badge = 'Colección TGP',
+  ctaLabel = 'Explorar Colección',
+} = Astro.props;
+
+const isBottomCandidate = 
+  collectionKey.toLowerCase().includes('arqueo') ||
+  collectionKey.toLowerCase().includes('historia') ||
+  collectionKey.toLowerCase().includes('cinematic');
+
+const activeMode = mode || (isBottomCandidate ? 'bottom' : 'bottom-right');
+const safeImg = coverImage ? sanitizeImageUrl(coverImage) : null;
+
+// Mapa de frases evocativas por colección
+const epigraphMap: Record<string, string> = {
+  "arqueosemiotica":   "Los [[signos]] sobreviven a los imperios. **Cada glifo,** un mensaje lanzado a la eternidad sin destinatario conocido.",
+  "filosofia":         "El pensamiento como [[territorio.]] Las **ideas no mueren:** se transforman, se heredan, se contradicen.",
+  "mitologia":         "Antes del dato, existió el [[mito.]] El relato que **une cielo y tierra** antes de que la ciencia los separara.",
+  "historia":          "El [[tiempo]] no es lineal. Es una **red de causas** que la memoria humana teje y desteje sin cesar.",
+  "ensayos-cinematicos": "Imágenes que **piensan.** El [[cine]] como forma de conocimiento antes de que el conocimiento fuera escrito.",
+  "arquetipos":        "Figuras que reaparecen en cada cultura. Los [[arquetipos]] son la gramática **secreta del ser humano.**",
+  "historia-natural":  "La vida como **archivo.** Cada especie, un [[capítulo]] de una historia que empezó mucho antes que nosotros.",
+  "historia-antigua":  "Las [[civilizaciones]] no colapsan: **se transforman.** Sus ruinas son preguntas, no respuestas.",
+  "historia-medieval": "Entre el [[fin del mundo]] romano y el alba del moderno, **siglos de invención** que el olvido llama oscuros.",
+  "religion":          "Lo [[sagrado]] como necesidad primaria. **Cada fe,** un intento humano de darle nombre al misterio.",
+};
+
+const rawEpigraph = epigraphMap[collectionKey] || `**${label}:** una [[colección]] de registros del pensamiento humano en expansión.`;
+
+function parseHeroPhrase(text: string) {
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-bold md:font-black">$1</strong>')
+    .replace(/\[\[([^\]]+)\]\]/g, '<span class="italic text-amber-200/90 font-serif drop-shadow-[0_0_12px_rgba(245,158,11,0.5)]">$1</span>')
+    .replace(/(^|[^*])\*([^*]+)\*([^*]|$)/g, '$1<span class="italic text-[#E3DDD3] font-serif">$2</span>$3');
+}
+
+const epigraphHTML = parseHeroPhrase(rawEpigraph);
+
+// Luminosidad y acento de color heredado por colección
+const accentGlowStyle = (() => {
+  const k = collectionKey.toLowerCase();
+  if (k.includes("mitolog") || k.includes("simbol")) return "border-rose-500/40 text-rose-100 shadow-[0_0_30px_rgba(225,29,72,0.4)] hover:shadow-[0_0_40px_rgba(225,29,72,0.65)] hover:border-rose-400";
+  if (k.includes("historia") || k.includes("prehistoria")) return "border-emerald-500/40 text-emerald-100 shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:shadow-[0_0_40px_rgba(16,185,129,0.65)] hover:border-emerald-400";
+  if (k.includes("filosof") || k.includes("gnos")) return "border-sky-500/40 text-sky-100 shadow-[0_0_30px_rgba(14,165,233,0.4)] hover:shadow-[0_0_40px_rgba(14,165,233,0.65)] hover:border-sky-400";
+  if (k.includes("cinematic") || k.includes("dossier")) return "border-indigo-500/40 text-indigo-100 shadow-[0_0_30px_rgba(99,102,241,0.4)] hover:shadow-[0_0_40px_rgba(99,102,241,0.65)] hover:border-indigo-400";
+  if (k.includes("arte") || k.includes("arquitectura")) return "border-amber-500/40 text-amber-100 shadow-[0_0_30px_rgba(245,158,11,0.4)] hover:shadow-[0_0_40px_rgba(245,158,11,0.65)] hover:border-amber-400";
+  return "border-amber-500/40 text-amber-100 shadow-[0_0_30px_rgba(217,119,6,0.4)] hover:shadow-[0_0_40px_rgba(217,119,6,0.65)] hover:border-amber-400";
+})();
+
+const cardId = `cce-${collectionKey}-${index}`;
+---
+
+<div
+  class="cce-root group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 bg-black shadow-2xl flex flex-col justify-end w-full isolate select-none min-h-[82vh] md:min-h-180 lg:min-h-205"
+  id={cardId}
+  data-card-id={cardId}
+  data-mode={activeMode}
+>
+  {/* Imagen de fondo Ken Burns — Límpida y sin filtros permanentes */}
+  <div class="cce-bg-wrap absolute inset-0 overflow-hidden">
+    {safeImg ? (
+      <Image
+        src={safeImg}
+        alt={label}
+        inferSize={true}
+        format="webp"
+        loading={index === 0 ? "eager" : "lazy"}
+        fetchpriority={index === 0 ? "high" : undefined}
+        decoding="async"
+        class="cce-bg-img absolute inset-0 object-center pointer-events-none -z-10 img-nativa scale-100 brightness-100 contrast-100"
+      />
+    ) : (
+      <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1c242b] via-stone-900 to-[#0a0b0b] -z-10" />
+    )}
+  </div>
+
+  {/* ✦ CAPA CINEMÁTICA: Frase Evocativa */}
+  {/* Modo Abajo (75/25) vs Modo Cuadrante Inferior Derecho */}
+  {activeMode === 'bottom' ? (
+    <div class="cce-cinematic-layer absolute inset-0 opacity-0 pointer-events-none z-15 flex justify-center items-end">
+      <div class="w-full bg-linear-to-t from-black via-black/95 to-transparent pt-20 md:pt-28 pb-8 md:pb-12 px-6 sm:px-12 text-center">
+        <p class="cce-cinematic-text font-serif text-xl sm:text-2xl md:text-3xl lg:text-[2.5rem] text-[#E3DDD3]/95 leading-snug tracking-tight drop-shadow-2xl text-center max-w-[42ch] mx-auto">
+          <span class="cce-text-anim inline-block opacity-0" set:html={epigraphHTML}></span>
+        </p>
+      </div>
+    </div>
+  ) : (
+    <div class="cce-cinematic-layer absolute inset-0 opacity-0 pointer-events-none z-15 flex justify-end items-end">
+      <div class="w-full md:w-[50%] lg:w-[44%] bg-linear-to-t md:bg-linear-to-l from-black via-black/90 to-transparent pt-16 md:pt-24 pb-8 md:pb-12 px-6 sm:px-10 md:px-14">
+        <p class="cce-cinematic-text font-serif text-xl sm:text-2xl md:text-3xl lg:text-[2.6rem] text-[#E3DDD3]/95 leading-tight tracking-tight drop-shadow-2xl text-right max-w-[34ch] ml-auto">
+          <span class="cce-text-anim inline-block opacity-0" set:html={epigraphHTML}></span>
+        </p>
+      </div>
+    </div>
+  )}
+
+  {/* ✦ CONTENIDO EDITORIAL PRINCIPAL: Título, Metadatos y CTA Solitario Destacado Centrado */}
+  <div class="cce-content relative z-20 w-full h-full p-6 sm:p-10 md:p-14 lg:p-18 flex flex-col justify-center items-center text-center mx-auto max-w-4xl opacity-0">
+    <div class="flex flex-col items-center text-center mx-auto gap-3 md:gap-5">
+      
+      {/* 1. Metadatos de Colección */}
+      <div class="cce-meta flex items-center justify-center gap-3">
+        <span class="inline-flex items-center gap-2 font-metadata text-[10px] sm:text-xs uppercase tracking-[0.4em] text-[#EFEBE3] font-bold drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)]">
+          <span class="cce-meta-dot w-1.5 h-1.5 rounded-full bg-rust-orange inline-block shadow-[0_0_6px_rgba(239,235,227,0.8)]" />
+          {badge} · {count} {count === 1 ? 'Documento' : 'Documentos'}
+        </span>
+      </div>
+
+      {/* 2. Título Monumental de la Colección */}
+      <h2 class="cce-title font-serif font-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-tight tracking-tight gradient-general-h2 drop-shadow-[0_4px_28px_rgba(0,0,0,0.95)] text-center">
+        <a href={link} class="inline-block transition-transform duration-500 hover:scale-[1.01]">
+          {label}
+        </a>
+      </h2>
+
+      {/* Subtítulo / Cover essay title (si aplica) */}
+      {coverTitle && (
+        <p class="cce-subtitle font-serif text-white/90 text-sm sm:text-base md:text-lg tracking-wide font-light max-w-2xl text-center drop-shadow-[0_2px_14px_rgba(0,0,0,0.95)]">
+          {coverTitle}
+        </p>
+      )}
+
+      {/* 3. CTA SOLITARIO DESTACADO CON LUMINOSIDAD HEREDADA */}
+      <div class="cce-cta flex items-center justify-center mt-4">
+        <a
+          href={link}
+          class={`group/btn inline-flex items-center gap-3 px-8 py-4 sm:px-10 sm:py-4.5 bg-black/40 md:backdrop-blur-md border font-metadata font-bold text-xs sm:text-sm tracking-[0.3em] uppercase rounded-full transition-all duration-400 active:scale-95 ${accentGlowStyle}`}
+        >
+          <span>{ctaLabel}</span>
+          <span class="opacity-70 group-hover/btn:translate-x-1.5 transition-transform duration-300">
+            ▸
+          </span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  import gsap from "gsap";
+
+  function initCCE() {
+    const cards = Array.from(document.querySelectorAll<HTMLElement>(".cce-root"));
+    if (cards.length === 0) return;
+
+    cards.forEach((card) => {
+      if (card.dataset.cceInit === "true") return;
+      card.dataset.cceInit = "true";
+
+      const mode = card.dataset.mode || "bottom-right";
+      const bg = card.querySelector<HTMLElement>(".cce-bg-img");
+      const metaEl = card.querySelector<HTMLElement>(".cce-meta");
+      const titleEl = card.querySelector<HTMLElement>(".cce-title");
+      const subtitleEl = card.querySelector<HTMLElement>(".cce-subtitle");
+      const ctaEl = card.querySelector<HTMLElement>(".cce-cta");
+      const contentEl = card.querySelector<HTMLElement>(".cce-content");
+      const cinematicLayer = card.querySelector<HTMLElement>(".cce-cinematic-layer");
+      const textAnim = card.querySelector<HTMLElement>(".cce-text-anim");
+
+      const textIntroEls = [metaEl, titleEl, subtitleEl].filter(Boolean) as HTMLElement[];
+      const textFullEls = [metaEl, titleEl, subtitleEl, ctaEl].filter(Boolean) as HTMLElement[];
+
+      let isRunning = false;
+
+      function playCycle() {
+        if (isRunning) return;
+        isRunning = true;
+
+        const tl = gsap.timeline({
+          onComplete: () => {
+            isRunning = false;
+            // Reiniciar ciclo pasados unos segundos si sigue visible en viewport
+            setTimeout(() => {
+              if (card.classList.contains("cpe-in-view")) {
+                playCycle();
+              }
+            }, 1000);
+          }
+        });
+
+        // Background Ken Burns suave
+        if (bg) {
+          gsap.set(bg, { scale: 1, xPercent: 0, yPercent: 0 });
+          gsap.to(bg, { scale: 1.045, yPercent: -2.5, duration: 16, ease: "none" });
+        }
+
+        // PASO 1: Entrada del Título + Metadata (sin CTA)
+        if (contentEl) gsap.set(contentEl, { opacity: 1 });
+        if (ctaEl) gsap.set(ctaEl, { opacity: 0, scale: 1, y: 0 });
+        if (cinematicLayer) gsap.set(cinematicLayer, { opacity: 0 });
+        if (textAnim) gsap.set(textAnim, { opacity: 0 });
+
+        if (textIntroEls.length > 0) {
+          tl.fromTo(
+            textIntroEls,
+            { opacity: 0, y: 22, filter: "blur(4px)" },
+            { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.75, stagger: 0.12, ease: "power3.out" },
+            0.25
+          );
+
+          // Pausa de lectura del título
+          tl.to({}, { duration: 1.4 });
+
+          // PASO 2: Título se borra suavemente
+          tl.to(textIntroEls, {
+            opacity: 0,
+            y: -12,
+            filter: "blur(6px)",
+            duration: 0.6,
+            ease: "power2.in",
+          });
+        }
+
+        // PASO 3: Movimiento 75/25 abajo o paneo lateral + Frase en zona mask suave
+        if (cinematicLayer && textAnim) {
+          if (bg) {
+            if (mode === "bottom") {
+              // Modo abajo 75/25: la imagen se eleva para acomodar el gap black abajo
+              tl.to(bg, { scale: 1.12, yPercent: -16, xPercent: 0, duration: 1.5, ease: "power2.out" }, "-=0.2");
+            } else {
+              // Modo cuadrante inferior derecho: paneo lateral suave (-7%)
+              tl.to(bg, { scale: 1.14, xPercent: -7, yPercent: -2.5, duration: 1.5, ease: "power2.out" }, "-=0.2");
+            }
+          }
+
+          // Soft mask shadow entra rápido al momento de abrir el gap
+          tl.to(cinematicLayer, { opacity: 1, duration: 0.45, ease: "power2.out" }, "<");
+
+          // Frase se escribe en sincronía
+          tl.fromTo(
+            textAnim,
+            { opacity: 0, y: 14, scale: 0.98, filter: "blur(4px)" },
+            { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.65, ease: "power2.out" },
+            "<0.05"
+          );
+
+          // Pausa contemplativa de la frase
+          tl.to({}, { duration: 3.2 });
+
+          // Salida sin gaps de la frase y soft mask mientras la imagen re-encuadra
+          tl.to(textAnim, { opacity: 0, filter: "blur(4px)", y: -6, duration: 0.35, ease: "power2.in" });
+          if (bg) {
+            tl.to(bg, { scale: 1.045, xPercent: 0, yPercent: -2.5, duration: 1.2, ease: "power2.inOut" }, "-=0.1");
+          }
+          tl.to(cinematicLayer, { opacity: 0, duration: 0.9, ease: "power2.inOut" }, "<");
+        }
+
+        // PASO 4: Aparece Título + Subtítulo + Metadatos + CTA Solitario Destacado
+        if (textFullEls.length > 0) {
+          tl.set(ctaEl, { scale: 1 });
+          tl.fromTo(
+            textFullEls,
+            { opacity: 0, y: 20, filter: "blur(4px)" },
+            { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.75, stagger: 0.12, ease: "power3.out" },
+            "+=0.1"
+          );
+
+          // Pausa de visualización conjunta
+          tl.to({}, { duration: 2.2 });
+
+          // ✦ PASO 4.5 (NUEVO PASO): El Título y Metadatos se retiran,
+          // el CTA queda SOLO en tamaño 1px mayor (+luminosidad) antes de desvanecer
+          if (textIntroEls.length > 0) {
+            tl.to(textIntroEls, {
+              opacity: 0,
+              y: -14,
+              filter: "blur(6px)",
+              duration: 0.65,
+              ease: "power2.in",
+            });
+          }
+
+          if (ctaEl) {
+            tl.to(ctaEl, {
+              scale: 1.04, // 1px mayor en tamaño de tipografía/botón de forma armónica
+              y: -2,
+              filter: "drop-shadow(0 0 20px rgba(255,255,255,0.25))",
+              duration: 0.55,
+              ease: "power2.out",
+            }, "<0.1");
+
+            // Pausa con CTA solitario destacado activo
+            tl.to({}, { duration: 2.0 });
+
+            // El CTA se desvanece suavemente
+            tl.to(ctaEl, {
+              opacity: 0,
+              y: -8,
+              scale: 1.01,
+              filter: "blur(6px)",
+              duration: 0.75,
+              ease: "power2.inOut",
+            });
+          }
+
+          // PASO 5: IMAGEN NUDA (Protagonista visual pura sin interferencias)
+          tl.to({}, { duration: 2.2 });
+        }
+      }
+
+      // IntersectionObserver para activar el ciclo cinemático cuando la card entra en pantalla
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            card.classList.add("cpe-in-view");
+            playCycle();
+          } else {
+            card.classList.remove("cpe-in-view");
+          }
+        });
+      }, { threshold: 0.25 });
+
+      observer.observe(card);
+    });
+  }
+
+  document.addEventListener("astro:page-load", initCCE);
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    initCCE();
+  } else {
+    document.addEventListener("DOMContentLoaded", initCCE);
+  }
+</script>

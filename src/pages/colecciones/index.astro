@@ -10,6 +10,7 @@ import Marquee from '../../components/Marquee.astro';
 import CoverflowCarousel, { type CoverflowPost } from '../../components/CoverflowCarousel';
 import CollectionEpigraph from '../../components/CollectionEpigraph.astro';
 import VerticalCollectionsStack from '../../components/VerticalCollectionsStack.astro';
+import CinematicCollectionCardEngine from '../../components/CinematicCollectionCardEngine.astro';
 import {
   getPublishableEssays,
   groupByCategory,
@@ -166,45 +167,20 @@ const epigraphMap: Record<string, string> = {
 
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">
 
-      {/* BANNER DESTACADO: SITIOS GEOHISTÓRICOS (Hero Card Cinemática con Imagen) */}
+      {/* BANNER DESTACADO: SITIOS GEOHISTÓRICOS & ARQUEOSEMIÓTICA (Hero Card Cinemática con Modo Abajo 75/25) */}
       <section class="reveal-brote w-full">
-        <a
-          href="/colecciones/arqueosemiotica/"
-          class="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 bg-theme-dark/80 hover:border-white/25 transition-all duration-500 shadow-2xl min-h-[82vh] md:min-h-180 lg:min-h-205 flex flex-col justify-end p-6 sm:p-10 md:p-14 lg:p-18 isolate"
-        >
-          {georefCoverEssay?.img && (
-            <Image
-              src={sanitizeImageUrl(georefCoverEssay?.img)}
-              alt="Sitios Geohistóricos & Arqueohistóricos"
-              inferSize={true}
-              format="webp"
-              loading="lazy"
-              decoding="async"
-              class="cover-brote-img absolute inset-0 object-center brightness-60 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.02] group-hover:brightness-75 img-nativa"
-            />
-          )}
-          <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/50 via-50% to-transparent pointer-events-none z-10"></div>
-
-          <div class="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div class="flex flex-col gap-2 max-w-4xl">
-              <span class="font-mono text-xs sm:text-sm uppercase tracking-[0.4em] text-rust-orange font-bold">
-                Colección Especializada · Georreferencias
-              </span>
-              <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-black gradient-general-h1 leading-tight">
-                Sitios Geohistóricos &amp; Arqueohistóricos
-              </h2>
-              <p class="h2-thin-hook text-sm sm:text-base md:text-lg text-white/80 tracking-[0.15em] mt-1">
-                Aramu Muru · Tikal · Bonampak · Cartago · Qapaq Ñan · Yonaguni
-              </p>
-            </div>
-
-            <div class="shrink-0">
-              <span class="inline-flex items-center gap-3 px-6 py-3.5 rounded-xl bg-[#151718]/90 border border-white/15 text-[#E0E0E0]/85 font-mono text-xs uppercase tracking-[0.3em] font-bold group-hover:bg-white/20 group-hover:border-white/40 group-hover:text-white transition-all duration-300 shadow-lg">
-                Explorar Cartografía →
-              </span>
-            </div>
-          </div>
-        </a>
+        <CinematicCollectionCardEngine
+          collectionKey="arqueosemiotica"
+          label="Sitios Geohistóricos & Arqueohistóricos"
+          badge="Colección Especializada · Georreferencias"
+          count={publishableGeorefs.length}
+          coverImage={georefCoverEssay?.img}
+          coverTitle="Aramu Muru · Tikal · Bonampak · Cartago · Qapaq Ñan · Yonaguni"
+          link="/colecciones/arqueosemiotica/"
+          index={0}
+          mode="bottom"
+          ctaLabel="Explorar Cartografía"
+        />
       </section>
 
       {/* ─── EPIGRAFE CINEMATICO: entre Sitios Geohistóricos y las Colecciones Temáticas ─── */}
@@ -213,55 +189,29 @@ const epigraphMap: Record<string, string> = {
       />
 
       {/* ═══════════════════════════════════════════════════════════════════
-          COLECCIONES TEMÁTICAS GENERALES — PANTALLAS DE CINE FULL-HEIGHT
+          COLECCIONES TEMÁTICAS GENERALES — PANTALLAS DE CINE FULL-HEIGHT CINEMÁTICAS
       ═══════════════════════════════════════════════════════════════════ */}
-      <section class="flex flex-col gap-8 sm:gap-12 md:gap-16 w-full">
-        {/* ─── Primera card (hero): sin epigrafe previo ─── */}
+      <section class="flex flex-col gap-12 sm:gap-16 md:gap-24 w-full">
         {collections.slice(0, 3).map((col, index) => {
-          // Todas las cards son pantallas de cine hero de gran altura
-          const mobileHeightClass = "min-h-[82vh] md:min-h-180 lg:min-h-205";
           const epigraphText = epigraphMap[col.key] || `**${col.label}:** una [[colección]] de registros del pensamiento humano en expansión.`;
 
           return (
-            <div class="flex flex-col w-full">
-              {/* Epigrafe cinematico antes de cada card (excepto la primera) */}
+            <div class="flex flex-col w-full gap-8 md:gap-12">
+              {/* Epígrafe cinemático previo (excepto en la primera colección) */}
               {index > 0 && (
                 <CollectionEpigraph text={epigraphText} />
               )}
 
-              <a
-                href={`/colecciones/${col.key}/`}
-                class={`reveal-brote group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/5 bg-theme-dark/80 hover:border-white/25 transition-all duration-500 shadow-2xl flex flex-col justify-end w-full isolate ${mobileHeightClass}`}
-              >
-                {col.coverEssay?.img ? (
-                  <Image
-                    src={sanitizeImageUrl(col.coverEssay.img)}
-                    alt={col.label}
-                    inferSize={true}
-                    format="webp"
-                    loading={index === 0 ? "eager" : "lazy"}
-                    fetchpriority={index === 0 ? "high" : undefined}
-                    decoding="async"
-                    class="cover-brote-img absolute inset-0 object-center pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.018] group-hover:brightness-95 img-nativa"
-                  />
-                ) : (
-                  <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1c242b] via-theme-dark to-[#0a0b0b] -z-10" />
-                )}
-
-                {/* Gradiente nítido sin desenfoque */}
-                <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/50 via-45% to-transparent pointer-events-none z-10"></div>
-
-                <div class="relative z-20 p-6 sm:p-10 md:p-14 lg:p-18 flex flex-col justify-end h-full">
-                  <span class="font-mono text-xs sm:text-sm uppercase tracking-[0.35em] text-rust-orange font-bold mb-2">Colección TGP</span>
-                  <h2 class="gradient-general-h2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-2 font-serif font-black tracking-tight leading-tight">{col.label}</h2>
-                  {col.coverEssay?.entry?.title && (
-                    <p class="font-serif text-white/70 text-sm sm:text-base md:text-lg line-clamp-1 mb-2 tracking-wide font-light">
-                      {col.coverEssay.entry.title}
-                    </p>
-                  )}
-                  <p class="font-mono text-xs sm:text-sm text-white/50">{col.count} {col.count === 1 ? 'Documento' : 'Documentos'}</p>
-                </div>
-              </a>
+              <CinematicCollectionCardEngine
+                collectionKey={col.key}
+                label={col.label}
+                count={col.count}
+                coverImage={col.coverEssay?.img}
+                coverTitle={col.coverEssay?.entry?.title}
+                link={`/colecciones/${col.key}/`}
+                index={index + 1}
+                mode={(col.key === 'arqueosemiotica' || col.key.includes('historia') || col.key.includes('cinematic')) ? 'bottom' : 'bottom-right'}
+              />
             </div>
           );
         })}
