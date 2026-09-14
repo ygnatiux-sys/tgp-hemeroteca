@@ -109,17 +109,17 @@ const paddedTotal = totalRows < 10 ? `0${totalRows}` : `${totalRows}`;
               <!-- Contenido textual — base de la tarjeta -->
               <div class="absolute bottom-0 left-0 w-full p-5 md:p-6 flex flex-col justify-end gap-2">
                 <!-- Título: Cinzel heredado, gradiente Acero/TGP en hover -->
-                <h3 class="font-cinzel font-bold text-lg md:text-xl leading-tight text-white/90 group-hover:text-white transition-colors drop-shadow-md line-clamp-2">
+                <h3 class="font-cinzel font-bold text-xl md:text-2xl leading-tight text-white/90 group-hover:text-white transition-colors drop-shadow-md line-clamp-2">
                   {item.title}
                 </h3>
 
                 <!-- Excerpt: Newsreader/Gloock, aireado y legible sobre fondo oscuro -->
-                <p class="font-serif text-[13px] md:text-sm leading-relaxed tracking-[0.01em] text-white/50 group-hover:text-white/70 transition-colors line-clamp-3">
+                <p class="font-serif text-[15px] md:text-base leading-relaxed tracking-[0.01em] text-white/50 group-hover:text-white/70 transition-colors line-clamp-3">
                   {item.excerpt}
                 </p>
 
                 <!-- CTA discreta -->
-                <span class="font-metadata text-[9px] uppercase tracking-[0.3em] text-white/25 group-hover:text-[#EFEBE3]/60 transition-colors mt-1">
+                <span class="font-metadata text-xs md:text-sm uppercase tracking-[0.3em] text-white/25 group-hover:text-[#EFEBE3]/60 transition-colors mt-1">
                   Leer ensayo →
                 </span>
               </div>

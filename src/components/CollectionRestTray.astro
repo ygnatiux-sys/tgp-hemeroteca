@@ -118,7 +118,7 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
               {/* Bloque Editorial Centrado al Pie Estilo Presentación de Colección */}
               <div class="relative z-20 p-5 sm:p-7 md:p-8 flex flex-col items-center justify-end text-center w-full pointer-events-none">
                 {year && (
-                  <span class="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.3em] text-rust-orange font-bold mb-1.5 block">
+                  <span class="font-mono text-xs sm:text-[13px] uppercase tracking-[0.3em] text-rust-orange font-bold mb-1.5 block">
                     {year}
                   </span>
                 )}
@@ -129,7 +129,7 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
                 </h3>
 
                 {cleanExcerpt && (
-                  <p class="font-sans text-xs sm:text-sm text-[#E3DDD3]/80 line-clamp-2 max-w-lg mb-4 leading-relaxed font-light hidden sm:block">
+                  <p class="font-sans text-sm sm:text-base text-[#E3DDD3]/80 line-clamp-2 max-w-lg mb-4 leading-relaxed font-light hidden sm:block">
                     {cleanExcerpt}
                   </p>
                 )}
@@ -138,7 +138,7 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
                 <div class="mt-1 w-full max-w-64 flex justify-center">
                   <a
                     href={href}
-                    class="card-cta-btn inline-flex items-center justify-center gap-2.5 w-full py-2.5 sm:py-3 px-6 rounded-lg font-mono font-semibold text-[9.5px] sm:text-xs uppercase tracking-[0.25em] transition-all duration-300 shadow-xl shadow-black/60 hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md"
+                    class="card-cta-btn inline-flex items-center justify-center gap-2.5 w-full py-2.5 sm:py-3 px-6 rounded-lg font-mono font-semibold text-xs sm:text-sm uppercase tracking-[0.25em] transition-all duration-300 shadow-xl shadow-black/60 hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md"
                   >
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />

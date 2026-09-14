@@ -88,8 +88,8 @@ const titleClass = isHero
 const excerptClass = isHero
   ? "text-base sm:text-lg md:text-xl text-white/90 line-clamp-3 max-w-3xl leading-relaxed"
   : isDuo40
-    ? "text-[11px] sm:text-xs text-white/80 line-clamp-1 max-w-xl font-light"
-    : "text-xs sm:text-sm text-white/85 line-clamp-2 max-w-2xl font-light";
+    ? "text-xs sm:text-sm text-white/80 line-clamp-1 max-w-xl font-light"
+    : "text-sm sm:text-base text-white/85 line-clamp-2 max-w-2xl font-light";
 
 const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
   entry.title || "",
@@ -288,7 +288,7 @@ const fitClass = (isHero && isPortraitArt) ? 'object-contain! bg-[#08090a]' : 'o
   <div class={`flex flex-col w-full grow ${hideExteriorTitle ? 'pt-6 sm:pt-8 items-center text-center' : 'pt-1'}`}>
     {/* En modo normal: Categoría y Tags arriba */}
     {!hideExteriorTitle && (
-      <div class="flex flex-wrap items-center gap-2 mb-2 font-metadata text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-stone-400">
+      <div class="flex flex-wrap items-center gap-2 mb-2 font-metadata text-xs md:text-sm uppercase tracking-[0.25em] text-stone-400">
         <span class={`${categoryAccentClass} font-semibold`}>
           {entry.category ? entry.category.toUpperCase() : 'ARCHIVO'}
         </span>
@@ -340,7 +340,7 @@ const fitClass = (isHero && isPortraitArt) ? 'object-contain! bg-[#08090a]' : 'o
     )}
 
     {/* Tags de Categorías y Metadatos en color default — separación limpia respecto al excerpt en modo cinemático */}
-    <div class={`flex flex-wrap items-center gap-x-4 gap-y-1.5 ${isHero ? "font-['Proza_Libre']" : "font-metadata"} text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-white/50 w-full ${hideExteriorTitle ? 'justify-center pt-6 sm:pt-8 border-t border-white/10 mx-auto max-w-xl' : 'justify-start'}`}>
+    <div class={`flex flex-wrap items-center gap-x-4 gap-y-1.5 ${isHero ? "font-['Proza_Libre']" : "font-metadata"} text-xs sm:text-sm uppercase tracking-[0.25em] text-white/50 w-full ${hideExteriorTitle ? 'justify-center pt-6 sm:pt-8 border-t border-white/10 mx-auto max-w-xl' : 'justify-start'}`}>
       {entry.category && (
         <span class="ch-tag">{entry.category.toUpperCase()}</span>
       )}

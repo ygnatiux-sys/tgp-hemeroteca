@@ -254,7 +254,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             aria-controls="view-years"
             id="tab-btn-years"
             data-main-tab="years"
-            class="archive-main-tab-btn px-2 py-1 bg-transparent border-none text-white/50 font-metadata text-[10px] md:text-[11px] uppercase tracking-[0.25em] cursor-pointer transition-all duration-300 flex items-center hover:text-white/80"
+            class="archive-main-tab-btn px-2 py-1 bg-transparent border-none text-white/50 font-metadata text-xs md:text-[13px] uppercase tracking-[0.25em] cursor-pointer transition-all duration-300 flex items-center hover:text-white/80"
           >
             Por Año
           </button>
@@ -283,7 +283,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
           <button
             type="button"
             data-cat-filter-btn="all"
-            class="cat-filter-btn font-metadata text-[9px] uppercase tracking-[0.2em] px-2 py-1 text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
+            class="cat-filter-btn font-metadata text-xs uppercase tracking-[0.2em] px-2 py-1 text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
           >
             TODAS LAS INVESTIGACIONES ({publishable.length})
           </button>
@@ -293,7 +293,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             <select
               id="cat-linter-select"
               aria-label="Seleccionar categoría o tema de investigación"
-              class="appearance-none font-metadata text-[9px] uppercase tracking-[0.2em] px-2 py-1 pr-6 border-none text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
+              class="appearance-none font-metadata text-xs uppercase tracking-[0.2em] px-2 py-1 pr-6 border-none text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
             >
               <option value="all" class="bg-[#0a0a0a] text-white/50">POR CATEGORÍA / TEMA</option>
               {categories.map(cat => (
@@ -321,7 +321,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
               <div class="category-block flex flex-col gap-8" data-category-group={group.catKey}>
                 {/* Presentación Editorial de Colección Centrada (Tipografía Gloock con Gradiente Metálico Cálido) */}
                 <div class="editorial-bar flex flex-col items-center justify-center text-center pb-8 pt-4 gap-3 w-full max-w-4xl mx-auto">
-                  <span class="font-metadata text-[10px] sm:text-[11px] uppercase tracking-[0.35em] text-rust-orange font-bold">
+                  <span class="font-metadata text-[13px] sm:text-sm uppercase tracking-[0.35em] text-rust-orange font-bold">
                     Colección Especializada · {group.essays.length} {group.essays.length === 1 ? 'Dossier' : 'Dossieres'}
                   </span>
 
@@ -334,7 +334,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                   <div class="flex items-center gap-4 justify-center mt-1">
                     <a
                       href={`/colecciones/${group.catKey}/`}
-                      class="font-metadata text-[10.5px] sm:text-[11.5px] uppercase tracking-[0.25em] text-white/60 hover:text-rust-orange transition-colors flex items-center gap-2 group/arrow"
+                      class="font-metadata text-xs sm:text-[13px] uppercase tracking-[0.25em] text-white/60 hover:text-rust-orange transition-colors flex items-center gap-2 group/arrow"
                     >
                       <span>Explorar Colección Completa</span>
                       <span class="text-rust-orange group-hover/arrow:translate-x-1 transition-transform">→</span>
@@ -387,7 +387,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
               <button
                 type="button"
                 data-year-filter-btn="all"
-                class="year-filter-btn font-metadata text-[9px] uppercase tracking-[0.2em] px-2 py-1 text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
+                class="year-filter-btn font-metadata text-xs uppercase tracking-[0.2em] px-2 py-1 text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
               >
                 TODOS LOS AÑOS ({publishable.length})
               </button>
@@ -396,7 +396,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                 <select
                   id="year-linter-select"
                   aria-label="Seleccionar año de archivo"
-                  class="appearance-none font-metadata text-[9px] uppercase tracking-[0.2em] px-2 py-1 pr-6 border-none text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
+                  class="appearance-none font-metadata text-xs uppercase tracking-[0.2em] px-2 py-1 pr-6 border-none text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
                 >
                   <option value="all" class="bg-[#0a0a0a] text-white/50">POR AÑO</option>
                   {years.map(year => (
@@ -427,7 +427,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                 <div class="archive-year-cinematic-group flex flex-col gap-10 md:gap-14" data-year-group={year}>
                   {/* Divisor de Año Editorial Centrado (Tipografía Gloock con Gradiente Metálico Cálido) */}
                   <div class="flex flex-col items-center justify-center text-center pb-8 pt-4 gap-3 w-full max-w-4xl mx-auto">
-                    <span class="font-metadata text-[10px] sm:text-[11px] uppercase tracking-[0.35em] text-rust-orange font-bold">
+                    <span class="font-metadata text-[13px] sm:text-sm uppercase tracking-[0.35em] text-rust-orange font-bold">
                       Hemeroteca Histórica · {yearEssays.length} {yearEssays.length === 1 ? 'Dossier' : 'Dossieres'}
                     </span>
                     <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-black tracking-tight leading-[1.05] gradient-general-h1 glow-metallic-gloock uppercase">
@@ -497,8 +497,8 @@ function createPremierSequences(essays: typeof resolvedEssays) {
       const yearFilterButtons = document.querySelectorAll<HTMLButtonElement>('.year-filter-btn');
       const yearGroups = document.querySelectorAll<HTMLElement>('.archive-year-cinematic-group');
 
-      const activeBtnClasses = ['text-[#EFEBE3]', 'font-gloock', 'text-[13px]', 'md:text-[15px]', 'tracking-wide', 'normal-case'];
-      const inactiveBtnClasses = ['text-white/50', 'font-metadata', 'text-[10px]', 'md:text-[11px]', 'uppercase', 'tracking-[0.25em]'];
+      const activeBtnClasses = ['text-[#EFEBE3]', 'font-gloock', 'text-sm', 'md:text-base', 'tracking-wide', 'normal-case'];
+      const inactiveBtnClasses = ['text-white/50', 'font-metadata', 'text-xs', 'md:text-[13px]', 'uppercase', 'tracking-[0.25em]'];
 
       // Función para cambiar de solapa principal
       const switchTab = (tabName: 'categories' | 'years') => {
