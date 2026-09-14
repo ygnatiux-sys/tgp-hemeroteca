@@ -218,7 +218,6 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     </div>
   </div>
 
-  <ExpandableModal />
 </section>
 
 <style>
@@ -250,9 +249,9 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     will-change: transform, opacity;
   }
 
-  /* Aspecto Vertical (Modo clásico póster 2:3 con proporción 80/20 estricta) */
+  /* Aspecto Vertical (Modo clásico póster 5:8 con proporción 80/20 estricta) */
   .netflix-card {
-    aspect-ratio: 2 / 3;
+    aspect-ratio: 5 / 8;
     background-color: #0a0c0f;
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
@@ -416,120 +415,10 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
 
       updateButtons();
 
-      // GSAP FLIP Interception
-      const cards = row.querySelectorAll('.netflix-card-link');
-      const modal = row.querySelector('.expandable-modal') as HTMLDialogElement;
-      const closeBtn = row.querySelector('.close-modal-btn');
-      
-      const mContainer = row.querySelector('.modal-container') as HTMLElement;
-      const mImage = row.querySelector('.modal-image') as HTMLImageElement;
-      const mTitle = row.querySelector('.modal-title') as HTMLElement;
-      const mEyebrow = row.querySelector('.modal-eyebrow') as HTMLElement;
-      const mExcerpts = row.querySelectorAll('.modal-excerpt');
-      const mCta = row.querySelector('.modal-cta') as HTMLAnchorElement;
-
-      if (!modal || !mContainer || !mImage || !mTitle) return;
-
-      let currentFlipTween: gsap.core.Timeline | null = null;
-      let activeArticle: HTMLElement | null = null;
-      let activeImg: HTMLElement | null = null;
-      let activeTitle: HTMLElement | null = null;
-
-      cards.forEach(card => {
-        card.addEventListener('click', (e) => {
-          if (window.getSelection()?.toString().length) {
-            return;
-          }
-          e.preventDefault();
-          
-          const a = e.currentTarget as HTMLElement;
-          const article = a.closest('.netflix-card') as HTMLElement;
-          const img = article.querySelector('.netflix-card-img') as HTMLElement;
-          const title = article.querySelector('.netflix-card-title') as HTMLElement;
-          
-          activeArticle = article;
-          activeImg = img;
-          activeTitle = title;
-
-          const cardId = a.dataset.cardId;
-          
-          // Inject data into modal
-          mImage.src = a.dataset.image || '';
-          mTitle.innerHTML = a.dataset.title || '';
-          if (mEyebrow) {
-             mEyebrow.innerHTML = a.dataset.eyebrow || '';
-             mEyebrow.className = `modal-eyebrow text-[10px] tracking-[0.3em] uppercase font-metadata font-bold mb-2 ${a.dataset.eyebrowClass || "text-rust-orange"}`;
-             mEyebrow.style.display = a.dataset.eyebrow ? 'block' : 'none';
-             mEyebrow.style.opacity = '1';
-          }
-          mExcerpts.forEach(el => el.innerHTML = a.dataset.excerpt || '');
-          if (mCta) mCta.href = a.dataset.link || '#';
-          
-          const extraContent = mContainer.querySelectorAll('.modal-excerpt, .modal-cta, .close-modal-btn, .modal-eyebrow');
-          gsap.set(extraContent, { clearProps: "all" });
-          gsap.set([mContainer, mImage, mTitle], { clearProps: "all" });
-
-          // Match Flip IDs
-          mContainer.dataset.flipId = `card-container-${cardId}`;
-          mImage.dataset.flipId = `card-image-${cardId}`;
-          mTitle.dataset.flipId = `card-title-${cardId}`;
-
-          // Get state of card elements
-          const state = Flip.getState([article, img, title]);
-          
-          // Show modal
-          modal.showModal();
-          
-          currentFlipTween = Flip.from(state, {
-            targets: [mContainer, mImage, mTitle],
-            duration: 0.5,
-            ease: "power3.inOut",
-            absolute: true,
-          });
-        });
-      });
-
-      const closeModal = () => {
-        if (!modal.open) return;
-
-        // Hide eyebrow immediately to prevent layout jumps during FLIP reverse
-        const eyebrow = mContainer.querySelector(".modal-eyebrow") as HTMLElement | null;
-        if (eyebrow) eyebrow.style.display = "none";
-
-        const extraContent = mContainer.querySelectorAll('.modal-excerpt, .modal-cta, .close-modal-btn');
-        gsap.to(extraContent, { opacity: 0, duration: 0.15 });
-
-        if (currentFlipTween) {
-          currentFlipTween.timeScale(1.3).reverse();
-          currentFlipTween.eventCallback("onReverseComplete", () => {
-            modal.close();
-            gsap.set([mContainer, mImage, mTitle, ...Array.from(extraContent)], { clearProps: "all" });
-            currentFlipTween = null;
-            activeArticle = null;
-            activeImg = null;
-            activeTitle = null;
-          });
-        } else {
-          modal.close();
-        }
-      };
-
-      if (closeBtn) {
-        closeBtn.addEventListener('click', closeModal);
-      }
-
-      modal.addEventListener('cancel', (e) => {
-        e.preventDefault();
-        closeModal();
-      });
-
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          closeModal();
-        }
-      });
     });
   }
+
+
 
   if (typeof document !== 'undefined') {
     if (document.readyState === 'loading') {

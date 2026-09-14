@@ -92,7 +92,7 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
 
           return (
             <div
-              class="rest-tray-card absolute top-1/2 -translate-y-1/2 w-[82%] sm:w-[68%] md:w-[56%] lg:w-[50%] max-w-160 aspect-video rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 bg-stone-950 shadow-2xl transition-all duration-600 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col justify-end"
+              class="rest-tray-card absolute top-1/2 -translate-y-1/2 w-[72%] sm:w-[58%] md:w-[46%] lg:w-[40%] max-w-[520px] aspect-3/4 rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 bg-stone-950 shadow-2xl transition-all duration-600 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col justify-end"
               data-card-index={idx}
               data-slug={item.slug}
             >
@@ -249,11 +249,11 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
           if (diff > total / 2) diff -= total;
           if (diff < -total / 2) diff += total;
 
-          // 1. Tarjeta Central (Activa) — Escala 1.05, dominante, z-30
+          // 1. Tarjeta Central (Activa) — Escala 1.08, dominante, z-30
           if (diff === 0) {
             card.classList.add('is-active');
             card.style.left = '50%';
-            card.style.transform = 'translate3d(-50%, -50%, 0) scale(1.05)';
+            card.style.transform = 'translate3d(-50%, -50%, 0) scale(1.08)';
             card.style.opacity = '1';
             card.style.filter = 'brightness(1)';
             card.style.zIndex = '30';
@@ -263,9 +263,9 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
           else if (diff === -1 || (total === 2 && diff === 1 && currentIndex === 1)) {
             card.classList.remove('is-active');
             card.style.left = `calc(50% - ${step1}%)`;
-            card.style.transform = 'translate3d(-50%, -50%, 0) scale(0.84)';
-            card.style.opacity = '0.85';
-            card.style.filter = 'brightness(0.65)';
+            card.style.transform = 'translate3d(-50%, -50%, 0) scale(0.74)';
+            card.style.opacity = '0.80';
+            card.style.filter = 'brightness(0.55)';
             card.style.zIndex = '20';
             card.style.pointerEvents = 'auto';
           }
@@ -273,9 +273,9 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
           else if (diff === 1) {
             card.classList.remove('is-active');
             card.style.left = `calc(50% + ${step1}%)`;
-            card.style.transform = 'translate3d(-50%, -50%, 0) scale(0.84)';
-            card.style.opacity = '0.85';
-            card.style.filter = 'brightness(0.65)';
+            card.style.transform = 'translate3d(-50%, -50%, 0) scale(0.74)';
+            card.style.opacity = '0.80';
+            card.style.filter = 'brightness(0.55)';
             card.style.zIndex = '20';
             card.style.pointerEvents = 'auto';
           }
@@ -283,9 +283,9 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
           else if (diff === -2) {
             card.classList.remove('is-active');
             card.style.left = `calc(50% - ${step2}%)`;
-            card.style.transform = 'translate3d(-50%, -50%, 0) scale(0.70)';
-            card.style.opacity = '0.40';
-            card.style.filter = 'brightness(0.35)';
+            card.style.transform = 'translate3d(-50%, -50%, 0) scale(0.58)';
+            card.style.opacity = '0.30';
+            card.style.filter = 'brightness(0.30)';
             card.style.zIndex = '10';
             card.style.pointerEvents = 'auto';
           }
@@ -293,9 +293,9 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
           else if (diff === 2) {
             card.classList.remove('is-active');
             card.style.left = `calc(50% + ${step2}%)`;
-            card.style.transform = 'translate3d(-50%, -50%, 0) scale(0.70)';
-            card.style.opacity = '0.40';
-            card.style.filter = 'brightness(0.35)';
+            card.style.transform = 'translate3d(-50%, -50%, 0) scale(0.58)';
+            card.style.opacity = '0.30';
+            card.style.filter = 'brightness(0.30)';
             card.style.zIndex = '10';
             card.style.pointerEvents = 'auto';
           }
@@ -393,26 +393,26 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
 
 <style>
   .tray-viewport {
-    height: 380px;
+    height: 500px;
   }
   @media (min-width: 480px) {
     .tray-viewport {
-      height: 420px;
+      height: 580px;
     }
   }
   @media (min-width: 640px) {
     .tray-viewport {
-      height: 470px;
+      height: 640px;
     }
   }
   @media (min-width: 768px) {
     .tray-viewport {
-      height: 520px;
+      height: 700px;
     }
   }
   @media (min-width: 1024px) {
     .tray-viewport {
-      height: 560px;
+      height: 760px;
     }
   }
 </style>
