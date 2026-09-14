@@ -5,8 +5,9 @@ import LayoutDeriva from '../../layouts/CinematicFX/LayoutDeriva.astro';
 import LayoutUmbral from '../../layouts/CinematicFX/LayoutUmbral.astro';
 import { parseLLMText } from '../../lib/parseLLMText';
 import { isValidImageSrc } from '../../lib/content-filter';
-import PolvoDorado from '../../components/PolvoDorado.astro';
 import PostCinematicStyle from '../../components/PostCinematicStyle.astro';
+import BackSlideButton from '../../components/BackSlideButton.astro';
+import { QuickReturnButton } from '../../components/QuickReturnButton';
 
 export const prerender = true;
 
@@ -99,25 +100,21 @@ const layoutProps = {
   config: isCustom ? customVariables : undefined,
 };
 
-const isAdamBridge = slug === 'adam-s-bridge';
 const fullEssayText = aiText || (finalFrontmatter as any).generadorTexto || '';
-const parsedHtml = parseLLMText(fullEssayText, { isHeroCinematicStyle: isAdamBridge });
+// Todos los ensayos cinemáticos usan el modo Hero Cinemático
+const parsedHtml = parseLLMText(fullEssayText, { isHeroCinematicStyle: true });
 ---
 
 <SelectedLayout {...layoutProps}>
+  <BackSlideButton fallbackUrl="/ensayos-cinematicos" />
+  <QuickReturnButton client:load forceVisible={true} fallbackUrl="/ensayos-cinematicos" />
   {Content ? (
     <div class="flex flex-col gap-12 w-full">
       <Content />
     </div>
   ) : (
     <div class="flex flex-col gap-12 w-full">
-      {!isAdamBridge && finalFrontmatter.excerpt && (
-        <PolvoDorado 
-          text={finalFrontmatter.excerpt} 
-          eyebrow="RESPIRO CINEMÁTICO · TGP"
-        />
-      )}
-      <PostCinematicStyle class={isAdamBridge ? 'hero-cinematic-mode' : ''}>
+      <PostCinematicStyle class="hero-cinematic-mode">
         <div class="cinematic-essay-content w-full" set:html={parsedHtml} />
       </PostCinematicStyle>
     </div>
@@ -126,6 +123,7 @@ const parsedHtml = parseLLMText(fullEssayText, { isHeroCinematicStyle: isAdamBri
 
 <script>
   function initHeroCinematicReveal() {
+    // Aplica a todos los ensayos cinemáticos (hero-cinematic-mode en todos)
     const blocks = document.querySelectorAll<HTMLElement>('.hero-cinematic-mode .cinematic-block');
     if (!blocks.length) return;
 

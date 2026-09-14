@@ -376,7 +376,7 @@ const heroTitleClass = `text-[clamp(2.25rem,5vw,4.5rem)] font-cinzel font-extrab
       <>
         <Header />
         <BackSlideButton fallbackUrl="/archivo" />
-        <QuickReturnButton client:load accentColor={activeAccent} fallbackUrl="/archivo" />
+        <QuickReturnButton client:load forceVisible={true} accentColor={activeAccent} fallbackUrl="/archivo" />
 
         <InteriorHero
           title={doc.title || "Ensayo TGP"}

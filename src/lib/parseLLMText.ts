@@ -2,6 +2,15 @@ export interface ParseLLMTextOptions {
   isHeroCinematicStyle?: boolean;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Regex único que cubre TODOS los tipos de comillas dobles que pueden llegar
+// del LLM o del JSON escapado:
+//   " (ASCII),  " "  (curly Unicode),  « »  (guillemets),
+//   \\" (backslash+quote literal),  &quot; (HTML entity)
+// Se aplica en el texto CRUDO, antes de inyectar ningún HTML.
+// ─────────────────────────────────────────────────────────────────────────────
+const DOUBLE_QUOTE_RE = /\\"|&quot;|["""«»]/g;
+
 /**
  * Transforma el texto crudo de un LLM en HTML estructurado para animaciones GSAP.
  * Resuelve saltos de línea duros y agrupa en bloques cinemáticos con espaciado vertical.
@@ -15,10 +24,9 @@ export function parseLLMText(rawText: string, options: ParseLLMTextOptions = {})
   // 0. Limpiar posibles artefactos de portapapeles (StartFragment / EndFragment)
   let text = rawText.replace(/\\?\s*(?:StartFragment|EndFragment)\s*/gi, '').trim();
 
-  // 0.5 Sanitización radical de comillas dobles (para evitar residuos en el frontend)
-  // Se hace ANTES de inyectar cualquier HTML para no romper atributos class="..."
-  text = text.replace(/["“”«»]/g, '');
-  text = text.replace(/\\"/g, ''); // Por si vienen escapadas literalmente como \ "
+  // 0.5 Sanitizar TODAS las variantes de comillas dobles del texto crudo,
+  //     antes de inyectar ninguna etiqueta HTML (para no romper class="...").
+  text = text.replace(DOUBLE_QUOTE_RE, '');
 
   // 1. Escapar HTML peligroso
   let html = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -40,17 +48,29 @@ export function parseLLMText(rawText: string, options: ParseLLMTextOptions = {})
     let authorLine = '';
 
     rawLines.forEach((line) => {
-      // Si la línea comienza con guión largo (—), doble guión (--), guión (-) o &mdash;, es la atribución
+      // 1. Si la línea comienza con guión (en nueva línea)
       if (/^(?:—|--|-|&mdash;)\s*(.*)/i.test(line) && quoteLines.length > 0) {
         authorLine = line.replace(/^(?:—|--|-|&mdash;)\s*/i, '').trim();
       } else {
-        quoteLines.push(line);
+        // 2. Si la atribución está al final de la misma línea (ej: "texto. — Autor")
+        // Buscamos un espacio, guión, espacio y luego texto que no termine en minúscula para evitar cortes erróneos
+        const inlineMatch = line.match(/(.*)\s+(?:—|--|&mdash;)\s+(.+)$/);
+        if (inlineMatch && inlineMatch[1].length > 20) {
+          quoteLines.push(inlineMatch[1].trim());
+          authorLine = inlineMatch[2].trim();
+        } else {
+          quoteLines.push(line);
+        }
       }
     });
 
-    let quoteBody = quoteLines.join(' ').trim();
-    // Limpiamos comillas dobles exteriores sobrantes ("..." o “...” o \”...\”)
-    quoteBody = quoteBody.replace(/^[\\"'“«]+|[\\"'”»]+$/g, '').trim();
+    // Limpiamos asteriscos sobrantes en el autor para que no reciba el estilo itálico exagerado
+    if (authorLine) {
+      authorLine = authorLine.replace(/\*/g, '').trim();
+    }
+
+    // quoteBody ya llegó limpio desde el paso 0.5 — no se necesita un segundo replace
+    const quoteBody = quoteLines.join(' ').trim();
 
     return `
       <div class="respiro-cinematico-card border-l-4 border-[#d97736] bg-white/5 py-8 px-8 md:px-14 rounded-r-2xl shadow-xl max-w-[64ch] w-full mx-auto my-10 text-center backdrop-blur-md">
@@ -87,9 +107,7 @@ export function parseLLMText(rawText: string, options: ParseLLMTextOptions = {})
     html = html.replace(/\*([^*\r\n]+)\*/g, '<span class="italic text-white/80">$1</span>');
   }
 
-  // 7. Citas en bloque y glifos ya procesados limpiamente sin colisión de comillas en atributos HTML
-
-  // 8. Títulos (#, ## y ###) con tipografía Gloock / Cinzel y Gradiente
+  // 7. Títulos (#, ## y ###) con tipografía Gloock / Cinzel y Gradiente
   html = html.replace(/^###\s+(.*)$/gm, 
     '<h3 class="font-[\'Cinzel\',serif] text-2xl sm:text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-linear-to-b from-[#F5F4F0] via-[#DFCA9D] to-[#94A3B8] drop-shadow-[0_4px_20px_rgba(0,0,0,0.85)] tracking-tight mb-5 mt-8 block w-full text-center">$1</h3>'
   );
@@ -97,7 +115,7 @@ export function parseLLMText(rawText: string, options: ParseLLMTextOptions = {})
     '<h2 class="font-[\'Gloock\',serif] text-4xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-linear-to-b from-white via-[#E2E8F0] to-[#DFCA9D] drop-shadow-[0_6px_35px_rgba(0,0,0,0.95)] tracking-tight mb-6 mt-10 block w-full text-center">$1</h2>'
   );
 
-  // 9. Separación SEMÁNTICA real
+  // 8. Separación SEMÁNTICA real
   // Dividimos únicamente donde hay 2 o más saltos de línea (párrafos reales)
   const blocks = html.split(/\n{2,}/);
   
@@ -151,5 +169,3 @@ export function parseLLMText(rawText: string, options: ParseLLMTextOptions = {})
 
   return wrapped;
 }
-
-

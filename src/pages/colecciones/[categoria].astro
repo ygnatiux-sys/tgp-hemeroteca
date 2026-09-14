@@ -9,6 +9,8 @@ import Marquee from '../../components/Marquee.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import AguaNieve from '../../components/AguaNieve.astro';
 import VisorTemasSlider from '../../components/VisorTemasSlider.astro';
+import BackSlideButton from '../../components/BackSlideButton.astro';
+import { QuickReturnButton } from '../../components/QuickReturnButton';
 
 import {
   getPublishableEssays,
@@ -162,6 +164,8 @@ const sequences = createPremierSequences(resolvedEssays);
   description={`Colección temática especializada sobre ${label} en The Great Puzzle Project. Catálogo completo con ${resolvedEssays.length} investigaciones documentadas.`}
   image={coverImageUrl}
 >
+  <BackSlideButton fallbackUrl="/colecciones" />
+  <QuickReturnButton client:load forceVisible={true} fallbackUrl="/colecciones" />
   <div class="text-white min-h-screen pb-32">
 
     {/* ── HERO: SEO H1 INVISIBLE ── */}
