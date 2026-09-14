@@ -117,6 +117,10 @@ export const METALLIC_GRADIENTS_LIBRARY: Record<string, MetallicGradientSpec> = 
 
 /**
  * Recomienda el gradiente metálico ideal según la categoría, título, contraste de fondo o selector explícito.
+ * 
+ * ⚠️ UNIFORMIZACIÓN GLOBAL: La función siempre devuelve gradient-general-h1 (titanio 2 colores)
+ * para mantener todos los heros grandes del sitio con el mismo color unificado.
+ * El selector dinámico por categoría queda comentado abajo como referencia histórica.
  */
 export function recommendMetallicGradient(
   category: string = '',
@@ -124,86 +128,51 @@ export function recommendMetallicGradient(
   bgContrast: 'light' | 'dark' = 'dark',
   explicitVariant?: string | null
 ): { gradientClass: string; strokeClass: string; gradientSpec: MetallicGradientSpec } {
-  // 0. Selector explícito si el autor o post lo define directamente
+
+  // UNIFORMIZACIÓN GLOBAL — gradient-general-h1 para todos los heros grandes
+  return {
+    gradientClass: METALLIC_GRADIENTS_LIBRARY.generalH1.className,
+    strokeClass: '', // Sin filo especial — el gradiente titanio ya tiene contraste propio
+    gradientSpec: METALLIC_GRADIENTS_LIBRARY.generalH1,
+  };
+
+  /* ── SELECTOR DINÁMICO ORIGINAL (deshabilitado — conservar como referencia) ──
   const explicit = (explicitVariant || '').toLowerCase().trim();
   if (explicit) {
     if (explicit.includes('rojo') || explicit.includes('netflix') || explicit.includes('red')) {
-      return {
-        gradientClass: METALLIC_GRADIENTS_LIBRARY.rojoNetflix.className,
-        strokeClass: METALLIC_GRADIENTS_LIBRARY.rojoNetflix.strokeClass,
-        gradientSpec: METALLIC_GRADIENTS_LIBRARY.rojoNetflix,
-      };
+      return { gradientClass: METALLIC_GRADIENTS_LIBRARY.rojoNetflix.className, strokeClass: METALLIC_GRADIENTS_LIBRARY.rojoNetflix.strokeClass, gradientSpec: METALLIC_GRADIENTS_LIBRARY.rojoNetflix };
     }
     if (explicit.includes('azul') || explicit.includes('blue') || explicit.includes('platin')) {
-      return {
-        gradientClass: METALLIC_GRADIENTS_LIBRARY.azulPlatinado.className,
-        strokeClass: METALLIC_GRADIENTS_LIBRARY.azulPlatinado.strokeClass,
-        gradientSpec: METALLIC_GRADIENTS_LIBRARY.azulPlatinado,
-      };
+      return { gradientClass: METALLIC_GRADIENTS_LIBRARY.azulPlatinado.className, strokeClass: METALLIC_GRADIENTS_LIBRARY.azulPlatinado.strokeClass, gradientSpec: METALLIC_GRADIENTS_LIBRARY.azulPlatinado };
     }
     if (explicit.includes('titan') || explicit.includes('dark')) {
-      return {
-        gradientClass: METALLIC_GRADIENTS_LIBRARY.titaniumDark.className,
-        strokeClass: METALLIC_GRADIENTS_LIBRARY.titaniumDark.strokeClass,
-        gradientSpec: METALLIC_GRADIENTS_LIBRARY.titaniumDark,
-      };
+      return { gradientClass: METALLIC_GRADIENTS_LIBRARY.titaniumDark.className, strokeClass: METALLIC_GRADIENTS_LIBRARY.titaniumDark.strokeClass, gradientSpec: METALLIC_GRADIENTS_LIBRARY.titaniumDark };
     }
     if (explicit.includes('silver') || explicit.includes('plata') || explicit.includes('bright')) {
-      return {
-        gradientClass: METALLIC_GRADIENTS_LIBRARY.silverBright.className,
-        strokeClass: METALLIC_GRADIENTS_LIBRARY.silverBright.strokeClass,
-        gradientSpec: METALLIC_GRADIENTS_LIBRARY.silverBright,
-      };
+      return { gradientClass: METALLIC_GRADIENTS_LIBRARY.silverBright.className, strokeClass: METALLIC_GRADIENTS_LIBRARY.silverBright.strokeClass, gradientSpec: METALLIC_GRADIENTS_LIBRARY.silverBright };
     }
     if (explicit.includes('acero') || explicit.includes('steel')) {
-      return {
-        gradientClass: METALLIC_GRADIENTS_LIBRARY.steelTitanium.className,
-        strokeClass: METALLIC_GRADIENTS_LIBRARY.steelTitanium.strokeClass,
-        gradientSpec: METALLIC_GRADIENTS_LIBRARY.steelTitanium,
-      };
+      return { gradientClass: METALLIC_GRADIENTS_LIBRARY.steelTitanium.className, strokeClass: METALLIC_GRADIENTS_LIBRARY.steelTitanium.strokeClass, gradientSpec: METALLIC_GRADIENTS_LIBRARY.steelTitanium };
     }
   }
 
   const cat = (category || '').toLowerCase();
   const t = (title || '').toLowerCase();
 
-  // 1. Temas HARD de Historia (Bélicos, Batallas, Imperio, Conflictos) -> Rojo Netflix Anodizado
-  const isHardHistory = /atila|cartago|neron|roma|galos|cesar|moctezuma|cortez|guerra|batalla|imperio|conquista|sangre|destruccion|combate/i.test(
-    `${cat} ${t}`
-  );
+  const isHardHistory = /atila|cartago|neron|roma|galos|cesar|moctezuma|cortez|guerra|batalla|imperio|conquista|sangre|destruccion|combate/i.test(`${cat} ${t}`);
   if (isHardHistory && bgContrast === 'dark') {
-    return {
-      gradientClass: METALLIC_GRADIENTS_LIBRARY.rojoNetflix.className,
-      strokeClass: METALLIC_GRADIENTS_LIBRARY.rojoNetflix.strokeClass,
-      gradientSpec: METALLIC_GRADIENTS_LIBRARY.rojoNetflix,
-    };
+    return { gradientClass: METALLIC_GRADIENTS_LIBRARY.rojoNetflix.className, strokeClass: METALLIC_GRADIENTS_LIBRARY.rojoNetflix.strokeClass, gradientSpec: METALLIC_GRADIENTS_LIBRARY.rojoNetflix };
   }
 
-  // 2. Gnosis, Filosofía Profunda, Cosmología, Sueños, Arquetipos -> Azul Platinado
-  const isDeepCosmic = /filosofia|hegel|gnosis|cosmo|luna|sueño|arquetipo|nag-hammadi|simbolismo|estrella|astrologia/i.test(
-    `${cat} ${t}`
-  );
+  const isDeepCosmic = /filosofia|hegel|gnosis|cosmo|luna|sueño|arquetipo|nag-hammadi|simbolismo|estrella|astrologia/i.test(`${cat} ${t}`);
   if (isDeepCosmic && bgContrast === 'dark') {
-    return {
-      gradientClass: METALLIC_GRADIENTS_LIBRARY.azulPlatinado.className,
-      strokeClass: METALLIC_GRADIENTS_LIBRARY.azulPlatinado.strokeClass,
-      gradientSpec: METALLIC_GRADIENTS_LIBRARY.azulPlatinado,
-    };
+    return { gradientClass: METALLIC_GRADIENTS_LIBRARY.azulPlatinado.className, strokeClass: METALLIC_GRADIENTS_LIBRARY.azulPlatinado.strokeClass, gradientSpec: METALLIC_GRADIENTS_LIBRARY.azulPlatinado };
   }
 
-  // 3. Fondos claros o diurnos -> Titanio Oscuro con Filo Blanco
   if (bgContrast === 'light') {
-    return {
-      gradientClass: METALLIC_GRADIENTS_LIBRARY.titaniumDark.className,
-      strokeClass: METALLIC_GRADIENTS_LIBRARY.titaniumDark.strokeClass,
-      gradientSpec: METALLIC_GRADIENTS_LIBRARY.titaniumDark,
-    };
+    return { gradientClass: METALLIC_GRADIENTS_LIBRARY.titaniumDark.className, strokeClass: METALLIC_GRADIENTS_LIBRARY.titaniumDark.strokeClass, gradientSpec: METALLIC_GRADIENTS_LIBRARY.titaniumDark };
   }
 
-  // 4. Fallback estándar Hero sobre fondo oscuro → Steel Titanium (Hemeroteca Original)
-  return {
-    gradientClass: METALLIC_GRADIENTS_LIBRARY.steelTitanium.className,
-    strokeClass: METALLIC_GRADIENTS_LIBRARY.steelTitanium.strokeClass,
-    gradientSpec: METALLIC_GRADIENTS_LIBRARY.steelTitanium,
-  };
+  return { gradientClass: METALLIC_GRADIENTS_LIBRARY.steelTitanium.className, strokeClass: METALLIC_GRADIENTS_LIBRARY.steelTitanium.strokeClass, gradientSpec: METALLIC_GRADIENTS_LIBRARY.steelTitanium };
+  ── FIN SELECTOR DINÁMICO */
 }

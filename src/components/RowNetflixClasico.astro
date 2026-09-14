@@ -186,8 +186,8 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
                 />
               </div>
 
-              {/* Scrim Localizado (Franja inferior completa en el 20% inferior de la tarjeta) */}
-              <div class="absolute bottom-0 inset-x-0 w-full h-[28%] sm:h-[22%] bg-linear-to-t from-black/95 via-black/70 to-transparent pointer-events-none z-0"></div>
+              {/* Scrim Localizado (Franja inferior para contraste sobre imagen cover) */}
+              <div class="absolute bottom-0 inset-x-0 w-full h-[55%] sm:h-[50%] bg-linear-to-t from-black/95 via-black/70 to-transparent pointer-events-none z-0"></div>
 
               {/* Contenedor del Texto (Z-Index) */}
               <div class="absolute bottom-0 left-0 p-4 sm:p-5 flex flex-col justify-end gap-1.5 z-10 w-full md:w-[90%] pointer-events-none">
@@ -199,13 +199,13 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
                   "netflix-card-title line-clamp-2 leading-tight transition-all duration-300 tracking-wide sm:tracking-wider gradient-general-h2",
                   item.isGloock
                     ? "font-gloock font-bold text-[18px] sm:text-[20px]"
-                    : "font-cinzel font-extrabold text-[18px] sm:text-[20px] md:text-[22px]"
+                    : "font-alegreya font-extrabold text-[18px] sm:text-[20px] md:text-[22px]"
                 ]} data-flip-id={`card-title-${cardId}`}>
                   {item.title}
                 </h4>
 
                 {item.subtitle && (
-                  <p class="font-serif font-light text-[14px] sm:text-[15px] text-white/70 line-clamp-2 leading-tight mt-1">
+                  <p class="font-proza font-light text-[14px] sm:text-[15px] text-white/70 line-clamp-2 leading-tight mt-1">
                     {item.subtitle}
                   </p>
                 )}
@@ -281,7 +281,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    object-fit: contain !important;
+    object-fit: cover !important;
     object-position: center !important;
     filter: brightness(0.88) contrast(1.04);
     transition: filter 340ms ease, transform 500ms ease;

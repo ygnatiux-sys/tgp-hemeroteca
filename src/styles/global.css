@@ -823,6 +823,12 @@ html[data-nav-state="2"] header:hover .brand-element {
     font-family: var(--font-metadata);
     letter-spacing: -0.015em;
   }
+  .font-alegreya {
+    font-family: var(--font-alegreya);
+  }
+  .font-proza {
+    font-family: var(--font-sans); /* Proza Libre */
+  }
 
   /* Gradiente Acero Cepillado / Titanium (3 stops top-to-bottom estático) */
   /* ==========================================================================
@@ -896,6 +902,8 @@ html[data-nav-state="2"] header:hover .brand-element {
      La paleta clásica de la hemeroteca: #94A3B8 → #64748B → #94A3B8 → #475569 → #334155
      Hermano azulado del Gloock gradient. Destello azul-acero especular en el centro. */
   .gradient-steel-titanium {
+    /*
+    OPCIÓN ANTERIOR (5 stops, especular):
     background-image: linear-gradient(
       to bottom,
       #94A3B8 0%,
@@ -904,6 +912,9 @@ html[data-nav-state="2"] header:hover .brand-element {
       #475569 75%,
       #334155 100%
     );
+    */
+    /* TITANIO UNIFORME (2 colores, alineado con brand) */
+    background-image: linear-gradient(180deg, #CBD5E1 0%, #334155 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -924,11 +935,9 @@ html[data-nav-state="2"] header:hover .brand-element {
     paint-order: stroke fill;
   }
 
-  /* Gradiente Metálico Elegido para H1 (Didone Gloock, estructura especular multi-stop de Cinzel Steel adaptada a Pergamino/Cobre) */
+  /* Gradiente Metálico Elegido para H1 (Universal — Titanio 2 colores)
+     font-family y font-weight NO están aquí para no pisar fuentes de otros componentes */
   .gradient-general-h1 {
-    font-family: "Gloock", serif;
-    font-weight: 900;
-    letter-spacing: -0.04em;
     /* 
     OPCIÓN ANTERIOR (Pergamino/Cobre - No eliminar):
     background-image: linear-gradient(
@@ -940,7 +949,7 @@ html[data-nav-state="2"] header:hover .brand-element {
       rgba(110, 72, 47, 0.70) 100% 
     );
     */
-    /* NUEVO TITANIO UNIFORME (Acero 2 colores, estilo Brand Hemeroteca) */
+    /* TITANIO UNIFORME (Acero 2 colores, estilo Brand Hemeroteca) */
     background-image: linear-gradient(180deg, #CBD5E1 0%, #334155 100%);
     -webkit-background-clip: text;
     background-clip: text;
@@ -957,18 +966,22 @@ html[data-nav-state="2"] header:hover .brand-element {
     font-weight: 800;
     letter-spacing: 0.015em;
     word-spacing: 0.08em;
+    /*
+    OPCIÓN ANTERIOR (Pergamino/Cobre - No eliminar):
     background-image: linear-gradient(
       to bottom,
-      #FFFFFF 0%,        /* 1. Destello especular superior */
-      #EFEBE3 25%,       /* 2. Cuerpo brillante de Pergamino */
-      #D5C7B3 60%,       /* 3. Transición intermedia Níquel / Champagne */
-      #C88D58 85%,       /* 4. Reflejo del bisel Cobrizo Dorado */
-      rgba(110, 72, 47, 0.75) 100% /* 5. Sombra de base metálica */
+      #FFFFFF 0%,
+      #EFEBE3 25%,
+      #D5C7B3 60%,
+      #C88D58 85%,
+      rgba(110, 72, 47, 0.75) 100%
     );
+    */
+    /* NUEVO TITANIO UNIFORME (Acero 2 colores, estilo Brand Hemeroteca) */
+    background-image: linear-gradient(180deg, #CBD5E1 0%, #334155 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    filter: brightness(0.98);
   }
 
   [data-theme='light'] .gradient-general-h2 {
