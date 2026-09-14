@@ -497,17 +497,17 @@ const fitClass =
     {/* Botón CTA Grande Centrado "VER REGISTRO" / "VER MÁS" con amplio aire */}
     {
       centerCtaBelow && (
-        <div class="flex justify-center mt-14 sm:mt-20 md:mt-24 mb-16 sm:mb-24 md:mb-28">
+        <div class="flex justify-center mt-14 sm:mt-20 md:mt-24 mb-32 sm:mb-40 md:mb-48">
           <a
             href={secondaryHref}
             target={isExternal ? "_blank" : undefined}
             rel={isExternal ? "noopener noreferrer" : undefined}
-            class={`group relative inline-flex items-center justify-center gap-4 px-10 sm:px-14 py-4 sm:py-5 rounded-full bg-transparent border border-[#E3DDD3]/25 text-[#EFEBE3] font-metadata font-bold text-[10.5px] sm:text-xs uppercase tracking-[0.35em] backdrop-blur-md shadow-[0_0_30px_-5px_rgba(255,255,255,0.05)] hover:bg-[#EFEBE3]/10 hover:border-[#EFEBE3]/50 hover:shadow-[0_0_40px_-5px_rgba(227,221,211,0.2)] hover:scale-[1.02] active:scale-95 transition-all duration-500 overflow-hidden ${!isExternal ? "cac-modal-trigger" : ""}`}
+            class={`group relative inline-flex items-center justify-center gap-6 px-20 sm:px-28 py-8 sm:py-10 rounded-full bg-transparent border border-[#E3DDD3]/25 text-[#EFEBE3] font-metadata font-bold text-lg sm:text-xl uppercase tracking-[0.35em] backdrop-blur-md shadow-[0_0_30px_-5px_rgba(255,255,255,0.05)] hover:bg-[#EFEBE3]/10 hover:border-[#EFEBE3]/50 hover:shadow-[0_0_40px_-5px_rgba(227,221,211,0.2)] hover:scale-[1.02] active:scale-95 transition-all duration-500 overflow-hidden ${!isExternal ? "cac-modal-trigger" : ""}`}
           >
             {/* Brillo interno cinematico */}
             <div class="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none" />
             <span class="relative z-10">{ctaLabel || secondaryLabel}</span>
-            <span class="relative z-10 text-[10px] sm:text-xs transition-transform duration-500 group-hover:translate-x-1.5">
+            <span class="relative z-10 text-base sm:text-lg transition-transform duration-500 group-hover:translate-x-2">
               &#9656;
             </span>
           </a>
