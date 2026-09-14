@@ -5,6 +5,7 @@
   --font-sans: "Proza Libre", "Inter", sans-serif;
   --font-mono: "IBM Plex Mono", "Space Mono", monospace;
   --font-serif: "Newsreader", "Gloock", serif;
+  --font-gloock: "Gloock", "Newsreader", serif;
   --font-cinzel: "Cinzel", serif;
   --font-alegreya: "Alegreya Sans", sans-serif;
 }
@@ -1892,6 +1893,12 @@ html[data-nav-state="2"] header:hover .brand-element {
    Sobrescribe 'select-none' y 'pointer-events-none' para permitir leer y
    seleccionar los textos superpuestos sin arrastrar las imágenes.
 ═════════════════════════════════════════════════════════════════════════ */
+.netflix-card-img,
+.spotlight-card-img,
+.tray-card-img {
+  pointer-events: none !important;
+}
+
 .netflix-row-root,
 .v-slider-root,
 .spotlight-media-tray-root,
@@ -1906,6 +1913,10 @@ html[data-nav-state="2"] header:hover .brand-element {
 }
 
 .cac-normal-ui,
-.cce-normal-ui {
+.cce-normal-ui,
+.netflix-card-title,
+.netflix-card-subtitle,
+.netflix-card-info {
   pointer-events: auto !important;
+  user-select: text !important;
 }

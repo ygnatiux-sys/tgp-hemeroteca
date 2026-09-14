@@ -359,7 +359,7 @@ const fitClass =
       }
 
       <h2
-        class={`font-cinzel tracking-tight drop-shadow-[0_4px_28px_rgba(0,0,0,0.95)] transition-all duration-300 ch-h1-container cac-card-title ${hideExteriorTitle ? "text-center w-full mx-auto" : ""} ${titleClass}`}
+        class={`tracking-tight drop-shadow-[0_4px_28px_rgba(0,0,0,0.95)] transition-all duration-300 ch-h1-container cac-card-title ${isHero ? "font-gloock" : "font-cinzel"} ${hideExteriorTitle ? "text-center w-full mx-auto" : ""} ${titleClass}`}
         data-flip-id={`card-title-${cardId}`}
       >
         <span
@@ -418,7 +418,7 @@ const fitClass =
             class="hover:opacity-80 transition-opacity block flex-1 cac-modal-trigger"
           >
             <h3
-              class={`font-cinzel font-extrabold text-lg sm:text-xl md:text-2xl tracking-tighter leading-snug cac-card-title ${cardGradientClass}`}
+              class={`font-extrabold text-lg sm:text-xl md:text-2xl tracking-tighter leading-snug cac-card-title ${isHero ? "font-gloock" : "font-cinzel"} ${cardGradientClass}`}
             >
               {titlePrefix}
               <span class="title-keyword-shine-fade">{titleKeyword}</span>

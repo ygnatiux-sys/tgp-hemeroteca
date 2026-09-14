@@ -170,7 +170,7 @@ const uid = `spotlight-${Math.random().toString(36).substring(2, 8)}`;
                   <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/45 to-transparent pointer-events-none" />
 
                   {/* Información Editorial en la base de la tarjeta */}
-                  <div class="absolute inset-x-0 bottom-0 p-2 sm:p-3 flex flex-col justify-end pointer-events-none z-10">
+                  <div class="absolute inset-x-0 bottom-0 p-2 sm:p-3 flex flex-col justify-end pointer-events-auto select-text cursor-text z-10">
                     {post.category && (
                       <span class="text-[7.5px] sm:text-[8px] tracking-[0.25em] font-mono text-rust-orange font-bold uppercase truncate mb-0.5">
                         {post.category}

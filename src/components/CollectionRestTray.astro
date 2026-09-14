@@ -88,8 +88,7 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
           const isCinematic = entry.category === 'Ensayos Cinemáticos' || entry.category === 'ensayos-cinematicos' || normalizeCategory(entry.category) === 'ensayos-cinematicos';
           const href = isCinematic ? `/ensayos-cinematicos/${item.slug}/` : `/hemeroteca/${item.slug}/`;
 
-          const isPortraitArt = /mercurio|homero|saturno|wiki|busto|estatua|retrato|filosofia|hegel/i.test(imgUrl);
-          const fitClass = isPortraitArt ? 'object-contain bg-[#08090a]' : 'object-cover';
+          const fitClass = 'object-cover';
 
           return (
             <div

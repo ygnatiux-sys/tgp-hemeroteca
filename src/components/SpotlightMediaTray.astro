@@ -124,7 +124,7 @@ const uid = `tray-${Math.random().toString(36).substring(2, 8)}`;
                 <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 via-45% to-transparent pointer-events-none z-10" />
 
                 {/* Información Editorial en la base con tipografía y jerarquía heredada */}
-                <div class="relative z-20 p-4 sm:p-5 flex flex-col justify-end h-full pointer-events-none">
+                <div class="relative z-20 p-4 sm:p-5 flex flex-col justify-end h-full pointer-events-auto select-text cursor-text">
                   {/* Badge de Categoría */}
                   <span class="font-mono text-xs sm:text-[13px] uppercase tracking-widest text-rust-orange font-bold mb-1 block">
                     {col.category || 'Colección TGP'}

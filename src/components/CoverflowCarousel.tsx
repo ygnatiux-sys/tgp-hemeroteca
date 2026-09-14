@@ -190,7 +190,7 @@ export default function CoverflowCarousel({
                 <img
                   src={post.image}
                   alt={post.title}
-                  className="w-full h-full object-contain bg-[#0a0c0f]"
+                  className="w-full h-full object-cover object-center bg-[#0a0c0f]"
                   loading="lazy"
                   decoding="async"
                 />
