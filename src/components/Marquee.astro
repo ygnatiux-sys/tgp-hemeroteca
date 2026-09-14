@@ -23,7 +23,7 @@ const {
   imageUrl = "",
   vibeClass = "",
   isH1 = false,
-  fontClass = "font-serif",
+  fontClass = "font-gloock font-black",
   heightClass = "h-[calc(80vh-2rem)] min-h-150",
   marginClass = "mb-[25vh] md:mb-[35vh]",
   roundedClass = "rounded-3xl",
@@ -34,9 +34,9 @@ const {
 } = Astro.props;
 
 const safeImageUrl = sanitizeImageUrl(imageUrl);
-const isSerif = fontClass.includes("serif") || fontClass.includes("gloock") || fontClass.includes("gradient-general");
+const isGloockOrSerif = fontClass.includes("serif") || fontClass.includes("gloock") || fontClass.includes("gradient-general");
 const hasExplicitGradient = fontClass.includes("gradient-");
-const gradientClass = hasExplicitGradient ? "" : (isSerif ? "gradient-general-h1" : "gradient-steel-titanium");
+const gradientClass = hasExplicitGradient ? "" : (isGloockOrSerif ? "gradient-general-h1 glow-metallic-gloock" : "gradient-steel-titanium");
 ---
 
 <section
