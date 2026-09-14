@@ -929,14 +929,19 @@ html[data-nav-state="2"] header:hover .brand-element {
     font-family: "Gloock", serif;
     font-weight: 900;
     letter-spacing: -0.04em;
+    /* 
+    OPCIÓN ANTERIOR (Pergamino/Cobre - No eliminar):
     background-image: linear-gradient(
       to bottom,
-      #FFFFFF 0%,        /* 1. Destello especular en el bisel superior */
-      #EFEBE3 22%,       /* 2. Cuerpo brillante de Pergamino / Vellum */
-      #D5C7B3 55%,       /* 3. Transición intermedia Níquel / Champagne */
-      #C88D58 82%,       /* 4. Reflejo del bisel Cobrizo Dorado */
-      rgba(110, 72, 47, 0.70) 100% /* 5. Profundidad metálica oscura al pie */
+      #FFFFFF 0%,        
+      #EFEBE3 22%,       
+      #D5C7B3 55%,       
+      #C88D58 82%,       
+      rgba(110, 72, 47, 0.70) 100% 
     );
+    */
+    /* NUEVO TITANIO UNIFORME (Acero 2 colores, estilo Brand Hemeroteca) */
+    background-image: linear-gradient(180deg, #CBD5E1 0%, #334155 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;

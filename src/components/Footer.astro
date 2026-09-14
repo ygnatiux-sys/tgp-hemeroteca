@@ -83,7 +83,7 @@ const isActive = (href: string) => {
         </nav>
 
         {/* ─── ACCIONES + COPYRIGHT ─── */}
-        <div class="flex flex-wrap justify-center items-center gap-2 sm:gap-4 font-metadata text-[9px] uppercase tracking-[0.2em] text-white/70 shrink-0 mt-4 md:mt-0">
+        <div class="flex flex-wrap justify-center items-center gap-2 sm:gap-4 font-metadata text-[11px] sm:text-xs uppercase tracking-[0.2em] text-white/70 shrink-0 mt-4 md:mt-0">
           <button
             id="tgp-share-btn-min"
             type="button"
@@ -154,16 +154,16 @@ const isActive = (href: string) => {
 
             {/* Lema del Brand como Menú Vertical */}
             <div class="flex flex-col items-center text-center gap-1.5 mt-4">
-              <span class="footer-motto-text text-xs md:text-[13px] tracking-wide select-none">
+              <span class="footer-motto-text text-[13px] md:text-[15px] tracking-wide select-none">
                 Mapa de la Memoria y Sentido humanos.
               </span>
-              <span class="footer-motto-text text-xs md:text-[13px] tracking-wide select-none">
+              <span class="footer-motto-text text-[13px] md:text-[15px] tracking-wide select-none">
                 Historia profunda.
               </span>
-              <span class="footer-motto-text text-xs md:text-[13px] tracking-wide select-none">
+              <span class="footer-motto-text text-[13px] md:text-[15px] tracking-wide select-none">
                 Arqueosemiotica.
               </span>
-              <span class="footer-motto-text text-xs md:text-[13px] tracking-wide select-none">
+              <span class="footer-motto-text text-[13px] md:text-[15px] tracking-wide select-none">
                 Herencia Sapiens.
               </span>
             </div>
@@ -171,10 +171,10 @@ const isActive = (href: string) => {
 
           {/* 2. COLUMNA NAVEGACIÓN (Span 2) */}
           <div class="lg:col-span-2 flex flex-col">
-            <h3 class="font-metadata text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-white/40 font-bold mb-4">
+            <h3 class="font-metadata text-xs md:text-[13px] uppercase tracking-[0.25em] text-white/40 font-bold mb-4">
               Navegación
             </h3>
-            <nav class="flex flex-col space-y-2.5 font-['Gloock'] text-xs md:text-sm font-bold">
+            <nav class="flex flex-col space-y-2.5 font-['Gloock'] text-[13px] md:text-[15px] font-bold">
               <a href="/" class:list={["footer-nav-link", isActive("/") && "is-active"]}>
                 Inicio
               </a>
@@ -202,7 +202,7 @@ const isActive = (href: string) => {
 
           {/* 3. COLUMNA REDES SOCIALES (Span 2) */}
           <div class="lg:col-span-2 flex flex-col">
-            <h3 class="font-metadata text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-white/70 font-bold mb-4">
+            <h3 class="font-metadata text-xs md:text-[13px] uppercase tracking-[0.25em] text-white/70 font-bold mb-4">
               Redes Sociales
             </h3>
             <div class="flex flex-col gap-3.5">
@@ -317,17 +317,17 @@ const isActive = (href: string) => {
 
           {/* 4. COLUMNA CONTACTO & AUTORÍA (Span 4) */}
           <div class="lg:col-span-4 flex flex-col">
-            <h3 class="font-metadata text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-white/70 font-bold mb-4">
+            <h3 class="font-metadata text-xs md:text-[13px] uppercase tracking-[0.25em] text-white/70 font-bold mb-4">
               Contacto
             </h3>
             <a
               href="mailto:thegreatpuzzleproject@gmail.com"
-              class="footer-nav-link text-xs md:text-sm lg:text-[14.5px] font-bold block truncate mb-10"
+              class="footer-nav-link text-[13px] md:text-[15px] lg:text-base font-bold block truncate mb-10"
             >
               THEGREATPUZZLEPROJECT@GMAIL.COM
             </a>
             
-            <h3 class="font-metadata text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-white/70 font-bold mb-4">
+            <h3 class="font-metadata text-xs md:text-[13px] uppercase tracking-[0.25em] text-white/70 font-bold mb-4">
               Autoría & Dirección
             </h3>
             <div class="flex items-start gap-4">
@@ -341,15 +341,15 @@ const isActive = (href: string) => {
                  <img src="/perfil.webp" alt="Xavier Benítez" width="56" height="56" loading="lazy" decoding="async" class="rounded-md w-14 h-14 object-cover grayscale group-hover/avatar:grayscale-0 transition-all duration-500" />
               </a>
               <div class="flex flex-col">
-                <a href="https://gravatar.com/xavierbeniteztgp" target="_blank" rel="noopener noreferrer" class="font-cinzel font-bold text-white tracking-wide text-sm hover:text-[#f5d0fe] transition-colors">Xavier Benítez</a>
-                <p class="font-sans text-[11.5px] text-[#b4b4b0] leading-relaxed tracking-wide font-light mt-1.5 pr-2">Con <strong class="text-[#c4c4c4] font-normal tracking-wide">25 años de trayectoria educativa</strong> e investigación en semiótica y tecnología, dirige <em class="font-serif italic text-rust-orange">TGP</em> como plataforma independiente.</p>
+                <a href="https://gravatar.com/xavierbeniteztgp" target="_blank" rel="noopener noreferrer" class="font-cinzel font-bold text-white tracking-wide text-[15px] hover:text-[#f5d0fe] transition-colors">Xavier Benítez</a>
+                <p class="font-sans text-[13px] text-[#b4b4b0] leading-relaxed tracking-wide font-light mt-1.5 pr-2">Con <strong class="text-[#c4c4c4] font-normal tracking-wide">25 años de trayectoria educativa</strong> e investigación en semiótica y tecnología, dirige <em class="font-serif italic text-rust-orange">TGP</em> como plataforma independiente.</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* ─── BARRA INFERIOR / COLOPHON ─── */}
-        <div class="border-t border-white/10 pt-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 font-metadata text-xs md:text-sm lg:text-[13.5px] uppercase tracking-[-0.015em] text-white/70">
+        <div class="border-t border-white/10 pt-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 font-metadata text-[13px] md:text-[14px] lg:text-[15px] uppercase tracking-[-0.015em] text-white/70">
           <div class="flex flex-wrap items-center gap-2 sm:gap-4">
             <span>
               <a href="https://alternative.thegreatpuzzleproject.com/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none;cursor:default;pointer-events:auto;">©</a> 2026 THE GREAT PUZZLE PROJECT · INVESTIGACIÓN Y CARTOGRAFÍA
@@ -377,7 +377,7 @@ const isActive = (href: string) => {
             </a>
           </div>
 
-          <div class="flex items-center gap-3 font-metadata text-xs md:text-sm lg:text-[13.5px] uppercase tracking-[-0.015em] lantern-neon-pulse cursor-pointer text-white/75 hover:text-white">
+          <div class="flex items-center gap-3 font-metadata text-[13px] md:text-[14px] lg:text-[15px] uppercase tracking-[-0.015em] lantern-neon-pulse cursor-pointer text-white/75 hover:text-white">
             <a
               href="https://share.google/2jdBPO5AZhrjplGgj"
               target="_blank"

@@ -24,7 +24,7 @@ const { transparentUntilScroll = false } = Astro.props;
       <div class="flex items-center gap-2 md:gap-2.5">
         {/* Logo marca 3 líneas */}
         <a href="https://ediciones.thegreatpuzzleproject.com" class="group/brand flex flex-col text-left justify-center select-none" title="Ir a Ediciones de The Great Puzzle Project">
-          <span class="font-['Gloock'] font-black text-[11px] md:text-[12px] lg:text-[13px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-1">
+          <span class="font-['Gloock'] font-black text-xs md:text-[13px] lg:text-[14px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-1">
             THE GREAT
           </span>
           <div class="flex items-center gap-1.5 my-0.5">
@@ -35,11 +35,11 @@ const { transparentUntilScroll = false } = Astro.props;
                 class="scale-[1.05] animate-soft-pulse group-hover/brand:scale-[1.10] transition-transform duration-500 img-nativa"
               />
             </div>
-            <span class="font-['Gloock'] font-black text-[11px] md:text-[12px] lg:text-[13px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-2">
+            <span class="font-['Gloock'] font-black text-xs md:text-[13px] lg:text-[14px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-2">
               PUZZLE
             </span>
           </div>
-          <span class="font-['Gloock'] font-black text-[11px] md:text-[12px] lg:text-[13px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-3">
+          <span class="font-['Gloock'] font-black text-xs md:text-[13px] lg:text-[14px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-3">
             PROJECT
           </span>
         </a>
@@ -48,14 +48,14 @@ const { transparentUntilScroll = false } = Astro.props;
         <div class="w-px h-8 md:h-9 bg-white/15 mx-0.5 rounded-full"></div>
 
         {/* HEMEROTECA — badge */}
-        <a href="/" class="brand-hemeroteca header-subtitle-hemeroteca font-['Gloock'] font-black text-xs md:text-[13px] lg:text-[14px] tracking-widest uppercase px-1.5 py-0.5 rounded-md transition-all duration-500 border border-transparent leading-none gradient-steel-line-3" title="Volver al Inicio de la Hemeroteca">
+        <a href="/" class="brand-hemeroteca header-subtitle-hemeroteca font-['Gloock'] font-black text-[13px] md:text-[14px] lg:text-[15px] tracking-widest uppercase px-1.5 py-0.5 rounded-md transition-all duration-500 border border-transparent leading-none gradient-steel-line-3" title="Volver al Inicio de la Hemeroteca">
           HEMEROTECA
         </a>
       </div>
     </div>
 
     {/* ── CENTRO: Nav desktop (solo xl+) ── */}
-    <nav class="toolbar-element hidden xl:flex absolute left-1/2 -translate-x-1/2 items-center gap-5 2xl:gap-6 shrink-0 font-metadata text-[14px] xl:text-[15px] tracking-[-0.01em] whitespace-nowrap z-0 transition-all duration-500">
+    <nav class="toolbar-element hidden xl:flex absolute left-1/2 -translate-x-1/2 items-center gap-5 2xl:gap-6 shrink-0 font-metadata text-[15px] xl:text-base tracking-[-0.01em] whitespace-nowrap z-0 transition-all duration-500">
 
       <a href="/" class="header-nav-link transition-colors py-1">Inicio</a>
       <a href="/colecciones/" class="header-nav-link transition-colors py-1">Colecciones</a>
@@ -126,7 +126,7 @@ const { transparentUntilScroll = false } = Astro.props;
 >
   {/* Cabecera del drawer */}
   <div class="flex items-center justify-between px-6 py-4 border-b border-white/8 shrink-0">
-    <span class="font-metadata text-[9px] uppercase tracking-[0.4em] text-rust-orange font-bold select-none">
+    <span class="font-metadata text-[11px] uppercase tracking-[0.4em] text-rust-orange font-bold select-none">
       TGP · Menú
     </span>
     <button
@@ -164,12 +164,12 @@ const { transparentUntilScroll = false } = Astro.props;
 
   {/* ── Nav secundaria ── */}
   <div class="px-6 pt-2 pb-4">
-    <p class="font-metadata text-[8.5px] uppercase tracking-[0.4em] text-white/25 mb-3">Plataformas</p>
+    <p class="font-metadata text-[11px] uppercase tracking-[0.4em] text-white/25 mb-3">Plataformas</p>
     <a
       href="https://ediciones.thegreatpuzzleproject.com"
       target="_blank"
       rel="noopener noreferrer"
-      class="drawer-nav-link group flex items-center justify-between py-3 text-[14px] font-['Gloock'] text-[#EFEBE3]/50 hover:text-[#EFEBE3]/90 border-b border-white/5 transition-all duration-300"
+      class="drawer-nav-link group flex items-center justify-between py-3 text-[15px] font-['Gloock'] text-[#EFEBE3]/50 hover:text-[#EFEBE3]/90 border-b border-white/5 transition-all duration-300"
     >
       <span>Editorial TGP</span>
       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40 group-hover:opacity-80 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
@@ -178,7 +178,7 @@ const { transparentUntilScroll = false } = Astro.props;
       href="https://thegreatpuzzleproject.substack.com"
       target="_blank"
       rel="noopener noreferrer"
-      class="drawer-nav-link group flex items-center justify-between py-3 text-[14px] font-['Gloock'] text-[#EFEBE3]/50 hover:text-[#EFEBE3]/90 transition-all duration-300"
+      class="drawer-nav-link group flex items-center justify-between py-3 text-[15px] font-['Gloock'] text-[#EFEBE3]/50 hover:text-[#EFEBE3]/90 transition-all duration-300"
     >
       <span>Newsletter</span>
       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40 group-hover:opacity-80 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
@@ -191,10 +191,10 @@ const { transparentUntilScroll = false } = Astro.props;
   {/* ── Footer del drawer ── */}
   <div class="px-6 py-5 border-t border-white/8 flex items-end justify-between shrink-0">
     <div class="flex flex-col gap-0.5">
-      <span class="font-['Gloock'] font-black text-[10px] uppercase tracking-widest gradient-steel-line-1">
+      <span class="font-['Gloock'] font-black text-xs uppercase tracking-widest gradient-steel-line-1">
         The Great Puzzle Project
       </span>
-      <span class="font-metadata text-[8px] uppercase tracking-[0.3em] text-white/25">Patrimonio · Archivo · Memoria</span>
+      <span class="font-metadata text-[11px] uppercase tracking-[0.3em] text-white/25">Patrimonio · Archivo · Memoria</span>
     </div>
     {/* Logo pequeño */}
     <div class="w-7 h-7 rounded-full overflow-hidden border border-white/10 shrink-0 opacity-50">
