@@ -1887,4 +1887,25 @@ html[data-nav-state="2"] header:hover .brand-element {
   background-color: #08090a !important;
 }
 
-
+/* ═════════════════════════════════════════════════════════════════════════
+   CORRECCIÓN GLOBAL: SELECCIÓN DE TEXTO EN SLIDERS Y TARJETAS
+   Sobrescribe 'select-none' y 'pointer-events-none' para permitir leer y
+   seleccionar los textos superpuestos sin arrastrar las imágenes.
+═════════════════════════════════════════════════════════════════════════ */
+.netflix-row-root,
+.v-slider-root,
+.spotlight-media-tray-root,
+.spotlight-hero-root,
+.cce-root,
+.collection-rest-tray-root,
+.visor-cinematico-root,
+.cinematic-excerpt-rest,
+.cpe-root,
+.cge-root {
+  user-select: auto !important;
+}
+
+.cac-normal-ui,
+.cce-normal-ui {
+  pointer-events: auto !important;
+}

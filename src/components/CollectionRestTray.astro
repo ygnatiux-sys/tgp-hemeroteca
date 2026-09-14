@@ -40,7 +40,7 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
 ---
 
 {essays.length > 0 && (
-  <div id={uid} class="collection-rest-tray-root w-full my-6 sm:my-10 select-none relative overflow-x-clip overflow-y-visible" data-count={essays.length}>
+  <div id={uid} class="collection-rest-tray-root w-full my-6 sm:my-10 relative overflow-x-clip overflow-y-visible" data-count={essays.length}>
     {/* ── ESCENARIO CINEMÁTICO DEL TRAY EN PERSPECTIVA CON AMPLIO AIRE ── */}
     <div class="relative w-full overflow-x-clip overflow-y-visible py-8 sm:py-14 md:py-18">
 
@@ -116,7 +116,7 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
               <div class="card-side-dimmer absolute inset-0 bg-black/45 pointer-events-none transition-opacity duration-500 z-15" />
 
               {/* Bloque Editorial Centrado al Pie Estilo Presentación de Colección */}
-              <div class="relative z-20 p-5 sm:p-7 md:p-8 flex flex-col items-center justify-end text-center w-full pointer-events-none">
+              <div class="relative z-20 p-5 sm:p-7 md:p-8 flex flex-col items-center justify-end text-center w-full">
                 {year && (
                   <span class="font-mono text-xs sm:text-[13px] uppercase tracking-[0.3em] text-rust-orange font-bold mb-1.5 block">
                     {year}

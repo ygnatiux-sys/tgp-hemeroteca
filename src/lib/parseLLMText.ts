@@ -34,6 +34,10 @@ export function parseLLMText(rawText: string, options: ParseLLMTextOptions = {})
   // 2. Normalizar retornos de carro (Windows a Unix)
   html = html.replace(/\r\n/g, '\n');
 
+  // 2.5 Eliminar Markdown Horizontal Rules (---, ***, ___)
+  // Para que no formen un bloque independiente con artefactos de guiones
+  html = html.replace(/^[-*_]{3,}\s*$/gm, '');
+
   // 3. Citas en bloque contiguas (Blockquotes: > texto o &gt; texto) con Formato RESPIRO CINEMÁTICO TGP
   // Agrupa todas las líneas consecutivas que comienzan con > o &gt; en una sola tarjeta con cita + autor
   html = html.replace(/((?:^(?:&gt;|> )[^\n]*(?:\n|$))+)/gm, (match) => {
@@ -99,12 +103,14 @@ export function parseLLMText(rawText: string, options: ParseLLMTextOptions = {})
   );
 
   // 6. Cursivas simples (*palabra*) - IMPORTANTE: después de negritas
+  // Regex ajustado para exigir que no haya espacio después del primer asterisco
+  // Esto evita atrapar asteriscos usados como viñetas de lista (* Elemento 1)
   if (isHeroCinematicStyle) {
-    html = html.replace(/\*([^*\r\n]+)\*/g, 
+    html = html.replace(/\*([^\s*][^*\r\n]*?[^\s*]|[^\s*])\*/g, 
       '<span class="hero-word-italic italic text-amber-100/95 font-serif drop-shadow-[0_0_8px_rgba(217,119,54,0.35)]">$1</span>'
     );
   } else {
-    html = html.replace(/\*([^*\r\n]+)\*/g, '<span class="italic text-white/80">$1</span>');
+    html = html.replace(/\*([^\s*][^*\r\n]*?[^\s*]|[^\s*])\*/g, '<span class="italic text-white/80">$1</span>');
   }
 
   // 7. Títulos (#, ## y ###) con tipografía Gloock / Cinzel y Gradiente
@@ -128,6 +134,31 @@ export function parseLLMText(rawText: string, options: ParseLLMTextOptions = {})
       if (/^<(h[1-6]|div class="respiro-cinematico-card)/i.test(trimmed)) {
         trimmed = trimmed.replace(/\n/g, ' '); 
         return `<div class="cinematic-block min-h-[45vh] md:min-h-[50vh] my-[4vh] md:my-[6vh] flex flex-col items-center justify-center w-full px-4 md:px-8 text-center">${trimmed}</div>`;
+      }
+      
+      // Detectar listas (líneas que empiezan con * o - o número.)
+      if (/^(?:[-*]|\d+\.)\s+/.test(trimmed)) {
+        const isOrdered = /^\d+\.\s+/.test(trimmed);
+        const listTag = isOrdered ? 'ol' : 'ul';
+        const listClass = isOrdered 
+          ? 'list-decimal list-inside text-left inline-block w-full max-w-4xl mx-auto' 
+          : 'list-disc list-inside text-left inline-block w-full max-w-4xl mx-auto';
+        
+        const listItems = trimmed.split('\n').map(line => {
+          const match = line.match(/^(?:[-*]|\d+\.)\s+(.*)/);
+          if (match) {
+            return `<li class="mb-5 pl-3 leading-relaxed text-white/85 text-base sm:text-lg md:text-xl font-light font-sans tracking-wide drop-shadow-md">${match[1]}</li>`;
+          }
+          return line;
+        });
+        
+        return `
+          <div class="cinematic-block min-h-[45vh] md:min-h-[50vh] my-[4vh] md:my-[6vh] flex flex-col items-center justify-center w-full px-6 md:px-12 text-center">
+            <${listTag} class="${listClass}">
+              ${listItems.join('\n')}
+            </${listTag}>
+          </div>
+        `;
       }
       
       // Si es un párrafo regular, convertimos los hard-wraps en espacios

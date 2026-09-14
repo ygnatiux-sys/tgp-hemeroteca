@@ -87,7 +87,7 @@ export default function CoverflowCarousel({
   if (!posts || posts.length === 0) return null;
 
   return (
-    <div className="w-full py-12 md:py-20 bg-transparent text-[#E3DDD3] select-none relative overflow-hidden">
+    <div className="w-full py-12 md:py-20 bg-transparent text-[#E3DDD3] relative overflow-hidden">
       {/* Header Editorial con degradado general H1 y rust-orange heredado */}
       {(title || eyebrow) && (
         <div className="max-w-7xl mx-auto px-6 md:px-12 mb-8 flex items-end justify-between">
