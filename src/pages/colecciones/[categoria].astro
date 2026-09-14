@@ -130,33 +130,6 @@ const categoryDustTexts: Record<string, string> = {
 const defaultDustText = `La colección [[${label}]] concentra investigaciones que excavan más allá de la superficie. **Cada documento es un umbral.** Un conjunto de rastros que aguardan la mirada que los vuelva a nombrar, trazar y comprender.`;
 const dustText = categoryDustTexts[key] ?? defaultDustText;
 
-// ─── TIPO DE LAYOUT EXCLUSIVO POR COLECCIÓN ─────────────────────────────────
-type LayoutType = 'mosaico-arquetipos' | 'bitacora-arqueosemiotica' | 'cronica-historia' | 'teatro-cinematico' | 'premier-default';
-
-const layoutType: LayoutType =
-  key === 'arquetipos-globales' ? 'mosaico-arquetipos' :
-  (key === 'arqueosemiotica' || key === 'georreferencias' || key === 'sitios-arqueohistoricos') ? 'bitacora-arqueosemiotica' :
-  key === 'ensayos-cinematicos' ? 'teatro-cinematico' :
-  key.startsWith('historia') ? 'cronica-historia' :
-  'premier-default';
-
-// Helper para secuencias Premier (usado en premier-default y como respaldo)
-function createPremierSequences(items: typeof resolvedEssays) {
-  const sequences: Array<{
-    hero: typeof resolvedEssays[0];
-    duo: typeof resolvedEssays;
-  }> = [];
-  
-  for (let i = 0; i < items.length; i += 3) {
-    sequences.push({
-      hero: items[i],
-      duo: items.slice(i + 1, i + 3),
-    });
-  }
-  return sequences;
-}
-
-const sequences = createPremierSequences(resolvedEssays);
 ---
 
 <Layout
@@ -191,382 +164,73 @@ const sequences = createPremierSequences(resolvedEssays);
       />
     )}
 
-    {/* ── RESPIRO VISUAL / EXCERPT DOBLE SCROLL POLVO DORADO & TYPEMAGIC ── */}
-    <CinematicExcerptRest text={dustText} />
-
-    {/* ── AGUANIEVE CRISTALINO NARRATIVO ── */}
-    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 -mt-4 mb-8">
-      <AguaNieve category={key} />
-    </div>
-
-    {/* ── CONTENIDO PRINCIPAL SEGÚN EL LAYOUT EXCLUSIVO DE LA COLECCIÓN ── */}
+    {/* ── CONTENIDO PRINCIPAL: GRILLA EDITORIAL DE INVESTIGACIONES (MOSAICO EN 3 COLUMNAS) ── */}
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-4">
-
-      {/* ═════════════════════════════════════════════════════════════════════
-          CASO 1: ARQUETIPOS GLOBALES (MOSAICO SIMBÓLICO TIPO CÓDEX / TAROT)
-      ═════════════════════════════════════════════════════════════════════ */}
-      {layoutType === 'mosaico-arquetipos' && (
-        <section class="flex flex-col gap-8 md:gap-12">
-          <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-5 gap-3">
-            <div>
-              <span class="font-mono text-xs uppercase tracking-[0.4em] text-rust-orange font-bold block mb-1">
-                Colección Simbólica · Cartografía de la Psique
-              </span>
-              <h2 class="text-3xl md:text-4xl lg:text-5xl font-serif font-black gradient-general-h1">
-                Arquetipos Globales
-              </h2>
-            </div>
-            <span class="font-mono text-xs uppercase tracking-[0.25em] text-white/50">
-              {resolvedEssays.length} {resolvedEssays.length === 1 ? 'Arquetipo' : 'Arquetipos Documentados'}
+      <section class="flex flex-col gap-8 md:gap-12">
+        <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-5 gap-3">
+          <div>
+            <span class="font-mono text-xs uppercase tracking-[0.4em] text-rust-orange font-bold block mb-1">
+              Colección Especializada · Cartografía Epistémica
             </span>
+            <h2 class="text-3xl md:text-4xl lg:text-5xl font-gloock font-black gradient-general-h1 glow-metallic-gloock">
+              {label}
+            </h2>
           </div>
+          <span class="font-mono text-xs uppercase tracking-[0.25em] text-white/50">
+            {resolvedEssays.length} {resolvedEssays.length === 1 ? 'Investigación' : 'Investigaciones Documentadas'}
+          </span>
+        </div>
 
-          {/* Grilla Mosaico Simbólico: 3 columnas simétricas con proporción vertical editorial */}
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {resolvedEssays.map((item, idx) => {
-              const itemImg = item.img ? sanitizeImageUrl((item.img as any)?.src ?? item.img) : null;
-              const linkUrl = `/hemeroteca/${item.slug}/`;
+        {/* Grilla Mosaico: 3 columnas simétricas con proporción vertical editorial */}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {resolvedEssays.map((item, idx) => {
+            const itemImg = item.img ? sanitizeImageUrl((item.img as any)?.src ?? item.img) : null;
+            const isCine = (item as any).isCinematicGSAP || item.entry?.category === 'Ensayos Cinemáticos';
+            const linkUrl = isCine ? `/ensayos-cinematicos/${item.slug}/` : `/hemeroteca/${item.slug}/`;
 
-              return (
-                <a
-                  href={linkUrl}
-                  class="group relative overflow-hidden rounded-xl md:rounded-2xl border border-white/10 bg-theme-dark/90 hover:border-white/25 hover:shadow-2xl hover:shadow-black/60 transition-all duration-500 flex flex-col justify-end isolate min-h-110 md:min-h-125"
-                >
-                  {itemImg ? (
-                    <Image
-                      src={itemImg}
-                      alt={item.entry.title}
-                      inferSize={true}
-                      format="webp"
-                      loading={idx < 3 ? "eager" : "lazy"}
-                      decoding="async"
-                      class="absolute inset-0 object-center brightness-85 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.03] group-hover:brightness-95 img-nativa"
-                    />
-                  ) : (
-                    <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1b1c24] via-theme-dark to-black -z-10" />
-                  )}
-
-                  {/* Scrim global único y suave */}
-                  <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 via-40% to-transparent pointer-events-none z-10" />
-
-                  <div class="relative z-20 p-6 md:p-8 flex flex-col justify-end h-full">
-                    <h3 class="font-cinzel font-extrabold text-2xl md:text-3xl leading-tight mb-4 gradient-acero-ios drop-shadow-xl">
-                      {item.entry.title}
-                    </h3>
-
-                    <div class="pt-3 border-t border-white/10 flex items-center justify-between">
-                      <span class="font-mono text-[13px] uppercase tracking-[0.25em] text-white/45 group-hover:text-white/80 transition-colors">
-                        Explorar →
-                      </span>
-                      {item.entry.date && (
-                        <span class="font-mono text-[13px] text-white/30">
-                          {formatYear(item.entry.date)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </a>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* ═════════════════════════════════════════════════════════════════════
-          CASO 2: ARQUEOSEMIÓTICA & GEORREFERENCIAS (BITÁCORA DE EXPEDICIÓN)
-      ═════════════════════════════════════════════════════════════════════ */}
-      {layoutType === 'bitacora-arqueosemiotica' && (
-        <section class="flex flex-col gap-10 md:gap-14">
-          <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-5 gap-3">
-            <div>
-              <span class="font-mono text-xs uppercase tracking-[0.4em] text-rust-orange font-bold block mb-1">
-                Bitácora de Campo · Cartografía Lítica & Simbólica
-              </span>
-              <h2 class="text-3xl md:text-4xl lg:text-5xl font-serif font-black gradient-general-h1">
-                Arqueosemiótica & Georreferencias
-              </h2>
-            </div>
-            <span class="font-mono text-xs uppercase tracking-[0.25em] text-white/50">
-              {resolvedEssays.length} {resolvedEssays.length === 1 ? 'Sitio' : 'Sitios & Investigaciones'}
-            </span>
-          </div>
-
-          {/* 1. Sitio Principal Destacado (Hero Panorámico con Coordenadas) */}
-          {resolvedEssays[0] && (
-            <div class="w-full">
-              <CinematicArchiveCard
-                slug={resolvedEssays[0].slug}
-                entry={resolvedEssays[0].entry}
-                img={resolvedEssays[0].img}
-                variant="hero"
-                enableCinemagraph={true}
-              />
-            </div>
-          )}
-
-          {/* 2. Grid de Expediciones: 2 columnas asimétricas con datos geohistóricos */}
-          {resolvedEssays.length > 1 && (
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-              {resolvedEssays.slice(1).map((item, idx) => {
-                const itemImg = item.img ? sanitizeImageUrl((item.img as any)?.src ?? item.img) : null;
-                const linkUrl = `/hemeroteca/${item.slug}/`;
-
-                return (
-                  <a
-                    href={linkUrl}
-                    class="group relative overflow-hidden rounded-xl md:rounded-2xl border border-white/10 bg-theme-dark/80 hover:border-white/25 transition-all duration-500 flex flex-col justify-end min-h-95 md:min-h-105 isolate"
-                  >
-                    {itemImg ? (
-                      <Image
-                        src={itemImg}
-                        alt={item.entry.title}
-                        inferSize={true}
-                        format="webp"
-                        loading="lazy"
-                        decoding="async"
-                        class="absolute inset-0 object-center brightness-75 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.025] group-hover:brightness-90 img-nativa"
-                      />
-                    ) : (
-                      <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#161a1d] via-theme-dark to-[#090b0c] -z-10" />
-                    )}
-
-                    {/* Scrim global único y suave */}
-                    <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 via-50% to-transparent pointer-events-none z-10" />
-
-                    <div class="relative z-20 p-6 md:p-8 flex flex-col justify-end h-full">
-                      <h3 class="font-cinzel font-extrabold text-2xl md:text-3xl leading-tight mb-4 gradient-steel-titanium drop-shadow-xl">
-                        {item.entry.title}
-                      </h3>
-
-                      <div class="pt-3 border-t border-white/10 flex items-center justify-between">
-                        <span class="font-mono text-[13px] uppercase tracking-[0.3em] text-white/45 group-hover:text-white/80 transition-colors">
-                          Explorar →
-                        </span>
-                        <span class="font-mono text-[13px] text-white/30">
-                          {formatYear(item.entry.date)}
-                        </span>
-                      </div>
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* ═════════════════════════════════════════════════════════════════════
-          CASO 3: HISTORIA & CRÓNICA DOCUMENTAL (LÍNEA DE TIEMPO / CRÓNICA)
-      ═════════════════════════════════════════════════════════════════════ */}
-      {layoutType === 'cronica-historia' && (
-        <section class="flex flex-col gap-10 md:gap-14">
-          <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-5 gap-3">
-            <div>
-              <span class="font-mono text-xs uppercase tracking-[0.4em] text-rust-orange font-bold block mb-1">
-                Crónica Documental · Archivo Histórico
-              </span>
-              <h2 class="text-3xl md:text-4xl lg:text-5xl font-serif font-black gradient-general-h1">
-                {label}
-              </h2>
-            </div>
-            <span class="font-mono text-xs uppercase tracking-[0.25em] text-white/50">
-              {resolvedEssays.length} {resolvedEssays.length === 1 ? 'Registro' : 'Registros Documentales'}
-            </span>
-          </div>
-
-          {/* Secuencias Cinematográficas Premier: 1 Hero Full Bleed + Dúo 60/40 */}
-          <div class="flex flex-col gap-12 md:gap-16">
-            {sequences.map((seq) => (
-              <div class="premier-sequence flex flex-col gap-6 md:gap-8">
-                {/* 1. Hero Cinemático */}
-                <div class="w-full">
-                  <CinematicArchiveCard
-                    slug={seq.hero.slug}
-                    entry={seq.hero.entry}
-                    img={seq.hero.img}
-                    variant="hero"
-                    enableCinemagraph={true}
+            return (
+              <a
+                href={linkUrl}
+                class="group relative overflow-hidden rounded-xl md:rounded-2xl border border-white/10 bg-theme-dark/90 hover:border-white/25 hover:shadow-2xl hover:shadow-black/60 transition-all duration-500 flex flex-col justify-end isolate min-h-110 md:min-h-125"
+              >
+                {itemImg ? (
+                  <Image
+                    src={itemImg}
+                    alt={item.entry.title}
+                    inferSize={true}
+                    format="webp"
+                    loading={idx < 6 ? "eager" : "lazy"}
+                    decoding="async"
+                    class="absolute inset-0 object-cover object-center brightness-85 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.03] group-hover:brightness-95 img-nativa"
                   />
-                </div>
-
-                {/* 2. Dúo 60/40 */}
-                {seq.duo.length > 0 && (
-                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-                    {seq.duo[0] && (
-                      <div class={seq.duo.length > 1 ? "lg:col-span-7 flex flex-col" : "lg:col-span-12 flex flex-col"}>
-                        <CinematicArchiveCard
-                          slug={seq.duo[0].slug}
-                          entry={seq.duo[0].entry}
-                          img={seq.duo[0].img}
-                          variant={seq.duo.length > 1 ? "duo-60" : "hero"}
-                          enableCinemagraph={true}
-                        />
-                      </div>
-                    )}
-                    {seq.duo[1] && (
-                      <div class="lg:col-span-5 flex flex-col">
-                        <CinematicArchiveCard
-                          slug={seq.duo[1].slug}
-                          entry={seq.duo[1].entry}
-                          img={seq.duo[1].img}
-                          variant="duo-40"
-                          enableCinemagraph={true}
-                        />
-                      </div>
-                    )}
-                  </div>
+                ) : (
+                  <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1b1c24] via-theme-dark to-black -z-10" />
                 )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
 
-      {/* ═════════════════════════════════════════════════════════════════════
-          CASO 4: ENSAYOS CINEMÁTICOS (TEATRO OSCURO / DOSSIERES GSAP)
-      ═════════════════════════════════════════════════════════════════════ */}
-      {layoutType === 'teatro-cinematico' && (
-        <section class="flex flex-col gap-10 md:gap-14">
-          <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-5 gap-3">
-            <div>
-              <span class="font-mono text-xs uppercase tracking-[0.4em] text-rust-orange font-bold block mb-1">
-                Experiencias a Pantalla Completa · Dossieres GSAP
-              </span>
-              <h2 class="text-3xl md:text-4xl lg:text-5xl font-serif font-black gradient-general-h1">
-                Ensayos Cinemáticos
-              </h2>
-            </div>
-            <span class="font-mono text-xs uppercase tracking-[0.25em] text-white/50">
-              {resolvedEssays.length} {resolvedEssays.length === 1 ? 'Dossier' : 'Dossieres Cinemáticos'}
-            </span>
-          </div>
+                {/* Scrim global único y suave */}
+                <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/40 via-40% to-transparent pointer-events-none z-10" />
 
-          {/* Grilla de Posters Cinemáticos Panorámicos */}
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
-            {resolvedEssays.map((item, idx) => {
-              const itemImg = item.img ? sanitizeImageUrl((item.img as any)?.src ?? item.img) : null;
-              const linkUrl = `/ensayos-cinematicos/${item.slug}/`;
+                <div class="relative z-20 p-6 md:p-8 flex flex-col justify-end h-full">
+                  <h3 class="font-gloock font-bold text-2xl md:text-3xl leading-tight mb-4 gradient-general-h1 glow-metallic-gloock drop-shadow-xl">
+                    {item.entry.title}
+                  </h3>
 
-              return (
-                <a
-                  href={linkUrl}
-                  class="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 bg-theme-dark hover:border-white/25 hover:shadow-2xl hover:shadow-black/80 transition-all duration-500 flex flex-col justify-end aspect-16/10 min-h-90 md:min-h-105 isolate"
-                >
-                  {itemImg ? (
-                    <Image
-                      src={itemImg}
-                      alt={item.entry.title}
-                      inferSize={true}
-                      format="webp"
-                      loading={idx < 4 ? "eager" : "lazy"}
-                      decoding="async"
-                      class="absolute inset-0 object-center brightness-75 contrast-[1.08] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.03] group-hover:brightness-90 img-nativa"
-                    />
-                  ) : (
-                    <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#101316] via-theme-dark to-black -z-10" />
-                  )}
-
-                  <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/50 via-40% to-transparent pointer-events-none z-10" />
-
-                  <div class="relative z-20 p-6 md:p-8 flex flex-col justify-end h-full">
-                    <div class="flex items-center gap-3 mb-2">
-                      <span class="font-mono text-xs md:text-[13px] uppercase tracking-[0.35em] text-rust-orange font-bold px-2.5 py-1 rounded bg-black/60 border border-rust-orange/30 backdrop-blur-sm">
-                        GSAP Inmersivo
+                  <div class="pt-3 border-t border-white/10 flex items-center justify-between">
+                    <span class="font-mono text-[13px] uppercase tracking-[0.25em] text-white/45 group-hover:text-white/80 transition-colors">
+                      Explorar →
+                    </span>
+                    {item.entry.date && (
+                      <span class="font-mono text-[13px] text-white/30">
+                        {formatYear(item.entry.date)}
                       </span>
-                      {item.entry.date && (
-                        <span class="font-mono text-[13px] text-white/50 tracking-wider">
-                          {formatYear(item.entry.date)}
-                        </span>
-                      )}
-                    </div>
-
-                    <h3 class="text-2xl md:text-3xl lg:text-4xl font-serif font-black text-white group-hover:text-rust-orange transition-colors leading-tight mb-2">
-                      {item.entry.title}
-                    </h3>
-
-                    {item.entry.dek && (
-                      <p class="font-serif text-white/75 text-[15px] md:text-[17px] line-clamp-2 mb-4 leading-relaxed font-light">
-                        {item.entry.dek}
-                      </p>
                     )}
-
-                    <div class="inline-flex items-center gap-2 text-[15px] font-mono uppercase tracking-[0.25em] text-white/70 group-hover:text-white transition-colors">
-                      <span>Iniciar Experiencia Cinemática</span>
-                      <span class="group-hover:translate-x-1.5 transition-transform">→</span>
-                    </div>
                   </div>
-                </a>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* ═════════════════════════════════════════════════════════════════════
-          CASO 5: PREMIER DEFAULT (ARQUEOLOGÍA, FILOSOFÍA, ENSAYO, ETC.)
-      ═════════════════════════════════════════════════════════════════════ */}
-      {layoutType === 'premier-default' && (
-        <section class="flex flex-col gap-10 md:gap-14">
-          <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-5 gap-3">
-            <div>
-              <span class="font-mono text-xs uppercase tracking-[0.4em] text-rust-orange font-bold block mb-1">
-                Colección Especializada · Archivo TGP
-              </span>
-              <h2 class="text-3xl md:text-4xl lg:text-5xl font-serif font-black gradient-general-h1">
-                {label}
-              </h2>
-            </div>
-            <span class="font-mono text-xs uppercase tracking-[0.25em] text-white/50">
-              {resolvedEssays.length} {resolvedEssays.length === 1 ? 'Documento' : 'Documentos'}
-            </span>
-          </div>
-
-          <div class="flex flex-col gap-12 md:gap-16">
-            {sequences.map((seq) => (
-              <div class="premier-sequence flex flex-col gap-6 md:gap-8">
-                {/* 1. Hero Cinemático */}
-                <div class="w-full">
-                  <CinematicArchiveCard
-                    slug={seq.hero.slug}
-                    entry={seq.hero.entry}
-                    img={seq.hero.img}
-                    variant="hero"
-                    enableCinemagraph={true}
-                  />
                 </div>
-
-                {/* 2. Dúo 60/40 */}
-                {seq.duo.length > 0 && (
-                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-                    {seq.duo[0] && (
-                      <div class={seq.duo.length > 1 ? "lg:col-span-7 flex flex-col" : "lg:col-span-12 flex flex-col"}>
-                        <CinematicArchiveCard
-                          slug={seq.duo[0].slug}
-                          entry={seq.duo[0].entry}
-                          img={seq.duo[0].img}
-                          variant={seq.duo.length > 1 ? "duo-60" : "hero"}
-                          enableCinemagraph={true}
-                        />
-                      </div>
-                    )}
-                    {seq.duo[1] && (
-                      <div class="lg:col-span-5 flex flex-col">
-                        <CinematicArchiveCard
-                          slug={seq.duo[1].slug}
-                          entry={seq.duo[1].entry}
-                          img={seq.duo[1].img}
-                          variant="duo-40"
-                          enableCinemagraph={true}
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+              </a>
+            );
+          })}
+        </div>
+      </section>
 
       {/* ═════════════════════════════════════════════════════════════════════
           ÍNDICE INTERNO & VISOR CINEMÁTICO SINCRONIZADO
@@ -575,7 +239,7 @@ const sequences = createPremierSequences(resolvedEssays);
         <div class="reveal-item flex items-end justify-between">
           <div>
             <span class="font-mono text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Catálogo Exhaustivo</span>
-            <h2 class="text-2xl md:text-3xl font-serif font-black gradient-general-h2">
+            <h2 class="text-2xl md:text-3xl font-gloock font-black gradient-general-h1 glow-metallic-gloock">
               {label} — Visor &amp; Índice Completo
             </h2>
           </div>
