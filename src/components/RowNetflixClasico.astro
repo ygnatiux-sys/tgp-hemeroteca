@@ -179,7 +179,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
                   format="webp"
                   widths={[400, 768, 1200]}
                   sizes="(max-width: 768px) 360px, 480px"
-                  class="netflix-card-img absolute inset-0 transition-transform duration-700 ease-out group-hover/card:scale-105 img-nativa"
+                  class="netflix-card-img absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover/card:scale-105 img-nativa"
                   loading="lazy"
                   decoding="async"
                   data-flip-id={`card-image-${cardId}`}
@@ -276,7 +276,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
   }
 
   .netflix-card-image-wrap :global(img),
-  .netflix-card-img {
+  :global(.netflix-card-img) {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;

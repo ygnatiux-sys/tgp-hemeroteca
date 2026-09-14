@@ -9,6 +9,25 @@
   --font-alegreya: "Alegreya Sans", sans-serif;
 }
 
+@layer utilities {
+  /* ═════════════════════════════════════════════════════════════════════════
+     AUMENTO GLOBAL DE LEGIBILIDAD (POLÍTICA DE "UN PUNTO MÁS")
+     Forzamos que ninguna clase utilitaria de Tailwind (text-[8px] a text-[11.5px])
+     renderice texto por debajo de 12px (text-xs). Esto aplica a páginas interiores,
+     HTML dedicados y todo el sitio sin tener que cazar clase por clase.
+  ═════════════════════════════════════════════════════════════════════════ */
+  [class*="text-[8px]"],
+  [class*="text-[8.5px]"],
+  [class*="text-[9px]"],
+  [class*="text-[9.5px]"],
+  [class*="text-[10px]"],
+  [class*="text-[10.5px]"],
+  [class*="text-[11px]"],
+  [class*="text-[11.5px]"] {
+    font-size: 12px !important;
+  }
+}
+
 /* ═════════════════════════════════════════════════════════════════════════
    PALETA Y VARIABLES DE TEMA (DARK ACADEMIA / MODO DÍA PAPIRO FRÍO)
 ═════════════════════════════════════════════════════════════════════════ */

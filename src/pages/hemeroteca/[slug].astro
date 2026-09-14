@@ -164,10 +164,11 @@ if (rawSourceText.startsWith("{")) {
 // 4. Procesar HTML y vincular imágenes relativas a R2
 let renderedHtml = "";
 let cinematicHtml = "";
+const isAdamBridge = slug === "adam-s-bridge";
 if (finalMarkdownText) {
   const normalizedMarkdown = finalMarkdownText.replace(/(?:src\/assets|\/src\/assets)\/([^\s"')]+)/g, `${R2_STORAGE_BASE_URL}/$1`);
   renderedHtml = marked.parse(normalizedMarkdown) as string;
-  cinematicHtml = parseLLMText(normalizedMarkdown);
+  cinematicHtml = parseLLMText(normalizedMarkdown, { isHeroCinematicStyle: isAdamBridge });
 }
 
 // 5. Resolución de imagen de portada
@@ -519,7 +520,7 @@ const heroTitleClass = `text-[clamp(2.25rem,5vw,4.5rem)] font-cinzel font-extrab
         {/* ─── VISTA 1: MODO CINEMÁTICO (PostCinematicStyle + GSAP) ─── */}
         <div id="view-cinematic" class="cinematic-reading-view w-full">
           {cinematicHtml ? (
-            <PostCinematicStyle class={isArquetipo ? 'is-arquetipo-mode' : ''}>
+            <PostCinematicStyle class={`${isArquetipo ? 'is-arquetipo-mode' : ''} ${isAdamBridge ? 'hero-cinematic-mode' : ''}`.trim()}>
               <div class={`cinematic-essay-content w-full ${isArquetipo ? 'arquetipo-typing-root' : ''}`} set:html={cinematicHtml} />
             </PostCinematicStyle>
           ) : (
@@ -1268,8 +1269,8 @@ const heroTitleClass = `text-[clamp(2.25rem,5vw,4.5rem)] font-cinzel font-extrab
         // Sólo los <p> directos del bloque cinemático
         const paragraphs = block.querySelectorAll('p');
         paragraphs.forEach(para => {
-          // No procesar si ya fue wrapeado
-          if (para.querySelector('.aqt-word')) return;
+          // No procesar si ya fue wrapeado o si es formato Hero Cinemático
+          if (para.querySelector('.aqt-word') || para.classList.contains('hero-cinematic-body-text') || para.closest('.hero-cinematic-mode')) return;
 
           const originalText = para.innerHTML;
           // Tokenizar preservando HTML interior (negritas, cursivas, spans)
