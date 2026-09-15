@@ -4,6 +4,9 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import LightboxGlobal from "../components/LightboxGlobal.astro";
 import BackSlideButton from "../components/BackSlideButton.astro";
+import TgpMindSidebar from "../components/TgpMindSidebar";
+
+const isTgpDev = import.meta.env.DEV;
 
 interface Props {
   description?: string;
@@ -185,6 +188,9 @@ const globalSchema = {
 
     {/* Visor Inmersivo Global */}
     <LightboxGlobal />
+
+    {/* TGP Mind Sidebar — solo en desarrollo local */}
+    {isTgpDev && <TgpMindSidebar client:load />}
 
     <script>
       import { gsap } from "gsap";
