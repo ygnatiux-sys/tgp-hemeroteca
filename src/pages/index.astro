@@ -410,30 +410,19 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
             </div>
           </div>
 
-          {/* Mobile: scroll horizontal snapping */}
-          <div class="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
-            {resolvedCollections.map(({ key, label, count, img, coverEssay }) => (
-              <a
-                href={`/archivo/?categoria=${encodeURIComponent(key)}`}
-                class="group shrink-0 w-[72vw] sm:w-[55vw] md:w-auto snap-start bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-rust-orange/50 transition-all duration-500 flex flex-col"
-              >
-                {img ? (
-                  <div class="overflow-hidden aspect-video relative">
-                    <img src={sanitizeImageUrl(img)} alt={label} loading="lazy" decoding="async" class="transition-transform duration-700 group-hover:scale-105 opacity-70 group-hover:opacity-90 img-nativa" />
-                    <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent" />
-                    <div class="absolute bottom-0 left-0 p-4">
-                      <p class="font-metadata text-[9px] uppercase tracking-[0.3em] text-rust-orange mb-1">{count} artículos</p>
-                      <h3 class="font-cinzel font-bold text-lg leading-tight text-white group-hover:text-rust-orange transition-colors">{label}</h3>
-                    </div>
-                  </div>
-                ) : (
-                  <div class="p-5 flex flex-col gap-2 flex-1">
-                    <p class="font-metadata text-[9px] uppercase tracking-[0.3em] text-rust-orange">{count} artículos</p>
-                    <h3 class="font-cinzel font-bold text-lg leading-tight group-hover:text-rust-orange transition-colors">{label}</h3>
-                  </div>
-                )}
-              </a>
-            ))}
+          {/* Mobile: scroll horizontal snapping (Reemplazado por RowNetflixClasico Infinito) */}
+          <div class="w-full -mx-4 px-4 md:mx-0 md:px-0">
+            <RowNetflixClasico
+              title=""
+              eyebrow=""
+              items={resolvedCollections.map(c => ({
+                title: c.label,
+                collectionLabel: `${c.count} ARTÍCULOS`,
+                image: c.img,
+                link: `/archivo/?categoria=${encodeURIComponent(c.key)}`
+              }))}
+              max={15}
+            />
           </div>
         </section>
       )}
