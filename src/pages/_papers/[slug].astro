@@ -16,7 +16,6 @@ import { getCollection, getEntry, render } from "astro:content";
 import { marked } from "marked";
 import AcademicLayout from "../../layouts/AcademicLayout.astro";
 import MarqueeColecciones from "../../components/MarqueeColecciones.astro";
-import { QuickReturnButton } from "../../components/QuickReturnButton";
 import PostCinematicStyle from "../../components/PostCinematicStyle.astro";
 import { parseLLMText } from "../../lib/parseLLMText";
 import {
@@ -141,8 +140,6 @@ const pageTitle = `${title} — Papers · TGP`;
 ---
 
 <AcademicLayout title={pageTitle} description={excerpt ?? undefined} image={optimizedImgUrl} slug={slug}>
-  <QuickReturnButton client:only="react" variant="papers" accentColor="#EFEBE3" fallbackUrl="/papers" />
-
   <!-- ═══════════════════════════════════════════════════════════════
        ZONA 1: CABECERA DEL PAPER — fondo roto (#F5F2ED)
        Separación muy sutil de la zona de lectura

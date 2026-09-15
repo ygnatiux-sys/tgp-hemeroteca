@@ -10,7 +10,6 @@ import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import AguaNieve from '../../components/AguaNieve.astro';
 import VisorTemasSlider from '../../components/VisorTemasSlider.astro';
 import BackSlideButton from '../../components/BackSlideButton.astro';
-import { QuickReturnButton } from '../../components/QuickReturnButton';
 
 import {
   getPublishableEssays,
@@ -138,7 +137,6 @@ const dustText = categoryDustTexts[key] ?? defaultDustText;
   image={coverImageUrl}
 >
   <BackSlideButton fallbackUrl="/colecciones" />
-  <QuickReturnButton client:load forceVisible={true} fallbackUrl="/colecciones" />
   <div class="text-white min-h-screen pb-32">
 
     {/* ── HERO: SEO H1 INVISIBLE ── */}

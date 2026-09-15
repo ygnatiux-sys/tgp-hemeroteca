@@ -10,6 +10,7 @@ interface Props {
   title?: string;
   image?: string;
   hideHeader?: boolean;
+  showBackButton?: boolean;
   footerVariant?: "full" | "minimal";
   /** Home cinematográfico: nav transparente al tope, sólido tras 50px de scroll */
   headerTransparentUntilScroll?: boolean;
@@ -22,6 +23,7 @@ const {
   description: customDescription,
   image: customImage,
   hideHeader = false,
+  showBackButton = false,
   footerVariant = "full",
   headerTransparentUntilScroll = true,
   bodyStyle = "",
@@ -165,14 +167,8 @@ const globalSchema = {
     class={`${bodyClass} text-(--text-body) antialiased transition-colors duration-400 flex flex-col min-h-screen`}
     style={bodyStyle || undefined}
   >
-    {
-      !hideHeader && (
-        <>
-          <Header transparentUntilScroll={headerTransparentUntilScroll} />
-          <BackSlideButton fallbackUrl="/" />
-        </>
-      )
-    }
+    { !hideHeader && <Header transparentUntilScroll={headerTransparentUntilScroll} /> }
+    { showBackButton && <BackSlideButton fallbackUrl="/" /> }
 
     <div id="smooth-wrapper">
       <div id="smooth-content">

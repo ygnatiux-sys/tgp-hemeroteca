@@ -10,7 +10,6 @@ import { marked } from "marked";
 import Header from "../../components/Header.astro";
 import PostCinematicStyle from "../../components/PostCinematicStyle.astro";
 import { parseLLMText } from "../../lib/parseLLMText";
-import { QuickReturnButton } from "../../components/QuickReturnButton";
 import BackSlideButton from "../../components/BackSlideButton.astro";
 import PolvoDorado from "../../components/PolvoDorado.astro";
 
@@ -360,7 +359,8 @@ const heroTitleClass = `text-[clamp(2.25rem,5vw,4.5rem)] font-cinzel font-extrab
 ---
 
 <Layout
-  hideHeader={true}
+  hideHeader={isCinematicView}
+  showBackButton={!isCinematicView}
   footerVariant="minimal"
   title={`${doc.title} | Hemeroteca TGP`}
   description={doc.excerpt || doc.description}
@@ -374,10 +374,6 @@ const heroTitleClass = `text-[clamp(2.25rem,5vw,4.5rem)] font-cinzel font-extrab
       </div>
     ) : (
       <>
-        <Header />
-        <BackSlideButton fallbackUrl="/archivo" />
-        <QuickReturnButton client:load forceVisible={true} accentColor={activeAccent} fallbackUrl="/archivo" />
-
         <InteriorHero
           title={doc.title || "Ensayo TGP"}
           image={optimizedImage}

@@ -16,6 +16,7 @@ interface Props {
   description?: string;
   image?: string;
   slug?: string;
+  showBackButton?: boolean;
 }
 
 const {
@@ -23,6 +24,7 @@ const {
   description = "Scriptorium Epistémico. Lectura profunda de dossieres y ensayos de investigación.",
   image = "/images/favicon.TGP.webp",
   slug,
+  showBackButton = true,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
@@ -349,7 +351,7 @@ const globalSchema = {
     <Header transparentUntilScroll={false} />
 
     <!-- Botón de Retroceso Inteligente Lateral -->
-    <BackSlideButton fallbackUrl="/papers" />
+    { showBackButton && <BackSlideButton fallbackUrl="/papers" /> }
 
     <main class="pt-20 md:pt-24">
       <slot />

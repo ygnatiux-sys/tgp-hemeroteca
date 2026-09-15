@@ -3,7 +3,6 @@ import { resolveMultivisionClass } from "../lib/multivision";
 // src/components/CinematicDossier.astro
 import SpotifyIcon from './icons/Spotify.astro';
 import YouTubeIcon from './icons/YouTube.astro';
-import { QuickReturnButton } from './QuickReturnButton';
 import { sanitizeImageUrl } from '../lib/content-filter';
 
 export interface Fragment {
@@ -283,9 +282,6 @@ const { fragments = [], isModal = false } = Astro.props;
       </div>
     </div>
   )}
-
-  {/* Widget Orbital Cinemático (WOC 2026) para cerrar diapositivas */}
-  <QuickReturnButton client:load fallbackUrl="/archivo" forceVisible={true} />
 </section>
 
 <script>

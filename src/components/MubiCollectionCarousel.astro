@@ -1,0 +1,398 @@
+---
+/**
+ * MubiCollectionCarousel.astro
+ * Carrusel de colecciones cinematográfico por bloques rígidos (estilo MUBI).
+ * - Bloques rígidos de 3 tarjetas
+ * - Staggered Fade Out (izq -> der) seguido de Staggered Fade In
+ * - Loop infinito al agotar todos los bloques de la colección
+ * - Autoplay de 7 segundos con pausa activa en hover (.pause() y .resume())
+ * - Paginación numérica transparente ("01 / 04")
+ * - Estilos estructurales puros heredando tipografías, colores y tokens nativos del proyecto
+ */
+import { sanitizeImageUrl } from '../lib/content-filter';
+
+const FALLBACK_IMG = 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop';
+
+export interface MubiCollectionCard {
+  title: string;
+  collectionLabel?: string;
+  image: string;
+  link: string;
+  count?: number;
+  subtitle?: string;
+  isGloock?: boolean;
+}
+
+interface Props {
+  title?: string;
+  eyebrow?: string;
+  items: MubiCollectionCard[];
+  itemsPerBlock?: number;
+  autoplaySeconds?: number;
+  height?: string; // rango recomendado: 65vh - 75vh
+}
+
+const {
+  title = "Colecciones",
+  eyebrow = "Organización Temática",
+  items = [],
+  itemsPerBlock = 3,
+  autoplaySeconds = 7,
+  height = "68vh"
+} = Astro.props;
+
+// Sanitizar y normalizar los items
+const cleanItems: MubiCollectionCard[] = items.map(item => ({
+  ...item,
+  // Sanitizar URL y aplicar fallback si es null/inválido
+  image: (item.image && typeof item.image === 'string'
+    ? sanitizeImageUrl(item.image) || FALLBACK_IMG
+    : FALLBACK_IMG) as string,
+}));
+
+// Agrupar las tarjetas en bloques rígidos de N (por defecto 3)
+const blocks: MubiCollectionCard[][] = [];
+for (let i = 0; i < cleanItems.length; i += itemsPerBlock) {
+  blocks.push(cleanItems.slice(i, i + itemsPerBlock));
+}
+
+const totalBlocks = blocks.length;
+const uid = `mubi-${Math.random().toString(36).substring(2, 9)}`;
+---
+
+{totalBlocks > 0 && (
+  <section 
+    id={uid} 
+    class="mubi-carousel-root w-full relative group/mubi"
+    data-autoplay-seconds={autoplaySeconds}
+    data-total-blocks={totalBlocks}
+    aria-label={title}
+  >
+    <!-- Encabezado editorial con eyebrow, título, paginación numérica y controles -->
+    <header class="mubi-header flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4">
+      <div>
+        {eyebrow && (
+          <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">
+            {eyebrow}
+          </span>
+        )}
+        <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-cinzel font-extrabold tracking-tight drop-shadow-md" style="background-image: linear-gradient(180deg, #CBD5E1 0%, #334155 100%); -webkit-background-clip: text; background-clip: text; color: transparent;">
+          {title}
+        </h2>
+      </div>
+
+      <!-- Controles de navegación y Paginación Numérica -->
+      <div class="flex items-center gap-4 self-end md:self-auto">
+        <!-- Índice Numérico de Paginación (ej. "01 / 05") -->
+        <div class="mubi-pagination font-metadata text-[11px] sm:text-xs tracking-[0.3em] uppercase text-white/60 select-none">
+          <span class="mubi-current-page text-white font-bold">01</span>
+          <span class="opacity-40 mx-1">/</span>
+          <span class="mubi-total-pages opacity-60">{String(totalBlocks).padStart(2, '0')}</span>
+        </div>
+
+        <!-- Botones de Navegación Manual -->
+        <div class="flex items-center gap-2">
+          <button 
+            type="button"
+            class="mubi-prev-btn w-9 h-9 rounded-full bg-black/40 hover:bg-black/80 text-white/60 hover:text-white border border-white/10 hover:border-white/30 backdrop-blur-md transition-all duration-200 flex items-center justify-center cursor-pointer shadow-lg active:scale-95 focus:outline-none"
+            aria-label="Bloque anterior"
+          >
+            <svg class="w-4 h-4 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+
+          <button 
+            type="button"
+            class="mubi-next-btn w-9 h-9 rounded-full bg-black/40 hover:bg-black/80 text-white/60 hover:text-white border border-white/10 hover:border-white/30 backdrop-blur-md transition-all duration-200 flex items-center justify-center cursor-pointer shadow-lg active:scale-95 focus:outline-none"
+            aria-label="Bloque siguiente"
+          >
+            <svg class="w-4 h-4 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Escenario Principal (Contenedor de altura fija adaptativa para relación 3:4) -->
+    <div class="mubi-stage" style={`--mubi-height: ${height};`}>
+      {blocks.map((block, blockIdx) => (
+        <div 
+          class={`mubi-block ${blockIdx === 0 ? 'is-active' : ''}`}
+          data-block-index={blockIdx}
+          aria-hidden={blockIdx === 0 ? "false" : "true"}
+        >
+          {block.map((item, itemIdx) => (
+            <article class="mubi-card group/card">
+              <a 
+                href={item.link} 
+                class="mubi-card-link absolute inset-0 w-full h-full block" 
+                aria-label={`Ver colección: ${item.title}`}
+              >
+                <!-- Contenedor Imagen Full-Bleed con zoom sutil en hover -->
+                <div class="mubi-card-media absolute inset-0 w-full h-full overflow-hidden bg-[#0a0c0f]">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    class="mubi-card-img absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover/card:scale-105 pointer-events-none"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+
+                <!-- Scrim degradado inferior nativo del proyecto -->
+                <div class="mubi-card-scrim absolute bottom-0 inset-x-0 w-full h-[60%] sm:h-[52%] bg-linear-to-t from-black/95 via-black/70 to-transparent pointer-events-none z-10"></div>
+
+                <!-- Bloque tipográfico inferior con metadatos y título nativo -->
+                <div class="mubi-card-content absolute bottom-0 inset-x-0 p-5 sm:p-6 md:p-7 flex flex-col justify-end gap-1.5 z-20 pointer-events-auto select-text">
+                  {item.collectionLabel && (
+                    <span class="font-metadata font-bold block line-clamp-1 text-[11px] sm:text-xs tracking-[0.3em] uppercase text-rust-orange/90">
+                      {item.collectionLabel}
+                    </span>
+                  )}
+
+                  <h3 class:list={[
+                    "mubi-card-title line-clamp-2 leading-tight transition-all duration-300 tracking-wide sm:tracking-wider gradient-general-h2",
+                    item.isGloock 
+                      ? "font-gloock font-bold text-[20px] sm:text-[22px] md:text-[24px]" 
+                      : "font-alegreya font-extrabold text-[20px] sm:text-[22px] md:text-[26px]"
+                  ]}>
+                    {item.title}
+                  </h3>
+
+                  {item.subtitle && (
+                    <p class="font-proza font-light text-[13px] sm:text-[14px] text-white/70 line-clamp-2 leading-snug mt-1">
+                      {item.subtitle}
+                    </p>
+                  )}
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  /* ═══════════════════════════════════════════════════════════════════
+     CSS ESTRUCTURAL: Flexbox, Dimensiones y Contención Adaptativa
+     Sin agregar colores ni fuentes artificiales (herencia 100% nativa)
+     ═══════════════════════════════════════════════════════════════════ */
+  .mubi-carousel-root {
+    display: block;
+    position: relative;
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+
+  /*
+   * Contenedor de altura fija adaptativa:
+   * Se recomienda el rango de 65vh a 75vh (por defecto 68vh, clamp entre 460px y 700px).
+   * En formato vertical 3:4 o 4:5, 3 tarjetas en fila llenan el ancho con elegancia cinematográfica.
+   */
+  .mubi-stage {
+    position: relative;
+    width: 100%;
+    height: var(--mubi-height, 68vh);
+    min-height: 460px;
+    max-height: 700px;
+    overflow: hidden;
+  }
+
+  /* Cada bloque rígido ocupa la totalidad del stage */
+  .mubi-block {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    gap: 1.25rem;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  .mubi-block.is-active {
+    pointer-events: auto;
+    visibility: visible;
+  }
+
+  /* Las tarjetas rígidas en flexbox 3 columnas */
+  .mubi-card {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    opacity: 1;              /* Arranque nativo: siempre visible */
+    transform: translateY(0);
+    will-change: transform, opacity;
+  }
+
+  /* Adaptación responsive para pantallas más estrechas */
+  @media (max-width: 1024px) {
+    .mubi-stage {
+      height: clamp(420px, 62vh, 640px);
+    }
+    .mubi-block {
+      gap: 1rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .mubi-stage {
+      height: clamp(380px, 58vh, 520px);
+    }
+    /* En móvil angosto mostramos la tarjeta principal del bloque */
+    .mubi-card:not(:first-child) {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+
+  function initMubiCarousels() {
+    const carousels = document.querySelectorAll<HTMLElement>('.mubi-carousel-root');
+
+    carousels.forEach((carousel) => {
+      // Evitar reinicialización si ya está configurado
+      if (carousel.dataset.initialized === 'true') return;
+      carousel.dataset.initialized = 'true';
+
+      const autoplaySeconds = parseFloat(carousel.dataset.autoplaySeconds || '7');
+      const totalBlocks = parseInt(carousel.dataset.totalBlocks || '1', 10);
+      if (totalBlocks <= 1) return; // Si solo hay 1 bloque, no requiere rotación
+
+      const blocks = Array.from(carousel.querySelectorAll<HTMLElement>('.mubi-block'));
+      const prevBtn = carousel.querySelector<HTMLButtonElement>('.mubi-prev-btn');
+      const nextBtn = carousel.querySelector<HTMLButtonElement>('.mubi-next-btn');
+      const currentPageEl = carousel.querySelector<HTMLElement>('.mubi-current-page');
+
+      let currentBlockIndex = 0;
+      let isTransitioning = false;
+      let isHovered = false;
+
+      // Autoplay con GSAP delayedCall
+      let autoplayCall: gsap.core.Tween | null = null;
+
+      const scheduleNextAutoplay = () => {
+        if (autoplayCall) {
+          autoplayCall.kill();
+        }
+        autoplayCall = gsap.delayedCall(autoplaySeconds, () => {
+          advanceBlock(1);
+        });
+
+        // Si ya está bajo hover, se mantiene pausado inmediatamente
+        if (isHovered && autoplayCall) {
+          autoplayCall.pause();
+        }
+      };
+
+      /**
+       * Transición de bloques rígidos con GSAP:
+       * 1. Staggered Fade Out (izq -> der con stagger 0.1)
+       * 2. Intercambio de visibilidad e índice de paginación
+       * 3. Staggered Fade In (izq -> der con stagger 0.1)
+       * 4. Loop infinito garantizado con reset de opacidad
+       */
+      const advanceBlock = (delta: number) => {
+        if (isTransitioning) return;
+
+        const nextBlockIndex = (currentBlockIndex + delta + totalBlocks) % totalBlocks;
+        if (nextBlockIndex === currentBlockIndex) return;
+
+        isTransitioning = true;
+
+        const currentBlock = blocks[currentBlockIndex];
+        const nextBlock = blocks[nextBlockIndex];
+
+        const currentCards = Array.from(currentBlock.querySelectorAll<HTMLElement>('.mubi-card'));
+        const nextCards = Array.from(nextBlock.querySelectorAll<HTMLElement>('.mubi-card'));
+
+        // PRE-SETUP: Bloque entrante parte de opacity 0, y 16
+        // (se hace ANTES del timeline para que GSAP siempre tenga un punto de partida limpio)
+        nextBlock.classList.add('is-active');
+        nextBlock.setAttribute('aria-hidden', 'false');
+        gsap.set(nextCards, { opacity: 0, y: 16 });
+
+        // Actualizar paginación
+        if (currentPageEl) {
+          currentPageEl.textContent = String(nextBlockIndex + 1).padStart(2, '0');
+        }
+
+        // Timeline maestro de transición
+        const tl = gsap.timeline({
+          onComplete: () => {
+            // Limpiar estado del bloque saliente
+            currentBlock.classList.remove('is-active');
+            currentBlock.setAttribute('aria-hidden', 'true');
+            // CRÍTICO: Resetear opacidad del bloque saliente para que el loop funcione
+            gsap.set(currentCards, { opacity: 1, y: 0, clearProps: 'all' });
+            currentBlockIndex = nextBlockIndex;
+            isTransitioning = false;
+            scheduleNextAutoplay();
+          }
+        });
+
+        // 1. STAGGERED FADE OUT del bloque actual (Izquierda a Derecha)
+        tl.to(currentCards, {
+          opacity: 0,
+          y: -14,
+          duration: 0.42,
+          stagger: 0.1,
+          ease: "power2.in"
+        });
+
+        // 2. STAGGERED FADE IN del bloque entrante (Izquierda a Derecha)
+        tl.to(nextCards, {
+          opacity: 1,
+          y: 0,
+          duration: 0.52,
+          stagger: 0.1,
+          ease: "power2.out"
+        });
+      };
+
+      // ─── AUTOPLAY CON PAUSA ACTIVA (.pause() y .resume()) ───
+      carousel.addEventListener('mouseenter', () => {
+        isHovered = true;
+        if (autoplayCall) {
+          autoplayCall.pause();
+        }
+      });
+
+      carousel.addEventListener('mouseleave', () => {
+        isHovered = false;
+        if (autoplayCall && !isTransitioning) {
+          autoplayCall.resume();
+        }
+      });
+
+      // ─── INTERACCIÓN DE CONTROLES MANUALES ───
+      prevBtn?.addEventListener('click', () => {
+        advanceBlock(-1);
+      });
+
+      nextBtn?.addEventListener('click', () => {
+        advanceBlock(1);
+      });
+
+      // Iniciar el temporizador inicial
+      scheduleNextAutoplay();
+    });
+  }
+
+  // Ejecución en carga inicial y tras navegación Astro View Transitions
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMubiCarousels);
+  } else {
+    initMubiCarousels();
+  }
+
+  document.addEventListener('astro:page-load', initMubiCarousels);
+</script>

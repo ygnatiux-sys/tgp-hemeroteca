@@ -7,7 +7,6 @@ import { parseLLMText } from '../../lib/parseLLMText';
 import { isValidImageSrc } from '../../lib/content-filter';
 import PostCinematicStyle from '../../components/PostCinematicStyle.astro';
 import BackSlideButton from '../../components/BackSlideButton.astro';
-import { QuickReturnButton } from '../../components/QuickReturnButton';
 
 export const prerender = true;
 
@@ -107,7 +106,6 @@ const parsedHtml = parseLLMText(fullEssayText, { isHeroCinematicStyle: true });
 
 <SelectedLayout {...layoutProps}>
   <BackSlideButton fallbackUrl="/ensayos-cinematicos" />
-  <QuickReturnButton client:load forceVisible={true} fallbackUrl="/ensayos-cinematicos" />
   {Content ? (
     <div class="flex flex-col gap-12 w-full">
       <Content />

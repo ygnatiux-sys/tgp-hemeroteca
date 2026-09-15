@@ -17,22 +17,20 @@ const { fallbackUrl = "/" } = Astro.props;
 
 <script define:vars={{ fallbackUrl }}>
   const initBackSlide = () => {
-    const btn = document.getElementById('back-slide-btn');
-    if (!btn) return;
+    const btns = document.querySelectorAll('.back-slide-btn');
+    if (btns.length === 0) return;
 
-    // Ya no dependemos del mousemove para visibilidad básica,
-    // pero podemos dejarlo visible siempre.
-    btn.classList.add('is-visible');
-
-    // Navegación de salida inteligente
-    btn.onclick = () => {
-      const hasHistory = window.history.length > 1 && document.referrer.includes(window.location.host);
-      if (hasHistory) {
-        window.history.back();
-      } else {
-        window.location.href = fallbackUrl;
-      }
-    };
+    btns.forEach(btn => {
+      btn.onclick = () => {
+        // Validación de historial propio (verificamos que el referrer sea del mismo host)
+        const hasHistory = window.history.length > 1 && document.referrer.includes(window.location.host);
+        if (hasHistory) {
+          window.history.back();
+        } else {
+          window.location.href = fallbackUrl;
+        }
+      };
+    });
   };
 
   document.addEventListener('astro:page-load', initBackSlide);
@@ -50,7 +48,6 @@ const { fallbackUrl = "/" } = Astro.props;
     top: 50%;
     transform: translateY(-50%);
     z-index: 100;
-    /* Estilos copiados exactamente del slider CinematicPostEngine */
     width: 40px;
     height: 40px;
     display: flex;
@@ -62,8 +59,8 @@ const { fallbackUrl = "/" } = Astro.props;
     backdrop-filter: blur(4px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     cursor: pointer;
-    opacity: 0;
-    pointer-events: none;
+    opacity: 0.5; /* Visible por defecto, disimulado */
+    pointer-events: auto;
     transition: all 0.3s ease;
   }
 
@@ -75,11 +72,6 @@ const { fallbackUrl = "/" } = Astro.props;
     }
   }
 
-  .back-slide-btn.is-visible {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
   .back-icon {
     transition: transform 0.25s ease;
   }
@@ -88,6 +80,7 @@ const { fallbackUrl = "/" } = Astro.props;
     background-color: rgba(0, 0, 0, 0.5);
     color: rgba(255, 255, 255, 1);
     border-color: rgba(255, 255, 255, 0.3);
+    opacity: 1;
   }
 
   .back-slide-btn:hover .back-icon {

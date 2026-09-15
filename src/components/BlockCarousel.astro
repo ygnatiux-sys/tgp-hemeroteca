@@ -1,0 +1,392 @@
+---
+/**
+ * BlockCarousel.astro
+ * Carrusel por bloques rígidos de 3 tarjetas — MUBI style.
+ * Mecánica: Stagger Fade Out → Stagger Fade In con GSAP.
+ * Probado con datos hardcoded internamente.
+ *
+ * Props:
+ *   cards — array de { title, label, image, href }
+ */
+
+interface Card {
+  title: string;
+  label?: string;
+  image: string;
+  href: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  cards: Card[];
+  cardsPerPage?: number;    // Default: 3
+  autoplay?: number;        // Segundos. 0 = sin autoplay. Default: 7
+  height?: string;          // CSS height del stage. Default: "65vh"
+}
+
+const {
+  eyebrow  = "Colecciones",
+  heading  = "Colecciones",
+  cards    = [],
+  cardsPerPage = 3,
+  autoplay = 7,
+  height   = "65vh",
+} = Astro.props;
+
+// Partir el array en páginas de N cards
+const pages: Card[][] = [];
+for (let i = 0; i < cards.length; i += cardsPerPage) {
+  pages.push(cards.slice(i, i + cardsPerPage));
+}
+const totalPages = pages.length;
+const uid = "bc-" + Math.random().toString(36).slice(2, 8);
+---
+
+{cards.length > 0 && (
+<section
+  id={uid}
+  class="bc-root"
+  data-autoplay={autoplay}
+  data-total={totalPages}
+>
+
+  <!-- ── HEADER ── -->
+  <div class="bc-header">
+    <div>
+      {eyebrow && <span class="bc-eyebrow">{eyebrow}</span>}
+      <h2 class="bc-heading">{heading}</h2>
+    </div>
+    {totalPages > 1 && (
+      <div class="bc-controls">
+        <div class="bc-pagination">
+          <span class="bc-cur">01</span>
+          <span class="bc-sep">/</span>
+          <span class="bc-tot">{String(totalPages).padStart(2,"0")}</span>
+        </div>
+        <button class="bc-btn bc-prev" type="button" aria-label="Anterior">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="bc-btn bc-next" type="button" aria-label="Siguiente">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    )}
+  </div>
+
+  <!-- ── STAGE ── -->
+  <div class="bc-stage" style={`--bc-h:${height}`}>
+    {pages.map((page, pi) => (
+      <div class={`bc-page ${pi === 0 ? "bc-active" : ""}`} data-page={pi} aria-hidden={pi !== 0 ? "true" : "false"}>
+        {page.map((card) => (
+          <a href={card.href} class="bc-card">
+            <img src={card.image} alt={card.title} loading="lazy" decoding="async" />
+            <div class="bc-scrim"></div>
+            <div class="bc-info">
+              {card.label && <span class="bc-label">{card.label}</span>}
+              <p class="bc-title">{card.title}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    ))}
+  </div>
+
+</section>
+)}
+
+<style>
+/* ── ROOT ── */
+.bc-root {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ── HEADER ── */
+.bc-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+}
+.bc-eyebrow {
+  display: block;
+  font-size: 0.625rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+  /* color hereda del proyecto */
+  color: var(--color-rust-orange, #e07a5f);
+  font-family: var(--font-metadata, sans-serif);
+}
+.bc-heading {
+  font-size: clamp(1.5rem, 3vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  background-image: linear-gradient(180deg, #CBD5E1 0%, #334155 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0;
+  font-family: var(--font-cinzel, serif);
+}
+.bc-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-shrink: 0;
+}
+.bc-pagination {
+  font-family: var(--font-metadata, sans-serif);
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  user-select: none;
+}
+.bc-cur  { color: #fff; font-weight: 700; }
+.bc-sep  { opacity: 0.35; }
+.bc-btn {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.45);
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  backdrop-filter: blur(6px);
+}
+.bc-btn:hover {
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  border-color: rgba(255,255,255,0.35);
+}
+.bc-btn:active { transform: scale(0.93); }
+
+/* ── STAGE — contenedor de altura fija ── */
+.bc-stage {
+  position: relative;
+  width: 100%;
+  height: var(--bc-h, 65vh);
+  min-height: 400px;
+  max-height: 720px;
+}
+
+/* ── PÁGINAS — apiladas sobre sí, una visible a la vez ── */
+.bc-page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  gap: 0.875rem;
+  /* oculto por defecto */
+  visibility: hidden;
+  pointer-events: none;
+}
+.bc-page.bc-active {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* ── TARJETA ── */
+.bc-card {
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+  display: block;
+  border-radius: 0;
+  text-decoration: none;
+  /* estado inicial siempre visible — GSAP lo anima */
+  opacity: 1;
+}
+.bc-card img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  transition: transform 0.6s ease-out;
+}
+.bc-card:hover img { transform: scale(1.04); }
+
+/* ── SCRIM ── */
+.bc-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top,
+    rgba(0,0,0,0.92) 0%,
+    rgba(0,0,0,0.55) 30%,
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+/* ── INFO ── */
+.bc-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.5rem 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  z-index: 2;
+}
+.bc-label {
+  font-family: var(--font-metadata, sans-serif);
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--color-rust-orange, #e07a5f);
+  line-height: 1;
+  display: block;
+}
+.bc-title {
+  font-family: var(--font-alegreya, serif);
+  font-size: clamp(1rem, 1.5vw, 1.5rem);
+  font-weight: 800;
+  line-height: 1.2;
+  color: #fff;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  /* gradient title si el proyecto tiene esta utilidad */
+  background-image: linear-gradient(180deg, #e8e0d8 0%, #a89e92 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .bc-stage {
+    height: clamp(380px, 60vh, 560px);
+  }
+  /* En móvil solo 1 card */
+  .bc-page { gap: 0; }
+  .bc-card:not(:first-child) { display: none; }
+}
+</style>
+
+<script>
+import gsap from "gsap";
+
+function init() {
+  document.querySelectorAll<HTMLElement>(".bc-root").forEach((root) => {
+    if (root.dataset.ready === "1") return;
+    root.dataset.ready = "1";
+
+    const autoplaySecs = parseFloat(root.dataset.autoplay || "7");
+    const totalPages   = parseInt(root.dataset.total   || "1", 10);
+
+    if (totalPages < 2) return;
+
+    const pages   = Array.from(root.querySelectorAll<HTMLElement>(".bc-page"));
+    const btnPrev = root.querySelector<HTMLButtonElement>(".bc-prev");
+    const btnNext = root.querySelector<HTMLButtonElement>(".bc-next");
+    const curEl   = root.querySelector<HTMLElement>(".bc-cur");
+
+    let cur          = 0;
+    let busy         = false;
+    let hovered      = false;
+    let timer: gsap.core.Tween | null = null;
+
+    /* ── Programar próximo autoplay ── */
+    function schedule() {
+      timer?.kill();
+      if (autoplaySecs <= 0) return;
+      timer = gsap.delayedCall(autoplaySecs, () => go(1));
+      if (hovered) timer.pause();
+    }
+
+    /* ── Transición principal ── */
+    function go(delta: number) {
+      if (busy) return;
+      const next = (cur + delta + totalPages) % totalPages;
+      if (next === cur) return;
+
+      busy = true;
+
+      const pageOut  = pages[cur];
+      const pageIn   = pages[next];
+      const cardsOut = Array.from(pageOut.querySelectorAll<HTMLElement>(".bc-card"));
+      const cardsIn  = Array.from(pageIn.querySelectorAll<HTMLElement>(".bc-card"));
+
+      /* Preparar el bloque entrante: activo pero cards en opacity 0 */
+      pageIn.classList.add("bc-active");
+      pageIn.setAttribute("aria-hidden", "false");
+      gsap.set(cardsIn, { opacity: 0, y: 18 });
+
+      /* Actualizar paginación */
+      if (curEl) curEl.textContent = String(next + 1).padStart(2, "0");
+
+      const tl = gsap.timeline({
+        onComplete() {
+          /* Limpiar bloque saliente y resetear sus cards para el loop */
+          pageOut.classList.remove("bc-active");
+          pageOut.setAttribute("aria-hidden", "true");
+          gsap.set(cardsOut, { clearProps: "all" });
+
+          cur  = next;
+          busy = false;
+          schedule();
+        }
+      });
+
+      /* 1 — STAGGER FADE OUT del bloque saliente */
+      tl.to(cardsOut, {
+        opacity: 0,
+        y: -16,
+        duration: 0.38,
+        stagger: 0.09,
+        ease: "power2.in",
+      });
+
+      /* 2 — STAGGER FADE IN del bloque entrante */
+      tl.to(cardsIn, {
+        opacity: 1,
+        y: 0,
+        duration: 0.48,
+        stagger: 0.09,
+        ease: "power2.out",
+      });
+    }
+
+    /* ── Hover: pausa y reanuda el timer ── */
+    root.addEventListener("mouseenter", () => {
+      hovered = true;
+      timer?.pause();
+    });
+    root.addEventListener("mouseleave", () => {
+      hovered = false;
+      if (!busy) timer?.resume();
+    });
+
+    /* ── Botones manuales ── */
+    btnPrev?.addEventListener("click", () => go(-1));
+    btnNext?.addEventListener("click", () => go( 1));
+
+    /* Arrancar */
+    schedule();
+  });
+}
+
+document.addEventListener("astro:page-load", init);
+if (document.readyState !== "loading") init();
+else document.addEventListener("DOMContentLoaded", init);
+</script>

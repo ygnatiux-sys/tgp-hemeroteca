@@ -12,6 +12,7 @@ import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../components/CinematicPostEngine.astro';
 import SliderCinematico from '../components/SliderCinematico.astro';
 import RowNetflixClasico from '../components/RowNetflixClasico.astro';
+import BlockCarousel from '../components/BlockCarousel.astro';
 import SpotlightHero from '../components/SpotlightHero.astro';
 import CinematicGrid from '../components/CinematicGrid.astro';
 import {
@@ -218,7 +219,7 @@ const archiveRows = remaining
   .slice(0, 10);
 
 // ─── COLECCIONES DESTACADAS (§5.4) ────────────────────────────────────────────
-const categoryGroups = groupByCategory(publishable, 2);
+const categoryGroups = groupByCategory(publishable, 1);
 const collections = Array.from(categoryGroups.entries())
   .map(([key, essays]) => ({
     key,
@@ -226,7 +227,7 @@ const collections = Array.from(categoryGroups.entries())
     count: essays.length,
     coverEssay: essays[0],
   }))
-  .slice(0, 4);
+  .sort((a, b) => b.count - a.count);
 
 // ─── CARGA DE IMÁGENES EDITORIAL ──────────────────────────────────────────────
 const leadImage  = resolveEssayImage(leadStory?.entry, leadStory?.slug);
@@ -396,36 +397,26 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
 
 
       {/* ═══════════════════════════════════════════════════════════════════
-          BLOQUE 4: COLECCIONES DESTACADAS (§5.4)
-          Solo categorías con ≥ 2 artículos publicables. Sin descripciones inventadas.
+          BLOQUE 4: COLECCIONES — BlockCarousel por bloques de 3 (MUBI style)
       ═══════════════════════════════════════════════════════════════════ */}
       {resolvedCollections.length > 0 && (
-        <section class="flex flex-col gap-8">
-          <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4">
-            <div>
-              <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Organización Temática</span>
-              <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-cinzel font-extrabold tracking-tight drop-shadow-md" style="background-image: linear-gradient(180deg, #CBD5E1 0%, #334155 100%); -webkit-background-clip: text; background-clip: text; color: transparent;">
-                Colecciones
-              </h2>
-            </div>
-          </div>
-
-          {/* Mobile: scroll horizontal snapping (Reemplazado por RowNetflixClasico Infinito) */}
-          <div class="w-full -mx-4 px-4 md:mx-0 md:px-0">
-            <RowNetflixClasico
-              title=""
-              eyebrow=""
-              items={resolvedCollections.map(c => ({
-                title: c.label,
-                collectionLabel: `${c.count} ARTÍCULOS`,
-                image: c.img,
-                link: `/archivo/?categoria=${encodeURIComponent(c.key)}`
-              }))}
-              max={15}
-            />
-          </div>
-        </section>
+        <BlockCarousel
+          eyebrow="Organización Temática"
+          heading="Colecciones"
+          cards={resolvedCollections
+            .filter(c => c.img && typeof c.img === 'string' && c.img.length > 4)
+            .map(c => ({
+              title: c.label,
+              label: `${c.count} ARTÍCULOS`,
+              image: c.img as string,
+              href: `/colecciones/${encodeURIComponent(c.key)}`,
+            }))}
+          cardsPerPage={3}
+          autoplay={7}
+          height="65vh"
+        />
       )}
+
 
       {/* ═══════════════════════════════════════════════════════════════════
           BLOQUE 5: ZONA ARCHIVOS (HEROS FULL BLEED APILADOS COMO ARCHIVO GENERAL)
