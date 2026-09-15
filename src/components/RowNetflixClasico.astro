@@ -112,7 +112,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
 >
   <!-- Encabezado de la fila -->
   {title && (
-    <div class="mb-4 px-2 md:px-4 z-20 relative flex items-end justify-between gap-4">
+    <div class="mb-4 px-2 md:px-4 z-30 relative flex items-end justify-between gap-4">
       <div>
         {eyebrow && (
           <span class="text-[8.5px] md:text-[9px] tracking-[0.4em] uppercase font-metadata text-rust-orange/90 font-bold block mb-1">
@@ -245,7 +245,6 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     max-height: 660px;
     overflow-x: clip;
     overflow-y: visible;
-    margin: 1.5rem 0;
   }
   @media (min-width: 768px) {
     .gallery-tray-wrapper {
@@ -262,7 +261,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     position: absolute;
     top: 0; bottom: 0;
     width: 12%;
-    z-index: 30;
+    z-index: 20;
   }
   .gallery-fade-left  { left:  0; background: linear-gradient(to right, var(--bg-main, #0f1110) 5%, transparent); }
   .gallery-fade-right { right: 0; background: linear-gradient(to left,  var(--bg-main, #0f1110) 5%, transparent); }
@@ -289,8 +288,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     border: 1px solid rgba(255,255,255,0.08);
     background: #0a0c0f;
 
-    /* Estado inicial: GSAP gobierna transform, left, scale, opacity, filter */
-    transform: translate(-50%, -50%);
+    /* Estado inicial: GSAP gobierna íntegramente transform (xPercent, yPercent, scale), left, opacity, filter */
     opacity: 0;
     will-change: transform, left, opacity, filter;
     transition: border-color 300ms ease;
@@ -497,6 +495,8 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
               zIndex: targetZIndex,
               xPercent: -50,
               yPercent: -50,
+              x: 0,
+              y: 0,
             });
             card.style.pointerEvents = targetPointerEvents;
           } else {
@@ -505,6 +505,10 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
               scale: targetScale,
               opacity: targetOpacity,
               filter: targetFilter,
+              xPercent: -50,
+              yPercent: -50,
+              x: 0,
+              y: 0,
               duration: 0.72,
               ease: "power3.out",
               overwrite: "auto",

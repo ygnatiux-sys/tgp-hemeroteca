@@ -14,7 +14,8 @@ const { transparentUntilScroll = false } = Astro.props;
 
 <header
   id="site-header"
-  class="fixed top-0 w-full z-50 transition-all duration-500 bg-transparent border-b border-transparent"
+  class="fixed top-0 w-full z-50 bg-transparent border-b border-transparent"
+  data-transparent-until-scroll={transparentUntilScroll ? "true" : "false"}
 >
   {/* Barra principal: altura mínima 56px mobile, 60px desktop → WCV */}
   <div class="w-full px-4 md:px-6 lg:px-8 xl:px-12 flex items-center justify-between relative" style="min-height:56px; height:56px;">
@@ -246,70 +247,89 @@ const { transparentUntilScroll = false } = Astro.props;
       }
     });
 
-    // ── Limpiar listeners previos ──
+    // ── Limpiar listeners previos y elementos obsoletos ──
     if (window.tgpHeaderState) {
-      window.removeEventListener('scroll', window.tgpHeaderState.scrollHandler);
-      document.removeEventListener('click', window.tgpHeaderState.clickHandler);
-      const oldTrigger = document.getElementById('header-hover-trigger');
-      if (oldTrigger && window.tgpHeaderState.hoverEnterHandler) {
-        oldTrigger.removeEventListener('mouseenter', window.tgpHeaderState.hoverEnterHandler);
+      if (window.tgpHeaderState.scrollHandler) {
+        window.removeEventListener('scroll', window.tgpHeaderState.scrollHandler);
       }
-      if (window.tgpHeaderState.hoverLeaveHandler) {
-        header.removeEventListener('mouseleave', window.tgpHeaderState.hoverLeaveHandler);
+      if (window.tgpHeaderState.mouseMoveHandler) {
+        window.removeEventListener('mousemove', window.tgpHeaderState.mouseMoveHandler);
+      }
+      if (window.tgpHeaderState.clickHandler) {
+        document.removeEventListener('click', window.tgpHeaderState.clickHandler);
       }
     } else {
       window.tgpHeaderState = {};
     }
 
-    // ── Hover trigger para revelar header en scroll ──
-    let trigger = document.getElementById('header-hover-trigger');
-    if (!trigger) {
-      trigger = document.createElement('div');
-      trigger.id = 'header-hover-trigger';
-      trigger.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:15px;z-index:9999;pointer-events:auto;';
-      document.body.appendChild(trigger);
-    }
+    const oldTrigger = document.getElementById('header-hover-trigger');
+    if (oldTrigger) oldTrigger.remove();
 
-    const hoverEnterHandler = () => {
-      if (header.classList.contains('is-scrolled')) {
-        header.classList.add('is-hovered-revealed');
-      }
-    };
-    const hoverLeaveHandler = () => {
-      header.classList.remove('is-hovered-revealed');
-    };
-
-    trigger.addEventListener('mouseenter', hoverEnterHandler);
-    header.addEventListener('mouseleave', hoverLeaveHandler);
-    window.tgpHeaderState.hoverEnterHandler = hoverEnterHandler;
-    window.tgpHeaderState.hoverLeaveHandler = hoverLeaveHandler;
-
+    // ── Modern Smart Sticky Navbar (Headroom Pattern) ──
+    const transparentUntilScroll = header.getAttribute('data-transparent-until-scroll') !== 'false';
     let lastScrollY = window.scrollY;
-    const scrollHandler = () => {
+    let isTicking = false;
+    const scrollThreshold = 8; // Mínimo delta para evitar jitter
+    const topThreshold = 40;   // Umbral superior para transparencia de hero
+
+    const updateHeaderScroll = () => {
       const currentScrollY = window.scrollY;
-      if (Math.abs(currentScrollY - lastScrollY) > 5) {
-        header.classList.remove('is-clicked-revealed', 'is-hovered-revealed');
+
+      // Si el drawer móvil está abierto, el header debe permanecer accesible
+      const isDrawerOpen = mobileBtn && mobileBtn.getAttribute('aria-expanded') === 'true';
+      if (isDrawerOpen) {
+        header.classList.remove('is-hidden');
+        lastScrollY = currentScrollY;
+        isTicking = false;
+        return;
       }
-      lastScrollY = currentScrollY;
-      if (currentScrollY > 20) {
-        header.classList.add('is-scrolled');
+
+      if (currentScrollY <= topThreshold) {
+        // Al tope de la página
+        if (transparentUntilScroll) {
+          header.classList.remove('is-scrolled');
+        } else {
+          header.classList.add('is-scrolled');
+        }
+        header.classList.remove('is-hidden');
       } else {
-        header.classList.remove('is-scrolled', 'is-clicked-revealed', 'is-hovered-revealed');
+        // Con scroll: activar estilo sticky glassmorphism
+        header.classList.add('is-scrolled');
+
+        const delta = currentScrollY - lastScrollY;
+        if (Math.abs(delta) >= scrollThreshold) {
+          if (delta > 0 && currentScrollY > 120) {
+            // Scroll descendente: ocultar suavemente para lectura inmersiva
+            header.classList.add('is-hidden');
+          } else if (delta < 0) {
+            // Scroll ascendente: revelar inmediatamente con glassmorphism
+            header.classList.remove('is-hidden');
+          }
+        }
+      }
+
+      lastScrollY = Math.max(0, currentScrollY);
+      isTicking = false;
+    };
+
+    const scrollHandler = () => {
+      if (!isTicking) {
+        window.requestAnimationFrame(updateHeaderScroll);
+        isTicking = true;
       }
     };
 
-    const clickHandler = (e) => {
-      if (window.scrollY > 20) {
-        if (!header.contains(e.target)) {
-          header.classList.toggle('is-clicked-revealed');
-        }
+    // Si el usuario mueve el cursor al borde superior absoluto de la ventana (<= 10px), revelar
+    const mouseMoveHandler = (e) => {
+      if (e.clientY <= 10 && header.classList.contains('is-hidden')) {
+        header.classList.remove('is-hidden');
       }
     };
 
     window.addEventListener('scroll', scrollHandler, { passive: true });
-    document.addEventListener('click', clickHandler);
+    window.addEventListener('mousemove', mouseMoveHandler, { passive: true });
     window.tgpHeaderState.scrollHandler = scrollHandler;
-    window.tgpHeaderState.clickHandler = clickHandler;
+    window.tgpHeaderState.mouseMoveHandler = mouseMoveHandler;
 
     // ── Drawer Móvil ──
     const mobileBtn = document.getElementById('nav-mobile-btn');
@@ -377,35 +397,38 @@ const { transparentUntilScroll = false } = Astro.props;
 </script>
 
 <style>
-  /* ── Estado base: totalmente transparente ── */
+  /* ── Estado base del navbar: transición fluida ── */
   #site-header {
-    background-color: transparent !important;
-    border-bottom-color: transparent !important;
-    box-shadow: none !important;
+    background-color: transparent;
+    border-bottom: 1px solid transparent;
+    box-shadow: none;
     opacity: 1;
     transform: translateY(0);
-    transition: opacity 0.35s ease, transform 0.35s ease;
+    transition:
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      background-color 0.3s ease,
+      border-color 0.3s ease,
+      backdrop-filter 0.3s ease,
+      box-shadow 0.3s ease;
   }
 
-  /* ── Con scroll: se oculta ── */
+  /* ── Con scroll: sticky glassmorphism al navegar o scroll up ── */
   #site-header.is-scrolled {
-    opacity: 0 !important;
-    pointer-events: none;
-    transform: translateY(-10px);
+    background-color: rgba(14, 17, 16, 0.88);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.5);
   }
 
-  /* ── Revelado por hover, foco o click ── */
-  #site-header.is-scrolled:focus-within,
-  #site-header.is-hovered-revealed,
-  #site-header.is-clicked-revealed {
-    opacity: 1 !important;
-    pointer-events: auto !important;
+  /* ── Scroll descendente: ocultar suavemente para lectura inmersiva ── */
+  #site-header.is-hidden {
+    transform: translateY(-100%) !important;
+  }
+
+  /* ── Accesibilidad: siempre visible si hay foco dentro (Tab) ── */
+  #site-header:focus-within {
     transform: translateY(0) !important;
-    /* Fondo glassmorphism cuando visible sobre contenido */
-    background-color: rgba(14, 17, 16, 0.88) !important;
-    border-bottom-color: rgba(255,255,255,0.07) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
   }
 
   /* ── Hamburger → X animado ── */
@@ -437,11 +460,10 @@ const { transparentUntilScroll = false } = Astro.props;
   [data-theme='light'] #site-header .header-action-btn {
     color: #F5F5F7 !important;
   }
-  [data-theme='light'] #site-header.is-scrolled:focus-within,
-  [data-theme='light'] #site-header.is-hovered-revealed,
-  [data-theme='light'] #site-header.is-clicked-revealed {
+  [data-theme='light'] #site-header.is-scrolled {
     background-color: rgba(245, 244, 240, 0.94) !important;
-    border-bottom-color: rgba(0,0,0,0.08) !important;
+    border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08) !important;
   }
   [data-theme='light'] #site-header .header-action-btn svg {
     stroke: #F5F5F7 !important;
