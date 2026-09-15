@@ -76,7 +76,7 @@ function pushToHistory(sessionId: string, role: 'user' | 'model', text: string) 
 async function callGemini(
   sessionId: string,
   userMessage: string,
-  model: 'gemini-3.8-flash' | 'gemini-3.8-pro' = 'gemini-3.8-flash'
+  model: 'gemini-1.5-flash' | 'gemini-1.5-pro' = 'gemini-1.5-flash'
 ): Promise<string> {
   const history = getHistory(sessionId);
 
@@ -160,14 +160,14 @@ app.post('/webhook/telegram', async (c) => {
   } else if (/^\/(pro|deep)\s+/i.test(text)) {
     // /pro o /deep → Gemini Pro
     const query = text.replace(/^\/(pro|deep)\s+/i, '');
-    response = await callGemini(sessionId, query, 'gemini-3.8-pro');
+    response = await callGemini(sessionId, query, 'gemini-1.5-pro');
   } else if (/^\[deep\]/i.test(text)) {
     // [Deep] → Gemini Pro
     const query = text.replace(/^\[deep\]\s*/i, '');
-    response = await callGemini(sessionId, query, 'gemini-3.8-pro');
+    response = await callGemini(sessionId, query, 'gemini-1.5-pro');
   } else {
     // Texto normal → Flash
-    response = await callGemini(sessionId, text, 'gemini-3.8-flash');
+    response = await callGemini(sessionId, text, 'gemini-1.5-flash');
   }
 
   await sendTelegram(chatId, response);
@@ -214,7 +214,7 @@ app.post('/api/mind', async (c) => {
 
   if (!cleanMessage) return c.json({ error: 'Mensaje vacío.' }, 400);
 
-  const model = usePro ? 'gemini-3.8-pro' : 'gemini-3.8-flash';
+  const model = usePro ? 'gemini-1.5-pro' : 'gemini-1.5-flash';
   const responseText = await callGemini(sessionId, cleanMessage, model);
 
   return c.json({ response: responseText, model, sessionId });
@@ -250,14 +250,14 @@ app.post('/api/vision', async (c) => {
 
   try {
     const response = await genai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-1.5-flash',
       contents: [
         { text: prompt },
         { inlineData: { data: base64Data, mimeType } }
       ]
     });
     
-    return c.json({ response: response.text, model: 'gemini-3.8-flash' });
+    return c.json({ response: response.text, model: 'gemini-1.5-flash' });
   } catch (error: any) {
     console.error('[Vision API] Error:', error);
     return c.json({ error: 'Error procesando la imagen.' }, 500);

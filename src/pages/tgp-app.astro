@@ -1,6 +1,7 @@
 ---
 export const prerender = true;
 import Layout from '../layouts/Layout.astro';
+import { TgpVisionBoardWithTrigger } from '../components/TgpVisionBoard';
 ---
 
 <Layout title="TGP Scriptorium | Panel de Control">
@@ -49,6 +50,8 @@ import Layout from '../layouts/Layout.astro';
           <h2 class="text-lg font-serif text-[#f0f2f1] group-hover:text-white">TGP Alternative</h2>
           <p class="text-sm text-[#8a9a98] mt-1">Gestionar ensayos, narrativas liminales y arquitectura visual.</p>
         </a>
+
+        <TgpVisionBoardWithTrigger client:load />
       </div>
 
       <footer class="mt-8 text-center text-xs text-[#62706e] font-mono">
