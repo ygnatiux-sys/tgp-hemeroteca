@@ -76,7 +76,7 @@ function pushToHistory(sessionId: string, role: 'user' | 'model', text: string) 
 async function callGemini(
   sessionId: string,
   userMessage: string,
-  model: 'gemini-1.5-flash-latest' | 'gemini-1.5-pro-latest' = 'gemini-1.5-flash-latest'
+  model: 'gemini-3.8-flash' | 'gemini-3.8-pro' = 'gemini-3.8-flash'
 ): Promise<string> {
   const history = getHistory(sessionId);
 
@@ -160,14 +160,14 @@ app.post('/webhook/telegram', async (c) => {
   } else if (/^\/(pro|deep)\s+/i.test(text)) {
     // /pro o /deep → Gemini Pro
     const query = text.replace(/^\/(pro|deep)\s+/i, '');
-    response = await callGemini(sessionId, query, 'gemini-1.5-pro-latest');
+    response = await callGemini(sessionId, query, 'gemini-3.8-pro');
   } else if (/^\[deep\]/i.test(text)) {
     // [Deep] → Gemini Pro
     const query = text.replace(/^\[deep\]\s*/i, '');
-    response = await callGemini(sessionId, query, 'gemini-1.5-pro-latest');
+    response = await callGemini(sessionId, query, 'gemini-3.8-pro');
   } else {
     // Texto normal → Flash
-    response = await callGemini(sessionId, text, 'gemini-1.5-flash-latest');
+    response = await callGemini(sessionId, text, 'gemini-3.8-flash');
   }
 
   await sendTelegram(chatId, response);
@@ -214,10 +214,54 @@ app.post('/api/mind', async (c) => {
 
   if (!cleanMessage) return c.json({ error: 'Mensaje vacío.' }, 400);
 
-  const model = usePro ? 'gemini-1.5-pro-latest' : 'gemini-1.5-flash-latest';
+  const model = usePro ? 'gemini-3.8-pro' : 'gemini-3.8-flash';
   const responseText = await callGemini(sessionId, cleanMessage, model);
 
   return c.json({ response: responseText, model, sessionId });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RUTA 3: /api/vision — Ingesta Multimodal Scriptorium
+// ─────────────────────────────────────────────────────────────────────────────
+app.post('/api/vision', async (c) => {
+  // Guard: x-api-key
+  const apiKey = c.req.header('x-api-key');
+  if (!TGP_MIND_API_KEY || apiKey !== TGP_MIND_API_KEY) {
+    return c.json({ error: 'No autorizado.' }, 401);
+  }
+
+  // CORS restrictivo
+  const origin = c.req.header('Origin') ?? '';
+  const isLocal = origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1');
+  if (origin && !isLocal) {
+    return c.json({ error: 'Origen no permitido.' }, 403);
+  }
+
+  let body: any;
+  try { body = await c.req.json(); } catch { return c.json({ error: 'JSON inválido.' }, 400); }
+
+  const prompt: string = body?.prompt ?? '';
+  const base64Data: string = body?.base64 ?? '';
+  const mimeType: string = body?.mimeType ?? 'image/jpeg';
+
+  if (!prompt || !base64Data) {
+    return c.json({ error: 'Faltan campos requeridos (prompt o base64).' }, 400);
+  }
+
+  try {
+    const response = await genai.models.generateContent({
+      model: 'gemini-3.8-flash',
+      contents: [
+        { text: prompt },
+        { inlineData: { data: base64Data, mimeType } }
+      ]
+    });
+    
+    return c.json({ response: response.text, model: 'gemini-3.8-flash' });
+  } catch (error: any) {
+    console.error('[Vision API] Error:', error);
+    return c.json({ error: 'Error procesando la imagen.' }, 500);
+  }
 });
 
 // ── Arranque ──────────────────────────────────────────────────────────────────
