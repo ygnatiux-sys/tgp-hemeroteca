@@ -5,6 +5,7 @@ import Image from '../../components/SafeImage.astro';
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import SpotlightMediaTray, { type TrayCollectionItem } from '../../components/SpotlightMediaTray.astro';
+import RowNetflixClasico from '../../components/RowNetflixClasico.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import Marquee from '../../components/Marquee.astro';
 import CoverflowCarousel, { type CoverflowPost } from '../../components/CoverflowCarousel';
@@ -152,10 +153,20 @@ const epigraphMap: Record<string, string> = {
         {/* Scrim / Black Mask suave que difumina la transición del pie de imagen con el componente a ancho total */}
         <div class="absolute -top-24 inset-x-0 bottom-0 bg-linear-to-b from-transparent via-black/85 via-40% to-(--bg-current) pointer-events-none -z-10"></div>
 
-        <SpotlightMediaTray 
-          collections={coleccionesTrayItems}
+        <RowNetflixClasico 
           eyebrow="COLECCIONES DESTACADAS"
-          allLink="/colecciones/"
+          title="COLECCIONES"
+          actionText="VER TODAS →"
+          actionHref="/colecciones/"
+          trayHeight="62vh"
+          items={coleccionesTrayItems.map(c => ({
+            title: c.title,
+            subtitle: c.excerpt,
+            image: c.coverImage,
+            collectionLabel: c.category,
+            link: c.link,
+            slug: c.slug
+          }))}
         />
       </div>
     </div>

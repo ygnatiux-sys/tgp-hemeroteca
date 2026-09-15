@@ -78,53 +78,51 @@ const resolvedCollections = collections.map(c => ({
     {/* Contenedor principal del marquee con máscara de desvanecimiento a los lados */}
     <div class="marquee-container w-full overflow-hidden flex relative group">
       
-      {/* Primer track */}
-      <div class="marquee-track flex gap-4 md:gap-6 px-2 w-max animate-marquee group-hover:pause">
-        {resolvedCollections.map(({ key, label, count, img }) => (
+      {/* Botón Anterior Flotante en Cápsula con tokens heredados */}
+      <button 
+        type="button"
+        class="marquee-nav-btn prev-btn absolute left-1 sm:left-2 md:left-4 top-1/2 -translate-y-1/2 z-40 w-9 md:w-11 h-20 md:h-24 rounded-full bg-black/40 hover:bg-black/85 text-[#E3DDD3]/40 hover:text-[#EFEBE3] border border-[#E3DDD3]/10 hover:border-[#E3DDD3]/30 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl focus:outline-none"
+        aria-label="Colecciones anteriores"
+      >
+        <svg class="w-5 h-5 md:w-6 md:h-6 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+
+      {/* Botón Siguiente Flotante en Cápsula con tokens heredados */}
+      <button 
+        type="button"
+        class="marquee-nav-btn next-btn absolute right-1 sm:right-2 md:right-4 top-1/2 -translate-y-1/2 z-40 w-9 md:w-11 h-20 md:h-24 rounded-full bg-black/40 hover:bg-black/85 text-[#E3DDD3]/40 hover:text-[#EFEBE3] border border-[#E3DDD3]/10 hover:border-[#E3DDD3]/30 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl focus:outline-none"
+        aria-label="Siguientes colecciones"
+      >
+        <svg class="w-4 h-4 md:w-5 md:h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      </button>
+
+      {/* Track Scrolleable nativo */}
+      <div class="marquee-scroller flex gap-4 md:gap-6 px-2 w-full overflow-x-auto scroll-smooth no-scrollbar select-none" style="-ms-overflow-style: none; scrollbar-width: none;">
+        
+        {/* Usamos el triple de elementos para dar ilusión de infinito con JS nativo */}
+        {[...resolvedCollections, ...resolvedCollections, ...resolvedCollections].map(({ key, label, count, img }, idx) => (
           <a
             href={`/colecciones/${key}/`}
-            class="group/card shrink-0 w-[72vw] sm:w-[50vw] md:w-70 lg:w-85 bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-white/25 transition-all duration-500 flex flex-col"
+            class="group/card shrink-0 h-[62vh] aspect-[10/14.5] sm:aspect-[10/12.5] lg:aspect-[10/11.5] bg-[#0a0c0f] border border-white/10 rounded-xl overflow-hidden hover:border-white/25 transition-all duration-500 flex flex-col pointer-events-auto"
+            draggable="false"
           >
             {img ? (
-              <div class="overflow-hidden aspect-video relative">
-                <img src={img} alt={label} loading="lazy" decoding="async" class="transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90 img-nativa" />
-                <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent" />
-                <div class="absolute bottom-0 left-0 p-4 md:p-5 w-full">
-                  <p class="font-metadata text-[9px] uppercase tracking-[0.3em] text-rust-orange mb-1">{count} artículos</p>
-                  <h3 class="font-cinzel font-bold text-base md:text-lg leading-tight text-white group-hover/card:text-rust-orange transition-colors">{label}</h3>
+              <div class="overflow-hidden h-full relative">
+                <img src={img} alt={label} draggable="false" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90 img-nativa" />
+                <div class="absolute inset-0 bg-linear-to-t from-[#0a0c0f]/90 via-[#0a0c0f]/40 to-transparent" />
+                <div class="absolute bottom-0 left-0 p-4 md:p-6 w-full">
+                  <p class="font-metadata text-[10px] md:text-xs uppercase tracking-[0.3em] text-rust-orange mb-2 drop-shadow-md">{count} artículos</p>
+                  <h3 class="font-cinzel font-bold text-lg md:text-xl lg:text-2xl leading-tight text-white group-hover/card:text-rust-orange transition-colors drop-shadow-lg">{label}</h3>
                 </div>
               </div>
             ) : (
-              <div class="p-5 flex flex-col justify-end gap-2 flex-1 min-h-35 md:min-h-47.5">
-                <p class="font-metadata text-[9px] uppercase tracking-[0.3em] text-rust-orange">{count} artículos</p>
-                <h3 class="font-cinzel font-bold text-base md:text-lg leading-tight text-white group-hover/card:text-rust-orange transition-colors">{label}</h3>
-              </div>
-            )}
-          </a>
-        ))}
-      </div>
-      
-      {/* Segundo track para infinite loop exacto */}
-      <div class="marquee-track flex gap-4 md:gap-6 px-2 w-max animate-marquee group-hover:pause" aria-hidden="true">
-        {resolvedCollections.map(({ key, label, count, img }) => (
-          <a
-            href={`/colecciones/${key}/`}
-            class="group/card shrink-0 w-[72vw] sm:w-[50vw] md:w-70 lg:w-85 bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-white/25 transition-all duration-500 flex flex-col"
-            tabindex="-1"
-          >
-            {img ? (
-              <div class="overflow-hidden aspect-video relative">
-                <img src={img} alt={label} loading="lazy" decoding="async" class="transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90 img-nativa" />
-                <div class="absolute inset-0 bg-linear-to-t from-theme-dark/80 to-transparent" />
-                <div class="absolute bottom-0 left-0 p-4 md:p-5 w-full">
-                  <p class="font-metadata text-[9px] uppercase tracking-[0.3em] text-rust-orange mb-1">{count} artículos</p>
-                  <h3 class="font-cinzel font-bold text-base md:text-lg leading-tight text-white group-hover/card:text-rust-orange transition-colors">{label}</h3>
-                </div>
-              </div>
-            ) : (
-              <div class="p-5 flex flex-col justify-end gap-2 flex-1 min-h-35 md:min-h-47.5">
-                <p class="font-metadata text-[9px] uppercase tracking-[0.3em] text-rust-orange">{count} artículos</p>
-                <h3 class="font-cinzel font-bold text-base md:text-lg leading-tight text-white group-hover/card:text-rust-orange transition-colors">{label}</h3>
+              <div class="p-5 flex flex-col justify-end gap-2 h-full">
+                <p class="font-metadata text-[10px] md:text-xs uppercase tracking-[0.3em] text-rust-orange">{count} artículos</p>
+                <h3 class="font-cinzel font-bold text-lg md:text-xl lg:text-2xl leading-tight text-white group-hover/card:text-rust-orange transition-colors">{label}</h3>
               </div>
             )}
           </a>
@@ -146,48 +144,95 @@ const resolvedCollections = collections.map(c => ({
     );
   }
   
-  .marquee-track {
-    /* Compensa el flex gap entre los dos contenedores gemelos */
-    padding-right: 1rem;
-  }
-  @media (min-width: 768px) {
-    .marquee-track {
-      padding-right: 1.5rem; 
-    }
-  }
-
-  .animate-marquee {
-    animation: scroll-marquee 150s linear infinite;
-  }
-
-  .pause {
-    animation-play-state: paused !important;
-  }
-  
-  @keyframes scroll-marquee {
-    0% {
-      transform: translateX(0%);
-    }
-    100% {
-      transform: translateX(-100%);
-    }
-  }
-  
-  /* Fallback de accesibilidad */
-  @media (prefers-reduced-motion: reduce) {
-    .animate-marquee {
-      animation: none !important;
-    }
-    .marquee-container {
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      mask-image: none;
-    }
-    .marquee-track {
-      width: auto;
-    }
-    .marquee-track:nth-child(2) {
-      display: none;
-    }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 </style>
+
+<script>
+  function initNaturalMarquee() {
+    const containers = document.querySelectorAll('.marquee-container');
+    
+    containers.forEach(container => {
+      if (container.hasAttribute('data-init')) return;
+      container.setAttribute('data-init', 'true');
+      
+      const scroller = container.querySelector('.marquee-scroller') as HTMLElement;
+      const prevBtn = container.querySelector('.prev-btn') as HTMLButtonElement;
+      const nextBtn = container.querySelector('.next-btn') as HTMLButtonElement;
+      
+      if (!scroller) return;
+
+      let isDown = false;
+      let startX = 0;
+      let scrollLeft = 0;
+      let animationId = 0;
+      let isPaused = false;
+      let isDragging = false;
+      const scrollSpeed = 0.5; // pixeles por frame
+
+      // Autoplay loop
+      function playMarquee() {
+        if (!isPaused && !isDown) {
+          scroller.scrollLeft += scrollSpeed;
+          
+          // Lógica de loop infinito nativo
+          // Al tener 3 copias, cuando llegamos a los 2/3, reseteamos a 1/3 (centro exacto)
+          const scrollWidth = scroller.scrollWidth;
+          const oneThird = scrollWidth / 3;
+          
+          if (scroller.scrollLeft >= oneThird * 2) {
+            scroller.scrollLeft -= oneThird;
+          } else if (scroller.scrollLeft <= 0) {
+            scroller.scrollLeft += oneThird;
+          }
+        }
+        animationId = requestAnimationFrame(playMarquee);
+      }
+      
+      // Iniciar posicionando en el medio (para poder retroceder de entrada sin topar borde)
+      const initialThird = scroller.scrollWidth / 3;
+      scroller.scrollLeft = initialThird;
+      playMarquee();
+
+      // Controles
+      container.addEventListener('mouseenter', () => isPaused = true);
+      container.addEventListener('mouseleave', () => isPaused = false);
+      
+      if (prevBtn) prevBtn.addEventListener('click', () => scroller.scrollBy({ left: -400, behavior: 'smooth' }));
+      if (nextBtn) nextBtn.addEventListener('click', () => scroller.scrollBy({ left: 400, behavior: 'smooth' }));
+
+      // Drag to scroll
+      scroller.addEventListener('mousedown', (e) => {
+        isDown = true;
+        isDragging = false;
+        scroller.style.scrollBehavior = 'auto'; // desactiva smooth al draggear
+        startX = e.pageX - scroller.offsetLeft;
+        scrollLeft = scroller.scrollLeft;
+      });
+      scroller.addEventListener('mouseleave', () => { isDown = false; });
+      scroller.addEventListener('mouseup', (e) => { 
+        isDown = false; 
+        scroller.style.scrollBehavior = 'smooth';
+      });
+      scroller.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        isDragging = true;
+        e.preventDefault();
+        const x = e.pageX - scroller.offsetLeft;
+        const walk = (x - startX) * 2;
+        scroller.scrollLeft = scrollLeft - walk;
+      });
+
+      // Evitar que el click navegue si estábamos arrastrando
+      scroller.addEventListener('click', (e) => {
+        if (isDragging) {
+          e.preventDefault();
+        }
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initNaturalMarquee);
+  document.addEventListener('astro:page-load', initNaturalMarquee);
+</script>

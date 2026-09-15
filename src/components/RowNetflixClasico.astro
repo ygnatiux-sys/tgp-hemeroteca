@@ -271,7 +271,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 68%;
+    width: 55%; /* Móvil: 1 centro, 2 asomando */
     height: auto;
     aspect-ratio: 10 / 14.5; /* Más larga hacia abajo en móvil */
     max-width: none;
@@ -297,7 +297,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
 
   @media (min-width: 640px) {
     .gallery-card {
-      width: 52%;
+      width: 36%; /* Tablet: 3 visibles */
       aspect-ratio: 10 / 12.5; /* Más larga hacia abajo en tablet */
       border-radius: 1.25rem;
     }
@@ -305,8 +305,8 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
 
   @media (min-width: 1024px) {
     .gallery-card {
-      width: 42%;
-      aspect-ratio: 10 / 11.5; /* 15% más larga hacia abajo que un cuadrado (1:1) */
+      width: 20%; /* Desktop: 4 iguales visibles, 2 asomando */
+      aspect-ratio: 10 / 12.5; 
       border-radius: 1.5rem;
     }
   }
@@ -355,11 +355,13 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
       let currentIndex = 0;
 
       function updateCards() {
-        // Separación horizontal según viewport (% del wrapper) calibrada para 3 cards con gap elegante
+        // Separación horizontal según viewport (% del wrapper) calibrada para 3 a 5 cards con gap elegante
         const w = window.innerWidth;
         const isMobile = w < 640;
         const isTablet = w >= 640 && w < 1024;
-        const step = isMobile ? 60 : (isTablet ? 45 : 42); // %
+        
+        // Ajustamos el step para el nuevo tamaño más compacto:
+        const step = isMobile ? 50 : (isTablet ? 32 : 20); // %
 
         cards.forEach((card, idx) => {
           let diff = idx - currentIndex;
@@ -368,36 +370,79 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
           if (diff >  total / 2) diff -= total;
           if (diff < -total / 2) diff += total;
 
-          if (diff === 0) {
-            // ── CENTRO: dominante, grande, brillante ──
-            card.style.left      = '50%';
-            card.style.transform = 'translate(-50%, -50%) scale(1.06)';
-            card.style.opacity   = '1';
-            card.style.filter    = 'brightness(1)';
-            card.style.zIndex    = '20';
-            card.style.pointerEvents = 'auto';
-            card.classList.add('is-active');
+          if (!isMobile && !isTablet) {
+            // DESKTOP: 4 cards centrales nivel 1, 2 bordes nivel 2
+            // Centramos el bloque de 4 cards (diff 0, 1, 2, 3) restando 1.5 al diff
+            const leftPos = 50 + (diff - 1.5) * step;
 
-          } else if (Math.abs(diff) === 1) {
-            // ── LATERALES: en sombra, con padding y escala reducida ──
-            card.style.left      = `calc(50% + ${diff * step}%)`;
-            card.style.transform = 'translate(-50%, -50%) scale(0.82)';
-            card.style.opacity   = '0.48';
-            card.style.filter    = 'brightness(0.55)';
-            card.style.zIndex    = '10';
-            card.style.pointerEvents = 'auto';
-            card.classList.remove('is-active');
+            if (diff >= 0 && diff <= 3) {
+              // ── CENTRO (4 IGUALES) ──
+              card.style.left      = `${leftPos}%`;
+              card.style.transform = 'translate(-50%, -50%) scale(1.0)';
+              card.style.opacity   = '1';
+              card.style.filter    = 'brightness(1)';
+              card.style.zIndex    = '30';
+              card.style.pointerEvents = 'auto';
+              card.classList.add('is-active');
 
+            } else if (diff === -1 || diff === 4) {
+              // ── EXTREMOS (2 más chicos en la sombra) ──
+              card.style.left      = `${leftPos}%`;
+              card.style.transform = 'translate(-50%, -50%) scale(0.75)';
+              card.style.opacity   = '0.4';
+              card.style.filter    = 'brightness(0.4)';
+              card.style.zIndex    = '20';
+              card.style.pointerEvents = 'auto';
+              card.classList.remove('is-active');
+
+            } else {
+              // ── OCULTAS ──
+              const dir = diff < 0 ? -1 : 1;
+              card.style.left      = `calc(50% + ${dir * 180}%)`;
+              card.style.transform = 'translate(-50%, -50%) scale(0.60)';
+              card.style.opacity   = '0';
+              card.style.filter    = 'brightness(0.2)';
+              card.style.zIndex    = '0';
+              card.style.pointerEvents = 'none';
+              card.classList.remove('is-active');
+            }
           } else {
-            // ── OCULTAS: teletransportadas silenciosamente al otro flanco ──
-            const dir = diff < 0 ? -1 : 1;
-            card.style.left      = `calc(50% + ${dir * 130}%)`;
-            card.style.transform = 'translate(-50%, -50%) scale(0.70)';
-            card.style.opacity   = '0';
-            card.style.filter    = 'brightness(0.2)';
-            card.style.zIndex    = '0';
-            card.style.pointerEvents = 'none';
-            card.classList.remove('is-active');
+            // MOBILE / TABLET: Lógica original (1 centro, laterales cayendo en cascada)
+            const leftPos = 50 + diff * step;
+            if (diff === 0) {
+              card.style.left      = `${leftPos}%`;
+              card.style.transform = 'translate(-50%, -50%) scale(1.06)';
+              card.style.opacity   = '1';
+              card.style.filter    = 'brightness(1)';
+              card.style.zIndex    = '30';
+              card.style.pointerEvents = 'auto';
+              card.classList.add('is-active');
+            } else if (Math.abs(diff) === 1) {
+              card.style.left      = `${leftPos}%`;
+              card.style.transform = 'translate(-50%, -50%) scale(0.90)';
+              card.style.opacity   = '0.7';
+              card.style.filter    = 'brightness(0.65)';
+              card.style.zIndex    = '20';
+              card.style.pointerEvents = 'auto';
+              card.classList.remove('is-active');
+            } else if (Math.abs(diff) === 2) {
+              card.style.left      = `${leftPos}%`;
+              card.style.transform = 'translate(-50%, -50%) scale(0.75)';
+              card.style.opacity   = '0.35';
+              card.style.filter    = 'brightness(0.35)';
+              card.style.zIndex    = '10';
+              card.style.pointerEvents = 'auto';
+              card.classList.remove('is-active');
+            } else {
+              const dir = diff < 0 ? -1 : 1;
+              card.style.left      = `calc(50% + ${dir * 180}%)`;
+              card.style.transform = 'translate(-50%, -50%) scale(0.60)';
+              card.style.opacity   = '0';
+              card.style.filter    = 'brightness(0.2)';
+              card.style.zIndex    = '0';
+              card.style.pointerEvents = 'none';
+              card.classList.remove('is-active');
+            }
           }
         });
       }
