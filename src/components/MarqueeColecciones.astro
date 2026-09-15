@@ -100,8 +100,8 @@ const resolvedCollections = collections.map(c => ({
         </svg>
       </button>
 
-      {/* Track Scrolleable nativo */}
-      <div class="marquee-scroller flex gap-4 md:gap-6 px-2 w-full overflow-x-auto scroll-smooth no-scrollbar select-none" style="-ms-overflow-style: none; scrollbar-width: none;">
+      {/* Track Scrolleable nativo con scroll constante sin efecto resorte */}
+      <div class="marquee-scroller flex gap-4 md:gap-6 px-2 w-full overflow-x-auto no-scrollbar select-none" style="-ms-overflow-style: none; scrollbar-width: none; scroll-behavior: auto;">
         
         {/* Usamos el triple de elementos para dar ilusión de infinito con JS nativo */}
         {[...resolvedCollections, ...resolvedCollections, ...resolvedCollections].map(({ key, label, count, img }, idx) => (
@@ -169,62 +169,97 @@ const resolvedCollections = collections.map(c => ({
       let animationId = 0;
       let isPaused = false;
       let isDragging = false;
-      const scrollSpeed = 0.5; // pixeles por frame
+      const scrollSpeed = 0.5; // pixeles por frame constante
 
-      // Autoplay loop
+      // Asegurar que scroll-behavior sea siempre auto para evitar cualquier rebote o resorte
+      scroller.style.scrollBehavior = 'auto';
+
+      function normalizeLoop() {
+        const scrollWidth = scroller.scrollWidth;
+        const oneThird = scrollWidth / 3;
+        if (oneThird <= 0) return;
+        
+        if (scroller.scrollLeft >= oneThird * 2) {
+          scroller.scrollLeft -= oneThird;
+        } else if (scroller.scrollLeft <= 0) {
+          scroller.scrollLeft += oneThird;
+        }
+      }
+
+      // Autoplay continuo e imperceptible
       function playMarquee() {
         if (!isPaused && !isDown) {
           scroller.scrollLeft += scrollSpeed;
-          
-          // Lógica de loop infinito nativo
-          // Al tener 3 copias, cuando llegamos a los 2/3, reseteamos a 1/3 (centro exacto)
-          const scrollWidth = scroller.scrollWidth;
-          const oneThird = scrollWidth / 3;
-          
-          if (scroller.scrollLeft >= oneThird * 2) {
-            scroller.scrollLeft -= oneThird;
-          } else if (scroller.scrollLeft <= 0) {
-            scroller.scrollLeft += oneThird;
-          }
+          normalizeLoop();
         }
         animationId = requestAnimationFrame(playMarquee);
       }
       
-      // Iniciar posicionando en el medio (para poder retroceder de entrada sin topar borde)
+      // Iniciar en el tercio central
       const initialThird = scroller.scrollWidth / 3;
-      scroller.scrollLeft = initialThird;
+      if (initialThird > 0) {
+        scroller.scrollLeft = initialThird;
+      }
       playMarquee();
 
-      // Controles
+      // Pausa suave al posar el mouse
       container.addEventListener('mouseenter', () => isPaused = true);
       container.addEventListener('mouseleave', () => isPaused = false);
       
-      if (prevBtn) prevBtn.addEventListener('click', () => scroller.scrollBy({ left: -400, behavior: 'smooth' }));
-      if (nextBtn) nextBtn.addEventListener('click', () => scroller.scrollBy({ left: 400, behavior: 'smooth' }));
+      // Navegación por botones sin conflicto de resorte
+      function stepScroll(amount: number) {
+        isPaused = true;
+        scroller.scrollBy({ left: amount, behavior: 'smooth' });
+        setTimeout(() => {
+          scroller.style.scrollBehavior = 'auto';
+          normalizeLoop();
+          isPaused = false;
+        }, 450);
+      }
 
-      // Drag to scroll
+      if (prevBtn) prevBtn.addEventListener('click', () => stepScroll(-450));
+      if (nextBtn) nextBtn.addEventListener('click', () => stepScroll(450));
+
+      // Drag to scroll 1:1 natural (sin aceleración x2 ni resorte en mouseup)
       scroller.addEventListener('mousedown', (e) => {
         isDown = true;
         isDragging = false;
-        scroller.style.scrollBehavior = 'auto'; // desactiva smooth al draggear
+        scroller.style.scrollBehavior = 'auto';
         startX = e.pageX - scroller.offsetLeft;
         scrollLeft = scroller.scrollLeft;
       });
-      scroller.addEventListener('mouseleave', () => { isDown = false; });
-      scroller.addEventListener('mouseup', (e) => { 
+
+      scroller.addEventListener('mouseleave', () => { 
         isDown = false; 
-        scroller.style.scrollBehavior = 'smooth';
       });
+
+      scroller.addEventListener('mouseup', () => { 
+        isDown = false; 
+        scroller.style.scrollBehavior = 'auto';
+      });
+
       scroller.addEventListener('mousemove', (e) => {
         if (!isDown) return;
         isDragging = true;
         e.preventDefault();
         const x = e.pageX - scroller.offsetLeft;
-        const walk = (x - startX) * 2;
+        const walk = x - startX;
         scroller.scrollLeft = scrollLeft - walk;
+
+        const scrollWidth = scroller.scrollWidth;
+        const oneThird = scrollWidth / 3;
+        if (oneThird > 0) {
+          if (scroller.scrollLeft >= oneThird * 2) {
+            scroller.scrollLeft -= oneThird;
+            scrollLeft -= oneThird;
+          } else if (scroller.scrollLeft <= 0) {
+            scroller.scrollLeft += oneThird;
+            scrollLeft += oneThird;
+          }
+        }
       });
 
-      // Evitar que el click navegue si estábamos arrastrando
+      // Evitar que el click active navegación si estábamos arrastrando
       scroller.addEventListener('click', (e) => {
         if (isDragging) {
           e.preventDefault();
