@@ -199,7 +199,7 @@ const dustText = categoryDustTexts[key] ?? defaultDustText;
                     format="webp"
                     loading={idx < 6 ? "eager" : "lazy"}
                     decoding="async"
-                    class="absolute inset-0 object-cover object-center brightness-85 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-700 ease-out group-hover:scale-[1.03] group-hover:brightness-95 img-nativa"
+                    class="absolute inset-0 object-cover object-center brightness-85 contrast-[1.05] pointer-events-none -z-10 transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.02] group-hover:brightness-95 img-nativa"
                   />
                 ) : (
                   <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1b1c24] via-theme-dark to-black -z-10" />
@@ -317,7 +317,7 @@ const dustText = categoryDustTexts[key] ?? defaultDustText;
                           format="webp"
                           loading="lazy"
                           decoding="async"
-                          class="absolute inset-0 group-hover:scale-105 transition-transform duration-700 ease-out img-nativa"
+                          class="absolute inset-0 group-hover:scale-[1.025] transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] img-nativa"
                         />
                       </div>
                     ) : (

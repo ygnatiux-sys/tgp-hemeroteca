@@ -56,7 +56,7 @@ export default function GalleryCard({
         <img 
           src={image} 
           alt={title} 
-          className="opacity-85 transition-transform duration-500 ease-out group-hover:scale-105 img-nativa" 
+          className="opacity-85 transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.025] img-nativa" 
           loading="lazy"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-4">

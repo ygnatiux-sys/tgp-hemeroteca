@@ -324,13 +324,13 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
 
   .gallery-card-img {
     filter: brightness(0.9) contrast(1.04);
-    transition: filter 340ms ease, transform 0.6s ease-out;
+    transition: filter 400ms ease, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .gallery-card.is-active .gallery-card-img {
     filter: brightness(1) contrast(1.04);
   }
   .gallery-card:hover .gallery-card-img {
-    transform: scale(1.04);
+    transform: scale(1.025);
   }
   .gallery-card:hover { border-color: rgba(224, 122, 95, 0.45); }
 </style>

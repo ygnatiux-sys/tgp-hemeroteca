@@ -105,7 +105,7 @@ const cardGradientClass = isHero ? "gradient-steel-titanium" : "gradient-metal-s
         loading={isEager ? "eager" : "lazy"}
         fetchpriority={isEager ? "high" : undefined}
         decoding="async"
-        class={`absolute inset-0 object-center brightness-90 contrast-[1.03] pointer-events-none -z-10 ${ enableCinemagraph ? "cinemagraph-ken-burns" : "group-hover:scale-[1.018] group-hover:brightness-95 transition-transform duration-700 delay-75 ease-out" } ${resolveMultivisionClass(img)}`}
+        class={`absolute inset-0 object-center brightness-90 contrast-[1.03] pointer-events-none -z-10 ${ enableCinemagraph ? "cinemagraph-ken-burns" : "group-hover:scale-[1.02] group-hover:brightness-95 transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)]" } ${resolveMultivisionClass(img)}`}
       />
     ) : (
       <div class="absolute inset-0 w-full h-full bg-linear-to-br from-[#1c242b] via-theme-dark to-[#0a0b0b] -z-10" />

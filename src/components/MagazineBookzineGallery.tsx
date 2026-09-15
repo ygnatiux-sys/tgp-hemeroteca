@@ -178,7 +178,7 @@ export function MagazineBookzineGallery({ images, title, accentColor = '#EFEBE3'
                     <img
                       src={item.thumbUrl || item.url}
                       alt={item.title}
-                      className="transition-transform duration-700 ease-out group-hover:scale-105 img-nativa"
+                      className="transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.025] img-nativa"
                       loading="lazy"
                     />
                     

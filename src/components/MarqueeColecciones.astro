@@ -112,7 +112,7 @@ const resolvedCollections = collections.map(c => ({
           >
             {img ? (
               <div class="overflow-hidden h-full relative">
-                <img src={img} alt={label} draggable="false" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-70 group-hover/card:opacity-90 img-nativa" />
+                <img src={img} alt={label} draggable="false" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/card:scale-[1.025] opacity-70 group-hover/card:opacity-90 img-nativa" />
                 <div class="absolute inset-0 bg-linear-to-t from-[#0a0c0f]/90 via-[#0a0c0f]/40 to-transparent" />
                 <div class="absolute bottom-0 left-0 p-4 md:p-6 w-full">
                   <p class="font-metadata text-[10px] md:text-xs uppercase tracking-[0.3em] text-rust-orange mb-2 drop-shadow-md">{count} artículos</p>

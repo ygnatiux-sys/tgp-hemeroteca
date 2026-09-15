@@ -263,7 +263,13 @@ const fitClass =
           loading={isEager ? "eager" : "lazy"}
           fetchpriority={isEager ? "high" : undefined}
           decoding="async"
-          class={`absolute inset-0 w-full h-full object-center transition-transform duration-700 ease-out group-hover:scale-[1.04] cac-card-img ${isHero ? "brightness-100 contrast-100" : "brightness-90 group-hover:brightness-100"} ${fitClass} ${enableCinemagraph && !isHero ? "cinemagraph-ken-burns" : ""} ${resolveMultivisionClass(img)}`}
+          class={`absolute inset-0 w-full h-full object-center cac-card-img ${
+            enableCinemagraph && !isHero
+              ? "cinemagraph-ken-burns"
+              : isHero
+                ? "transition-transform duration-1200 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.015]"
+                : "transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.02]"
+          } ${isHero ? "brightness-100 contrast-100" : "brightness-90 group-hover:brightness-100"} ${fitClass} ${resolveMultivisionClass(img)}`}
           style={
             isHero
               ? "object-position: 50% 50%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
@@ -668,20 +674,20 @@ const fitClass =
           ).to(tags, { opacity: 0.7, duration: 0.4 }, 0.6);
         }
 
-        // 2. H1 zoom-out para ceder el escenario al excerpt
+        // 2. H1 zoom-out para ceder el escenario al excerpt (suave y orgánico)
         if (h1Container && excerptContainer) {
           tl.to(
             h1Container,
             {
-              scale: 1.06,
-              y: -4,
-              filter: "blur(8px)",
+              scale: 1.025,
+              y: -2,
+              filter: "blur(6px)",
               opacity: 0,
-              duration: 0.9,
+              duration: 1.1,
               ease: "power2.inOut",
               force3D: true,
             },
-            0.3,
+            0.4,
           );
         }
 
@@ -786,13 +792,13 @@ const fitClass =
       tl.add(() => {
         if (img) {
           if (isPortrait) {
-            // Rostro (ej. Hegel): se corre a la izquierda
+            // Rostro (ej. Hegel): se corre a la izquierda con suavidad
             img.style.objectPosition = "20% 50%";
-            img.style.transform = "scale(1.08)";
+            img.style.transform = "scale(1.045)";
           } else {
-            // Paisaje cinemático: no se corre, mantiene encuadre centrado con leve respiro
+            // Paisaje cinemático: mantiene encuadre centrado con leve respiro
             img.style.objectPosition = "50% 50%";
-            img.style.transform = "scale(1.04)";
+            img.style.transform = "scale(1.025)";
           }
         }
       });

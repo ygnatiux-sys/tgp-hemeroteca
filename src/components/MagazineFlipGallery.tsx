@@ -210,7 +210,7 @@ export function MagazineFlipGallery({ images, title, accentColor = '#EFEBE3' }: 
                 <img
                   src={item.thumbUrl || item.url}
                   alt={item.title}
-                  className="group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100 img-nativa"
+                  className="group-hover:scale-[1.025] transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] opacity-90 group-hover:opacity-100 img-nativa"
                   loading="lazy"
                 />
                 <div className="absolute top-2 right-2 p-1.5 rounded-full bg-black/70 text-white font-metadata text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">

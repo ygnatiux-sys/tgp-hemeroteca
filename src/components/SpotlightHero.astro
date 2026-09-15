@@ -200,41 +200,41 @@ const uid = `spotlight-${Math.random().toString(36).substring(2, 8)}`;
     transform: translate3d(0, 0, 0);
   }
 
-  /* ── MOVIMIENTO Y HOVER TIPO ROW NETFLIX ── */
+  /* ── MOVIMIENTO Y HOVER TIPO ROW NETFLIX (SUAVIZADO GLOBAL) ── */
   .spotlight-card {
     transform: translate3d(0, 0, 0) scale(1);
     transform-origin: center center;
     transition: 
-      transform 340ms cubic-bezier(0.25, 1, 0.5, 1), 
-      opacity 300ms ease,
-      box-shadow 300ms ease, 
-      border-color 300ms ease;
+      transform 700ms cubic-bezier(0.16, 1, 0.3, 1), 
+      opacity 400ms ease,
+      box-shadow 500ms ease, 
+      border-color 400ms ease;
     will-change: transform, opacity;
   }
 
   .spotlight-card:not(.spotlight-card-active):hover {
-    transform: translate3d(0, -6px, 0) scale(1.08);
+    transform: translate3d(0, -2px, 0) scale(1.025);
     z-index: 20;
     opacity: 1;
     border-color: rgba(245, 158, 11, 0.85);
     box-shadow: 0 16px 32px -4px rgba(0, 0, 0, 0.8);
-    transition-delay: 100ms;
+    transition-delay: 50ms;
   }
 
   .spotlight-card-active {
-    transform: translate3d(0, -4px, 0) scale(1.06);
+    transform: translate3d(0, -2px, 0) scale(1.02);
     z-index: 10;
   }
 
   /* Sibling push sutil en la bandeja horizontal */
   .spotlight-track:has(.spotlight-card:hover) .spotlight-card:not(:hover):has(~ .spotlight-card:hover) {
-    transform: translate3d(-6px, 0, 0);
-    transition-delay: 100ms;
+    transform: translate3d(-3px, 0, 0);
+    transition-delay: 50ms;
   }
 
   .spotlight-card:hover ~ .spotlight-card {
-    transform: translate3d(6px, 0, 0);
-    transition-delay: 100ms;
+    transform: translate3d(3px, 0, 0);
+    transition-delay: 50ms;
   }
 
   .spotlight-track:not(:hover) .spotlight-card:not(.spotlight-card-active) {
