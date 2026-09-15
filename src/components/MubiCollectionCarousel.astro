@@ -68,7 +68,7 @@ const uid = `mubi-${Math.random().toString(36).substring(2, 9)}`;
     data-total-blocks={totalBlocks}
     aria-label={title}
   >
-    <!-- Encabezado editorial con eyebrow, título, paginación numérica y controles -->
+    <!-- Encabezado editorial con eyebrow y título -->
     <header class="mubi-header flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4">
       <div>
         {eyebrow && (
@@ -80,43 +80,38 @@ const uid = `mubi-${Math.random().toString(36).substring(2, 9)}`;
           {title}
         </h2>
       </div>
+    </header>
 
-      <!-- Controles de navegación y Paginación Numérica -->
-      <div class="flex items-center gap-4 self-end md:self-auto">
-        <!-- Índice Numérico de Paginación (ej. "01 / 05") -->
-        <div class="mubi-pagination font-metadata text-[11px] sm:text-xs tracking-[0.3em] uppercase text-white/60 select-none">
-          <span class="mubi-current-page text-white font-bold">01</span>
-          <span class="opacity-40 mx-1">/</span>
-          <span class="mubi-total-pages opacity-60">{String(totalBlocks).padStart(2, '0')}</span>
-        </div>
-
-        <!-- Botones de Navegación Manual -->
-        <div class="flex items-center gap-2">
+    <!-- Escenario Principal con Chevrons Nativos Slider Netflix -->
+    <div class="relative w-full group/mubi-stage">
+      {totalBlocks > 1 && (
+        <>
+          <!-- Botón Anterior Flotante en Cápsula (Nativo Netflix) -->
           <button 
             type="button"
-            class="mubi-prev-btn w-9 h-9 rounded-full bg-black/40 hover:bg-black/80 text-white/60 hover:text-white border border-white/10 hover:border-white/30 backdrop-blur-md transition-all duration-200 flex items-center justify-center cursor-pointer shadow-lg active:scale-95 focus:outline-none"
+            class="mubi-prev-btn absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-40 w-9 md:w-10 h-16 md:h-20 rounded-full bg-black/40 hover:bg-black/85 text-[#E3DDD3]/40 hover:text-[#EFEBE3] border border-[#E3DDD3]/10 hover:border-[#E3DDD3]/30 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl focus:outline-none"
             aria-label="Bloque anterior"
           >
-            <svg class="w-4 h-4 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <svg class="w-5 h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
           </button>
 
+          <!-- Botón Siguiente Flotante en Cápsula (Nativo Netflix) -->
           <button 
             type="button"
-            class="mubi-next-btn w-9 h-9 rounded-full bg-black/40 hover:bg-black/80 text-white/60 hover:text-white border border-white/10 hover:border-white/30 backdrop-blur-md transition-all duration-200 flex items-center justify-center cursor-pointer shadow-lg active:scale-95 focus:outline-none"
+            class="mubi-next-btn absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-40 w-9 md:w-10 h-16 md:h-20 rounded-full bg-black/40 hover:bg-black/85 text-[#E3DDD3]/40 hover:text-[#EFEBE3] border border-[#E3DDD3]/10 hover:border-[#E3DDD3]/30 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl focus:outline-none"
             aria-label="Bloque siguiente"
           >
-            <svg class="w-4 h-4 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <svg class="w-5 h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
             </svg>
           </button>
-        </div>
-      </div>
-    </header>
+        </>
+      )}
 
-    <!-- Escenario Principal (Contenedor de altura fija adaptativa para relación 3:4) -->
-    <div class="mubi-stage" style={`--mubi-height: ${height};`}>
+      <!-- Escenario Principal (Contenedor de altura fija adaptativa para relación 3:4) -->
+      <div class="mubi-stage" style={`--mubi-height: ${height};`}>
       {blocks.map((block, blockIdx) => (
         <div 
           class={`mubi-block ${blockIdx === 0 ? 'is-active' : ''}`}
@@ -226,9 +221,18 @@ const uid = `mubi-${Math.random().toString(36).substring(2, 9)}`;
     height: 100%;
     position: relative;
     overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
     opacity: 1;              /* Arranque nativo: siempre visible */
     transform: translateY(0);
     will-change: transform, opacity;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  .mubi-card:hover {
+    border-color: rgba(224, 122, 95, 0.45);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), 0 0 20px rgba(224, 122, 95, 0.15);
   }
 
   /* Adaptación responsive para pantallas más estrechas */
@@ -314,11 +318,11 @@ const uid = `mubi-${Math.random().toString(36).substring(2, 9)}`;
         const currentCards = Array.from(currentBlock.querySelectorAll<HTMLElement>('.mubi-card'));
         const nextCards = Array.from(nextBlock.querySelectorAll<HTMLElement>('.mubi-card'));
 
-        // PRE-SETUP: Bloque entrante parte de opacity 0, y 16
+        // PRE-SETUP: Bloque entrante parte de opacity 0, y 20
         // (se hace ANTES del timeline para que GSAP siempre tenga un punto de partida limpio)
         nextBlock.classList.add('is-active');
         nextBlock.setAttribute('aria-hidden', 'false');
-        gsap.set(nextCards, { opacity: 0, y: 16 });
+        gsap.set(nextCards, { opacity: 0, y: 20 });
 
         // Actualizar paginación
         if (currentPageEl) {
@@ -342,19 +346,19 @@ const uid = `mubi-${Math.random().toString(36).substring(2, 9)}`;
         // 1. STAGGERED FADE OUT del bloque actual (Izquierda a Derecha)
         tl.to(currentCards, {
           opacity: 0,
-          y: -14,
-          duration: 0.42,
+          y: -20,
+          duration: 0.55,
           stagger: 0.1,
-          ease: "power2.in"
+          ease: "power2.inOut"
         });
 
         // 2. STAGGERED FADE IN del bloque entrante (Izquierda a Derecha)
         tl.to(nextCards, {
           opacity: 1,
           y: 0,
-          duration: 0.52,
+          duration: 0.65,
           stagger: 0.1,
-          ease: "power2.out"
+          ease: "power3.out"
         });
       };
 

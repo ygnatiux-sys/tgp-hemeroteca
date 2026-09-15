@@ -1,0 +1,261 @@
+---
+/**
+ * MazoCartasGSAP.astro
+ * Mazo de naipes cinemático con animación GSAP tipo abanico al hover.
+ * Props:
+ *   cartas — array de { src: string, alt?: string, href?: string }
+ */
+
+interface Carta {
+  src: string;
+  alt?: string;
+  href?: string;
+}
+
+interface Props {
+  cartas: Carta[];
+  titulo?: string;
+  subtitulo?: string;
+  cta?: { label: string; href: string };
+}
+
+const {
+  cartas = [],
+  titulo,
+  subtitulo,
+  cta,
+} = Astro.props;
+---
+
+{cartas.length > 0 && (
+  <section class="mz-root">
+    {(titulo || subtitulo) && (
+      <header class="mz-header">
+        {titulo && <p class="mz-eyebrow">{titulo}</p>}
+        {subtitulo && <h2 class="mz-titulo">{subtitulo}</h2>}
+      </header>
+    )}
+
+    <div class="mz-escenario">
+      <div class="mz-mazo" id="mzMazo" role="group" aria-label="Cartas del archivo">
+        {cartas.map((carta, i) => (
+          carta.href
+            ? <a href={carta.href} class="mz-carta" aria-label={carta.alt || `Carta ${i + 1}`}>
+                <img src={carta.src} alt={carta.alt || ""} loading="lazy" decoding="async" />
+              </a>
+            : <div class="mz-carta" aria-label={carta.alt || `Carta ${i + 1}`}>
+                <img src={carta.src} alt={carta.alt || ""} loading="lazy" decoding="async" />
+              </div>
+        ))}
+      </div>
+    </div>
+
+    {cta && (
+      <div class="mz-cta-wrap">
+        <a href={cta.href} class="mz-cta">
+          {cta.label}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    )}
+  </section>
+)}
+
+<style>
+  /* ── Zona contenedora ── */
+  .mz-root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+    padding: 5rem 1rem 6.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── Header ── */
+  .mz-header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .mz-eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--color-rust-orange, #e07a5f);
+    font-family: var(--font-metadata, sans-serif);
+    margin: 0;
+    opacity: 0.85;
+  }
+  .mz-titulo {
+    font-family: var(--font-cinzel, serif);
+    font-size: clamp(1.75rem, 3.2vw, 2.8rem);
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    background-image: linear-gradient(180deg, #CBD5E1 0%, #334155 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin: 0;
+  }
+
+  /* ── Escenario centrado para el mazo (+25%: 380px -> 480px) ── */
+  .mz-escenario {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 480px;
+    position: relative;
+  }
+
+  /* ── Mazo: contenedor relativo (+25%: 220x320 -> 275x400) ── */
+  .mz-mazo {
+    position: relative;
+    width: 275px;
+    height: 400px;
+    cursor: pointer;
+  }
+
+  /* ── Carta individual ── */
+  .mz-carta {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow:
+      0 25px 60px rgba(0, 0, 0, 0.65),
+      0 6px 18px rgba(0, 0, 0, 0.45),
+      inset 0 0 0 1px rgba(255,255,255,0.1);
+    /* Pivote en el borde inferior central — para el efecto abanico */
+    transform-origin: bottom center;
+    display: block;
+    text-decoration: none;
+    /* will-change para que la GPU gestione la transformación */
+    will-change: transform, opacity;
+  }
+
+  .mz-carta img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    pointer-events: none;
+    /* Micro-viñeta interna para unificar el look de las cartas */
+    filter: brightness(0.92) contrast(1.05);
+    transition: filter 0.35s ease;
+    display: block;
+  }
+  .mz-carta:hover {
+    z-index: 30;
+  }
+  .mz-carta:hover img {
+    filter: brightness(1.06) contrast(1.08);
+  }
+
+  /* ── CTA ── */
+  .mz-cta-wrap {
+    display: flex;
+    justify-content: center;
+  }
+  .mz-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-metadata, sans-serif);
+    font-size: 0.72rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(8px);
+    color: rgba(255,255,255,0.55);
+    padding: 1rem 3rem;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: border-color 0.3s, color 0.3s, background 0.3s;
+  }
+  .mz-cta:hover {
+    border-color: rgba(224, 122, 95, 0.55);
+    color: #fff;
+    background: rgba(224, 122, 95, 0.1);
+  }
+  .mz-cta svg {
+    transition: transform 0.3s ease;
+  }
+  .mz-cta:hover svg {
+    transform: translateX(4px);
+  }
+
+  @media (max-width: 480px) {
+    .mz-mazo  { width: 225px; height: 325px; }
+    .mz-escenario { height: 400px; }
+  }
+</style>
+
+<script>
+  import gsap from "gsap";
+
+  function initMazo() {
+    document.querySelectorAll<HTMLElement>("#mzMazo").forEach((mazo) => {
+      // Evitar doble inicialización
+      if (mazo.dataset.ready === "1") return;
+      mazo.dataset.ready = "1";
+
+      const cartas = Array.from(mazo.querySelectorAll<HTMLElement>(".mz-carta"));
+      if (cartas.length < 2) return;
+
+      const n = cartas.length;
+
+      // Parámetros adaptables según el número de naipes (ej. 3 vs 5 cartas)
+      const stepAngle = n > 3 ? 12 : 19;
+      const stepX = n > 3 ? 62 : 70;
+      const stepY = n > 3 ? 10 : 12;
+      const baseJitter = n > 3 ? 2 : 2.5;
+
+      // Asignar z-index en cascada inicial
+      cartas.forEach((carta, i) => {
+        carta.style.zIndex = String(i + 1);
+      });
+
+      // ── Estado inicial: mazo sutilmente desordenado ──
+      gsap.set(cartas, {
+        rotate: (i: number) => (i - (n - 1) / 2) * baseJitter,
+        y: 0,
+        x: 0,
+      });
+
+      // ── Hover IN: efecto abanico cinemático adaptado ──
+      mazo.addEventListener("mouseenter", () => {
+        gsap.to(cartas, {
+          rotate: (i: number) => (i - (n - 1) / 2) * stepAngle,
+          x:      (i: number) => (i - (n - 1) / 2) * stepX,
+          y:      (i: number) => Math.abs(i - (n - 1) / 2) * stepY,
+          duration: 0.65,
+          ease: "back.out(1.4)",
+          stagger: 0.035,
+        });
+      });
+
+      // ── Hover OUT: regreso suave al mazo ──
+      mazo.addEventListener("mouseleave", () => {
+        gsap.to(cartas, {
+          rotate: (i: number) => (i - (n - 1) / 2) * baseJitter,
+          x: 0,
+          y: 0,
+          duration: 0.5,
+          ease: "power4.out",
+          stagger: 0.02,
+        });
+      });
+    });
+  }
+
+  document.addEventListener("astro:page-load", initMazo);
+  if (document.readyState !== "loading") initMazo();
+  else document.addEventListener("DOMContentLoaded", initMazo);
+</script>

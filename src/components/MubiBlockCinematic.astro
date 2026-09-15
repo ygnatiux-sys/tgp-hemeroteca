@@ -1,0 +1,609 @@
+---
+/**
+ * MubiBlockCinematic.astro
+ * Componente estructural limpio con mecánica MUBI y GSAP:
+ * - Tarjetas rígidas en bloques de 3
+ * - Staggered Fade Out (-20px, stagger: 0.1) -> Staggered Fade In (+20px -> 0, stagger: 0.1)
+ * - Autoplay controlado (7s), loop infinito, pausa al hover y controles táctiles
+ */
+
+export interface MubiCinematicItem {
+  title: string;
+  excerpt?: string;
+  img: string;
+  href: string;
+  badge?: string;
+  category?: string;
+}
+
+interface Props {
+  items: MubiCinematicItem[];
+  titulo?: string;
+  subtitulo?: string;
+}
+
+const {
+  items = [],
+  titulo = "Dossiers Cinemáticos",
+  subtitulo = "Lectura Visual en Tres Actos",
+} = Astro.props;
+
+// Para que la mecánica de transición MUBI por bloques funcione plenamente,
+// si se pasan 3 tarjetas, se duplican a 6 (2 bloques de 3) para probar la alternancia.
+let list = [...items];
+if (list.length === 3) {
+  list = [...list, ...list];
+}
+
+// Agrupamos en bloques de exactamente 3 tarjetas
+const blocks: MubiCinematicItem[][] = [];
+for (let i = 0; i < list.length; i += 3) {
+  blocks.push(list.slice(i, i + 3));
+}
+---
+
+{blocks.length > 0 && (
+  <section class="mubi-root" data-mubi-blocks={blocks.length}>
+    <!-- Encabezado Editorial Coherente con Home -->
+    {(titulo || subtitulo) && (
+      <header class="mubi-header">
+        <div class="mubi-header-info">
+          {titulo && <span class="mubi-eyebrow">{titulo}</span>}
+          {subtitulo && <h2 class="mubi-heading">{subtitulo}</h2>}
+        </div>
+      </header>
+    )}
+
+    <div class="mubi-viewport relative w-full group/mubi-viewport">
+      {blocks.length > 1 && (
+        <>
+          <!-- Botón Anterior Flotante en Cápsula (Nativo Netflix) -->
+          <button 
+            class="mubi-prev absolute left-1 sm:left-2 md:left-4 lg:left-6 top-1/2 -translate-y-1/2 z-40 w-9 md:w-10 h-16 md:h-20 rounded-full bg-black/40 hover:bg-black/85 text-[#E3DDD3]/40 hover:text-[#EFEBE3] border border-[#E3DDD3]/10 hover:border-[#E3DDD3]/30 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl focus:outline-none"
+            type="button"
+            aria-label="Bloque anterior"
+          >
+            <svg class="w-5 h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+
+          <!-- Botón Siguiente Flotante en Cápsula (Nativo Netflix) -->
+          <button 
+            class="mubi-next absolute right-1 sm:right-2 md:right-4 lg:right-6 top-1/2 -translate-y-1/2 z-40 w-9 md:w-10 h-16 md:h-20 rounded-full bg-black/40 hover:bg-black/85 text-[#E3DDD3]/40 hover:text-[#EFEBE3] border border-[#E3DDD3]/10 hover:border-[#E3DDD3]/30 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl focus:outline-none"
+            type="button"
+            aria-label="Bloque siguiente"
+          >
+            <svg class="w-5 h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </button>
+        </>
+      )}
+
+      <div class="mubi-gallery">
+        {blocks.map((block, bIdx) => (
+          <div
+            class={`mubi-block block-${bIdx + 1} ${bIdx === 0 ? "mubi-active" : ""}`}
+            data-block-idx={bIdx}
+          >
+            {block.map((card) => (
+              <a
+                href={card.href}
+                class={`mubi-card block-${bIdx + 1} group/card`}
+                aria-label={card.title}
+              >
+                <div class="mubi-media">
+                  <img
+                    src={card.img}
+                    alt={card.title}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div class="mubi-media-gradient"></div>
+                  <span class="mubi-badge">
+                    {card.badge || card.category || "CINEMÁTICO"}
+                  </span>
+                </div>
+
+                <div class="mubi-text">
+                  <h3 class="mubi-card-title">{card.title}</h3>
+                  {card.excerpt && (
+                    <p class="mubi-card-excerpt">{card.excerpt}</p>
+                  )}
+                  <span class="mubi-card-cta">
+                    Explorar Dossier
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                      <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {blocks.length > 1 && (
+        <div class="mubi-dots-bar">
+          <div class="mubi-dots">
+            {blocks.map((_, i) => (
+              <button
+                class={`mubi-dot ${i === 0 ? "active" : ""}`}
+                data-dot-idx={i}
+                type="button"
+                aria-label={`Ir al bloque ${i + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+)}
+
+<style>
+  /* ═══════════════════════════════════════════════════════════════════
+     CSS REFINADO HEREDADO DEL SISTEMA TGP HOME
+     Tipografías: Cinzel, Proza Libre (--font-sans), Google Sans Flex (--font-metadata)
+     Paleta: Rust Orange (#e07a5f), Acero Titanio, #B4B4B0 y Scrim Obsidian
+     ═══════════════════════════════════════════════════════════════════ */
+  .mubi-root {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+    padding: 3.5rem 0 5.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── Encabezado Editorial Idéntico a Bloques Home (max-w-360 / 1440px) ── */
+  .mubi-header {
+    width: 100%;
+    max-width: 90rem;
+    padding: 0 clamp(1rem, 3.5vw, 3rem) 1.25rem clamp(1rem, 3.5vw, 3rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+    box-sizing: border-box;
+  }
+
+  @media (min-width: 640px) {
+    .mubi-header {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+  }
+
+  .mubi-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .mubi-eyebrow {
+    font-family: var(--font-metadata, "Google Sans Flex", "IBM Plex Mono", sans-serif);
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--color-rust-orange, #e07a5f);
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+    display: block;
+  }
+
+  .mubi-heading {
+    font-family: var(--font-cinzel, "Cinzel", serif);
+    font-size: clamp(1.65rem, 3vw, 2.5rem);
+    font-weight: 900;
+    letter-spacing: -0.015em;
+    background-image: linear-gradient(180deg, #CBD5E1 0%, #334155 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  [data-theme='light'] .mubi-heading {
+    background-image: linear-gradient(to bottom, #1c1e21 0%, rgba(28, 30, 33, 0.5) 100%);
+  }
+
+
+
+  /* ── Viewport Adaptado al Formato MUBI (75vh aprox) ── */
+  .mubi-viewport {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+    gap: 2.25rem;
+  }
+
+  /* ── Escenario donde conviven las tarjetas (alineado a Home) ── */
+  .mubi-gallery {
+    position: relative;
+    width: 100%;
+    max-width: 90rem;
+    padding: 0 clamp(1rem, 3.5vw, 3rem);
+    box-sizing: border-box;
+  }
+
+  /* ── Bloque de 3 tarjetas ── */
+  .mubi-block {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    width: 100%;
+    position: relative;
+  }
+
+  .mubi-block:not(.mubi-active) {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  /* ── Tarjeta individual en proporción amplia ── */
+  .mubi-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1.15rem;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  /* ── Contenedor Multimedia Vertical (3:4) ── */
+  .mubi-media {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border-radius: 14px;
+    position: relative;
+    background: var(--bg-alt, #0a0c0f);
+    border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+    box-shadow:
+      0 20px 45px rgba(0, 0, 0, 0.75),
+      0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  [data-theme='light'] .mubi-media {
+    background: #E2DFD8;
+    border-color: rgba(42, 41, 39, 0.12);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  }
+
+  .mubi-card:hover .mubi-media {
+    border-color: rgba(224, 122, 95, 0.45);
+    box-shadow:
+      0 24px 50px rgba(0, 0, 0, 0.85),
+      0 0 22px rgba(224, 122, 95, 0.18);
+  }
+
+  .mubi-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.75s cubic-bezier(0.25, 1, 0.5, 1), filter 0.4s ease;
+  }
+
+  .mubi-card:hover .mubi-media img {
+    transform: scale(1.05);
+    filter: brightness(1.06) contrast(1.04);
+  }
+
+  .mubi-media-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.65) 100%);
+    pointer-events: none;
+    opacity: 0.55;
+    transition: opacity 0.4s ease;
+  }
+
+  .mubi-card:hover .mubi-media-gradient {
+    opacity: 0.25;
+  }
+
+  /* ── Badge Editorial Píldora TGP ── */
+  .mubi-badge {
+    position: absolute;
+    top: 0.85rem;
+    left: 0.85rem;
+    font-family: var(--font-metadata, "Google Sans Flex", "IBM Plex Mono", sans-serif);
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--color-rust-orange, #e07a5f);
+    background: rgba(10, 12, 15, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid rgba(224, 122, 95, 0.32);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  }
+
+  /* ── Contenido Tipográfico Heredado ── */
+  .mubi-text {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .mubi-card-title {
+    font-family: var(--font-cinzel, "Cinzel", serif);
+    font-size: clamp(1.1rem, 1.4vw, 1.35rem);
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--text-main, #E2E8F0);
+    margin: 0;
+    letter-spacing: -0.015em;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+  }
+
+  [data-theme='light'] .mubi-card-title {
+    color: #1C1E21;
+  }
+
+  .mubi-card:hover .mubi-card-title {
+    color: var(--color-rust-orange, #e07a5f);
+    text-shadow: 0 0 16px rgba(224, 122, 95, 0.35);
+  }
+
+  /* Excerpt alineado a --text-body (#B4B4B0) y font-sans (Proza Libre) */
+  .mubi-card-excerpt {
+    font-family: var(--font-sans, "Proza Libre", sans-serif);
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-body, #B4B4B0);
+    font-weight: 300;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  [data-theme='light'] .mubi-card-excerpt {
+    color: #2A2927;
+  }
+
+  .mubi-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-metadata, "Google Sans Flex", "IBM Plex Mono", sans-serif);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--color-rust-orange, #e07a5f);
+    opacity: 0.88;
+    margin-top: 0.2rem;
+    font-weight: 600;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .mubi-card:hover .mubi-card-cta {
+    opacity: 1;
+    transform: translateX(4px);
+  }
+
+  /* ── Barra de Dots Inferior ── */
+  .mubi-dots-bar {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .mubi-dots {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .mubi-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.35s ease;
+    padding: 0;
+  }
+
+  [data-theme='light'] .mubi-dot {
+    background: rgba(42, 41, 39, 0.2);
+  }
+
+  .mubi-dot.active {
+    width: 22px;
+    background: var(--color-rust-orange, #e07a5f);
+    box-shadow: 0 0 12px rgba(224, 122, 95, 0.5);
+  }
+
+  @media (max-width: 960px) {
+    .mubi-block {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .mubi-block {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+
+  function initMubiShowcase() {
+    const roots = document.querySelectorAll<HTMLElement>(".mubi-root");
+
+    roots.forEach((root) => {
+      if (root.dataset.mubiReady === "1") return;
+      root.dataset.mubiReady = "1";
+
+      const blockEls = Array.from(root.querySelectorAll<HTMLElement>(".mubi-block"));
+      if (blockEls.length < 2) return;
+
+      const dotEls = Array.from(root.querySelectorAll<HTMLElement>(".mubi-dot"));
+      const prevBtn = root.querySelector<HTMLButtonElement>(".mubi-prev");
+      const nextBtn = root.querySelector<HTMLButtonElement>(".mubi-next");
+      const viewport = root.querySelector<HTMLElement>(".mubi-viewport");
+
+    let currentIndex = 0;
+    let isAnimating = false;
+
+    // Estado inicial: sólo el primer bloque visible, los demás ocultos
+    blockEls.forEach((block, bIdx) => {
+      const cards = Array.from(block.querySelectorAll<HTMLElement>(".mubi-card"));
+      if (bIdx === 0) {
+        gsap.set(cards, { opacity: 1, y: 0, visibility: "visible" });
+      } else {
+        gsap.set(cards, { opacity: 0, y: 20, visibility: "hidden" });
+      }
+    });
+
+    function updateDots(idx: number) {
+      dotEls.forEach((dot, dIdx) => {
+        dot.classList.toggle("active", dIdx === idx);
+      });
+    }
+
+    function transitionToBlock(nextIndex: number) {
+      if (isAnimating || nextIndex === currentIndex) return;
+      isAnimating = true;
+
+      const currentBlock = blockEls[currentIndex];
+      const nextBlock = blockEls[nextIndex];
+
+      const currentCards = Array.from(currentBlock.querySelectorAll<HTMLElement>(".mubi-card"));
+      const nextCards = Array.from(nextBlock.querySelectorAll<HTMLElement>(".mubi-card"));
+
+      // Línea de tiempo maestra para la transición cinemática
+      const tl = gsap.timeline({
+        onComplete: () => {
+          // Limpieza de visibilidad estructural
+          currentBlock.classList.remove("mubi-active");
+          currentBlock.style.position = "absolute";
+          currentBlock.style.visibility = "hidden";
+          currentBlock.style.pointerEvents = "none";
+
+          nextBlock.style.position = "relative";
+          nextBlock.style.pointerEvents = "auto";
+
+          currentIndex = nextIndex;
+          updateDots(currentIndex);
+          isAnimating = false;
+        }
+      });
+
+      // 1. SALIDA: Desvanecimiento escalonado (Staggered Fade Out) del bloque actual
+      tl.to(currentCards, {
+        opacity: 0,
+        y: -20, // Suave desplazamiento hacia arriba al desaparecer
+        stagger: 0.1, // <-- El secreto de MUBI: micro-retraso secuencial
+        duration: 0.55,
+        ease: "power2.inOut"
+      });
+
+      // 2. ENTRADA: Preparación del siguiente bloque en el espacio correcto
+      tl.set(nextBlock, {
+        visibility: "visible",
+        onComplete: () => {
+          nextBlock.classList.add("mubi-active");
+        }
+      });
+
+      tl.set(nextCards, {
+        visibility: "visible",
+        y: 20, // Entran viniendo sutilmente desde abajo
+        opacity: 0
+      });
+
+      // 3. REVELACIÓN: Desvanecimiento escalonado inverso (Staggered Fade In)
+      tl.to(nextCards, {
+        opacity: 1,
+        y: 0,
+        stagger: 0.1, // Desfase secuencial premium al aparecer
+        duration: 0.65,
+        ease: "power3.out"
+      });
+    }
+
+    // LÓGICA DE AUTOPLAY CONTROLADO (7 segundos)
+    let autoplayCall: gsap.core.DelayedCall | null = null;
+    function runAutoplay() {
+      if (autoplayCall) autoplayCall.kill();
+      autoplayCall = gsap.delayedCall(7, () => {
+        let next = currentIndex + 1;
+        if (next >= blockEls.length) next = 0; // Loop infinito al agotar bloques
+        transitionToBlock(next);
+        runAutoplay();
+      });
+    }
+
+    runAutoplay();
+
+    // CONGELAMIENTO INTELIGENTE POR INTERACCIÓN (Hover / Pausa Activa)
+    if (viewport) {
+      viewport.addEventListener("mouseenter", () => autoplayCall?.pause());
+      viewport.addEventListener("mouseleave", () => autoplayCall?.resume());
+    }
+
+    // CONTROLES MANUALES (Next / Prev / Dots)
+    nextBtn?.addEventListener("click", () => {
+      let next = currentIndex + 1;
+      if (next >= blockEls.length) next = 0;
+      transitionToBlock(next);
+      runAutoplay();
+    });
+
+    prevBtn?.addEventListener("click", () => {
+      let prev = currentIndex - 1;
+      if (prev < 0) prev = blockEls.length - 1;
+      transitionToBlock(prev);
+      runAutoplay();
+    });
+
+    dotEls.forEach((dot, dIdx) => {
+      dot.addEventListener("click", () => {
+        transitionToBlock(dIdx);
+        runAutoplay();
+      });
+    });
+  });
+}
+
+  document.addEventListener("astro:page-load", initMubiShowcase);
+  if (document.readyState !== "loading") initMubiShowcase();
+  else document.addEventListener("DOMContentLoaded", initMubiShowcase);
+</script>

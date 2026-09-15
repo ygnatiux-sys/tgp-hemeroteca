@@ -1,6 +1,7 @@
 ---
 import { resolveMultivisionClass } from "../lib/multivision";
 export const prerender = true;
+import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import m1 from '../assets/manifiesto/m1.png';
 import m2 from '../assets/manifiesto/m2.png';
@@ -8,11 +9,74 @@ import m3 from '../assets/manifiesto/m3.png';
 import KitLeadMagnet from '../components/KitLeadMagnet.astro';
 import Marquee from '../components/Marquee.astro';
 import CinematicExcerptRest from '../components/CinematicExcerptRest.astro';
-import { sanitizeImageUrl } from '../lib/content-filter';
+import MazoCartasGSAP from '../components/MazoCartasGSAP.astro';
+import MubiBlockCinematic, { type MubiCinematicItem } from '../components/MubiBlockCinematic.astro';
+import { sanitizeImageUrl, getPublishableEssays, resolveEssayImage, isValidImageSrc } from '../lib/content-filter';
 
 // Portada Hero Cinemática (Monjes Novicios Leyendo en el Templo - Wikimedia Commons)
 const ABOUT_WIKI_COVER = '/src/assets/remotas/monks-1822569-1280.webp';
 const aboutCoverUrl = sanitizeImageUrl(ABOUT_WIKI_COVER);
+
+// ── 5 posts reales para el Mazo de Cartas ──
+const allRaw = await getCollection('ensayos').catch(() => []);
+const publishable = getPublishableEssays(allRaw);
+// Tomar los primeros 5 que tengan imagen válida
+const mazoCartas = publishable
+  .map(e => ({
+    src: resolveEssayImage(e.entry, e.slug) as string,
+    alt: e.entry.title || e.slug,
+    href: `/hemeroteca/${e.slug}/`,
+  }))
+  .filter(c => typeof c.src === 'string' && c.src.length > 4)
+  .slice(0, 5);
+
+// ── Ensayos Cinemáticos para el Showcase por Bloques MUBI (de a 3 tarjetas) ──
+const allCinematicosRaw = await getCollection('ensayosCinematicos').catch(() => []);
+const mubiCinematicItems: MubiCinematicItem[] = allCinematicosRaw
+  .map(item => {
+    const slug = item.id.replace(/\/index$/, '');
+    const data = item.data as any;
+
+    let directCover = data.coverImage || data.image || data.portada || null;
+    if (!directCover && Array.isArray(data.gallery) && data.gallery.length > 0) {
+      directCover = data.gallery[0];
+    }
+
+    let aiImage = null;
+    let aiText = data.generadorTexto || '';
+    if (typeof data.generadorTexto === 'string' && data.generadorTexto.trim().startsWith('{')) {
+      try {
+        const parsed = JSON.parse(data.generadorTexto);
+        if (parsed?.image && typeof parsed.image === 'string' && isValidImageSrc(parsed.image)) {
+          aiImage = parsed.image;
+        }
+        if (parsed?.text && typeof parsed.text === 'string') {
+          aiText = parsed.text;
+        }
+      } catch (e) {}
+    }
+
+    const dynamicCover = (directCover && isValidImageSrc(typeof directCover === 'object' ? directCover.src : directCover))
+      ? directCover
+      : aiImage;
+
+    const resolvedImg = resolveEssayImage({ coverImage: dynamicCover }, slug) ||
+      resolveEssayImage(data, slug) ||
+      `/src/assets/ensayos-cinematicos/${slug}/coverImage.jpg`;
+
+    const cleanExcerpt = (data.dek || data.excerpt || (aiText ? aiText.replace(/[#*_`>\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 150) + '…' : '')) as string;
+
+    return {
+      title: data.title || slug,
+      excerpt: cleanExcerpt,
+      img: sanitizeImageUrl(resolvedImg) || resolvedImg,
+      href: `/ensayos-cinematicos/${slug}/`,
+      badge: "DOSSIER CINEMÁTICO",
+      category: "Ensayos Cinemáticos",
+    };
+  })
+  .filter(item => typeof item.img === 'string' && item.img.length > 4)
+  .slice(0, 6);
 ---
 
 <Layout
@@ -321,6 +385,30 @@ const aboutCoverUrl = sanitizeImageUrl(ABOUT_WIKI_COVER);
 
     </div>
   </div>
+
+  {/* ══════════════════════════════════════════════════════════════════
+      MAZO DE CARTAS: 3 posts del archivo con efecto GSAP abanico
+  ══════════════════════════════════════════════════════════════════ */}
+  {mazoCartas.length > 0 && (
+    <MazoCartasGSAP
+      cartas={mazoCartas}
+      titulo="Del Archivo"
+      subtitulo="Explorar la Hemeroteca"
+      cta={{ label: "Ver archivo completo", href: "/archivo/" }}
+    />
+  )}
+
+  {/* ══════════════════════════════════════════════════════════════════
+      SHOWCASE MUBI CINEMÁTICO: Bloques rígidos de 3 tarjetas con GSAP
+  ══════════════════════════════════════════════════════════════════ */}
+  {mubiCinematicItems.length > 0 && (
+    <MubiBlockCinematic
+      items={mubiCinematicItems}
+      titulo="Colección Cinemática"
+      subtitulo="Experiencias Visuales en Tres Actos"
+    />
+  )}
+
 </Layout>
 
 <script>

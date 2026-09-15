@@ -15,6 +15,7 @@ import RowNetflixClasico from '../components/RowNetflixClasico.astro';
 import BlockCarousel from '../components/BlockCarousel.astro';
 import SpotlightHero from '../components/SpotlightHero.astro';
 import CinematicGrid from '../components/CinematicGrid.astro';
+import MubiBlockCinematic, { type MubiCinematicItem } from '../components/MubiBlockCinematic.astro';
 import {
   type EssayEntry,
   getPublishableEssays,
@@ -203,13 +204,13 @@ const topFeaturedSlugs = new Set([
   secondaryB?.slug,
 ].filter(Boolean));
 
-// Completar "Ensayos Recientes" con 4 cards de Ensayos Cinemáticos
+// Completar "Ensayos Recientes" con ensayos cinemáticos y de archivo (12 para carrusel fluido 4+2)
 const availableCinematics = publishableCinematicos.filter(c => !topFeaturedSlugs.has(c.slug));
 
 const recentEssays: EssayEntry[] = [
   ...availableCinematics,
   ...remaining.filter(e => !topFeaturedSlugs.has(e.slug) && !availableCinematics.some(c => c.slug === e.slug))
-].slice(0, 4);
+].slice(0, 12);
 
 const recentSlugs = new Set(recentEssays.map(e => e.slug));
 
@@ -265,6 +266,22 @@ const gridItems = publishableCinematicos.map(item => {
     link: `/ensayos-cinematicos/${item.slug}`,
   };
 });
+
+// ─── POSTS PARA SHOWCASE MUBI CINEMÁTICO AL FINAL DEL HOME ───
+const mubiHomeCinematicItems: MubiCinematicItem[] = publishableCinematicos
+  .map(item => {
+    const aiText = item.entry.generadorTexto || '';
+    const cleanExcerpt = ((item.entry as any).dek || (item.entry as any).excerpt || (aiText ? aiText.replace(/[#*_`>\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 180) + '…' : '')) as string;
+    return {
+      title: item.entry.title || 'Dossier Cinemático',
+      excerpt: cleanExcerpt,
+      img: resolveEssayImage(item.entry, item.slug) as string,
+      href: `/ensayos-cinematicos/${item.slug}/`,
+      badge: "DOSSIER CINEMÁTICO",
+      category: "Ensayos Cinemáticos",
+    };
+  })
+  .filter(item => typeof item.img === 'string' && item.img.length > 4);
 
 const resolvedCollections = collections.map(c => ({
   ...c,
@@ -549,11 +566,16 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════
-          BLOQUE FINAL: VERTICAL CINEMATIC GRID (DEBAJO DE TODO)
+          BLOQUE FINAL: SHOWCASE CINEMÁTICO MUBI (DEBAJO DE TODO)
+          Bloques rígidos de 3 tarjetas de tamaño amplio con loop infinito GSAP
       ═══════════════════════════════════════════════════════════════════ */}
-      {gridItems.length > 0 && (
-        <div id="seccion-ensayos-cinematicos" class="relative z-30 w-full bg-[#080808]">
-          <CinematicGrid items={gridItems} title="Ensayos Cinemáticos" />
+      {mubiHomeCinematicItems.length > 0 && (
+        <div id="seccion-ensayos-cinematicos" class="relative z-30 w-full">
+          <MubiBlockCinematic
+            items={mubiHomeCinematicItems}
+            titulo="Colección Cinemática"
+            subtitulo="Dossiers en Pantalla Completa"
+          />
         </div>
       )}
 

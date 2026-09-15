@@ -92,6 +92,14 @@ displayItems = displayItems.map(item => ({
   title: item.title || '',
 }));
 
+// Salvaguarda: para que la física 4 en vista + 2 en sombras funcione en bucle infinito, aseguramos al menos 8 items
+if (displayItems.length > 0 && displayItems.length < 6) {
+  displayItems = [...displayItems, ...displayItems];
+  if (displayItems.length < 6) {
+    displayItems = [...displayItems, ...displayItems];
+  }
+}
+
 const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
 ---
 
@@ -118,7 +126,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
       
       <div class="flex items-center gap-4">
         <span class="text-[8.5px] font-metadata tracking-[0.25em] text-white/30 uppercase hidden sm:inline-block">
-          {displayItems.length} Artículos
+          {items.length || displayItems.length} Artículos
         </span>
         {actionText && actionHref && (
           <a href={actionHref} class="font-metadata text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(239,235,227,0.5)] transition-all">
@@ -273,7 +281,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     left: 50%;
     width: 55%; /* Móvil: 1 centro, 2 asomando */
     height: auto;
-    aspect-ratio: 10 / 14.5; /* Más larga hacia abajo en móvil */
+    aspect-ratio: 10 / 14; /* Proporción vertical elegante */
     max-width: none;
     cursor: pointer;
     border-radius: 1rem;
@@ -281,42 +289,32 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     border: 1px solid rgba(255,255,255,0.08);
     background: #0a0c0f;
 
-    /* Estado pasante por defecto */
-    transform: translate(-50%, -50%) scale(0.85);
-    opacity: 0.45;
-    filter: brightness(0.55);
-
+    /* Estado inicial: GSAP gobierna transform, left, scale, opacity, filter */
+    transform: translate(-50%, -50%);
+    opacity: 0;
     will-change: transform, left, opacity, filter;
-    transition:
-      transform      580ms cubic-bezier(0.25, 1, 0.5, 1),
-      left           580ms cubic-bezier(0.25, 1, 0.5, 1),
-      opacity        580ms ease,
-      filter         580ms ease,
-      border-color   300ms ease;
+    transition: border-color 300ms ease;
   }
 
   @media (min-width: 640px) {
     .gallery-card {
-      width: 36%; /* Tablet: 3 visibles */
-      aspect-ratio: 10 / 12.5; /* Más larga hacia abajo en tablet */
+      width: 28%; /* Tablet: 3 visibles + 2 en sombra */
+      aspect-ratio: 10 / 13.5;
       border-radius: 1.25rem;
     }
   }
 
   @media (min-width: 1024px) {
     .gallery-card {
-      width: 20%; /* Desktop: 4 iguales visibles, 2 asomando */
-      aspect-ratio: 10 / 12.5; 
-      border-radius: 1.5rem;
+      width: 18.5%; /* Desktop: 4 centrales visibles + 2 en sombra */
+      aspect-ratio: 10 / 13.5; 
+      border-radius: 1.25rem;
     }
   }
 
   /* Estado activo (centro) */
   .gallery-card.is-active {
-    opacity: 1;
-    filter: brightness(1);
     border-color: rgba(255,255,255,0.2);
-    z-index: 20;
     pointer-events: auto;
   }
 
@@ -328,15 +326,20 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
 
   .gallery-card-img {
     filter: brightness(0.9) contrast(1.04);
-    transition: filter 340ms ease;
+    transition: filter 340ms ease, transform 0.6s ease-out;
   }
   .gallery-card.is-active .gallery-card-img {
     filter: brightness(1) contrast(1.04);
   }
-  .gallery-card:hover { border-color: rgba(255,255,255,0.25); }
+  .gallery-card:hover .gallery-card-img {
+    transform: scale(1.04);
+  }
+  .gallery-card:hover { border-color: rgba(224, 122, 95, 0.45); }
 </style>
 
 <script>
+  import { gsap } from "gsap";
+
   function initGalleryRows() {
     const rows = document.querySelectorAll<HTMLElement>('.netflix-row-root');
 
@@ -354,125 +357,194 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
       const total = cards.length;
       let currentIndex = 0;
 
-      function updateCards() {
-        // Separación horizontal según viewport (% del wrapper) calibrada para 3 a 5 cards con gap elegante
+      function updateCards(immediate = false) {
         const w = window.innerWidth;
         const isMobile = w < 640;
         const isTablet = w >= 640 && w < 1024;
-        
-        // Ajustamos el step para el nuevo tamaño más compacto:
-        const step = isMobile ? 50 : (isTablet ? 32 : 20); // %
 
         cards.forEach((card, idx) => {
-          let diff = idx - currentIndex;
+          // Distancia circular simétrica
+          let diff = ((idx - currentIndex) % total + total) % total;
+          if (diff > total - 3) {
+            diff -= total;
+          }
 
-          // Envoltura circular seamless
-          if (diff >  total / 2) diff -= total;
-          if (diff < -total / 2) diff += total;
+          let targetLeft = "50%";
+          let targetScale = 1.0;
+          let targetOpacity = 1.0;
+          let targetFilter = "brightness(1) contrast(1.04)";
+          let targetZIndex = 20;
+          let targetPointerEvents = "auto";
+          let isActive = false;
 
           if (!isMobile && !isTablet) {
-            // DESKTOP: 4 cards centrales nivel 1, 2 bordes nivel 2
-            // Centramos el bloque de 4 cards (diff 0, 1, 2, 3) restando 1.5 al diff
-            const leftPos = 50 + (diff - 1.5) * step;
+            // ── DESKTOP: 4 EN LA VISTA + 2 EN EXTREMOS EN LA SOMBRA ──
+            const step = 20; // 20% uniforme
+            // Centro de 4 cards (0, 1, 2, 3) está en 1.5
+            // diff = 0 -> 20%
+            // diff = 1 -> 40%
+            // diff = 2 -> 60%
+            // diff = 3 -> 80%
+            // diff = -1 -> 0% (extremo izquierdo en sombra)
+            // diff = 4 -> 100% (extremo derecho en sombra)
+            const leftNum = 50 + (diff - 1.5) * step;
 
             if (diff >= 0 && diff <= 3) {
-              // ── CENTRO (4 IGUALES) ──
-              card.style.left      = `${leftPos}%`;
-              card.style.transform = 'translate(-50%, -50%) scale(1.0)';
-              card.style.opacity   = '1';
-              card.style.filter    = 'brightness(1)';
-              card.style.zIndex    = '30';
-              card.style.pointerEvents = 'auto';
-              card.classList.add('is-active');
-
+              // ── 4 CARDS EN LA VISTA CENTRAL ──
+              targetLeft = `${leftNum}%`;
+              targetScale = 1.0;
+              targetOpacity = 1.0;
+              targetFilter = "brightness(1) contrast(1.04)";
+              targetZIndex = 30;
+              targetPointerEvents = "auto";
+              isActive = true;
             } else if (diff === -1 || diff === 4) {
-              // ── EXTREMOS (2 más chicos en la sombra) ──
-              card.style.left      = `${leftPos}%`;
-              card.style.transform = 'translate(-50%, -50%) scale(0.75)';
-              card.style.opacity   = '0.4';
-              card.style.filter    = 'brightness(0.4)';
-              card.style.zIndex    = '20';
-              card.style.pointerEvents = 'auto';
-              card.classList.remove('is-active');
-
+              // ── 2 EN LOS EXTREMOS EN LA SOMBRA ──
+              targetLeft = `${leftNum}%`;
+              targetScale = 0.80;
+              targetOpacity = 0.35;
+              targetFilter = "brightness(0.35) contrast(0.9)";
+              targetZIndex = 15;
+              targetPointerEvents = "auto";
+              isActive = false;
             } else {
-              // ── OCULTAS ──
+              // ── OCULTAS FUERA DE PANTALLA ──
               const dir = diff < 0 ? -1 : 1;
-              card.style.left      = `calc(50% + ${dir * 180}%)`;
-              card.style.transform = 'translate(-50%, -50%) scale(0.60)';
-              card.style.opacity   = '0';
-              card.style.filter    = 'brightness(0.2)';
-              card.style.zIndex    = '0';
-              card.style.pointerEvents = 'none';
-              card.classList.remove('is-active');
+              targetLeft = `${50 + dir * 140}%`;
+              targetScale = 0.60;
+              targetOpacity = 0;
+              targetFilter = "brightness(0.1)";
+              targetZIndex = 0;
+              targetPointerEvents = "none";
+              isActive = false;
+            }
+          } else if (isTablet) {
+            // ── TABLET: 3 EN LA VISTA + 2 EN SOMBRA ──
+            const step = 28;
+            const leftNum = 50 + (diff - 1.0) * step;
+
+            if (diff >= 0 && diff <= 2) {
+              targetLeft = `${leftNum}%`;
+              targetScale = 1.0;
+              targetOpacity = 1.0;
+              targetFilter = "brightness(1) contrast(1.04)";
+              targetZIndex = 30;
+              targetPointerEvents = "auto";
+              isActive = true;
+            } else if (diff === -1 || diff === 3) {
+              targetLeft = `${leftNum}%`;
+              targetScale = 0.80;
+              targetOpacity = 0.35;
+              targetFilter = "brightness(0.35) contrast(0.9)";
+              targetZIndex = 15;
+              targetPointerEvents = "auto";
+              isActive = false;
+            } else {
+              const dir = diff < 0 ? -1 : 1;
+              targetLeft = `${50 + dir * 140}%`;
+              targetScale = 0.60;
+              targetOpacity = 0;
+              targetFilter = "brightness(0.1)";
+              targetZIndex = 0;
+              targetPointerEvents = "none";
+              isActive = false;
             }
           } else {
-            // MOBILE / TABLET: Lógica original (1 centro, laterales cayendo en cascada)
-            const leftPos = 50 + diff * step;
+            // ── MOBILE: 1 EN LA VISTA + 2 EN SOMBRA ──
+            const step = 60;
+            const leftNum = 50 + diff * step;
+
             if (diff === 0) {
-              card.style.left      = `${leftPos}%`;
-              card.style.transform = 'translate(-50%, -50%) scale(1.06)';
-              card.style.opacity   = '1';
-              card.style.filter    = 'brightness(1)';
-              card.style.zIndex    = '30';
-              card.style.pointerEvents = 'auto';
-              card.classList.add('is-active');
+              targetLeft = `${leftNum}%`;
+              targetScale = 1.04;
+              targetOpacity = 1.0;
+              targetFilter = "brightness(1) contrast(1.04)";
+              targetZIndex = 30;
+              targetPointerEvents = "auto";
+              isActive = true;
             } else if (Math.abs(diff) === 1) {
-              card.style.left      = `${leftPos}%`;
-              card.style.transform = 'translate(-50%, -50%) scale(0.90)';
-              card.style.opacity   = '0.7';
-              card.style.filter    = 'brightness(0.65)';
-              card.style.zIndex    = '20';
-              card.style.pointerEvents = 'auto';
-              card.classList.remove('is-active');
-            } else if (Math.abs(diff) === 2) {
-              card.style.left      = `${leftPos}%`;
-              card.style.transform = 'translate(-50%, -50%) scale(0.75)';
-              card.style.opacity   = '0.35';
-              card.style.filter    = 'brightness(0.35)';
-              card.style.zIndex    = '10';
-              card.style.pointerEvents = 'auto';
-              card.classList.remove('is-active');
+              targetLeft = `${leftNum}%`;
+              targetScale = 0.82;
+              targetOpacity = 0.45;
+              targetFilter = "brightness(0.4) contrast(0.9)";
+              targetZIndex = 15;
+              targetPointerEvents = "auto";
+              isActive = false;
             } else {
               const dir = diff < 0 ? -1 : 1;
-              card.style.left      = `calc(50% + ${dir * 180}%)`;
-              card.style.transform = 'translate(-50%, -50%) scale(0.60)';
-              card.style.opacity   = '0';
-              card.style.filter    = 'brightness(0.2)';
-              card.style.zIndex    = '0';
-              card.style.pointerEvents = 'none';
-              card.classList.remove('is-active');
+              targetLeft = `${50 + dir * 140}%`;
+              targetScale = 0.60;
+              targetOpacity = 0;
+              targetFilter = "brightness(0.1)";
+              targetZIndex = 0;
+              targetPointerEvents = "none";
+              isActive = false;
             }
+          }
+
+          if (isActive) {
+            card.classList.add('is-active');
+          } else {
+            card.classList.remove('is-active');
+          }
+
+          if (immediate) {
+            gsap.set(card, {
+              left: targetLeft,
+              scale: targetScale,
+              opacity: targetOpacity,
+              filter: targetFilter,
+              zIndex: targetZIndex,
+              xPercent: -50,
+              yPercent: -50,
+            });
+            card.style.pointerEvents = targetPointerEvents;
+          } else {
+            gsap.to(card, {
+              left: targetLeft,
+              scale: targetScale,
+              opacity: targetOpacity,
+              filter: targetFilter,
+              duration: 0.72,
+              ease: "power3.out",
+              overwrite: "auto",
+              onStart: () => {
+                card.style.zIndex = String(targetZIndex);
+                card.style.pointerEvents = targetPointerEvents;
+              }
+            });
           }
         });
       }
 
       function goTo(index: number) {
         currentIndex = (index + total) % total;
-        updateCards();
+        updateCards(false);
       }
 
       if (nextBtn) nextBtn.addEventListener('click', e => { e.preventDefault(); goTo(currentIndex + 1); });
       if (prevBtn) prevBtn.addEventListener('click', e => { e.preventDefault(); goTo(currentIndex - 1); });
 
-      // Click en tarjeta lateral la trae al centro
+      // Click en tarjeta lateral la trae al frente; si ya está activa, navega
       cards.forEach((card, idx) => {
         card.addEventListener('click', e => {
-          if (idx !== currentIndex) {
+          if (!card.classList.contains('is-active')) {
             e.preventDefault();
             goTo(idx);
           }
         });
       });
 
-      // Swipe touch
+      // Swipe touch fluido
       let touchStartX = 0;
       wrapper.addEventListener('touchstart', (e: TouchEvent) => {
         touchStartX = e.changedTouches[0].screenX;
       }, { passive: true });
       wrapper.addEventListener('touchend', (e: TouchEvent) => {
-        const diff = touchStartX - e.changedTouches[0].screenX;
-        if (Math.abs(diff) > 40) diff > 0 ? goTo(currentIndex + 1) : goTo(currentIndex - 1);
+        const diffX = touchStartX - e.changedTouches[0].screenX;
+        if (Math.abs(diffX) > 40) {
+          diffX > 0 ? goTo(currentIndex + 1) : goTo(currentIndex - 1);
+        }
       }, { passive: true });
 
       // Wheel horizontal
@@ -484,9 +556,9 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
         }
       }, { passive: false });
 
-      window.addEventListener('resize', updateCards);
-      // Inicializar posiciones tras render
-      requestAnimationFrame(() => requestAnimationFrame(updateCards));
+      window.addEventListener('resize', () => updateCards(true));
+      // Inicializar posiciones de inmediato
+      updateCards(true);
     });
   }
 
