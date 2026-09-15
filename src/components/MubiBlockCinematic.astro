@@ -241,7 +241,6 @@ for (let i = 0; i < list.length; i += 3) {
     position: relative;
     width: 100%;
     max-width: 90rem;
-    padding: 0 clamp(1rem, 3.5vw, 3rem);
     box-sizing: border-box;
   }
 
@@ -252,6 +251,8 @@ for (let i = 0; i < list.length; i += 3) {
     gap: 2rem;
     width: 100%;
     position: relative;
+    padding: 0 clamp(1rem, 3.5vw, 3rem);
+    box-sizing: border-box;
   }
 
   .mubi-block:not(.mubi-active) {
@@ -513,12 +514,14 @@ for (let i = 0; i < list.length; i += 3) {
         onComplete: () => {
           // Limpieza de visibilidad estructural
           currentBlock.classList.remove("mubi-active");
-          currentBlock.style.position = "absolute";
-          currentBlock.style.visibility = "hidden";
-          currentBlock.style.pointerEvents = "none";
+          currentBlock.style.position = "";
+          currentBlock.style.visibility = "";
+          currentBlock.style.pointerEvents = "";
 
-          nextBlock.style.position = "relative";
-          nextBlock.style.pointerEvents = "auto";
+          nextBlock.classList.add("mubi-active");
+          nextBlock.style.position = "";
+          nextBlock.style.visibility = "";
+          nextBlock.style.pointerEvents = "";
 
           currentIndex = nextIndex;
           updateDots(currentIndex);
@@ -537,10 +540,7 @@ for (let i = 0; i < list.length; i += 3) {
 
       // 2. ENTRADA: Preparación del siguiente bloque en el espacio correcto
       tl.set(nextBlock, {
-        visibility: "visible",
-        onComplete: () => {
-          nextBlock.classList.add("mubi-active");
-        }
+        visibility: "visible"
       });
 
       tl.set(nextCards, {
