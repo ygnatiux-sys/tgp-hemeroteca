@@ -7,6 +7,7 @@ import CinematicExcerptRest from '../components/CinematicExcerptRest.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
 import CoverflowCarousel, { type CoverflowPost } from '../components/CoverflowCarousel';
 import CollectionRestTray from '../components/CollectionRestTray.astro';
+import RowNetflixClasico from '../components/RowNetflixClasico.astro';
 import SpotlightMediaTray, { type TrayCollectionItem } from '../components/SpotlightMediaTray.astro';
 import Marquee from '../components/Marquee.astro';
 import {
@@ -268,12 +269,20 @@ function createPremierSequences(essays: typeof resolvedEssays) {
         
         {/* ─── SLIDER DE CATEGORÍAS EN TRAY MODO ROW NETFLIX / SPOTLIGHT MEDIA TRAY CON SLIDER HORIZONTAL Y CHEVRONS ─── */}
         <div id="category-slider" class="relative w-full -mx-4 sm:-mx-8 md:-mx-12 lg:-mx-16 px-4 sm:px-8 md:px-12 lg:px-16 pb-6">
-          <SpotlightMediaTray 
-            collections={categoryTrayItems}
+          <RowNetflixClasico 
             eyebrow="ORGANIZACIÓN TEMÁTICA"
             title="COLECCIONES"
-            allLink="/colecciones/"
-            cardAspect="landscape"
+            actionText="VER TODAS →"
+            actionHref="/colecciones/"
+            trayHeight="62vh"
+            items={categoryTrayItems.map(c => ({
+              title: c.title,
+              subtitle: c.excerpt,
+              image: c.coverImage,
+              collectionLabel: c.category,
+              link: c.link,
+              slug: c.slug
+            }))}
           />
         </div>
 
