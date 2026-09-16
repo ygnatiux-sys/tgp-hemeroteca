@@ -161,99 +161,48 @@ function crearModeloEnsayo(
   });
 }
 
-// ─── URL de imagen de reserva alojada en R2 (usada cuando ninguna busqueda da resultado) ───
-const FALLBACK_IMAGE_URL = 'https://storage.thegreatpuzzleproject.com/tgp-fallback.jpg';
-
-// ── Procesamiento de Imágenes (Wikimedia ES/EN + Commons → Cloudflare R2) ─────
-async function buscarImagenWikipedia(termino: string, lang: 'es' | 'en'): Promise<string> {
-  const ua  = 'TGPMind/1.0 (contact@thegreatpuzzleproject.com)';
-  const base = `https://${lang}.wikipedia.org/w/api.php`;
-
-  // Paso 1: página directa
-  const url1 = `${base}?action=query&titles=${encodeURIComponent(termino)}&prop=pageimages&format=json&pithumbsize=1000&redirects=1`;
-  const d1   = await (await fetch(url1, { headers: { 'User-Agent': ua } })).json() as any;
-  if (d1?.query?.pages) {
-    for (const id in d1.query.pages) {
-      const src = d1.query.pages[id]?.thumbnail?.source;
-      if (src) return src;
-    }
-  }
-
-  // Paso 2: búsqueda de texto completa
-  const url2 = `${base}?action=query&generator=search&gsrsearch=${encodeURIComponent(termino)}&gsrlimit=5&prop=pageimages&format=json&pithumbsize=1000`;
-  const d2   = await (await fetch(url2, { headers: { 'User-Agent': ua } })).json() as any;
-  if (d2?.query?.pages) {
-    for (const id in d2.query.pages) {
-      const src = d2.query.pages[id]?.thumbnail?.source;
-      if (src) return src;
-    }
-  }
-  return '';
-}
-
-async function buscarImagenCommons(termino: string): Promise<string> {
-  const ua  = 'TGPMind/1.0 (contact@thegreatpuzzleproject.com)';
-  const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(termino)}&gsrnamespace=6&gsrlimit=5&prop=imageinfo&iiprop=url&format=json`;
-  try {
-    const d = await (await fetch(url, { headers: { 'User-Agent': ua } })).json() as any;
-    if (d?.query?.pages) {
-      for (const id in d.query.pages) {
-        const info = d.query.pages[id]?.imageinfo?.[0];
-        if (info?.url && /\.(jpg|jpeg|png|webp)$/i.test(info.url)) return info.url;
-      }
-    }
-  } catch {}
-  return '';
-}
-
-async function generarTerminosAlternativos(tema: string): Promise<string[]> {
-  try {
-    const prompt = `Para buscar imágenes en Wikipedia de "${tema}", dame 4 términos de búsqueda alternativos en español e inglés, más amplios o más específicos, separados por coma. Solo los términos, sin explicación.`;
-    const resp   = await genai.models.generateContent({ model: 'gemini-3.8-flash', contents: [{ text: prompt }] });
-    return (resp.text || '')
-      .split(',')
-      .map((t: string) => t.trim())
-      .filter((t: string) => t.length > 2);
-  } catch { return []; }
-}
-
-async function subirImagenAR2(imageUrl: string): Promise<string> {
-  const ua     = 'TGPMind/1.0 (contact@thegreatpuzzleproject.com)';
-  const imgRes = await fetch(imageUrl, { headers: { 'User-Agent': ua } });
-  if (!imgRes.ok) throw new Error(`HTTP ${imgRes.status} al descargar imagen`);
-  const buffer   = Buffer.from(await imgRes.arrayBuffer());
-  const archivo  = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}.jpg`;
-  await r2Client.send(new PutObjectCommand({ Bucket: R2_BUCKET_NAME, Key: archivo, Body: buffer, ContentType: 'image/jpeg' }));
-  const publicUrl = `https://storage.thegreatpuzzleproject.com/${archivo}`;
-  console.log(`[R2] Subida: ${publicUrl}`);
-  return publicUrl;
-}
-
+// ── Procesamiento de Imágenes (Wikimedia → Cloudflare R2) ────────────────────
 async function procesarImagen(terminoBusqueda: string): Promise<string> {
-  console.log(`[Imagen] Buscando: "${terminoBusqueda}"`);
+  const userAgent = 'TGPMind/1.0 (contact@thegreatpuzzleproject.com)';
   try {
-    // Estrategia 1: Wikipedia ES
-    let raw = await buscarImagenWikipedia(terminoBusqueda, 'es');
+    const apiUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(terminoBusqueda)}&prop=pageimages&format=json&pithumbsize=1000&redirects=1`;
+    const res    = await fetch(apiUrl, { headers: { 'User-Agent': userAgent } });
+    const data   = (await res.json()) as any;
 
-    // Estrategia 2: Wikipedia EN
-    if (!raw) raw = await buscarImagenWikipedia(terminoBusqueda, 'en');
-
-    // Estrategia 3: términos alternativos generados por Gemini
-    if (!raw) {
-      const alternos = await generarTerminosAlternativos(terminoBusqueda);
-      console.log(`[Imagen] Alternos Gemini: ${alternos.join(', ')}`);
-      for (const alt of alternos) {
-        raw = await buscarImagenWikipedia(alt, 'es') || await buscarImagenWikipedia(alt, 'en');
-        if (raw) break;
+    let imageUrl: string | undefined;
+    const pages = data?.query?.pages;
+    if (pages) {
+      for (const id in pages) {
+        if (pages[id]?.thumbnail?.source) { imageUrl = pages[id].thumbnail.source; break; }
       }
     }
 
-    // Estrategia 4: Wikimedia Commons
-    if (!raw) raw = await buscarImagenCommons(terminoBusqueda);
+    if (!imageUrl) {
+      const searchUrl  = `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(terminoBusqueda)}&gsrlimit=1&prop=pageimages&format=json&pithumbsize=1000`;
+      const searchRes  = await fetch(searchUrl, { headers: { 'User-Agent': userAgent } });
+      const searchData = (await searchRes.json()) as any;
+      const sPages     = searchData?.query?.pages;
+      if (sPages) {
+        for (const id in sPages) {
+          if (sPages[id]?.thumbnail?.source) { imageUrl = sPages[id].thumbnail.source; break; }
+        }
+      }
+    }
 
-    if (!raw) { console.warn(`[Imagen] Sin resultados para: "${terminoBusqueda}"`); return ''; }
+    if (!imageUrl) { console.warn(`[Wikimedia] Sin imagen para: "${terminoBusqueda}"`); return ''; }
 
-    return await subirImagenAR2(raw);
+    const imgRes = await fetch(imageUrl, { headers: { 'User-Agent': userAgent } });
+    if (!imgRes.ok) throw new Error(`HTTP ${imgRes.status} al descargar imagen`);
+    const buffer        = Buffer.from(await imgRes.arrayBuffer());
+    const nombreArchivo = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}.jpg`;
+
+    await r2Client.send(new PutObjectCommand({
+      Bucket: R2_BUCKET_NAME, Key: nombreArchivo, Body: buffer, ContentType: 'image/jpeg',
+    }));
+
+    const publicUrl = `https://storage.thegreatpuzzleproject.com/${nombreArchivo}`;
+    console.log(`[R2] Subida: ${publicUrl}`);
+    return publicUrl;
   } catch (err) {
     console.error(`[procesarImagen] Error para "${terminoBusqueda}":`, err);
     return '';
@@ -650,8 +599,8 @@ function buildSocialInlineKeyboard(cfg: SesionSocialConfig) {
   return {
     inline_keyboard: [
       [
-        { text: mark(cfg.redes === 'facebook', '🔵 Facebook'), callback_data: 'red_fb' },
-        { text: mark(cfg.redes === 'tiktok', '⚫ TikTok'), callback_data: 'red_tiktok' },
+        { text: mark(cfg.redes === 'facebook', 'ðŸ”µ Facebook'), callback_data: 'red_fb' },
+        { text: mark(cfg.redes === 'tiktok', 'âš« TikTok'), callback_data: 'red_tiktok' },
       ],
       [
         { text: mark(cfg.modelo === 'flash', 'Flash'), callback_data: 'mod_flash' },
@@ -661,7 +610,7 @@ function buildSocialInlineKeyboard(cfg: SesionSocialConfig) {
         { text: mark(cfg.imagen === 'si', 'Con Imagen'), callback_data: 'img_si' },
         { text: mark(cfg.imagen === 'no', 'Sin Imagen'), callback_data: 'img_no' },
       ],
-      [{ text: '🚀 GENERAR Y PUBLICAR', callback_data: 'generar_social' }],
+      [{ text: 'ðŸš€ GENERAR Y PUBLICAR', callback_data: 'generar_social' }],
     ],
   };
 }
@@ -731,7 +680,7 @@ app.post('/webhook/telegram-social', async (c) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: chatId,
-        text: `⚙️ Configura tu publicacion sobre:\n"${sesion.tema}"`,
+        text: `âš™ï¸ Configura tu publicacion sobre:\n"${sesion.tema}"`,
         reply_markup: buildSocialInlineKeyboard(sesion),
       }),
     });
@@ -758,7 +707,7 @@ app.post('/webhook/telegram-social', async (c) => {
     sesionesSocial.set(chatId, sesion);
 
     if (data === 'generar_social') {
-      await editMessageTextSocial(chatId, messageId, `⏳ Generando texto para "${sesion.tema}"...`);
+      await editMessageTextSocial(chatId, messageId, `â³ Generando texto para "${sesion.tema}"...`);
       await answerCallbackQuerySocial(callbackId, 'Generando...');
       try {
         const modelName    = sesion.modelo === 'pro' ? 'gemini-2.5-pro' : 'gemini-3.8-flash';
@@ -767,34 +716,24 @@ app.post('/webhook/telegram-social', async (c) => {
         const textoGenerado = await callGemini(`social-${chatId}`, userPrompt, modelName, SOCIAL_PROMPT);
         if (!textoGenerado || textoGenerado.trim() === '') throw new Error('Gemini no devolvio texto.');
 
-        // Imagen Wikimedia -> R2 con multi-estrategia y red de seguridad para TikTok
+        // Imagen Wikimedia -> R2 con fallback gracioso
         let urlR2 = '';
         if (sesion.imagen === 'si') {
-          await editMessageTextSocial(chatId, messageId, `⏳ Buscando imagen para "${sesion.tema}"...`);
+          await editMessageTextSocial(chatId, messageId, `â³ Buscando imagen para "${sesion.tema}"...`);
           urlR2 = await procesarImagen(sesion.tema);
-          if (!urlR2) {
-            // TikTok EXIGE media obligatoriamente — usar imagen de reserva
-            if (sesion.redes === 'tiktok') {
-              urlR2 = FALLBACK_IMAGE_URL;
-              console.log(`[Social] TikTok: usando imagen de reserva: ${urlR2}`);
-              await sendTelegramSocial(chatId, `⚠️ Sin imagen especifica para "${sesion.tema}". Usando imagen de reserva para TikTok.`);
-            } else {
-              await sendTelegramSocial(chatId, `⚠️ Sin imagen para "${sesion.tema}". Se publicara sin imagen.`);
-            }
-          } else {
-            console.log(`[Social] Imagen R2: ${urlR2}`);
-          }
+          if (!urlR2) await sendTelegramSocial(chatId, `âš ï¸ Sin imagen para "${sesion.tema}". Se publicara sin imagen.`);
+          else console.log(`[Social] Imagen R2: ${urlR2}`);
         }
 
-        const redLabel  = sesion.redes === 'facebook' ? 'Facebook 🔵' : 'TikTok ⚫';
+        const redLabel  = sesion.redes === 'facebook' ? 'Facebook ðŸ”µ' : 'TikTok âš«';
         const platforms = sesion.redes === 'facebook'
           ? [{ platform: 'facebook', accountId: ZERNIO_FB_ID }]
           : [{ platform: 'tiktok',   accountId: ZERNIO_TIKTOK_ID }];
-        const payload: any = { platforms, content: textoGenerado, publishNow: true };
-        if (urlR2) payload.mediaItems = [{ type: 'image', url: urlR2 }];
+        const payload: any = { platforms, content: textoGenerado };
+        if (urlR2) payload.mediaUrls = [urlR2];
         console.log('Payload hacia Zernio:', JSON.stringify(payload));
 
-        await editMessageTextSocial(chatId, messageId, `⏳ Publicando en ${redLabel}...`);
+        await editMessageTextSocial(chatId, messageId, `â³ Publicando en ${redLabel}...`);
         const zernioRes = await fetch('https://api.zernio.com/v1/posts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${ZERNIO_API_KEY}` },
@@ -808,23 +747,20 @@ app.post('/webhook/telegram-social', async (c) => {
         const zernioData: any = await zernioRes.json();
         console.log('[Zernio] Respuesta:', JSON.stringify(zernioData));
 
-        // La URL real del post publicado viene en platforms[0].platformPostUrl (solo disponible con publishNow:true)
         const postUrl: string =
-          zernioData?.post?.platforms?.[0]?.platformPostUrl ||
-          zernioData?.post?.platforms?.[0]?.postUrl         ||
-          zernioData?.post?.platforms?.[0]?.url             ||
-          zernioData?.post?.url                             ||
-          zernioData?.post?.postUrl                         ||
+          zernioData?.data?.url             ||
+          zernioData?.data?.postUrl         ||
+          zernioData?.data?.posts?.[0]?.url ||
+          zernioData?.url                   ||
+          zernioData?.postUrl               ||
           '';
 
-        const urlLine = postUrl
-          ? `\n\n🔗 Enlace de publicacion: ${postUrl}`
-          : `\n\n📋 Post ID: ${zernioData?.post?._id || 'N/A'} (URL disponible cuando Zernio complete la publicacion)`;
-        const imgLine = urlR2 ? `\n🖼 Imagen: ${urlR2}` : '';
-        await sendTelegramSocial(chatId, `✅ Publicacion enviada a ${redLabel}.\n\n${textoGenerado}${urlLine}${imgLine}`);
+        const urlLine = postUrl ? `\n\nðŸ”— Ver en ${redLabel}: ${postUrl}` : '';
+        const imgLine = urlR2   ? `\nðŸ–¼ Imagen: ${urlR2}` : '';
+        await sendTelegramSocial(chatId, `âœ… Publicacion enviada a ${redLabel}.\n\n${textoGenerado}${urlLine}${imgLine}`);
       } catch (error: any) {
         console.error('[Social Webhook Error]:', error);
-        await sendTelegramSocial(chatId, `⚠️ Error al publicar: ${error?.message || 'Fallo desconocido'}`);
+        await sendTelegramSocial(chatId, `âš ï¸ Error al publicar: ${error?.message || 'Fallo desconocido'}`);
       }
       return c.json({ ok: true });
     }
