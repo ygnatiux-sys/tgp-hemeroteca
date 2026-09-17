@@ -1989,3 +1989,19 @@ html[data-nav-state="2"] header:hover .brand-element {
   pointer-events: auto !important;
   user-select: text !important;
 }
+
+/* ═════════════════════════════════════════════════════════════════════════
+   GOOGLE PICKER API: CENTRADO EN VIEWPORT Y MÁXIMA PRIORIDAD Z-INDEX
+═════════════════════════════════════════════════════════════════════════ */
+.picker-dialog-bg {
+  z-index: 99998 !important;
+  position: fixed !important;
+}
+
+.picker-dialog {
+  z-index: 99999 !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}

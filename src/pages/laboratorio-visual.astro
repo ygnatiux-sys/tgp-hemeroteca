@@ -21,3 +21,17 @@ import VisualLaboratory from '../components/VisualLaboratory.svelte';
     <VisualLaboratory client:load />
   </main>
 </Layout>
+
+<style is:global>
+  .picker-dialog-bg {
+    z-index: 99998 !important;
+    position: fixed !important;
+  }
+  .picker-dialog {
+    z-index: 99999 !important;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+</style>

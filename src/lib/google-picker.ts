@@ -89,8 +89,19 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
         const style = document.createElement('style');
         style.id = 'google-picker-anchor-style';
         style.textContent = `
-          .picker-dialog { z-index: 10001 !important; max-width: 96vw !important; max-height: 94vh !important; }
-          .picker-dialog-bg { z-index: 10000 !important; backdrop-filter: blur(2px); }
+          .picker-dialog-bg {
+            z-index: 99998 !important;
+            position: fixed !important;
+          }
+          .picker-dialog {
+            z-index: 99999 !important;
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            max-width: 96vw !important;
+            max-height: 94vh !important;
+          }
         `;
         document.head.appendChild(style);
       }
