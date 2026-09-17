@@ -1,5 +1,6 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
+import svelte from '@astrojs/svelte';
 import markdoc from '@astrojs/markdoc';
 import keystatic from '@keystatic/astro';
 
@@ -24,7 +25,8 @@ function startupLogger() {
 }
 
 export const tgpIntegrations = [
-  react(), 
+  react(),
+  svelte(), // ← ScriptoriumCapture.svelte y futuras islas Svelte
   markdoc(), 
   keystatic(), // ← activo en todos los entornos (local + Cloudflare Worker)
   startupLogger()
