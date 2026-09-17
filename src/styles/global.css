@@ -69,6 +69,75 @@
   --header-bg: rgba(245, 244, 240, 0.92);
   --header-border: rgba(42, 41, 39, 0.12);
   color: #2A2927;
+  background-color: var(--bg-main);
+}
+
+/* Fondo y color base global respetando Dark Academia por defecto */
+body {
+  background-color: var(--bg-main);
+  color: var(--text-body);
+}
+
+[data-theme='light'] body {
+  background-color: var(--bg-main) !important;
+  color: var(--text-body) !important;
+}
+
+[data-theme='light'] #smooth-wrapper,
+[data-theme='light'] #smooth-content {
+  background-color: transparent;
+}
+
+/* Adaptación universal de layouts cinemáticos en Modo Claro al pulsar el Sol */
+[data-theme='light'] [class*="bg-[#0b0c0d]"],
+[data-theme='light'] [class*="bg-[#121413]"],
+[data-theme='light'] [class*="bg-[#07090a]"] {
+  background-color: var(--bg-main) !important;
+  color: var(--text-body) !important;
+}
+
+[data-theme='light'] #obsidiana-bg-root {
+  opacity: 0.08 !important;
+}
+
+[data-theme='light'] .typemagyk-wrapper,
+[data-theme='light'] .typemagyk-wrapper :global(p) {
+  color: var(--text-body) !important;
+}
+
+[data-theme='light'] .typemagyk-wrapper :global(h1),
+[data-theme='light'] .typemagyk-wrapper :global(h2),
+[data-theme='light'] .typemagyk-wrapper :global(h3) {
+  color: var(--text-main) !important;
+}
+
+[data-theme='light'] .typemagyk-wrapper :global(blockquote) {
+  border-left-color: var(--accent-primary) !important;
+  color: var(--accent-secondary) !important;
+}
+
+[data-theme='light'] .font-serif.text-white\/60 {
+  color: var(--text-body) !important;
+}
+
+[data-theme='light'] .text-white\/30 {
+  color: rgba(28, 30, 33, 0.45) !important;
+}
+
+[data-theme='light'] .drop-shadow-\[0_2px_30px_rgba\(0\,0\,0\,0\.9\)\] {
+  filter: none !important;
+}
+
+[data-theme='light'] .border-zinc-800 {
+  border-color: rgba(42, 41, 39, 0.15) !important;
+}
+
+[data-theme='light'] .text-zinc-100 {
+  color: var(--text-main) !important;
+}
+
+[data-theme='light'] .text-zinc-400 {
+  color: var(--text-body) !important;
 }
 
 /* Transición suave global entre temas — solo elementos semánticos de texto y layout */

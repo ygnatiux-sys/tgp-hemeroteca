@@ -9,3 +9,12 @@
 ## 3. Comportamiento en este Entorno
 - Modifica los archivos directamente y ejecuta las pruebas de forma proactiva.
 - Evita pedir confirmación para tareas técnicas o pasos de compilación y ejecución de scripts locales.
+
+## 4. Protocolo de Eficiencia Cognitiva (Ahorro de Tokens)
+Antes de ejecutar cualquier tarea de generación o refactorización de código, debes cumplir estrictamente:
+1. **Auditoría Previa:** Revisa el árbol de archivos y el historial para verificar si el componente o la lógica solicitada ya existe o fue generada previamente.
+2. **Diagnóstico Explícito:** Si el componente ya existe, antes de generar código nuevo, responde brevemente con uno de estos tres estados:
+   - `[ESTADO: INTACTO]` "La lógica ya existe y cumple el objetivo. No requiere cambios."
+   - `[ESTADO: PARCHE]` "El archivo existe. Solo hace falta una modificación puntual (ej. cambiar estilos o arreglar un bug). Procederé con una cirugía mínima."
+   - `[ESTADO: REESCRITURA]` "El archivo existe, pero los nuevos requisitos exigen cambiar la arquitectura. Sugiero una reescritura."
+3. **Cirugía Mínima (Diffs):** Si la tarea requiere modificar algo existente, NUNCA reescribas el archivo completo. Modifica estrictamente las líneas necesarias para cumplir el objetivo y preservar el resto del código para minimizar el consumo de tokens.

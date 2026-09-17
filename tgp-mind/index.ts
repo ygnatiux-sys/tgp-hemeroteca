@@ -577,7 +577,7 @@ app.use('/api/*', cors({
     if (origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) return origin;
     return null;
   },
-  allowHeaders: ['Content-Type', 'Authorization'],
+  allowHeaders: ['Content-Type', 'Authorization', 'x-api-key', 'X-Api-Key'],
   allowMethods: ['POST', 'OPTIONS'],
 }));
 

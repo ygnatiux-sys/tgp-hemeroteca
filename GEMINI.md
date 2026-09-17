@@ -1,11 +1,4 @@
-# Gemini Agent Rules
-
-- Aplica los cambios directamente en el código.
-- No generes archivos de walkthrough (`walkthrough.md`), ni `task.md`, ni planes de verificación, a menos que se esté explícitamente en el modo de plan de implementación (Planning Mode) donde sea estrictamente requerido por el sistema.
-- **Idioma Estricto**: A partir de ahora, todas tus respuestas, explicaciones y comentarios en el código deben ser única y exclusivamente en español.
-- **Autonomía de Ejecución**: Siempre que escribas un script nuevo, necesites validar una función, compilar código, instalar dependencias o correr tests, debes ejecutar los comandos correspondientes en la terminal por ti mismo. No delegues la ejecución de pruebas locales al usuario.
-
-## PROTOCOLO DE EFICIENCIA COGNITIVA (AHORRO DE TOKENS)
+# PROTOCOLO DE EFICIENCIA COGNITIVA (AHORRO DE TOKENS)
 
 Antes de ejecutar cualquier tarea de generación o refactorización de código, el agente DEBE cumplir estrictamente los siguientes pasos:
 

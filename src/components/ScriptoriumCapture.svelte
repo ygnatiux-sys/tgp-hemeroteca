@@ -53,10 +53,12 @@
   let fileInputEl: HTMLInputElement;
 
   // ── Declaraciones reactivas ────────────────────────────────────────────────
-  $: if (isOpen) {
-    document.body.style.overflow = 'hidden';
-  } else {
-    document.body.style.overflow = '';
+  $: if (typeof document !== 'undefined') {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
   }
 
   $: hasImage = !!imageFile || !!imageUrl;
