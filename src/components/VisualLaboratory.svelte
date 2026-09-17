@@ -14,6 +14,16 @@
     ? (import.meta as any).env?.TGP_API_TOKEN
     : null) ?? 'token-desarrollo';
 
+  import { openGooglePicker } from '../lib/google-picker';
+
+  const GOOGLE_PICKER_KEY = (typeof import.meta !== 'undefined'
+    ? (import.meta as any).env?.PUBLIC_GOOGLE_PICKER_API_KEY
+    : null) ?? '';
+
+  const GOOGLE_CLIENT_ID = (typeof import.meta !== 'undefined'
+    ? (import.meta as any).env?.PUBLIC_GOOGLE_CLIENT_ID
+    : null) ?? '';
+
   // ── Estado reactivo ───────────────────────────────────────────────────────
   let imagenBase:       File | null  = null;
   let imagenProcesada:  string | null = null;  // data-URI resultante
@@ -32,9 +42,31 @@
     ? `${imagenBase.name} · ${(imagenBase.size / 1024).toFixed(1)} KB`
     : null;
 
+  let pickerLoading = false;
+
   // ── Manejo de archivo ─────────────────────────────────────────────────────
   function abrirSelector() {
     fileInputEl?.click();
+  }
+
+  function abrirGooglePickerModal() {
+    pickerLoading = true;
+    errorMsg = null;
+    openGooglePicker({
+      apiKey: GOOGLE_PICKER_KEY,
+      clientId: GOOGLE_CLIENT_ID,
+      onSelect: (file: File) => {
+        pickerLoading = false;
+        imagenBase = file;
+        imagenProcesada = null;
+        r2Url = null;
+        estadoR2 = 'idle';
+      },
+      onError: (err) => {
+        pickerLoading = false;
+        errorMsg = `Google Picker: ${err.message}`;
+      },
+    });
   }
 
   function handleFileChange(e: Event) {
@@ -157,9 +189,13 @@
     <label class="vl-step-label">1 · Ingesta de Imagen Base</label>
 
     <div class="vl-ingesta-row">
-      <button class="vl-btn vl-btn--primary" on:click={abrirSelector}>
+      <button class="vl-btn vl-btn--primary" on:click={abrirGooglePickerModal} disabled={pickerLoading}>
         <span class="vl-btn-icon">✦</span>
-        Extraer de Google Drive / Photos / Local
+        {pickerLoading ? 'Iniciando Google Picker…' : 'Extraer de Google Drive / Photos'}
+      </button>
+
+      <button class="vl-btn vl-btn--gray" on:click={abrirSelector}>
+        Subir Archivo Local
       </button>
 
       <input

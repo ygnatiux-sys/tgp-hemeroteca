@@ -5,34 +5,30 @@
   // Estética Material You / MD3 Light · Tailwind CSS puro
   // ─────────────────────────────────────────────────────────────────────────────
   import { marked } from 'marked';
+  import { openGooglePicker } from '../lib/google-picker';
 
   // ── Tipos ─────────────────────────────────────────────────────────────────
   interface VisionResult {
     prompt: string;
     response: string;
     imagePreview: string;
-    imageSource: 'local' | 'wikimedia';
+    imageSource: 'local' | 'google';
     imageName: string;
     timestamp: Date;
-  }
-
-  interface WikiItem {
-    title: string;
-    url: string;
-    thumb: string;
   }
 
   // ── Config ────────────────────────────────────────────────────────────────
   const API_KEY = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_TGP_MIND_API_KEY : null) ?? '2771';
   const VISION_ENDPOINT = 'http://localhost:3001/api/vision';
+  const GOOGLE_PICKER_KEY = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_PICKER_API_KEY : null) ?? '';
+  const GOOGLE_CLIENT_ID = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_CLIENT_ID : null) ?? '';
 
   // ── Estado del Trigger ────────────────────────────────────────────────────
   let isOpen = false;
 
   // ── Estado del Board ──────────────────────────────────────────────────────
   let imageFile: File | null = null;
-  let imageUrl: string | null = null;
-  let imageSource: 'local' | 'wikimedia' = 'local';
+  let imageSource: 'local' | 'google' = 'local';
   let previewUrl: string | null = null;
   let imageName = '';
   let prompt = '';
@@ -40,19 +36,14 @@
   let isDragging = false;
   let results: VisionResult[] = [];
   let error: string | null = null;
-
-  // Wikimedia
-  let wikiQuery = '';
-  let wikiResults: WikiItem[] = [];
-  let wikiLoading = false;
-  let wikiOpen = false;
+  let pickerLoading = false;
 
   // Refs de DOM (Svelte bind:this)
   let promptEl: HTMLTextAreaElement;
   let resultsEl: HTMLDivElement;
   let fileInputEl: HTMLInputElement;
 
-  // ── Declaraciones reactivas ────────────────────────────────────────────────
+  // ── Bloqueo de Scroll al abrir modal ──────────────────────────────────────
   $: if (typeof document !== 'undefined') {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -61,7 +52,7 @@
     }
   }
 
-  $: hasImage = !!imageFile || !!imageUrl;
+  $: hasImage = !!imageFile && !!previewUrl;
   $: canSubmit = hasImage && prompt.trim().length > 0 && !isLoading;
 
   // ── Helpers Base64 ────────────────────────────────────────────────────────
@@ -79,22 +70,14 @@
     });
   }
 
-  async function urlToBase64(url: string): Promise<{ base64: string; mimeType: string }> {
-    const res = await fetch(url);
-    const blob = await res.blob();
-    const file = new File([blob], 'wikimedia-image', { type: blob.type });
-    return fileToBase64(file);
-  }
-
-  // ── Carga de archivo local ────────────────────────────────────────────────
-  function loadLocalFile(file: File) {
+  // ── Carga de imagen (Local o Google Picker) ────────────────────────────────
+  function loadFile(file: File, source: 'local' | 'google' = 'local') {
     if (!file.type.startsWith('image/')) {
-      error = 'Solo se aceptan imágenes.';
+      error = 'Solo se aceptan archivos de imagen (JPG, PNG, WEBP, GIF, TIFF).';
       return;
     }
     imageFile = file;
-    imageUrl = null;
-    imageSource = 'local';
+    imageSource = source;
     imageName = file.name;
     previewUrl = URL.createObjectURL(file);
     error = null;
@@ -103,7 +86,7 @@
   function handleFileChange(e: Event) {
     const input = e.target as HTMLInputElement;
     const file = input.files?.[0];
-    if (file) loadLocalFile(file);
+    if (file) loadFile(file, 'local');
   }
 
   function handleDragOver(e: DragEvent) {
@@ -119,74 +102,42 @@
     e.preventDefault();
     isDragging = false;
     const file = e.dataTransfer?.files[0];
-    if (file) loadLocalFile(file);
+    if (file) loadFile(file, 'local');
   }
 
   function clearImage() {
     imageFile = null;
-    imageUrl = null;
     previewUrl = null;
     imageName = '';
+    if (fileInputEl) fileInputEl.value = '';
   }
 
-  // ── Wikimedia Commons ─────────────────────────────────────────────────────
-  async function searchWikimedia() {
-    if (!wikiQuery.trim()) return;
-    wikiLoading = true;
-    wikiResults = [];
-    try {
-      const url = `https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(wikiQuery)}&srnamespace=6&srlimit=12&format=json&origin=*`;
-      const res = await fetch(url);
-      const data = await res.json();
-      const pages = data?.query?.search ?? [];
-      const withThumbs = await Promise.all(
-        pages.slice(0, 12).map(async (p: any) => {
-          const title = p.title;
-          const infoUrl = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=imageinfo&iiprop=url|thumburl&iiurlwidth=280&format=json&origin=*`;
-          try {
-            const infoRes = await fetch(infoUrl);
-            const infoData = await infoRes.json();
-            const pg = infoData?.query?.pages ?? {};
-            const page: any = Object.values(pg)[0];
-            const info = page?.imageinfo?.[0];
-            return { title: title.replace('File:', ''), url: info?.url ?? '', thumb: info?.thumburl ?? info?.url ?? '' };
-          } catch { return null; }
-        })
-      );
-      wikiResults = withThumbs.filter(Boolean) as WikiItem[];
-    } catch {
-      error = 'Error consultando Wikimedia Commons.';
-    } finally {
-      wikiLoading = false;
-    }
-  }
-
-  function selectWikiImage(item: WikiItem) {
-    imageUrl = item.url;
-    imageFile = null;
-    imageSource = 'wikimedia';
-    imageName = item.title;
-    previewUrl = item.thumb;
-    wikiOpen = false;
+  // ── Google Picker Nativo (Drive / Fotos) ─────────────────────────────────
+  function abrirGooglePicker() {
+    pickerLoading = true;
     error = null;
+    openGooglePicker({
+      apiKey: GOOGLE_PICKER_KEY,
+      clientId: GOOGLE_CLIENT_ID,
+      onSelect: (file: File) => {
+        pickerLoading = false;
+        loadFile(file, 'google');
+      },
+      onError: (err) => {
+        pickerLoading = false;
+        error = `Google Picker: ${err.message}`;
+      },
+    });
   }
 
   // ── Submit a Gemini Vision ────────────────────────────────────────────────
   async function handleSubmit(e?: Event) {
     e?.preventDefault();
-    if (!canSubmit) return;
+    if (!canSubmit || !imageFile) return;
     isLoading = true;
     error = null;
     try {
-      let base64: string;
-      let mimeType: string;
-      if (imageSource === 'local' && imageFile) {
-        ({ base64, mimeType } = await fileToBase64(imageFile));
-      } else if (imageSource === 'wikimedia' && imageUrl) {
-        ({ base64, mimeType } = await urlToBase64(imageUrl));
-      } else {
-        throw new Error('Sin imagen disponible.');
-      }
+      const { base64, mimeType } = await fileToBase64(imageFile);
       const res = await fetch(VISION_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY },
@@ -204,7 +155,6 @@
       }, ...results];
       prompt = '';
       promptEl?.focus();
-      // Scroll suave al panel de resultados
       setTimeout(() => resultsEl?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     } catch (err: any) {
       error = err.message ?? 'Error de conexión con TGP Mind.';
@@ -219,10 +169,6 @@
 
   function handleOverlayClick(e: MouseEvent) {
     if (e.target === e.currentTarget) isOpen = false;
-  }
-
-  function handleWikiKeydown(e: KeyboardEvent) {
-    if (e.key === 'Enter') searchWikimedia();
   }
 </script>
 
@@ -239,7 +185,7 @@
         TGP Vision / Iconografía
       </h2>
       <p class="text-sm text-zinc-600 leading-relaxed">
-        Análisis visual profundo, semiótica iconográfica y consulta directa en Wikimedia Commons.
+        Análisis visual profundo, semiótica iconográfica e ingesta directa con Google Drive / Fotos.
       </p>
     </div>
     <span class="inline-flex items-center px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-800 bg-emerald-100 border border-emerald-200 rounded-full shrink-0 shadow-xs">
@@ -253,22 +199,22 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
-    class="fixed inset-0 z-9998 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 overflow-y-auto"
+    class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 select-none"
     on:click={handleOverlayClick}
     role="dialog"
     tabindex="-1"
     aria-modal="true"
     aria-label="TGP Vision Board"
   >
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden border border-zinc-200 my-auto text-zinc-900 animate-in fade-in zoom-in-95 duration-150">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-6xl h-[88vh] max-h-[88vh] flex flex-col overflow-hidden border border-zinc-200 text-zinc-900 select-auto">
 
       <!-- Header del modal -->
-      <header class="flex items-center justify-between px-6 md:px-8 py-5 border-b border-zinc-200 bg-zinc-50/90 shrink-0">
+      <header class="flex items-center justify-between px-6 md:px-8 py-4 border-b border-zinc-200 bg-zinc-50/95 shrink-0">
         <div>
-          <div class="text-xs font-mono font-medium tracking-widest uppercase text-emerald-700">
+          <div class="text-[11px] font-mono font-medium tracking-widest uppercase text-emerald-700">
             TGP Scriptorium · Motor Cognitivo Multimodal
           </div>
-          <div class="text-2xl font-bold text-zinc-900 mt-0.5">
+          <div class="text-xl font-bold text-zinc-900 mt-0.5">
             Vision / Iconografía
           </div>
         </div>
@@ -282,21 +228,21 @@
       </header>
 
       <!-- Workspace en 2 columnas -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 flex-1 overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-zinc-200">
+      <div class="grid grid-cols-1 lg:grid-cols-2 flex-1 min-h-0 overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-zinc-200">
 
-        <!-- ── COLUMNA IZQUIERDA: Ingesta Visual ─────────────────────────── -->
-        <div class="p-6 md:p-8 flex flex-col gap-6 overflow-y-auto bg-zinc-50/50">
+        <!-- ── COLUMNA IZQUIERDA: Ingesta Visual (limpia y anclada) ──────── -->
+        <div class="p-6 md:p-8 flex flex-col gap-5 overflow-y-auto bg-zinc-50/50">
 
-          <!-- Dropzone o Preview -->
-          <div>
-            <span class="block text-xs font-bold uppercase tracking-wider text-zinc-600 mb-2">
-              Archivo Local · Drag &amp; Drop
+          <!-- Selección / Ingesta de Imagen -->
+          <div class="flex flex-col gap-2">
+            <span class="block text-xs font-bold uppercase tracking-wider text-zinc-600">
+              1. Selección de Imagen
             </span>
 
             {#if !previewUrl}
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div
-                class="border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 {isDragging ? 'border-emerald-500 bg-emerald-50/70 scale-[0.99]' : 'border-zinc-300 bg-zinc-50 hover:bg-zinc-100 hover:border-zinc-400'}"
+                class="border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 min-h-55 {isDragging ? 'border-emerald-500 bg-emerald-50/70 scale-[0.99]' : 'border-zinc-300 bg-white hover:bg-zinc-50 hover:border-zinc-400'}"
                 on:dragover={handleDragOver}
                 on:dragleave={handleDragLeave}
                 on:drop={handleDrop}
@@ -309,22 +255,25 @@
                   class="hidden"
                   on:change={handleFileChange}
                 />
-                <div class="text-3xl text-zinc-400 mb-2">⊕</div>
+                <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-3 shadow-xs">
+                  ↑
+                </div>
                 <div class="text-base font-semibold text-zinc-800">Arrastrá una imagen aquí</div>
-                <div class="text-xs text-zinc-500 mt-1">o hacé clic para explorar · JPG, PNG, WEBP, TIFF, GIF</div>
+                <div class="text-xs text-zinc-500 mt-1">o hacé clic para explorar desde tu equipo</div>
+                <div class="text-[11px] text-zinc-400 mt-2 font-mono">JPG · PNG · WEBP · GIF · TIFF</div>
               </div>
             {:else}
-              <div class="relative rounded-2xl overflow-hidden border border-zinc-200 bg-zinc-100 aspect-video shadow-sm group">
+              <div class="relative rounded-2xl overflow-hidden border border-zinc-200 bg-zinc-900 aspect-video shadow-md group flex items-center justify-center">
                 <img src={previewUrl} alt={imageName} class="w-full h-full object-contain" />
-                <div class="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-4 flex items-center justify-between text-white">
-                  <span class="text-xs font-medium truncate max-w-[70%]">{imageName}</span>
-                  <span class="text-[10px] uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded-full {imageSource === 'wikimedia' ? 'bg-amber-500/90 text-white' : 'bg-emerald-600 text-white'}">
-                    {imageSource === 'wikimedia' ? 'Wikimedia' : 'Local'}
+                <div class="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-3.5 flex items-center justify-between text-white">
+                  <span class="text-xs font-medium truncate max-w-[70%]" title={imageName}>{imageName}</span>
+                  <span class="text-[10px] uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded-full {imageSource === 'google' ? 'bg-blue-600 text-white' : 'bg-emerald-600 text-white'}">
+                    {imageSource === 'google' ? 'Google Cloud' : 'Archivo Local'}
                   </span>
                 </div>
                 <button
                   type="button"
-                  class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center text-sm transition-transform hover:scale-110 cursor-pointer shadow-md"
+                  class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center text-sm transition-transform hover:scale-110 cursor-pointer shadow-md"
                   on:click={clearImage}
                   title="Quitar imagen"
                 >
@@ -335,76 +284,37 @@
           </div>
 
           <!-- Separador -->
-          <div class="flex items-center gap-3 text-xs text-zinc-400 font-medium my-0">
+          <div class="flex items-center gap-3 text-xs text-zinc-400 font-medium">
             <div class="flex-1 h-px bg-zinc-200"></div>
-            <span>o traer desde Wikimedia Commons</span>
+            <span>o desde tu nube de Google</span>
             <div class="flex-1 h-px bg-zinc-200"></div>
           </div>
 
-          <!-- Wikimedia panel -->
-          {#if !wikiOpen}
-            <button
-              type="button"
-              class="w-full py-3 px-4 rounded-xl border border-zinc-200 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-medium text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs"
-              on:click={() => (wikiOpen = true)}
-            >
-              <span class="text-base">🔭</span>
-              Buscar en Wikimedia Commons
-            </button>
-          {:else}
-            <div class="bg-white border border-zinc-200 rounded-2xl p-5 shadow-sm flex flex-col gap-3">
-              <span class="text-xs font-bold uppercase tracking-wider text-zinc-600">Wikimedia Commons · Búsqueda Directa</span>
-              <div class="flex gap-2">
-                <input
-                  class="flex-1 px-3.5 py-2 text-sm bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
-                  placeholder="ej: Roman Forum, Byzantine icon, Leonardo..."
-                  bind:value={wikiQuery}
-                  on:keydown={handleWikiKeydown}
-                />
-                <button
-                  type="button"
-                  class="px-4 py-2 text-xs font-semibold uppercase tracking-wider bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0"
-                  on:click={searchWikimedia}
-                  disabled={wikiLoading || !wikiQuery.trim()}
-                >
-                  {wikiLoading ? 'Buscando…' : 'Buscar'}
-                </button>
-              </div>
+          <!-- Botón de apertura nativa del Google Picker -->
+          <button
+            type="button"
+            class="w-full py-4 px-5 rounded-2xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-blue-900 font-semibold text-sm flex items-center justify-center gap-3 transition-all duration-150 cursor-pointer shadow-xs hover:shadow-sm disabled:opacity-60 disabled:cursor-not-allowed group"
+            on:click={abrirGooglePicker}
+            disabled={pickerLoading}
+          >
+            <svg class="w-5 h-5 shrink-0 text-blue-600 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/>
+            </svg>
+            <span>{pickerLoading ? 'Abriendo Google Picker…' : 'Abrir Google Drive / Google Fotos'}</span>
+          </button>
 
-              {#if wikiResults.length > 0}
-                <div class="grid grid-cols-3 sm:grid-cols-4 gap-2.5 max-h-60 overflow-y-auto p-1 border border-zinc-100 rounded-xl bg-zinc-50/50">
-                  {#each wikiResults as item, i (i)}
-                    <button
-                      type="button"
-                      class="aspect-square rounded-lg overflow-hidden border border-zinc-200 bg-zinc-100 hover:border-emerald-500 hover:ring-2 hover:ring-emerald-400 transition-all group cursor-pointer"
-                      title={item.title}
-                      on:click={() => selectWikiImage(item)}
-                    >
-                      <img src={item.thumb} alt={item.title} loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                    </button>
-                  {/each}
-                </div>
-              {:else if !wikiLoading && wikiQuery}
-                <div class="text-xs text-zinc-500 text-center py-4">Sin resultados para "{wikiQuery}"</div>
-              {/if}
-
-              <button
-                type="button"
-                class="text-xs font-medium text-zinc-500 hover:text-zinc-800 self-end mt-1 cursor-pointer transition-colors"
-                on:click={() => (wikiOpen = false)}
-              >
-                ✕ Cerrar buscador
-              </button>
-            </div>
-          {/if}
+          <!-- Nota informativa anclada -->
+          <div class="mt-auto p-4 rounded-xl bg-zinc-100/70 border border-zinc-200/80 text-[11px] text-zinc-500 leading-relaxed">
+            <span class="font-semibold text-zinc-700">TGP Scriptorium:</span> Accedé a tus imágenes locales o navegá por tus carpetas y fotos en Google Cloud sin salir de la interfaz.
+          </div>
 
         </div>
 
         <!-- ── COLUMNA DERECHA: Prompt + Resultados ───────────────────────── -->
-        <div class="p-6 md:p-8 flex flex-col gap-6 overflow-hidden bg-white">
+        <div class="p-6 md:p-8 flex flex-col gap-5 overflow-hidden bg-white min-h-0">
           <div class="flex flex-col gap-3 shrink-0">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-zinc-600">Instrucción Analítica</span>
+              <span class="text-xs font-bold uppercase tracking-wider text-zinc-600">2. Instrucción Analítica</span>
               <span class="text-[11px] font-mono text-zinc-400">Ctrl + Enter para enviar</span>
             </div>
             <textarea
@@ -422,13 +332,13 @@
                 <span class="text-sm">{previewUrl ? '✓' : '◌'}</span>
                 <span>
                   {previewUrl
-                    ? `Imagen lista (${imageSource === 'wikimedia' ? 'Wikimedia' : 'Local'})`
+                    ? `Imagen lista (${imageSource === 'google' ? 'Google Cloud' : 'Archivo Local'})`
                     : 'Sin imagen seleccionada'}
                 </span>
               </div>
               <button
                 type="button"
-                class="px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-300"
+                class="px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-emerald-600 hover:bg-emerald-700 text-white"
                 on:click={handleSubmit}
                 disabled={!canSubmit}
               >
@@ -446,7 +356,7 @@
           </div>
 
           <!-- Feed de Resultados -->
-          <div class="flex-1 overflow-y-auto space-y-4 pr-1 min-h-70" bind:this={resultsEl}>
+          <div class="flex-1 min-h-0 overflow-y-auto space-y-4 pr-1" bind:this={resultsEl}>
             {#if isLoading}
               <div class="h-full flex flex-col items-center justify-center py-12 gap-3 text-zinc-500">
                 <div class="flex gap-2">
