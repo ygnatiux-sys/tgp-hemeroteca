@@ -164,57 +164,150 @@ function crearModeloEnsayo(
 // ─── URL de imagen de reserva alojada en R2 (usada cuando ninguna busqueda da resultado) ───
 const FALLBACK_IMAGE_URL = 'https://storage.thegreatpuzzleproject.com/tgp-fallback.jpg';
 
-// ── Procesamiento de Imágenes (Wikimedia ES/EN + Commons → Cloudflare R2) ─────
-async function buscarImagenWikipedia(termino: string, lang: 'es' | 'en'): Promise<string> {
-  const ua  = 'TGPMind/1.0 (contact@thegreatpuzzleproject.com)';
-  const base = `https://${lang}.wikipedia.org/w/api.php`;
+// ── ANTI-DRIFT: Pipeline de Resolución de Entidad y Búsqueda Curada ──────────
+interface EntidadVisualCanonica {
+  wikiEn: string;
+  wikiEs: string;
+  categoriaCommons: string;
+  keywords: string[];
+}
 
-  // Paso 1: página directa
-  const url1 = `${base}?action=query&titles=${encodeURIComponent(termino)}&prop=pageimages&format=json&pithumbsize=1000&redirects=1`;
-  const d1   = await (await fetch(url1, { headers: { 'User-Agent': ua } })).json() as any;
-  if (d1?.query?.pages) {
-    for (const id in d1.query.pages) {
-      const src = d1.query.pages[id]?.thumbnail?.source;
-      if (src) return src;
-    }
+async function resolverEntidadCanonica(tema: string): Promise<EntidadVisualCanonica> {
+  const prompt = `Actúa como especialista enciclopédico de Wikipedia y Wikimedia Commons.
+Analiza este tema o búsqueda histórica/geológica/cultural (que puede tener errores tipográficos o nombres informales): "${tema}".
+Devuelve ÚNICAMENTE un objeto JSON sin formato markdown con esta estructura exacta:
+{
+  "wikiEn": "Título exacto del artículo principal en Wikipedia en inglés (ej: 'Klerksdorp sphere')",
+  "wikiEs": "Título exacto del artículo principal en Wikipedia en español (ej: 'Esferas de Klerksdorp')",
+  "categoriaCommons": "Nombre de la categoría más específica en Wikimedia Commons si existe, sin 'Category:' (ej: 'Klerksdorp spheres')",
+  "keywords": ["2 a 4 palabras clave esenciales en inglés o español sin stopwords"]
+}`;
+
+  try {
+    const resp = await genai.models.generateContent({
+      model: 'gemini-3.8-flash',
+      contents: [{ text: prompt }],
+      config: { responseMimeType: 'application/json' },
+    });
+    const parsed = JSON.parse(resp.text || '{}');
+    return {
+      wikiEn: parsed.wikiEn || tema,
+      wikiEs: parsed.wikiEs || tema,
+      categoriaCommons: parsed.categoriaCommons || '',
+      keywords: Array.isArray(parsed.keywords) ? parsed.keywords.map((k: string) => k.toLowerCase()) : [],
+    };
+  } catch (err) {
+    console.warn('[Anti-Drift] Falló resolución con Gemini, usando término directo:', err);
+    return {
+      wikiEn: tema,
+      wikiEs: tema,
+      categoriaCommons: '',
+      keywords: tema.toLowerCase().split(/\s+/).filter(w => w.length > 3),
+    };
   }
+}
 
-  // Paso 2: búsqueda de texto completa
-  const url2 = `${base}?action=query&generator=search&gsrsearch=${encodeURIComponent(termino)}&gsrlimit=5&prop=pageimages&format=json&pithumbsize=1000`;
-  const d2   = await (await fetch(url2, { headers: { 'User-Agent': ua } })).json() as any;
-  if (d2?.query?.pages) {
-    for (const id in d2.query.pages) {
-      const src = d2.query.pages[id]?.thumbnail?.source;
-      if (src) return src;
+// Búsqueda curada de imagen principal vía módulo PageImages de Wikipedia
+async function buscarPageImageWikipedia(titulo: string, lang: 'en' | 'es'): Promise<string> {
+  if (!titulo) return '';
+  const ua = 'TGPMind/1.0 (contact@thegreatpuzzleproject.com)';
+  const base = `https://${lang}.wikipedia.org/w/api.php`;
+  const url = `${base}?action=query&titles=${encodeURIComponent(titulo)}&prop=pageimages|original&format=json&pithumbsize=1200&redirects=1`;
+
+  try {
+    const res = await fetch(url, { headers: { 'User-Agent': ua } });
+    if (!res.ok) return '';
+    const data = await res.json() as any;
+    const pages = data?.query?.pages;
+    if (!pages) return '';
+
+    for (const id in pages) {
+      if (id === '-1') continue;
+      const page = pages[id];
+      const src = page?.original?.source || page?.thumbnail?.source;
+      if (src && /\.(jpe?g|png|webp)$/i.test(src)) {
+        // Filtrar banderas, mapas genéricos, escudos o íconos
+        if (!/(flag|bandera|mapa|map|escudo|coat_of_arms|icon|disambig|symbol)/i.test(src)) {
+          return src;
+        }
+      }
     }
+  } catch (err) {
+    console.warn(`[PageImage] Error en Wikipedia ${lang} para "${titulo}":`, err);
   }
   return '';
 }
 
-async function buscarImagenCommons(termino: string): Promise<string> {
-  const ua  = 'TGPMind/1.0 (contact@thegreatpuzzleproject.com)';
-  const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(termino)}&gsrnamespace=6&gsrlimit=5&prop=imageinfo&iiprop=url&format=json`;
+// Búsqueda restringida en Wikimedia Commons con filtrado de metadatos y categorías
+async function buscarCommonsEstricto(categoria: string, keywords: string[]): Promise<string> {
+  const ua = 'TGPMind/1.0 (contact@thegreatpuzzleproject.com)';
+  const base = 'https://commons.wikimedia.org/w/api.php';
+
+  // 1. Si existe categoría exacta en Commons, extraer imágenes miembros de esa categoría (namespace 6 = File)
+  if (categoria) {
+    try {
+      const catUrl = `${base}?action=query&generator=categorymembers&gcmtitle=${encodeURIComponent('Category:' + categoria)}&gcmnamespace=6&gcmlimit=8&prop=imageinfo&iiprop=url|size&format=json`;
+      const res = await fetch(catUrl, { headers: { 'User-Agent': ua } });
+      const data = await res.json() as any;
+      const pages = data?.query?.pages;
+      if (pages) {
+        for (const id in pages) {
+          const info = pages[id]?.imageinfo?.[0];
+          const imgUrl = info?.url;
+          if (imgUrl && /\.(jpe?g|png|webp)$/i.test(imgUrl)) {
+            // Descartar mapas, diagramas e íconos pequeños
+            if (!/(map|flag|diagram|icon|locator)/i.test(imgUrl) && (!info.width || info.width >= 500)) {
+              return imgUrl;
+            }
+          }
+        }
+      }
+    } catch {}
+  }
+
+  // 2. Si no hay categoría o no arrojó resultados, buscar por keywords con exclusión estricta
+  if (keywords.length > 0) {
+    try {
+      const queryStr = keywords.join(' ') + ' -map -flag -icon -diagram';
+      const searchUrl = `${base}?action=query&generator=search&gsrsearch=${encodeURIComponent(queryStr)}&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url|size&format=json`;
+      const res = await fetch(searchUrl, { headers: { 'User-Agent': ua } });
+      const data = await res.json() as any;
+      const pages = data?.query?.pages;
+      if (pages) {
+        for (const id in pages) {
+          const title = (pages[id]?.title || '').toLowerCase();
+          const info = pages[id]?.imageinfo?.[0];
+          const imgUrl = info?.url;
+          if (!imgUrl || !/\.(jpe?g|png|webp)$/i.test(imgUrl)) continue;
+
+          // Validar que el archivo contenga al menos una de las keywords principales
+          const matchKw = keywords.some(k => title.includes(k));
+          if (matchKw && !/(map|flag|diagram|icon|locator)/i.test(title)) {
+            return imgUrl;
+          }
+        }
+      }
+    } catch {}
+  }
+
+  return '';
+}
+
+async function buscarImagenWikipediaFallback(termino: string, lang: 'es' | 'en'): Promise<string> {
+  const ua = 'TGPMind/1.0 (contact@thegreatpuzzleproject.com)';
+  const base = `https://${lang}.wikipedia.org/w/api.php`;
+  const url = `${base}?action=query&generator=search&gsrsearch=${encodeURIComponent(termino)}&gsrlimit=3&prop=pageimages&format=json&pithumbsize=1000`;
   try {
-    const d = await (await fetch(url, { headers: { 'User-Agent': ua } })).json() as any;
+    const res = await fetch(url, { headers: { 'User-Agent': ua } });
+    const d = await res.json() as any;
     if (d?.query?.pages) {
       for (const id in d.query.pages) {
-        const info = d.query.pages[id]?.imageinfo?.[0];
-        if (info?.url && /\.(jpg|jpeg|png|webp)$/i.test(info.url)) return info.url;
+        const src = d.query.pages[id]?.thumbnail?.source;
+        if (src) return src;
       }
     }
   } catch {}
   return '';
-}
-
-async function generarTerminosAlternativos(tema: string): Promise<string[]> {
-  try {
-    const prompt = `Para buscar imágenes en Wikipedia de "${tema}", dame 4 términos de búsqueda alternativos en español e inglés, más amplios o más específicos, separados por coma. Solo los términos, sin explicación.`;
-    const resp   = await genai.models.generateContent({ model: 'gemini-3.8-flash', contents: [{ text: prompt }] });
-    return (resp.text || '')
-      .split(',')
-      .map((t: string) => t.trim())
-      .filter((t: string) => t.length > 2);
-  } catch { return []; }
 }
 
 // Helper: Subir Buffer binario a Cloudflare R2
@@ -266,29 +359,30 @@ async function subirImagenAR2(imageUrl: string): Promise<string> {
 }
 
 async function procesarImagen(terminoBusqueda: string): Promise<string> {
-  console.log(`[Imagen] Buscando: "${terminoBusqueda}"`);
+  console.log(`[Anti-Drift Imagen] Iniciando búsqueda verificada para: "${terminoBusqueda}"`);
   try {
-    // Estrategia 1: Wikipedia ES
-    let raw = await buscarImagenWikipedia(terminoBusqueda, 'es');
+    // 1. Resolver entidad canónica con Gemini (corrige typos y mapea títulos exactos)
+    const entidad = await resolverEntidadCanonica(terminoBusqueda);
+    console.log(`[Anti-Drift] Entidad: WikiEN="${entidad.wikiEn}", WikiES="${entidad.wikiEs}", CatCommons="${entidad.categoriaCommons}"`);
 
-    // Estrategia 2: Wikipedia EN
-    if (!raw) raw = await buscarImagenWikipedia(terminoBusqueda, 'en');
+    // 2. Prioridad A: PageImage curada de Wikipedia en inglés (máxima resolución y relevancia)
+    let raw = await buscarPageImageWikipedia(entidad.wikiEn, 'en');
 
-    // Estrategia 3: términos alternativos generados por Gemini
+    // 3. Prioridad B: PageImage curada de Wikipedia en español
+    if (!raw) raw = await buscarPageImageWikipedia(entidad.wikiEs, 'es');
+
+    // 4. Prioridad C: Commons estricto por categoría específica (Category:...) o keywords validadas
+    if (!raw) raw = await buscarCommonsEstricto(entidad.categoriaCommons, entidad.keywords);
+
+    // 5. Prioridad D: Respaldo en Wikipedia
+    if (!raw) raw = await buscarImagenWikipediaFallback(entidad.wikiEs, 'es') || await buscarImagenWikipediaFallback(entidad.wikiEn, 'en');
+
     if (!raw) {
-      const alternos = await generarTerminosAlternativos(terminoBusqueda);
-      console.log(`[Imagen] Alternos Gemini: ${alternos.join(', ')}`);
-      for (const alt of alternos) {
-        raw = await buscarImagenWikipedia(alt, 'es') || await buscarImagenWikipedia(alt, 'en');
-        if (raw) break;
-      }
+      console.warn(`[Anti-Drift] Sin resultados verificados para: "${terminoBusqueda}"`);
+      return '';
     }
 
-    // Estrategia 4: Wikimedia Commons
-    if (!raw) raw = await buscarImagenCommons(terminoBusqueda);
-
-    if (!raw) { console.warn(`[Imagen] Sin resultados para: "${terminoBusqueda}"`); return ''; }
-
+    console.log(`[Anti-Drift] Imagen seleccionada con éxito: ${raw}`);
     return await subirImagenAR2(raw);
   } catch (err) {
     console.error(`[procesarImagen] Error para "${terminoBusqueda}":`, err);
