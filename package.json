@@ -26,6 +26,7 @@
     "clean:urls": "node scripts/limpiar-urls-contenido.mjs",
     "optimize:remote": "node scripts/optimizar-remotas.mjs",
     "sync": "npm run optimize:remote && npm run upload:assets && git pull origin main && git add . && (git diff --staged --quiet || git commit -m \"TGP Sync: Actualización unificada de arquitectura y contenido\") && git push origin main",
+    "postinstall": "node scripts/patch-astro.mjs",
     "analisis": "node scripts/analisis-distribucion.mjs",
     "sanear": "node scripts/sanear-hemeroteca.mjs",
     "sanear:preview": "node scripts/sanear-hemeroteca.mjs --dry-run",
@@ -35,7 +36,7 @@
   "dependencies": {
     "@0no-co/graphql.web": "^1.2.0",
     "@astrojs/check": "^0.9.10",
-    "@astrojs/cloudflare": "^14.2.3",
+    "@astrojs/cloudflare": "^14.3.1",
     "@astrojs/markdoc": "^2.0.8",
     "@astrojs/node": "^11.1.4",
     "@astrojs/react": "^6.0.4",
