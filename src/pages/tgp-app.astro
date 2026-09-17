@@ -1,7 +1,7 @@
 ---
 export const prerender = true;
 import Layout from '../layouts/Layout.astro';
-import { TgpVisionBoardWithTrigger } from '../components/TgpVisionBoard';
+import ScriptoriumCapture from '../components/ScriptoriumCapture.svelte';
 ---
 
 <Layout title="TGP Scriptorium | Panel de Control">
@@ -51,7 +51,7 @@ import { TgpVisionBoardWithTrigger } from '../components/TgpVisionBoard';
           <p class="text-sm text-[#8a9a98] mt-1">Gestionar ensayos, narrativas liminales y arquitectura visual.</p>
         </a>
 
-        <TgpVisionBoardWithTrigger client:load />
+        <ScriptoriumCapture client:load />
       </div>
 
       <footer class="mt-8 text-center text-xs text-[#62706e] font-mono">

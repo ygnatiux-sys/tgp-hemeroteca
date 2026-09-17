@@ -79,8 +79,7 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
         .setIncludeFolders(true)
         .setSelectFolderEnabled(false);
 
-      // Vista Google Fotos
-      const photosView = new g.picker.PhotosView();
+      const uploadView = new g.picker.DocsUploadView();
 
       const appId = clientId.split('-')[0];
       const origin = window.location.protocol + '//' + window.location.host;
@@ -106,8 +105,17 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
         .setDeveloperKey(apiKey)
         .setOrigin(origin)
         .addView(docsView)
-        .addView(photosView)
-        .addView(new g.picker.DocsUploadView())
+        .addView(uploadView);
+
+      try {
+        if (g.picker.View && g.picker.ViewId?.PHOTOS) {
+          builder.addView(new g.picker.View(g.picker.ViewId.PHOTOS));
+        }
+      } catch {
+        // Fallback transparente si Photos no está disponible
+      }
+
+      builder
         .setSize(pickerWidth, pickerHeight)
         .setZIndex(10000)
         .setCallback(async (data: any) => {
@@ -128,6 +136,11 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
                 const file = new File([blob], fileName, { type: blob.type || mimeType });
                 onSelect(file);
                 return;
+              }
+
+              if (res.status === 401) {
+                currentAccessToken = null;
+                if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem('tgp_g_token');
               }
 
               // Fallback para Google Fotos o URLs con thumbnail enriquecido
@@ -152,7 +165,18 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
       picker.setVisible(true);
     };
 
-    // 4. Inicializar Token Client y solicitar autorización
+    // 4. Verificar si el token ya existe en memoria (o sessionStorage)
+    if (!currentAccessToken && typeof sessionStorage !== 'undefined') {
+      currentAccessToken = sessionStorage.getItem('tgp_g_token');
+    }
+
+    // Si ya existe el access_token, mostramos el PickerBuilder directamente saltando requestAccessToken()
+    if (currentAccessToken) {
+      createPickerInstance(currentAccessToken);
+      return;
+    }
+
+    // Si no existe, solicitamos la autorización a Google
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: clientId,
       scope: 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/photoslibrary.readonly',
@@ -161,15 +185,14 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
           throw new Error(`Error de autenticación Google: ${response.error}`);
         }
         currentAccessToken = response.access_token;
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.setItem('tgp_g_token', response.access_token);
+        }
         createPickerInstance(currentAccessToken!);
       },
     });
 
-    if (currentAccessToken) {
-      createPickerInstance(currentAccessToken);
-    } else {
-      tokenClient.requestAccessToken({ prompt: '' });
-    }
+    tokenClient.requestAccessToken({ prompt: '' });
   } catch (err: any) {
     console.error('[Google Picker]:', err);
     onError?.(err);

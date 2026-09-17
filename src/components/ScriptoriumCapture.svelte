@@ -218,13 +218,22 @@
             Vision / Iconografía
           </div>
         </div>
-        <button
-          type="button"
-          class="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-zinc-600 bg-zinc-100 hover:bg-zinc-200 hover:text-zinc-900 border border-zinc-200 rounded-full transition-colors cursor-pointer"
-          on:click={() => (isOpen = false)}
-        >
-          ✕ Cerrar
-        </button>
+        <div class="flex items-center gap-3">
+          <a
+            href="/tgp-app/"
+            class="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-emerald-800 bg-emerald-50 hover:bg-emerald-100 hover:text-emerald-900 border border-emerald-200 rounded-full transition-colors inline-flex items-center gap-1.5 shadow-xs"
+            title="Volver al Panel Principal de TGP App"
+          >
+            ← Volver al Hub
+          </a>
+          <button
+            type="button"
+            class="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-zinc-600 bg-zinc-100 hover:bg-zinc-200 hover:text-zinc-900 border border-zinc-200 rounded-full transition-colors cursor-pointer"
+            on:click={() => (isOpen = false)}
+          >
+            ✕ Cerrar
+          </button>
+        </div>
       </header>
 
       <!-- Workspace en 2 columnas -->
