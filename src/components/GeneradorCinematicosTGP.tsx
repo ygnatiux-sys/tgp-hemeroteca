@@ -1,0 +1,817 @@
+import React, { useState, useEffect, useRef } from 'react';
+
+// ─── Helper: Setter nativo de React 18 ─────────────────────────────────────
+// Keystatic usa inputs controlados por React. El simple `element.value = x`
+// no dispara el estado interno de React. Este helper usa el setter nativo
+// del prototipo para forzar que React detecte el cambio y valide el slug.
+// setNativeValue: función interna (no re-exportada para evitar colisión con GeneradorGeorreferenciaTGP)
+function setNativeValue(element: HTMLElement, value: string): void {
+  const proto = Object.getPrototypeOf(element);
+  const descriptor =
+    Object.getOwnPropertyDescriptor(proto, 'value') ||
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value') ||
+    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
+
+  if (descriptor && descriptor.set) {
+    descriptor.set.call(element, value);
+  } else {
+    (element as any).value = value;
+  }
+
+  // Disparar todos los eventos que React 18 necesita para detectar el cambio
+  element.dispatchEvent(new Event('input',  { bubbles: true }));
+  element.dispatchEvent(new Event('change', { bubbles: true }));
+  element.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true }));
+}
+
+// ─── Helper: inyectar en el editor ProseMirror de KS (fields.document "Contenido") ───────
+function injectIntoKSDocumentEditor(markdownText: string): boolean {
+  if (typeof document === 'undefined' || !markdownText) return false;
+  
+  // Buscar el editor ProseMirror de Keystatic (campo Contenido)
+  const editorEl = document.querySelector<HTMLDivElement>(
+    '.ProseMirror[contenteditable="true"], [contenteditable="true"].ProseMirror, div[contenteditable="true"][role="textbox"], [contenteditable="true"]'
+  );
+  if (!editorEl) {
+    console.warn('[TGP] Editor ProseMirror no encontrado en el DOM.');
+    return false;
+  }
+
+  try {
+    // 1. Enfocar el editor
+    editorEl.focus();
+
+    // 2. Seleccionar todo el contenido existente
+    const sel = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(editorEl);
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+
+    // 3. Método Primario: Simulación de Pegado con DataTransfer (ProseMirror nativo)
+    const dt = new DataTransfer();
+    dt.setData('text/plain', markdownText);
+    const htmlFormatted = markdownText
+      .split('\n\n')
+      .filter(Boolean)
+      .map(p => p.startsWith('#') ? `<h2>${p.replace(/^#+\s*/, '')}</h2>` : `<p>${p}</p>`)
+      .join('');
+    dt.setData('text/html', htmlFormatted);
+
+    const pasteEvt = new ClipboardEvent('paste', {
+      clipboardData: dt,
+      bubbles: true,
+      cancelable: true,
+      composed: true
+    });
+    editorEl.dispatchEvent(pasteEvt);
+
+    // 4. Método Secundario: execCommand insertText
+    try {
+      document.execCommand('insertText', false, markdownText);
+    } catch (e) {}
+
+    // 5. Método Terciario: InputEvent beforeinput
+    try {
+      const inputEvt = new InputEvent('beforeinput', {
+        inputType: 'insertText',
+        data: markdownText,
+        bubbles: true,
+        cancelable: true,
+        composed: true
+      });
+      editorEl.dispatchEvent(inputEvt);
+    } catch (e) {}
+
+    // 6. Copiar automáticamente al portapapeles como respaldo
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(markdownText);
+      }
+    } catch (e) {}
+
+    // 7. Notificar cambio de input
+    editorEl.dispatchEvent(new Event('input', { bubbles: true }));
+    return true;
+  } catch (err) {
+    console.error('[TGP] Error inyectando en ProseMirror:', err);
+    return false;
+  }
+}
+
+export interface GeminiCinematicProps {
+  value: string;
+  onChange: (val: string) => void;
+}
+
+export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProps) {
+  // ─── ESTADO INTERNO UNIFICADO ───
+  let initialText = value;
+  let initialImage = null;
+  try {
+    const parsed = JSON.parse(value);
+    if (parsed && typeof parsed === 'object') {
+      initialText = parsed.text || '';
+      initialImage = parsed.image || null;
+    }
+  } catch (e) {
+    // Texto plano o vacío
+  }
+
+  const [generatedText, setGeneratedText] = useState(initialText);
+  const [tema, setTema] = useState('');
+  const [generarAmbos, setGenerarAmbos] = useState(true);
+  const [isGeneratingText, setIsGeneratingText] = useState(false);
+  const [isGeneratingArt, setIsGeneratingArt] = useState(false);
+  const [statusMsg, setStatusMsg] = useState<{ type: 'info' | 'error' | 'success'; text: string } | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(initialImage);
+  const [previewPrompt, setPreviewPrompt] = useState<string | null>(null);
+
+  // ── Toggles para campos opcionales (default OFF) ──
+  const [syncExcerpt, setSyncExcerpt] = useState(false);
+  const [excerptIA, setExcerptIA] = useState<string>('');
+  const [isSynced, setIsSynced] = useState(false); // true cuando el texto fue enviado a Keystatic
+
+  const pendingRef = useRef<{ text?: string; excerpt?: string; image?: string }>({});
+
+  const getSlugFromUrl = (): string | null => {
+    if (typeof window === 'undefined') return null;
+    const parts = window.location.pathname.split('/');
+    const itemIndex = parts.indexOf('item');
+    if (itemIndex !== -1 && parts[itemIndex + 1]) {
+      return parts[itemIndex + 1];
+    }
+    return null;
+  };
+
+  const currentSlug = getSlugFromUrl() || 'nuevo_ensayo_cinematico';
+  const BACKUP_KEY = `tgp_cinematico_${currentSlug}`;
+
+  useEffect(() => {
+    if (value && value !== generatedText) {
+      try {
+        const parsed = JSON.parse(value);
+        if (parsed?.text) setGeneratedText(parsed.text);
+        if (parsed?.image) setPreviewImage(parsed.image);
+      } catch (e) {
+        setGeneratedText(value);
+      }
+    } else if (!value) {
+      try {
+        const savedBackup = localStorage.getItem(BACKUP_KEY);
+        if (savedBackup && currentSlug !== 'new' && currentSlug !== 'nuevo_ensayo_cinematico') {
+          const parsed = JSON.parse(savedBackup);
+          if (parsed.text && !generatedText) {
+            setGeneratedText(parsed.text);
+            if (parsed.image) setPreviewImage(parsed.image);
+            if (parsed.excerpt) setExcerptIA(parsed.excerpt);
+          }
+        }
+      } catch (e) {}
+    }
+  }, [value, currentSlug]);
+
+  // Sincronizar hacia Keystatic
+  const syncToKeystatic = (newText: string, newImage: string | null) => {
+    const payload = JSON.stringify({ text: newText, image: newImage });
+    onChange(payload);
+    try {
+      localStorage.setItem(BACKUP_KEY, JSON.stringify({
+        text: newText,
+        image: newImage,
+        excerpt: excerptIA,
+        slug: currentSlug,
+        updatedAt: new Date().toISOString()
+      }));
+    } catch (e) {}
+  };
+
+  // Helper: bloquea/desbloquea el botón Save nativo de Keystatic
+  const lockKeystatiSave = (lock: boolean) => {
+    if (typeof document === 'undefined') return;
+    document.querySelectorAll<HTMLButtonElement>('button').forEach(btn => {
+      const label = (btn.textContent || '').trim().toLowerCase();
+      if (label === 'save' || label === 'create') {
+        if (lock) {
+          btn.setAttribute('disabled', 'true');
+          btn.setAttribute('title', '⚠️ Presioná «Generar» primero para crear el ensayo');
+          btn.style.opacity = '0.35'; btn.style.cursor = 'not-allowed';
+        } else {
+          btn.removeAttribute('disabled'); btn.removeAttribute('title');
+          btn.style.opacity = ''; btn.style.cursor = '';
+        }
+      }
+    });
+  };
+  useEffect(() => { if (!isSynced) lockKeystatiSave(true); }, []);
+  useEffect(() => { lockKeystatiSave(!isSynced); }, [isSynced]);
+
+  // Auto-detectar título desde el campo de título de Keystatic
+  const getEffectiveTopic = (): string => {
+    if (tema.trim()) return tema.trim();
+    if (typeof document !== 'undefined') {
+      const titleInput = document.querySelector<HTMLInputElement>('input[name="title"], input[name="title.name"], input[id^="title"]');
+      if (titleInput && titleInput.value.trim()) return titleInput.value.trim();
+    }
+    return '';
+  };
+
+  // ─── Inyectar en los campos DOM de Keystatic con setNativeValue ─────────────
+  // OBLIGATORIO: Título y Slug (soluciona error "slug must not be empty")
+  // CONDICIONAL: Excerpt
+  const syncFieldsToKeystaticDOM = (titleToUse?: string, excToUse?: string) => {
+    if (typeof document === 'undefined') return;
+
+    const finalTitle = (titleToUse || getEffectiveTopic() || 'Ensayo Cinemático').trim();
+
+    // 1. Inyección en el campo Título de Keystatic
+    const titleInputs = document.querySelectorAll<HTMLInputElement>(
+      'input[name="title"], input[name="title.name"], input[id*="title"], input[placeholder*="titulo"], input[placeholder*="tit"]'
+    );
+    titleInputs.forEach(el => setNativeValue(el, finalTitle));
+
+    // 2. Inyección directa en el campo Slug de Keystatic
+    const slugValue = finalTitle
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
+
+    const slugInputs = document.querySelectorAll<HTMLInputElement>(
+      'input[name="title.slug"], input[name="slug"], input[id*="slug"], input[placeholder*="slug"]'
+    );
+    slugInputs.forEach(el => setNativeValue(el, slugValue));
+
+    // 3. Inyección de Fecha Actualizada
+    const todayStr = new Date().toISOString().split('T')[0];
+    const dateInputs = document.querySelectorAll<HTMLInputElement>(
+      'input[name="date"], input[type="date"], input[id*="date"]'
+    );
+    dateInputs.forEach(el => setNativeValue(el, todayStr));
+
+    // 4. CONDICIONAL: Excerpt
+    if (syncExcerpt && excToUse) {
+      const excTextareas = document.querySelectorAll<HTMLTextAreaElement>(
+        'textarea[name="excerpt"], textarea[id*="excerpt"], textarea[placeholder*="excerpt"], textarea[placeholder*="resumen"]'
+      );
+      excTextareas.forEach(el => setNativeValue(el, excToUse));
+    }
+  };
+
+  // 1. Generar Escrito / Texto con Gemini 3.1 Pro
+  const handleGenerateText = async (): Promise<string | null> => {
+    const topic = getEffectiveTopic();
+    if (!topic) {
+      setStatusMsg({ type: 'error', text: 'Por favor, ingresa un título o tema para el ensayo cinemático.' });
+      return null;
+    }
+
+    // Auto-sincronizar título y slug de inmediato
+    syncFieldsToKeystaticDOM(topic);
+
+    setIsGeneratingText(true);
+    setStatusMsg({ type: 'info', text: 'Generando investigación y ensayo cinemático GSAP con Gemini 3.1 Pro...' });
+
+    try {
+      const res = await fetch('/api/generar-tgp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ titulo: topic, generarImagen: false })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al generar texto');
+
+      const content = data.content || '';
+      const generatedExcerpt = data.excerpt || '';
+      setGeneratedText(content);
+      injectIntoKSDocumentEditor(content);
+      syncToKeystatic(content, previewImage);
+      syncFieldsToKeystaticDOM(topic, generatedExcerpt);
+      setIsSynced(true);
+      lockKeystatiSave(false);
+      setStatusMsg({ type: 'success', text: '✅ Ensayo inyectado en el editor Contenido y sincronizado.' });
+      return content;
+    } catch (err: any) {
+      setStatusMsg({ type: 'error', text: `Error en texto: ${err.message || 'Fallo de conexión'}` });
+      return null;
+    } finally {
+      setIsGeneratingText(false);
+    }
+  };
+
+  // 2. Generar Arte / Portada con Gemini Flash + Nano Banana
+  const handleGenerateArt = async (): Promise<string | null> => {
+    const topic = getEffectiveTopic();
+    if (!topic) {
+      setStatusMsg({ type: 'error', text: 'Por favor, ingresa un título o tema para generar la imagen.' });
+      return null;
+    }
+
+    syncFieldsToKeystaticDOM(topic);
+
+    setIsGeneratingArt(true);
+    setStatusMsg({ type: 'info', text: 'Direccionando y materializando arte cinemático 16:9...' });
+
+    try {
+      const res = await fetch('/api/generar-tgp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ titulo: topic, generarImagen: true, estilo: 'dark-academia' })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al generar imagen');
+
+      if (data.imageUrl) {
+        setPreviewImage(data.imageUrl);
+        setPreviewPrompt(data.imagePrompt || null);
+        syncToKeystatic(generatedText, data.imageUrl);
+        syncFieldsToKeystaticDOM(topic);
+        
+        setStatusMsg({ type: 'success', text: '✅ Imagen cinemática materializada y vinculada.' });
+        return data.imageUrl;
+      } else {
+        setPreviewPrompt(data.imagePrompt || null);
+        setStatusMsg({ type: 'info', text: data.warning || 'Dirección de arte lista.' });
+        return null;
+      }
+    } catch (err: any) {
+      setStatusMsg({ type: 'error', text: `Error en arte: ${err.message || 'Fallo de conexión'}` });
+      return null;
+    } finally {
+      setIsGeneratingArt(false);
+    }
+  };
+
+  // 3. Generar Ambos Juntos
+  const handleExecuteCombined = async () => {
+    setStatusMsg(null);
+    const topic = getEffectiveTopic();
+    if (!topic) {
+      setStatusMsg({ type: 'error', text: 'Por favor, ingresa un título o tema antes de generar.' });
+      return;
+    }
+
+    syncFieldsToKeystaticDOM(topic);
+
+    if (generarAmbos) {
+      const textResult = await handleGenerateText();
+      
+      setIsGeneratingArt(true);
+      setStatusMsg({ type: 'info', text: 'Ensayo cinemático completado. Materializando arte 16:9...' });
+      
+      try {
+        const res = await fetch('/api/generar-tgp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ titulo: topic, generarImagen: true, estilo: 'dark-academia' })
+        });
+        const data = await res.json();
+        
+        if (data.imageUrl) {
+          setPreviewImage(data.imageUrl);
+          setPreviewPrompt(data.imagePrompt || null);
+          syncToKeystatic(textResult || generatedText, data.imageUrl);
+          syncFieldsToKeystaticDOM(topic);
+          setIsSynced(true);
+          lockKeystatiSave(false);
+          setStatusMsg({ type: 'success', text: '✅ Ensayo, Portada y Slug GSAP sincronizados exitosamente.' });
+        }
+      } catch (err: any) {
+        setStatusMsg({ type: 'error', text: `Error en arte: ${err.message || 'Fallo de conexión'}` });
+      } finally {
+        setIsGeneratingArt(false);
+      }
+    }
+  };
+
+  const isBusy = isGeneratingText || isGeneratingArt;
+
+  // Guardado seguro a disco: SOLO opera si hay un slug confirmado de URL.
+  const handleSaveDirectlyToDisk = async (overrides?: { text?: string; excerpt?: string; image?: string }) => {
+    const slugToUse = getSlugFromUrl();
+    if (!slugToUse) {
+      console.info('[TGP] Post nuevo detectado: Keystatic manejará el save inicial.');
+      return null;
+    }
+
+    const topic = getEffectiveTopic();
+    const textToUse = overrides?.text !== undefined ? overrides.text : generatedText;
+    const excToUse = overrides?.excerpt !== undefined ? overrides.excerpt : excerptIA;
+    const imgToUse = overrides?.image !== undefined ? overrides.image : previewImage;
+
+    try {
+      const res = await fetch('/api/guardar-cinematico', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug: slugToUse,
+          title: topic || slugToUse.replace(/-/g, ' '),
+          content: textToUse,
+          excerpt: excToUse,
+          imageUrl: imgToUse,
+        })
+      });
+      const data = await res.json();
+      return data;
+    } catch (e) {
+      console.error('[TGP] Error guardando ensayo cinemático:', e);
+      return null;
+    }
+  };
+
+  // 4. Traspasar Todo a Keystatic (inyecta en campos nativos y editor ProseMirror)
+  const handleTraspasarTodo = async () => {
+    const topic = getEffectiveTopic();
+    if (!generatedText && !previewImage) {
+      setStatusMsg({ type: 'error', text: 'No hay contenido generado para traspasar. Generá primero.' });
+      return;
+    }
+    syncFieldsToKeystaticDOM(topic, excerptIA);
+    if (generatedText) {
+      injectIntoKSDocumentEditor(generatedText);
+    }
+    syncToKeystatic(generatedText, previewImage);
+    setIsSynced(true);
+    lockKeystatiSave(false);
+
+    const slugConfirmado = getSlugFromUrl();
+    if (slugConfirmado) {
+      const saveRes = await handleSaveDirectlyToDisk();
+      if (saveRes?.productionMode) {
+        setStatusMsg({ type: 'success', text: `✅ Contenido preparado. Presioná el botón azul "Save" de Keystatic arriba para publicar en GitHub.` });
+      } else {
+        setStatusMsg({ type: 'success', text: `✅ Ensayo cinemático guardado en disco y traspasado al editor.` });
+      }
+    } else {
+      setStatusMsg({ type: 'success', text: '✅ Contenido inyectado en campos nativos y editor de Keystatic. Podés hacer Save.' });
+    }
+  };
+
+  const hasContent = !!(generatedText || previewImage);
+
+  return (
+    <div style={{
+      backgroundColor: '#0c0d0e',
+      border: '1px solid rgba(255,255,255,0.1)',
+      borderRadius: '12px',
+      padding: '20px',
+      color: '#EFEBE3',
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+      marginTop: '12px',
+      marginBottom: '16px'
+    }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '12px' }}>
+        <div>
+          <h3 style={{ margin: 0, fontSize: '14px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#D4AF37', fontWeight: 700 }}>
+            🎬 Asistente de IA Cinemático (GSAP)
+          </h3>
+          <p style={{ margin: '4px 0 0', fontSize: '11px', color: 'rgba(239,235,227,0.6)', letterSpacing: '0.05em' }}>
+            Redacción Erudita (Gemini 3.1 Pro), Dirección Visual & Sincronización de Slug
+          </p>
+        </div>
+      </div>
+
+      {/* Input de Tema */}
+      <div style={{ marginBottom: '14px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+          <label style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(239,235,227,0.7)' }}>
+            Tema / Título para la IA:
+          </label>
+          <button
+            type="button"
+            onClick={() => syncFieldsToKeystaticDOM(tema)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#D4AF37',
+              fontSize: '11px',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              padding: 0
+            }}
+          >
+            ⚡ Forzar Slug en Keystatic
+          </button>
+        </div>
+        <input
+          type="text"
+          value={tema}
+          onChange={(e) => {
+            setTema(e.target.value);
+            syncFieldsToKeystaticDOM(e.target.value);
+          }}
+          placeholder="Ej: El Tapir Sudamericano y las Rutas Andinas..."
+          style={{
+            width: '100%',
+            backgroundColor: '#16171a',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: '6px',
+            padding: '10px 12px',
+            color: '#fff',
+            fontSize: '13px',
+            outline: 'none',
+            boxSizing: 'border-box'
+          }}
+        />
+      </div>
+
+      {/* Toggles de Sincronización y Opciones */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+        {/* Toggle Ambos */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            id="toggleAmbosCine"
+            checked={generarAmbos}
+            onChange={(e) => setGenerarAmbos(e.target.checked)}
+            style={{ cursor: 'pointer', accentColor: '#D4AF37' }}
+          />
+          <label htmlFor="toggleAmbosCine" style={{ fontSize: '12px', color: 'rgba(239,235,227,0.85)', cursor: 'pointer', userSelect: 'none' }}>
+            Generar Escrito + Portada simultáneamente con un solo clic
+          </label>
+        </div>
+
+        {/* Toggle Excerpt */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            id="toggleExcerptCine"
+            checked={syncExcerpt}
+            onChange={(e) => {
+              setSyncExcerpt(e.target.checked);
+              if (e.target.checked && excerptIA) {
+                syncFieldsToKeystaticDOM(tema, excerptIA);
+              }
+            }}
+            style={{ cursor: 'pointer', accentColor: '#D4AF37' }}
+          />
+          <label htmlFor="toggleExcerptCine" style={{ fontSize: '12px', color: 'rgba(239,235,227,0.7)', cursor: 'pointer', userSelect: 'none' }}>
+            Autocompletar campo "Excerpt / Resumen" en Keystatic (Opcional)
+          </label>
+        </div>
+      </div>
+
+      {/* Botones de Acción */}
+      <div style={{ display: 'grid', gridTemplateColumns: generarAmbos ? '1fr' : '1fr 1fr', gap: '10px', marginBottom: '14px' }}>
+        {generarAmbos ? (
+          <button
+            type="button"
+            disabled={isBusy}
+            onClick={handleExecuteCombined}
+            style={{
+              backgroundColor: isBusy ? '#333' : '#D4AF37',
+              color: isBusy ? '#888' : '#0c0d0e',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '12px',
+              fontSize: '12px',
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              cursor: isBusy ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            {isBusy ? '⚡ Procesando Ambos...' : '⚡ Generar Escrito + Arte Completo'}
+          </button>
+        ) : (
+          <>
+            <button
+              type="button"
+              disabled={isBusy}
+              onClick={handleGenerateText}
+              style={{
+                backgroundColor: isGeneratingText ? '#1b382b' : '#1e4620',
+                color: '#8ef5a4',
+                border: '1px solid rgba(142,245,164,0.3)',
+                borderRadius: '6px',
+                padding: '12px',
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                cursor: isBusy ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              {isGeneratingText ? '✍️ Redactando...' : '1. Generar Escrito (Pro)'}
+            </button>
+
+            <button
+              type="button"
+              disabled={isBusy}
+              onClick={handleGenerateArt}
+              style={{
+                backgroundColor: isGeneratingArt ? '#381c3d' : '#4a154b',
+                color: '#e4a1f5',
+                border: '1px solid rgba(228,161,245,0.3)',
+                borderRadius: '6px',
+                padding: '12px',
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                cursor: isBusy ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              {isGeneratingArt ? '🎨 Renderizando...' : '2. Generar Portada (Flash)'}
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Notificaciones de Estado */}
+      {statusMsg && (
+        <div style={{
+          padding: '10px 12px',
+          borderRadius: '6px',
+          fontSize: '12px',
+          marginBottom: '12px',
+          backgroundColor: statusMsg.type === 'error' ? 'rgba(239,68,68,0.15)' : statusMsg.type === 'success' ? 'rgba(34,197,94,0.15)' : 'rgba(59,130,246,0.15)',
+          border: `1px solid ${statusMsg.type === 'error' ? 'rgba(239,68,68,0.4)' : statusMsg.type === 'success' ? 'rgba(34,197,94,0.4)' : 'rgba(59,130,246,0.4)'}`,
+          color: statusMsg.type === 'error' ? '#fca5a5' : statusMsg.type === 'success' ? '#86efac' : '#93c5fd'
+        }}>
+          {statusMsg.text}
+        </div>
+      )}
+
+      {/* BADGE SINCRONIZACIÓN */}
+      {generatedText && (
+        <div style={{
+          padding: '10px 14px',
+          marginBottom: '12px',
+          borderRadius: '6px',
+          fontSize: '12px',
+          fontWeight: 700,
+          background: isSynced ? 'rgba(25,118,210,0.12)' : 'rgba(245,124,0,0.08)',
+          border: isSynced ? '1px solid #1976d2' : '1px solid #f57c00',
+          color: isSynced ? '#90caf9' : '#ffb74d'
+        }}>
+          {isSynced
+            ? '✅ Ensayo traspasado — podés presionar «Save» en Keystatic.'
+            : '⚠️ Ensayo listo. Presioná «Traspasar Todo a Keystatic» abajo antes de «Save».'}
+        </div>
+      )}
+
+      {/* ÁREA DE TEXTO DEL ENSAYO CINEMÁTICO */}
+      {generatedText && (
+        <div style={{ marginTop: '14px', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
+            <label style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#D4AF37', fontWeight: 700 }}>
+              CONTENIDO DEL ENSAYO CINEMÁTICO (GSAP):
+            </label>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    navigator.clipboard.writeText(generatedText).then(() => {
+                      alert('✓ Ensayo copiado al portapapeles.');
+                    }).catch(() => {
+                      const el = document.querySelector<HTMLTextAreaElement>('textarea[placeholder*="cinemático"]');
+                      if (el) { el.select(); document.execCommand('copy'); }
+                      alert('✓ Texto seleccionado — usá Ctrl+C para copiar.');
+                    });
+                  } catch { alert('Usá Ctrl+A y Ctrl+C en el textarea para copiar.'); }
+                }}
+                style={{ padding: '4px 10px', background: '#14283c', color: '#90caf9', border: '1px solid #285484', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
+              >
+                📋 Copiar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    const slug = getSlugFromUrl() || 'ensayo-cinematico-tgp';
+                    const blob = new Blob([generatedText], { type: 'text/markdown;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${slug}-${new Date().toISOString().slice(0, 10)}.md`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  } catch (e) { alert('No se pudo descargar. Copiá el texto manualmente.'); }
+                }}
+                style={{ padding: '4px 10px', background: '#1b3a1b', color: '#81c784', border: '1px solid #2e7d32', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
+                title="Descarga el ensayo cinemático como archivo .md en tu carpeta de Descargas"
+              >
+                ⬇️ Descargar .md
+              </button>
+            </div>
+          </div>
+          <textarea
+            value={generatedText}
+            placeholder="Cuerpo del ensayo cinemático..."
+            onChange={(e) => {
+              const newText = e.target.value;
+              setGeneratedText(newText);
+              syncToKeystatic(newText, previewImage);
+            }}
+            rows={10}
+            style={{
+              width: '100%',
+              backgroundColor: '#16171a',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '6px',
+              padding: '12px',
+              color: '#fff',
+              fontSize: '13px',
+              lineHeight: '1.6',
+              fontFamily: 'Consolas, Monaco, monospace',
+              boxSizing: 'border-box',
+              resize: 'vertical'
+            }}
+          />
+        </div>
+      )}
+
+      {/* Vista previa de imagen generada */}
+      {previewImage && (
+        <div style={{ marginTop: '12px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', overflow: 'hidden', backgroundColor: '#000' }}>
+          <img src={previewImage} alt="Arte Generado" style={{ width: '100%', height: 'auto', display: 'block' }} />
+          <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.03)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <span style={{ fontSize: '11px', color: 'rgba(239,235,227,0.6)', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
+              {previewPrompt ? `Prompt: ${previewPrompt}` : 'Portada cinemática generada'}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                const img = previewImage;
+                if (!img) return;
+                try {
+                  const slug = getSlugFromUrl() || 'portada-cinematica';
+                  const a = document.createElement('a');
+                  a.href = img;
+                  a.download = `${slug}-portada.jpg`;
+                  a.target = '_blank';
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                } catch { window.open(img, '_blank'); }
+              }}
+              style={{ padding: '4px 10px', background: '#3a2a10', color: '#ffb74d', border: '1px solid #ff9800', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
+              title="Descarga la imagen de portada generada"
+            >
+              ⬇️ Descargar Portada
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ─── BOTÓN TRASPASAR TODO A KEYSTATIC ─── */}
+      {hasContent && (
+        <button
+          type="button"
+          onClick={handleTraspasarTodo}
+          style={{
+            width: '100%',
+            marginTop: '16px',
+            padding: '14px',
+            borderRadius: '8px',
+            border: isSynced ? '2px solid #00e5ff' : '2px solid #3b82f6',
+            background: isSynced
+              ? 'linear-gradient(135deg, #0d2847, #1a4a8a)'
+              : 'linear-gradient(135deg, #1d4ed8, #2563eb)',
+            color: '#fff',
+            fontSize: '13px',
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            cursor: 'pointer',
+            boxShadow: isSynced ? '0 0 16px rgba(0,229,255,0.25)' : '0 4px 14px rgba(37,99,235,0.4)',
+            transition: 'all 0.2s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+          }}
+        >
+          {isSynced
+            ? '✅ Traspasado — Podés presionar Save'
+            : '✓ Traspasar Todo a Keystatic'}
+        </button>
+      )}
+    </div>
+  );
+}
+
+export const geminiCinematicField = {
+  kind: 'form' as const,
+  label: 'Asistente IA Cinemático TGP',
+  Input: GeneradorCinematicosTGP,
+  defaultValue: () => '',
+  parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+  serialize: (v: any) => ({ value: typeof v === 'string' ? v : (v?.value || '') }),
+  validate: (v: any) => v,
+  reader: {
+    parse: (v: any) => (typeof v === 'string' ? v : (v?.value || '')),
+  },
+};
