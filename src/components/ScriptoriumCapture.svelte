@@ -8,18 +8,25 @@
   import { openGooglePicker } from '../lib/google-picker';
 
   // ── Tipos ─────────────────────────────────────────────────────────────────
+  type TransmuteStatus = 'idle' | 'sending' | 'success' | 'error';
+
   interface VisionResult {
     prompt: string;
+    pillLabel: string;
     response: string;
     imagePreview: string;
     imageSource: 'local' | 'google';
     imageName: string;
     timestamp: Date;
+    transmuteStatus: TransmuteStatus;
+    transmuteError?: string;
   }
 
   // ── Config ────────────────────────────────────────────────────────────────
   const API_KEY = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_TGP_MIND_API_KEY : null) ?? '2771';
-  const VISION_ENDPOINT = 'http://localhost:3001/api/vision';
+  const VISION_ENDPOINT = import.meta.env.DEV
+    ? 'http://localhost:3001/api/vision'
+    : 'https://tgp-mind-713934653057.us-central1.run.app/api/vision';
   const GOOGLE_PICKER_KEY = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_PICKER_API_KEY : null) ?? '';
   const GOOGLE_CLIENT_ID = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_CLIENT_ID : null) ?? '';
 
@@ -37,6 +44,10 @@
   let results: VisionResult[] = [];
   let error: string | null = null;
   let pickerLoading = false;
+
+  // ── Estado Cascada Cognitiva ──────────────────────────────────────────────
+  let showManualPrompt = false;
+  let activePillLabel = 'Informe Base';
 
   // Refs de DOM (Svelte bind:this)
   let promptEl: HTMLTextAreaElement;
@@ -130,10 +141,20 @@
     });
   }
 
+  // ── Disparadores Cascada Cognitiva ───────────────────────────────────────
+  async function triggerPreset(label: string, presetPrompt: string) {
+    if (!hasImage || isLoading) return;
+    prompt = presetPrompt;
+    activePillLabel = label;
+    await handleSubmit(undefined, label, presetPrompt);
+  }
+
   // ── Submit a Gemini Vision ────────────────────────────────────────────────
-  async function handleSubmit(e?: Event) {
+  async function handleSubmit(e?: Event, labelOverride?: string, promptOverride?: string) {
     e?.preventDefault();
-    if (!canSubmit || !imageFile) return;
+    const finalPrompt = (promptOverride ?? prompt).trim();
+    if (!hasImage || !finalPrompt || isLoading || !imageFile) return;
+    const finalLabel = labelOverride ?? activePillLabel ?? 'Manual';
     isLoading = true;
     error = null;
     try {
@@ -141,20 +162,23 @@
       const res = await fetch(VISION_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY },
-        body: JSON.stringify({ prompt, base64, mimeType }),
+        body: JSON.stringify({ prompt: finalPrompt, base64, mimeType }),
       });
       if (!res.ok) throw new Error(`Error ${res.status}: ${await res.text()}`);
       const data = await res.json();
       results = [{
-        prompt,
+        prompt: finalPrompt,
+        pillLabel: finalLabel,
         response: data.response ?? '(Sin respuesta)',
         imagePreview: previewUrl ?? '',
         imageSource,
         imageName,
         timestamp: new Date(),
+        transmuteStatus: 'idle',
       }, ...results];
-      prompt = '';
-      promptEl?.focus();
+      if (showManualPrompt) {
+        prompt = '';
+      }
       setTimeout(() => resultsEl?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     } catch (err: any) {
       error = err.message ?? 'Error de conexión con TGP Mind.';
@@ -164,11 +188,46 @@
   }
 
   function handlePromptKeydown(e: KeyboardEvent) {
-    if (e.key === 'Enter' && e.ctrlKey) handleSubmit();
+    if (e.key === 'Enter' && e.ctrlKey) handleSubmit(undefined, 'Manual');
   }
 
   function handleOverlayClick(e: MouseEvent) {
     if (e.target === e.currentTarget) isOpen = false;
+  }
+
+  // ── Transmutación → Keystatic CMS ─────────────────────────────────────────
+  let selectedCollection = 'ensayosCinematicos';
+
+  async function transmuteToKeystatic(index: number, r: VisionResult) {
+    results = results.map((item, i) =>
+      i === index ? { ...item, transmuteStatus: 'sending', transmuteError: undefined } : item
+    );
+    try {
+      const res = await fetch('/api/hemeroteca/transmute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          collection: selectedCollection,
+          pillLabel: r.pillLabel,
+          prompt: r.prompt,
+          response: r.response,
+          imageName: r.imageName,
+          imageSource: r.imageSource,
+          timestamp: r.timestamp.toISOString(),
+        }),
+      });
+      if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(msg || `HTTP ${res.status}`);
+      }
+      results = results.map((item, i) =>
+        i === index ? { ...item, transmuteStatus: 'success' } : item
+      );
+    } catch (err: any) {
+      results = results.map((item, i) =>
+        i === index ? { ...item, transmuteStatus: 'error', transmuteError: err.message } : item
+      );
+    }
   }
 </script>
 
@@ -325,41 +384,111 @@
         </div>
 
         <!-- ── COLUMNA DERECHA: Prompt + Resultados ───────────────────────── -->
+        <!-- ── COLUMNA DERECHA: Cascada Cognitiva (Material You Light) ────── -->
         <div class="p-6 md:p-8 flex flex-col gap-5 overflow-hidden bg-white min-h-0">
-          <div class="flex flex-col gap-3 shrink-0">
+          <div class="flex flex-col gap-3.5 shrink-0 bg-zinc-50 p-5 rounded-3xl border border-zinc-200 shadow-sm">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-zinc-600">2. Instrucción Analítica</span>
-              <span class="text-[11px] font-mono text-zinc-400">Ctrl + Enter para enviar</span>
-            </div>
-            <textarea
-              bind:this={promptEl}
-              bind:value={prompt}
-              rows="3"
-              class="w-full px-4 py-3 text-sm bg-zinc-50 border border-zinc-300 rounded-2xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-none shadow-xs"
-              placeholder="Describí qué querés analizar: iconografía, composición, simbología, datación, contexto histórico, atribución estilística..."
-              on:keydown={handlePromptKeydown}
-              disabled={isLoading}
-            ></textarea>
-
-            <div class="flex items-center justify-between gap-4 mt-1">
-              <div class="text-xs font-medium {previewUrl ? 'text-emerald-700' : 'text-zinc-400'} flex items-center gap-1.5">
-                <span class="text-sm">{previewUrl ? '✓' : '◌'}</span>
-                <span>
-                  {previewUrl
-                    ? `Imagen lista (${imageSource === 'google' ? 'Google Cloud' : 'Archivo Local'})`
-                    : 'Sin imagen seleccionada'}
-                </span>
+              <span class="text-xs font-bold uppercase tracking-wider text-zinc-600">
+                2. Cascada Cognitiva
+              </span>
+              <div class="text-xs font-medium {hasImage ? 'text-emerald-700' : 'text-zinc-400'} flex items-center gap-1.5">
+                <span class="text-sm">{hasImage ? '✓' : '◌'}</span>
+                <span>{hasImage ? 'Documento Listo' : 'Requiere Imagen'}</span>
               </div>
+            </div>
+
+            <!-- Botón Principal (Informe Base) -->
+            <button
+              type="button"
+              disabled={!hasImage || isLoading}
+              on:click={() => triggerPreset('Informe Base', 'Realiza un informe neutral y exhaustivo de esta imagen. Describe literalmente qué se ve, extrae cualquier texto legible (OCR) y señala las entidades principales.')}
+              class="w-full p-4 rounded-2xl bg-emerald-100 hover:bg-emerald-200/90 text-emerald-900 border border-emerald-300 font-semibold text-sm transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-between group disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-emerald-200/80 text-emerald-800 flex items-center justify-center font-bold text-base group-hover:scale-105 transition-transform">
+                  ✦
+                </div>
+                <div class="text-left">
+                  <div class="text-sm font-bold text-emerald-950">Informe Base (OCR + Entidades)</div>
+                  <div class="text-xs text-emerald-700 font-normal">Lectura literal, transcripción de texto y catálogo de entidades</div>
+                </div>
+              </div>
+              <span class="text-xs font-mono font-bold uppercase tracking-wider px-2.5 py-1 bg-white/80 rounded-lg text-emerald-800 border border-emerald-200 shadow-2xs">
+                {isLoading && activePillLabel === 'Informe Base' ? 'Procesando…' : 'Ejecutar ↵'}
+              </span>
+            </button>
+
+            <!-- Fila de Píldoras (Chips) -->
+            <div class="flex flex-wrap items-center gap-2 pt-0.5">
+              <!-- Chip 1: Arqueohistoria -->
               <button
                 type="button"
-                class="px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-emerald-600 hover:bg-emerald-700 text-white"
-                on:click={handleSubmit}
-                disabled={!canSubmit}
+                disabled={!hasImage || isLoading}
+                on:click={() => triggerPreset('Arqueohistoria', 'Realiza una inmersión arqueológica e histórica profunda. Identifica filiación estilística, contexto temporal, cruces culturales y anomalías.')}
+                class="px-3.5 py-2 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed
+                {activePillLabel === 'Arqueohistoria' && isLoading 
+                  ? 'bg-amber-100 border-amber-300 text-amber-900 font-semibold' 
+                  : 'bg-white hover:bg-amber-50 border-zinc-200 hover:border-amber-300 text-zinc-800 hover:text-amber-900 shadow-2xs'}"
               >
-                <span>{isLoading ? 'Analizando…' : 'Procesar'}</span>
-                <span class="text-xs">↵</span>
+                🏺 Arqueohistoria
+              </button>
+
+              <!-- Chip 2: Hermenéutica -->
+              <button
+                type="button"
+                disabled={!hasImage || isLoading}
+                on:click={() => triggerPreset('Hermenéutica', 'Decodifica símbolos, geometría sagrada, iconografía o arquetipos. Analiza la materialidad, manufactura y erosión.')}
+                class="px-3.5 py-2 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed
+                {activePillLabel === 'Hermenéutica' && isLoading 
+                  ? 'bg-purple-100 border-purple-300 text-purple-900 font-semibold' 
+                  : 'bg-white hover:bg-purple-50 border-zinc-200 hover:border-purple-300 text-zinc-800 hover:text-purple-900 shadow-2xs'}"
+              >
+                👁 Hermenéutica
+              </button>
+
+              <!-- Chip 3: Manual (Ocultar/Revelar Textarea) -->
+              <button
+                type="button"
+                on:click={() => (showManualPrompt = !showManualPrompt)}
+                class="px-3.5 py-2 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer
+                {showManualPrompt 
+                  ? 'bg-zinc-900 border-zinc-900 text-white shadow-xs' 
+                  : 'bg-white hover:bg-zinc-100 border-zinc-200 text-zinc-700 shadow-2xs'}"
+              >
+                ✏ Manual {showManualPrompt ? '▲' : '▼'}
               </button>
             </div>
+
+            <!-- Textarea Ocultable (Modo Manual) -->
+            {#if showManualPrompt}
+              <div class="mt-2 space-y-2 pt-2 border-t border-zinc-200/70">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] font-mono font-medium text-zinc-500 uppercase tracking-wider">
+                    Prompt Libre Personalizado
+                  </span>
+                  <span class="text-[11px] font-mono text-zinc-400">Ctrl + Enter para enviar</span>
+                </div>
+                <textarea
+                  bind:this={promptEl}
+                  bind:value={prompt}
+                  rows="3"
+                  class="w-full px-4 py-3 text-sm bg-white border border-zinc-300 rounded-2xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-none shadow-inner"
+                  placeholder="Escribe tu consulta o instrucción específica de análisis..."
+                  on:keydown={handlePromptKeydown}
+                  disabled={isLoading}
+                ></textarea>
+                <div class="flex justify-end">
+                  <button
+                    type="button"
+                    disabled={!hasImage || !prompt.trim() || isLoading}
+                    on:click={() => handleSubmit(undefined, 'Manual')}
+                    class="px-4 py-2 bg-zinc-900 hover:bg-black text-white text-xs font-semibold rounded-xl transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    {isLoading && activePillLabel === 'Manual' ? 'Analizando…' : 'Consultar Manualmente ↵'}
+                  </button>
+                </div>
+              </div>
+            {/if}
 
             {#if error}
               <div class="p-3.5 text-xs rounded-xl bg-red-50 text-red-700 border border-red-200 flex items-center gap-2">
@@ -369,7 +498,7 @@
             {/if}
           </div>
 
-          <!-- Feed de Resultados -->
+          <!-- Feed de Resultados Apilados -->
           <div class="flex-1 min-h-0 overflow-y-auto space-y-4 pr-1" bind:this={resultsEl}>
             {#if isLoading}
               <div class="h-full flex flex-col items-center justify-center py-12 gap-3 text-zinc-500">
@@ -378,39 +507,113 @@
                   <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.15s]"></div>
                   <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.3s]"></div>
                 </div>
-                <div class="text-xs font-mono uppercase tracking-widest text-zinc-500">
-                  Procesando con Gemini Vision…
+                <div class="text-xs font-mono uppercase tracking-widest text-zinc-600 font-medium">
+                  {activePillLabel ? `Ejecutando ${activePillLabel} con Gemini Vision…` : 'Procesando con Gemini Vision…'}
                 </div>
               </div>
             {:else if results.length === 0}
               <div class="h-full flex flex-col items-center justify-center py-16 text-center text-zinc-400 gap-2">
                 <div class="text-3xl text-zinc-300">◈</div>
-                <div class="text-sm font-medium text-zinc-500">
-                  Cargá una imagen y escribí tu instrucción<br />para iniciar el análisis visual.
+                <div class="text-sm font-medium text-zinc-600">
+                  Carga una imagen y pulsa <strong class="text-zinc-800">Informe Base</strong> o cualquier píldora<br />para iniciar la cascada cognitiva.
                 </div>
               </div>
             {:else}
               {#each results as r, i (i)}
-                <div class="p-5 rounded-2xl bg-zinc-50 border border-zinc-200 shadow-xs flex flex-col md:flex-row gap-5">
-                  <div class="w-24 h-24 rounded-xl overflow-hidden border border-zinc-200 bg-zinc-100 shrink-0 self-start">
-                    <img src={r.imagePreview} alt={r.imageName} class="w-full h-full object-cover" />
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center justify-between mb-2">
-                      <span class="text-[11px] font-mono text-zinc-400">
+                <div class="p-5 rounded-3xl bg-zinc-50 border border-zinc-200 shadow-sm flex flex-col gap-4">
+                  <header class="flex items-center justify-between border-b border-zinc-200/80 pb-3">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-2xs
+                        {r.pillLabel === 'Informe Base' ? 'bg-emerald-100 text-emerald-900 border border-emerald-200' :
+                         r.pillLabel === 'Arqueohistoria' ? 'bg-amber-100 text-amber-900 border border-amber-200' :
+                         r.pillLabel === 'Hermenéutica' ? 'bg-purple-100 text-purple-900 border border-purple-200' :
+                         'bg-zinc-200 text-zinc-800 border border-zinc-300'}">
+                        {r.pillLabel || 'Informe Base'}
+                      </span>
+                      <span class="text-[11px] font-mono text-zinc-500">
                         {r.timestamp.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                       </span>
-                      <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-emerald-800 bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-md">
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-600 bg-white border border-zinc-200 px-2 py-0.5 rounded-md">
                         gemini-vision
                       </span>
+                      <button
+                        type="button"
+                        class="text-xs font-mono text-zinc-500 hover:text-zinc-900 px-2 py-0.5 rounded hover:bg-zinc-200 transition-colors cursor-pointer"
+                        on:click={() => navigator.clipboard.writeText(r.response)}
+                        title="Copiar Markdown al portapapeles"
+                      >
+                        Copiar
+                      </button>
                     </div>
-                    <div class="text-xs font-semibold text-zinc-800 mb-2 italic">
-                      ↳ "{r.prompt}"
+                  </header>
+
+                  <div class="flex gap-4 items-start">
+                    <div class="w-20 h-20 rounded-2xl overflow-hidden border border-zinc-200 bg-zinc-100 shrink-0 shadow-2xs">
+                      <img src={r.imagePreview} alt={r.imageName} class="w-full h-full object-cover" />
                     </div>
-                    <div class="prose prose-zinc max-w-none text-xs leading-relaxed text-zinc-700">
-                      <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                      {@html marked.parse(r.response)}
+                    <div class="flex-1 min-w-0">
+                      <div class="text-xs font-medium text-zinc-500 mb-2 line-clamp-1 italic">
+                        ↳ "{r.prompt}"
+                      </div>
+                      <div class="prose prose-zinc max-w-none text-xs leading-relaxed text-zinc-800 font-sans">
+                        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                        {@html marked.parse(r.response)}
+                      </div>
                     </div>
+                  </div>
+
+                  <!-- ── Botón Transmutar → Keystatic ──────────────────────── -->
+                  <div class="pt-3 border-t border-zinc-200/80 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={r.transmuteStatus === 'sending' || r.transmuteStatus === 'success'}
+                        on:click={() => transmuteToKeystatic(i, r)}
+                        class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl border transition-all duration-200 cursor-pointer disabled:cursor-not-allowed
+                          {r.transmuteStatus === 'success'
+                            ? 'bg-emerald-50 border-emerald-300 text-emerald-800 opacity-80'
+                            : r.transmuteStatus === 'error'
+                            ? 'bg-red-50 border-red-300 text-red-800 hover:bg-red-100'
+                            : r.transmuteStatus === 'sending'
+                            ? 'bg-zinc-100 border-zinc-300 text-zinc-500 opacity-70'
+                            : 'bg-white border-zinc-300 text-zinc-800 hover:bg-zinc-100 hover:border-zinc-400 shadow-2xs'}"
+                      >
+                        {#if r.transmuteStatus === 'sending'}
+                          <span class="animate-spin text-sm">⟳</span>
+                          <span>Enviando a Hemeroteca…</span>
+                        {:else if r.transmuteStatus === 'success'}
+                          <span>✅</span>
+                          <span>Guardado en Keystatic</span>
+                        {:else if r.transmuteStatus === 'error'}
+                          <span>⚠</span>
+                          <span>Reintentar Transmutación</span>
+                        {:else}
+                          <span>⚡</span>
+                          <span>Guardar en Hemeroteca</span>
+                        {/if}
+                      </button>
+
+                      <select
+                        bind:value={selectedCollection}
+                        class="text-xs py-2 px-3 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all cursor-pointer shadow-2xs font-medium"
+                        title="Seleccionar colección de destino en Keystatic"
+                      >
+                        <option value="ensayosCinematicos">Ensayos Cinemáticos - GSAP</option>
+                        <option value="ensayos">Ensayos</option>
+                        <option value="arquetiposGlobales">Arquetipos Globales</option>
+                        <option value="direccionDeArte">Dirección de Arte - IA</option>
+                        <option value="georreferencias">Georreferencias Arqueosemióticas</option>
+                        <option value="informesPremium">Informes Premium</option>
+                      </select>
+                    </div>
+
+                    {#if r.transmuteStatus === 'error' && r.transmuteError}
+                      <span class="text-[11px] text-red-600 font-mono truncate max-w-[50%]" title={r.transmuteError}>
+                        {r.transmuteError}
+                      </span>
+                    {/if}
                   </div>
                 </div>
               {/each}

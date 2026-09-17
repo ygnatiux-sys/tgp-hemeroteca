@@ -572,11 +572,19 @@ app.post('/webhook/telegram', async (c) => {
 // ─────────────────────────────────────────────────────────────────────────────
 // RUTA 2: /api/mind -- Sidebar local
 // ─────────────────────────────────────────────────────────────────────────────
+const isAllowedOrigin = (origin: string) => {
+  if (!origin) return true;
+  return (
+    origin.startsWith('http://localhost') ||
+    origin.startsWith('http://127.0.0.1') ||
+    origin.endsWith('.thegreatpuzzleproject.com') ||
+    origin === 'https://thegreatpuzzleproject.com' ||
+    origin.endsWith('.pages.dev')
+  );
+};
+
 app.use('/api/*', cors({
-  origin: (origin) => {
-    if (origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) return origin;
-    return null;
-  },
+  origin: (origin) => isAllowedOrigin(origin) ? origin : null,
   allowHeaders: ['Content-Type', 'Authorization', 'x-api-key', 'X-Api-Key'],
   allowMethods: ['POST', 'OPTIONS'],
 }));
@@ -585,9 +593,8 @@ app.post('/api/mind', async (c) => {
   const auth = (c.req.header('Authorization') ?? '').replace('Bearer ', '').trim();
   if (!TGP_MIND_API_KEY || auth !== TGP_MIND_API_KEY) return c.json({ error: 'No autorizado.' }, 401);
 
-  const origin  = c.req.header('Origin') ?? '';
-  const isLocal = origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1');
-  if (origin && !isLocal) return c.json({ error: 'Origen no permitido.' }, 403);
+  const origin = c.req.header('Origin') ?? '';
+  if (origin && !isAllowedOrigin(origin)) return c.json({ error: 'Origen no permitido.' }, 403);
 
   let body: any;
   try { body = await c.req.json(); } catch { return c.json({ error: 'JSON invalido.' }, 400); }
@@ -610,9 +617,8 @@ app.post('/api/vision', async (c) => {
   const apiKey = c.req.header('x-api-key');
   if (!TGP_MIND_API_KEY || apiKey !== TGP_MIND_API_KEY) return c.json({ error: 'No autorizado.' }, 401);
 
-  const origin  = c.req.header('Origin') ?? '';
-  const isLocal = origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1');
-  if (origin && !isLocal) return c.json({ error: 'Origen no permitido.' }, 403);
+  const origin = c.req.header('Origin') ?? '';
+  if (origin && !isAllowedOrigin(origin)) return c.json({ error: 'Origen no permitido.' }, 403);
 
   let body: any;
   try { body = await c.req.json(); } catch { return c.json({ error: 'JSON invalido.' }, 400); }
