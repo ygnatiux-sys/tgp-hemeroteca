@@ -592,11 +592,14 @@ export default config({
         }),
 
         // 3. CAMPO DE CONTENIDO
-      content: fields.document({
+        content: fields.document({
           label: 'Contenido',
           formatting: true,
           links: true,
-          images: true,
+          images: {
+            directory: 'src/assets/ensayos-cinematicos',
+            publicPath: '/src/assets/ensayos-cinematicos/'
+          },
           componentBlocks
         }),
       },
