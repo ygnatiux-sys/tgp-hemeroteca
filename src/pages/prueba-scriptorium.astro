@@ -1,0 +1,18 @@
+---
+// Ajusta las rutas relativas según tu estructura exacta
+import LayoutObsidiana from '../layouts/CinematicFX/LayoutObsidiana.astro';
+import ScriptoriumCapture from '../components/ScriptoriumCapture.svelte';
+---
+
+<LayoutObsidiana title="Laboratorio TGP | Svelte Test">
+  <main class="max-w-4xl mx-auto px-4 py-16">
+    <header class="mb-12 border-b border-zinc-800 pb-6">
+      <h1 class="text-3xl font-serif text-zinc-100">Prueba de Transmutación</h1>
+      <p class="text-zinc-400 mt-2 font-mono text-sm uppercase tracking-widest">Entorno Aislado Svelte</p>
+    </header>
+
+    <!-- La directiva client:load es vital para encender el componente interactivo -->
+    <ScriptoriumCapture client:load />
+
+  </main>
+</LayoutObsidiana>

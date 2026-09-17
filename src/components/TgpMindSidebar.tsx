@@ -171,28 +171,31 @@ const TgpMindSidebar: FC = () => {
           right: 0;
           transform: translateY(-50%);
           z-index: 10000;
-          background: #0c0e10;
-          border: 1px solid rgba(224, 122, 95, 0.35);
+          background: #1a1e23;
+          border: 1.5px solid #e07a5f;
           border-right: none;
-          border-radius: 8px 0 0 8px;
-          padding: 14px 8px;
+          border-radius: 10px 0 0 10px;
+          padding: 16px 9px;
           cursor: pointer;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 6px;
-          transition: background 0.3s ease, border-color 0.3s ease;
+          gap: 8px;
+          box-shadow: -4px 0 20px rgba(224, 122, 95, 0.45), 0 4px 14px rgba(0,0,0,0.6);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .tgp-mind-toggle:hover {
-          background: #141618;
-          border-color: rgba(224, 122, 95, 0.65);
+          background: #252b32;
+          border-color: #ff9e80;
+          box-shadow: -6px 0 28px rgba(224, 122, 95, 0.7);
         }
         .tgp-mind-toggle-label {
           font-family: 'IBM Plex Mono', monospace;
-          font-size: 9px;
-          letter-spacing: 0.2em;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.22em;
           text-transform: uppercase;
-          color: rgba(224, 122, 95, 0.75);
+          color: #ffb499;
           writing-mode: vertical-rl;
           transform: rotate(180deg);
         }
@@ -201,12 +204,13 @@ const TgpMindSidebar: FC = () => {
           height: 8px;
           border-radius: 50%;
           background: #e07a5f;
-          opacity: 0.9;
+          box-shadow: 0 0 10px #e07a5f;
+          opacity: 1;
           animation: tgp-pulse 2s ease-in-out infinite;
         }
         @keyframes tgp-pulse {
-          0%, 100% { transform: scale(1); opacity: 0.9; }
-          50% { transform: scale(1.3); opacity: 0.5; }
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.35); opacity: 0.6; }
         }
 
         /* Header */

@@ -5,13 +5,15 @@ import Layout from '../Layout.astro';
 import TypeMagyk from '../../components/TypeMagyk.astro';
 
 interface Props {
-  frontmatter: any;
+  frontmatter?: any;
+  title?: string;
   isCustom?: boolean;
   atmosfera?: string;
   config?: any;
 }
 
-const { frontmatter, config } = Astro.props;
+const frontmatter = Astro.props.frontmatter || { title: Astro.props.title };
+const { config } = Astro.props;
 
 // Construir el array de imágenes: gallery, coverImage/image/portada, o imagen AI base64
 const rawImages: any[] = [
