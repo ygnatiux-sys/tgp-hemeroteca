@@ -217,16 +217,52 @@ async function generarTerminosAlternativos(tema: string): Promise<string[]> {
   } catch { return []; }
 }
 
+// Helper: Subir Buffer binario a Cloudflare R2
+async function subirBufferAR2(buffer: Buffer, key: string, contentType = 'image/jpeg'): Promise<string> {
+  await r2Client.send(new PutObjectCommand({
+    Bucket: R2_BUCKET_NAME,
+    Key: key,
+    Body: buffer,
+    ContentType: contentType,
+  }));
+  const publicUrl = `https://storage.thegreatpuzzleproject.com/${key}`;
+  console.log(`[R2] Buffer subido exitosamente: ${publicUrl}`);
+  return publicUrl;
+}
+
+// Helper: Descargar foto desde Telegram Bot API por file_id y subirla directo a R2
+async function procesarFotoTelegramAR2(fileId: string, customSlug = 'telegram'): Promise<{ url: string; mimeType: string; fileName: string }> {
+  // 1. Obtener file_path de Telegram
+  const fileInfoRes = await fetch(`${TELEGRAM_API}/getFile?file_id=${fileId}`);
+  if (!fileInfoRes.ok) throw new Error(`Error en getFile de Telegram: ${fileInfoRes.statusText}`);
+  const fileInfo = await fileInfoRes.json() as any;
+  const filePath = fileInfo?.result?.file_path;
+  if (!filePath) throw new Error('Telegram no devolvió file_path');
+
+  // 2. Descargar binario
+  const fileDownloadUrl = `https://api.telegram.org/file/bot${TELEGRAM_TOKEN}/${filePath}`;
+  const imgRes = await fetch(fileDownloadUrl);
+  if (!imgRes.ok) throw new Error(`Error descargando imagen de Telegram: ${imgRes.statusText}`);
+  const buffer = Buffer.from(await imgRes.arrayBuffer());
+
+  // 3. Determinar extensión y content-type
+  const ext = filePath.split('.').pop()?.toLowerCase() || 'jpg';
+  const mimeType = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
+  const fileName = `${customSlug}-${Date.now()}.${ext}`;
+  const r2Key = `telegram/${fileName}`;
+
+  // 4. Subir a R2
+  const url = await subirBufferAR2(buffer, r2Key, mimeType);
+  return { url, mimeType, fileName };
+}
+
 async function subirImagenAR2(imageUrl: string): Promise<string> {
   const ua     = 'TGPMind/1.0 (contact@thegreatpuzzleproject.com)';
   const imgRes = await fetch(imageUrl, { headers: { 'User-Agent': ua } });
   if (!imgRes.ok) throw new Error(`HTTP ${imgRes.status} al descargar imagen`);
   const buffer   = Buffer.from(await imgRes.arrayBuffer());
   const archivo  = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}.jpg`;
-  await r2Client.send(new PutObjectCommand({ Bucket: R2_BUCKET_NAME, Key: archivo, Body: buffer, ContentType: 'image/jpeg' }));
-  const publicUrl = `https://storage.thegreatpuzzleproject.com/${archivo}`;
-  console.log(`[R2] Subida: ${publicUrl}`);
-  return publicUrl;
+  return await subirBufferAR2(buffer, archivo, 'image/jpeg');
 }
 
 async function procesarImagen(terminoBusqueda: string): Promise<string> {
@@ -303,6 +339,86 @@ generador: "TGP Mind (Gemini + R2 + GitOps)"
   return { slug, contenidoMdoc: mdoc.trim() + '\n' };
 }
 
+// ── Publicación Atómica en GitHub respetando el Sistema de Colecciones de Keystatic ──
+async function publicarEntradaKeystaticGitHub({
+  coleccion = 'ensayos-cinematicos',
+  slug,
+  indexJson,
+  contentMdoc,
+  token,
+  repoFull,
+  mensajeCommit,
+}: {
+  coleccion?: 'ensayos-cinematicos' | 'ensayos' | 'georreferencias';
+  slug: string;
+  indexJson: Record<string, any>;
+  contentMdoc: string;
+  token: string;
+  repoFull: string;
+  mensajeCommit?: string;
+}): Promise<string> {
+  const octokitDynamic = new Octokit({ auth: token });
+  const parts  = repoFull.includes('/') ? repoFull.split('/') : ['ygnatiux-sys', repoFull];
+  const owner  = parts[0] || 'ygnatiux-sys';
+  const repo   = parts[1];
+  const branch = process.env.GITHUB_BRANCH || 'main';
+
+  // 1. Obtener SHA del commit actual en la rama
+  const refRes = await octokitDynamic.git.getRef({ owner, repo, ref: `heads/${branch}` });
+  const latestCommitSha = refRes.data.object.sha;
+  const latestCommit = await octokitDynamic.git.getCommit({ owner, repo, commit_sha: latestCommitSha });
+  const baseTreeSha = latestCommit.data.tree.sha;
+
+  // 2. Ruta exacta según el sistema de colecciones Keystatic
+  const basePath = `src/content/${coleccion}/${slug}`;
+
+  // 3. Crear árbol atómico con index.json y content.mdoc
+  const treeEntries = [
+    {
+      path: `${basePath}/index.json`,
+      mode: '100644' as const,
+      type: 'blob' as const,
+      content: JSON.stringify(indexJson, null, 2),
+    },
+    {
+      path: `${basePath}/content.mdoc`,
+      mode: '100644' as const,
+      type: 'blob' as const,
+      content: contentMdoc,
+    },
+  ];
+
+  const newTree = await octokitDynamic.git.createTree({
+    owner,
+    repo,
+    base_tree: baseTreeSha,
+    tree: treeEntries,
+  });
+
+  // 4. Crear commit
+  const commitMsg = mensajeCommit || `TGP Mind: Entrada Keystatic [${coleccion}] -- ${slug}`;
+  const newCommit = await octokitDynamic.git.createCommit({
+    owner,
+    repo,
+    message: commitMsg,
+    tree: newTree.data.sha,
+    parents: [latestCommitSha],
+  });
+
+  // 5. Actualizar la rama principal
+  await octokitDynamic.git.updateRef({
+    owner,
+    repo,
+    ref: `heads/${branch}`,
+    sha: newCommit.data.sha,
+  });
+
+  const commitUrl = `https://github.com/${owner}/${repo}/commit/${newCommit.data.sha}`;
+  console.log(`[GitHub Keystatic Commit] ${basePath} publicado exitosamente: ${commitUrl}`);
+  return commitUrl;
+}
+
+// Compatibilidad retroactiva con repositorios legacy (Alternative)
 async function publicarEnGitHub(
   slug: string,
   contenidoMdoc: string,
@@ -333,7 +449,7 @@ async function publicarEnGitHub(
     sha,
   });
 
-  console.log(`[GitHub Commit] ${path} -> commit ${commitRes.data.commit?.sha}`);
+  console.log(`[GitHub Commit Legacy] ${path} -> commit ${commitRes.data.commit?.sha}`);
   return commitRes.data.content?.html_url || `https://github.com/${owner}/${repo}/blob/${branch}/${path}`;
 }
 
@@ -342,14 +458,26 @@ interface SesionConfig {
   tema: string;
   destino:    'social' | 'hemeroteca' | 'alternative';
   modelo:     'flash'  | 'pro';
-  fuenteImg:  'none'   | 'wiki' | 'imagen3';
+  fuenteImg:  'none'   | 'wiki' | 'imagen3' | 'telegram';
   cantidadImg: 1 | 3 | 5;
+  imagenTelegramUrl?: string;
+  coleccion?: 'ensayos-cinematicos' | 'ensayos';
 }
 const sesiones = new Map<number, SesionConfig>();
 
 // ── Inline Keyboard Builder ───────────────────────────────────────────────────
+// ── Inline Keyboard Builder ───────────────────────────────────────────────────
 function buildInlineKeyboard(cfg: SesionConfig) {
   const mark = (active: boolean, label: string) => (active ? `✅ ${label}` : label);
+  const filaImagenes = [
+    { text: mark(cfg.fuenteImg === 'none',    'Sin imagen'), callback_data: 'img_none'    },
+    { text: mark(cfg.fuenteImg === 'wiki',    'Wiki'),       callback_data: 'img_wiki'    },
+    { text: mark(cfg.fuenteImg === 'imagen3', 'Imagen 3'),   callback_data: 'img_imagen3' },
+  ];
+  if (cfg.imagenTelegramUrl) {
+    filaImagenes.push({ text: mark(cfg.fuenteImg === 'telegram', '📷 Foto R2'), callback_data: 'img_telegram' });
+  }
+
   return {
     inline_keyboard: [
       [
@@ -361,18 +489,14 @@ function buildInlineKeyboard(cfg: SesionConfig) {
         { text: mark(cfg.modelo === 'flash', 'Flash'), callback_data: 'mod_flash' },
         { text: mark(cfg.modelo === 'pro',   'Pro'),   callback_data: 'mod_pro'   },
       ],
-      [
-        { text: mark(cfg.fuenteImg === 'none',    'Sin imagen'), callback_data: 'img_none'    },
-        { text: mark(cfg.fuenteImg === 'wiki',    'Wiki'),       callback_data: 'img_wiki'    },
-        { text: mark(cfg.fuenteImg === 'imagen3', 'Imagen 3'),   callback_data: 'img_imagen3' },
-      ],
+      filaImagenes,
       [
         { text: mark(cfg.cantidadImg === 1, '1 secc'),  callback_data: 'cant_1' },
         { text: mark(cfg.cantidadImg === 3, '3 secc'),  callback_data: 'cant_3' },
         { text: mark(cfg.cantidadImg === 5, '5 secc'),  callback_data: 'cant_5' },
       ],
       [
-        { text: 'GENERAR ENSAYO', callback_data: 'generar_ok' },
+        { text: '🚀 GENERAR ENSAYO', callback_data: 'generar_ok' },
       ],
     ],
   };
@@ -438,12 +562,13 @@ app.post('/webhook/telegram', async (c) => {
   let body: any;
   try { body = await c.req.json(); } catch { return c.json({ ok: true }); }
 
-  // ── RAMA A: Mensaje de texto (nuevo pedido) ─────────────────────────────────
+  // ── RAMA A: Mensaje de texto o foto (nuevo pedido) ─────────────────────────
   const message = body?.message;
   if (message) {
     const chatId: number | undefined = message?.chat?.id;
-    const text: string = message?.text ?? '';
-    if (!chatId || !text) return c.json({ ok: true });
+    const hasPhoto = Array.isArray(message?.photo) && message.photo.length > 0;
+    const text: string = message?.text ?? message?.caption ?? '';
+    if (!chatId || (!text && !hasPhoto)) return c.json({ ok: true });
 
     if (chatId !== XAVIER_CHAT_ID) {
       console.warn(`[Telegram] Acceso bloqueado para chatId: ${chatId}`);
@@ -452,11 +577,38 @@ app.post('/webhook/telegram', async (c) => {
     }
 
     if (text.trim() === '/start') {
-      await sendTelegram(chatId, 'TGP Mind en linea.\n\nEscribime cualquier tema y te presentare un panel de control para configurar tu publicacion.');
+      await sendTelegram(chatId, 'TGP Mind en línea.\n\nEscribime cualquier tema o envíame una foto con pie de foto para publicarla en Keystatic/Hemeroteca.');
       return c.json({ ok: true });
     }
 
-    const sesion: SesionConfig = { tema: text.trim(), destino: 'hemeroteca', modelo: 'flash', fuenteImg: 'wiki', cantidadImg: 5 };
+    // Si viene foto adjunta de Telegram, descargarla y subirla directo a Cloudflare R2
+    let imagenR2Url = '';
+    if (hasPhoto) {
+      const bestPhoto = message.photo[message.photo.length - 1];
+      const baseSlug = generarSlug(text ? text.slice(0, 30) : 'foto-telegram');
+      try {
+        await sendTelegram(chatId, '📷 Descargando imagen de Telegram y subiendo a Cloudflare R2...');
+        const r2Res = await procesarFotoTelegramAR2(bestPhoto.file_id, baseSlug);
+        imagenR2Url = r2Res.url;
+        await sendTelegram(chatId, `✅ Imagen alojada en Cloudflare R2:\n${imagenR2Url}`);
+      } catch (errUpload: any) {
+        console.error('[Telegram Photo Upload Error]:', errUpload);
+        await sendTelegram(chatId, `⚠️ Error subiendo imagen a R2: ${errUpload?.message || 'Error'}`);
+      }
+    }
+
+    const temaFinal = text.trim() || (imagenR2Url ? 'Ensayo Visual de Archivo' : '');
+    if (!temaFinal) return c.json({ ok: true });
+
+    const sesion: SesionConfig = {
+      tema: temaFinal,
+      destino: 'hemeroteca',
+      modelo: 'flash',
+      fuenteImg: imagenR2Url ? 'telegram' : 'wiki',
+      cantidadImg: imagenR2Url ? 1 : 3,
+      imagenTelegramUrl: imagenR2Url || undefined,
+      coleccion: 'ensayos-cinematicos',
+    };
     sesiones.set(chatId, sesion);
 
     await fetch(`${TELEGRAM_API}/sendMessage`, {
@@ -464,7 +616,7 @@ app.post('/webhook/telegram', async (c) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: chatId,
-        text: `Configura tu publicacion sobre:\n${sesion.tema}`,
+        text: `Configura tu publicación sobre:\n"${sesion.tema}"${imagenR2Url ? '\n\n📷 Portada vinculada a tu imagen de R2.' : ''}`,
         reply_markup: buildInlineKeyboard(sesion),
       }),
     });
@@ -492,17 +644,18 @@ app.post('/webhook/telegram', async (c) => {
     }
 
     // Actualizar estado segun boton
-    if      (data === 'dest_social')  sesion.destino     = 'social';
-    else if (data === 'dest_hem')     sesion.destino     = 'hemeroteca';
-    else if (data === 'dest_alt')     sesion.destino     = 'alternative';
-    else if (data === 'mod_flash')    sesion.modelo      = 'flash';
-    else if (data === 'mod_pro')      sesion.modelo      = 'pro';
-    else if (data === 'img_none')     sesion.fuenteImg   = 'none';
-    else if (data === 'img_wiki')     sesion.fuenteImg   = 'wiki';
-    else if (data === 'img_imagen3')  sesion.fuenteImg   = 'imagen3';
-    else if (data === 'cant_1')       sesion.cantidadImg = 1;
-    else if (data === 'cant_3')       sesion.cantidadImg = 3;
-    else if (data === 'cant_5')       sesion.cantidadImg = 5;
+    if      (data === 'dest_social')   sesion.destino     = 'social';
+    else if (data === 'dest_hem')      sesion.destino     = 'hemeroteca';
+    else if (data === 'dest_alt')      sesion.destino     = 'alternative';
+    else if (data === 'mod_flash')     sesion.modelo      = 'flash';
+    else if (data === 'mod_pro')       sesion.modelo      = 'pro';
+    else if (data === 'img_none')      sesion.fuenteImg   = 'none';
+    else if (data === 'img_wiki')      sesion.fuenteImg   = 'wiki';
+    else if (data === 'img_imagen3')   sesion.fuenteImg   = 'imagen3';
+    else if (data === 'img_telegram')  sesion.fuenteImg   = 'telegram';
+    else if (data === 'cant_1')        sesion.cantidadImg = 1;
+    else if (data === 'cant_3')        sesion.cantidadImg = 3;
+    else if (data === 'cant_5')        sesion.cantidadImg = 5;
     sesiones.set(chatId, sesion);
 
     // ── GENERAR ──────────────────────────────────────────────────────────────
@@ -533,7 +686,11 @@ app.post('/webhook/telegram', async (c) => {
 
         await sendTelegram(chatId, `Ensayo: "${parsed.titulo}". Procesando imagenes...`);
 
-        if (sesion.fuenteImg === 'wiki' && Array.isArray(parsed.secciones)) {
+        if (sesion.fuenteImg === 'telegram' && sesion.imagenTelegramUrl && Array.isArray(parsed.secciones)) {
+          if (parsed.secciones.length > 0) {
+            parsed.secciones[0].imagen_url = sesion.imagenTelegramUrl;
+          }
+        } else if (sesion.fuenteImg === 'wiki' && Array.isArray(parsed.secciones)) {
           for (const seccion of parsed.secciones) {
             if (seccion.busqueda_wikimedia) {
               const r2Url = await procesarImagen(seccion.busqueda_wikimedia);
@@ -544,13 +701,56 @@ app.post('/webhook/telegram', async (c) => {
           for (const seccion of parsed.secciones) seccion.imagen_url = 'PENDIENTE_IMAGEN3';
         }
 
-        await sendTelegram(chatId, `Compilando Markdoc y publicando en GitHub...`);
+        await sendTelegram(chatId, `Compilando estructura Keystatic y publicando en GitHub...`);
         const { slug, contenidoMdoc } = generarMarkdoc(parsed);
 
         const token    = sesion.destino === 'hemeroteca' ? GITHUB_TOKEN_HEMEROTECA  : GITHUB_TOKEN_ALTERNATIVE;
         const repoFull = sesion.destino === 'hemeroteca' ? GITHUB_REPO_HEMEROTECA   : GITHUB_REPO_ALTERNATIVE;
 
-        const githubUrl = await publicarEnGitHub(slug, contenidoMdoc, token, repoFull);
+        let githubUrl = '';
+        if (sesion.destino === 'hemeroteca') {
+          // Publicación respetando la estructura dual de Keystatic: index.json + content.mdoc
+          const coverUrl = sesion.imagenTelegramUrl || parsed.secciones?.[0]?.imagen_url || '';
+          const primerParrafo = parsed.secciones?.[0]?.parrafo || '';
+
+          const indexJson = {
+            title: parsed.titulo,
+            generadorTexto: JSON.stringify({
+              text: contenidoMdoc,
+              image: coverUrl,
+            }),
+            atmosfera: {
+              discriminant: 'obsidiana',
+            },
+            gallery: [],
+            dek: primerParrafo ? primerParrafo.slice(0, 110) + '...' : '',
+            coverImage: coverUrl,
+            date: new Date().toISOString().slice(0, 10),
+            excerpt: primerParrafo ? primerParrafo.slice(0, 180) + '...' : '',
+          };
+
+          // Cuerpo Markdoc puro sin frontmatter para que Keystatic lo edite limpiamente
+          let bodyMdoc = '';
+          if (Array.isArray(parsed.secciones)) {
+            parsed.secciones.forEach((sec: any, idx: number) => {
+              if (sec.imagen_url) bodyMdoc += `![${parsed.titulo} -- Sección ${idx + 1}](${sec.imagen_url})\n\n`;
+              if (sec.parrafo) bodyMdoc += `${sec.parrafo.trim()}\n\n`;
+            });
+          }
+
+          githubUrl = await publicarEntradaKeystaticGitHub({
+            coleccion: 'ensayos-cinematicos',
+            slug,
+            indexJson,
+            contentMdoc: bodyMdoc.trim() + '\n',
+            token,
+            repoFull,
+            mensajeCommit: `TGP Mind: Ensayo cinemático Keystatic -- ${parsed.titulo}`,
+          });
+        } else {
+          githubUrl = await publicarEnGitHub(slug, contenidoMdoc, token, repoFull);
+        }
+
         await sendTelegram(chatId, `"${parsed.titulo}" publicado en ${destinoLabel}.\n${githubUrl}\n\nCloudflare Pages renderizando.`);
       } catch (error: any) {
         console.error('[Telegram Webhook Error]:', error);
@@ -637,6 +837,29 @@ app.post('/api/vision', async (c) => {
   } catch (error: any) {
     console.error('[Vision API] Error:', error);
     return c.json({ error: 'Error procesando la imagen.' }, 500);
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RUTA 4: /api/telegram/upload-media -- Ingesta programable directa de Telegram a R2
+// ─────────────────────────────────────────────────────────────────────────────
+app.post('/api/telegram/upload-media', async (c) => {
+  const apiKey = c.req.header('x-api-key') || (c.req.header('Authorization') ?? '').replace('Bearer ', '').trim();
+  if (TGP_MIND_API_KEY && apiKey !== TGP_MIND_API_KEY) return c.json({ error: 'No autorizado.' }, 401);
+
+  let body: any;
+  try { body = await c.req.json(); } catch { return c.json({ error: 'JSON invalido' }, 400); }
+
+  const fileId: string = body?.fileId ?? '';
+  const slug: string = body?.slug ?? 'telegram-media';
+  if (!fileId) return c.json({ error: 'Falta parametro fileId' }, 400);
+
+  try {
+    const result = await procesarFotoTelegramAR2(fileId, slug);
+    return c.json({ success: true, url: result.url, fileName: result.fileName, mimeType: result.mimeType });
+  } catch (err: any) {
+    console.error('[API Telegram Upload Media Error]:', err);
+    return c.json({ success: false, error: err?.message || 'Error al procesar y subir imagen a R2' }, 500);
   }
 });
 
