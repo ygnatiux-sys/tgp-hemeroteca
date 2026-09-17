@@ -6,13 +6,13 @@ import ScriptoriumCapture from '../components/ScriptoriumCapture.svelte';
 
 <Layout title="TGP Scriptorium | Panel de Control">
   <main class="min-h-screen bg-[#0b0f0e] text-[#d4d4d2] flex flex-col items-center justify-center p-6">
-    <div class="max-w-xl w-full border border-[#263231] bg-[#111716] p-8 rounded-lg shadow-2xl backdrop-blur-md">
+    <div class="max-w-4xl w-full border border-[#263231] bg-[#111716] p-6 sm:p-8 rounded-xl shadow-2xl backdrop-blur-md">
       <header class="mb-8 text-center border-b border-[#263231] pb-6">
         <span class="text-xs uppercase tracking-widest text-[#8a9a98] font-mono">Cartografía Epistémica & Ediciones</span>
         <h1 class="text-3xl font-serif font-light text-[#f0f2f1] mt-2">TGP Scriptorium</h1>
       </header>
 
-      <div class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <a 
           href="/keystatic" 
           class="block p-4 border border-[#263231] hover:border-[#4a5a58] bg-[#161d1c] hover:bg-[#1c2423] transition-all rounded group"
@@ -73,7 +73,9 @@ import ScriptoriumCapture from '../components/ScriptoriumCapture.svelte';
           <p class="text-sm text-[#8a9a98] mt-1">Análisis iconográfico con Gemini Vision, extracción desde Google Drive / Fotos y vista dedicada.</p>
         </a>
 
-        <ScriptoriumCapture client:load />
+        <div class="md:col-span-2">
+          <ScriptoriumCapture client:load />
+        </div>
       </div>
 
       <footer class="mt-8 text-center text-xs text-[#62706e] font-mono">

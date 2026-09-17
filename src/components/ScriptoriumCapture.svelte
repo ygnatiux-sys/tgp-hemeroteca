@@ -172,40 +172,32 @@
   }
 </script>
 
-<!-- ── TRIGGER (Material You Light) ────────────────────────────────────── -->
-<div class="flex flex-col gap-3">
-  <div class="flex items-center justify-between px-1">
-    <a
-      href="/tgp-app/"
-      class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-emerald-700 transition-colors"
-      title="Volver al panel de control TGP App"
-    >
-      <span>←</span> Volver a TGP App
-    </a>
-    <span class="text-[11px] font-mono text-zinc-400">Hub / Scriptorium</span>
-  </div>
-
-  <button
-    type="button"
-    id="tgp-vision-board-trigger"
-    class="w-full text-left p-6 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-2xl shadow-sm transition-all duration-200 cursor-pointer block group"
-    on:click={() => (isOpen = true)}
-  >
-    <div class="flex items-center justify-between gap-4">
-      <div class="flex-1">
-        <h2 class="text-xl font-bold text-zinc-900 mb-1 group-hover:text-zinc-950 transition-colors">
+<!-- ── TRIGGER ──────────────────────────────────────────────────────────── -->
+<button
+  type="button"
+  id="tgp-vision-board-trigger"
+  class="w-full text-left p-5 bg-[#161d1c] hover:bg-[#1c2423] border border-[#263231] hover:border-[#4a5a58] rounded-xl transition-all duration-200 cursor-pointer block group shadow-sm"
+  on:click={() => (isOpen = true)}
+>
+  <div class="flex items-center justify-between gap-4">
+    <div class="flex-1">
+      <div class="flex items-center gap-2 mb-1">
+        <h2 class="text-lg font-serif text-[#f0f2f1] group-hover:text-white transition-colors">
           TGP Vision / Iconografía
         </h2>
-        <p class="text-sm text-zinc-600 leading-relaxed">
-          Análisis visual profundo, semiótica iconográfica e ingesta directa con Google Drive / Fotos.
-        </p>
+        <span class="text-[10px] uppercase font-mono tracking-widest text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full shrink-0">
+          Modal Rápido
+        </span>
       </div>
-      <span class="inline-flex items-center px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-800 bg-emerald-100 border border-emerald-200 rounded-full shrink-0 shadow-xs">
-        Multimodal
-      </span>
+      <p class="text-sm text-[#8a9a98] leading-relaxed">
+        Análisis visual profundo, semiótica iconográfica e ingesta directa con Google Drive / Fotos.
+      </p>
     </div>
-  </button>
-</div>
+    <span class="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 rounded-full shrink-0 shadow-xs">
+      Multimodal
+    </span>
+  </div>
+</button>
 
 <!-- ── OVERLAY / BOARD MODAL (Material You Light) ────────────────────────── -->
 {#if isOpen}
