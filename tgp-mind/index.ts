@@ -751,7 +751,11 @@ app.post('/webhook/telegram', async (c) => {
           githubUrl = await publicarEnGitHub(slug, contenidoMdoc, token, repoFull);
         }
 
-        await sendTelegram(chatId, `"${parsed.titulo}" publicado en ${destinoLabel}.\n${githubUrl}\n\nCloudflare Pages renderizando.`);
+        const webUrl = sesion.destino === 'hemeroteca'
+          ? `https://thegreatpuzzleproject.com/ensayos-cinematicos/${slug}`
+          : `https://alternative.thegreatpuzzleproject.com/ensayos/${slug}`;
+
+        await sendTelegram(chatId, `"${parsed.titulo}" publicado en ${destinoLabel}.\n\n🔗 Ver en la Web:\n${webUrl}\n\n📦 Commit en GitHub:\n${githubUrl}\n\n⚡ Cloudflare Pages procesando el nuevo despliegue.`);
       } catch (error: any) {
         console.error('[Telegram Webhook Error]:', error);
         await sendTelegram(chatId, `Error en TGP Mind: ${error?.message || 'Fallo desconocido'}`);
