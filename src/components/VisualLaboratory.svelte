@@ -174,7 +174,17 @@
       <span class="vl-kicker">Infraestructura Visual TGP</span>
       <h2 class="vl-title">Laboratorio Visual · Ingesta &amp; Procesamiento</h2>
     </div>
-    <span class="vl-badge">R2 + Cloud Run</span>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <a
+        href="/tgp-app/"
+        class="vl-btn vl-btn--gray"
+        style="text-decoration:none; font-size:11px; padding:6px 14px; border-radius:9999px; display:inline-flex; align-items:center; gap:6px;"
+        title="Volver al Hub de TGP App"
+      >
+        ← Volver a TGP App
+      </a>
+      <span class="vl-badge">R2 + Cloud Run</span>
+    </div>
   </div>
 
   <!-- ── Error global ──────────────────────────────────────────────────── -->
@@ -186,7 +196,7 @@
        PASO 1 · INGESTA
   ════════════════════════════════════════════════════════════════════ -->
   <section class="vl-section">
-    <label class="vl-step-label">1 · Ingesta de Imagen Base</label>
+    <span class="vl-step-label">1 · Ingesta de Imagen Base</span>
 
     <div class="vl-ingesta-row">
       <button class="vl-btn vl-btn--primary" on:click={abrirGooglePickerModal} disabled={pickerLoading}>
@@ -232,7 +242,7 @@
   ════════════════════════════════════════════════════════════════════ -->
   {#if imagenBase && estado !== 'procesando'}
     <section class="vl-section">
-      <label class="vl-step-label">2 · Motores de Transformación (Cloud Run)</label>
+      <span class="vl-step-label">2 · Motores de Transformación (Cloud Run)</span>
       <div class="vl-motores-row">
         <button
           class="vl-btn vl-btn--green"

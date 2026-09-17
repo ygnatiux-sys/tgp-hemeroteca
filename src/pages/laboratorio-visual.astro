@@ -1,0 +1,23 @@
+---
+import Layout from '../layouts/Layout.astro';
+import VisualLaboratory from '../components/VisualLaboratory.svelte';
+---
+
+<Layout title="Laboratorio Visual TGP · Ingesta &amp; Procesamiento">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 min-h-screen">
+    <header class="mb-8 border-b border-zinc-800 pb-6 flex items-center justify-between">
+      <div>
+        <span class="text-xs uppercase tracking-widest text-emerald-500 font-mono">Infraestructura Visual TGP</span>
+        <h1 class="text-3xl font-serif font-light text-zinc-100 mt-1">Laboratorio Visual</h1>
+      </div>
+      <a
+        href="/tgp-app/"
+        class="px-4 py-2 text-xs font-mono uppercase tracking-wider text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-full transition-all"
+      >
+        ← Volver al Hub
+      </a>
+    </header>
+
+    <VisualLaboratory client:load />
+  </main>
+</Layout>

@@ -173,26 +173,39 @@
 </script>
 
 <!-- ── TRIGGER (Material You Light) ────────────────────────────────────── -->
-<button
-  type="button"
-  id="tgp-vision-board-trigger"
-  class="w-full text-left p-6 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-2xl shadow-sm transition-all duration-200 cursor-pointer block group"
-  on:click={() => (isOpen = true)}
->
-  <div class="flex items-center justify-between gap-4">
-    <div class="flex-1">
-      <h2 class="text-xl font-bold text-zinc-900 mb-1 group-hover:text-zinc-950 transition-colors">
-        TGP Vision / Iconografía
-      </h2>
-      <p class="text-sm text-zinc-600 leading-relaxed">
-        Análisis visual profundo, semiótica iconográfica e ingesta directa con Google Drive / Fotos.
-      </p>
-    </div>
-    <span class="inline-flex items-center px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-800 bg-emerald-100 border border-emerald-200 rounded-full shrink-0 shadow-xs">
-      Multimodal
-    </span>
+<div class="flex flex-col gap-3">
+  <div class="flex items-center justify-between px-1">
+    <a
+      href="/tgp-app/"
+      class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-emerald-700 transition-colors"
+      title="Volver al panel de control TGP App"
+    >
+      <span>←</span> Volver a TGP App
+    </a>
+    <span class="text-[11px] font-mono text-zinc-400">Hub / Scriptorium</span>
   </div>
-</button>
+
+  <button
+    type="button"
+    id="tgp-vision-board-trigger"
+    class="w-full text-left p-6 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-2xl shadow-sm transition-all duration-200 cursor-pointer block group"
+    on:click={() => (isOpen = true)}
+  >
+    <div class="flex items-center justify-between gap-4">
+      <div class="flex-1">
+        <h2 class="text-xl font-bold text-zinc-900 mb-1 group-hover:text-zinc-950 transition-colors">
+          TGP Vision / Iconografía
+        </h2>
+        <p class="text-sm text-zinc-600 leading-relaxed">
+          Análisis visual profundo, semiótica iconográfica e ingesta directa con Google Drive / Fotos.
+        </p>
+      </div>
+      <span class="inline-flex items-center px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-800 bg-emerald-100 border border-emerald-200 rounded-full shrink-0 shadow-xs">
+        Multimodal
+      </span>
+    </div>
+  </button>
+</div>
 
 <!-- ── OVERLAY / BOARD MODAL (Material You Light) ────────────────────────── -->
 {#if isOpen}
