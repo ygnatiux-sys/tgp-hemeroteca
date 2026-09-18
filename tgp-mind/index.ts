@@ -17,9 +17,9 @@ import 'dotenv/config';
 
 // ── Configuración ─────────────────────────────────────────────────────────────
 const PORT               = parseInt(process.env.PORT || '3001');
-const TELEGRAM_TOKEN     = process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_TOKEN || '';
-const GEMINI_API_KEY     = process.env.GEMINI_API_KEY || '';
-const TGP_MIND_API_KEY   = process.env.TGP_MIND_API_KEY || '';
+const TELEGRAM_TOKEN     = (process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_TOKEN || '').replace(/['"]/g, '').trim();
+const GEMINI_API_KEY     = (process.env.GEMINI_API_KEY || '').replace(/['"]/g, '').trim();
+const TGP_MIND_API_KEY   = (process.env.TGP_MIND_API_KEY || '').replace(/['"]/g, '').trim();
 const XAVIER_CHAT_ID     = 7886507052;
 const DIALOGFLOW_PROJECT  = process.env.DIALOGFLOW_PROJECT  || '';
 const DIALOGFLOW_LOCATION = process.env.DIALOGFLOW_LOCATION || 'us-central1';
@@ -1181,7 +1181,7 @@ ESTRUCTURA OBLIGATORIA DEL INFORME:
 ## 7. DISCREPANCIAS, DUDAS ABIERTAS Y ANÁLISIS OSINT`;
 
     const responseGemini = await genai.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-3.8-flash',
       contents: [{ text: promptOSINT }],
       config: {
         maxOutputTokens: 4000,
@@ -1258,7 +1258,7 @@ Estructura rigurosa TGP:
 Estilo: Ensayo argentino contemporáneo. Denso, sin introducciones vacías, con ritmo narrativo y elegancia Dark Academia.`;
 
     const responseGemini = await genai.models.generateContent({
-      model: 'gemini-1.5-pro',
+      model: 'gemini-2.5-pro',
       contents: [{ text: `INFORME TÉCNICO (DATA LAKE):\n\n${informeTexto}\n\nEscribe el ensayo definitivo TGP.` }],
       config: {
         systemInstruction: SYSTEM_PROMPT_PREMIUM,
@@ -1527,12 +1527,22 @@ app.post('/telegram-webhook', async (c) => {
   const message = body?.message;
   if (message) {
     const chatId = message.chat?.id;
-    if (chatId !== XAVIER_CHAT_ID) {
-      await fetch(`${TELEGRAM_API}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chatId, text: '⛔ Acceso restringido. Nodo privado TGP.' }),
-      });
+    console.log(`[Omni-Bot Webhook] Mensaje recibido de chatId: ${chatId} | texto: "${message.text || ''}"`);
+    if (XAVIER_CHAT_ID && chatId !== XAVIER_CHAT_ID) {
+      console.warn(`[Omni-Bot Webhook] Chat ID no coincide: recibido ${chatId}, esperado ${XAVIER_CHAT_ID}`);
+      try {
+        await fetch(`${TELEGRAM_API}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: `⛔ Acceso restringido.\n\nTu Telegram Chat ID es: \`${chatId}\`.\nActualiza XAVIER_CHAT_ID con este número para autorizarte.`,
+            parse_mode: 'Markdown',
+          }),
+        });
+      } catch (errSend) {
+        console.error('[Omni-Bot Webhook] Error al enviar mensaje de chatId:', errSend);
+      }
       return c.json({ ok: true });
     }
 
@@ -1556,7 +1566,7 @@ app.post('/telegram-webhook', async (c) => {
       });
 
       const summaryResp = await genai.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-3.8-flash',
         contents: [{ text: `Resume de forma analítica, densa y en viñetas este texto:\n\n${quoted}` }],
         config: { systemInstruction: 'Eres un analista de TGP. Tono sobrio, preciso y directo.' },
       });
@@ -1617,7 +1627,7 @@ ${JSON.stringify(metadatosVision, null, 2)}
 Detalla: toponimia, coordenadas, historia, geología, fuentes y contexto académico. Tono neutro de Data Lake.`;
 
         const osintResp = await genai.models.generateContent({
-          model: 'gemini-1.5-flash',
+          model: 'gemini-3.8-flash',
           contents: [{ text: promptOSINT }],
           config: { maxOutputTokens: 3000, temperature: 0.2 },
         });
@@ -1692,7 +1702,7 @@ Detalla: toponimia, coordenadas, historia, geología, fuentes y contexto académ
 
       try {
         const resp = await genai.models.generateContent({
-          model: 'gemini-1.5-flash',
+          model: 'gemini-3.8-flash',
           contents: [{ text: `Escribe un análisis histórico, filosófico y conceptual denso en Modo TGP sobre: "${text.trim()}". Máximo 3 párrafos de alto impacto.` }],
           config: { systemInstruction: 'Eres el motor cognitivo de TGP. Tono sobrio, Dark Academia accesible y densidad analítica.' },
         });
@@ -1746,7 +1756,7 @@ Detalla: toponimia, coordenadas, historia, geología, fuentes y contexto académ
         body: JSON.stringify({ chat_id: chatId, message_id: messageId, text: '⏳ Redactando hilo para X / Zernio con Flash...' }),
       });
       const res = await genai.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-3.8-flash',
         contents: [{ text: `Redacta un hilo de X (Twitter) incisivo, con gancho visual, basado en este informe:\n\n${registro?.informe_osint || ''}` }],
       });
       await sendTelegram(chatId, `📱 Hilo X / Zernio:\n\n${res.text}`);
@@ -1761,7 +1771,7 @@ Detalla: toponimia, coordenadas, historia, geología, fuentes y contexto académ
         body: JSON.stringify({ chat_id: chatId, message_id: messageId, text: '⏳ Creando guion TikTok/Reels con Flash...' }),
       });
       const res = await genai.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-3.8-flash',
         contents: [{ text: `Escribe un guion corto para TikTok/Reels (Voz en off + Indicaciones visuales [Visual]) sobre:\n\n${registro?.informe_osint || ''}` }],
       });
       await sendTelegram(chatId, `🎬 Guion Audiovisual:\n\n${res.text}`);
@@ -1819,7 +1829,7 @@ Estructura:
       }
 
       const proResp = await genai.models.generateContent({
-        model: 'gemini-1.5-pro',
+        model: 'gemini-2.5-pro',
         contents: [{ text: `INFORME BASE:\n\n${registro?.informe_osint || ''}` }],
         config: genConfig,
       });
