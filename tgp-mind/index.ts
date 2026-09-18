@@ -995,6 +995,34 @@ async function subirBufferOsintAR2(imageBuffer: Buffer, id: string, mimeType = '
   return `${R2_PUBLIC_DOMAIN}/${fileKey}`;
 }
 
+async function asegurarTablaD1(): Promise<void> {
+  if (!CLOUDFLARE_D1_DATABASE_ID || !CLOUDFLARE_API_TOKEN) return;
+  const url = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${CLOUDFLARE_D1_DATABASE_ID}/query`;
+  const schemaQuery = `
+    CREATE TABLE IF NOT EXISTS data_lake_vision (
+      id TEXT PRIMARY KEY,
+      imagen_url TEXT,
+      metadatos_vision TEXT,
+      informe_osint TEXT,
+      ensayo_premium TEXT,
+      audio_url TEXT,
+      fecha_ingesta TEXT
+    );
+  `;
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${CLOUDFLARE_API_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ sql: schemaQuery }),
+    });
+  } catch (err) {
+    console.warn('[D1 Schema Warning]:', err);
+  }
+}
+
 async function guardarEnCloudflareD1(registro: {
   id: string;
   imagen_url: string;
@@ -1006,6 +1034,7 @@ async function guardarEnCloudflareD1(registro: {
     console.warn('[D1 Storage] Omitiendo guardado en D1 (variables CLOUDFLARE_D1_DATABASE_ID o CLOUDFLARE_API_TOKEN no configuradas).');
     return;
   }
+  await asegurarTablaD1();
   const url = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${CLOUDFLARE_D1_DATABASE_ID}/query`;
   const query = `
     INSERT INTO data_lake_vision (id, imagen_url, metadatos_vision, informe_osint, fecha_ingesta)

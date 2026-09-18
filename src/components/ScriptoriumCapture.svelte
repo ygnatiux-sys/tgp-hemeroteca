@@ -39,6 +39,9 @@
   const GOOGLE_PICKER_KEY = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_PICKER_API_KEY : null) ?? '';
   const GOOGLE_CLIENT_ID = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_CLIENT_ID : null) ?? '';
 
+  // ── Prop de Integración ───────────────────────────────────────────────────
+  export let embedded = false;
+
   // ── Estado del Trigger ────────────────────────────────────────────────────
   let isOpen = false;
 
@@ -63,9 +66,9 @@
   let resultsEl: HTMLDivElement;
   let fileInputEl: HTMLInputElement;
 
-  // ── Bloqueo de Scroll al abrir modal ──────────────────────────────────────
+  // ── Bloqueo de Scroll al abrir modal (solo en modo popup) ──────────────────
   $: if (typeof document !== 'undefined') {
-    if (isOpen) {
+    if (isOpen && !embedded) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -291,49 +294,51 @@
   }
 </script>
 
-<!-- ── TRIGGER ──────────────────────────────────────────────────────────── -->
-<button
-  type="button"
-  id="tgp-vision-board-trigger"
-  class="w-full text-left p-5 bg-[#161d1c] hover:bg-[#1c2423] border border-[#263231] hover:border-[#4a5a58] rounded-xl transition-all duration-200 cursor-pointer block group shadow-sm"
-  on:click={() => (isOpen = true)}
->
-  <div class="flex items-center justify-between gap-4">
-    <div class="flex-1">
-      <div class="flex items-center gap-2 mb-1">
-        <h2 class="text-lg font-serif text-[#f0f2f1] group-hover:text-white transition-colors">
-          TGP Vision / Iconografía
-        </h2>
-        <span class="text-[10px] uppercase font-mono tracking-widest text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full shrink-0">
-          Modal Rápido
-        </span>
+{#if !embedded}
+  <!-- ── TRIGGER (Solo si no está embebido) ──────────────────────────── -->
+  <button
+    type="button"
+    id="tgp-vision-board-trigger"
+    class="w-full text-left p-5 bg-[#161d1c] hover:bg-[#1c2423] border border-[#263231] hover:border-[#4a5a58] rounded-xl transition-all duration-200 cursor-pointer block group shadow-sm"
+    on:click={() => (isOpen = true)}
+  >
+    <div class="flex items-center justify-between gap-4">
+      <div class="flex-1">
+        <div class="flex items-center gap-2 mb-1">
+          <h2 class="text-lg font-serif text-[#f0f2f1] group-hover:text-white transition-colors">
+            TGP Vision / Iconografía
+          </h2>
+          <span class="text-[10px] uppercase font-mono tracking-widest text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full shrink-0">
+            Modal Rápido
+          </span>
+        </div>
+        <p class="text-sm text-[#8a9a98] leading-relaxed">
+          Análisis visual profundo, semiótica iconográfica e ingesta directa con Google Drive / Fotos.
+        </p>
       </div>
-      <p class="text-sm text-[#8a9a98] leading-relaxed">
-        Análisis visual profundo, semiótica iconográfica e ingesta directa con Google Drive / Fotos.
-      </p>
+      <span class="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 rounded-full shrink-0 shadow-xs">
+        Multimodal
+      </span>
     </div>
-    <span class="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 rounded-full shrink-0 shadow-xs">
-      Multimodal
-    </span>
-  </div>
-</button>
+  </button>
+{/if}
 
-<!-- ── OVERLAY / BOARD MODAL (Material You Light) ────────────────────────── -->
-{#if isOpen}
+<!-- ── WORKSPACE BOARD (Embebido o Modal) ────────────────────────────────── -->
+{#if isOpen || embedded}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
   <div
-    class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 select-none"
-    on:click={handleOverlayClick}
-    role="dialog"
-    tabindex="-1"
-    aria-modal="true"
+    class={embedded ? 'w-full' : 'fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 select-none'}
+    on:click={!embedded ? handleOverlayClick : undefined}
+    role={!embedded ? 'dialog' : undefined}
+    aria-modal={!embedded ? 'true' : undefined}
     aria-label="TGP Vision Board"
   >
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-6xl h-[88vh] max-h-[88vh] flex flex-col overflow-hidden border border-zinc-200 text-zinc-900 select-auto">
+    <div class="bg-white rounded-3xl shadow-xl w-full {embedded ? 'max-w-7xl h-[calc(100vh-120px)] min-h-180' : 'max-w-6xl h-[88vh] max-h-[88vh] shadow-2xl'} flex flex-col overflow-hidden border border-zinc-200 text-zinc-900 select-auto">
 
-      <!-- Header del modal -->
-      <header class="flex items-center justify-between px-6 md:px-8 py-4 border-b border-zinc-200 bg-zinc-50/95 shrink-0">
+      <!-- Header del workspace -->
+      <header class="flex items-center justify-between px-6 md:px-8 py-3.5 border-b border-zinc-200 bg-zinc-50/95 shrink-0">
         <div>
           <div class="text-[11px] font-mono font-medium tracking-widest uppercase text-emerald-700">
             TGP Scriptorium · Motor Cognitivo Multimodal
@@ -350,13 +355,15 @@
           >
             ← Volver al Hub
           </a>
-          <button
-            type="button"
-            class="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-zinc-600 bg-zinc-100 hover:bg-zinc-200 hover:text-zinc-900 border border-zinc-200 rounded-full transition-colors cursor-pointer"
-            on:click={() => (isOpen = false)}
-          >
-            ✕ Cerrar
-          </button>
+          {#if !embedded}
+            <button
+              type="button"
+              class="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-zinc-600 bg-zinc-100 hover:bg-zinc-200 hover:text-zinc-900 border border-zinc-200 rounded-full transition-colors cursor-pointer"
+              on:click={() => (isOpen = false)}
+            >
+              ✕ Cerrar
+            </button>
+          {/if}
         </div>
       </header>
 

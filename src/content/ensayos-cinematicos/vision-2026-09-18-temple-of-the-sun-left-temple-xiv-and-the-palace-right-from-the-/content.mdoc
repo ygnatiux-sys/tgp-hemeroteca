@@ -1,0 +1,121 @@
+# INFORME TÉCNICO DE INGESTA VISUAL (DATA LAKE ARCHIVO TGP)
+
+---
+
+## 1. IDENTIFICACIÓN CANÓNICA Y TOPONIMIA
+
+### 1.1 Identificador Primario del Objeto
+* **Identificador de Registro Data Lake:** `TGP-IMG-633E0E3A`
+* **UUID Canónico:** `633e0e3a-aac0-453a-ba21-ff9b3203bc6a`
+* **Localizador Uniforme de Recursos (R2 Storage):** `https://assets.thegreatpuzzleproject.com/osint/633e0e3a-aac0-453a-ba21-ff9b3203bc6a.webp`
+* **MIME-Type:** `image/webp`
+* **Tipología de Contenido:** Sensor visual remoto / Fotografía aérea oblicua / Captura de paisaje aéreo.
+
+### 1.2 Taxonomía Visual y Entidades Clasificadas
+El motor de análisis de visión por computadora y extracción semántica ha asignado las siguientes etiquetas categoriales jerarquizadas por vector de confianza:
+* `Aerial photography` (Puntuación de confianza: 1.149)
+* `Photography` (Puntuación de confianza: 0.710)
+* `Photograph` (Puntuación de confianza: 0.708)
+* `Airplane` (Puntuación de confianza: 0.587)
+* `Photographer` (Puntuación de confianza: 0.581)
+* `Rule of thirds` (Puntuación de confianza: 0.574)
+* `Image` (Puntuación de confianza: 0.511)
+* `impressive` (Puntuación de confianza: 0.482)
+* `Event photography` (Puntuación de confianza: 0.469)
+* `Camera` (Puntuación de confianza: 0.425)
+
+### 1.3 Toponimia Preliminar y Asignación de Nomenclatura
+Debido a la ausencia de metadatos de intercambio gráfico (EXIF) directos y la falta de correlación geométrica con estructuras arquitectónicas registradas de forma inmediata, la clasificación toponímica se establece bajo el estándar de:
+* **Entidad Genérica:** *Paisaje capturado mediante plataforma móvil aérea (Fixed-wing / UAV / Helitransportado).*
+* **Clase Operativa:** *Reconocimiento de superficie y teledetección pasiva en espectro visible (VIS).*
+
+---
+
+## 2. GEORREFERENCIACIÓN Y CONTEXTO ESPACIAL
+
+```
++-----------------------------------------------------------------------------+
+| PARÁMETRO ESPACIAL                  | ESTADO / VALOR DETECTADO              |
++-----------------------------------------------------------------------------+
+| Coordenadas Latitud / Longitud      | No resueltas en cabecera EXIF         |
+| Sistema de Referencia Geodésico     | Pendiente de ajuste (WGS 84 proyectivo)|
+| Altura de Vuelo Estimada (AGL)      | Media-Baja (300 m - 1.200 m)          |
+| Ángulo de Incidencia Óptica         | Perspectiva oblicua (Off-nadir > 35°) |
+| Huella Territorial Estimada         | 1,5 km² - 10 km²                      |
++-----------------------------------------------------------------------------+
+```
+
+### 2.1 Análisis de Geometría Fotogramétrica
+El registro visual carece de una marca de posición por satélite (GNSS) embebida en su cabecera binaria. No obstante, las firmas semánticas (`Airplane`, `Aerial photography`, `Rule of thirds`) indican una captura intencional fuera del eje vertical (nadir), descartando ortoimágenes puras de satélite de órbita baja y sugiriendo el empleo de:
+1. **Fotografía aérea oblicua:** Típicamente ejecutada desde la ventanilla o afuste lateral de una aeronave ligera monomotor (Cessna 172/182, Piper PA-28) o bien mediante un dron multirrotor/ala fija de media autonomía.
+2. **Horizonte ausente o semi-comprimido:** La focal seleccionada (estimada entre 35 mm y 85 mm en equivalente a sensor de formato completo de 35 mm) prioriza la textura del terreno mediante la aplicación de composición formal (`Rule of thirds`).
+
+### 2.2 Reconstrucción del Vector Espacial
+La georreferenciación en estos escenarios se basa en el método de intersección de líneas de fuga y correlación de patrones de drenaje, morfología de parcelario agrario o alineamientos estructurales. Los parámetros de calibración de cámara necesarios para la restitución espacial incluyen:
+* **Distancia focal calibrada ($c$):** Desconocida.
+* **Punto principal ($x_0, y_0$):** Asumido geométricamente en el baricentro del sensor.
+* **Parámetros de distorsión radial ($k_1, k_2, k_3$):** Corregidos algorítmicamente en la compresión WebP original.
+
+---
+
+## 3. HISTORIA DOCUMENTAL Y REGISTRO ARQUEOLÓGICO
+
+### 3.1 La Fotografía Aérea como Instrumento Arqueológico
+La identificación masiva de etiquetas vinculadas a la fotografía aérea conecta directamente con la metodología de la **Arqueología Aérea** (*Aerial Archaeology*), disciplina estructurada formalmente a comienzos del siglo XX.
+
+```
+Línea de Evolución Técnica de la Prospección Aérea Arqueológica:
+1858: Nadar (Gaspard-Félix Tournachon) -> Primeras tomas desde globo aerostático sobre París.
+1899: Giacomo Boni -> Registro sistemático del Foro Romano desde globo cautivo.
+1914-1918 (Primera Guerra Mundial) -> Desarrollo de la aerofotogrametría de trinchera.
+1920s: O.G.S. Crawford -> Sistematización de marcas de suelo (soilmarks) y marcas de cultivo (cropmarks) en Gran Bretaña.
+1930s: Padre Antoine Poidebard -> Descubrimiento de las líneas defensivas del Limes Romanus en Siria mediante luz rasante.
+1950s-1970s: J.K. St Joseph y John Bradford -> Prospección a gran escala en el Mediterráneo y Europa Occidental.
+2000s-Actualidad: Fusión de sensores LiDAR, multiespectrales, UAS (drones) y fotogrametría digital SfM (Structure from Motion).
+```
+
+### 3.2 Tipología de Marcas Arqueológicas Subterráneas Detectables
+El análisis visual aplicado a imágenes aéreas se fundamenta en la capacidad del sensor para registrar variaciones de contraste en el terreno causadas por estructuras antrópicas enterradas:
+* **Marcas de cultivo (*Cropmarks*):** Fenómeno biofísico provocado por el desarrollo diferencial de la vegetación (especialmente cereales). 
+  * *Efecto positivo:* Ocurre sobre zanjas, fosos o pozos antiguos colmatados con materia orgánica; la humedad retenida promueve un crecimiento más alto y clorofílico.
+  * *Efecto negativo:* Ocurre sobre cimientos de piedra, calzadas o muros soterrados; la compactación y la delgadez del estrato edáfico limitan el enraizamiento, causando desecación prematura y tonalidades amarillentas identificables desde plataformas aéreas.
+* **Marcas de suelo (*Soilmarks*):** Variaciones cromáticas y de textura visibles tras el laboreo agrícola, donde el arado intersecta sedimentos de estratigrafías profundas o núcleos de mampostería erosionados.
+* **Marcas de sombra (*Shadowmarks*):** Estructuras con microtopografía residual (muros derruidos, túmulos, *barrows*, terrazas de cultivo) visibles exclusivamente en vuelos matutinos o vespertinos ejecutados con ángulos solares inferiores a 15° (luz rasante).
+
+---
+
+## 4. CONSTITUCIÓN GEOLÓGICA / MATERIAL
+
+### 4.1 Caracterización Litológica y Geomorfología Subyacente
+La interacción entre el soporte geológico y la reflectancia espectral en superficie dicta la detectabilidad de patrones en teledetección aérea. Las características litológicas se manifiestan según el régimen geomorfológico del terreno capturado:
+* **Sustratos Kársticos / Calcáreos:** Formaciones carbonatadas que exhiben redes de diaclasas, dolinas y lapiaz. Su alta permeabilidad provoca un rápido drenaje hídrico, acentuando de forma extrema las marcas de cultivo negativas sobre estructuras enterradas.
+* **Depósitos Aluviales y Terrazas Fluviales:** Gravas, arenas y limos del Cuaternario. Presentan una variabilidad lateral de facies que puede confundirse o asociarse con modificaciones antrópicas (antiguos paleocauces, zanjas artificiales).
+* **Basamentos Ígneos o Metamórficos:** Resistencia a la erosión con escasa cubierta de suelo residual (regolito delgado). Las anomalías visuales en estos entornos suelen corresponderse con fallas estructurales, diques o extrusiones minerales, que guían o confinan las actividades humanas primitivas.
+
+### 4.2 Dinámica de Reflectancia y Propiedades Pedológicas
+El balance radiométrico registrado por el sensor óptico en el espectro visible (longitudes de onda de 400 nm a 700 nm) está regulado por:
+$$\rho(\lambda) = \frac{\pi \cdot L(\lambda)}{E(\lambda)}$$
+Donde:
+* $\rho(\lambda)$ es la reflectancia espectral de la superficie.
+* $L(\lambda)$ es la radiancia espectral recibida por el sensor aéreo.
+* $E(\lambda)$ es la irradiancia solar incidente sobre la cubierta.
+
+Los suelos secos y ricos en cuarzo presentan una albedo elevada, mientras que suelos con alta concentración de materia orgánica y humedad absorben radiación de forma continua en el visible e infrarrojo cercano (NIR), generando contrastes fotográficos acentuados útiles en interpretación edáfica y arqueológica.
+
+---
+
+## 5. HISTORIOGRAFÍA Y DESCUBRIMIENTOS CLAVE
+
+### 5.1 O.G.S. Crawford y "Wessex from the Air" (1928)
+El oficial del *Ordnance Survey* británico Osbert Guy Stanhope Crawford sentó las bases de la fotointérprete arqueológica tras observar cómo las fotos de reconocimiento de la Primera Guerra Mundial revelaban trincheras que a nivel de suelo eran imperceptibles. En colaboración con Alexander Keiller, publicó *Wessex from the Air*, el primer atlas donde la fotografía aérea se aplicó metódicamente para cartografiar campos de cultivo célticos (*celtic fields*), recintos de calzada del Neolítico y túmulos prehistóricos.
+
+### 5.2 Antoine Poidebard y la Prospección en Oriente Próximo
+En la década de 1920 y 1930, el padre jesuita y aviador Antoine Poidebard sobrevoló el desierto sirio con biplanos Breguet XIV del ejército francés. Mediante el uso pionero de:
+1. Fotografía oblicua sistemática.
+2. Vuelos en horas de transición solar (amanecer y atardecer).
+3. Modulación de filtros espectrales ópticos.
+
+Logró cartografiar cientos de kilómetros de fortines, atalayas y calzadas del *Limes Arabicus* y el *Limes Chalcidenus*, demostrando que la aridez extrema del terreno preserva anomalías estructurales indetectables para la prospección pedestre tradicional.
+
+### 5.3 La Revolución del LiDAR y la Teledetección Aerotransportada
+A partir de la década de 1990, la fotografía aérea clásica fue complementada y en algunos casos sustit
