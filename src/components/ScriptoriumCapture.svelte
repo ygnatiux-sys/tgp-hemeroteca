@@ -6,6 +6,7 @@
   // ─────────────────────────────────────────────────────────────────────────────
   import { marked } from 'marked';
   import { openGooglePicker } from '../lib/google-picker';
+  import { ejecutarIngestaExhaustiva, ejecutarRedaccionPremium } from '../lib/vision-osint';
 
   // ── Tipos ─────────────────────────────────────────────────────────────────
   type TransmuteStatus = 'idle' | 'sending' | 'success' | 'error';
@@ -20,13 +21,21 @@
     timestamp: Date;
     transmuteStatus: TransmuteStatus;
     transmuteError?: string;
+    d1Id?: string;
+    r2Url?: string;
+    audioUrl?: string;
+    premiumLoading?: boolean;
+    premiumError?: string;
   }
 
   // ── Config ────────────────────────────────────────────────────────────────
   const API_KEY = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_TGP_MIND_API_KEY : null) ?? '2771';
-  const VISION_ENDPOINT = import.meta.env.DEV
-    ? 'http://localhost:3001/api/vision'
-    : 'https://tgp-mind-713934653057.us-central1.run.app/api/vision';
+  const TGP_MIND_URL = import.meta.env.DEV
+    ? 'http://localhost:3001'
+    : 'https://tgp-mind-713934653057.us-central1.run.app';
+  const VISION_ENDPOINT = `${TGP_MIND_URL}/api/vision`;
+  const EXHAUSTIVE_ENDPOINT = `${TGP_MIND_URL}/api/vision-exhaustivo`;
+  const PREMIUM_ENDPOINT = `${TGP_MIND_URL}/api/redaccion-premium`;
   const GOOGLE_PICKER_KEY = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_PICKER_API_KEY : null) ?? '';
   const GOOGLE_CLIENT_ID = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_CLIENT_ID : null) ?? '';
 
@@ -149,7 +158,7 @@
     await handleSubmit(undefined, label, presetPrompt);
   }
 
-  // ── Submit a Gemini Vision ────────────────────────────────────────────────
+  // ── Submit a Gemini Vision / Data Lake OSINT ─────────────────────────────
   async function handleSubmit(e?: Event, labelOverride?: string, promptOverride?: string) {
     e?.preventDefault();
     const finalPrompt = (promptOverride ?? prompt).trim();
@@ -159,23 +168,43 @@
     error = null;
     try {
       const { base64, mimeType } = await fileToBase64(imageFile);
-      const res = await fetch(VISION_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY },
-        body: JSON.stringify({ prompt: finalPrompt, base64, mimeType }),
-      });
-      if (!res.ok) throw new Error(`Error ${res.status}: ${await res.text()}`);
-      const data = await res.json();
+      const fullBase64 = `data:${mimeType};base64,${base64}`;
+
+      let resultText = '';
+      let d1Id: string | undefined = undefined;
+      let r2Url: string | undefined = undefined;
+
+      // Pipeline Data Lake OSINT (R2 + D1 + Vision)
+      try {
+        const osintData = await ejecutarIngestaExhaustiva(EXHAUSTIVE_ENDPOINT, fullBase64, API_KEY);
+        resultText = osintData.informe || '';
+        d1Id = osintData.id;
+        r2Url = osintData.imagen_url;
+      } catch (osintErr) {
+        console.warn('[Scriptorium] Falló ingesta exhaustiva, ejecutando fallback Vision directo:', osintErr);
+        const res = await fetch(VISION_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY },
+          body: JSON.stringify({ prompt: finalPrompt, base64, mimeType }),
+        });
+        if (!res.ok) throw new Error(`Error ${res.status}: ${await res.text()}`);
+        const data = await res.json();
+        resultText = data.response ?? '(Sin respuesta)';
+      }
+
       results = [{
         prompt: finalPrompt,
         pillLabel: finalLabel,
-        response: data.response ?? '(Sin respuesta)',
-        imagePreview: previewUrl ?? '',
+        response: resultText,
+        imagePreview: r2Url || previewUrl || '',
         imageSource,
         imageName,
         timestamp: new Date(),
         transmuteStatus: 'idle',
+        d1Id,
+        r2Url,
       }, ...results];
+
       if (showManualPrompt) {
         prompt = '';
       }
@@ -184,6 +213,35 @@
       error = err.message ?? 'Error de conexión con TGP Mind.';
     } finally {
       isLoading = false;
+    }
+  }
+
+  // ── Generar Ensayo Pro + Audio TTS (Google Cloud TTS es-AR) ─────────────
+  async function generarEnsayoAudio(index: number, r: VisionResult) {
+    results = results.map((item, i) =>
+      i === index ? { ...item, premiumLoading: true, premiumError: undefined } : item
+    );
+    try {
+      const data = await ejecutarRedaccionPremium(
+        PREMIUM_ENDPOINT,
+        r.d1Id || 'manual',
+        API_KEY,
+        r.response
+      );
+      results = results.map((item, i) =>
+        i === index
+          ? {
+              ...item,
+              premiumLoading: false,
+              response: `${item.response}\n\n---\n\n### 🎙 Ensayo Premium Grounded (TGP Mind)\n\n${data.ensayo}`,
+              audioUrl: data.audio_url || undefined,
+            }
+          : item
+      );
+    } catch (err: any) {
+      results = results.map((item, i) =>
+        i === index ? { ...item, premiumLoading: false, premiumError: err.message } : item
+      );
     }
   }
 
@@ -214,6 +272,8 @@
           imageName: r.imageName,
           imageSource: r.imageSource,
           timestamp: r.timestamp.toISOString(),
+          r2Url: r.r2Url,
+          d1Id: r.d1Id,
         }),
       });
       if (!res.ok) {
@@ -521,7 +581,8 @@
             {:else}
               {#each results as r, i (i)}
                 <div class="p-5 rounded-3xl bg-zinc-50 border border-zinc-200 shadow-sm flex flex-col gap-4">
-                  <header class="flex items-center justify-between border-b border-zinc-200/80 pb-3">
+                  <!-- Header con píldora, timestamp y badges de R2/D1 -->
+                  <header class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-200/80 pb-3">
                     <div class="flex items-center gap-2">
                       <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-2xs
                         {r.pillLabel === 'Informe Base' ? 'bg-emerald-100 text-emerald-900 border border-emerald-200' :
@@ -530,13 +591,20 @@
                          'bg-zinc-200 text-zinc-800 border border-zinc-300'}">
                         {r.pillLabel || 'Informe Base'}
                       </span>
-                      <span class="text-[11px] font-mono text-zinc-500">
-                        {r.timestamp.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                      </span>
+                      {#if r.d1Id}
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200" title="Registro persistido en Cloudflare D1">
+                          🗄 D1: {r.d1Id.slice(0, 8)}…
+                        </span>
+                      {/if}
+                      {#if r.r2Url}
+                        <a href={r.r2Url} target="_blank" rel="noopener noreferrer" class="text-[10px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 hover:underline" title="Ver imagen en Cloudflare R2">
+                          ☁ R2 Image ↗
+                        </a>
+                      {/if}
                     </div>
                     <div class="flex items-center gap-2">
-                      <span class="text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-600 bg-white border border-zinc-200 px-2 py-0.5 rounded-md">
-                        gemini-vision
+                      <span class="text-[11px] font-mono text-zinc-500">
+                        {r.timestamp.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                       </span>
                       <button
                         type="button"
@@ -549,49 +617,32 @@
                     </div>
                   </header>
 
-                  <div class="flex gap-4 items-start">
-                    <div class="w-20 h-20 rounded-2xl overflow-hidden border border-zinc-200 bg-zinc-100 shrink-0 shadow-2xs">
-                      <img src={r.imagePreview} alt={r.imageName} class="w-full h-full object-cover" />
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <div class="text-xs font-medium text-zinc-500 mb-2 line-clamp-1 italic">
-                        ↳ "{r.prompt}"
-                      </div>
-                      <div class="prose prose-zinc max-w-none text-xs leading-relaxed text-zinc-800 font-sans">
-                        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                        {@html marked.parse(r.response)}
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- ── Botón Transmutar → Keystatic ──────────────────────── -->
-                  <div class="pt-3 border-t border-zinc-200/80 flex flex-wrap items-center justify-between gap-3">
-                    <div class="flex items-center gap-2">
+                  <!-- ── BARRA DE ACCIÓN PRINCIPAL (Siempre visible arriba) ── -->
+                  <div class="p-3 bg-white rounded-2xl border border-zinc-200/90 shadow-2xs flex flex-wrap items-center justify-between gap-2.5">
+                    <div class="flex flex-wrap items-center gap-2">
                       <button
                         type="button"
                         disabled={r.transmuteStatus === 'sending' || r.transmuteStatus === 'success'}
                         on:click={() => transmuteToKeystatic(i, r)}
-                        class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl border transition-all duration-200 cursor-pointer disabled:cursor-not-allowed
+                        class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl border transition-all duration-200 cursor-pointer disabled:cursor-not-allowed
                           {r.transmuteStatus === 'success'
-                            ? 'bg-emerald-50 border-emerald-300 text-emerald-800 opacity-80'
+                            ? 'bg-emerald-100 border-emerald-300 text-emerald-900'
                             : r.transmuteStatus === 'error'
                             ? 'bg-red-50 border-red-300 text-red-800 hover:bg-red-100'
                             : r.transmuteStatus === 'sending'
                             ? 'bg-zinc-100 border-zinc-300 text-zinc-500 opacity-70'
-                            : 'bg-white border-zinc-300 text-zinc-800 hover:bg-zinc-100 hover:border-zinc-400 shadow-2xs'}"
+                            : 'bg-emerald-600 hover:bg-emerald-700 border-emerald-700 text-white shadow-xs'}"
                       >
                         {#if r.transmuteStatus === 'sending'}
                           <span class="animate-spin text-sm">⟳</span>
-                          <span>Enviando a Hemeroteca…</span>
+                          <span>Guardando…</span>
                         {:else if r.transmuteStatus === 'success'}
                           <span>✅</span>
                           <span>Guardado en Keystatic</span>
                         {:else if r.transmuteStatus === 'error'}
-                          <span>⚠</span>
-                          <span>Reintentar Transmutación</span>
+                          <span>⚠ Reintentar</span>
                         {:else}
-                          <span>⚡</span>
-                          <span>Guardar en Hemeroteca</span>
+                          <span>⚡ Guardar en Hemeroteca</span>
                         {/if}
                       </button>
 
@@ -609,11 +660,54 @@
                       </select>
                     </div>
 
-                    {#if r.transmuteStatus === 'error' && r.transmuteError}
-                      <span class="text-[11px] text-red-600 font-mono truncate max-w-[50%]" title={r.transmuteError}>
-                        {r.transmuteError}
-                      </span>
-                    {/if}
+                    <!-- Botón Ensayo Premium + Audio TTS -->
+                    <button
+                      type="button"
+                      disabled={r.premiumLoading}
+                      on:click={() => generarEnsayoAudio(i, r)}
+                      class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border border-purple-300 bg-purple-50 hover:bg-purple-100 text-purple-900 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-2xs"
+                      title="Genera un ensayo profundo con Grounding y audio TTS es-AR"
+                    >
+                      {#if r.premiumLoading}
+                        <span class="animate-spin text-xs">⟳</span>
+                        <span>Generando Ensayo & Audio…</span>
+                      {:else}
+                        <span>🎙</span>
+                        <span>Ensayo Pro + Audio TTS</span>
+                      {/if}
+                    </button>
+                  </div>
+
+                  {#if r.audioUrl}
+                    <div class="p-3 bg-purple-50/70 border border-purple-200 rounded-2xl flex flex-col gap-1.5">
+                      <div class="flex items-center justify-between text-xs text-purple-900 font-semibold">
+                        <span>🎧 Audio Neuronal (es-AR):</span>
+                        <a href={r.audioUrl} target="_blank" rel="noopener noreferrer" class="font-mono text-[11px] text-purple-700 hover:underline">Descargar MP3 ↗</a>
+                      </div>
+                      <audio controls class="w-full h-8" src={r.audioUrl}></audio>
+                    </div>
+                  {/if}
+
+                  {#if r.premiumError}
+                    <div class="p-2 text-xs bg-red-50 text-red-700 border border-red-200 rounded-xl">
+                      ⚠ Error al generar Ensayo Pro: {r.premiumError}
+                    </div>
+                  {/if}
+
+                  <!-- Contenido Markdown y Vista de Imagen -->
+                  <div class="flex gap-4 items-start">
+                    <div class="w-20 h-20 rounded-2xl overflow-hidden border border-zinc-200 bg-zinc-100 shrink-0 shadow-2xs">
+                      <img src={r.imagePreview} alt={r.imageName} class="w-full h-full object-cover" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="text-xs font-medium text-zinc-500 mb-2 line-clamp-1 italic">
+                        ↳ "{r.prompt}"
+                      </div>
+                      <div class="prose prose-zinc max-w-none text-xs leading-relaxed text-zinc-800 font-sans">
+                        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                        {@html marked.parse(r.response)}
+                      </div>
+                    </div>
                   </div>
                 </div>
               {/each}

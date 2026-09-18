@@ -37,7 +37,7 @@ export const OPTIONS: APIRoute = async () =>
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { collection = 'ensayosCinematicos', pillLabel, prompt, response, imageName, imageSource, timestamp } = body as {
+    const { collection = 'ensayosCinematicos', pillLabel, prompt, response, imageName, imageSource, timestamp, r2Url, d1Id } = body as {
       collection?: string;
       pillLabel: string;
       prompt: string;
@@ -45,6 +45,8 @@ export const POST: APIRoute = async ({ request }) => {
       imageName: string;
       imageSource: string;
       timestamp: string;
+      r2Url?: string;
+      d1Id?: string;
     };
 
     if (!response?.trim()) {
@@ -111,6 +113,8 @@ export const POST: APIRoute = async ({ request }) => {
       dek: `Captura multimodal (${pillLabel}): ${prompt.slice(0, 100)}...`,
       excerpt: prompt,
       imageSource: imageSource || 'local',
+      imageUrl: r2Url || undefined,
+      d1Id: d1Id || undefined,
       capturedAt: date.toISOString(),
     };
     await fs.writeFile(path.join(entryDir, 'index.json'), JSON.stringify(metadata, null, 2), 'utf-8');

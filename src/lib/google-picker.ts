@@ -175,18 +175,7 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
       picker.setVisible(true);
     };
 
-    // 4. Verificar si el token ya existe en memoria (o sessionStorage)
-    if (!currentAccessToken && typeof sessionStorage !== 'undefined') {
-      currentAccessToken = sessionStorage.getItem('tgp_g_token');
-    }
-
-    // Si ya existe el access_token, mostramos el PickerBuilder directamente saltando requestAccessToken()
-    if (currentAccessToken) {
-      createPickerInstance(currentAccessToken);
-      return;
-    }
-
-    // Si no existe, solicitamos la autorización a Google
+    // 4. Solicitar autorización o refrescar token mediante Google Identity Services
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: clientId,
       scope: 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/photoslibrary.readonly',
@@ -202,6 +191,7 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
       },
     });
 
+    // Solicitar token fresco para evitar error 403 por token caducado
     tokenClient.requestAccessToken({ prompt: '' });
   } catch (err: any) {
     console.error('[Google Picker]:', err);
