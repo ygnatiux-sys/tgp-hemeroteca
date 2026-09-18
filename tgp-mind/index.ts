@@ -17,7 +17,7 @@ import 'dotenv/config';
 
 // ── Configuración ─────────────────────────────────────────────────────────────
 const PORT               = parseInt(process.env.PORT || '3001');
-const TELEGRAM_TOKEN     = process.env.TELEGRAM_TOKEN || '';
+const TELEGRAM_TOKEN     = process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_TOKEN || '';
 const GEMINI_API_KEY     = process.env.GEMINI_API_KEY || '';
 const TGP_MIND_API_KEY   = process.env.TGP_MIND_API_KEY || '';
 const XAVIER_CHAT_ID     = 7886507052;
@@ -1004,7 +1004,7 @@ async function guardarEnCloudflareD1(registro: {
   }
 }
 
-async function obtenerInformeD1(id: string): Promise<{ informe_osint: string; imagen_url: string } | null> {
+async function obtenerInformeD1(id: string): Promise<{ informe_osint: string; imagen_url: string; ensayo_premium?: string } | null> {
   if (!CLOUDFLARE_D1_DATABASE_ID || !CLOUDFLARE_API_TOKEN) return null;
   const url = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${CLOUDFLARE_D1_DATABASE_ID}/query`;
   const res = await fetch(url, {
@@ -1014,7 +1014,7 @@ async function obtenerInformeD1(id: string): Promise<{ informe_osint: string; im
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      sql: 'SELECT informe_osint, imagen_url FROM data_lake_vision WHERE id = ? LIMIT 1',
+      sql: 'SELECT informe_osint, imagen_url, ensayo_premium FROM data_lake_vision WHERE id = ? LIMIT 1',
       params: [id],
     }),
   });
@@ -1512,6 +1512,316 @@ app.post('/webhook/telegram-social', async (c) => {
     await editMessageReplyMarkupSocial(chatId, messageId, buildSocialInlineKeyboard(sesion));
     await answerCallbackQuerySocial(callbackId);
     return c.json({ ok: true });
+  }
+
+  return c.json({ ok: true });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RUTA 5: /telegram-webhook -- Omni-Bot @Analista_IMG_bot (Data Lake + Cortafuegos)
+// ─────────────────────────────────────────────────────────────────────────────
+app.post('/telegram-webhook', async (c) => {
+  let body: any;
+  try { body = await c.req.json(); } catch { return c.json({ ok: true }); }
+
+  const message = body?.message;
+  if (message) {
+    const chatId = message.chat?.id;
+    if (chatId !== XAVIER_CHAT_ID) {
+      await fetch(`${TELEGRAM_API}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: '⛔ Acceso restringido. Nodo privado TGP.' }),
+      });
+      return c.json({ ok: true });
+    }
+
+    // Regla extra: /resumir sobre reply_to_message
+    const text: string = message.text || '';
+    if (text.startsWith('/resumir') && message.reply_to_message) {
+      const quoted = message.reply_to_message.text || message.reply_to_message.caption || '';
+      if (!quoted) {
+        await fetch(`${TELEGRAM_API}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text: '⚠️ El mensaje citado no contiene texto.' }),
+        });
+        return c.json({ ok: true });
+      }
+
+      await fetch(`${TELEGRAM_API}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: '⚡ Sintetizando con Gemini Flash...' }),
+      });
+
+      const summaryResp = await genai.models.generateContent({
+        model: 'gemini-1.5-flash',
+        contents: [{ text: `Resume de forma analítica, densa y en viñetas este texto:\n\n${quoted}` }],
+        config: { systemInstruction: 'Eres un analista de TGP. Tono sobrio, preciso y directo.' },
+      });
+
+      await fetch(`${TELEGRAM_API}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: `📋 Resumen Ejecutivo:\n\n${summaryResp.text}` }),
+      });
+      return c.json({ ok: true });
+    }
+
+    // FASE 1: Ingestión de Imagen a Data Lake
+    const photos = message.photo;
+    if (Array.isArray(photos) && photos.length > 0) {
+      const id = crypto.randomUUID();
+      const bestPhoto = photos[photos.length - 1];
+
+      await fetch(`${TELEGRAM_API}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: '⏳ Ingestando imagen en Data Lake (Vision + Flash + R2)...' }),
+      });
+
+      try {
+        const fileInfoRes = await fetch(`${TELEGRAM_API}/getFile?file_id=${bestPhoto.file_id}`);
+        const fileInfo: any = await fileInfoRes.json();
+        const filePath = fileInfo.result?.file_path;
+        const fileUrl = `https://api.telegram.org/file/bot${TELEGRAM_TOKEN}/${filePath}`;
+        const imgBuffer = Buffer.from(await (await fetch(fileUrl)).arrayBuffer());
+
+        // Cloud Vision (Web Detection + Landmarks)
+        const [webResult, landmarkResult] = await Promise.all([
+          visionClient.webDetection({ image: { content: imgBuffer } }),
+          visionClient.landmarkDetection({ image: { content: imgBuffer } }),
+        ]);
+
+        const webDetection = webResult[0]?.webDetection;
+        const entidades = (webDetection?.webEntities || [])
+          .filter((e) => (e.score || 0) >= 0.6 && e.description)
+          .map((e) => ({ entidad: e.description, score: Number((e.score || 0).toFixed(2)) }));
+
+        const landmarks = (landmarkResult[0]?.landmarkAnnotations || []).map((l) => ({
+          nombre: l.description,
+          lat: l.locations?.[0]?.latLng?.latitude,
+          lng: l.locations?.[0]?.latLng?.longitude,
+        }));
+
+        const metadatosVision = { entidades, landmarks };
+
+        // Subida a Cloudflare R2
+        const imagenUrl = await subirBufferOsintAR2(imgBuffer, id, 'image/webp');
+
+        // Expansión OSINT con Gemini 1.5 Flash
+        const promptOSINT = `Actúa como investigador OSINT y arqueólogo de TGP. Elabora un informe enciclopédico factual exhaustivo sobre esta imagen usando los metadatos:
+[METADATOS VISION]:
+${JSON.stringify(metadatosVision, null, 2)}
+Detalla: toponimia, coordenadas, historia, geología, fuentes y contexto académico. Tono neutro de Data Lake.`;
+
+        const osintResp = await genai.models.generateContent({
+          model: 'gemini-1.5-flash',
+          contents: [{ text: promptOSINT }],
+          config: { maxOutputTokens: 3000, temperature: 0.2 },
+        });
+        const informeOSINT = osintResp.text || 'Sin informe.';
+
+        // Persistencia en Cloudflare D1
+        await guardarEnCloudflareD1({
+          id,
+          imagen_url: imagenUrl,
+          metadatos_vision: metadatosVision,
+          informe_osint: informeOSINT,
+          fecha_ingesta: new Date().toISOString(),
+        });
+
+        // Respuesta Telegram con Teclado Nivel 1
+        const entStr = entidades.map((e) => `• ${e.entidad}`).slice(0, 5).join('\n') || 'Sin entidades con score > 0.6';
+        const landStr = landmarks[0] ? `📍 ${landmarks[0].nombre}` : '📍 Sin landmark directo';
+
+        const summaryText = `✅ Ingesta Data Lake Completada\n\nID: \`${id}\`\n${landStr}\n\nEntidades detectadas:\n${entStr}\n\nSelecciona el destino:`;
+
+        await fetch(`${TELEGRAM_API}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: summaryText,
+            reply_markup: {
+              inline_keyboard: [
+                [{ text: '🌐 Destino: Web (TGP)', callback_data: `dest_web:${id}` }],
+                [{ text: '📱 Hilo para X / Zernio', callback_data: `dest_zernio:${id}` }],
+                [{ text: '📸 Guion TikTok / Reels', callback_data: `dest_tiktok:${id}` }],
+              ],
+            },
+          }),
+        });
+      } catch (err: any) {
+        console.error('[Omni-Bot Ingesta Error]:', err);
+        await fetch(`${TELEGRAM_API}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text: `❌ Error en ingesta: ${err.message}` }),
+        });
+      }
+      return c.json({ ok: true });
+    }
+  }
+
+  // FASE 2 & 3: Callback Queries y Cortafuegos Financiero
+  const callbackQuery = body?.callback_query;
+  if (callbackQuery) {
+    const callbackId = callbackQuery.id;
+    const data: string = callbackQuery.data || '';
+    const chatId = callbackQuery.message?.chat?.id;
+    const messageId = callbackQuery.message?.message_id;
+
+    if (!data || data === 'fin') {
+      await answerCallbackQuery(callbackId, 'Sesión terminada.');
+      await fetch(`${TELEGRAM_API}/editMessageText`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, message_id: messageId, text: '🏁 Sesión editorial completada.' }),
+      });
+      return c.json({ ok: true });
+    }
+
+    const [action, id] = data.split(':');
+    const registro = await obtenerInformeD1(id);
+    await answerCallbackQuery(callbackId, 'Procesando...');
+
+    // Hilo para X / Zernio
+    if (action === 'dest_zernio') {
+      await fetch(`${TELEGRAM_API}/editMessageText`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, message_id: messageId, text: '⏳ Redactando hilo para X / Zernio con Flash...' }),
+      });
+      const res = await genai.models.generateContent({
+        model: 'gemini-1.5-flash',
+        contents: [{ text: `Redacta un hilo de X (Twitter) incisivo, con gancho visual, basado en este informe:\n\n${registro?.informe_osint || ''}` }],
+      });
+      await sendTelegram(chatId, `📱 Hilo X / Zernio:\n\n${res.text}`);
+      return c.json({ ok: true });
+    }
+
+    // Guion TikTok / Reels
+    if (action === 'dest_tiktok') {
+      await fetch(`${TELEGRAM_API}/editMessageText`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, message_id: messageId, text: '⏳ Creando guion TikTok/Reels con Flash...' }),
+      });
+      const res = await genai.models.generateContent({
+        model: 'gemini-1.5-flash',
+        contents: [{ text: `Escribe un guion corto para TikTok/Reels (Voz en off + Indicaciones visuales [Visual]) sobre:\n\n${registro?.informe_osint || ''}` }],
+      });
+      await sendTelegram(chatId, `🎬 Guion Audiovisual:\n\n${res.text}`);
+      return c.json({ ok: true });
+    }
+
+    // Cortafuegos Financiero: Menú de Rigor Web
+    if (action === 'dest_web') {
+      await fetch(`${TELEGRAM_API}/editMessageText`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          message_id: messageId,
+          text: '🏛 Producción Editorial Web (TGP)\n\nElige el nivel de profundidad cognitiva:',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '📝 Pro Estándar (Sin Grounding)', callback_data: `web_normal:${id}` }],
+              [{ text: '🔍 Pro Premium (Con Grounding)', callback_data: `web_pro:${id}` }],
+            ],
+          },
+        }),
+      });
+      return c.json({ ok: true });
+    }
+
+    // Producción Pro (Con o Sin Grounding)
+    if (action === 'web_normal' || action === 'web_pro') {
+      const useGrounding = action === 'web_pro';
+      await fetch(`${TELEGRAM_API}/editMessageText`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          message_id: messageId,
+          text: `⚡ Invocando Gemini 1.5 Pro ${useGrounding ? '(con Google Search Grounding)' : '(Modo Estándar)'}...`,
+        }),
+      });
+
+      const systemPrompt = `Actúa en Modo TGP. Eres un ensayista filosófico y crítico cultural de alto nivel.
+Redacta un ensayo denso, sobrio y cinematográfico basado en el informe técnico.
+Estructura:
+1) Gancho visual evocador
+2) Contexto arqueológico e histórico
+3) Núcleo conceptual filosófico
+4) Cierre existencial sobre la condición humana.`;
+
+      const genConfig: any = {
+        systemInstruction: systemPrompt,
+        temperature: 0.7,
+        maxOutputTokens: 2500,
+      };
+      if (useGrounding) {
+        genConfig.tools = [{ googleSearch: {} }];
+      }
+
+      const proResp = await genai.models.generateContent({
+        model: 'gemini-1.5-pro',
+        contents: [{ text: `INFORME BASE:\n\n${registro?.informe_osint || ''}` }],
+        config: genConfig,
+      });
+
+      const ensayoTexto = proResp.text || 'Sin texto generado.';
+      await actualizarRegistroD1(id, ensayoTexto, null);
+
+      await sendTelegram(chatId, `🏛 Ensayo Editorial TGP:\n\n${ensayoTexto}`);
+      await fetch(`${TELEGRAM_API}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: '🎧 ¿Deseas generar la locución neural de este ensayo?',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '🎙️ Generar Audio TTS (es-AR)', callback_data: `tts:${id}` }],
+              [{ text: '❌ Terminar Sesión', callback_data: 'fin' }],
+            ],
+          },
+        }),
+      });
+      return c.json({ ok: true });
+    }
+
+    // Audio TTS (es-AR)
+    if (action === 'tts') {
+      await fetch(`${TELEGRAM_API}/editMessageText`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, message_id: messageId, text: '🎙️ Sintetizando locución es-AR y subiendo a R2...' }),
+      });
+
+      const textoEnsayo = registro?.ensayo_premium || registro?.informe_osint || '';
+      const audioUrl = await generarYGuardarAudioTTS(id, textoEnsayo);
+
+      if (audioUrl) {
+        await actualizarRegistroD1(id, textoEnsayo, audioUrl);
+        await fetch(`${TELEGRAM_API}/sendAudio`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, audio: audioUrl, caption: '🎙 Locución Oficial TGP (es-AR)' }),
+        });
+        await fetch(`${TELEGRAM_API}/editMessageText`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, message_id: messageId, text: '✅ Audio generado y catalogado en Cloudflare R2.' }),
+        });
+      } else {
+        await sendTelegram(chatId, '⚠️ No se pudo generar el audio TTS.');
+      }
+      return c.json({ ok: true });
+    }
   }
 
   return c.json({ ok: true });

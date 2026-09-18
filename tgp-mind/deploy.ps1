@@ -38,12 +38,22 @@ Write-Host "Proyecto: $PROJECT_ID | Región: $REGION | Servicio: $SERVICE_NAME" 
 
 gcloud config set project $PROJECT_ID
 
-gcloud run deploy $SERVICE_NAME `
-  --source . `
-  --region $REGION `
-  --platform managed `
-  --allow-unauthenticated `
-  --clear-base-image
+if ($envVarsString) {
+    gcloud run deploy $SERVICE_NAME `
+      --source . `
+      --region $REGION `
+      --platform managed `
+      --allow-unauthenticated `
+      --clear-base-image `
+      --set-env-vars "$envVarsString"
+} else {
+    gcloud run deploy $SERVICE_NAME `
+      --source . `
+      --region $REGION `
+      --platform managed `
+      --allow-unauthenticated `
+      --clear-base-image
+}
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "[TGP Mind] Error en el despliegue." -ForegroundColor Red
