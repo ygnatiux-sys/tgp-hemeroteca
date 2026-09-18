@@ -11,6 +11,8 @@ import { GoogleGenAI } from '@google/genai';
 import { GoogleGenerativeAI, SchemaType, type ResponseSchema } from '@google/generative-ai';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { Octokit } from '@octokit/rest';
+import vision from '@google-cloud/vision';
+import crypto from 'node:crypto';
 import 'dotenv/config';
 
 // ── Configuración ─────────────────────────────────────────────────────────────
@@ -29,11 +31,14 @@ const ZERNIO_FB_ID          = process.env.ZERNIO_FB_ID || '';
 const ZERNIO_TIKTOK_ID      = process.env.ZERNIO_TIKTOK_ID || '';
 const TELEGRAM_SOCIAL_API   = `https://api.telegram.org/bot${TELEGRAM_SOCIAL_TOKEN}`;
 
-// ── Cloudflare R2 ─────────────────────────────────────────────────────────────
-const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID || process.env.R2_ACCOUNT_ID || '';
-const R2_ACCESS_KEY_ID      = process.env.R2_ACCESS_KEY_ID      || '';
-const R2_SECRET_ACCESS_KEY  = process.env.R2_SECRET_ACCESS_KEY  || '';
-const R2_BUCKET_NAME        = process.env.R2_BUCKET_NAME        || 'tgp-storage';
+// ── Cloudflare R2 & D1 ────────────────────────────────────────────────────────
+const CLOUDFLARE_ACCOUNT_ID    = process.env.CLOUDFLARE_ACCOUNT_ID || process.env.R2_ACCOUNT_ID || '';
+const CLOUDFLARE_D1_DATABASE_ID = process.env.CLOUDFLARE_D1_DATABASE_ID || '';
+const CLOUDFLARE_API_TOKEN     = process.env.CLOUDFLARE_API_TOKEN     || '';
+const R2_ACCESS_KEY_ID         = process.env.R2_ACCESS_KEY_ID         || '';
+const R2_SECRET_ACCESS_KEY     = process.env.R2_SECRET_ACCESS_KEY     || '';
+const R2_BUCKET_NAME           = process.env.R2_BUCKET_NAME           || 'tgp-storage';
+const R2_PUBLIC_DOMAIN         = process.env.R2_PUBLIC_DOMAIN         || 'https://assets.thegreatpuzzleproject.com';
 
 const r2Client = new S3Client({
   region: 'auto',
@@ -43,6 +48,9 @@ const r2Client = new S3Client({
     secretAccessKey: R2_SECRET_ACCESS_KEY,
   },
 });
+
+// ── Google Cloud Vision Client ────────────────────────────────────────────────
+const visionClient = new vision.ImageAnnotatorClient();
 
 // ── GitHub / Octokit ──────────────────────────────────────────────────────────
 const GITHUB_TOKEN             = process.env.GITHUB_TOKEN             || '';
@@ -935,6 +943,351 @@ app.post('/api/vision', async (c) => {
   } catch (error: any) {
     console.error('[Vision API] Error:', error);
     return c.json({ error: 'Error procesando la imagen.' }, 500);
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPERS PARA DATA LAKE OSINT (R2 + CLOUDFLARE D1 + TTS)
+// ─────────────────────────────────────────────────────────────────────────────
+async function subirBufferOsintAR2(imageBuffer: Buffer, id: string, mimeType = 'image/webp'): Promise<string> {
+  const fileKey = `osint/${id}.webp`;
+  await r2Client.send(
+    new PutObjectCommand({
+      Bucket: R2_BUCKET_NAME,
+      Key: fileKey,
+      Body: imageBuffer,
+      ContentType: mimeType,
+      CacheControl: 'public, max-age=31536000, immutable',
+    })
+  );
+  return `${R2_PUBLIC_DOMAIN}/${fileKey}`;
+}
+
+async function guardarEnCloudflareD1(registro: {
+  id: string;
+  imagen_url: string;
+  metadatos_vision: object;
+  informe_osint: string;
+  fecha_ingesta: string;
+}): Promise<void> {
+  if (!CLOUDFLARE_D1_DATABASE_ID || !CLOUDFLARE_API_TOKEN) {
+    console.warn('[D1 Storage] Omitiendo guardado en D1 (variables CLOUDFLARE_D1_DATABASE_ID o CLOUDFLARE_API_TOKEN no configuradas).');
+    return;
+  }
+  const url = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${CLOUDFLARE_D1_DATABASE_ID}/query`;
+  const query = `
+    INSERT INTO data_lake_vision (id, imagen_url, metadatos_vision, informe_osint, fecha_ingesta)
+    VALUES (?, ?, ?, ?, ?)
+  `;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${CLOUDFLARE_API_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      sql: query,
+      params: [
+        registro.id,
+        registro.imagen_url,
+        JSON.stringify(registro.metadatos_vision),
+        registro.informe_osint,
+        registro.fecha_ingesta,
+      ],
+    }),
+  });
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.warn(`[D1 Storage Warning] (${response.status}): ${errorText}`);
+  } else {
+    console.log(`[D1 Storage] Registro persistido exitosamente con ID: ${registro.id}`);
+  }
+}
+
+async function obtenerInformeD1(id: string): Promise<{ informe_osint: string; imagen_url: string } | null> {
+  if (!CLOUDFLARE_D1_DATABASE_ID || !CLOUDFLARE_API_TOKEN) return null;
+  const url = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${CLOUDFLARE_D1_DATABASE_ID}/query`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${CLOUDFLARE_API_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      sql: 'SELECT informe_osint, imagen_url FROM data_lake_vision WHERE id = ? LIMIT 1',
+      params: [id],
+    }),
+  });
+  const data: any = await res.json();
+  const rows = data?.result?.[0]?.results;
+  return rows && rows.length > 0 ? rows[0] : null;
+}
+
+async function actualizarRegistroD1(id: string, ensayo: string, audioUrl: string | null): Promise<void> {
+  if (!CLOUDFLARE_D1_DATABASE_ID || !CLOUDFLARE_API_TOKEN) return;
+  const url = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${CLOUDFLARE_D1_DATABASE_ID}/query`;
+  await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${CLOUDFLARE_API_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      sql: 'UPDATE data_lake_vision SET ensayo_premium = ?, audio_url = ? WHERE id = ?',
+      params: [ensayo, audioUrl, id],
+    }),
+  });
+  console.log(`[D1 Storage] Ensayo Premium y Audio persistidos para ID: ${id}`);
+}
+
+async function generarYGuardarAudioTTS(id: string, texto: string): Promise<string | null> {
+  try {
+    const textoLimpio = texto
+      .replace(/[#*_`>\-\[\]\(\)]/g, '')
+      .replace(/\s+/g, ' ')
+      .slice(0, 4500);
+
+    const ttsUrl = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GEMINI_API_KEY}`;
+    const ttsRes = await fetch(ttsUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        input: { text: textoLimpio },
+        voice: {
+          languageCode: 'es-AR',
+          name: 'es-AR-Neural2-A',
+          ssmlGender: 'FEMALE',
+        },
+        audioConfig: {
+          audioEncoding: 'MP3',
+          speakingRate: 0.96,
+          pitch: -1.0,
+        },
+      }),
+    });
+
+    if (!ttsRes.ok) {
+      console.warn('[TTS] Aviso en Google TTS:', await ttsRes.text());
+      return null;
+    }
+
+    const ttsData: any = await ttsRes.json();
+    if (!ttsData.audioContent) return null;
+
+    const audioBuffer = Buffer.from(ttsData.audioContent, 'base64');
+    const audioKey = `audios/${id}.mp3`;
+
+    await r2Client.send(
+      new PutObjectCommand({
+        Bucket: R2_BUCKET_NAME,
+        Key: audioKey,
+        Body: audioBuffer,
+        ContentType: 'audio/mpeg',
+        CacheControl: 'public, max-age=31536000, immutable',
+      })
+    );
+
+    return `${R2_PUBLIC_DOMAIN}/${audioKey}`;
+  } catch (err) {
+    console.error('[TTS Error]:', err);
+    return null;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RUTA 3B: /api/vision-exhaustivo -- Ingesta Exhaustiva (Data Lake OSINT)
+// ─────────────────────────────────────────────────────────────────────────────
+app.post('/api/vision-exhaustivo', async (c) => {
+  const apiKey = c.req.header('x-api-key') || (c.req.header('Authorization') ?? '').replace('Bearer ', '').trim();
+  if (TGP_MIND_API_KEY && apiKey !== TGP_MIND_API_KEY) {
+    return c.json({ error: 'No autorizado: API Key inválida.' }, 401);
+  }
+
+  let body: { imageBase64?: string; mimeType?: string };
+  try { body = await c.req.json(); } catch { return c.json({ error: 'Payload JSON malformado.' }, 400); }
+
+  const { imageBase64, mimeType = 'image/webp' } = body;
+  if (!imageBase64) return c.json({ error: 'Se requiere el parámetro "imageBase64".' }, 400);
+
+  const rawBase64 = imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64;
+  const imageBuffer = Buffer.from(rawBase64, 'base64');
+  const recordId = crypto.randomUUID();
+
+  try {
+    // 1. Guardado de imagen en R2
+    console.log(`[Vision-Exhaustivo] Subiendo imagen a R2 (ID: ${recordId})...`);
+    let imagenPublicUrl = `${R2_PUBLIC_DOMAIN}/osint/${recordId}.webp`;
+    try {
+      imagenPublicUrl = await subirBufferOsintAR2(imageBuffer, recordId, mimeType);
+    } catch (errR2: any) {
+      console.warn('[Vision-Exhaustivo] Falló subida a R2, continuando pipeline:', errR2?.message);
+    }
+
+    // 2. Extracción con Google Cloud Vision
+    console.log('[Vision-Exhaustivo] Extrayendo datos con Cloud Vision...');
+    const [webResult, landmarkResult] = await Promise.all([
+      visionClient.webDetection({ image: { content: imageBuffer } }),
+      visionClient.landmarkDetection({ image: { content: imageBuffer } }),
+    ]);
+
+    const webDetection = webResult[0]?.webDetection;
+    const entidades = (webDetection?.webEntities || [])
+      .filter((e) => e.description)
+      .map((e) => ({
+        descripcion: e.description || '',
+        score: Number((e.score || 0).toFixed(3)),
+      }));
+
+    const urls = (webDetection?.pagesWithMatchingImages || [])
+      .filter((p) => p.url)
+      .map((p) => ({
+        url: p.url || '',
+        titulo: p.pageTitle || 'Sin título',
+      }));
+
+    const landmarks = landmarkResult[0]?.landmarkAnnotations || [];
+    const coords = landmarks.map((l) => ({
+      nombre: l.description || 'Punto de Interés Desconocido',
+      score: Number((l.score || 0).toFixed(3)),
+      lat: l.locations?.[0]?.latLng?.latitude || null,
+      lng: l.locations?.[0]?.latLng?.longitude || null,
+    }));
+
+    const metadatos = { entidades, urls, coords };
+
+    // 3. Expansión Cognitiva con Gemini 1.5 Flash (~3000 tokens)
+    console.log('[Vision-Exhaustivo] Generando monografía en Gemini 1.5 Flash...');
+    const promptOSINT = `Actúa como un investigador de OSINT y arqueología. Usa estas etiquetas, coordenadas y URLs para elaborar un informe enciclopédico exhaustivo y estructurado (alrededor de 3000 tokens). Detalla: historia, geología, descubrimientos, referencias a Wikipedia y análisis de las fuentes web. Mantén un tono neutro y descriptivo (Data Lake), sin conclusiones ensayísticas.
+
+URL PÚBLICA DE LA IMAGEN EN R2: ${imagenPublicUrl}
+
+[COORDENADAS Y MONUMENTOS DETECTADOS]:
+${coords.length > 0 ? JSON.stringify(coords, null, 2) : 'No se identificaron monumentos conocidos ni coordenadas GPS directas.'}
+
+[ENTIDADES WEB IDENTIFICADAS]:
+${entidades.length > 0 ? entidades.map((e) => `- ${e.descripcion} (Confianza: ${e.score})`).join('\n') : 'Sin entidades web detectadas.'}
+
+[FUENTES WEB COINCIDENTES]:
+${urls.length > 0 ? urls.map((u) => `- [${u.titulo}](${u.url})`).join('\n') : 'Sin páginas indexadas coincidentes.'}
+
+ESTRUCTURA OBLIGATORIA DEL INFORME:
+# INFORME TÉCNICO DE INGESTA VISUAL (DATA LAKE ARCHIVO TGP)
+## 1. IDENTIFICACIÓN CANÓNICA Y TOPONIMIA
+## 2. GEORREFERENCIACIÓN Y CONTEXTO ESPACIAL
+## 3. HISTORIA DOCUMENTAL Y REGISTRO ARQUEOLÓGICO
+## 4. CONSTITUCIÓN GEOLÓGICA / MATERIAL
+## 5. HISTORIOGRAFÍA Y DESCUBRIMIENTOS CLAVE
+## 6. MAPEO DE FUENTES WEB Y REFERENCIAS ACADÉMICAS
+## 7. DISCREPANCIAS, DUDAS ABIERTAS Y ANÁLISIS OSINT`;
+
+    const responseGemini = await genai.models.generateContent({
+      model: 'gemini-1.5-flash',
+      contents: [{ text: promptOSINT }],
+      config: {
+        maxOutputTokens: 4000,
+        temperature: 0.2,
+      },
+    });
+
+    const informeOSINT = responseGemini.text || 'No se pudo generar el cuerpo del informe.';
+    const fechaIngesta = new Date().toISOString();
+
+    // 4. Persistencia en Cloudflare D1
+    try {
+      await guardarEnCloudflareD1({
+        id: recordId,
+        imagen_url: imagenPublicUrl,
+        metadatos_vision: metadatos,
+        informe_osint: informeOSINT,
+        fecha_ingesta: fechaIngesta,
+      });
+    } catch (errD1) {
+      console.warn('[Vision-Exhaustivo] Aviso en D1:', errD1);
+    }
+
+    return c.json({
+      id: recordId,
+      imagen_url: imagenPublicUrl,
+      informe: informeOSINT,
+      metadatos,
+      fecha_ingesta: fechaIngesta,
+    });
+  } catch (err: any) {
+    console.error('[Vision-Exhaustivo Error]:', err);
+    return c.json({ error: 'Fallo en la ingesta exhaustiva.', detalles: err?.message }, 500);
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RUTA 3C: /api/redaccion-premium -- Fase de Producción Literaria TGP
+// ─────────────────────────────────────────────────────────────────────────────
+app.post('/api/redaccion-premium', async (c) => {
+  const apiKey = c.req.header('x-api-key') || (c.req.header('Authorization') ?? '').replace('Bearer ', '').trim();
+  if (TGP_MIND_API_KEY && apiKey !== TGP_MIND_API_KEY) {
+    return c.json({ error: 'No autorizado: API Key inválida.' }, 401);
+  }
+
+  let body: { id?: string; informe_directo?: string };
+  try { body = await c.req.json(); } catch { return c.json({ error: 'Payload JSON inválido.' }, 400); }
+
+  const id = body?.id || crypto.randomUUID();
+  let informeTexto = body?.informe_directo || '';
+  let imagenUrl = '';
+
+  try {
+    if (!informeTexto && body?.id) {
+      const registro = await obtenerInformeD1(body.id);
+      if (registro) {
+        informeTexto = registro.informe_osint;
+        imagenUrl = registro.imagen_url;
+      }
+    }
+
+    if (!informeTexto) {
+      return c.json({ error: 'No se encontró el informe OSINT para redactar el ensayo.' }, 400);
+    }
+
+    console.log(`[Redacción Premium] Redactando ensayo con Gemini 1.5 Pro + Grounding (ID: ${id})...`);
+    const SYSTEM_PROMPT_PREMIUM = `Actúa en Modo TGP. Eres un ensayista y crítico cultural contemporáneo de alto nivel.
+Usa este informe técnico para redactar un ensayo cultural y filosófico breve, profundo y crítico.
+Estructura rigurosa TGP:
+1) Gancho visual evocador y misterioso
+2) Contexto histórico y arqueológico preciso
+3) Concepto filosófico o técnico nuclear
+4) Cierre existencial y universal sobre la condición humana.
+Estilo: Ensayo argentino contemporáneo. Denso, sin introducciones vacías, con ritmo narrativo y elegancia Dark Academia.`;
+
+    const responseGemini = await genai.models.generateContent({
+      model: 'gemini-1.5-pro',
+      contents: [{ text: `INFORME TÉCNICO (DATA LAKE):\n\n${informeTexto}\n\nEscribe el ensayo definitivo TGP.` }],
+      config: {
+        systemInstruction: SYSTEM_PROMPT_PREMIUM,
+        temperature: 0.75,
+        maxOutputTokens: 2500,
+        tools: [{ googleSearch: {} }],
+      },
+    });
+
+    const ensayoFinal = responseGemini.text || 'Error al generar el ensayo.';
+
+    console.log('[Redacción Premium] Sintetizando audio narrativo en R2...');
+    const audioUrl = await generarYGuardarAudioTTS(id, ensayoFinal);
+
+    try {
+      await actualizarRegistroD1(id, ensayoFinal, audioUrl);
+    } catch (errD1) {
+      console.warn('[Redacción Premium] Aviso actualizando D1:', errD1);
+    }
+
+    return c.json({
+      id,
+      ensayo: ensayoFinal,
+      audio_url: audioUrl,
+      imagen_url: imagenUrl,
+    });
+  } catch (err: any) {
+    console.error('[Redacción Premium Error]:', err);
+    return c.json({ error: 'Fallo al procesar el ensayo premium.', detalles: err?.message }, 500);
   }
 });
 
