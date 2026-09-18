@@ -1663,6 +1663,57 @@ Detalla: toponimia, coordenadas, historia, geología, fuentes y contexto académ
       }
       return c.json({ ok: true });
     }
+
+    // Manejo de /start
+    if (text.trim() === '/start') {
+      await fetch(`${TELEGRAM_API}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: '🏛️ *TGP Omni-Bot en línea (@Analista_IMG_bot)*\n\n📸 *Envía una fotografía* para iniciar la ingesta exhaustiva al Data Lake (Cloud Vision + Gemini Flash + R2 + D1).\n\n✍️ O escribe cualquier tema (ej: *las cruzadas*) para generar un análisis conceptual inmediato.\n\n💬 También puedes usar `/resumir` respondiendo a cualquier mensaje.',
+          parse_mode: 'Markdown',
+        }),
+      });
+      return c.json({ ok: true });
+    }
+
+    // Manejo de Texto Libre (ej: "las cruzadas")
+    if (text.trim()) {
+      await fetch(`${TELEGRAM_API}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: `⏳ *Analizando "${text.trim()}" con Gemini Flash...*`,
+          parse_mode: 'Markdown',
+        }),
+      });
+
+      try {
+        const resp = await genai.models.generateContent({
+          model: 'gemini-1.5-flash',
+          contents: [{ text: `Escribe un análisis histórico, filosófico y conceptual denso en Modo TGP sobre: "${text.trim()}". Máximo 3 párrafos de alto impacto.` }],
+          config: { systemInstruction: 'Eres el motor cognitivo de TGP. Tono sobrio, Dark Academia accesible y densidad analítica.' },
+        });
+
+        await fetch(`${TELEGRAM_API}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: resp.text || 'Sin respuesta generada.',
+          }),
+        });
+      } catch (errGen: any) {
+        await fetch(`${TELEGRAM_API}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text: `⚠️ Error al generar respuesta: ${errGen?.message}` }),
+        });
+      }
+      return c.json({ ok: true });
+    }
   }
 
   // FASE 2 & 3: Callback Queries y Cortafuegos Financiero
