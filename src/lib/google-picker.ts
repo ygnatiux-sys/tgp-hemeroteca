@@ -128,7 +128,6 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
 
       builder
         .setSize(pickerWidth, pickerHeight)
-        .setZIndex(10000)
         .setCallback(async (data: any) => {
           if (data[g.picker.Response.ACTION] === g.picker.Action.PICKED) {
             const doc = data[g.picker.Response.DOCUMENTS][0];
