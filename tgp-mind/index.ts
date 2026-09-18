@@ -917,6 +917,38 @@ app.post('/api/mind', async (c) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// RUTA: /process-image -- Transformación Estructural & Deriva Estética (Laboratorio Visual)
+// ─────────────────────────────────────────────────────────────────────────────
+app.post('/process-image', async (c) => {
+  try {
+    const formData = await c.req.parseBody();
+    const file = formData['file'] as File | undefined;
+    const mode = (formData['mode'] as string) || 'opencv';
+
+    if (!file) {
+      return c.json({ error: 'No se envió ningún archivo de imagen.' }, 400);
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const base64 = buffer.toString('base64');
+    const mimeType = file.type || 'image/png';
+    const dataUri = `data:${mimeType};base64,${base64}`;
+
+    console.log(`[Process-Image] Procesando modo: ${mode} para archivo: ${file.name}`);
+
+    return c.json({
+      success: true,
+      mode,
+      data_uri: dataUri,
+    });
+  } catch (err: any) {
+    console.error('[Process-Image Error]:', err);
+    return c.json({ error: err?.message || 'Error al procesar la imagen.' }, 500);
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // RUTA 3: /api/vision -- Ingesta Multimodal Scriptorium
 // ─────────────────────────────────────────────────────────────────────────────
 app.post('/api/vision', async (c) => {

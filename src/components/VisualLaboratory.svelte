@@ -6,13 +6,15 @@
   // ─────────────────────────────────────────────────────────────────────────────
 
   // ── Config ────────────────────────────────────────────────────────────────
-  const CLOUD_RUN_ENDPOINT = (typeof import.meta !== 'undefined'
-    ? (import.meta as any).env?.TGP_CLOUD_RUN_URL
-    : null) ?? 'http://localhost:8080/process-image';
+  const CLOUD_RUN_BASE = (typeof import.meta !== 'undefined'
+    ? (import.meta as any).env?.PUBLIC_TGP_MIND_URL
+    : null) ?? 'http://localhost:3001';
+
+  const CLOUD_RUN_ENDPOINT = `${CLOUD_RUN_BASE.replace(/\/$/, '')}/process-image`;
 
   const API_TOKEN = (typeof import.meta !== 'undefined'
-    ? (import.meta as any).env?.TGP_API_TOKEN
-    : null) ?? 'token-desarrollo';
+    ? (import.meta as any).env?.TGP_MIND_API_KEY || (import.meta as any).env?.TGP_API_TOKEN
+    : null) ?? '2771';
 
   import { openGooglePicker } from '../lib/google-picker';
 
