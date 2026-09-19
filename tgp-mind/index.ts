@@ -1,4 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
+﻿// ─────────────────────────────────────────────────────────────────────────────
 // TGP MIND — Orquestador IA con Hono + Gemini + Inline Keyboard Wizard
 // Autor: TGP / Xavier Benítez
 // Deploy: Google Cloud Run
@@ -26,7 +26,9 @@ const DIALOGFLOW_PROJECT  = process.env.DIALOGFLOW_PROJECT  || '';
 const DIALOGFLOW_LOCATION = process.env.DIALOGFLOW_LOCATION || 'us-central1';
 const DIALOGFLOW_AGENT_ID = process.env.DIALOGFLOW_AGENT_ID || '';
 const TELEGRAM_API        = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
-const TELEGRAM_SOCIAL_TOKEN = process.env.TELEGRAM_SOCIAL_TOKEN || '';
+const TELEGRAM_SOCIAL_TOKEN     = process.env.TELEGRAM_SOCIAL_TOKEN || '';
+const TELEGRAM_TGP_CLOUD_TOKEN  = process.env.TELEGRAM_TGP_CLOUD_TOKEN || '';
+const TELEGRAM_DEV_TOKEN        = process.env.TELEGRAM_DEV_BOT_TOKEN   || '';
 const ZERNIO_API_KEY        = process.env.ZERNIO_API_KEY || '';
 const ZERNIO_FB_ID          = process.env.ZERNIO_FB_ID || '';
 const ZERNIO_TIKTOK_ID      = process.env.ZERNIO_TIKTOK_ID || '';
@@ -1474,6 +1476,8 @@ app.post('/webhook/telegram-social', async (c) => {
     if (chatId !== XAVIER_CHAT_ID) { await sendTelegramSocial(chatId, 'Acceso denegado.'); return c.json({ ok: true }); }
     const sesion: SesionSocialConfig = { tema: text.trim(), redes: 'facebook', modelo: 'flash', imagen: 'si' };
     sesionesSocial.set(chatId, sesion);
+
+    // Mensaje 1: inline keyboard clásico
     await fetch(`${TELEGRAM_SOCIAL_API}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1483,6 +1487,23 @@ app.post('/webhook/telegram-social', async (c) => {
         reply_markup: buildSocialInlineKeyboard(sesion),
       }),
     });
+
+    // Mensaje 2: botón Mini App
+    const temaEncodedSocial = encodeURIComponent(sesion.tema);
+    await fetch(`${TELEGRAM_SOCIAL_API}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: '📱 *O usa la interfaz visual:*',
+        parse_mode: 'Markdown',
+        reply_markup: {
+          keyboard: [[{ text: '⚙️ Configurar publicación', web_app: { url: `${MINI_APP_URL}?bot=social&tema=${temaEncodedSocial}` } }]],
+          resize_keyboard: true, one_time_keyboard: true,
+        },
+      }),
+    });
+
     return c.json({ ok: true });
   }
 
@@ -1761,7 +1782,7 @@ Detalla: toponimia, coordenadas, historia, geología, fuentes y contexto académ
       const queryId = crypto.randomUUID().slice(0, 8);
       pendingTextQueries.set(queryId, text.trim());
       const temaEncoded = encodeURIComponent(text.trim());
-      const miniAppFullUrl = `${MINI_APP_URL}?tema=${temaEncoded}`;
+      const miniAppFullUrl = `${MINI_APP_URL}?bot=omni&tema=${temaEncoded}`;
 
       // Mensaje 1: análisis directo (inline keyboard Flash/Pro)
       await fetch(`${TELEGRAM_API}/sendMessage`, {
@@ -1900,26 +1921,6 @@ Detalla: toponimia, coordenadas, historia, geología, fuentes y contexto académ
       return c.json({ ok: true });
     }
 
-    // Cortafuegos Financiero: Menú de Rigor Web
-    if (action === 'dest_web') {
-      await fetch(`${TELEGRAM_API}/editMessageText`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          message_id: messageId,
-          text: '🏛 Producción Editorial Web (TGP)\n\nElige el nivel de profundidad cognitiva:',
-          reply_markup: {
-            inline_keyboard: [
-              [{ text: '📝 Pro Estándar (Sin Grounding)', callback_data: `web_normal:${id}` }],
-              [{ text: '🔍 Pro Premium (Con Grounding)', callback_data: `web_pro:${id}` }],
-            ],
-          },
-        }),
-      });
-      return c.json({ ok: true });
-    }
-
     // Producción Pro (Con o Sin Grounding)
     if (action === 'web_normal' || action === 'web_pro') {
       const useGrounding = action === 'web_pro';
@@ -2052,30 +2053,45 @@ function extractChatIdFromInitData(initData: string): number | null {
   return null;
 }
 
+// ── Routing multi-bot: tokens/APIs por botId ──────────────────────────────────
+function getBotApi(botId?: string): { api: string; token: string } {
+  switch (botId) {
+    case 'social':    return { api: TELEGRAM_SOCIAL_API,  token: TELEGRAM_SOCIAL_TOKEN };
+    case 'assistant': return { api: `https://api.telegram.org/bot${TELEGRAM_TGP_CLOUD_TOKEN}`, token: TELEGRAM_TGP_CLOUD_TOKEN };
+    case 'liminal':   return { api: `https://api.telegram.org/bot${TELEGRAM_DEV_TOKEN}`, token: TELEGRAM_DEV_TOKEN };
+    default:          return { api: TELEGRAM_API, token: TELEGRAM_TOKEN };
+  }
+}
+
 app.post('/api/bot/generate', async (c) => {
   let body: any;
   try { body = await c.req.json(); } catch { return c.json({ error: 'JSON invalido' }, 400); }
 
-  const { tema, red, modelo, imagen, formato, initData } = body as {
+  const { bot, tema, red, modelo, imagen, formato, photoUrl, initData } = body as {
+    bot?: string;
     tema?: string;
     red?: 'facebook' | 'instagram' | 'tiktok';
     modelo?: 'flash' | 'pro';
-    imagen?: 'si' | 'no';
+    imagen?: 'wikimedia' | 'photos' | 'no';
     formato?: 'tgp' | 'libre';
+    photoUrl?: string | null;
     initData?: string;
   };
 
   if (!tema) return c.json({ error: 'Falta el campo "tema"' }, 400);
 
+  // Routing por bot
+  const { api: BOT_API, token: BOT_TOKEN } = getBotApi(bot);
+
   // Verificar initData (omitir en dev si esta vacio)
   let chatId: number = XAVIER_CHAT_ID;
   if (initData && initData.length > 0) {
-    const isValid = verifyTelegramInitData(initData, TELEGRAM_TOKEN);
+    const isValid = verifyTelegramInitData(initData, BOT_TOKEN || TELEGRAM_TOKEN);
     if (!isValid) return c.json({ error: 'initData invalido' }, 401);
     chatId = extractChatIdFromInitData(initData) ?? XAVIER_CHAT_ID;
   }
 
-  const redLabel = { facebook: 'Facebook', instagram: 'Instagram', tiktok: 'TikTok' }[red ?? 'facebook'] || 'Facebook';
+  const redLabel  = { facebook: 'Facebook', instagram: 'Instagram', tiktok: 'TikTok' }[red ?? 'facebook'] || 'Editorial';
   const modelName = modelo === 'pro' ? 'gemini-2.5-pro' : 'gemini-3.8-flash';
   const modLabel  = modelo === 'pro' ? 'Gemini Pro' : 'Gemini Flash';
 
@@ -2086,7 +2102,7 @@ app.post('/api/bot/generate', async (c) => {
   const userPrompt = `Redacta una publicacion editorial para ${redLabel} sobre el siguiente tema: "${tema}". Formato: publicacion de red social con alto impacto intelectual. Sin hashtags genericos. Maximo 3 parrafos.`;
 
   // Notificar inicio
-  await fetch(`${TELEGRAM_API}/sendMessage`, {
+  await fetch(`${BOT_API}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -2104,9 +2120,9 @@ app.post('/api/bot/generate', async (c) => {
 
     const textoGenerado = resp.text || 'Sin contenido generado.';
 
-    // Buscar imagen si aplica
-    let imagenUrl = '';
-    if (imagen === 'si') {
+    // Resolver imagen: Google Photos > Wikimedia > sin imagen
+    let imagenUrl = photoUrl || '';
+    if (!imagenUrl && imagen === 'wikimedia') {
       try {
         const entidad = await resolverEntidadCanonica(tema);
         imagenUrl = await buscarPageImageWikipedia(entidad.wikiEn, 'en') || await buscarPageImageWikipedia(entidad.wikiEs, 'es') || '';
@@ -2114,7 +2130,7 @@ app.post('/api/bot/generate', async (c) => {
     }
 
     if (imagenUrl) {
-      await fetch(`${TELEGRAM_API}/sendPhoto`, {
+      await fetch(`${BOT_API}/sendPhoto`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -2124,7 +2140,7 @@ app.post('/api/bot/generate', async (c) => {
         }),
       });
     } else {
-      await fetch(`${TELEGRAM_API}/sendMessage`, {
+      await fetch(`${BOT_API}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chat_id: chatId, text: `${redLabel} via TGP Mind (${modLabel}):\n\n${textoGenerado}` }),
@@ -2134,7 +2150,7 @@ app.post('/api/bot/generate', async (c) => {
     return c.json({ ok: true });
   } catch (err: any) {
     console.error('[Mini App Generate Error]:', err);
-    await fetch(`${TELEGRAM_API}/sendMessage`, {
+    await fetch(`${BOT_API}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: chatId, text: `Error al generar: ${err?.message}` }),
@@ -2144,6 +2160,67 @@ app.post('/api/bot/generate', async (c) => {
 });
 
 app.get('/api/bot/miniapp-url', (c) => c.json({ url: MINI_APP_URL }));
+
+// ── Google Photos Picker: /api/my-photos ──────────────────────────────────────
+// Headless: usa GOOGLE_REFRESH_TOKEN en .env (OAuth flow una sola vez).
+// Devuelve fotos recientes sin CORS issues para la Mini App Svelte.
+app.get('/api/my-photos', async (c) => {
+  const GOOGLE_CLIENT_ID     = process.env.GOOGLE_CLIENT_ID     || process.env.PUBLIC_GOOGLE_CLIENT_ID || '';
+  const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
+  const GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN || '';
+
+  if (!GOOGLE_REFRESH_TOKEN) {
+    return c.json({ error: 'GOOGLE_REFRESH_TOKEN no configurado. Genera uno con el script OAuth.' }, 503);
+  }
+
+  try {
+    // 1. Obtener access_token fresco
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id:     GOOGLE_CLIENT_ID,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        refresh_token: GOOGLE_REFRESH_TOKEN,
+        grant_type:    'refresh_token',
+      }).toString(),
+    });
+    const { access_token } = await tokenRes.json() as any;
+    if (!access_token) throw new Error('No se pudo obtener access_token de Google.');
+
+    // 2. Listar fotos recientes
+    const photosRes = await fetch('https://photoslibrary.googleapis.com/v1/mediaItems?pageSize=30', {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+    const data = await photosRes.json() as any;
+    const photos = (data.mediaItems || []).map((item: any) => ({
+      id:       item.id,
+      url:      `${item.baseUrl}=w600-h600-c`,
+      filename: item.filename,
+    }));
+
+    return c.json({ photos });
+  } catch (err: any) {
+    console.error('[Google Photos] Error:', err);
+    return c.json({ error: err?.message || 'Error al obtener fotos.' }, 500);
+  }
+});
+
+// ── Proxy Wikimedia CORS-free: /api/proxy/wikimedia?q=... ────────────────────
+// La Mini App Svelte llama aqui en lugar de a Wikimedia directamente.
+app.get('/api/proxy/wikimedia', async (c) => {
+  const q = c.req.query('q') || '';
+  if (!q) return c.json({ imageUrl: '' });
+  try {
+    const entidad = await resolverEntidadCanonica(q);
+    const imageUrl = await buscarPageImageWikipedia(entidad.wikiEn, 'en')
+      || await buscarPageImageWikipedia(entidad.wikiEs, 'es')
+      || '';
+    return c.json({ imageUrl, query: { wikiEn: entidad.wikiEn, wikiEs: entidad.wikiEs } });
+  } catch (err: any) {
+    return c.json({ imageUrl: '', error: err?.message });
+  }
+});
 serve({ fetch: app.fetch, port: PORT }, () => {
   console.log(`[TGP Mind] Puerto ${PORT} -- Listo.`);
 });
