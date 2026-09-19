@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Extractor Forense TGP",
+  "version": "1.0.0",
+  "description": "Extractor forense de publicaciones y comentarios con evasión de CSP para análisis TGP.",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://script.google.com/macros/s/AKfycbxDAInTvmvfJZsMKbgpkYAP8wEedpAvRIv5t2s_QcNbUUaZp8h2bMr5A9XoII2_5C9hCw/*",
+    "https://script.google.com/*",
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Extraer y enviar al Laboratorio Forense TGP"
+  }
+}

@@ -19,3 +19,6 @@ tgp-scraper/Config.ts
 tgp-scraper/Config.js
 tgp-scraper/.clasp.json
 tgp-scraper/node_modules/
+
+# Local utility scripts
+*.bat
