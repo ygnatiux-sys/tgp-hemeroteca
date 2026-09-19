@@ -1,4 +1,4 @@
-﻿/**
+/**
  * get-google-token.js
  * ─────────────────────────────────────────────────────────────────────────────
  * Script one-time para obtener el GOOGLE_REFRESH_TOKEN de Google Photos API.
@@ -38,10 +38,17 @@ const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` + new URLSearchP
   prompt:        'consent',
 }).toString();
 
+import { exec } from 'child_process';
+
 console.log('\n🔐 TGP — Google Photos OAuth Token Generator\n');
-console.log('Abre esta URL en tu navegador:\n');
+console.log('Abriendo navegador en tu cuenta de Google...');
+console.log('Si no se abre solo, haz clic o copia esta URL:\n');
 console.log(authUrl);
-console.log('\nEsperando callback en http://localhost:3999/callback ...\n');
+console.log('\nEsperando respuesta en http://localhost:3999/callback ...\n');
+
+try {
+  exec(`start "" "${authUrl.replace(/&/g, '^&')}"`);
+} catch (e) {}
 
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost:3999');
@@ -68,9 +75,28 @@ const server = createServer(async (req, res) => {
     const data = await tokenRes.json();
 
     if (data.refresh_token) {
-      console.log('\n✅ ÉXITO! Agrega esto a tu .env:\n');
-      console.log(`GOOGLE_REFRESH_TOKEN="${data.refresh_token}"\n`);
-      res.end('<h2>✅ Token obtenido! Revisa la terminal.</h2><p>Ya puedes cerrar esta ventana.</p>');
+      console.log('\n✅ ÉXITO! Token obtenido: ' + data.refresh_token.slice(0, 15) + '...\n');
+      
+      // Auto-guardar en ambos .env
+      import('fs').then(fs => {
+        ['.env', 'tgp-mind/.env'].forEach(file => {
+          try {
+            let content = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '';
+            if (content.includes('GOOGLE_REFRESH_TOKEN=')) {
+              content = content.replace(/GOOGLE_REFRESH_TOKEN=.*/, `GOOGLE_REFRESH_TOKEN="${data.refresh_token}"`);
+            } else {
+              content += `\nGOOGLE_REFRESH_TOKEN="${data.refresh_token}"\n`;
+            }
+            fs.writeFileSync(file, content, 'utf8');
+            console.log(`Guardado en ${file}`);
+          } catch (e) {
+            console.error(`No se pudo escribir en ${file}:`, e.message);
+          }
+        });
+      });
+
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end('<h1 style="font-family:sans-serif;color:#10b981;">✅ ¡Listo! Conexión completada</h1><p style="font-family:sans-serif;font-size:16px;">El token se guardó automáticamente en tu .env.<br>Ya puedes cerrar esta pestaña y volver a Antigravity.</p>');
     } else {
       console.error('ERROR: No se obtuvo refresh_token:', data);
       res.end('<h2>❌ Error. Revisa la terminal.</h2>');
