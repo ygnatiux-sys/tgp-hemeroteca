@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   import { onMount } from "svelte";
 
   // ── Tipos ──────────────────────────────────────────────────────────────
@@ -84,10 +84,11 @@
     red   = BOT_CONFIGS[botId].defaultRed;
 
     // Aplicar CSS vars dinámicas del bot
-    document.documentElement.style.setProperty("--accent",        cfg.accent);
-    document.documentElement.style.setProperty("--accent-bg",     cfg.accentBg);
-    document.documentElement.style.setProperty("--accent-border", cfg.accentBorder);
-    document.documentElement.style.setProperty("--accent-glow",   cfg.accentGlow);
+    const currentCfg = BOT_CONFIGS[botId] || BOT_CONFIGS.omni;
+    document.documentElement.style.setProperty("--accent",        currentCfg.accent);
+    document.documentElement.style.setProperty("--accent-bg",     currentCfg.accentBg);
+    document.documentElement.style.setProperty("--accent-border", currentCfg.accentBorder);
+    document.documentElement.style.setProperty("--accent-glow",   currentCfg.accentGlow);
 
     const tg = (window as any).Telegram?.WebApp;
     if (tg) {
@@ -168,10 +169,15 @@
       {/if}
     </div>
     <h1 class="title">Configurar Publicación</h1>
-    <p class="tema-pill">
-      <span>✍️</span>
-      <span class="tema-text">{tema}</span>
-    </p>
+    <div class="tema-box">
+      <span class="tema-icon">✍️</span>
+      <input
+        class="tema-input"
+        type="text"
+        bind:value={tema}
+        placeholder="Escribe el tema o título aquí..."
+      />
+    </div>
   </header>
 
   <!-- Body -->
@@ -354,16 +360,23 @@
     border: 1px solid rgba(57,211,83,.35); border-radius: 100px; padding: 2px 7px;
   }
   .title { font-size: 21px; font-weight: 700; letter-spacing: -.3px; color: #f0f6fc; margin-bottom: 10px; }
-  .tema-pill {
-    display: flex; align-items: flex-start; gap: 8px;
-    background: rgba(255,255,255,.03); border: 1px solid #2a3441;
-    border-radius: 10px; padding: 8px 12px;
+  .tema-box {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.04); border: 1px solid #2a3441;
+    border-radius: 10px; padding: 7px 12px;
+    transition: border-color .15s, box-shadow .15s;
   }
-  .tema-text {
-    font-size: 13px; color: #8b949e; line-height: 1.4;
-    overflow: hidden; display: -webkit-box;
-    -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  .tema-box:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-glow);
   }
+  .tema-icon { font-size: 15px; flex-shrink: 0; }
+  .tema-input {
+    flex: 1; background: transparent; border: none; outline: none;
+    font-size: 14px; font-weight: 500; color: #f0f6fc;
+    font-family: inherit; width: 100%;
+  }
+  .tema-input::placeholder { color: #6e7681; font-weight: 400; }
 
   /* ── Body ── */
   .body { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 18px; }
