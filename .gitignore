@@ -13,3 +13,9 @@ node_modules
 tgp-mind-*.json
 # Cloudflare local state
 .wrangler/
+
+# TGP Scraper / Clasp secrets & dependencies
+tgp-scraper/Config.ts
+tgp-scraper/Config.js
+tgp-scraper/.clasp.json
+tgp-scraper/node_modules/

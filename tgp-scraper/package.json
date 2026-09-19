@@ -1,0 +1,19 @@
+{
+  "name": "tgp-scraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node build.js",
+    "push": "node build.js && clasp push -f"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/google-apps-script": "^2.0.13",
+    "ts2gas": "^4.2.0",
+    "typescript": "^7.0.2"
+  }
+}

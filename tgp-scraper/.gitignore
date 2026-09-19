@@ -1,0 +1,12 @@
+# Dependencias
+node_modules/
+
+# Configuración local de clasp
+.clasp.json
+.clasprc.json
+
+# Archivos con credenciales activas (NUNCA SUBIR A GIT)
+Config.ts
+Config.js
+*.env
+*.env.*

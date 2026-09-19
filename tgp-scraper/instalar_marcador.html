@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Instalador Marcador - Extractor Forense TGP</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 560px;
+      text-align: center;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 12px;
+      color: #38bdf8;
+    }
+    p {
+      color: #94a3b8;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .bookmark-btn {
+      display: inline-block;
+      margin: 24px 0;
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #2563eb, #0284c7);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 16px;
+      text-decoration: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      cursor: grab;
+      border: 2px dashed #60a5fa;
+      transition: transform 0.2s;
+    }
+    .bookmark-btn:hover {
+      transform: scale(1.03);
+    }
+    .instructions {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 14px;
+      text-align: left;
+      color: #cbd5e1;
+    }
+    code {
+      background: #334155;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #f43f5e;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔬 Extractor Forense TGP</h1>
+    <p>Arrastra el botón azul a tu <strong>barra de marcadores / favoritos</strong> de tu navegador:</p>
+
+    <a class="bookmark-btn" href="javascript:(async function(){const url='https://script.google.com/macros/s/AKfycbxDAInTvmvfJZsMKbgpkYAP8wEedpAvRIv5t2s_QcNbUUaZp8h2bMr5A9XoII2_5C9hCw/exec';alert('Iniciando captura forense...');let imgBase64='';let imgNode=document.querySelector('article img[style*=&quot;object-fit: cover&quot;]')||document.querySelector('img');if(imgNode){try{let canvas=document.createElement('canvas');canvas.width=imgNode.naturalWidth||imgNode.width;canvas.height=imgNode.naturalHeight||imgNode.height;canvas.getContext('2d').drawImage(imgNode,0,0);imgBase64=canvas.toDataURL('image/jpeg').split(',')[1];}catch(e){console.log('Restricción CORS local en imagen');}}let textNodes=document.querySelectorAll('span[dir=&quot;auto&quot;], div[dir=&quot;auto&quot;]');let comments=Array.from(textNodes).map(n=>n.innerText).filter(t=>t.trim().length>0);try{await fetch(url,{method:'POST',body:JSON.stringify({image:imgBase64,comments:comments}),headers:{'Content-Type':'text/plain;charset=utf-8'}});alert('Extracción enviada al Laboratorio. Revisa Telegram.');}catch(err){alert('Error enviando datos: '+err);}})();">
+      📌 Capturar TGP
+    </a>
+
+    <div class="instructions">
+      <strong>Instrucciones:</strong>
+      <ol style="margin: 8px 0; padding-left: 20px;">
+        <li>Abre la barra de marcadores en tu navegador (<code>Ctrl + Shift + B</code>).</li>
+        <li>Arrastra el botón <strong>"📌 Capturar TGP"</strong> a tu barra.</li>
+        <li>Cuando estés en una publicación con comentarios o imagen, haz clic en el marcador.</li>
+      </ol>
+    </div>
+  </div>
+</body>
+</html>
