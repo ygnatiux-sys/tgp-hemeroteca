@@ -1,4 +1,4 @@
-﻿// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 // TGP MIND — Orquestador IA con Hono + Gemini + Inline Keyboard Wizard
 // Autor: TGP / Xavier Benítez
 // Deploy: Google Cloud Run
@@ -33,6 +33,8 @@ const ZERNIO_API_KEY        = process.env.ZERNIO_API_KEY || '';
 const ZERNIO_FB_ID          = process.env.ZERNIO_FB_ID || '';
 const ZERNIO_TIKTOK_ID      = process.env.ZERNIO_TIKTOK_ID || '';
 const TELEGRAM_SOCIAL_API   = `https://api.telegram.org/bot${TELEGRAM_SOCIAL_TOKEN}`;
+const TELEGRAM_ASSISTANT_API= `https://api.telegram.org/bot${TELEGRAM_TGP_CLOUD_TOKEN}`;
+const MINI_APP_URL          = (process.env.MINI_APP_URL || 'https://thegreatpuzzleproject.com/bot-selector').trim();
 
 // ── Cloudflare R2 & D1 ────────────────────────────────────────────────────────
 const CLOUDFLARE_ACCOUNT_ID    = process.env.CLOUDFLARE_ACCOUNT_ID || process.env.R2_ACCOUNT_ID || '';
