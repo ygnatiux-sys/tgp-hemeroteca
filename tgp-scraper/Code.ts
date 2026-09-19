@@ -98,3 +98,14 @@ function doGet(): GoogleAppsScript.Content.TextOutput {
     })
   ).setMimeType(ContentService.MimeType.JSON);
 }
+
+// Función de prueba manual para disparar autorización de permisos en Google Apps Script
+function probarScript(): void {
+  const testPayload = {
+    image: "",
+    comments: ["Prueba forense: rituales y antropología en redes sociales."]
+  };
+  const result = doPost(JSON.stringify(testPayload));
+  Logger.log("Resultado de probarScript: " + result.getContent());
+}
+

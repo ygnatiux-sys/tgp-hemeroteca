@@ -1,7 +1,5 @@
 // Compiled using tgp-scraper 1.0.0 (TypeScript 4.9.5)
-var exports = exports || {};
-var module = module || { exports: exports };
-exports.analyzeWithGemini = void 0;
+// Módulo de integración con Gemini 1.5 Flash
 function analyzeWithGemini(imageBase64, comments) {
     var _a, _b, _c, _d, _e;
     if (!GEMINI_API_KEY) {
@@ -17,20 +15,22 @@ function analyzeWithGemini(imageBase64, comments) {
     }
     var promptText = "\nEres un analista forense de contenido y redes.\nAnaliza la imagen adjunta (que corresponde a una captura de publicaci\u00F3n o contexto) y examina exhaustivamente la lista de comentarios adjunta.\n\nInstrucciones:\n1. \"analisis_imagen\": Resume de forma concisa qu\u00E9 representa la imagen, elementos clave visibles, texto en pantalla o contexto general de la publicaci\u00F3n.\n2. \"plots_principales\": Extrae los argumentos centrales, revelaciones, hip\u00F3tesis o debates m\u00E1s profundos y significativos de los comentarios.\n3. \"aportes_secundarios\": Extrae detalles adicionales, an\u00E9cdotas, datos contextuales, menciones o ramificaciones secundarias relevantes.\n4. Omite por completo ruido, saludos vac\u00EDos, spam, insultos sin contenido y emoticones aislados.\n5. Devuelve EXCLUSIVAMENTE un JSON v\u00E1lido con esta estructura:\n{\n  \"analisis_imagen\": \"resumen conciso del contexto y contenido visual\",\n  \"plots_principales\": [\"plot 1\", \"plot 2\", ...],\n  \"aportes_secundarios\": [\"aporte 1\", \"aporte 2\", ...]\n}\n\nLista de comentarios extra\u00EDdos:\n".concat(JSON.stringify(comments, null, 2), "\n").trim();
     var url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=".concat(GEMINI_API_KEY);
+    var parts = [];
+    if (cleanBase64 && cleanBase64.trim().length > 0) {
+        parts.push({
+            inline_data: {
+                mime_type: mimeType,
+                data: cleanBase64.trim()
+            }
+        });
+    }
+    parts.push({
+        text: promptText
+    });
     var payload = {
         contents: [
             {
-                parts: [
-                    {
-                        inline_data: {
-                            mime_type: mimeType,
-                            data: cleanBase64
-                        }
-                    },
-                    {
-                        text: promptText
-                    }
-                ]
+                parts: parts
             }
         ],
         generationConfig: {
@@ -59,4 +59,3 @@ function analyzeWithGemini(imageBase64, comments) {
         throw new Error("Fallo al parsear respuesta JSON de Gemini: ".concat(candidateText));
     }
 }
-exports.analyzeWithGemini = analyzeWithGemini;

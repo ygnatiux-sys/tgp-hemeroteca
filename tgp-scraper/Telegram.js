@@ -1,7 +1,4 @@
 // Compiled using tgp-scraper 1.0.0 (TypeScript 4.9.5)
-var exports = exports || {};
-var module = module || { exports: exports };
-exports.sendTelegramNotification = void 0;
 // Módulo de notificación por Telegram
 function sendTelegramNotification(docId, summaryNotes) {
     if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
@@ -32,4 +29,3 @@ function sendTelegramNotification(docId, summaryNotes) {
         Logger.log("Aviso Telegram (".concat(code, "): ").concat(response.getContentText()));
     }
 }
-exports.sendTelegramNotification = sendTelegramNotification;

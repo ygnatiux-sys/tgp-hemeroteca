@@ -1,6 +1,6 @@
 // Módulo de notificación por Telegram
 
-export function sendTelegramNotification(
+function sendTelegramNotification(
   docId: string,
   summaryNotes?: string
 ): void {

@@ -1,12 +1,12 @@
 // Módulo de integración con Gemini 1.5 Flash
 
-export interface GeminiAnalysisResult {
+interface GeminiAnalysisResult {
   analisis_imagen: string;
   plots_principales: string[];
   aportes_secundarios: string[];
 }
 
-export function analyzeWithGemini(
+function analyzeWithGemini(
   imageBase64: string,
   comments: string[]
 ): GeminiAnalysisResult {
@@ -46,20 +46,25 @@ ${JSON.stringify(comments, null, 2)}
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
+  const parts: any[] = [];
+
+  if (cleanBase64 && cleanBase64.trim().length > 0) {
+    parts.push({
+      inline_data: {
+        mime_type: mimeType,
+        data: cleanBase64.trim()
+      }
+    });
+  }
+
+  parts.push({
+    text: promptText
+  });
+
   const payload = {
     contents: [
       {
-        parts: [
-          {
-            inline_data: {
-              mime_type: mimeType,
-              data: cleanBase64
-            }
-          },
-          {
-            text: promptText
-          }
-        ]
+        parts: parts
       }
     ],
     generationConfig: {
