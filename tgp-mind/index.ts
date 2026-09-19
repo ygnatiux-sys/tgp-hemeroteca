@@ -18,6 +18,7 @@ import 'dotenv/config';
 // ── Configuración ─────────────────────────────────────────────────────────────
 const PORT               = parseInt(process.env.PORT || '3001');
 const TELEGRAM_TOKEN     = (process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_TOKEN || '').replace(/['"]/g, '').trim();
+const TELEGRAM_BOT_NAME  = (process.env.TELEGRAM_BOT_NAME || 'Analista_IMG_bot').replace(/['"]/g, '').trim();
 const GEMINI_API_KEY     = (process.env.GEMINI_API_KEY || '').replace(/['"]/g, '').trim();
 const TGP_MIND_API_KEY   = (process.env.TGP_MIND_API_KEY || '').replace(/['"]/g, '').trim();
 const XAVIER_CHAT_ID     = 7886507052;
@@ -566,6 +567,7 @@ interface SesionConfig {
   coleccion?: 'ensayos-cinematicos' | 'ensayos';
 }
 const sesiones = new Map<number, SesionConfig>();
+const pendingTextQueries = new Map<string, string>();
 
 // ── Inline Keyboard Builder ───────────────────────────────────────────────────
 // ── Inline Keyboard Builder ───────────────────────────────────────────────────
@@ -653,9 +655,14 @@ async function editMessageText(chatId: number, messageId: number, text: string, 
   } catch (err) { console.error('[Telegram] editMessageText error:', err); }
 }
 
+import { devBotApp } from './src/devBot.js';
+
 // ── Hono App ──────────────────────────────────────────────────────────────────
 const app = new Hono();
 app.get('/', (c) => c.json({ status: 'TGP Mind activo', ts: new Date().toISOString() }));
+
+// ── RUTA AISLADA DE DESARROLLO (@UXliminal_bot) ──────────────────────────────
+app.route('/webhook-dev', devBotApp);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // RUTA 1: Webhook Telegram -- Wizard con Inline Keyboards
@@ -1742,47 +1749,57 @@ Detalla: toponimia, coordenadas, historia, geología, fuentes y contexto académ
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: chatId,
-          text: '🏛️ *TGP Omni-Bot en línea (@Analista_IMG_bot)*\n\n📸 *Envía una fotografía* para iniciar la ingesta exhaustiva al Data Lake (Cloud Vision + Gemini Flash + R2 + D1).\n\n✍️ O escribe cualquier tema (ej: *las cruzadas*) para generar un análisis conceptual inmediato.\n\n💬 También puedes usar `/resumir` respondiendo a cualquier mensaje.',
+          text: `🏛️ *TGP Assistant en línea (@${TELEGRAM_BOT_NAME})*\n\n📸 *Envía una fotografía* para iniciar la ingesta exhaustiva al Data Lake (Cloud Vision + Gemini + R2 + D1).\n\n✍️ O escribe cualquier tema o pregunta (ej: *el cosmos vs el caos*) para elegir entre Flash o Pro y generar un análisis conceptual inmediato.\n\n💬 También puedes usar \`/resumir\` respondiendo a cualquier mensaje.`,
           parse_mode: 'Markdown',
         }),
       });
       return c.json({ ok: true });
     }
 
-    // Manejo de Texto Libre (ej: "las cruzadas")
+    // Manejo de Texto Libre: inline Flash/Pro + botón Mini App
     if (text.trim()) {
+      const queryId = crypto.randomUUID().slice(0, 8);
+      pendingTextQueries.set(queryId, text.trim());
+      const temaEncoded = encodeURIComponent(text.trim());
+      const miniAppFullUrl = `${MINI_APP_URL}?tema=${temaEncoded}`;
+
+      // Mensaje 1: análisis directo (inline keyboard Flash/Pro)
       await fetch(`${TELEGRAM_API}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: chatId,
-          text: `⏳ *Analizando "${text.trim()}" con Gemini Flash...*`,
+          text: `🏛️ *TGP Cognition (@${TELEGRAM_BOT_NAME})*\n\nTema: *"${text.trim()}"*\n\n*Análisis directo:*`,
           parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: '⚡ Gemini Flash (Ágil)', callback_data: `redact_flash:${queryId}` },
+                { text: '🧠 Gemini Pro (Profundo)', callback_data: `redact_pro:${queryId}` },
+              ],
+            ],
+          },
         }),
       });
 
-      try {
-        const resp = await genai.models.generateContent({
-          model: 'gemini-3.8-flash',
-          contents: [{ text: `Escribe un análisis histórico, filosófico y conceptual denso en Modo TGP sobre: "${text.trim()}". Máximo 3 párrafos de alto impacto.` }],
-          config: { systemInstruction: 'Eres el motor cognitivo de TGP. Tono sobrio, Dark Academia accesible y densidad analítica.' },
-        });
+      // Mensaje 2: botón Mini App para publicación en redes
+      await fetch(`${TELEGRAM_API}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: '📱 *Publicar en redes sociales:*',
+          parse_mode: 'Markdown',
+          reply_markup: {
+            keyboard: [
+              [{ text: '⚙️ Configurar publicación', web_app: { url: miniAppFullUrl } }],
+            ],
+            resize_keyboard: true,
+            one_time_keyboard: true,
+          },
+        }),
+      });
 
-        await fetch(`${TELEGRAM_API}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: resp.text || 'Sin respuesta generada.',
-          }),
-        });
-      } catch (errGen: any) {
-        await fetch(`${TELEGRAM_API}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: chatId, text: `⚠️ Error al generar respuesta: ${errGen?.message}` }),
-        });
-      }
       return c.json({ ok: true });
     }
   }
@@ -1806,8 +1823,52 @@ Detalla: toponimia, coordenadas, historia, geología, fuentes y contexto académ
     }
 
     const [action, id] = data.split(':');
-    const registro = await obtenerInformeD1(id);
     await answerCallbackQuery(callbackId, 'Procesando...');
+
+    // Callback para Redacción Interactiva Flash vs Pro
+    if (action === 'redact_flash' || action === 'redact_pro') {
+      const isPro = action === 'redact_pro';
+      const modelName = isPro ? 'gemini-2.5-pro' : 'gemini-3.8-flash';
+      const modelLabel = isPro ? 'Gemini 2.5 Pro (Máxima Densidad)' : 'Gemini 3.8 Flash (Modo Ágil)';
+      const tema = pendingTextQueries.get(id) || 'el tema solicitado';
+
+      await fetch(`${TELEGRAM_API}/editMessageText`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          message_id: messageId,
+          text: `⚡ Invocando *${modelLabel}* para redactar sobre:\n*"${tema}"*...`,
+          parse_mode: 'Markdown',
+        }),
+      });
+
+      try {
+        const resp = await genai.models.generateContent({
+          model: modelName,
+          contents: [{ text: `Escribe un análisis histórico, filosófico y conceptual denso en Modo TGP sobre: "${tema}". Máximo 3 párrafos de alto impacto.` }],
+          config: { systemInstruction: 'Eres el motor cognitivo de TGP. Tono sobrio, Dark Academia accesible y densidad analítica.' },
+        });
+
+        await fetch(`${TELEGRAM_API}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: resp.text || 'Sin respuesta generada.',
+          }),
+        });
+      } catch (errGen: any) {
+        await fetch(`${TELEGRAM_API}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text: `⚠️ Error al generar respuesta con ${modelLabel}: ${errGen?.message}` }),
+        });
+      }
+      return c.json({ ok: true });
+    }
+
+    const registro = await obtenerInformeD1(id);
 
     // Hilo para X / Zernio
     if (action === 'dest_zernio') {
@@ -1950,6 +2011,139 @@ Estructura:
 });
 
 // â”€â”€ Arranque â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+// ── MINI APP: /api/bot/generate ───────────────────────────────────────────────
+// Endpoint llamado desde la Telegram Mini App (BotSelector.svelte).
+// Verifica initData con HMAC-SHA256, extrae el chat_id y despacha a Gemini.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const MINI_APP_URL = process.env.MINI_APP_URL || 'https://thegreatpuzzleproject.com/bot-selector';
+
+/** Verifica el initData de Telegram con HMAC-SHA256 */
+function verifyTelegramInitData(initData: string, botToken: string): boolean {
+  try {
+    if (!initData) return false;
+    const params = new URLSearchParams(initData);
+    const hash = params.get('hash');
+    if (!hash) return false;
+    params.delete('hash');
+    const dataCheckString = [...params.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([k, v]) => `${k}=${v}`)
+      .join('\n');
+    const secretKey = crypto.createHmac('sha256', 'WebAppData').update(botToken).digest();
+    const computedHash = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
+    return computedHash === hash;
+  } catch {
+    return false;
+  }
+}
+
+/** Extrae el chat_id del user dentro del initData */
+function extractChatIdFromInitData(initData: string): number | null {
+  try {
+    const params = new URLSearchParams(initData);
+    const userStr = params.get('user');
+    if (userStr) {
+      const user = JSON.parse(decodeURIComponent(userStr));
+      return user?.id ?? null;
+    }
+  } catch { /* ignore */ }
+  return null;
+}
+
+app.post('/api/bot/generate', async (c) => {
+  let body: any;
+  try { body = await c.req.json(); } catch { return c.json({ error: 'JSON invalido' }, 400); }
+
+  const { tema, red, modelo, imagen, formato, initData } = body as {
+    tema?: string;
+    red?: 'facebook' | 'instagram' | 'tiktok';
+    modelo?: 'flash' | 'pro';
+    imagen?: 'si' | 'no';
+    formato?: 'tgp' | 'libre';
+    initData?: string;
+  };
+
+  if (!tema) return c.json({ error: 'Falta el campo "tema"' }, 400);
+
+  // Verificar initData (omitir en dev si esta vacio)
+  let chatId: number = XAVIER_CHAT_ID;
+  if (initData && initData.length > 0) {
+    const isValid = verifyTelegramInitData(initData, TELEGRAM_TOKEN);
+    if (!isValid) return c.json({ error: 'initData invalido' }, 401);
+    chatId = extractChatIdFromInitData(initData) ?? XAVIER_CHAT_ID;
+  }
+
+  const redLabel = { facebook: 'Facebook', instagram: 'Instagram', tiktok: 'TikTok' }[red ?? 'facebook'] || 'Facebook';
+  const modelName = modelo === 'pro' ? 'gemini-2.5-pro' : 'gemini-3.8-flash';
+  const modLabel  = modelo === 'pro' ? 'Gemini Pro' : 'Gemini Flash';
+
+  const systemInst = formato === 'tgp'
+    ? `Actua en Modo TGP. Eres ensayista filosofico y critico cultural. Tono Dark Academia: sobrio, denso, cinematografico. Estructura: 1) Gancho visual evocador 2) Contexto historico/filosofico 3) Nucleo conceptual 4) Cierre existencial universal`
+    : `Eres un redactor editorial directo y claro. Sin formulas. Ve al nucleo inmediatamente.`;
+
+  const userPrompt = `Redacta una publicacion editorial para ${redLabel} sobre el siguiente tema: "${tema}". Formato: publicacion de red social con alto impacto intelectual. Sin hashtags genericos. Maximo 3 parrafos.`;
+
+  // Notificar inicio
+  await fetch(`${TELEGRAM_API}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: `Generando con ${modLabel} para ${redLabel}...\n\nTema: ${tema}`,
+    }),
+  });
+
+  try {
+    const resp = await genai.models.generateContent({
+      model: modelName,
+      contents: [{ text: userPrompt }],
+      config: { systemInstruction: systemInst, temperature: modelo === 'pro' ? 0.72 : 0.85, maxOutputTokens: 1200 },
+    });
+
+    const textoGenerado = resp.text || 'Sin contenido generado.';
+
+    // Buscar imagen si aplica
+    let imagenUrl = '';
+    if (imagen === 'si') {
+      try {
+        const entidad = await resolverEntidadCanonica(tema);
+        imagenUrl = await buscarPageImageWikipedia(entidad.wikiEn, 'en') || await buscarPageImageWikipedia(entidad.wikiEs, 'es') || '';
+      } catch { /* imagen es opcional */ }
+    }
+
+    if (imagenUrl) {
+      await fetch(`${TELEGRAM_API}/sendPhoto`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          photo: imagenUrl,
+          caption: `${redLabel} via TGP Mind (${modLabel}):\n\n${textoGenerado}`.slice(0, 1024),
+        }),
+      });
+    } else {
+      await fetch(`${TELEGRAM_API}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: `${redLabel} via TGP Mind (${modLabel}):\n\n${textoGenerado}` }),
+      });
+    }
+
+    return c.json({ ok: true });
+  } catch (err: any) {
+    console.error('[Mini App Generate Error]:', err);
+    await fetch(`${TELEGRAM_API}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text: `Error al generar: ${err?.message}` }),
+    });
+    return c.json({ error: err?.message || 'Error interno' }, 500);
+  }
+});
+
+app.get('/api/bot/miniapp-url', (c) => c.json({ url: MINI_APP_URL }));
 serve({ fetch: app.fetch, port: PORT }, () => {
   console.log(`[TGP Mind] Puerto ${PORT} -- Listo.`);
 });

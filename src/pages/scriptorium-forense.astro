@@ -1,0 +1,217 @@
+---
+// Página full-screen para el visor forense Notion-style
+// No usa el Layout global — ocupa 100vh completo sin header/footer
+export const prerender = true;
+import ScriptoriumForenseViewer from '../components/ScriptoriumForenseViewer.svelte';
+---
+
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scriptorium Forense | TGP</title>
+  <meta name="description" content="Visor inmersivo de registros forenses extraídos de redes sociales. Análisis epistémico vía Gemini." />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <!-- Outfit + Inter (Material You / Google Sans feel) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: #121314;
+      color: #E1E2E5;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    #app {
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Barra superior mínima de contexto - Estilo Pixel Slate Monet */
+    .sfv-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      height: 44px;
+      background: #121314;
+      border-bottom: 1px solid #2A2D31;
+      flex-shrink: 0;
+      z-index: 50;
+    }
+    .sfv-topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: #C4C7C8;
+      text-decoration: none;
+    }
+    .sfv-topbar-brand span {
+      color: #AECBFA;
+      background: rgba(174, 203, 250, 0.12);
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-weight: 500;
+    }
+    .sfv-topbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .sfv-topbar-nav a {
+      font-size: 0.74rem;
+      color: #BEC7E0;
+      text-decoration: none;
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+      transition: all 0.2s ease;
+    }
+    .sfv-topbar-nav a:hover {
+      color: #AECBFA;
+      background: rgba(174, 203, 250, 0.08);
+    }
+    /* Botón Sol / Luna Material You */
+    .sfv-theme-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(174, 203, 250, 0.12);
+      color: #AECBFA;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+      margin-left: 0.25rem;
+    }
+    .sfv-theme-btn:hover {
+      transform: scale(1.1);
+      background: rgba(174, 203, 250, 0.22);
+    }
+    .sfv-theme-icon-sun { display: block; }
+    .sfv-theme-icon-moon { display: none; }
+
+    /* Modo Claro (Paleta Monet Claro) */
+    html.theme-light, html.theme-light body {
+      background: #F8F9FA;
+      color: #001D4A;
+    }
+    html.theme-light .sfv-topbar {
+      background: #F8F9FA;
+      border-bottom: 1px solid #E1E2E5;
+    }
+    html.theme-light .sfv-topbar-brand {
+      color: #1A1C1E;
+    }
+    html.theme-light .sfv-topbar-brand span {
+      color: #1A73E8;
+      background: rgba(26, 115, 232, 0.1);
+    }
+    html.theme-light .sfv-topbar-nav a {
+      color: #555F71;
+    }
+    html.theme-light .sfv-topbar-nav a:hover {
+      color: #1A73E8;
+      background: rgba(26, 115, 232, 0.08);
+    }
+    html.theme-light .sfv-theme-btn {
+      background: rgba(26, 115, 232, 0.1);
+      color: #1A73E8;
+    }
+    html.theme-light .sfv-theme-btn:hover {
+      background: rgba(26, 115, 232, 0.18);
+    }
+    html.theme-light .sfv-theme-icon-sun { display: none; }
+    html.theme-light .sfv-theme-icon-moon { display: block; }
+
+    .sfv-viewer-wrap {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      min-height: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+
+    <!-- Topbar mínima de navegación contextual -->
+    <nav class="sfv-topbar">
+      <a href="/tgp-app" class="sfv-topbar-brand">
+        TGP <span>Scriptorium</span> · Registros Forenses
+      </a>
+      <div class="sfv-topbar-nav">
+        <a href="/tgp-app">← Panel</a>
+        <a href="/scriptorium">Scriptorium Principal</a>
+        <a
+          href="https://docs.google.com/document/d/118g7dpIhdjIBJqGeVaa6ZCUmEAEtdg3mBBwQKFO2wj0/edit"
+          target="_blank"
+          rel="noopener noreferrer"
+        >Google Doc ↗</a>
+
+        <!-- Botón Sol / Luna Material You -->
+        <button
+          id="theme-toggle"
+          class="sfv-theme-btn"
+          aria-label="Alternar Modo Claro / Oscuro"
+          title="Alternar tema Material You"
+        >
+          <!-- Sol Material You -->
+          <svg class="sfv-theme-icon-sun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <!-- Luna Material You -->
+          <svg class="sfv-theme-icon-moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Visor principal -->
+    <div class="sfv-viewer-wrap">
+      <ScriptoriumForenseViewer client:load />
+    </div>
+
+  </div>
+
+  <script is:inline>
+    (function() {
+      var saved = localStorage.getItem('tgp-forense-theme');
+      if (saved === 'light') {
+        document.documentElement.classList.add('theme-light');
+      }
+      var btn = document.getElementById('theme-toggle');
+      if (btn) {
+        btn.addEventListener('click', function() {
+          var isLight = document.documentElement.classList.toggle('theme-light');
+          localStorage.setItem('tgp-forense-theme', isLight ? 'light' : 'dark');
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

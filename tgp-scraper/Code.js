@@ -70,13 +70,97 @@ function doPost(e) {
         })).setMimeType(ContentService.MimeType.JSON);
     }
 }
-// Handler GET auxiliar para verificar estado desde navegador
-function doGet() {
-    return ContentService.createTextOutput(JSON.stringify({
-        status: "online",
-        service: "Extractor Forense API",
-        timestamp: new Date().toISOString()
-    })).setMimeType(ContentService.MimeType.JSON);
+// Handler GET — sirve los registros forenses como JSON estructurado
+function doGet(e) {
+    var corsHeaders = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET",
+        "Access-Control-Allow-Headers": "Content-Type"
+    };
+    // Verificación de token básico
+    var QUERY_TOKEN = "forense2026"; // Cambia este valor y refleja en PUBLIC_GAS_FORENSIC_TOKEN del .env de Astro
+    var receivedToken = e && e.parameter && e.parameter.token ? e.parameter.token : "";
+    if (receivedToken !== QUERY_TOKEN) {
+        var denied = ContentService.createTextOutput(JSON.stringify({ status: "unauthorized", message: "Token inválido." })).setMimeType(ContentService.MimeType.JSON);
+        return denied;
+    }
+    try {
+        var doc = DocumentApp.openById(DOC_ID);
+        var body = doc.getBody();
+        var numChildren = body.getNumChildren();
+        var registros = [];
+        var currentRecord = null;
+        var currentSection = "";
+        for (var i = 0; i < numChildren; i++) {
+            var child = body.getChild(i);
+            var childType = child.getType();
+            if (childType === DocumentApp.ElementType.PARAGRAPH) {
+                var para = child.asParagraph();
+                var heading = para.getHeading();
+                var text = para.getText().trim();
+                if (!text)
+                    continue;
+                var isRecordHeader = heading === DocumentApp.ParagraphHeading.HEADING2 ||
+                    heading === DocumentApp.ParagraphHeading.HEADING1 ||
+                    /Registro Forense/i.test(text) ||
+                    (/^📅/.test(text) && /\d{4}-\d{2}-\d{2}/.test(text));
+                if (isRecordHeader) {
+                    if (currentRecord)
+                        registros.push(currentRecord);
+                    var tsMatch = text.match(/(\d{4}-\d{2}-\d{2}(?: \d{2}:\d{2}:\d{2})?)/);
+                    currentRecord = {
+                        timestamp: tsMatch ? tsMatch[1] : text.replace(/^📅\s*/, ''),
+                        analisis_imagen: "",
+                        plots_principales: [],
+                        aportes_secundarios: [],
+                        imagenes: []
+                    };
+                    currentSection = "";
+                }
+                else if (heading === DocumentApp.ParagraphHeading.HEADING3 && currentRecord) {
+                    if (text.includes("Visual") || text.includes("Imagen") || text.includes("imagen")) {
+                        currentSection = "analisis";
+                    }
+                    else if (text.includes("Plot") || text.includes("Principal")) {
+                        currentSection = "plots";
+                    }
+                    else if (text.includes("Aporte") || text.includes("Secundari") || text.includes("Contexto")) {
+                        currentSection = "aportes";
+                    }
+                }
+                else if (heading === DocumentApp.ParagraphHeading.NORMAL && currentRecord) {
+                    if (currentSection === "analisis") {
+                        currentRecord.analisis_imagen += (currentRecord.analisis_imagen ? " " : "") + text;
+                    }
+                }
+            }
+            else if (childType === DocumentApp.ElementType.LIST_ITEM && currentRecord) {
+                var item = child.asListItem();
+                var itemText = item.getText().trim();
+                if (!itemText)
+                    continue;
+                if (currentSection === "plots") {
+                    currentRecord.plots_principales.push(itemText);
+                }
+                else if (currentSection === "aportes") {
+                    currentRecord.aportes_secundarios.push(itemText);
+                }
+            }
+        }
+        if (currentRecord)
+            registros.push(currentRecord);
+        // Más recientes primero
+        registros.reverse();
+        var output = ContentService.createTextOutput(JSON.stringify({
+            status: "ok",
+            total: registros.length,
+            registros: registros
+        })).setMimeType(ContentService.MimeType.JSON);
+        return output;
+    }
+    catch (error) {
+        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: error.message || String(error) })).setMimeType(ContentService.MimeType.JSON);
+    }
 }
 // Función de prueba manual para disparar autorización de permisos en Google Apps Script
 function probarScript() {

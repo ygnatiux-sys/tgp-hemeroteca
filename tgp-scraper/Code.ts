@@ -88,15 +88,106 @@ function doPost(e: any): GoogleAppsScript.Content.TextOutput {
   }
 }
 
-// Handler GET auxiliar para verificar estado desde navegador
-function doGet(): GoogleAppsScript.Content.TextOutput {
-  return ContentService.createTextOutput(
-    JSON.stringify({
-      status: "online",
-      service: "Extractor Forense API",
-      timestamp: new Date().toISOString()
-    })
-  ).setMimeType(ContentService.MimeType.JSON);
+// Handler GET — sirve los registros forenses como JSON estructurado
+function doGet(e?: any): GoogleAppsScript.Content.TextOutput {
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET",
+    "Access-Control-Allow-Headers": "Content-Type"
+  };
+
+  // Verificación de token básico
+  const QUERY_TOKEN = "forense2026"; // Cambia este valor y refleja en PUBLIC_GAS_FORENSIC_TOKEN del .env de Astro
+  const receivedToken = e && e.parameter && e.parameter.token ? e.parameter.token : "";
+  if (receivedToken !== QUERY_TOKEN) {
+    const denied = ContentService.createTextOutput(
+      JSON.stringify({ status: "unauthorized", message: "Token inválido." })
+    ).setMimeType(ContentService.MimeType.JSON);
+    return denied;
+  }
+
+  try {
+    const doc = DocumentApp.openById(DOC_ID);
+    const body = doc.getBody();
+    const numChildren = body.getNumChildren();
+
+    const registros: any[] = [];
+    let currentRecord: any = null;
+    let currentSection = "";
+
+    for (let i = 0; i < numChildren; i++) {
+      const child = body.getChild(i);
+      const childType = child.getType();
+
+      if (childType === DocumentApp.ElementType.PARAGRAPH) {
+        const para = child.asParagraph();
+        const heading = para.getHeading();
+        const text = para.getText().trim();
+
+        if (!text) continue;
+
+        const isRecordHeader =
+          heading === DocumentApp.ParagraphHeading.HEADING2 ||
+          heading === DocumentApp.ParagraphHeading.HEADING1 ||
+          /Registro Forense/i.test(text) ||
+          (/^📅/.test(text) && /\d{4}-\d{2}-\d{2}/.test(text));
+
+        if (isRecordHeader) {
+          // Nuevo bloque de registro forense (ej: "📅 Registro Forense: 2026-09-19 03:30:00")
+          if (currentRecord) registros.push(currentRecord);
+          const tsMatch = text.match(/(\d{4}-\d{2}-\d{2}(?: \d{2}:\d{2}:\d{2})?)/);
+          currentRecord = {
+            timestamp: tsMatch ? tsMatch[1] : text.replace(/^📅\s*/, ''),
+            analisis_imagen: "",
+            plots_principales: [] as string[],
+            aportes_secundarios: [] as string[],
+            imagenes: [] as string[]
+          };
+          currentSection = "";
+        } else if (heading === DocumentApp.ParagraphHeading.HEADING3 && currentRecord) {
+          if (text.includes("Visual") || text.includes("Imagen") || text.includes("imagen")) {
+            currentSection = "analisis";
+          } else if (text.includes("Plot") || text.includes("Principal")) {
+            currentSection = "plots";
+          } else if (text.includes("Aporte") || text.includes("Secundari") || text.includes("Contexto")) {
+            currentSection = "aportes";
+          }
+        } else if (heading === DocumentApp.ParagraphHeading.NORMAL && currentRecord) {
+          if (currentSection === "analisis") {
+            currentRecord.analisis_imagen += (currentRecord.analisis_imagen ? " " : "") + text;
+          }
+        }
+      } else if (childType === DocumentApp.ElementType.LIST_ITEM && currentRecord) {
+        const item = child.asListItem();
+        const itemText = item.getText().trim();
+        if (!itemText) continue;
+        if (currentSection === "plots") {
+          currentRecord.plots_principales.push(itemText);
+        } else if (currentSection === "aportes") {
+          currentRecord.aportes_secundarios.push(itemText);
+        }
+      }
+    }
+
+    if (currentRecord) registros.push(currentRecord);
+
+    // Más recientes primero
+    registros.reverse();
+
+    const output = ContentService.createTextOutput(
+      JSON.stringify({
+        status: "ok",
+        total: registros.length,
+        registros: registros
+      })
+    ).setMimeType(ContentService.MimeType.JSON);
+
+    return output;
+  } catch (error: any) {
+    return ContentService.createTextOutput(
+      JSON.stringify({ status: "error", message: error.message || String(error) })
+    ).setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 // Función de prueba manual para disparar autorización de permisos en Google Apps Script
