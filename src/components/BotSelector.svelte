@@ -75,7 +75,7 @@
   let selectedPhoto: Photo | null = null;
   let showPhotosPicker         = false;
 
-  const API_URL = import.meta.env.PUBLIC_TGP_MIND_URL || "https://tgp-mind-uc.a.run.app";
+  const API_URL = import.meta.env.PUBLIC_TGP_MIND_URL || "https://tgp-mind-713934653057.us-central1.run.app";
 
   $: cfg = BOT_CONFIGS[botId] || BOT_CONFIGS.omni;
 
