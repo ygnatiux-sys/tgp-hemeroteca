@@ -270,15 +270,16 @@ export async function generarYGuardarAudioTTS(id: string, texto: string): Promis
 // TTL: 30 minutos. Cloud Run no mantiene estado en memoria entre requests.
 
 export interface HITLState {
-  tema?:     string;
-  red?:      string;
-  modelo?:   string;
-  imagen?:   string;
-  destino?:  string;
-  formato?:  string;
+  tema:      string;
+  destino?:  'hemeroteca' | 'alternative' | 'social';
+  red?:      'facebook' | 'tiktok';
+  densidad?: 'breve' | 'profundo_breve' | 'premium';
+  modelo?:   'flash' | 'pro';
+  fuenteImg?: 'wiki' | 'telegram' | 'none';
+  modoLibrePrompt?: string;
   photoUrl?: string;
-  step:      'awaiting_params' | 'awaiting_social_confirm' | 'awaiting_media_confirm';
-  history:   Array<{ role: 'user' | 'model'; text: string }>;
+  step:      'awaiting_dest' | 'awaiting_network' | 'awaiting_density' | 'awaiting_engine' | 'awaiting_confirm' | 'awaiting_params';
+  history?:  Array<{ role: 'user' | 'model'; text: string }>;
 }
 
 async function ensureHITLTable(): Promise<void> {
@@ -296,15 +297,16 @@ async function ensureHITLTable(): Promise<void> {
   });
 }
 
-export async function getHITLState(chatId: number): Promise<HITLState | null> {
+export async function getHITLState(chatId: number, botContext: string = 'default'): Promise<HITLState | null> {
   if (!_DATABASE_ID || !_API_TOKEN) return null;
+  const key = `${chatId}:${botContext}`;
   try {
     const res = await fetch(d1Url(), {
       method: 'POST',
       headers: d1Headers(),
       body: JSON.stringify({
         sql: `SELECT state, updated_at FROM hitl_sessions WHERE chat_id = ? LIMIT 1`,
-        params: [String(chatId)],
+        params: [key],
       }),
     });
     const data: any = await res.json();
@@ -312,13 +314,14 @@ export async function getHITLState(chatId: number): Promise<HITLState | null> {
     if (!row) return null;
     // Expirar después de 30 minutos
     const age = Date.now() - new Date(row.updated_at).getTime();
-    if (age > 30 * 60 * 1000) { await clearHITLState(chatId); return null; }
+    if (age > 30 * 60 * 1000) { await clearHITLState(chatId, botContext); return null; }
     return JSON.parse(row.state) as HITLState;
   } catch { return null; }
 }
 
-export async function setHITLState(chatId: number, state: HITLState): Promise<void> {
+export async function setHITLState(chatId: number, state: HITLState, botContext: string = 'default'): Promise<void> {
   if (!_DATABASE_ID || !_API_TOKEN) return;
+  const key = `${chatId}:${botContext}`;
   try {
     await ensureHITLTable();
     await fetch(d1Url(), {
@@ -327,22 +330,34 @@ export async function setHITLState(chatId: number, state: HITLState): Promise<vo
       body: JSON.stringify({
         sql: `INSERT INTO hitl_sessions (chat_id, state, updated_at) VALUES (?, ?, ?)
               ON CONFLICT(chat_id) DO UPDATE SET state = excluded.state, updated_at = excluded.updated_at`,
-        params: [String(chatId), JSON.stringify(state), new Date().toISOString()],
+        params: [key, JSON.stringify(state), new Date().toISOString()],
       }),
     });
   } catch (err) { console.warn('[HITL D1] Error guardando estado:', err); }
 }
 
-export async function clearHITLState(chatId: number): Promise<void> {
+export async function clearHITLState(chatId: number, botContext?: string): Promise<void> {
   if (!_DATABASE_ID || !_API_TOKEN) return;
   try {
-    await fetch(d1Url(), {
-      method: 'POST',
-      headers: d1Headers(),
-      body: JSON.stringify({
-        sql: 'DELETE FROM hitl_sessions WHERE chat_id = ?',
-        params: [String(chatId)],
-      }),
-    });
+    if (botContext) {
+      const key = `${chatId}:${botContext}`;
+      await fetch(d1Url(), {
+        method: 'POST',
+        headers: d1Headers(),
+        body: JSON.stringify({
+          sql: 'DELETE FROM hitl_sessions WHERE chat_id = ?',
+          params: [key],
+        }),
+      });
+    } else {
+      await fetch(d1Url(), {
+        method: 'POST',
+        headers: d1Headers(),
+        body: JSON.stringify({
+          sql: 'DELETE FROM hitl_sessions WHERE chat_id = ? OR chat_id LIKE ?',
+          params: [String(chatId), `${chatId}:%`],
+        }),
+      });
+    }
   } catch (err) { console.warn('[HITL D1] Error limpiando estado:', err); }
 }
