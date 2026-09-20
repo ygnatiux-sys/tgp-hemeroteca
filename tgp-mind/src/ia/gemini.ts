@@ -5,6 +5,7 @@
 //           callGemini(), crearModeloEnsayo() y TGP_SYSTEM_PROMPT.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import 'dotenv/config';
 import { GoogleGenAI } from '@google/genai';
 import { GoogleGenerativeAI, SchemaType, type ResponseSchema } from '@google/generative-ai';
 

@@ -1,4 +1,4 @@
-﻿// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 // TGP MIND Ã¢â‚¬â€ Orquestador IA con Hono + Gemini + Inline Keyboard Wizard
 // Autor: TGP / Xavier BenÃƒÂ­tez
 // Deploy: Google Cloud Run
@@ -47,6 +47,7 @@ import {
   subirBufferOsintAR2,
   subirImagenAR2,
   procesarFotoTelegramAR2,
+  listarImagenesRecientesR2,
 } from './src/storage/r2.js';
 // -- Storage: D1 + HITL (ver src/storage/d1.ts) ----------------------------------
 import {
@@ -521,44 +522,48 @@ app.post('/api/telegram/upload-media', async (c) => {
 // Headless: usa GOOGLE_REFRESH_TOKEN en .env (OAuth flow una sola vez).
 // Devuelve fotos recientes sin CORS issues para la Mini App Svelte.
 app.get('/api/my-photos', async (c) => {
-  const GOOGLE_CLIENT_ID     = process.env.GOOGLE_CLIENT_ID     || process.env.PUBLIC_GOOGLE_CLIENT_ID || '';
-  const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
-  const GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN || '';
-
-  if (!GOOGLE_REFRESH_TOKEN) {
-    return c.json({ error: 'GOOGLE_REFRESH_TOKEN no configurado. Genera uno con el script OAuth.' }, 503);
-  }
-
   try {
-    // 1. Obtener access_token fresco
-    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        client_id:     GOOGLE_CLIENT_ID,
-        client_secret: GOOGLE_CLIENT_SECRET,
-        refresh_token: GOOGLE_REFRESH_TOKEN,
-        grant_type:    'refresh_token',
-      }).toString(),
-    });
-    const { access_token } = await tokenRes.json() as any;
-    if (!access_token) throw new Error('No se pudo obtener access_token de Google.');
+    // 1. Prioridad: Imágenes reales alojadas en R2 (repositorio oficial TGP)
+    const r2Photos = await listarImagenesRecientesR2(30);
+    if (r2Photos && r2Photos.length > 0) {
+      return c.json({ photos: r2Photos, source: 'r2' });
+    }
 
-    // 2. Listar fotos recientes
-    const photosRes = await fetch('https://photoslibrary.googleapis.com/v1/mediaItems?pageSize=30', {
-      headers: { Authorization: `Bearer ${access_token}` },
-    });
-    const data = await photosRes.json() as any;
-    const photos = (data.mediaItems || []).map((item: any) => ({
-      id:       item.id,
-      url:      `${item.baseUrl}=w600-h600-c`,
-      filename: item.filename,
-    }));
+    // 2. Fallback opcional: Google Photos si existe token
+    const GOOGLE_CLIENT_ID     = process.env.GOOGLE_CLIENT_ID     || process.env.PUBLIC_GOOGLE_CLIENT_ID || '';
+    const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
+    const GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN || '';
 
-    return c.json({ photos });
+    if (GOOGLE_REFRESH_TOKEN && GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
+      const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id:     GOOGLE_CLIENT_ID,
+          client_secret: GOOGLE_CLIENT_SECRET,
+          refresh_token: GOOGLE_REFRESH_TOKEN,
+          grant_type:    'refresh_token',
+        }).toString(),
+      });
+      const { access_token } = await tokenRes.json() as any;
+      if (access_token) {
+        const photosRes = await fetch('https://photoslibrary.googleapis.com/v1/mediaItems?pageSize=30', {
+          headers: { Authorization: `Bearer ${access_token}` },
+        });
+        const data = await photosRes.json() as any;
+        const photos = (data.mediaItems || []).map((item: any) => ({
+          id:       item.id,
+          url:      `${item.baseUrl}=w600-h600-c`,
+          filename: item.filename,
+        }));
+        if (photos.length > 0) return c.json({ photos, source: 'google' });
+      }
+    }
+
+    return c.json({ photos: [] });
   } catch (err: any) {
-    console.error('[Google Photos] Error:', err);
-    return c.json({ error: err?.message || 'Error al obtener fotos.' }, 500);
+    console.error('[Photos API Error]:', err);
+    return c.json({ error: err?.message || 'Error al obtener fotos.', photos: [] }, 500);
   }
 });
 

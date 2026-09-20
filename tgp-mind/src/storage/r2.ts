@@ -7,7 +7,7 @@
 //   - procesarFotoTelegramAR2— descarga foto por file_id de Telegram y la sube a R2
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
 import crypto from 'node:crypto';
 
@@ -155,6 +155,31 @@ export async function procesarFotoTelegramAR2(fileId: string, customSlug = 'tele
   // 4. Subir a R2 con ContentType WebP
   const url = await subirBufferAR2(webpBuffer, r2Key, 'image/webp');
   return { url, mimeType: 'image/webp', fileName };
+}
+
+/**
+ * Lista las imágenes más recientes alojadas en R2 (repositorio visual de TGP).
+ */
+export async function listarImagenesRecientesR2(limit = 30): Promise<Array<{ id: string; url: string; filename: string }>> {
+  try {
+    const res = await getClient().send(new ListObjectsV2Command({
+      Bucket: _R2_BUCKET_NAME,
+      MaxKeys: 100,
+    }));
+    const items = (res.Contents || [])
+      .filter(c => c.Key && /\.(jpe?g|png|webp|avif)$/i.test(c.Key))
+      .sort((a, b) => (b.LastModified?.getTime() || 0) - (a.LastModified?.getTime() || 0))
+      .slice(0, limit);
+
+    return items.map(item => ({
+      id: item.Key!,
+      url: `${_R2_PUBLIC_DOMAIN}/${item.Key}`,
+      filename: item.Key!.split('/').pop() || item.Key!,
+    }));
+  } catch (err: any) {
+    console.error('[R2 Listar Imágenes Error]:', err);
+    return [];
+  }
 }
 
 // Re-export R2_PUBLIC_DOMAIN para uso en otros módulos (ej: TTS en D1)

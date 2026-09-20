@@ -264,10 +264,10 @@
           <span class="spinner"></span> Cargando galería…
         </div>
       {:else if photosState === "error"}
-        <p class="photos-error">⚠️ No se pudo cargar Google Photos.<br/>Verifica GOOGLE_REFRESH_TOKEN en el servidor.</p>
+        <p class="photos-error">⚠️ No se pudo conectar con la galería de fotos.<br/>Intenta nuevamente en unos segundos.</p>
       {:else if photosState === "loaded"}
         {#if photos.length === 0}
-          <p class="photos-empty">Sin fotos recientes.</p>
+          <p class="photos-empty">Sin fotos recientes en la galería.</p>
         {:else}
           <p class="photos-hint">{selectedPhoto ? `✅ Seleccionada: ${selectedPhoto.filename}` : 'Toca para seleccionar una foto'}</p>
           <div class="photos-grid">
