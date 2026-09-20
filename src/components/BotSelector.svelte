@@ -7,6 +7,7 @@
   type Modelo   = "flash" | "pro";
   type Imagen   = "wikimedia" | "photos" | "no";
   type Formato  = "tgp" | "libre";
+  type Destino  = "social" | "hemeroteca" | "alternative";
   type Estado   = "idle" | "loading" | "success" | "error";
   type PhotosState = "idle" | "loading" | "loaded" | "error";
 
@@ -62,8 +63,10 @@
   let modelo: Modelo     = "flash";
   let imagen: Imagen     = "wikimedia";
   let formato: Formato   = "tgp";
+  let destino: Destino   = "social";
   let estado: Estado     = "idle";
   let errorMsg           = "";
+  let generatedPreview   = "";
   let isTelegramAvailable = false;
 
   // Google Photos picker state
@@ -123,25 +126,30 @@
     if (estado === "loading") return;
     estado   = "loading";
     errorMsg = "";
+    generatedPreview = "";
     const tg = (window as any).Telegram?.WebApp;
     const initData = tg?.initData || "";
     try {
       const res = await fetch(`${API_URL}/api/bot/generate`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Mini-App": "true",
+        },
         body: JSON.stringify({
           bot: botId,
-          tema, red, modelo, imagen, formato,
+          tema, red, modelo, imagen, formato, destino,
           photoUrl: selectedPhoto?.url || null,
           initData,
         }),
       });
+      const d = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
         throw new Error(d?.error || `HTTP ${res.status}`);
       }
+      generatedPreview = d?.texto || "";
       estado = "success";
-      setTimeout(() => { if (tg) tg.close(); }, 1400);
+      setTimeout(() => { if (tg) tg.close(); }, 2500);
     } catch (err: any) {
       estado   = "error";
       errorMsg = err?.message || "Error al conectar con TGP Mind.";
@@ -182,6 +190,22 @@
 
   <!-- Body -->
   <main class="body">
+
+    <!-- Destino -->
+    <section class="section">
+      <label class="section-label" style="color: var(--accent)">Destino de Publicación</label>
+      <div class="toggle-group">
+        <button class="toggle {destino === 'social' ? 'active' : ''}" on:click={() => (destino = "social")}>
+          📡 Redes (Zernio)
+        </button>
+        <button class="toggle {destino === 'hemeroteca' ? 'active' : ''}" on:click={() => (destino = "hemeroteca")}>
+          📚 Hemeroteca
+        </button>
+        <button class="toggle {destino === 'alternative' ? 'active' : ''}" on:click={() => (destino = "alternative")}>
+          🏛️ Alternative
+        </button>
+      </div>
+    </section>
 
     {#if cfg.showRed}
     <section class="section">
@@ -292,8 +316,18 @@
 
   <!-- Footer / CTA -->
   <footer class="footer">
+    {#if estado === "success" && generatedPreview}
+      <div class="preview-box">
+        <span class="preview-label">✅ Generado con éxito:</span>
+        <p class="preview-text">{generatedPreview.slice(0, 160)}...</p>
+      </div>
+    {/if}
+
     {#if estado === "error"}
-      <p class="error-msg">⚠️ {errorMsg}</p>
+      <div class="error-box">
+        <p class="error-msg">⚠️ {errorMsg}</p>
+        <button class="btn-retry" on:click={handleGenerar}>🔄 Reintentar</button>
+      </div>
     {/if}
 
     <button
@@ -474,10 +508,25 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  .error-box {
+    display: flex; flex-direction: column; gap: 6px;
+  }
   .error-msg {
     font-size: 12px; color: #f85149;
     background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.2);
     border-radius: 8px; padding: 8px 12px; text-align: center;
   }
+  .btn-retry {
+    background: #21262d; border: 1px solid #30363d; color: #c9d1d9;
+    padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer;
+    font-weight: 600;
+  }
+  .btn-retry:hover { background: #30363d; }
+  .preview-box {
+    background: rgba(22,163,74,.1); border: 1px solid rgba(22,163,74,.3);
+    border-radius: 8px; padding: 8px 12px;
+  }
+  .preview-label { font-size: 11px; font-weight: 700; color: #4ade80; display: block; margin-bottom: 2px; }
+  .preview-text { font-size: 12px; color: #e6edf3; line-height: 1.4; }
   .dev-notice { font-size: 11px; color: #4a5568; text-align: center; font-family: monospace; }
 </style>
