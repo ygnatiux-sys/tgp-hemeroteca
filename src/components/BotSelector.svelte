@@ -12,6 +12,7 @@
   type PhotosState = "idle" | "loading" | "loaded" | "error";
 
   interface Photo { id: string; url: string; filename: string; }
+  type Densidad = "breve" | "profundo_breve" | "premium";
 
   // ── Config por bot ──────────────────────────────────────────────────────
   interface BotConfig {
@@ -64,6 +65,9 @@
   let imagen: Imagen     = "wikimedia";
   let formato: Formato   = "tgp";
   let destino: Destino   = "social";
+  let densidad: Densidad = "profundo_breve";
+  let modoLibrePrompt: string = "";
+  let showModoLibre: boolean = false;
   let estado: Estado     = "idle";
   let errorMsg           = "";
   let generatedPreview   = "";
@@ -139,6 +143,8 @@
         body: JSON.stringify({
           bot: botId,
           tema, red, modelo, imagen, formato, destino,
+          densidad,
+          modoLibrePrompt: modoLibrePrompt.trim() || undefined,
           photoUrl: selectedPhoto?.url || null,
           initData,
         }),
@@ -303,6 +309,49 @@
     </section>
     {/if}
 
+    <!-- Densidad / Extensión -->
+    <section class="section">
+      <label class="section-label" style="color: var(--accent)">Densidad / Extensión</label>
+      <div class="toggle-group">
+        <button
+          class="toggle model-toggle {densidad === 'breve' ? 'active' : ''}"
+          on:click={() => (densidad = "breve")}
+        >
+          ⚡ Breve <span class="sublabel">~800-1000t</span>
+        </button>
+        <button
+          class="toggle model-toggle {densidad === 'profundo_breve' ? 'active' : ''}"
+          on:click={() => (densidad = "profundo_breve")}
+        >
+          🧠 Profundo <span class="sublabel">~1500t</span>
+        </button>
+        <button
+          class="toggle model-toggle {densidad === 'premium' ? 'active pro-active' : ''}"
+          on:click={() => (densidad = "premium")}
+        >
+          🏛️ Premium <span class="sublabel">+4500t</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Modo Libre / Directiva HITL -->
+    <section class="section">
+      <div class="modo-libre-bar" on:click={() => (showModoLibre = !showModoLibre)} role="button" tabindex="0" on:keydown={(e) => { if (e.key === 'Enter') showModoLibre = !showModoLibre; }}>
+        <label class="section-label" style="color: var(--accent); cursor: pointer;">
+          ✍️ Directiva Libre / Modo HITL (Opcional)
+        </label>
+        <span class="modo-libre-icon">{showModoLibre ? "▲" : "▼"}</span>
+      </div>
+      {#if showModoLibre || modoLibrePrompt}
+        <textarea
+          class="modo-libre-textarea"
+          bind:value={modoLibrePrompt}
+          placeholder="Escribe instrucciones personalizadas (tono, fuentes, citas). Si lo dejas vacío, rige el preset estándar sin fricción."
+          rows="3"
+        ></textarea>
+      {/if}
+    </section>
+
     <!-- Resumen -->
     <div class="summary">
       <span class="summary-chip" style="border-color: var(--accent-border); color: var(--accent)">{cfg.icon} {cfg.label}</span>
@@ -310,6 +359,8 @@
       <span class="summary-chip">{modelo === "flash" ? "⚡ Flash" : "🧠 Pro"}</span>
       <span class="summary-chip">{imagen === "wikimedia" ? "🌐 Wiki" : imagen === "photos" ? "📷 Foto" : "📝 Texto"}</span>
       <span class="summary-chip">{formato === "tgp" ? "🏛️ TGP" : "✍️ Libre"}</span>
+      <span class="summary-chip">{densidad === "breve" ? "⚡ Breve" : densidad === "profundo_breve" ? "🧠 Profundo (1500t)" : "🏛️ Premium (+4500t)"}</span>
+      {#if modoLibrePrompt}<span class="summary-chip modo-libre-chip">✍️ Custom HITL</span>{/if}
     </div>
 
   </main>
@@ -467,6 +518,29 @@
     width: 18px; height: 18px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-size: 10px; font-weight: 700;
+  }
+
+  /* ── Modo Libre / HITL ── */
+  .modo-libre-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 4px; cursor: pointer; user-select: none;
+  }
+  .modo-libre-icon { font-size: 10px; color: var(--accent); }
+  .modo-libre-textarea {
+    width: 100%; box-sizing: border-box;
+    background: #161b22; border: 1px solid #2a3441; border-radius: 8px;
+    padding: 8px 12px; font-size: 12px; color: #e6edf3; font-family: inherit;
+    resize: vertical; outline: none; transition: border-color .15s, box-shadow .15s;
+  }
+  .modo-libre-textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-glow);
+  }
+  .modo-libre-textarea::placeholder { color: #6e7681; }
+  .modo-libre-chip {
+    background: rgba(163,113,247,0.15) !important;
+    border-color: #a371f7 !important;
+    color: #d4c7ff !important;
   }
 
   /* ── Summary ── */

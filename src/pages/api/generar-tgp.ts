@@ -22,7 +22,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     const body = await request.json();
-    const { titulo, generarImagen, estilo } = body;
+    const { titulo, generarImagen, estilo, densidad, modoLibrePrompt } = body;
 
     if (!titulo) {
       return new Response(JSON.stringify({ error: 'Falta el título.' }), { status: 400, headers });
@@ -118,7 +118,25 @@ export const POST: APIRoute = async ({ request }) => {
     } else {
       // --- MOTOR DE PENSAMIENTO (Gemini 3.1 Pro Preview con JSON de Excerpt y Categoría) ---
       try {
+        const dens = densidad === 'breve' ? 'breve' : (densidad === 'premium' ? 'premium' : 'profundo_breve');
+        let densidadInstruccion = '';
+        let maxTokens = 2200;
+
+        if (dens === 'breve') {
+          densidadInstruccion = 'EXTENSIÓN Y DENSIDAD: Breve (~800 a 1000 tokens). Ensayo conciso y ágil, centrado en la tesis fundamental sin rodeos.';
+          maxTokens = 1200;
+        } else if (dens === 'premium') {
+          densidadInstruccion = 'EXTENSIÓN Y DENSIDAD: Tratado Magna / Premium exhaustivo (+4500 tokens). Desarrolla una obra capitular exhaustiva con al menos 4 o 5 secciones temáticas principales (##), intercalando múltiples fuentes primarias textuales (> ), aparato crítico, análisis filológico o hermenéutico y una conclusión de largo alcance. No sintetices ni apresures el final.';
+          maxTokens = 8192;
+        } else {
+          densidadInstruccion = 'EXTENSIÓN Y DENSIDAD: Profundo pero condensado (~1500 tokens). Ensayo conceptual TGP completo con desarrollo riguroso de tesis y citas primarias.';
+          maxTokens = 2200;
+        }
+
+        const directivaLibre = modoLibrePrompt ? `\\n\\nDIRECTIVA PERSONALIZADA DEL AUTOR (HITL): "${modoLibrePrompt}". Aplica y prioriza esta directiva ad-hoc de tono, citas o enfoque.` : '';
+
         const prompt = `Escribe un ensayo profundo sobre: "${titulo}".
+${densidadInstruccion}${directivaLibre}
 Devuelve estrictamente un JSON válido con esta estructura:
 {
   "content": "Texto completo del ensayo en Markdown con subtítulos (##, ###). Tono Dark Academia erudito, estilizado y riguroso.\\n\\nREGLAS HISTÓRICAS Y CITAS OBLIGATORIAS:\\n1. FUENTES PRIMARIAS: Intercala testimonios y fuentes históricas originales de los actores o documentos involucrados (ej. citas de Nestorio, Simón el Estilita, San Agustín, Carpócrates, manuscritos o códices antiguos).\\n2. QUOTES LATERALES: Formatea estas fuentes o reflexiones clave como bloques de cita Markdown (> \\\"Cita histórica o testimonio...\\\") intercalados en el cuerpo (hasta 3 citas destacadas).\\n3. RECUADRO DE FUENTES ERUDITAS: Al final del ensayo, incluye de manera obligatoria una sección en recuadro titulada '## Fuentes Eruditas & Referencias Históricas' enumerando las fuentes primarias y bibliografía especializada en itálica soft de la tipografía principal.",
@@ -131,6 +149,7 @@ Devuelve estrictamente un JSON válido con esta estructura:
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
           config: {
             responseMimeType: 'application/json',
+            maxOutputTokens: maxTokens,
             systemInstruction: "Eres el motor cognitivo TGP (The Great Puzzle Project). Tu objetivo es producir ensayos de alta erudición e investigación histórica basada en fuentes primarias y testimonios originales de los actores históricos. Todo ensayo debe incluir quotes Markdown (>) con citas textuales originales e incluir al final una sección '## Fuentes Eruditas & Referencias Históricas' en itálica soft. NUNCA declares tu rol ni uses fórmulas autorreferenciales.",
           }
         });

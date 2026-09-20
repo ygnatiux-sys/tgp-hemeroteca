@@ -15,6 +15,8 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
   const [ensayo, setEnsayo] = useState(value || '');
   const [excerptIA, setExcerptIA] = useState<string>('');
   const [categoryIA, setCategoryIA] = useState<string>('');
+  const [densidad, setDensidad] = useState<'breve' | 'profundo_breve' | 'premium'>('profundo_breve');
+  const [modoLibrePrompt, setModoLibrePrompt] = useState('');
 
   const [arteResult, setArteResult] = useState<{
     imageUrl: string | null;
@@ -226,7 +228,9 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           titulo: temaFinal, 
-          generarImagen: false 
+          generarImagen: false,
+          densidad,
+          modoLibrePrompt: modoLibrePrompt.trim() || undefined
         }),
       });
 
@@ -644,6 +648,104 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         <label htmlFor="toggleAmbos" style={{ fontSize: '0.9rem', color: generarAmbosJuntos ? '#d0ebd0' : '#d4c7ff', cursor: 'pointer', fontWeight: 600 }}>
           {generarAmbosJuntos ? 'Modo Simultáneo Activado (Texto + Excerpt + Portada en 1 clic)' : 'Modo Manual / Paso a Paso (Selecciona Texto o Portada individualmente)'}
         </label>
+      </div>
+
+      {/* SELECTOR DE DENSIDAD / EXTENSIÓN */}
+      <div style={{ marginBottom: '18px' }}>
+        <label style={{ fontSize: '0.75rem', color: '#aaa', display: 'block', marginBottom: '8px', fontWeight: 700 }}>
+          DENSIDAD / EXTENSIÓN DEL ENSAYO:
+        </label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+          <button
+            type="button"
+            onClick={() => setDensidad('breve')}
+            style={{
+              padding: '10px 12px',
+              background: densidad === 'breve' ? '#1b3a1b' : '#141414',
+              border: densidad === 'breve' ? '2px solid #4caf50' : '1px solid #333',
+              borderRadius: '6px',
+              color: densidad === 'breve' ? '#a5d6a7' : '#888',
+              cursor: 'pointer',
+              fontWeight: 700,
+              fontSize: '0.8rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '3px'
+            }}
+          >
+            <span>⚡ Breve</span>
+            <span style={{ fontSize: '0.68rem', fontWeight: 400, opacity: 0.8 }}>~800-1000 tokens</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setDensidad('profundo_breve')}
+            style={{
+              padding: '10px 12px',
+              background: densidad === 'profundo_breve' ? '#12263a' : '#141414',
+              border: densidad === 'profundo_breve' ? '2px solid #2196f3' : '1px solid #333',
+              borderRadius: '6px',
+              color: densidad === 'profundo_breve' ? '#90caf9' : '#888',
+              cursor: 'pointer',
+              fontWeight: 700,
+              fontSize: '0.8rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '3px'
+            }}
+          >
+            <span>🧠 Profundo</span>
+            <span style={{ fontSize: '0.68rem', fontWeight: 400, opacity: 0.8 }}>~1500 tokens (TGP)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setDensidad('premium')}
+            style={{
+              padding: '10px 12px',
+              background: densidad === 'premium' ? '#2a1a3e' : '#141414',
+              border: densidad === 'premium' ? '2px solid #ab47bc' : '1px solid #333',
+              borderRadius: '6px',
+              color: densidad === 'premium' ? '#ce93d8' : '#888',
+              cursor: 'pointer',
+              fontWeight: 700,
+              fontSize: '0.8rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '3px'
+            }}
+          >
+            <span>🏛️ Premium</span>
+            <span style={{ fontSize: '0.68rem', fontWeight: 400, opacity: 0.8 }}>+4500 tokens (Capítulos)</span>
+          </button>
+        </div>
+      </div>
+
+      {/* MODO LIBRE / DIRECTIVA HITL (OPCIONAL) */}
+      <div style={{ marginBottom: '20px' }}>
+        <label style={{ fontSize: '0.75rem', color: '#ce93d8', display: 'block', marginBottom: '6px', fontWeight: 700 }}>
+          ✍️ DIRECTIVA LIBRE / MODO HITL (OPCIONAL):
+        </label>
+        <textarea
+          value={modoLibrePrompt}
+          onChange={(e) => setModoLibrePrompt(e.target.value)}
+          placeholder="Escribe instrucciones ad-hoc de tono, fuentes o enfoque (ej: 'Enfócate en la hermenéutica de Corbin, cita a Plotino y dale tono solemne'). Si lo dejas vacío, aplica el preset estándar."
+          rows={2}
+          style={{
+            width: '100%',
+            padding: '10px 14px',
+            background: '#141418',
+            border: '1px solid #3a324a',
+            borderRadius: '6px',
+            color: '#e0e0e0',
+            fontSize: '0.85rem',
+            fontFamily: 'inherit',
+            outline: 'none',
+            resize: 'vertical',
+            boxSizing: 'border-box'
+          }}
+        />
       </div>
 
       {/* Botones de Acción (2 Pasos o 1 Clic según toggle) */}

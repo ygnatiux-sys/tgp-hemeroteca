@@ -26,6 +26,8 @@ export type RouteDecision =
         destino: 'hemeroteca' | 'alternative' | 'social';
         red?: 'facebook' | 'tiktok';
         modelo: 'flash' | 'pro';
+        densidad?: 'breve' | 'profundo_breve' | 'premium';
+        modoLibrePrompt?: string;
         fuenteImg: 'wiki' | 'telegram' | 'none';
         cantidadSecciones: number;
         photoUrl?: string;
@@ -39,6 +41,8 @@ export type RouteDecision =
         destino: 'hemeroteca' | 'alternative' | 'social';
         red?: 'facebook' | 'tiktok';
         modelo?: 'flash' | 'pro';
+        densidad?: 'breve' | 'profundo_breve' | 'premium';
+        modoLibrePrompt?: string;
         fuenteImg?: 'wiki' | 'telegram' | 'none';
         cantidadSecciones?: number;
         photoUrl?: string;
@@ -125,6 +129,8 @@ export async function routeIncomingMessage(input: RouteInput): Promise<RouteDeci
           destino: args.destino || (pendingState.destino as any) || (botContext === 'social' ? 'social' : 'hemeroteca'),
           red: args.red || (pendingState.red as any) || (botContext === 'social' ? 'facebook' : undefined),
           modelo: args.modelo || 'flash',
+          densidad: args.densidad || 'profundo_breve',
+          modoLibrePrompt: args.modoLibrePrompt,
           fuenteImg: args.fuenteImg || (photoUrl ? 'telegram' : 'wiki'),
           cantidadSecciones: args.cantidadSecciones || 3,
           photoUrl: photoUrl || pendingState.photoUrl,
@@ -163,6 +169,8 @@ export async function routeIncomingMessage(input: RouteInput): Promise<RouteDeci
         destino: args.destino || (botContext === 'social' ? 'social' : 'hemeroteca'),
         red: args.red || (botContext === 'social' ? 'facebook' : undefined),
         modelo: args.modelo || 'flash',
+        densidad: args.densidad || (botContext === 'social' ? 'breve' : 'profundo_breve'),
+        modoLibrePrompt: args.modoLibrePrompt,
         fuenteImg: args.fuenteImg || (photoUrl ? 'telegram' : 'wiki'),
         cantidadSecciones: args.cantidadSecciones || (botContext === 'social' ? 1 : 3),
         photoUrl,

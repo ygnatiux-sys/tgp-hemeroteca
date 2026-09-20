@@ -412,11 +412,254 @@ telegramRouter.post('/webhook/telegram-social', async (c) => {
   return c.json({ ok: true });
 });
 
+// ── Generador de Inline Keyboards Dinámicos para Micro-Prompts HITL ──────────
+function generarTecladoParaPrompt(texto: string): any {
+  const lower = texto.toLowerCase();
+  if (lower.includes('hemeroteca') && (lower.includes('redes') || lower.includes('social') || lower.includes('post'))) {
+    return {
+      inline_keyboard: [
+        [
+          { text: '📚 Hemeroteca (Web)', callback_data: 'Hemeroteca' },
+          { text: '📡 Redes Sociales', callback_data: 'Redes Sociales' },
+        ],
+      ],
+    };
+  }
+  if (lower.includes('facebook') || lower.includes('tiktok')) {
+    return {
+      inline_keyboard: [
+        [
+          { text: '🔵 Facebook', callback_data: 'Facebook' },
+          { text: '⚫ TikTok', callback_data: 'TikTok' },
+        ],
+      ],
+    };
+  }
+  if (lower.includes('flash') || lower.includes('pro')) {
+    return {
+      inline_keyboard: [
+        [
+          { text: '⚡ Flash (~2s)', callback_data: 'Flash' },
+          { text: '🧠 Pro (~8s)', callback_data: 'Pro' },
+        ],
+      ],
+    };
+  }
+  if (lower.includes('breve') || lower.includes('profundo') || lower.includes('densidad') || lower.includes('premium') || lower.includes('tratado')) {
+    return {
+      inline_keyboard: [
+        [
+          { text: '⚡ Breve (~800t)', callback_data: 'Breve' },
+          { text: '🧠 Profundo (~1500t)', callback_data: 'Profundo breve' },
+        ],
+        [
+          { text: '🏛️ Premium (+4500t Grounded)', callback_data: 'Tratado Premium' },
+        ],
+      ],
+    };
+  }
+  return undefined;
+}
+
+// ── Ejecutor Agéntico Omni (HITL, Redes y Hemeroteca) ─────────────────────────
+async function ejecutarDecisionOmni(chatId: number, decision: any) {
+  if (decision.type === 'micro_prompt') {
+    const replyMarkup = generarTecladoParaPrompt(decision.text);
+    await fetch(`${cfg.telegramApi}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: decision.text,
+        ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
+      }),
+    });
+    return;
+  }
+
+  if (decision.type === 'direct_answer') {
+    await fetch(`${cfg.telegramApi}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text: decision.text }),
+    });
+    return;
+  }
+
+  // Publicación / Ejecución directa (Ensayo Hemeroteca o Post Redes)
+  await fetch(`${cfg.telegramApi}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: `⚡ Agente Omni procesando solicitud: "${decision.params.tema}"...`,
+    }),
+  });
+
+  try {
+    const params = decision.params;
+    const tema = params.tema;
+    const destino = params.destino || 'social';
+    const red = params.red || 'facebook';
+    const modelo = params.modelo || 'flash';
+    const modelName = modelo === 'pro' ? 'gemini-2.5-pro' : 'gemini-3.8-flash';
+    const densidad = params.densidad || (destino === 'social' ? 'breve' : 'profundo_breve');
+    const modoLibre = params.modoLibrePrompt ? `\n\nDIRECTIVA PERSONALIZADA DEL AUTOR (MODO LIBRE):\n${params.modoLibrePrompt}` : '';
+
+    let directivaDensidad = '';
+    if (densidad === 'breve') {
+      directivaDensidad = 'Extensión: Breve y ágil (máximo 800-1000 tokens). Directo al núcleo conceptual.';
+    } else if (densidad === 'premium') {
+      directivaDensidad = 'Extensión: Tratado de archivo exhaustivo (+4500 tokens). Desarrolla obligatoriamente entre 4 y 5 secciones temáticas extensas con subtítulos (##), citas históricas textuales originales en bloques (> "...") y al final una sección "## Fuentes Eruditas & Referencias Históricas".';
+    } else {
+      directivaDensidad = 'Extensión: Ensayo conceptual profundo pero condensado (~1500 tokens). Estructura TGP completa en formato ágil.';
+    }
+
+    if (destino === 'hemeroteca' || destino === 'alternative') {
+      // ── 1. Generar Ensayo TGP ──────────────────────────────────────────
+      const promptEnsayo = `Escribe un ensayo reflexivo, denso y profundo para Hemeroteca TGP sobre: "${tema}". Estilo ensayo argentino contemporáneo. ${directivaDensidad}${modoLibre}`;
+      const ensayoTexto = await callGemini(`omni-ensayo-${chatId}`, promptEnsayo, 'gemini-2.5-pro', TGP_SYSTEM_PROMPT);
+
+      let imagenUrl = params.photoUrl || '';
+      if (!imagenUrl) {
+        try {
+          const entidad = await resolverEntidadCanonica(tema);
+          imagenUrl = (await buscarPageImageWikipedia(entidad.wikiEn, 'en')) || (await buscarPageImageWikipedia(entidad.wikiEs, 'es')) || '';
+        } catch {}
+      }
+
+      if (imagenUrl) {
+        try {
+          imagenUrl = await estandarizarYSubirImagenAR2(imagenUrl, 'omni-hemeroteca');
+        } catch {}
+      }
+
+      await registrarResguardoD1({
+        origen: 'telegram-omni',
+        destino,
+        tema,
+        textoGenerado: ensayoTexto,
+        metadatos: { destino, formato: 'tgp', modelo: 'pro', densidad },
+        imagenR2Url: imagenUrl,
+        chatId,
+      });
+
+      const preview = ensayoTexto.slice(0, 900);
+      await fetch(`${cfg.telegramApi}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: `📚 *Ensayo TGP Generado (${destino.toUpperCase()})*\n\n*Tema:* ${tema}\n*Densidad:* ${densidad.toUpperCase()}\n\n${preview}...\n\n_✅ Registrado en Bóveda D1 y listo en Hemeroteca._`,
+          parse_mode: 'Markdown',
+        }),
+      });
+    } else {
+      // ── 2. Generar Redes Sociales (Facebook / TikTok via Zernio) ────────
+      const userPrompt = `Genera un texto magnético y reflexivo para redes sociales (${red}) sobre: "${tema}". ${directivaDensidad}${modoLibre}`;
+      const textoGenerado = await callGemini(`omni-${chatId}`, userPrompt, modelName);
+
+      let imagenUrl = params.photoUrl || '';
+      if (!imagenUrl) {
+        try {
+          const entidad = await resolverEntidadCanonica(tema);
+          imagenUrl = (await buscarPageImageWikipedia(entidad.wikiEn, 'en')) || (await buscarPageImageWikipedia(entidad.wikiEs, 'es')) || '';
+        } catch {}
+      }
+
+      if (imagenUrl) {
+        try {
+          imagenUrl = await estandarizarYSubirImagenAR2(imagenUrl, 'omni-social');
+        } catch {}
+      }
+
+      await registrarResguardoD1({
+        origen: 'telegram-omni',
+        destino: 'social',
+        tema,
+        textoGenerado,
+        metadatos: { red, modelo, densidad },
+        imagenR2Url: imagenUrl,
+        chatId,
+      });
+
+      let postUrl = '';
+      try {
+        const resZernio = await publicarEnZernio({
+          redes: red === 'tiktok' ? 'tiktok' : 'facebook',
+          texto: textoGenerado,
+          urlImagen: imagenUrl || undefined,
+        });
+        postUrl = resZernio.postUrl || '';
+      } catch (zErr: any) {
+        console.warn('[Omni Zernio Warning]:', zErr?.message);
+      }
+
+      const urlLine = postUrl ? `\n\n🔗 Enlace: ${postUrl}` : '';
+      if (imagenUrl) {
+        await fetch(`${cfg.telegramApi}/sendPhoto`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            photo: imagenUrl,
+            caption: `✅ *Publicación Lista (${red.toUpperCase()})*\n\n${textoGenerado}${urlLine}`.slice(0, 1024),
+            parse_mode: 'Markdown',
+          }),
+        });
+      } else {
+        await fetch(`${cfg.telegramApi}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: `✅ *Publicación Lista (${red.toUpperCase()})*\n\n${textoGenerado}${urlLine}`,
+            parse_mode: 'Markdown',
+          }),
+        });
+      }
+    }
+  } catch (errExec: any) {
+    console.error('[Omni Execution Error]:', errExec);
+    await fetch(`${cfg.telegramApi}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: `⚠️ Error al procesar publicación: ${errExec?.message || 'Error desconocido'}`,
+      }),
+    });
+  }
+}
+
 // ── RUTA 3: /telegram-webhook (Omni-Bot @Analista_IMG_bot) ───────────────────
 telegramRouter.post('/telegram-webhook', async (c) => {
   let body: any;
   try { body = await c.req.json(); } catch { return c.json({ ok: true }); }
 
+  // 1. Manejo de Inline Buttons (Callback Queries)
+  const callbackQuery = body?.callback_query;
+  if (callbackQuery) {
+    const chatId = callbackQuery.message?.chat?.id;
+    const data = callbackQuery.data;
+    if (chatId) {
+      await fetch(`${cfg.telegramApi}/answerCallbackQuery`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callback_query_id: callbackQuery.id }),
+      });
+      const decision = await routeIncomingMessage({
+        chatId,
+        text: data,
+        hasPhoto: false,
+        botContext: 'omni',
+      });
+      await ejecutarDecisionOmni(chatId, decision);
+    }
+    return c.json({ ok: true });
+  }
+
+  // 2. Manejo de Mensajes Estándar
   const message = body?.message;
   if (message) {
     const chatId = message.chat?.id;
@@ -533,14 +776,14 @@ telegramRouter.post('/telegram-webhook', async (c) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: chatId,
-          text: `🏛️ *TGP Assistant en línea (@${cfg.telegramBotName})*\n\n📸 Envía una imagen para el Data Lake.\n✍️ O escribe cualquier consulta analítica o comando de publicación.`,
+          text: `🏛️ *TGP Omni Bot en línea (@${cfg.telegramBotName})*\n\n📸 Envía una imagen para el Data Lake.\n✍️ Escribe cualquier tema o comando para iniciar el diálogo editorial agéntico.`,
           parse_mode: 'Markdown',
         }),
       });
       return c.json({ ok: true });
     }
 
-    // Texto Libre: Enrutamiento Semántico Agéntico
+    // Texto Libre: Enrutamiento Semántico Agéntico con HITL
     const decision = await routeIncomingMessage({
       chatId,
       text,
@@ -548,158 +791,7 @@ telegramRouter.post('/telegram-webhook', async (c) => {
       botContext: 'omni',
     });
 
-    if (decision.type === 'micro_prompt') {
-      await fetch(`${cfg.telegramApi}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chatId, text: decision.text }),
-      });
-      return c.json({ ok: true });
-    }
-
-    if (decision.type === 'direct_answer') {
-      await fetch(`${cfg.telegramApi}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chatId, text: decision.text }),
-      });
-      return c.json({ ok: true });
-    }
-
-    // Publicación / Ejecución directa (Ensayo Hemeroteca o Post Redes)
-    await fetch(`${cfg.telegramApi}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: `⚡ Agente Omni procesando solicitud: "${decision.params.tema}"...`,
-      }),
-    });
-
-    try {
-      const params = decision.params;
-      const tema = params.tema;
-      const destino = params.destino || 'social';
-      const red = params.red || 'facebook';
-      const modelo = params.modelo || 'flash';
-      const modelName = modelo === 'pro' ? 'gemini-2.5-pro' : 'gemini-3.8-flash';
-
-      if (destino === 'hemeroteca' || destino === 'alternative') {
-        // ── 1. Generar Ensayo TGP ──────────────────────────────────────────
-        const promptEnsayo = `Escribe un ensayo reflexivo, denso y profundo para Hemeroteca TGP sobre: "${tema}". Estilo ensayo argentino contemporáneo. Aplica la estructura TGP: gancho visual, contexto histórico-filosófico, concepto técnico clave y cierre humano universal.`;
-        const ensayoTexto = await callGemini(`omni-ensayo-${chatId}`, promptEnsayo, 'gemini-2.5-pro', TGP_SYSTEM_PROMPT);
-
-        let imagenUrl = params.photoUrl || '';
-        if (!imagenUrl) {
-          try {
-            const entidad = await resolverEntidadCanonica(tema);
-            imagenUrl = (await buscarPageImageWikipedia(entidad.wikiEn, 'en')) || (await buscarPageImageWikipedia(entidad.wikiEs, 'es')) || '';
-          } catch {}
-        }
-
-        if (imagenUrl) {
-          try {
-            imagenUrl = await estandarizarYSubirImagenAR2(imagenUrl, 'omni-hemeroteca');
-          } catch {}
-        }
-
-        await registrarResguardoD1({
-          origen: 'telegram-omni',
-          destino,
-          tema,
-          textoGenerado: ensayoTexto,
-          metadatos: { destino, formato: 'tgp', modelo: 'pro' },
-          imagenR2Url: imagenUrl,
-          chatId,
-        });
-
-        const preview = ensayoTexto.slice(0, 900);
-        await fetch(`${cfg.telegramApi}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: `📚 *Ensayo TGP Generado (${destino.toUpperCase()})*\n\n*Tema:* ${tema}\n\n${preview}...\n\n_✅ Registrado en Bóveda D1 y listo en Hemeroteca._`,
-            parse_mode: 'Markdown',
-          }),
-        });
-      } else {
-        // ── 2. Generar Redes Sociales (Facebook / TikTok via Zernio) ────────
-        const userPrompt = `Genera un texto magnético y reflexivo para redes sociales (${red}) sobre: "${tema}". Estilo directo, sobrio y atrapante. Máximo 2 párrafos cortos y 3 hashtags.`;
-        const textoGenerado = await callGemini(`omni-${chatId}`, userPrompt, modelName);
-
-        let imagenUrl = params.photoUrl || '';
-        if (!imagenUrl) {
-          try {
-            const entidad = await resolverEntidadCanonica(tema);
-            imagenUrl = (await buscarPageImageWikipedia(entidad.wikiEn, 'en')) || (await buscarPageImageWikipedia(entidad.wikiEs, 'es')) || '';
-          } catch {}
-        }
-
-        if (imagenUrl) {
-          try {
-            imagenUrl = await estandarizarYSubirImagenAR2(imagenUrl, 'omni-social');
-          } catch {}
-        }
-
-        await registrarResguardoD1({
-          origen: 'telegram-omni',
-          destino: 'social',
-          tema,
-          textoGenerado,
-          metadatos: { red, modelo },
-          imagenR2Url: imagenUrl,
-          chatId,
-        });
-
-        let postUrl = '';
-        try {
-          const resZernio = await publicarEnZernio({
-            redes: red === 'tiktok' ? 'tiktok' : 'facebook',
-            texto: textoGenerado,
-            urlImagen: imagenUrl || undefined,
-          });
-          postUrl = resZernio.postUrl || '';
-        } catch (zErr: any) {
-          console.warn('[Omni Zernio Warning]:', zErr?.message);
-        }
-
-        const urlLine = postUrl ? `\n\n🔗 Enlace: ${postUrl}` : '';
-        if (imagenUrl) {
-          await fetch(`${cfg.telegramApi}/sendPhoto`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: chatId,
-              photo: imagenUrl,
-              caption: `✅ *Publicación Lista (${red.toUpperCase()})*\n\n${textoGenerado}${urlLine}`.slice(0, 1024),
-              parse_mode: 'Markdown',
-            }),
-          });
-        } else {
-          await fetch(`${cfg.telegramApi}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: chatId,
-              text: `✅ *Publicación Lista (${red.toUpperCase()})*\n\n${textoGenerado}${urlLine}`,
-              parse_mode: 'Markdown',
-            }),
-          });
-        }
-      }
-    } catch (errExec: any) {
-      console.error('[Omni Execution Error]:', errExec);
-      await fetch(`${cfg.telegramApi}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: `⚠️ Error al procesar publicación: ${errExec?.message || 'Error desconocido'}`,
-        }),
-      });
-    }
-
+    await ejecutarDecisionOmni(chatId, decision);
     return c.json({ ok: true });
   }
 
@@ -716,10 +808,12 @@ telegramRouter.post('/api/bot/generate', async (c) => {
     tema,
     red = 'facebook',
     modelo = 'flash',
+    densidad = 'profundo_breve',
+    modoLibrePrompt = '',
     imagen = 'wikimedia',
     destino = 'social',
     photoUrl = '',
-    bot = 'social',
+    bot = 'omni',
     formato = 'tgp',
   } = body;
 
@@ -752,12 +846,25 @@ telegramRouter.post('/api/bot/generate', async (c) => {
       body: JSON.stringify({ chat_id: chatId, text: `⏳ Generando para ${targetLabel} con ${modLabel}...` }),
     });
 
+    let directivaDensidad = '';
+    if (densidad === 'breve') {
+      directivaDensidad = 'Extensión: Breve y ágil (~800-1000 tokens máximo). Directo al grano.';
+    } else if (densidad === 'premium') {
+      directivaDensidad = 'Extensión: Tratado de archivo exhaustivo (+4500 tokens). Desarrolla de 4 a 5 secciones temáticas extensas con subtítulos (##), citas históricas textuales originales en bloques (> "...") y al final una sección "## Fuentes Eruditas & Referencias Históricas".';
+    } else {
+      directivaDensidad = 'Extensión: Ensayo conceptual profundo pero condensado (~1500 tokens). Estructura TGP completa en formato ágil.';
+    }
+
+    const modoLibre = modoLibrePrompt?.trim()
+      ? `\n\nDIRECTIVA PERSONALIZADA DEL AUTOR (MODO LIBRE):\n${modoLibrePrompt.trim()}`
+      : '';
+
     let textoGenerado = '';
     if (isHemeroteca) {
-      const userPrompt = `Escribe un ensayo reflexivo, denso y profundo para Hemeroteca TGP sobre: "${tema.trim()}". Estilo ensayo argentino contemporáneo. Aplica la estructura TGP: gancho visual, contexto histórico-filosófico, concepto técnico clave y cierre humano universal.`;
+      const userPrompt = `Escribe un ensayo reflexivo, denso y profundo para Hemeroteca TGP sobre: "${tema.trim()}". Estilo ensayo argentino contemporáneo. ${directivaDensidad}${modoLibre}`;
       textoGenerado = await callGemini(`miniapp-${chatId}`, userPrompt, 'gemini-2.5-pro', TGP_SYSTEM_PROMPT);
     } else {
-      const userPrompt = `Genera un texto magnético y reflexivo para redes sociales (${red}) sobre: ${tema.trim()}. Estilo directo, sobrio y atrapante. Máximo 2 párrafos cortos y 3 hashtags.`;
+      const userPrompt = `Genera un texto magnético y reflexivo para redes sociales (${red}) sobre: ${tema.trim()}. ${directivaDensidad}${modoLibre}`;
       const SOCIAL_PROMPT = 'Eres un redactor cultural y turístico experto. Crea descripciones grounded basadas en hechos. Tono: Informativo, directo y claro.';
       textoGenerado = await callGemini(`miniapp-${chatId}`, userPrompt, modelName, SOCIAL_PROMPT);
     }
@@ -785,7 +892,7 @@ telegramRouter.post('/api/bot/generate', async (c) => {
       destino,
       tema: tema.trim(),
       textoGenerado,
-      metadatos: { bot, red, modelo, imagen, formato, isMiniAppHeader },
+      metadatos: { bot, red, modelo, densidad, imagen, formato, isMiniAppHeader },
       imagenR2Url: imagenUrl,
       chatId,
     });
