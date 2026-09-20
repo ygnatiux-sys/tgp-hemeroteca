@@ -63,13 +63,15 @@ export function pushToHistory(sessionId: string, role: 'user' | 'model', text: s
 export async function callGemini(
   sessionId: string,
   userMessage: string,
-  model: 'gemini-3.8-flash' | 'gemini-2.5-pro' = 'gemini-3.8-flash',
-  overrideSystemPrompt?: string
+  model: 'gemini-3.8-flash' | 'gemini-3.1-pro-preview' | 'gemini-2.5-pro' = 'gemini-3.8-flash',
+  overrideSystemPrompt?: string,
+  maxOutputTokens: number = 8192
 ): Promise<string> {
+  const modelToUse = (model === 'gemini-2.5-pro' ? 'gemini-3.1-pro-preview' : model) as any;
   const history = getHistory(sessionId);
   const chat = genai.chats.create({
-    model,
-    config: { systemInstruction: overrideSystemPrompt || TGP_SYSTEM_PROMPT, temperature: 0.82, maxOutputTokens: 2048 },
+    model: modelToUse,
+    config: { systemInstruction: overrideSystemPrompt || TGP_SYSTEM_PROMPT, temperature: 0.82, maxOutputTokens },
     history: history.length > 0 ? history : undefined,
   });
   pushToHistory(sessionId, 'user', userMessage);
@@ -84,8 +86,9 @@ export const googleAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 export function crearModeloEnsayo(
   cantidadImg: number,
-  modelName: 'gemini-3.8-flash' | 'gemini-2.5-pro' = 'gemini-3.8-flash'
+  modelName: string = 'gemini-3.8-flash'
 ) {
+  const modelToUse = modelName === 'gemini-2.5-pro' ? 'gemini-3.1-pro-preview' : modelName;
   const esquema: ResponseSchema = {
     description: `Ensayo cinemático compuesto por exactamente ${cantidadImg} secciones.`,
     type: SchemaType.OBJECT,

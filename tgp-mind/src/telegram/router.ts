@@ -190,7 +190,7 @@ telegramRouter.post('/webhook/telegram', async (c) => {
     // Ejecución de publicación directa (Bypass o Tool Call)
     const params = decision.params;
     const modeloLabel = params.modelo === 'pro' ? 'Pro' : 'Flash';
-    const modelName = params.modelo === 'pro' ? 'gemini-2.5-pro' : 'gemini-3.8-flash';
+    const modelName = params.modelo === 'pro' ? 'gemini-3.1-pro-preview' : 'gemini-3.8-flash';
     const cantSecciones = params.cantidadSecciones || 3;
 
     await sendTelegram(chatId, `⚡ Agente TGP: Redactando ensayo sobre "${params.tema}" (${modeloLabel}, ${cantSecciones} secciones)...`);
@@ -364,7 +364,7 @@ telegramRouter.post('/webhook/telegram-social', async (c) => {
     const params = decision.params;
     const red = params.red || 'facebook';
     const modelo = params.modelo || 'flash';
-    const modelName = modelo === 'pro' ? 'gemini-2.5-pro' : 'gemini-3.8-flash';
+    const modelName = modelo === 'pro' ? 'gemini-3.1-pro-preview' : 'gemini-3.8-flash';
 
     await sendTelegramSocial(chatId, `⏳ Redactando y publicando en ${red === 'facebook' ? 'Facebook 🔵' : 'TikTok ⚫'}...`);
 
@@ -502,23 +502,27 @@ async function ejecutarDecisionOmni(chatId: number, decision: any) {
     const destino = params.destino || 'social';
     const red = params.red || 'facebook';
     const modelo = params.modelo || 'flash';
-    const modelName = modelo === 'pro' ? 'gemini-2.5-pro' : 'gemini-3.8-flash';
+    const modelName = modelo === 'pro' ? 'gemini-3.1-pro-preview' : 'gemini-3.8-flash';
     const densidad = params.densidad || (destino === 'social' ? 'breve' : 'profundo_breve');
     const modoLibre = params.modoLibrePrompt ? `\n\nDIRECTIVA PERSONALIZADA DEL AUTOR (MODO LIBRE):\n${params.modoLibrePrompt}` : '';
 
     let directivaDensidad = '';
+    let maxTokens = 2200;
     if (densidad === 'breve') {
       directivaDensidad = 'Extensión: Breve y ágil (máximo 800-1000 tokens). Directo al núcleo conceptual.';
+      maxTokens = 1200;
     } else if (densidad === 'premium') {
       directivaDensidad = 'Extensión: Tratado de archivo exhaustivo (+4500 tokens). Desarrolla obligatoriamente entre 4 y 5 secciones temáticas extensas con subtítulos (##), citas históricas textuales originales en bloques (> "...") y al final una sección "## Fuentes Eruditas & Referencias Históricas".';
+      maxTokens = 8192;
     } else {
       directivaDensidad = 'Extensión: Ensayo conceptual profundo pero condensado (~1500 tokens). Estructura TGP completa en formato ágil.';
+      maxTokens = 2200;
     }
 
     if (destino === 'hemeroteca' || destino === 'alternative') {
       // ── 1. Generar Ensayo TGP ──────────────────────────────────────────
       const promptEnsayo = `Escribe un ensayo reflexivo, denso y profundo para Hemeroteca TGP sobre: "${tema}". Estilo ensayo argentino contemporáneo. ${directivaDensidad}${modoLibre}`;
-      const ensayoTexto = await callGemini(`omni-ensayo-${chatId}`, promptEnsayo, 'gemini-2.5-pro', TGP_SYSTEM_PROMPT);
+      const ensayoTexto = await callGemini(`omni-ensayo-${chatId}`, promptEnsayo, 'gemini-3.1-pro-preview', TGP_SYSTEM_PROMPT, maxTokens);
 
       let imagenUrl = params.photoUrl || '';
       if (!imagenUrl) {
@@ -833,7 +837,7 @@ telegramRouter.post('/api/bot/generate', async (c) => {
   }
 
   try {
-    const modelName = modelo === 'pro' ? 'gemini-2.5-pro' : 'gemini-3.8-flash';
+    const modelName = modelo === 'pro' ? 'gemini-3.1-pro-preview' : 'gemini-3.8-flash';
     const modLabel = modelo === 'pro' ? 'Gemini Pro' : 'Gemini Flash';
     const redLabel = red === 'facebook' ? 'Facebook' : 'TikTok';
 
@@ -847,12 +851,16 @@ telegramRouter.post('/api/bot/generate', async (c) => {
     });
 
     let directivaDensidad = '';
+    let maxTokens = 2200;
     if (densidad === 'breve') {
       directivaDensidad = 'Extensión: Breve y ágil (~800-1000 tokens máximo). Directo al grano.';
+      maxTokens = 1200;
     } else if (densidad === 'premium') {
       directivaDensidad = 'Extensión: Tratado de archivo exhaustivo (+4500 tokens). Desarrolla de 4 a 5 secciones temáticas extensas con subtítulos (##), citas históricas textuales originales en bloques (> "...") y al final una sección "## Fuentes Eruditas & Referencias Históricas".';
+      maxTokens = 8192;
     } else {
       directivaDensidad = 'Extensión: Ensayo conceptual profundo pero condensado (~1500 tokens). Estructura TGP completa en formato ágil.';
+      maxTokens = 2200;
     }
 
     const modoLibre = modoLibrePrompt?.trim()
@@ -862,11 +870,11 @@ telegramRouter.post('/api/bot/generate', async (c) => {
     let textoGenerado = '';
     if (isHemeroteca) {
       const userPrompt = `Escribe un ensayo reflexivo, denso y profundo para Hemeroteca TGP sobre: "${tema.trim()}". Estilo ensayo argentino contemporáneo. ${directivaDensidad}${modoLibre}`;
-      textoGenerado = await callGemini(`miniapp-${chatId}`, userPrompt, 'gemini-2.5-pro', TGP_SYSTEM_PROMPT);
+      textoGenerado = await callGemini(`miniapp-${chatId}`, userPrompt, 'gemini-3.1-pro-preview', TGP_SYSTEM_PROMPT, maxTokens);
     } else {
       const userPrompt = `Genera un texto magnético y reflexivo para redes sociales (${red}) sobre: ${tema.trim()}. ${directivaDensidad}${modoLibre}`;
       const SOCIAL_PROMPT = 'Eres un redactor cultural y turístico experto. Crea descripciones grounded basadas en hechos. Tono: Informativo, directo y claro.';
-      textoGenerado = await callGemini(`miniapp-${chatId}`, userPrompt, modelName, SOCIAL_PROMPT);
+      textoGenerado = await callGemini(`miniapp-${chatId}`, userPrompt, modelName, SOCIAL_PROMPT, maxTokens);
     }
 
     let imagenUrl = photoUrl || '';
