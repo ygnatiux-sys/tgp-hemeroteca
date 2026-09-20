@@ -588,41 +588,108 @@ async function ejecutarDecisionOmni(chatId: number, decision: any) {
     }
 
     if (destino === 'hemeroteca' || destino === 'alternative') {
-      // ── 1. Generar Ensayo TGP ──────────────────────────────────────────
-      const promptEnsayo = `Escribe un ensayo reflexivo, denso y profundo para Hemeroteca TGP sobre: "${tema}". Estilo ensayo argentino contemporáneo. ${directivaDensidad}${modoLibre}`;
-      const ensayoTexto = await callGemini(`omni-ensayo-${chatId}`, promptEnsayo, 'gemini-3.1-pro-preview', TGP_SYSTEM_PROMPT, maxTokens);
-
-      let imagenUrl = params.photoUrl || '';
-      if (!imagenUrl) {
-        try {
-          const entidad = await resolverEntidadCanonica(tema);
-          imagenUrl = (await buscarPageImageWikipedia(entidad.wikiEn, 'en')) || (await buscarPageImageWikipedia(entidad.wikiEs, 'es')) || '';
-        } catch {}
-      }
-
-      if (imagenUrl) {
-        try {
-          imagenUrl = await estandarizarYSubirImagenAR2(imagenUrl, 'omni-hemeroteca');
-        } catch {}
-      }
-
-      await registrarResguardoD1({
-        origen: 'telegram-omni',
-        destino,
-        tema,
-        textoGenerado: ensayoTexto,
-        metadatos: { destino, formato: 'tgp', modelo: 'pro', densidad },
-        imagenR2Url: imagenUrl,
-        chatId,
-      });
-
-      const preview = ensayoTexto.slice(0, 900);
+      const cantSecciones = params.cantidadSecciones || (densidad === 'premium' ? 7 : (densidad === 'breve' ? 2 : 4));
+      
       await fetch(`${cfg.telegramApi}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: chatId,
-          text: `📚 *Ensayo TGP Generado (${destino.toUpperCase()})*\n\n*Tema:* ${tema}\n*Densidad:* ${densidad.toUpperCase()}\n\n${preview}...\n\n_✅ Registrado en Bóveda D1 y listo en Hemeroteca._`,
+          text: `⚡ *Omni Bot:* Redactando ensayo sobre "${tema}" (${modelo.toUpperCase()}, ${cantSecciones} secciones)...`,
+          parse_mode: 'Markdown',
+        }),
+      });
+
+      const modeloEnsayo = crearModeloEnsayo(cantSecciones, modelName);
+      const promptGitops = `Desarrolla un ensayo cinemático sobre: "${tema}". Genera exactamente ${cantSecciones} secciones con rigor histórico, filosófico y narrativo.${params.modoLibrePrompt ? ` Directiva ad-hoc: ${params.modoLibrePrompt}` : ''}`;
+      const result = await modeloEnsayo.generateContent(promptGitops);
+      const parsed = JSON.parse(result.response.text());
+
+      if (params.photoUrl && Array.isArray(parsed.secciones) && parsed.secciones.length > 0) {
+        parsed.secciones[0].imagen_url = params.photoUrl;
+      } else if (Array.isArray(parsed.secciones)) {
+        for (const seccion of parsed.secciones) {
+          if (seccion.busqueda_wikimedia) {
+            const r2Url = await procesarImagen(seccion.busqueda_wikimedia);
+            if (r2Url) seccion.imagen_url = r2Url;
+          }
+        }
+      }
+
+      const { slug, contenidoMdoc } = generarMarkdoc(parsed);
+      const token = destino === 'hemeroteca' ? cfg.githubTokenHemeroteca : cfg.githubTokenAlternative;
+      const repoFull = destino === 'hemeroteca' ? cfg.githubRepoHemeroteca : cfg.githubRepoAlternative;
+
+      let githubUrl = '';
+      if (destino === 'hemeroteca') {
+        let coverUrl = params.photoUrl || parsed.secciones?.[0]?.imagen_url || '';
+        if (coverUrl) {
+          try { coverUrl = await estandarizarYSubirImagenAR2(coverUrl, 'portadas'); } catch {}
+        }
+        const primerParrafo = parsed.secciones?.[0]?.parrafo || '';
+
+        const indexJson = {
+          title: parsed.titulo,
+          generadorTexto: JSON.stringify({ text: contenidoMdoc, image: coverUrl }),
+          atmosfera: { discriminant: 'obsidiana' },
+          gallery: [],
+          dek: primerParrafo ? primerParrafo.slice(0, 110) + '...' : '',
+          coverImage: coverUrl,
+          date: new Date().toISOString().slice(0, 10),
+          excerpt: primerParrafo ? primerParrafo.slice(0, 180) + '...' : '',
+        };
+
+        let bodyMdoc = '';
+        if (Array.isArray(parsed.secciones)) {
+          parsed.secciones.forEach((sec: any, idx: number) => {
+            if (sec.imagen_url) bodyMdoc += `![${parsed.titulo} -- Sección ${idx + 1}](${sec.imagen_url})\n\n`;
+            if (sec.parrafo) bodyMdoc += `${sec.parrafo.trim()}\n\n`;
+          });
+        }
+
+        githubUrl = await publicarEntradaKeystaticGitHub({
+          coleccion: 'ensayos-cinematicos',
+          slug,
+          indexJson,
+          contentMdoc: bodyMdoc.trim() + '\n',
+          token,
+          repoFull,
+          mensajeCommit: `TGP Mind [Omni Bot]: Ensayo cinemático Keystatic -- ${parsed.titulo}`,
+        });
+
+        await registrarResguardoD1({
+          origen: 'telegram-omni',
+          destino: 'hemeroteca',
+          tema,
+          textoGenerado: bodyMdoc.trim() || contenidoMdoc,
+          metadatos: { titulo: parsed.titulo, slug, modelo, githubUrl },
+          imagenR2Url: coverUrl,
+          chatId,
+        });
+      } else {
+        githubUrl = await publicarEnGitHub(slug, contenidoMdoc, token, repoFull);
+
+        await registrarResguardoD1({
+          origen: 'telegram-omni',
+          destino,
+          tema,
+          textoGenerado: contenidoMdoc,
+          metadatos: { titulo: parsed.titulo, slug, modelo, githubUrl },
+          imagenR2Url: params.photoUrl || '',
+          chatId,
+        });
+      }
+
+      const webUrl = destino === 'hemeroteca'
+        ? `https://thegreatpuzzleproject.com/ensayos-cinematicos/${slug}`
+        : `https://alternative.thegreatpuzzleproject.com/ensayos/${slug}`;
+
+      await fetch(`${cfg.telegramApi}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: `📚 *"${parsed.titulo}" publicado con éxito.*\n\n*Destino:* ${destino.toUpperCase()}\n*Densidad:* ${densidad.toUpperCase()}\n\n🔗 *Ver en la Web:*\n${webUrl}\n\n📦 *Commit en GitHub:*\n${githubUrl}`,
           parse_mode: 'Markdown',
         }),
       });
