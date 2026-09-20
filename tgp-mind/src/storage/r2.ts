@@ -133,16 +133,18 @@ export async function subirImagenAR2(imageUrl: string): Promise<string> {
   return await estandarizarYSubirImagenAR2(imageUrl, 'wikimedia');
 }
 
-export async function procesarFotoTelegramAR2(fileId: string, customSlug = 'telegram'): Promise<{ url: string; mimeType: string; fileName: string }> {
+export async function procesarFotoTelegramAR2(fileId: string, customSlug = 'telegram', botToken?: string): Promise<{ url: string; mimeType: string; fileName: string }> {
+  const token = botToken || _TELEGRAM_TOKEN;
+  const api = `https://api.telegram.org/bot${token}`;
   // 1. Obtener file_path de Telegram
-  const fileInfoRes = await fetch(`${_TELEGRAM_API}/getFile?file_id=${fileId}`);
+  const fileInfoRes = await fetch(`${api}/getFile?file_id=${fileId}`);
   if (!fileInfoRes.ok) throw new Error(`Error en getFile de Telegram: ${fileInfoRes.statusText}`);
   const fileInfo = await fileInfoRes.json() as any;
   const filePath = fileInfo?.result?.file_path;
   if (!filePath) throw new Error('Telegram no devolvió file_path');
 
   // 2. Descargar binario
-  const fileDownloadUrl = `https://api.telegram.org/file/bot${_TELEGRAM_TOKEN}/${filePath}`;
+  const fileDownloadUrl = `https://api.telegram.org/file/bot${token}/${filePath}`;
   const imgRes = await fetch(fileDownloadUrl);
   if (!imgRes.ok) throw new Error(`Error descargando imagen de Telegram: ${imgRes.statusText}`);
   const buffer = Buffer.from(await imgRes.arrayBuffer());

@@ -132,7 +132,24 @@ export function getBotApi(botId?: string): { api: string; token: string } {
 // ── Router Hono ──────────────────────────────────────────────────────────────
 export const telegramRouter = new Hono();
 
-// ── RUTA 1: /webhook/telegram (Hemeroteca / Principal) ────────────────────────
+// ── RUTA 1: /webhook/telegram (Hemeroteca / Xavier-Assistant @tgp_cloud_bot) ──
+async function sendTelegramAssistant(chatId: number, text: string, replyMarkup?: any): Promise<void> {
+  const api = cfg.telegramAssistantApi || cfg.telegramApi;
+  try {
+    const MAX_CHUNK = 4000;
+    if (text.length > MAX_CHUNK) {
+      for (let i = 0; i < text.length; i += MAX_CHUNK) await sendTelegramAssistant(chatId, text.slice(i, i + MAX_CHUNK), replyMarkup);
+      return;
+    }
+    const res = await fetch(`${api}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text, ...(replyMarkup ? { reply_markup: replyMarkup } : {}) }),
+    });
+    if (!res.ok) console.warn(`[Telegram Assistant] sendMessage error: ${await res.text()}`);
+  } catch (err) { console.error('[Telegram Assistant] fatal:', err); }
+}
+
 telegramRouter.post('/webhook/telegram', async (c) => {
   let body: any;
   try { body = await c.req.json(); } catch { return c.json({ ok: true }); }
@@ -145,12 +162,12 @@ telegramRouter.post('/webhook/telegram', async (c) => {
     if (!chatId || (!text && !hasPhoto)) return c.json({ ok: true });
 
     if (cfg.xavierChatId && chatId !== cfg.xavierChatId) {
-      await sendTelegram(chatId, 'Acceso denegado. Nodo privado TGP.');
+      await sendTelegramAssistant(chatId, 'Acceso denegado. Nodo privado TGP.');
       return c.json({ ok: true });
     }
 
     if (text.trim() === '/start') {
-      await sendTelegram(chatId, 'TGP Mind en línea.\n\nEscribime cualquier tema o envíame una foto con pie de foto para publicarla en Keystatic/Hemeroteca.');
+      await sendTelegramAssistant(chatId, 'TGP Mind en línea (Xavier-Assistant).\n\nEscribime cualquier tema o envíame una foto con pie de foto para publicarla en Keystatic/Hemeroteca.');
       return c.json({ ok: true });
     }
 
@@ -159,12 +176,12 @@ telegramRouter.post('/webhook/telegram', async (c) => {
       const bestPhoto = message.photo[message.photo.length - 1];
       const baseSlug = generarSlug(text ? text.slice(0, 30) : 'foto-telegram');
       try {
-        await sendTelegram(chatId, '📷 Descargando imagen y subiendo a Cloudflare R2...');
-        const r2Res = await procesarFotoTelegramAR2(bestPhoto.file_id, baseSlug);
+        await sendTelegramAssistant(chatId, '📷 Descargando imagen y subiendo a Cloudflare R2...');
+        const r2Res = await procesarFotoTelegramAR2(bestPhoto.file_id, baseSlug, cfg.telegramTgpCloudToken);
         imagenR2Url = r2Res.url;
-        await sendTelegram(chatId, `✅ Imagen alojada en Cloudflare R2:\n${imagenR2Url}`);
+        await sendTelegramAssistant(chatId, `✅ Imagen alojada en Cloudflare R2:\n${imagenR2Url}`);
       } catch (errUpload: any) {
-        await sendTelegram(chatId, `⚠️ Error subiendo imagen: ${errUpload?.message || 'Error'}`);
+        await sendTelegramAssistant(chatId, `⚠️ Error subiendo imagen: ${errUpload?.message || 'Error'}`);
       }
     }
 
@@ -178,12 +195,12 @@ telegramRouter.post('/webhook/telegram', async (c) => {
     });
 
     if (decision.type === 'micro_prompt') {
-      await sendTelegram(chatId, decision.text);
+      await sendTelegramAssistant(chatId, decision.text);
       return c.json({ ok: true });
     }
 
     if (decision.type === 'direct_answer') {
-      await sendTelegram(chatId, decision.text);
+      await sendTelegramAssistant(chatId, decision.text);
       return c.json({ ok: true });
     }
 
@@ -193,7 +210,7 @@ telegramRouter.post('/webhook/telegram', async (c) => {
     const modelName = params.modelo === 'pro' ? 'gemini-3.1-pro-preview' : 'gemini-3.8-flash';
     const cantSecciones = params.cantidadSecciones || 3;
 
-    await sendTelegram(chatId, `⚡ Agente TGP: Redactando ensayo sobre "${params.tema}" (${modeloLabel}, ${cantSecciones} secciones)...`);
+    await sendTelegramAssistant(chatId, `⚡ Agente TGP: Redactando ensayo sobre "${params.tema}" (${modeloLabel}, ${cantSecciones} secciones)...`);
 
     try {
       const modeloEnsayo = crearModeloEnsayo(cantSecciones, modelName);
@@ -201,7 +218,7 @@ telegramRouter.post('/webhook/telegram', async (c) => {
       const result = await modeloEnsayo.generateContent(promptGitops);
       const parsed = JSON.parse(result.response.text());
 
-      await sendTelegram(chatId, `Ensayo: "${parsed.titulo}". Procesando imágenes...`);
+      await sendTelegramAssistant(chatId, `Ensayo: "${parsed.titulo}". Procesando imágenes...`);
 
       if (params.fuenteImg === 'telegram' && params.photoUrl && Array.isArray(parsed.secciones)) {
         if (parsed.secciones.length > 0) parsed.secciones[0].imagen_url = params.photoUrl;
@@ -214,7 +231,7 @@ telegramRouter.post('/webhook/telegram', async (c) => {
         }
       }
 
-      await sendTelegram(chatId, 'Compilando estructura Keystatic y publicando en GitHub...');
+      await sendTelegramAssistant(chatId, 'Compilando estructura Keystatic y publicando en GitHub...');
       const { slug, contenidoMdoc } = generarMarkdoc(parsed);
       const token = params.destino === 'hemeroteca' ? cfg.githubTokenHemeroteca : cfg.githubTokenAlternative;
       const repoFull = params.destino === 'hemeroteca' ? cfg.githubRepoHemeroteca : cfg.githubRepoAlternative;
@@ -284,10 +301,10 @@ telegramRouter.post('/webhook/telegram', async (c) => {
         ? `https://thegreatpuzzleproject.com/ensayos-cinematicos/${slug}`
         : `https://alternative.thegreatpuzzleproject.com/ensayos/${slug}`;
 
-      await sendTelegram(chatId, `"${parsed.titulo}" publicado en ${params.destino}.\n\n🔗 Ver en la Web:\n${webUrl}\n\n📦 Commit en GitHub:\n${githubUrl}`);
+      await sendTelegramAssistant(chatId, `"${parsed.titulo}" publicado en ${params.destino}.\n\n🔗 Ver en la Web:\n${webUrl}\n\n📦 Commit en GitHub:\n${githubUrl}`);
     } catch (err: any) {
       console.error('[Telegram Agéntico Error]:', err);
-      await sendTelegram(chatId, `⚠️ Error en TGP Mind: ${err?.message || 'Fallo desconocido'}`);
+      await sendTelegramAssistant(chatId, `⚠️ Error en TGP Mind: ${err?.message || 'Fallo desconocido'}`);
     }
 
     return c.json({ ok: true });
