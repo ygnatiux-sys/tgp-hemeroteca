@@ -38,7 +38,7 @@
   const EXHAUSTIVE_ENDPOINT = `${TGP_MIND_URL}/api/vision-exhaustivo`;
   const PREMIUM_ENDPOINT = `${TGP_MIND_URL}/api/redaccion-premium`;
   const BOT_GENERATE_ENDPOINT = `${TGP_MIND_URL}/api/bot/generate`;
-  const GOOGLE_PICKER_KEY = import.meta.env.PUBLIC_GOOGLE_API_KEY;
+  const GOOGLE_PICKER_KEY = import.meta.env.PUBLIC_GOOGLE_PICKER_API_KEY;
   const GOOGLE_CLIENT_ID = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_CLIENT_ID : null) || '713934653057-f6er90sfdhmc6a8cjb3is51t2sjhgecv.apps.googleusercontent.com';
 
   // ── Prop de Integración ───────────────────────────────────────────────────
