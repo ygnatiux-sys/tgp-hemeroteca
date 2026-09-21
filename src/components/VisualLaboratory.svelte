@@ -19,9 +19,7 @@
   import { openGooglePicker } from '../lib/google-picker';
   import WikimediaGalleryInbox from './WikimediaGalleryInbox.svelte';
 
-  const GOOGLE_PICKER_KEY = import.meta.env.PUBLIC_GOOGLE_PICKER_API_KEY;
-
-  const GOOGLE_CLIENT_ID = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID;
+  // Credenciales Google manejadas por el backend (Cloud Run) — sin exposicion en frontend
 
   // ── Estado reactivo ───────────────────────────────────────────────────────
   let imagenBase:       File | null  = null;
@@ -53,8 +51,6 @@
     pickerLoading = true;
     errorMsg = null;
     openGooglePicker({
-      apiKey: GOOGLE_PICKER_KEY,
-      clientId: GOOGLE_CLIENT_ID,
       onSelect: (file: File) => {
         pickerLoading = false;
         imagenBase = file;
@@ -64,8 +60,8 @@
       },
       onError: (err) => {
         pickerLoading = false;
-        if (err.message !== 'PICKER_RENDERED' && err.message !== 'PICKER_CLOSED') {
-          errorMsg = `Google Picker: ${err.message}`;
+        if (err.message !== 'PICKER_RENDERED' && err.message !== 'PICKER_CLOSED' && err.message !== 'PICKER_TIMEOUT') {
+          errorMsg = `Google Photos: ${err.message}`;
         }
       },
     });

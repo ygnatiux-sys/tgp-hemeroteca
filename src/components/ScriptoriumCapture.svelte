@@ -38,8 +38,7 @@
   const EXHAUSTIVE_ENDPOINT = `${TGP_MIND_URL}/api/vision-exhaustivo`;
   const PREMIUM_ENDPOINT = `${TGP_MIND_URL}/api/redaccion-premium`;
   const BOT_GENERATE_ENDPOINT = `${TGP_MIND_URL}/api/bot/generate`;
-  const GOOGLE_PICKER_KEY = import.meta.env.PUBLIC_GOOGLE_PICKER_API_KEY;
-  const GOOGLE_CLIENT_ID = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_CLIENT_ID : null) || '713934653057-f6er90sfdhmc6a8cjb3is51t2sjhgecv.apps.googleusercontent.com';
+  // Credenciales Google manejadas por el backend (Cloud Run) — sin exposicion en frontend
 
   // ── Prop de Integración ───────────────────────────────────────────────────
   export let embedded = false;
@@ -151,16 +150,14 @@
     pickerLoading = true;
     error = null;
     openGooglePicker({
-      apiKey: GOOGLE_PICKER_KEY,
-      clientId: GOOGLE_CLIENT_ID,
       onSelect: (file: File) => {
         pickerLoading = false;
         loadFile(file, 'google');
       },
       onError: (err) => {
         pickerLoading = false;
-        if (err.message !== 'PICKER_RENDERED' && err.message !== 'PICKER_CLOSED') {
-          error = `Google Picker: ${err.message}`;
+        if (err.message !== 'PICKER_RENDERED' && err.message !== 'PICKER_CLOSED' && err.message !== 'PICKER_TIMEOUT') {
+          error = `Google Photos: ${err.message}`;
         }
       },
     });

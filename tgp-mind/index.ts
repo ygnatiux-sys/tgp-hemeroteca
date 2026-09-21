@@ -1,4 +1,4 @@
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+﻿// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 // TGP MIND Ã¢â‚¬â€ Orquestador IA con Hono + Gemini + Inline Keyboard Wizard
 // Autor: TGP / Xavier BenÃƒÂ­tez
 // Deploy: Google Cloud Run
@@ -543,54 +543,193 @@ app.post('/api/telegram/upload-media', async (c) => {
   }
 });
 
-// Ã¢â€â‚¬Ã¢â€â‚¬ Google Photos Picker: /api/my-photos Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
-// Headless: usa GOOGLE_REFRESH_TOKEN en .env (OAuth flow una sola vez).
-// Devuelve fotos recientes sin CORS issues para la Mini App Svelte.
-app.get('/api/my-photos', async (c) => {
+// ── Google Photos Picker API v1 ──────────────────────────────────────────────
+// Flujo session-based (nueva API obligatoria desde 31/03/2025).
+// Scope: https://www.googleapis.com/auth/photospicker.mediaitems.readonly
+// El backend maneja auth headless, descarga binaria y conversion a Base64.
+// El frontend NO descarga nada - recibe data:image/... listo para ingestar.
+
+/** Obtiene un access_token fresco desde el refresh_token del entorno */
+async function getGoogleAccessToken(): Promise<string> {
+  const GOOGLE_CLIENT_ID     = process.env.GOOGLE_CLIENT_ID     || '';
+  const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
+  const GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN || '';
+
+  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REFRESH_TOKEN) {
+    throw new Error('Faltan credenciales Google OAuth (GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET / GOOGLE_REFRESH_TOKEN)');
+  }
+
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id:     GOOGLE_CLIENT_ID,
+      client_secret: GOOGLE_CLIENT_SECRET,
+      refresh_token: GOOGLE_REFRESH_TOKEN,
+      grant_type:    'refresh_token',
+    }).toString(),
+  });
+
+  const data = await res.json() as any;
+  if (!data.access_token) {
+    throw new Error(`Error al refrescar token Google: ${data.error || JSON.stringify(data)}`);
+  }
+  return data.access_token;
+}
+
+// 1. POST /api/picker/session — Crea sesion Picker y devuelve { sessionId, pickerUri }
+app.post('/api/picker/session', async (c) => {
   try {
-    // 1. Prioridad: Imágenes reales alojadas en R2 (repositorio oficial TGP)
-    const r2Photos = await listarImagenesRecientesR2(30);
-    if (r2Photos && r2Photos.length > 0) {
-      return c.json({ photos: r2Photos, source: 'r2' });
+    const accessToken = await getGoogleAccessToken();
+
+    const res = await fetch('https://photospicker.googleapis.com/v1/sessions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({}),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      console.error('[Picker Session Error]:', res.status, errBody);
+      return c.json({ error: `Error al crear sesion Picker: ${res.status}` }, 500);
     }
 
-    // 2. Fallback opcional: Google Photos si existe token
-    const GOOGLE_CLIENT_ID     = process.env.GOOGLE_CLIENT_ID     || process.env.PUBLIC_GOOGLE_CLIENT_ID || '';
-    const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
-    const GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN || '';
+    const session = await res.json() as any;
+    const sessionId: string = session.id || '';
+    const rawUri: string   = session.pickerUri || '';
+    // autoclose=true cierra la pestana automaticamente tras la seleccion del usuario
+    const pickerUri = rawUri
+      ? `${rawUri}${rawUri.includes('?') ? '&' : '?'}autoclose=true`
+      : null;
 
-    if (GOOGLE_REFRESH_TOKEN && GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
-      const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          client_id:     GOOGLE_CLIENT_ID,
-          client_secret: GOOGLE_CLIENT_SECRET,
-          refresh_token: GOOGLE_REFRESH_TOKEN,
-          grant_type:    'refresh_token',
-        }).toString(),
-      });
-      const { access_token } = await tokenRes.json() as any;
-      if (access_token) {
-        const photosRes = await fetch('https://photoslibrary.googleapis.com/v1/mediaItems?pageSize=30', {
-          headers: { Authorization: `Bearer ${access_token}` },
-        });
-        const data = await photosRes.json() as any;
-        const photos = (data.mediaItems || []).map((item: any) => ({
-          id:       item.id,
-          url:      `${item.baseUrl}=w600-h600-c`,
-          filename: item.filename,
-        }));
-        if (photos.length > 0) return c.json({ photos, source: 'google' });
-      }
+    if (!sessionId || !pickerUri) {
+      return c.json({ error: 'Respuesta inesperada de la API de Google Picker' }, 500);
     }
 
-    return c.json({ photos: [] });
+    console.log('[Picker] Sesion creada: ' + sessionId);
+    return c.json({ sessionId, pickerUri });
   } catch (err: any) {
-    console.error('[Photos API Error]:', err);
-    return c.json({ error: err?.message || 'Error al obtener fotos.', photos: [] }, 500);
+    console.error('[Picker Session Error]:', err);
+    return c.json({ error: err?.message || 'Error al iniciar sesion de Picker' }, 500);
   }
 });
+
+// 2. GET /api/picker/poll/:sessionId — Consulta si el usuario ya selecciono fotos
+app.get('/api/picker/poll/:sessionId', async (c) => {
+  const sessionId = c.req.param('sessionId');
+  if (!sessionId) return c.json({ error: 'sessionId requerido' }, 400);
+
+  try {
+    const accessToken = await getGoogleAccessToken();
+
+    const res = await fetch(`https://photospicker.googleapis.com/v1/sessions/${sessionId}`, {
+      headers: { 'Authorization': `Bearer ${accessToken}` },
+    });
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      console.error('[Picker Poll Error]:', res.status, errBody);
+      // Sesion expirada o invalida
+      if (res.status === 404 || res.status === 410) {
+        return c.json({ ready: false, expired: true });
+      }
+      return c.json({ error: `Error al consultar sesion: ${res.status}` }, 500);
+    }
+
+    const data = await res.json() as any;
+    return c.json({
+      ready: !!data.mediaItemsSet,
+      pollingInterval: data.pollingConfig?.pollInterval || 3,
+    });
+  } catch (err: any) {
+    console.error('[Picker Poll Error]:', err);
+    return c.json({ error: err?.message || 'Error en polling de sesion' }, 500);
+  }
+});
+
+// 3. GET /api/picker/items/:sessionId — Descarga binario en backend y devuelve Base64
+app.get('/api/picker/items/:sessionId', async (c) => {
+  const sessionId = c.req.param('sessionId');
+  if (!sessionId) return c.json({ error: 'sessionId requerido' }, 400);
+
+  let accessToken = '';
+  try {
+    accessToken = await getGoogleAccessToken();
+
+    const listRes = await fetch(`https://photospicker.googleapis.com/v1/sessions/${sessionId}/mediaItems`, {
+      headers: { 'Authorization': `Bearer ${accessToken}` },
+    });
+
+    if (!listRes.ok) {
+      const errBody = await listRes.text();
+      console.error('[Picker Items Error]:', listRes.status, errBody);
+      return c.json({ error: `Error al obtener items: ${listRes.status}` }, 500);
+    }
+
+    const listData = await listRes.json() as any;
+    const rawItems: any[] = listData.mediaItems || [];
+
+    if (rawItems.length === 0) {
+      return c.json({ items: [], message: 'No hay fotos seleccionadas en esta sesion' });
+    }
+
+    // Descargar binario en el backend — evita CORS en el frontend
+    // Sufijo =d para obtener el archivo original completo sin recorte ni compresion
+    const items = await Promise.all(
+      rawItems.map(async (item: any) => {
+        const baseUrl: string  = item.mediaFile?.baseUrl || item.baseUrl || '';
+        const mimeType: string = item.mediaFile?.mimeType || item.mimeType || 'image/jpeg';
+        const filename: string = item.filename || `google-photo-${Date.now()}.jpg`;
+
+        if (!baseUrl) {
+          console.warn('[Picker Items] Item sin baseUrl:', item.id);
+          return null;
+        }
+
+        try {
+          // =d fuerza la descarga del archivo original (bytes completos sin recorte)
+          const downloadUrl = `${baseUrl}=d`;
+          const imgRes = await fetch(downloadUrl, {
+            headers: { 'Authorization': `Bearer ${accessToken}` },
+          });
+
+          if (!imgRes.ok) {
+            console.warn(`[Picker Items] Error descargando ${filename}: ${imgRes.status}`);
+            return null;
+          }
+
+          const buffer  = await imgRes.arrayBuffer();
+          const base64  = Buffer.from(buffer).toString('base64');
+          const dataUri = `data:${mimeType};base64,${base64}`;
+
+          return { id: item.id, filename, mimeType, base64: dataUri };
+        } catch (dlErr: any) {
+          console.warn(`[Picker Items] Error procesando ${filename}:`, dlErr.message);
+          return null;
+        }
+      })
+    );
+
+    const validItems = items.filter(Boolean);
+    console.log(`[Picker] ${validItems.length}/${rawItems.length} items convertidos a Base64`);
+    return c.json({ items: validItems });
+  } catch (err: any) {
+    console.error('[Picker Items Error]:', err);
+    return c.json({ error: err?.message || 'Error al procesar items del Picker' }, 500);
+  } finally {
+    // Limpiar sesion siempre en finally — evita sesiones zombie que consumen cuota
+    if (sessionId && accessToken) {
+      fetch(`https://photospicker.googleapis.com/v1/sessions/${sessionId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+      }).catch((e: any) => console.warn('[Picker] Error limpiando sesion:', e.message));
+    }
+  }
+});
+
 
 // Ã¢â€â‚¬Ã¢â€â‚¬ Proxy Wikimedia CORS-free: /api/proxy/wikimedia?q=... Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 // La Mini App Svelte llama aqui en lugar de a Wikimedia directamente.
