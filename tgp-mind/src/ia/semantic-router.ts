@@ -4,10 +4,105 @@
 // Persistencia de estado en Cloudflare D1 para Cloud Run Statelessness.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { callGeminiAgent, AgentResult } from './gemini.js';
+import { callGeminiAgent, AgentResult, buildDensityInstruction } from './gemini.js';
 import { getHITLState, setHITLState, clearHITLState, HITLState } from '../storage/d1.js';
 
 export type BotContext = 'omni' | 'social' | 'hemeroteca';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PARSER DE MENSAJE COMPLETO
+// Detecta si el usuario envió todos los parámetros en un único mensaje.
+// Ejemplos que activan inferencia directa (sin diálogo HITL):
+//   "Flash, Hemeroteca, 1500t: El mito de Ícaro"
+//   "Pro + Wiki, premium, hemeroteca: fascinum romano"
+//   "Social TikTok, breve, flash: escarabajo egipcio"
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface ParsedParams {
+  tema: string;
+  destino?: 'hemeroteca' | 'alternative' | 'social';
+  red?: 'facebook' | 'tiktok';
+  modelo?: 'flash' | 'pro';
+  densidad?: 'breve' | 'profundo_breve' | 'premium';
+  fuenteImg?: 'wiki' | 'telegram' | 'none';
+  modoLibrePrompt?: string;
+  groundingMode?: boolean;
+}
+
+/**
+ * Intenta extraer parámetros de un mensaje de texto libre.
+ * Retorna null si el mensaje no contiene suficientes señales paramétricas.
+ * Requiere mínimo: Tema + al menos 2 paramétros adicionales para activar.
+ */
+function parseMessageCompleto(text: string, botContext: BotContext): ParsedParams | null {
+  const lower = text.toLowerCase();
+
+  // Separar el tema del prefijo paramétrico (sep por ':', '->', '—')
+  const separadores = [':', '->', '—', '–', ' sobre '];
+  let temaRaw = '';
+  let prefijo = lower;
+
+  for (const sep of separadores) {
+    const idx = text.indexOf(sep);
+    if (idx > 2 && idx < text.length - 2) {
+      prefijo = text.slice(0, idx).toLowerCase();
+      temaRaw = text.slice(idx + sep.length).trim();
+      break;
+    }
+  }
+
+  // Sin separador claro, no es un mensaje parametrizado
+  if (!temaRaw) return null;
+
+  // Contar tokens encontrados para validar que hay suficiente señal
+  let tokensFound = 0;
+  const params: ParsedParams = { tema: temaRaw };
+
+  // ── Detectar DESTINO ──────────────────────────────────────────────────────
+  if (/hemeroteca/.test(prefijo)) { params.destino = 'hemeroteca'; tokensFound++; }
+  else if (/alternative/.test(prefijo)) { params.destino = 'alternative'; tokensFound++; }
+  else if (/social|tiktok|facebook|rrss|redes/.test(prefijo)) {
+    params.destino = 'social'; tokensFound++;
+    if (/tiktok/.test(prefijo)) params.red = 'tiktok';
+    else if (/facebook|fb/.test(prefijo)) params.red = 'facebook';
+  } else if (botContext === 'hemeroteca') {
+    // En bots especializados, el destino está implícito
+    params.destino = 'hemeroteca';
+  } else if (botContext === 'social') {
+    params.destino = 'social';
+  }
+
+  // ── Detectar DENSIDAD ─────────────────────────────────────────────────────
+  if (/premium|tratado|\+4500|4500t|exhaustivo/.test(prefijo)) {
+    params.densidad = 'premium'; params.groundingMode = true; tokensFound++;
+  } else if (/profundo|1500|1500t|conceptual/.test(prefijo)) {
+    params.densidad = 'profundo_breve'; tokensFound++;
+  } else if (/breve|800|800t|ágil|short/.test(prefijo)) {
+    params.densidad = 'breve'; tokensFound++;
+  }
+
+  // ── Detectar MOTOR ────────────────────────────────────────────────────────
+  if (/flash/.test(prefijo)) {
+    params.modelo = 'flash'; tokensFound++;
+    params.fuenteImg = /sin\s+img|solo\s+texto|none/.test(prefijo) ? 'none' : 'wiki';
+  } else if (/pro/.test(prefijo)) {
+    params.modelo = 'pro'; tokensFound++;
+    params.fuenteImg = /sin\s+img|solo\s+texto|none/.test(prefijo) ? 'none' : 'wiki';
+  }
+
+  // ── Detectar MODO LIBRE (directivas extra tras el tema) ───────────────────
+  const modoLibreMatch = temaRaw.match(/(.+?)(?:\s*[,;]\s*(.+))?$/);
+  if (modoLibreMatch && modoLibreMatch[2]) {
+    params.tema = modoLibreMatch[1].trim();
+    params.modoLibrePrompt = modoLibreMatch[2].trim();
+  }
+
+  // Requiere al menos 2 tokens detectados para considerarse mensaje completo
+  // (evita falsos positivos en mensajes de diálogo que contengan palabras como "profundo")
+  if (tokensFound < 2) return null;
+
+  return params;
+}
 
 export interface RouteInput {
   chatId: number;
@@ -57,12 +152,120 @@ export type RouteDecision =
       text: string;
     };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// PARSER DE SLASH COMMANDS ENRIQUECIDOS
+// Convierte mensajes tipo "/hemeroteca pro 1500t El mito de Ícaro"
+// en params listos para execute_tool, sin ningún paso HITL.
+//
+// Tokens reconocidos (en cualquier orden tras el comando base):
+//   Destino: /hemeroteca | /alternative | /social | /h | /a | /s
+//   Motor:   pro | flash
+//   Densidad: breve | 800t | profundo | 1500t | premium | 4500t | tratado
+//   Red:     facebook | tiktok | fb | tt
+//   Tema:    todo lo que no sea token reconocido
+// ─────────────────────────────────────────────────────────────────────────────
+
+function parseSlashCommand(
+  text: string,
+  botContext: BotContext,
+  photoUrl?: string,
+): ReturnType<typeof parseMessageCompleto> | null {
+  // Extraer el comando base y el resto
+  const [commandToken, ...rest] = text.slice(1).split(/\s+/);
+  const cmd = commandToken.toLowerCase();
+
+  // Determinar destino desde el comando
+  let destino: ParsedParams['destino'];
+  if (cmd === 'hemeroteca' || cmd === 'h' || cmd === 'hem') destino = 'hemeroteca';
+  else if (cmd === 'alternative' || cmd === 'alt' || cmd === 'a') destino = 'alternative';
+  else if (cmd === 'social' || cmd === 's' || cmd === 'redes') destino = 'social';
+  // Si el comando es un motor directamente, el destino viene del botContext
+  else if (cmd === 'pro' || cmd === 'flash') {
+    destino = botContext === 'social' ? 'social' : 'hemeroteca';
+    rest.unshift(cmd); // devolver el motor al pool de tokens
+  }
+  // Comando desconocido → no es un slash command TGP
+  else return null;
+
+  if (rest.length === 0) return null; // Sin tema → no podemos ejecutar
+
+  const params: ParsedParams = { tema: '', destino };
+  const temaTokens: string[] = [];
+
+  for (const token of rest) {
+    const t = token.toLowerCase().replace(/[:,]/g, '');
+
+    // Motor
+    if (t === 'pro') { params.modelo = 'pro'; continue; }
+    if (t === 'flash') { params.modelo = 'flash'; continue; }
+
+    // Densidad
+    if (t === 'breve' || t === '800t') { params.densidad = 'breve'; continue; }
+    if (t === 'profundo' || t === '1500t' || t === 'profundo_breve') { params.densidad = 'profundo_breve'; continue; }
+    if (t === 'premium' || t === '4500t' || t === 'tratado' || t === 'exhaustivo') {
+      params.densidad = 'premium';
+      params.groundingMode = true;
+      continue;
+    }
+
+    // Red social
+    if (t === 'facebook' || t === 'fb') { params.red = 'facebook'; continue; }
+    if (t === 'tiktok' || t === 'tt') { params.red = 'tiktok'; continue; }
+
+    // Fuente de imagen
+    if (t === 'wiki' || t === 'wikimedia') { params.fuenteImg = 'wiki'; continue; }
+    if (t === 'notxt' || t === 'soloimg') { params.fuenteImg = 'wiki'; continue; }
+
+    // Todo lo demás es el tema
+    temaTokens.push(token);
+  }
+
+  if (temaTokens.length === 0) return null; // Sin tema → sin acción
+  params.tema = temaTokens.join(' ').trim();
+
+  // Defaults inteligentes
+  if (!params.modelo) params.modelo = destino === 'social' ? 'flash' : 'pro';
+  if (!params.densidad) params.densidad = 'profundo_breve';
+  if (!params.fuenteImg) params.fuenteImg = photoUrl ? 'telegram' : 'wiki';
+
+  const cantSecciones = params.densidad === 'premium' ? 7 : (params.densidad === 'breve' ? 2 : 4);
+
+  return {
+    tema: params.tema,
+    destino: params.destino,
+    red: params.red,
+    modelo: params.modelo,
+    densidad: params.densidad,
+    fuenteImg: params.fuenteImg,
+    modoLibrePrompt: params.modoLibrePrompt,
+    groundingMode: params.groundingMode,
+    // cantidadSecciones se añade como campo extra (el tipo lo permite vía params)
+    ...(cantSecciones && { cantidadSecciones }),
+  } as any;
+}
+
 /**
+
  * Enruta semánticamente un mensaje entrante de Telegram.
  */
 export async function routeIncomingMessage(input: RouteInput): Promise<RouteDecision> {
   const { chatId, text, hasPhoto, photoUrl, botContext } = input;
   const cleanText = text.trim();
+
+  // ── 0. SLASH COMMANDS ENRIQUECIDOS (Fast Path Zero-Fricción) ─────────────────
+  // Formato: /[destino|motor] [densidad?] [tema]
+  // Ej: /hemeroteca pro 1500t El mito de Ícaro
+  //     /flash breve escarabajo egipcio
+  //     /social tiktok flash: El fascinum romano
+  // Si se detecta un slash command con tema, se ejecuta directamente sin HITL.
+  if (cleanText.startsWith('/') && !cleanText.startsWith('/start') && !cleanText.startsWith('/cancel')) {
+    const slashParsed = parseSlashCommand(cleanText, botContext, photoUrl);
+    if (slashParsed) {
+      console.log(`[SemanticRouter] Slash command fast path:`, slashParsed);
+      await clearHITLState(chatId, botContext);
+      return { type: 'execute_tool', toolName: 'publicar', params: slashParsed };
+    }
+  }
 
   // ── 1. BYPASS: Foto sin texto complejo ─────────────────────────────────────
   if (hasPhoto && (!cleanText || cleanText.length < 5)) {
@@ -228,6 +431,8 @@ export async function routeIncomingMessage(input: RouteInput): Promise<RouteDeci
       if (esConfirmacion) {
         await clearHITLState(chatId, botContext);
         const cantSecciones = pendingState.densidad === 'premium' ? 7 : (pendingState.densidad === 'breve' ? 2 : 4);
+        // groundingMode automático para Tier 3 Premium
+        const groundingMode = pendingState.densidad === 'premium';
 
         return {
           type: 'execute_tool',
@@ -242,6 +447,7 @@ export async function routeIncomingMessage(input: RouteInput): Promise<RouteDeci
             fuenteImg: pendingState.fuenteImg || (photoUrl ? 'telegram' : 'wiki'),
             cantidadSecciones: cantSecciones,
             photoUrl: pendingState.photoUrl || photoUrl,
+            groundingMode,
           },
         };
       }
@@ -257,7 +463,37 @@ export async function routeIncomingMessage(input: RouteInput): Promise<RouteDeci
     }
   }
 
-  // ── 4. INICIO DE NUEVO TEMA (Paso 0: Tema Inmutable) ────────────────────────
+  // ── 4. INICIO DE NUEVO TEMA — Inferencia Directa + HITL Fallback ────────────
+
+  // FAST PATH: Si el mensaje contiene suficientes parámetros inline, no preguntamos nada
+  const parsedCompleto = parseMessageCompleto(cleanText, botContext);
+  if (parsedCompleto && parsedCompleto.tema && parsedCompleto.destino) {
+    console.log(`[SemanticRouter] Inferencia directa activada:`, parsedCompleto);
+    await clearHITLState(chatId, botContext); // estado limpio
+
+    const cantSecciones = parsedCompleto.densidad === 'premium'
+      ? 7
+      : (parsedCompleto.densidad === 'breve' ? 2 : 4);
+
+    return {
+      type: 'execute_tool',
+      toolName: 'publicar',
+      params: {
+        tema: parsedCompleto.tema,
+        destino: parsedCompleto.destino,
+        red: parsedCompleto.red,
+        modelo: parsedCompleto.modelo || (parsedCompleto.destino === 'social' ? 'flash' : 'pro'),
+        densidad: parsedCompleto.densidad || 'profundo_breve',
+        modoLibrePrompt: parsedCompleto.modoLibrePrompt,
+        fuenteImg: parsedCompleto.fuenteImg || (photoUrl ? 'telegram' : 'wiki'),
+        cantidadSecciones: cantSecciones,
+        photoUrl,
+        groundingMode: parsedCompleto.groundingMode,
+      },
+    };
+  }
+
+  // HITL FALLBACK: Faltan parámetros → diálogo progresivo
   if (botContext === 'omni') {
     const newState: HITLState = {
       tema: cleanText,

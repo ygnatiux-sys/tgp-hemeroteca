@@ -7,7 +7,7 @@
 import { Hono } from 'hono';
 import crypto from 'node:crypto';
 import { routeIncomingMessage } from '../ia/semantic-router.js';
-import { callGemini, crearModeloEnsayo, genai, TGP_SYSTEM_PROMPT } from '../ia/gemini.js';
+import { callGemini, crearModeloEnsayo, genai, TGP_SYSTEM_PROMPT, buildDensityInstruction } from '../ia/gemini.js';
 import {
   sendTelegram,
   editMessageText,
@@ -266,14 +266,51 @@ async function ejecutarDecisionAssistant(chatId: number, decision: any) {
   const modeloLabel = params.modelo === 'pro' ? 'Pro' : 'Flash';
   const modelName = params.modelo === 'pro' ? 'gemini-3.1-pro-preview' : 'gemini-3.8-flash';
   const cantSecciones = params.cantidadSecciones || (params.densidad === 'premium' ? 7 : (params.densidad === 'breve' ? 2 : 4));
+  // Correción 1: La extensión se controla con directivas en el prompt, NUNCA con maxOutputTokens bajo.
+  const densityDirective = buildDensityInstruction(params.densidad, params.groundingMode ?? params.densidad === 'premium');
 
   await sendTelegramAssistant(chatId, `⚡ Agente TGP: Redactando ensayo sobre "${params.tema}" (${modeloLabel}, ${cantSecciones} secciones)...`);
 
   try {
-    const modeloEnsayo = crearModeloEnsayo(cantSecciones, modelName);
-    const promptGitops = `Desarrolla un ensayo cinemático sobre: "${params.tema}". Genera exactamente ${cantSecciones} secciones con rigor histórico, filosófico y narrativo.${params.modoLibrePrompt ? ` Directiva ad-hoc: ${params.modoLibrePrompt}` : ''}`;
-    const result = await modeloEnsayo.generateContent(promptGitops);
-    const parsed = JSON.parse(result.response.text());
+    let parsed: any;
+
+    // Correción 3: Tier 3 Premium activa Google Search grounding (anti-alucinación erudita)
+    if (params.densidad === 'premium') {
+      const premiumSystemPrompt = `Eres el motor cognitivo de TGP. Redactas tratados históricos exhaustivos con rigor primario.\n\n${densityDirective}`;
+      const premiumPrompt = `Desarrolla un tratado exhaustivo sobre: "${params.tema}". Estructura exactamente ${cantSecciones} secciones en JSON con el esquema: { titulo: string, secciones: Array<{ busqueda_wikimedia: string, parrafo: string }> }.${params.modoLibrePrompt ? ` Directiva ad-hoc: ${params.modoLibrePrompt}` : ''}`;
+
+      const premiumResponse = await genai.models.generateContent({
+        model: modelName,
+        contents: [{ role: 'user', parts: [{ text: premiumPrompt }] }],
+        config: {
+          systemInstruction: premiumSystemPrompt,
+          temperature: 0.4,
+          maxOutputTokens: 8192, // Nunca reducir — extensión controlada por densityDirective
+          tools: [{ googleSearch: {} }], // Grounding: ancla en fuentes reales, evita alucinaciones
+        },
+      });
+
+      // Intentar parsear JSON del texto generado
+      const rawText = (premiumResponse.text || '').trim();
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try { parsed = JSON.parse(jsonMatch[0]); } catch { parsed = null; }
+      }
+      // Si no viene como JSON (googleSearch puede devolver texto libre), construimos la estructura
+      if (!parsed || !parsed.secciones) {
+        const tituloMatch = rawText.match(/^#+ (.+)/m);
+        parsed = {
+          titulo: tituloMatch ? tituloMatch[1].trim() : params.tema,
+          secciones: [{ busqueda_wikimedia: params.tema, parrafo: rawText }],
+        };
+      }
+    } else {
+      // Tier 1 (breve) y Tier 2 (profundo): crearModeloEnsayo con JSON estructurado
+      const modeloEnsayo = crearModeloEnsayo(cantSecciones, modelName);
+      const promptGitops = `Desarrolla un ensayo cinemático sobre: "${params.tema}". Genera exactamente ${cantSecciones} secciones con rigor histórico, filosófico y narrativo.${densityDirective ? ` ${densityDirective}` : ''}${params.modoLibrePrompt ? ` Directiva ad-hoc: ${params.modoLibrePrompt}` : ''}`;
+      const result = await modeloEnsayo.generateContent(promptGitops);
+      parsed = JSON.parse(result.response.text());
+    }
 
     await sendTelegramAssistant(chatId, `Ensayo: "${parsed.titulo}". Procesando imágenes...`);
 
@@ -574,18 +611,7 @@ async function ejecutarDecisionOmni(chatId: number, decision: any) {
     const densidad = params.densidad || (destino === 'social' ? 'breve' : 'profundo_breve');
     const modoLibre = params.modoLibrePrompt ? `\n\nDIRECTIVA PERSONALIZADA DEL AUTOR (MODO LIBRE):\n${params.modoLibrePrompt}` : '';
 
-    let directivaDensidad = '';
-    let maxTokens = 2200;
-    if (densidad === 'breve') {
-      directivaDensidad = 'Extensión: Breve y ágil (máximo 800-1000 tokens). Directo al núcleo conceptual.';
-      maxTokens = 1200;
-    } else if (densidad === 'premium') {
-      directivaDensidad = 'Extensión: Tratado de archivo exhaustivo (+4500 tokens). Desarrolla obligatoriamente entre 4 y 5 secciones temáticas extensas con subtítulos (##), citas históricas textuales originales en bloques (> "...") y al final una sección "## Fuentes Eruditas & Referencias Históricas".';
-      maxTokens = 8192;
-    } else {
-      directivaDensidad = 'Extensión: Ensayo conceptual profundo pero condensado (~1500 tokens). Estructura TGP completa en formato ágil.';
-      maxTokens = 2200;
-    }
+    const densityDirective = buildDensityInstruction(densidad, params.groundingMode ?? (densidad === 'premium'));
 
     if (destino === 'hemeroteca' || destino === 'alternative') {
       const cantSecciones = params.cantidadSecciones || (densidad === 'premium' ? 7 : (densidad === 'breve' ? 2 : 4));
@@ -600,10 +626,40 @@ async function ejecutarDecisionOmni(chatId: number, decision: any) {
         }),
       });
 
-      const modeloEnsayo = crearModeloEnsayo(cantSecciones, modelName);
-      const promptGitops = `Desarrolla un ensayo cinemático sobre: "${tema}". Genera exactamente ${cantSecciones} secciones con rigor histórico, filosófico y narrativo.${params.modoLibrePrompt ? ` Directiva ad-hoc: ${params.modoLibrePrompt}` : ''}`;
-      const result = await modeloEnsayo.generateContent(promptGitops);
-      const parsed = JSON.parse(result.response.text());
+      let parsed: any;
+      if (densidad === 'premium') {
+        const premiumSystemPrompt = `Eres el motor cognitivo de TGP. Redactas tratados históricos exhaustivos con rigor primario.\n\n${densityDirective}`;
+        const premiumPrompt = `Desarrolla un tratado exhaustivo sobre: "${tema}". Estructura exactamente ${cantSecciones} secciones en JSON con el esquema: { titulo: string, secciones: Array<{ busqueda_wikimedia: string, parrafo: string }> }.${params.modoLibrePrompt ? ` Directiva ad-hoc: ${params.modoLibrePrompt}` : ''}`;
+
+        const premiumResponse = await genai.models.generateContent({
+          model: modelName,
+          contents: [{ role: 'user', parts: [{ text: premiumPrompt }] }],
+          config: {
+            systemInstruction: premiumSystemPrompt,
+            temperature: 0.4,
+            maxOutputTokens: 8192,
+            tools: [{ googleSearch: {} }],
+          },
+        });
+
+        const rawText = (premiumResponse.text || '').trim();
+        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try { parsed = JSON.parse(jsonMatch[0]); } catch { parsed = null; }
+        }
+        if (!parsed || !parsed.secciones) {
+          const tituloMatch = rawText.match(/^#+ (.+)/m);
+          parsed = {
+            titulo: tituloMatch ? tituloMatch[1].trim() : tema,
+            secciones: [{ busqueda_wikimedia: tema, parrafo: rawText }],
+          };
+        }
+      } else {
+        const modeloEnsayo = crearModeloEnsayo(cantSecciones, modelName);
+        const promptGitops = `Desarrolla un ensayo cinemático sobre: "${tema}". Genera exactamente ${cantSecciones} secciones con rigor histórico, filosófico y narrativo.${densityDirective ? ` ${densityDirective}` : ''}${params.modoLibrePrompt ? ` Directiva ad-hoc: ${params.modoLibrePrompt}` : ''}`;
+        const result = await modeloEnsayo.generateContent(promptGitops);
+        parsed = JSON.parse(result.response.text());
+      }
 
       if (params.photoUrl && Array.isArray(parsed.secciones) && parsed.secciones.length > 0) {
         parsed.secciones[0].imagen_url = params.photoUrl;
@@ -695,7 +751,7 @@ async function ejecutarDecisionOmni(chatId: number, decision: any) {
       });
     } else {
       // ── 2. Generar Redes Sociales (Facebook / TikTok via Zernio) ────────
-      const userPrompt = `Genera un texto magnético y reflexivo para redes sociales (${red}) sobre: "${tema}". ${directivaDensidad}${modoLibre}`;
+      const userPrompt = `Genera un texto magnético y reflexivo para redes sociales (${red}) sobre: "${tema}". ${densityDirective}${modoLibre}`;
       const textoGenerado = await callGemini(`omni-${chatId}`, userPrompt, modelName);
 
       let imagenUrl = params.photoUrl || '';
@@ -1167,18 +1223,7 @@ telegramRouter.post('/api/bot/generate', async (c) => {
       body: JSON.stringify({ chat_id: chatId, text: `⏳ Generando para ${targetLabel} con ${modLabel}...` }),
     });
 
-    let directivaDensidad = '';
-    let maxTokens = 2200;
-    if (densidad === 'breve') {
-      directivaDensidad = 'Extensión: Breve y ágil (~800-1000 tokens máximo). Directo al grano.';
-      maxTokens = 1200;
-    } else if (densidad === 'premium') {
-      directivaDensidad = 'Extensión: Tratado de archivo exhaustivo (+4500 tokens). Desarrolla de 4 a 5 secciones temáticas extensas con subtítulos (##), citas históricas textuales originales en bloques (> "...") y al final una sección "## Fuentes Eruditas & Referencias Históricas".';
-      maxTokens = 8192;
-    } else {
-      directivaDensidad = 'Extensión: Ensayo conceptual profundo pero condensado (~1500 tokens). Estructura TGP completa en formato ágil.';
-      maxTokens = 2200;
-    }
+    const directivaDensidad = buildDensityInstruction(densidad, densidad === 'premium');
 
     const modoLibre = modoLibrePrompt?.trim()
       ? `\n\nDIRECTIVA PERSONALIZADA DEL AUTOR (MODO LIBRE):\n${modoLibrePrompt.trim()}`
@@ -1187,11 +1232,11 @@ telegramRouter.post('/api/bot/generate', async (c) => {
     let textoGenerado = '';
     if (isHemeroteca) {
       const userPrompt = `Escribe un ensayo reflexivo, denso y profundo para Hemeroteca TGP sobre: "${tema.trim()}". Estilo ensayo argentino contemporáneo. ${directivaDensidad}${modoLibre}`;
-      textoGenerado = await callGemini(`miniapp-${chatId}`, userPrompt, 'gemini-3.1-pro-preview', TGP_SYSTEM_PROMPT, maxTokens);
+      textoGenerado = await callGemini(`miniapp-${chatId}`, userPrompt, 'gemini-3.1-pro-preview', TGP_SYSTEM_PROMPT, 8192);
     } else {
       const userPrompt = `Genera un texto magnético y reflexivo para redes sociales (${red}) sobre: ${tema.trim()}. ${directivaDensidad}${modoLibre}`;
       const SOCIAL_PROMPT = 'Eres un redactor cultural y turístico experto. Crea descripciones grounded basadas en hechos. Tono: Informativo, directo y claro.';
-      textoGenerado = await callGemini(`miniapp-${chatId}`, userPrompt, modelName, SOCIAL_PROMPT, maxTokens);
+      textoGenerado = await callGemini(`miniapp-${chatId}`, userPrompt, modelName, SOCIAL_PROMPT, 8192);
     }
 
     let imagenUrl = photoUrl || '';

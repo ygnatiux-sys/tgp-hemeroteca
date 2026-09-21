@@ -65,13 +65,16 @@ export async function callGemini(
   userMessage: string,
   model: 'gemini-3.8-flash' | 'gemini-3.1-pro-preview' | 'gemini-2.5-pro' = 'gemini-3.8-flash',
   overrideSystemPrompt?: string,
+  // REGLA: Nunca usar maxOutputTokens < 8192 para controlar extensión.
+  // El control de longitud se hace inyectando directivas en el system prompt.
+  // Valores bajos provocan cortes abruptos a mitad de oración.
   maxOutputTokens: number = 8192
 ): Promise<string> {
   const modelToUse = (model === 'gemini-2.5-pro' ? 'gemini-3.1-pro-preview' : model) as any;
   const history = getHistory(sessionId);
   const chat = genai.chats.create({
     model: modelToUse,
-    config: { systemInstruction: overrideSystemPrompt || TGP_SYSTEM_PROMPT, temperature: 0.82, maxOutputTokens },
+    config: { systemInstruction: overrideSystemPrompt || TGP_SYSTEM_PROMPT, temperature: 0.82, maxOutputTokens: 8192 },
     history: history.length > 0 ? history : undefined,
   });
   pushToHistory(sessionId, 'user', userMessage);
@@ -127,25 +130,29 @@ export function crearModeloEnsayo(
 export const AGENT_SYSTEM_PROMPT = `Eres el asistente agéntico de publicación e investigación para el ecosistema TGP Mind.
 Tu objetivo es dialogar con Xavier Benítez de forma analítica, sobria y dialéctica (Dark Academia accesible), transformando sus intenciones en publicaciones concretas mediante la función 'publicar'.
 
-REGLAS DE INTERACCIÓN (HUMAN-IN-THE-LOOP ESTRICTO):
+REGLA PRIMORDIAL — INFERENCIA DIRECTA (Reducción de Fricción):
+Si en un único mensaje el usuario provee TODOS los parámetros necesarios (Destino, Densidad, Motor y Tema), debes invocar INMEDIATAMENTE la función 'publicar' sin hacer ninguna pregunta.
+Ejemplos de mensajes completos que activan publicación directa:
+  - "Flash, Hemeroteca, 1500t: El mito de Ícaro"
+  - "Pro + Wiki, ensayo profundo sobre fascinum romano para Hemeroteca"
+  - "Social TikTok, breve, flash: escarabajo egipcio"
+Si faltan parámetros, usa el diálogo HITL progresivo como fallback (ver reglas abajo).
+
+REGLAS DE INTERACCIÓN (HITL PROGRESIVO — solo cuando faltan parámetros):
 1. BOTS ESPECIALIZADOS (RESPETAR ESPECIALIDAD):
    - En canal 'social', el destino es SIEMPRE 'social'. Nunca preguntes si quiere Hemeroteca. Pregunta sólo la red (Facebook o TikTok).
    - En canal 'hemeroteca', el destino es SIEMPRE 'hemeroteca'. NUNCA preguntes por Redes ni por Alternative.
    - En canal 'omni' (Omni Bot), si no especificó destino, consulta primero: "> ¿Publicamos esto como ensayo en Hemeroteca (web) o en Redes Sociales?"
-2. SECUENCIA DIALÉCTICA OBLIGATORIA (NO ASUMAS PARÁMETROS):
-   - Paso 1 (Tema recibido): Pregunta siempre la Densidad del ensayo o publicación:
-     "> ¿Qué densidad y formato deseas para este ensayo?"
-     Opciones: 1. Breve (~800t) | 2. Profundo (~1500t) | 3. Tratado Premium (+4500t). Recuerda que puede añadir directivas en Modo Libre.
-   - Paso 2 (Densidad elegida): NO asumas el motor ni publiques de inmediato. Pregunta sobre el Motor y Fuentes Visuales:
-     "> Densidad configurada: [Densidad]. ¿Qué motor de inteligencia y fuentes visuales aplicamos?"
-     Opciones: 1. Flash + Wikimedia | 2. Pro (Razonamiento profundo) + Wikimedia | 3. Pro (Solo texto) | O directivas en Modo Libre.
-   - Paso 3 (Confirmación / Proceder): Si el usuario elige motor/imágenes, o escribe "proceder", "publicar", "adelante", "ok", o envía directivas adicionales en Modo Libre, ENTONCES invoca la función 'publicar'.
+2. SECUENCIA DIALÉCTICA (FALLBACK si faltan parámetros):
+   - Si falta Densidad: Pregunta "> ¿Qué densidad? 1. Breve (~800t) | 2. Profundo (~1500t) | 3. Tratado Premium (+4500t)".
+   - Si falta Motor: Pregunta "> ¿Qué motor? 1. Flash + Wiki | 2. Pro + Wiki | 3. Pro (solo texto)".
+   - Una vez completos todos los parámetros, invoca 'publicar' directamente.
 3. MODO LIBRE / DIRECTIVAS AD-HOC:
-   - Si el usuario incluye instrucciones libres de estilo, citas, fuentes o enfoque (ej: "citá a Nestorio", "enfoque arqueosemiótico", "tono analítico"), captúralo SIEMPRE en 'modoLibrePrompt' y presérvalo en todo el flujo.
+   - Si el usuario incluye instrucciones libres de estilo, citas, fuentes o enfoque, captúralo en 'modoLibrePrompt' y presérvalo en todo el flujo.
 4. FORMATO OBLIGATORIO DE PREGUNTAS:
    - Toda pregunta dialéctica DEBE comenzar con '> ' para renderizar los teclados dinámicos en Telegram.
-5. RESPUESTAS NUMÉRICAS Y DIRECTAS:
-   - Si el usuario responde con números (ej: "1", "2", "3"), interpreta la opción correspondiente al paso actual, guarda la preferencia y avanza al siguiente paso dialéctico. NUNCA reinicies el tema ni asumas el fin del diálogo hasta completar las opciones o recibir confirmación.`;
+5. RESPUESTAS NUMÉRICAS:
+   - Si el usuario responde con números ("1", "2", "3"), interpreta la opción del paso actual y avanza.`;
 
 export const PUBLICAR_TOOL_DECLARATION = {
   name: 'publicar',
@@ -174,7 +181,7 @@ export const PUBLICAR_TOOL_DECLARATION = {
       },
       densidad: {
         type: 'STRING' as const,
-        description: 'Densidad y extensión del contenido: breve (~800-1000t), profundo_breve (~1500t ensayístico), o premium (+4500t tratado exhaustivo).',
+        description: 'Densidad y extensión del contenido: breve (~800-1000t), profundo_breve (~1500t ensayístico), o premium (+4500t tratado exhaustivo con fuentes primarias).',
         enum: ['breve', 'profundo_breve', 'premium'],
       },
       modoLibrePrompt: {
@@ -190,6 +197,10 @@ export const PUBLICAR_TOOL_DECLARATION = {
         type: 'INTEGER' as const,
         description: 'Cantidad de secciones para ensayos en Hemeroteca (1, 3 o 5).',
       },
+      groundingMode: {
+        type: 'BOOLEAN' as const,
+        description: 'Activa el modo Grounded para Tier 3 Premium: obliga a incluir fuentes históricas primarias reales y citas precisas, evitando alucinaciones en tratados eruditos.',
+      },
     },
     required: ['tema', 'destino'],
   },
@@ -199,6 +210,38 @@ export type AgentResult =
   | { type: 'tool_call'; name: string; args: Record<string, any> }
   | { type: 'micro_prompt'; text: string }
   | { type: 'text'; text: string };
+
+/**
+ * Construye la directiva estructural de extensión que se inyecta en el system prompt.
+ * Nunca uses maxOutputTokens < 8192 para controlar longitud: causa cortes abruptos.
+ * El control real de extensión se hace vía instrucciones semánticas en el prompt.
+ */
+export function buildDensityInstruction(densidad?: string, groundingMode?: boolean): string {
+  let directive = '';
+
+  switch (densidad) {
+    case 'breve':
+      directive = 'RESTRICCIÓN DE EXTENSIÓN (Tier 1 — Breve): Limita tu respuesta a exactamente 3 párrafos y un máximo de 500 palabras. Síntesis ágil, sin desarrollo capitular. Cada párrafo debe ser autónomo y denso conceptualmente.';
+      break;
+
+    case 'profundo_breve':
+      directive = 'RESTRICCIÓN DE EXTENSIÓN (Tier 2 — Profundo): Desarrolla exactamente 4 secciones con subtítulo (## Markdown). Mínimo 1200 palabras, máximo 1600 palabras. Incluye un párrafo de apertura gancho, desarrollo conceptual, derivación arqueosemiótica y cierre universal.';
+      break;
+
+    case 'premium':
+      // Tier 3: extensión libre + grounding obligatorio
+      directive = 'RESTRICCIÓN DE EXTENSIÓN (Tier 3 — Tratado Premium): Desarrolla un tratado exhaustivo de mínimo 4500 palabras estructurado en 7 secciones capitulares con subtítulos ## Markdown. Sin límite superior de extensión.';
+      if (groundingMode) {
+        directive += '\n\nMODO GROUNDED ACTIVADO (Anti-Alucinación Erudita): Es OBLIGATORIO incluir en cada sección al menos una fuente histórica primaria real y verificable (autor, obra, año o período). Usa exclusivamente fuentes primarias: inscripciones epigráficas, textos clásicos (Heródoto, Plinio, Tácito, etc.), hallazgos arqueológicos con referencias precisas. Jamás inventes datos, fechas o autores. Si no tienes certeza sobre un dato, explicítalo con "(fuente no verificada)" o apoya en fuentes secundarias académicas sólidas.';
+      }
+      break;
+
+    default:
+      directive = '';
+  }
+
+  return directive;
+}
 
 export async function callGeminiAgent(
   userPrompt: string,
@@ -222,6 +265,7 @@ export async function callGeminiAgent(
     config: {
       systemInstruction: AGENT_SYSTEM_PROMPT,
       temperature: 0.2,
+      maxOutputTokens: 8192, // NUNCA reducir — extensión controlada por buildDensityInstruction
       tools: [
         {
           functionDeclarations: [PUBLICAR_TOOL_DECLARATION as any],
