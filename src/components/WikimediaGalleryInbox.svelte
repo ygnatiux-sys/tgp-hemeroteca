@@ -18,7 +18,7 @@
   let isLoading = false;
   let error: string | null = null;
   let gallery: WikimediaImageItem[] = [];
-  let selectedIndex: number | null = null;
+  let selectedIndices: Set<number> = new Set();
   let previewImage: WikimediaImageItem | null = null; // Fancybox Lightbox modal
   let isIngesting = false;
   $: if (isOpen && typeof document !== 'undefined') {
@@ -41,20 +41,17 @@
 
     isLoading = true;
     error = null;
-    selectedIndex = null;
+    selectedIndices.clear();
+    selectedIndices = selectedIndices;
 
     try {
       const terms = q.split(',').map(t => t.trim()).filter(Boolean);
-      // Solicitar 3 por término para alcanzar ~15 imágenes con Promise.all
-      const limit = Math.max(2, Math.ceil(15 / Math.max(1, terms.length)));
+      const limit = Math.max(5, Math.ceil(20 / Math.max(1, terms.length)));
       const items = await getWikimediaGallery(terms, limit);
 
-      gallery = items.slice(0, 16);
+      gallery = items.slice(0, 30);
       if (gallery.length === 0) {
         error = 'No se encontraron imágenes CC0 para los términos indicados.';
-      } else {
-        // Auto-selección inteligente de la primera imagen por defecto
-        selectedIndex = 0;
       }
     } catch (err: any) {
       error = err.message || 'Error al conectar con la API de Wikimedia Commons.';
@@ -64,7 +61,6 @@
   }
 
   let prevIsOpen = false;
-  // Carga automática inicial una sola vez al abrir (previene bucles reactivos y 429)
   $: if (isOpen && !prevIsOpen) {
     prevIsOpen = true;
     if (gallery.length === 0 && !isLoading) {
@@ -75,42 +71,67 @@
   }
 
   function toggleSelect(index: number) {
-    selectedIndex = selectedIndex === index ? null : index;
+    if (selectedIndices.has(index)) {
+      selectedIndices.delete(index);
+    } else {
+      selectedIndices.add(index);
+    }
+    selectedIndices = selectedIndices; // trigger reactivity
   }
 
-  function autoSelectBest() {
+  function selectAll() {
     if (gallery.length === 0) return;
-    // Seleccionar la de mayor resolución disponible
-    let bestIdx = 0;
-    let maxPixels = 0;
-    gallery.forEach((img, idx) => {
-      const pixels = (img.width || 0) * (img.height || 0);
-      if (pixels > maxPixels) {
-        maxPixels = pixels;
-        bestIdx = idx;
-      }
-    });
-    selectedIndex = bestIdx;
+    gallery.forEach((_, idx) => selectedIndices.add(idx));
+    selectedIndices = selectedIndices;
   }
 
   function clearSelection() {
-    selectedIndex = null;
+    selectedIndices.clear();
+    selectedIndices = selectedIndices;
   }
 
   async function confirmarIngesta() {
-    if (selectedIndex === null || !gallery[selectedIndex]) return;
+    if (selectedIndices.size === 0) return;
     isIngesting = true;
     error = null;
 
     try {
-      const img = gallery[selectedIndex];
-      const file = await downloadWikimediaImageAsFile(img);
-      onSelect(file);
+      const selectedImgs = Array.from(selectedIndices).map(idx => gallery[idx]);
+      const downloadedFiles = await Promise.all(
+        selectedImgs.map(img => downloadWikimediaImageAsFile(img))
+      );
+      
+      for (const file of downloadedFiles) {
+        onSelect(file);
+      }
+      
       isOpen = false;
+      selectedIndices.clear();
+      selectedIndices = selectedIndices;
     } catch (err: any) {
-      error = `Error al procesar la imagen seleccionada: ${err.message}`;
+      error = `Error al procesar las imágenes: ${err.message}`;
     } finally {
       isIngesting = false;
+    }
+  }
+
+  function openBookzine() {
+    if (selectedIndices.size === 0) return;
+    try {
+      const selectedImgs = Array.from(selectedIndices).map(idx => {
+        const img = gallery[idx];
+        // Sanitización estricta: solo enviar lo necesario para renderizar la revista
+        return {
+          url: img.url, // O usar thumbUrl si url es muy pesado, pero url en HQ es mejor para revista
+          title: img.title || 'Sin título',
+          author: img.author || 'Desconocido',
+          licenseShortName: img.licenseShortName || 'CC0'
+        };
+      });
+      sessionStorage.setItem('tgp_bookzine_queue', JSON.stringify(selectedImgs));
+      window.open('/visor-revista', '_blank');
+    } catch (err: any) {
+      error = `Error al preparar la revista: ${err.message}`;
     }
   }
 
@@ -203,9 +224,9 @@
     <div class="px-5 py-2.5 bg-zinc-50/80 border-b border-zinc-200 flex items-center justify-between text-xs font-mono shrink-0">
       <div class="flex items-center gap-2">
         <span class="text-zinc-500">Selección:</span>
-        {#if selectedIndex !== null}
+        {#if selectedIndices.size > 0}
           <span class="text-emerald-800 font-bold bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded">
-            ✓ Imagen #{selectedIndex + 1}
+            ✓ {selectedIndices.size} imágen(es)
           </span>
         {:else}
           <span class="text-zinc-400">Ninguna seleccionada</span>
@@ -215,11 +236,11 @@
       <div class="flex items-center gap-2">
         <button
           type="button"
-          on:click={autoSelectBest}
+          on:click={selectAll}
           class="px-2.5 py-1 bg-white hover:bg-zinc-100 text-zinc-700 rounded text-[11px] border border-zinc-200 cursor-pointer shadow-2xs"
-          title="Seleccionar automáticamente la imagen con mayor resolución"
+          title="Seleccionar todas las imágenes cargadas"
         >
-          ⚡ Auto-seleccionar Mejor
+          ⚡ Seleccionar Todas
         </button>
         <button
           type="button"
@@ -259,7 +280,7 @@
           {#each gallery as img, idx (img.url)}
             <div
               class="group relative rounded-xl overflow-hidden border transition-all duration-150 flex flex-col bg-white
-              {selectedIndex === idx
+              {selectedIndices.has(idx)
                 ? 'border-emerald-500 ring-2 ring-emerald-500/40 shadow-md scale-[1.01]'
                 : 'border-zinc-200 hover:border-zinc-300 shadow-2xs'}"
             >
@@ -295,7 +316,7 @@
                 </button>
 
                 <!-- Checkmark de Selección -->
-                {#if selectedIndex === idx}
+                {#if selectedIndices.has(idx)}
                   <div class="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shadow">
                     ✓
                   </div>
@@ -316,12 +337,12 @@
                 <button
                   type="button"
                   class="w-full py-1.5 px-2 rounded-lg text-[10px] font-mono font-semibold transition-colors cursor-pointer
-                  {selectedIndex === idx
+                  {selectedIndices.has(idx)
                     ? 'bg-emerald-600 text-white'
                     : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200'}"
                   on:click={() => toggleSelect(idx)}
                 >
-                  {selectedIndex === idx ? '✓ Seleccionada' : '+ Seleccionar'}
+                  {selectedIndices.has(idx) ? '✓ Seleccionada' : '+ Seleccionar'}
                 </button>
               </div>
             </div>
@@ -333,10 +354,10 @@
     <!-- Footer con Acción de Ingesta -->
     <footer class="p-4 bg-zinc-50 border-t border-zinc-200 flex flex-wrap items-center justify-between gap-3 shrink-0">
       <div class="text-[11px] font-mono text-zinc-600">
-        {#if selectedIndex !== null}
-          <span>Archivo listo: <strong class="text-zinc-900">{gallery[selectedIndex]?.title.slice(0, 40)}…</strong></span>
+        {#if selectedIndices.size > 0}
+          <span>Archivos listos: <strong class="text-zinc-900">{selectedIndices.size} en total</strong></span>
         {:else}
-          <span>Seleccioná una imagen de la grilla para usar en la mesa de trabajo.</span>
+          <span>Seleccioná una o más imágenes de la grilla para usar en la mesa de trabajo.</span>
         {/if}
       </div>
 
@@ -350,16 +371,25 @@
         </button>
         <button
           type="button"
-          disabled={selectedIndex === null || isIngesting}
+          disabled={selectedIndices.size === 0 || isIngesting}
           on:click={confirmarIngesta}
           class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer flex items-center gap-2"
         >
           {#if isIngesting}
             <span class="animate-spin text-sm">⟳</span>
-            <span>Descargando imagen…</span>
+            <span>Descargando imagen(es)…</span>
           {:else}
-            <span>✦ Ingestar en Mesa de Trabajo ↵</span>
+            <span>✦ Ingestar en Mesa ↵</span>
           {/if}
+        </button>
+        <button
+          type="button"
+          disabled={selectedIndices.size === 0 || isIngesting}
+          on:click={openBookzine}
+          class="px-4 py-2 bg-zinc-800 hover:bg-black disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer flex items-center gap-2"
+          title="Abre la selección en el visor interactivo 3D tipo Revista"
+        >
+          📖 Ver en Bookzine
         </button>
       </div>
     </footer>
@@ -422,7 +452,10 @@
           class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
           on:click={() => {
             const idx = gallery.findIndex(g => g.url === previewImage?.url);
-            if (idx !== -1) selectedIndex = idx;
+            if (idx !== -1) {
+              selectedIndices.add(idx);
+              selectedIndices = selectedIndices;
+            }
             closeFancybox();
           }}
         >

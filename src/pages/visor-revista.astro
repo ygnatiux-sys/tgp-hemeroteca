@@ -1,0 +1,10 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BookzineWrapper from '../components/BookzineWrapper';
+---
+
+<Layout title="Visor Bookzine Scriptorium | TGP">
+  <main class="w-full h-screen overflow-hidden bg-zinc-50">
+    <BookzineWrapper client:only="react" />
+  </main>
+</Layout>

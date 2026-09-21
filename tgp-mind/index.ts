@@ -1,4 +1,4 @@
-﻿// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 // TGP MIND Ã¢â‚¬â€ Orquestador IA con Hono + Gemini + Inline Keyboard Wizard
 // Autor: TGP / Xavier BenÃƒÂ­tez
 // Deploy: Google Cloud Run
@@ -48,6 +48,7 @@ import {
   subirImagenAR2,
   procesarFotoTelegramAR2,
   listarImagenesRecientesR2,
+  estandarizarYSubirImagenAR2,
 } from './src/storage/r2.js';
 // -- Storage: D1 + HITL (ver src/storage/d1.ts) ----------------------------------
 import {
@@ -746,6 +747,59 @@ app.get('/api/proxy/wikimedia', async (c) => {
     return c.json({ imageUrl: '', error: err?.message });
   }
 });
+
+// ── POST /api/consolidate-magazine — Procesa array de imágenes Wikimedia a WebP en R2 ────────
+app.post('/api/consolidate-magazine', async (c) => {
+  try {
+    const body = await c.req.json() as { images: { url: string; title: string; author: string; licenseShortName: string }[] };
+    const { images } = body;
+
+    if (!Array.isArray(images) || images.length === 0) {
+      return c.json({ error: 'El array de imágenes es requerido y no puede estar vacío.' }, 400);
+    }
+    if (images.length > 30) {
+      return c.json({ error: 'Máximo 30 imágenes por consolidación.' }, 400);
+    }
+
+    console.log(`[Consolidate Magazine] Iniciando procesamiento secuencial de ${images.length} imágenes...`);
+    const results: { title: string; author: string; licenseShortName: string; r2Url: string; originalUrl: string }[] = [];
+
+    // PROCESAMIENTO SECUENCIAL (for...of) — Prohibido Promise.all para evitar OOM en Cloud Run
+    for (const img of images) {
+      try {
+        console.log(`[Consolidate Magazine] Procesando: ${img.title}`);
+        // estandarizarYSubirImagenAR2 descarga, convierte a WebP con sharp y sube a R2
+        const r2Url = await estandarizarYSubirImagenAR2(img.url, 'bookzine');
+        results.push({
+          title: img.title,
+          author: img.author,
+          licenseShortName: img.licenseShortName,
+          r2Url,
+          originalUrl: img.url,
+        });
+        console.log(`[Consolidate Magazine] OK -> ${r2Url}`);
+      } catch (imgErr: any) {
+        console.warn(`[Consolidate Magazine] Error en "${img.title}":`, imgErr.message);
+        // Incluir el item fallido con la URL original para que el frontend lo sepa
+        results.push({
+          title: img.title,
+          author: img.author,
+          licenseShortName: img.licenseShortName,
+          r2Url: img.url, // Fallback: usar URL original si falla
+          originalUrl: img.url,
+        });
+      }
+    }
+
+    console.log(`[Consolidate Magazine] Completado: ${results.length} imágenes procesadas.`);
+    return c.json({ success: true, results });
+
+  } catch (err: any) {
+    console.error('[Consolidate Magazine Error]:', err);
+    return c.json({ error: err?.message || 'Error al consolidar la revista en R2.' }, 500);
+  }
+});
+
 serve({ fetch: app.fetch, port: PORT }, () => {
   console.log(`[TGP Mind] Puerto ${PORT} -- Listo.`);
 });
