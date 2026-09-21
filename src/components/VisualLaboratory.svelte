@@ -17,6 +17,7 @@
     : null) ?? '2771';
 
   import { openGooglePicker } from '../lib/google-picker';
+  import WikimediaGalleryInbox from './WikimediaGalleryInbox.svelte';
 
   const GOOGLE_PICKER_KEY = (typeof import.meta !== 'undefined'
     ? (import.meta as any).env?.PUBLIC_GOOGLE_PICKER_API_KEY
@@ -35,6 +36,7 @@
   let r2Folder          = 'laboratorio-visual';
   let copiado           = false;
   let errorMsg:         string | null = null;
+  let isWikiInboxOpen   = false;
 
   // ── Ref de DOM ────────────────────────────────────────────────────────────
   let fileInputEl: HTMLInputElement;
@@ -81,6 +83,14 @@
       estadoR2        = 'idle';
       errorMsg        = null;
     }
+  }
+
+  function handleWikiSelect(file: File) {
+    imagenBase      = file;
+    imagenProcesada = null;
+    r2Url           = null;
+    estadoR2        = 'idle';
+    errorMsg        = null;
   }
 
   // ── Procesamiento en Cloud Run ────────────────────────────────────────────
@@ -204,6 +214,11 @@
       <button class="vl-btn vl-btn--primary" on:click={abrirGooglePickerModal} disabled={pickerLoading}>
         <span class="vl-btn-icon">✦</span>
         {pickerLoading ? 'Iniciando Google Picker…' : 'Extraer de Google Drive / Photos'}
+      </button>
+
+      <button class="vl-btn vl-btn--green" on:click={() => (isWikiInboxOpen = true)}>
+        <span>🏛</span>
+        Galería Wikimedia Commons (CC0)
       </button>
 
       <button class="vl-btn vl-btn--gray" on:click={abrirSelector}>
@@ -366,6 +381,8 @@
   {/if}
 
 </div>
+
+<WikimediaGalleryInbox bind:isOpen={isWikiInboxOpen} onSelect={handleWikiSelect} />
 
 <style>
   /* ── Root / tokens ────────────────────────────────────────────────────── */

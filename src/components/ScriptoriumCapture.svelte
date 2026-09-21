@@ -7,6 +7,7 @@
   import { marked } from 'marked';
   import { openGooglePicker } from '../lib/google-picker';
   import { ejecutarIngestaExhaustiva, ejecutarRedaccionPremium } from '../lib/vision-osint';
+  import WikimediaGalleryInbox from './WikimediaGalleryInbox.svelte';
 
   // ── Tipos ─────────────────────────────────────────────────────────────────
   type TransmuteStatus = 'idle' | 'sending' | 'success' | 'error';
@@ -57,6 +58,7 @@
   let results: VisionResult[] = [];
   let error: string | null = null;
   let pickerLoading = false;
+  let isWikiInboxOpen = false;
 
   // ── Estado Cascada Cognitiva & Puesto de Mando (Desk) ─────────────────────
   let showManualPrompt = true;
@@ -108,6 +110,11 @@
     imageName = file.name;
     previewUrl = URL.createObjectURL(file);
     error = null;
+  }
+
+  function handleWikiSelect(file: File) {
+    loadFile(file, 'local');
+    imageName = file.name;
   }
 
   function handleFileChange(e: Event) {
@@ -508,6 +515,16 @@
             <span>{pickerLoading ? 'Abriendo Google Fotos…' : 'Abrir mis Fotos (Google Fotos)'}</span>
           </button>
 
+          <!-- Botón Galería Wikimedia Commons (CC0) -->
+          <button
+            type="button"
+            class="w-full py-3 px-4 rounded-xl border border-emerald-300 bg-emerald-50/80 hover:bg-emerald-100 text-emerald-950 font-semibold text-xs flex items-center justify-center gap-2.5 transition-all duration-150 cursor-pointer shadow-2xs hover:shadow-xs group"
+            on:click={() => (isWikiInboxOpen = true)}
+          >
+            <span class="text-base group-hover:scale-110 transition-transform">🏛</span>
+            <span>Explorar Galería Wikimedia Commons (CC0)</span>
+          </button>
+
           <!-- Nota informativa anclada -->
           <div class="mt-auto p-4 rounded-xl bg-zinc-100/70 border border-zinc-200/80 text-[11px] text-zinc-500 leading-relaxed">
             <span class="font-semibold text-zinc-700">TGP Scriptorium:</span> Accedé a tus imágenes locales o navegá por tus carpetas y fotos en Google Cloud sin salir de la interfaz.
@@ -689,7 +706,7 @@
                   bind:this={promptEl}
                   bind:value={prompt}
                   rows="4"
-                  class="w-full px-4 py-3 text-sm bg-white border border-zinc-300 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-y shadow-2xs font-sans leading-relaxed min-h-[110px]"
+                  class="w-full px-4 py-3 text-sm bg-white border border-zinc-300 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-y shadow-2xs font-sans leading-relaxed min-h-27.5"
                   placeholder="Escribe tu consulta, mini-charla reflexiva o instrucción ChatOps. Admite Slash Commands directos (ej: /video fascinum romano o /hemeroteca pro 1500t El mito de Ícaro)..."
                   on:keydown={handlePromptKeydown}
                   disabled={isLoading}
@@ -886,3 +903,5 @@
     </div>
   </div>
 {/if}
+
+<WikimediaGalleryInbox bind:isOpen={isWikiInboxOpen} onSelect={handleWikiSelect} />
