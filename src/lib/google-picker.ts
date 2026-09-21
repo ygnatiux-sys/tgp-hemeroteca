@@ -28,6 +28,15 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
 
   const { onSelect, onError } = options;
 
+  // ── 0. Abrir pestaña vacía SÍNCRONAMENTE para evadir el Popup Blocker ──
+  // Los navegadores modernos bloquean window.open si ocurre después de un await (ej. fetch)
+  const pickerTab = window.open('', '_blank', 'noopener,noreferrer');
+  if (!pickerTab) {
+    if (onError) onError(new Error('El navegador bloqueó la pestaña de Google Photos. Habilita las ventanas emergentes.'));
+    return;
+  }
+  pickerTab.document.write('<div style="font-family:sans-serif;padding:2rem;">Conectando con Google Photos...</div>');
+
   // Resuelve la URL base del backend desde las opciones o desde la variable de entorno de Astro
   const backendBase = (options.backendUrl
     || (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_TGP_MIND_URL : null)
@@ -42,6 +51,7 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
     });
 
     if (!sessionRes.ok) {
+      pickerTab.close();
       const errData = await sessionRes.json().catch(() => ({})) as any;
       throw new Error(errData.error || `Error al crear sesion Picker: ${sessionRes.status}`);
     }
@@ -52,15 +62,12 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
     };
 
     if (!sessionId || !pickerUri) {
+      pickerTab.close();
       throw new Error('Respuesta invalida del backend: faltan sessionId o pickerUri');
     }
 
-    // ── 2. Abrir pickerUri en nueva pestaña ──────────────────────────────────
-    // Google prohíbe iframes — debe ser window.open en nueva pestaña
-    const pickerTab = window.open(pickerUri, '_blank', 'noopener,noreferrer');
-    if (!pickerTab) {
-      throw new Error('El navegador bloqueó la apertura de la pestaña de Google Photos. Habilita las ventanas emergentes para este sitio.');
-    }
+    // ── 2. Asignar pickerUri a la pestaña ya abierta ──────────────────────────
+    pickerTab.location.href = pickerUri;
 
     // ── 3. Polling al backend cada 3 s ───────────────────────────────────────
     const startTime = Date.now();
