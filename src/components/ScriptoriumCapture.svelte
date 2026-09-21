@@ -37,8 +37,8 @@
   const EXHAUSTIVE_ENDPOINT = `${TGP_MIND_URL}/api/vision-exhaustivo`;
   const PREMIUM_ENDPOINT = `${TGP_MIND_URL}/api/redaccion-premium`;
   const BOT_GENERATE_ENDPOINT = `${TGP_MIND_URL}/api/bot/generate`;
-  const GOOGLE_PICKER_KEY = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_PICKER_API_KEY : null) ?? '';
-  const GOOGLE_CLIENT_ID = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_CLIENT_ID : null) ?? '';
+  const GOOGLE_PICKER_KEY = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_PICKER_API_KEY : null) || 'AIzaSyD7Cf-awQfcVb_9i1GJfmLKPngpp6bzoiM';
+  const GOOGLE_CLIENT_ID = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_CLIENT_ID : null) || '713934653057-f6er90sfdhmc6a8cjb3is51t2sjhgecv.apps.googleusercontent.com';
 
   // ── Prop de Integración ───────────────────────────────────────────────────
   export let embedded = false;
@@ -400,7 +400,7 @@
     aria-modal={!embedded ? 'true' : undefined}
     aria-label="TGP Vision Board"
   >
-    <div class="bg-white rounded-3xl shadow-xl w-full {embedded ? 'max-w-7xl h-[calc(100vh-120px)] min-h-180' : 'max-w-6xl h-[88vh] max-h-[88vh] shadow-2xl'} flex flex-col overflow-hidden border border-zinc-200 text-zinc-900 select-auto">
+    <div class="bg-white rounded-3xl shadow-xl w-full {embedded ? 'max-w-7xl' : 'max-w-6xl h-[88vh] max-h-[88vh] shadow-2xl overflow-hidden'} flex flex-col border border-zinc-200 text-zinc-900 select-auto">
 
       <!-- Header del workspace -->
       <header class="flex items-center justify-between px-6 md:px-8 py-3.5 border-b border-zinc-200 bg-zinc-50/95 shrink-0">
@@ -433,10 +433,10 @@
       </header>
 
       <!-- Workspace en 2 columnas -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 flex-1 min-h-0 overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-zinc-200">
+      <div class="grid grid-cols-1 lg:grid-cols-2 flex-1 {embedded ? 'items-start' : 'min-h-0 overflow-hidden'} divide-y lg:divide-y-0 lg:divide-x divide-zinc-200">
 
         <!-- ── COLUMNA IZQUIERDA: Ingesta Visual (limpia y anclada) ──────── -->
-        <div class="p-6 md:p-8 flex flex-col gap-5 overflow-y-auto bg-zinc-50/50">
+        <div class="p-6 md:p-8 flex flex-col gap-5 {embedded ? 'lg:sticky lg:top-6 self-start' : 'overflow-y-auto'} bg-zinc-50/50">
 
           <!-- Selección / Ingesta de Imagen -->
           <div class="flex flex-col gap-2">
@@ -505,7 +505,7 @@
             <svg class="w-5 h-5 shrink-0 text-blue-600 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/>
             </svg>
-            <span>{pickerLoading ? 'Abriendo Google Picker…' : 'Abrir Google Drive / Google Fotos'}</span>
+            <span>{pickerLoading ? 'Abriendo Google Fotos…' : 'Abrir mis Fotos (Google Fotos)'}</span>
           </button>
 
           <!-- Nota informativa anclada -->
@@ -517,8 +517,8 @@
 
         <!-- ── COLUMNA DERECHA: Prompt + Resultados ───────────────────────── -->
         <!-- ── COLUMNA DERECHA: Cascada Cognitiva (Material You Light) ────── -->
-        <div class="p-6 md:p-8 flex flex-col gap-5 overflow-hidden bg-white min-h-0">
-          <div class="flex flex-col gap-3.5 shrink-0 bg-zinc-50 p-5 rounded-3xl border border-zinc-200 shadow-sm">
+        <div class="p-6 md:p-8 flex flex-col gap-6 {embedded ? '' : 'overflow-hidden min-h-0'} bg-white">
+          <div class="flex flex-col gap-3.5 {embedded ? '' : 'shrink-0'} bg-zinc-50 p-5 rounded-3xl border border-zinc-200 shadow-sm">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold uppercase tracking-wider text-zinc-600">
                 2. Cascada Cognitiva
@@ -723,7 +723,7 @@
           </div>
 
           <!-- Feed de Resultados Apilados -->
-          <div class="flex-1 min-h-0 overflow-y-auto space-y-4 pr-1" bind:this={resultsEl}>
+          <div class="{embedded ? 'space-y-4 pt-2' : 'flex-1 min-h-0 overflow-y-auto space-y-4 pr-1'}" bind:this={resultsEl}>
             {#if isLoading}
               <div class="h-full flex flex-col items-center justify-center py-12 gap-3 text-zinc-500">
                 <div class="flex gap-2">

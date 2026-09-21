@@ -1,0 +1,192 @@
+---
+export const prerender = false;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Diagnóstico · Google Picker</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 30px;
+        background: #0d1117;
+        color: #e6edf3;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      }
+      .card {
+        max-width: 750px;
+        margin: 0 auto;
+        background: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      }
+      h1 {
+        margin-top: 0;
+        font-size: 20px;
+        color: #58a6ff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      button {
+        background: #238636;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-bottom: 20px;
+      }
+      button:hover {
+        background: #2ea043;
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      #logs {
+        background: #090d12;
+        border: 1px solid #21262d;
+        border-radius: 10px;
+        padding: 16px;
+        font-size: 13px;
+        line-height: 1.6;
+        min-height: 200px;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+      .log-info { color: #8b949e; }
+      .log-success { color: #3fb950; font-weight: bold; }
+      .log-warn { color: #d29922; font-weight: bold; }
+      .log-error { color: #f85149; font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>🔍 Test Diagnóstico en 1 Paso · Google Picker</h1>
+      <p style="color: #8b949e; font-size: 13px;">
+        Este test aísla la llamada a Google Identity Services y Google Picker API, reportando en pantalla el estado exacto de autenticación, origen y respuesta 403 de Google.
+      </p>
+
+      <div style="margin: 20px 0;">
+        <button id="btn-run-test" type="button">▶ Ejecutar Test de Google Picker</button>
+      </div>
+
+      <div id="logs">Esperando que presiones el botón de test...</div>
+    </div>
+
+    <script is:inline>
+      const API_KEY = "AIzaSyD7Cf-awQfcVb_9i1GJfmLKPngpp6bzoiM";
+      const CLIENT_ID = "713934653057-f6er90sfdhmc6a8cjb3is51t2sjhgecv.apps.googleusercontent.com";
+      const logsEl = document.getElementById('logs');
+      const btn = document.getElementById('btn-run-test');
+
+      function appendLog(text, type = 'info') {
+        const span = document.createElement('span');
+        span.className = `log-${type}`;
+        span.textContent = text + '\n';
+        logsEl.appendChild(span);
+        console.log(`[Diagnostic] ${text}`);
+      }
+
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = src;
+          s.onload = () => resolve();
+          s.onerror = (e) => reject(new Error(`Fallo al cargar script: ${src}`));
+          document.head.appendChild(s);
+        });
+      }
+
+      btn.addEventListener('click', async () => {
+        logsEl.textContent = '';
+        btn.disabled = true;
+        appendLog('🚀 Iniciando test diagnóstico...', 'info');
+
+        appendLog(`1. Origen actual detectado por el navegador: ${window.location.origin}`, 'info');
+        appendLog(`   Client ID: ${CLIENT_ID}`, 'info');
+        appendLog(`   API Key: ${API_KEY.slice(0, 8)}...`, 'info');
+
+        try {
+          appendLog('2. Cargando librerías oficiales de Google (GAPI + GIS)...', 'info');
+          await Promise.all([
+            loadScript('https://apis.google.com/js/api.js'),
+            loadScript('https://accounts.google.com/gsi/client'),
+          ]);
+          appendLog('   ✓ Scripts de Google cargados correctamente.', 'success');
+
+          appendLog('3. Cargando módulo "picker" en GAPI...', 'info');
+          await new Promise((resolve, reject) => {
+            window.gapi.load('picker', {
+              callback: resolve,
+              onerror: () => reject(new Error('Fallo al inicializar gapi.picker')),
+            });
+          });
+          appendLog('   ✓ Módulo gapi.picker inicializado.', 'success');
+
+          appendLog('4. Inicializando Token Client de Google Identity Services (OAuth)...', 'info');
+          let tokenClient;
+          await new Promise((resolve, reject) => {
+            tokenClient = window.google.accounts.oauth2.initTokenClient({
+              client_id: CLIENT_ID,
+              scope: 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/photoslibrary.readonly',
+              callback: (res) => {
+                if (res.error) {
+                  appendLog(`   ⚠ Error de OAuth recibido de Google: ${res.error}`, 'error');
+                  if (res.error_description) appendLog(`     Detalle: ${res.error_description}`, 'error');
+                  reject(new Error(res.error));
+                } else {
+                  appendLog(`   ✓ OAuth Token recibido con éxito (tipo: ${res.token_type}, expires_in: ${res.expires_in}s)`, 'success');
+                  resolve(res.access_token);
+                }
+              },
+            });
+
+            appendLog('   Solicitando ventana de autorización a Google...', 'info');
+            tokenClient.requestAccessToken({ prompt: '' });
+          }).then(async (accessToken) => {
+            appendLog('5. Construyendo instancia del Picker con el Token...', 'info');
+            const g = window.google;
+            const view = new g.picker.View(g.picker.ViewId.PHOTOS);
+
+            const picker = new g.picker.PickerBuilder()
+              .setTitle('Test Diagnóstico TGP')
+              .setOAuthToken(accessToken)
+              .setDeveloperKey(API_KEY)
+              .setOrigin(window.location.origin)
+              .addView(view)
+              .setCallback((data) => {
+                appendLog(`   [Picker Callback] Evento: ${data[g.picker.Response.ACTION]}`, 'info');
+                if (data[g.picker.Response.ACTION] === g.picker.Action.PICKED) {
+                  const doc = data[g.picker.Response.DOCUMENTS][0];
+                  appendLog(`   ✓ Imagen seleccionada: ${doc[g.picker.Document.NAME]} (ID: ${doc[g.picker.Document.ID]})`, 'success');
+                }
+              })
+              .build();
+
+            appendLog('   ✓ PickerBuilder compilado. Abriendo modal...', 'success');
+            picker.setVisible(true);
+            appendLog('6. Modal enviado a pantalla. Si la ventana dentro del modal muestra "403 That\'s an error", significa que Google requiere agregar "http://localhost:4321" en los Orígenes Autorizados de JavaScript de la consola de Google Cloud.', 'warn');
+          });
+
+        } catch (err) {
+          appendLog(`❌ DIAGNÓSTICO FINAL: ${err.message}`, 'error');
+          if (err.message.includes('origin') || err.message.includes('403') || err.message.includes('access_denied')) {
+            appendLog(`\n💡 CAUSA CONFIRMADA: Google bloqueó la conexión porque el origen "${window.location.origin}" no está en los "Orígenes autorizados de JavaScript" del Client ID en Google Cloud Console.`, 'warn');
+          }
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

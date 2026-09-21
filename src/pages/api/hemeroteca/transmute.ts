@@ -28,10 +28,16 @@ function slugify(text: string): string {
     .slice(0, 64);
 }
 
+export const GET: APIRoute = async () =>
+  new Response(JSON.stringify({ status: 'API Transmute Activa', method: 'Requiere POST para publicar' }), {
+    status: 200,
+    headers,
+  });
+
 export const OPTIONS: APIRoute = async () =>
   new Response(null, {
     status: 204,
-    headers: { ...headers, 'Access-Control-Allow-Methods': 'POST, OPTIONS' },
+    headers: { ...headers, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS' },
   });
 
 export const POST: APIRoute = async ({ request }) => {

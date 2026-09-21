@@ -110,21 +110,22 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
       const pickerHeight = Math.min(window.innerHeight - 80, 640);
 
       const builder = new g.picker.PickerBuilder()
-        .setTitle('TGP Scriptorium · Google Drive & Fotos')
+        .setTitle('TGP Scriptorium · Google Fotos')
         .setAppId(appId)
         .setOAuthToken(token)
         .setDeveloperKey(apiKey)
-        .setOrigin(origin)
-        .addView(docsView)
-        .addView(uploadView);
+        .setOrigin(origin);
 
+      // Vista Principal Predeterminada: Google Fotos
       try {
         if (g.picker.View && g.picker.ViewId?.PHOTOS) {
           builder.addView(new g.picker.View(g.picker.ViewId.PHOTOS));
         }
-      } catch {
-        // Fallback transparente si Photos no está disponible
-      }
+      } catch {}
+
+      // Vistas complementarias
+      builder.addView(docsView);
+      builder.addView(uploadView);
 
       builder
         .setSize(pickerWidth, pickerHeight)
