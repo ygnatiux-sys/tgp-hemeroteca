@@ -20,11 +20,11 @@
 
   const GOOGLE_PICKER_KEY = (typeof import.meta !== 'undefined'
     ? (import.meta as any).env?.PUBLIC_GOOGLE_PICKER_API_KEY
-    : null) ?? '';
+    : null) ?? 'AIzaSyD7Cf-awQfcVb_9i1GJfmLKPngpp6bzoiM';
 
   const GOOGLE_CLIENT_ID = (typeof import.meta !== 'undefined'
     ? (import.meta as any).env?.PUBLIC_GOOGLE_CLIENT_ID
-    : null) ?? '';
+    : null) ?? '713934653057-f6er90sfdhmc6a8cjb3is51t2sjhgecv.apps.googleusercontent.com';
 
   // ── Estado reactivo ───────────────────────────────────────────────────────
   let imagenBase:       File | null  = null;
@@ -391,12 +391,12 @@
     background:    var(--bg);
     color:         var(--text);
     border:        1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: var(--radius-sm);
     padding:       24px;
-    max-width:     900px;
-    margin:        16px auto;
+    max-width:     100%;
+    margin:        0 auto;
     font-family:   var(--font-mono);
-    box-shadow:    0 24px 80px rgba(0,0,0,0.9);
+    box-shadow:    none;
   }
 
   /* ── Header ──────────────────────────────────────────────────────────── */

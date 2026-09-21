@@ -400,10 +400,10 @@
     aria-modal={!embedded ? 'true' : undefined}
     aria-label="TGP Vision Board"
   >
-    <div class="bg-white rounded-3xl shadow-xl w-full {embedded ? 'max-w-7xl' : 'max-w-6xl h-[88vh] max-h-[88vh] shadow-2xl overflow-hidden'} flex flex-col border border-zinc-200 text-zinc-900 select-auto">
+    <div class="w-full {embedded ? 'border border-zinc-200/90 bg-white' : 'bg-white rounded-2xl shadow-2xl max-w-6xl h-[88vh] max-h-[88vh] overflow-hidden border border-zinc-200'} flex flex-col text-zinc-900 select-auto">
 
       <!-- Header del workspace -->
-      <header class="flex items-center justify-between px-6 md:px-8 py-3.5 border-b border-zinc-200 bg-zinc-50/95 shrink-0">
+      <header class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-zinc-200 bg-zinc-50/80 shrink-0">
         <div>
           <div class="text-[11px] font-mono font-medium tracking-widest uppercase text-emerald-700">
             TGP Scriptorium · Motor Cognitivo Multimodal
@@ -415,7 +415,7 @@
         <div class="flex items-center gap-3">
           <a
             href="/tgp-app/"
-            class="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-emerald-800 bg-emerald-50 hover:bg-emerald-100 hover:text-emerald-900 border border-emerald-200 rounded-full transition-colors inline-flex items-center gap-1.5 shadow-xs"
+            class="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-emerald-800 bg-emerald-50 hover:bg-emerald-100 hover:text-emerald-900 border border-emerald-200 rounded-full transition-colors inline-flex items-center gap-1.5 shadow-2xs"
             title="Volver al Panel Principal de TGP App"
           >
             ← Volver al Hub
@@ -432,11 +432,11 @@
         </div>
       </header>
 
-      <!-- Workspace en 2 columnas -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 flex-1 {embedded ? 'items-start' : 'min-h-0 overflow-hidden'} divide-y lg:divide-y-0 lg:divide-x divide-zinc-200">
+      <!-- Workspace en 2 columnas (45% Ingesta / 55% Puesto de Mando) -->
+      <div class="flex flex-col lg:flex-row flex-1 {embedded ? 'items-start' : 'min-h-0 overflow-hidden'} divide-y lg:divide-y-0 lg:divide-x divide-zinc-200">
 
-        <!-- ── COLUMNA IZQUIERDA: Ingesta Visual (limpia y anclada) ──────── -->
-        <div class="p-6 md:p-8 flex flex-col gap-5 {embedded ? 'lg:sticky lg:top-6 self-start' : 'overflow-y-auto'} bg-zinc-50/50">
+        <!-- ── COLUMNA IZQUIERDA (45%): Ingesta Visual y Visor ──────── -->
+        <div class="w-full lg:w-[45%] p-4 sm:p-6 lg:p-7 flex flex-col gap-5 {embedded ? 'lg:sticky lg:top-4 self-start' : 'overflow-y-auto'} bg-zinc-50/40">
 
           <!-- Selección / Ingesta de Imagen -->
           <div class="flex flex-col gap-2">
@@ -447,7 +447,7 @@
             {#if !previewUrl}
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div
-                class="border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 min-h-55 {isDragging ? 'border-emerald-500 bg-emerald-50/70 scale-[0.99]' : 'border-zinc-300 bg-white hover:bg-zinc-50 hover:border-zinc-400'}"
+                class="border-2 border-dashed rounded-xl p-6 lg:p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 min-h-50 {isDragging ? 'border-emerald-500 bg-emerald-50/70 scale-[0.99]' : 'border-zinc-300 bg-white hover:bg-zinc-50 hover:border-zinc-400'}"
                 on:dragover={handleDragOver}
                 on:dragleave={handleDragLeave}
                 on:drop={handleDrop}
@@ -460,17 +460,17 @@
                   class="hidden"
                   on:change={handleFileChange}
                 />
-                <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-3 shadow-xs">
+                <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mb-2.5 shadow-2xs">
                   ↑
                 </div>
-                <div class="text-base font-semibold text-zinc-800">Arrastrá una imagen aquí</div>
-                <div class="text-xs text-zinc-500 mt-1">o hacé clic para explorar desde tu equipo</div>
-                <div class="text-[11px] text-zinc-400 mt-2 font-mono">JPG · PNG · WEBP · GIF · TIFF</div>
+                <div class="text-sm font-semibold text-zinc-800">Arrastrá una imagen aquí</div>
+                <div class="text-xs text-zinc-500 mt-0.5">o hacé clic para explorar desde tu equipo</div>
+                <div class="text-[10px] text-zinc-400 mt-2 font-mono">JPG · PNG · WEBP · GIF · TIFF</div>
               </div>
             {:else}
-              <div class="relative rounded-2xl overflow-hidden border border-zinc-200 bg-zinc-900 aspect-video shadow-md group flex items-center justify-center">
+              <div class="relative rounded-xl overflow-hidden border border-zinc-200 bg-zinc-900 aspect-video shadow-2xs group flex items-center justify-center">
                 <img src={previewUrl} alt={imageName} class="w-full h-full object-contain" />
-                <div class="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-3.5 flex items-center justify-between text-white">
+                <div class="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-3 flex items-center justify-between text-white">
                   <span class="text-xs font-medium truncate max-w-[70%]" title={imageName}>{imageName}</span>
                   <span class="text-[10px] uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded-full {imageSource === 'google' ? 'bg-blue-600 text-white' : 'bg-emerald-600 text-white'}">
                     {imageSource === 'google' ? 'Google Cloud' : 'Archivo Local'}
@@ -478,7 +478,7 @@
                 </div>
                 <button
                   type="button"
-                  class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center text-sm transition-transform hover:scale-110 cursor-pointer shadow-md"
+                  class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center text-xs transition-transform hover:scale-110 cursor-pointer shadow-md"
                   on:click={clearImage}
                   title="Quitar imagen"
                 >
@@ -498,7 +498,7 @@
           <!-- Botón de apertura nativa del Google Picker -->
           <button
             type="button"
-            class="w-full py-4 px-5 rounded-2xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-blue-900 font-semibold text-sm flex items-center justify-center gap-3 transition-all duration-150 cursor-pointer shadow-xs hover:shadow-sm disabled:opacity-60 disabled:cursor-not-allowed group"
+            class="w-full py-3 px-4 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-blue-900 font-semibold text-xs flex items-center justify-center gap-2.5 transition-all duration-150 cursor-pointer shadow-2xs hover:shadow-xs disabled:opacity-60 disabled:cursor-not-allowed group"
             on:click={abrirGooglePicker}
             disabled={pickerLoading}
           >
@@ -516,9 +516,9 @@
         </div>
 
         <!-- ── COLUMNA DERECHA: Prompt + Resultados ───────────────────────── -->
-        <!-- ── COLUMNA DERECHA: Cascada Cognitiva (Material You Light) ────── -->
-        <div class="p-6 md:p-8 flex flex-col gap-6 {embedded ? '' : 'overflow-hidden min-h-0'} bg-white">
-          <div class="flex flex-col gap-3.5 {embedded ? '' : 'shrink-0'} bg-zinc-50 p-5 rounded-3xl border border-zinc-200 shadow-sm">
+        <!-- ── COLUMNA DERECHA (55%): Cascada Cognitiva & Puesto de Mando ────── -->
+        <div class="w-full lg:w-[55%] p-4 sm:p-6 lg:p-7 flex flex-col gap-5 {embedded ? '' : 'overflow-hidden min-h-0'} bg-white">
+          <div class="flex flex-col gap-3.5 {embedded ? 'border-b border-zinc-200/80 pb-4' : 'bg-zinc-50 p-5 rounded-2xl border border-zinc-200 shrink-0'}">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold uppercase tracking-wider text-zinc-600">
                 2. Cascada Cognitiva
@@ -534,10 +534,10 @@
               type="button"
               disabled={!hasImage || isLoading}
               on:click={() => triggerPreset('Informe Base', 'Realiza un informe neutral y exhaustivo de esta imagen. Describe literalmente qué se ve, extrae cualquier texto legible (OCR) y señala las entidades principales.')}
-              class="w-full p-4 rounded-2xl bg-emerald-100 hover:bg-emerald-200/90 text-emerald-900 border border-emerald-300 font-semibold text-sm transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-between group disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              class="w-full p-3.5 rounded-xl bg-emerald-100/90 hover:bg-emerald-200/90 text-emerald-900 border border-emerald-300 font-semibold text-sm transition-all duration-200 shadow-2xs flex items-center justify-between group disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-emerald-200/80 text-emerald-800 flex items-center justify-center font-bold text-base group-hover:scale-105 transition-transform">
+                <div class="w-8 h-8 rounded-lg bg-emerald-200/80 text-emerald-800 flex items-center justify-center font-bold text-base group-hover:scale-105 transition-transform">
                   ✦
                 </div>
                 <div class="text-left">
@@ -557,7 +557,7 @@
                 type="button"
                 disabled={!hasImage || isLoading}
                 on:click={() => triggerPreset('Arqueohistoria', 'Realiza una inmersión arqueológica e histórica profunda. Identifica filiación estilística, contexto temporal, cruces culturales y anomalías.')}
-                class="px-3.5 py-2 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed
+                class="px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed
                 {activePillLabel === 'Arqueohistoria' && isLoading 
                   ? 'bg-amber-100 border-amber-300 text-amber-900 font-semibold' 
                   : 'bg-white hover:bg-amber-50 border-zinc-200 hover:border-amber-300 text-zinc-800 hover:text-amber-900 shadow-2xs'}"
@@ -570,7 +570,7 @@
                 type="button"
                 disabled={!hasImage || isLoading}
                 on:click={() => triggerPreset('Hermenéutica', 'Decodifica símbolos, geometría sagrada, iconografía o arquetipos. Analiza la materialidad, manufactura y erosión.')}
-                class="px-3.5 py-2 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed
+                class="px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed
                 {activePillLabel === 'Hermenéutica' && isLoading 
                   ? 'bg-purple-100 border-purple-300 text-purple-900 font-semibold' 
                   : 'bg-white hover:bg-purple-50 border-zinc-200 hover:border-purple-300 text-zinc-800 hover:text-purple-900 shadow-2xs'}"
@@ -582,7 +582,7 @@
               <button
                 type="button"
                 on:click={() => (showManualPrompt = !showManualPrompt)}
-                class="px-3.5 py-2 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer
+                class="px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer
                 {showManualPrompt 
                   ? 'bg-zinc-900 border-zinc-900 text-white shadow-xs' 
                   : 'bg-white hover:bg-zinc-100 border-zinc-200 text-zinc-700 shadow-2xs'}"
@@ -593,18 +593,18 @@
 
             <!-- PUESTO DE MANDO (DESK / INBOX AMPLIO) -->
             {#if showManualPrompt}
-              <div class="mt-2 space-y-3 pt-3 border-t bg-zinc-50/60 p-4 rounded-2xl border border-zinc-200/90 shadow-2xs">
-                
-                <!-- Barra Superior del Desk: Destino Colección + Badges -->
-                <div class="flex flex-wrap items-center justify-between gap-2.5 pb-2 border-b border-zinc-200/70">
-                  <div class="flex items-center gap-2">
-                    <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-600 flex items-center gap-1.5">
-                      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                      Colección Destino:
+              <div class="mt-2 space-y-2.5 pt-2">
+                <!-- Barra Horizontal Única: Destino + Densidad + Motor -->
+                <div class="flex flex-wrap items-center justify-between gap-2 p-2 bg-zinc-100/80 rounded-xl border border-zinc-200 text-xs">
+                  <!-- Grupo 1: Colección Destino -->
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                      Destino:
                     </span>
                     <select
                       bind:value={selectedCollection}
-                      class="text-xs py-1.5 px-3 bg-white border border-zinc-300 rounded-xl text-zinc-800 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-2xs cursor-pointer"
+                      class="text-xs py-1 px-2.5 bg-white border border-zinc-300 rounded-lg text-zinc-800 font-semibold focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-2xs cursor-pointer"
                       title="Selecciona la colección de destino en Keystatic"
                     >
                       <option value="ensayosCinematicos">Ensayos Cinemáticos - GSAP</option>
@@ -615,53 +615,53 @@
                       <option value="informesPremium">Informes Premium</option>
                     </select>
                   </div>
-                  <span class="text-[11px] font-mono text-zinc-400">Ctrl + Enter para enviar</span>
-                </div>
 
-                <!-- Panel de Control de Tiers (Densidad + Motor) -->
-                <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
-                  <!-- Selector de Densidad (3 Tiers) -->
-                  <div class="flex items-center gap-1.5">
-                    <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold mr-1">Densidad:</span>
+                  <div class="hidden sm:block h-4 w-px bg-zinc-300/80"></div>
+
+                  <!-- Grupo 2: Densidad -->
+                  <div class="flex items-center gap-1">
+                    <span class="text-[10px] font-mono text-zinc-400 uppercase font-semibold mr-0.5">Densidad:</span>
                     <button
                       type="button"
                       on:click={() => (manualDensidad = 'breve')}
-                      class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer shadow-2xs
+                      class="px-2 py-0.5 rounded-md text-[11px] font-medium border transition-all cursor-pointer shadow-2xs
                         {manualDensidad === 'breve'
                           ? 'bg-emerald-600 text-white border-emerald-700 font-semibold'
                           : 'bg-white text-zinc-700 hover:bg-zinc-100 border-zinc-200'}"
                     >
-                      ⚡ Breve (~800t)
+                      ⚡ Breve
                     </button>
                     <button
                       type="button"
                       on:click={() => (manualDensidad = 'profundo_breve')}
-                      class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer shadow-2xs
+                      class="px-2 py-0.5 rounded-md text-[11px] font-medium border transition-all cursor-pointer shadow-2xs
                         {manualDensidad === 'profundo_breve'
                           ? 'bg-emerald-600 text-white border-emerald-700 font-semibold'
                           : 'bg-white text-zinc-700 hover:bg-zinc-100 border-zinc-200'}"
                     >
-                      🧠 Profundo (~1500t)
+                      🧠 Profundo
                     </button>
                     <button
                       type="button"
                       on:click={() => (manualDensidad = 'premium')}
-                      class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer shadow-2xs
+                      class="px-2 py-0.5 rounded-md text-[11px] font-medium border transition-all cursor-pointer shadow-2xs
                         {manualDensidad === 'premium'
                           ? 'bg-purple-700 text-white border-purple-800 font-semibold'
                           : 'bg-white text-purple-900 hover:bg-purple-50 border-purple-200'}"
                     >
-                      🏛️ Tratado (+4500t)
+                      🏛️ Tratado
                     </button>
                   </div>
 
-                  <!-- Selector de Motor (Flash vs Pro) -->
-                  <div class="flex items-center gap-1.5">
-                    <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold mr-1">Motor:</span>
+                  <div class="hidden md:block h-4 w-px bg-zinc-300/80"></div>
+
+                  <!-- Grupo 3: Motor -->
+                  <div class="flex items-center gap-1">
+                    <span class="text-[10px] font-mono text-zinc-400 uppercase font-semibold mr-0.5">Motor:</span>
                     <button
                       type="button"
                       on:click={() => (manualModelo = 'flash')}
-                      class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer shadow-2xs
+                      class="px-2 py-0.5 rounded-md text-[11px] font-medium border transition-all cursor-pointer shadow-2xs
                         {manualModelo === 'flash'
                           ? 'bg-amber-600 text-white border-amber-700 font-semibold'
                           : 'bg-white text-zinc-700 hover:bg-amber-50 border-zinc-200'}"
@@ -671,22 +671,25 @@
                     <button
                       type="button"
                       on:click={() => (manualModelo = 'pro')}
-                      class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer shadow-2xs
+                      class="px-2 py-0.5 rounded-md text-[11px] font-medium border transition-all cursor-pointer shadow-2xs
                         {manualModelo === 'pro'
                           ? 'bg-blue-600 text-white border-blue-700 font-semibold'
                           : 'bg-white text-zinc-700 hover:bg-blue-50 border-zinc-200'}"
                     >
-                      🧠 Pro (Grounded)
+                      🧠 Pro
                     </button>
                   </div>
+
+                  <!-- Atajo -->
+                  <span class="text-[10px] font-mono text-zinc-400 hidden xl:inline ml-auto">Ctrl + Enter</span>
                 </div>
 
                 <!-- Textarea Amplio Tipo Desk (Puesto de Mando) -->
                 <textarea
                   bind:this={promptEl}
                   bind:value={prompt}
-                  rows="6"
-                  class="w-full px-4 py-3.5 text-sm bg-white border border-zinc-300 rounded-2xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-y shadow-inner font-sans leading-relaxed min-h-35"
+                  rows="4"
+                  class="w-full px-4 py-3 text-sm bg-white border border-zinc-300 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-y shadow-2xs font-sans leading-relaxed min-h-[110px]"
                   placeholder="Escribe tu consulta, mini-charla reflexiva o instrucción ChatOps. Admite Slash Commands directos (ej: /video fascinum romano o /hemeroteca pro 1500t El mito de Ícaro)..."
                   on:keydown={handlePromptKeydown}
                   disabled={isLoading}
@@ -744,7 +747,7 @@
               </div>
             {:else}
               {#each results as r, i (i)}
-                <div class="p-5 rounded-3xl bg-zinc-50 border border-zinc-200 shadow-sm flex flex-col gap-4">
+                <div class="p-4 sm:p-5 rounded-xl bg-zinc-50/70 border border-zinc-200 flex flex-col gap-3.5">
                   <!-- Header con píldora, timestamp y badges de R2/D1 -->
                   <header class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-200/80 pb-3">
                     <div class="flex items-center gap-2">
@@ -782,7 +785,7 @@
                   </header>
 
                   <!-- ── BARRA DE ACCIÓN PRINCIPAL (Siempre visible arriba) ── -->
-                  <div class="p-3 bg-white rounded-2xl border border-zinc-200/90 shadow-2xs flex flex-wrap items-center justify-between gap-2.5">
+                  <div class="p-2.5 bg-white rounded-xl border border-zinc-200/90 shadow-2xs flex flex-wrap items-center justify-between gap-2">
                     <div class="flex flex-wrap items-center gap-2">
                       <button
                         type="button"
@@ -860,7 +863,7 @@
 
                   <!-- Contenido Markdown y Vista de Imagen -->
                   <div class="flex gap-4 items-start">
-                    <div class="w-20 h-20 rounded-2xl overflow-hidden border border-zinc-200 bg-zinc-100 shrink-0 shadow-2xs">
+                    <div class="w-20 h-20 rounded-xl overflow-hidden border border-zinc-200 bg-zinc-100 shrink-0 shadow-2xs">
                       <img src={r.imagePreview} alt={r.imageName} class="w-full h-full object-cover" />
                     </div>
                     <div class="flex-1 min-w-0">
