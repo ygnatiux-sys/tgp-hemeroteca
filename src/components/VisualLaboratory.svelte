@@ -64,7 +64,9 @@
       },
       onError: (err) => {
         pickerLoading = false;
-        errorMsg = `Google Picker: ${err.message}`;
+        if (err.message !== 'PICKER_RENDERED' && err.message !== 'PICKER_CLOSED') {
+          errorMsg = `Google Picker: ${err.message}`;
+        }
       },
     });
   }

@@ -130,7 +130,12 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
       builder
         .setSize(pickerWidth, pickerHeight)
         .setCallback(async (data: any) => {
-          if (data[g.picker.Response.ACTION] === g.picker.Action.PICKED) {
+          const action = data[g.picker.Response.ACTION];
+          if (action === g.picker.Action.CANCEL) {
+            onError?.(new Error('PICKER_CLOSED'));
+            return;
+          }
+          if (action === g.picker.Action.PICKED) {
             const doc = data[g.picker.Response.DOCUMENTS][0];
             const fileId = doc[g.picker.Document.ID];
             const fileName = doc[g.picker.Document.NAME] || 'google-image.jpg';
@@ -174,12 +179,17 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
 
       const picker = builder.build();
       picker.setVisible(true);
+
+      // Desactivar estado de carga tras mostrar el modal (evita botón 'Iniciando...' colgado)
+      setTimeout(() => {
+        onError?.(new Error('PICKER_RENDERED'));
+      }, 1000);
     };
 
     // 4. Solicitar autorización o refrescar token mediante Google Identity Services
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: clientId,
-      scope: 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/photoslibrary.readonly',
+      scope: 'https://www.googleapis.com/auth/drive.readonly',
       callback: (response: any) => {
         if (response.error !== undefined) {
           throw new Error(`Error de autenticación Google: ${response.error}`);
@@ -192,8 +202,8 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
       },
     });
 
-    // Solicitar token fresco para evitar error 403 por token caducado
-    tokenClient.requestAccessToken({ prompt: '' });
+    // Solicitar token fresco mediante ventana emergente si es necesario
+    tokenClient.requestAccessToken({ prompt: 'consent' });
   } catch (err: any) {
     console.error('[Google Picker]:', err);
     onError?.(err);
