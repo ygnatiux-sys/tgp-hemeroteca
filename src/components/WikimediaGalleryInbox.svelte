@@ -225,7 +225,7 @@
       </div>
 
       <!-- Área de la Grilla de Imágenes (Scroll Nativo) -->
-      <div class="flex-1 overflow-y-auto p-4 sm:p-5 min-h-[300px]">
+      <div class="flex-1 overflow-y-auto p-4 sm:p-5 min-h-75">
         {#if isLoading}
           <div class="h-64 flex flex-col items-center justify-center gap-3 text-zinc-400">
             <div class="flex gap-2">
@@ -258,13 +258,19 @@
               >
                 <!-- Imagen Thumbnail con click para previsualizar Fancybox -->
                 <div class="relative aspect-4/3 bg-zinc-900 overflow-hidden cursor-pointer">
-                  <img
-                    src={img.thumbUrl}
-                    alt={img.title}
-                    loading="lazy"
-                    class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  <button
+                    type="button"
+                    class="w-full h-full block cursor-zoom-in"
                     on:click={() => (previewImage = img)}
-                  />
+                    aria-label="Inspeccionar {img.title} en pantalla completa"
+                  >
+                    <img
+                      src={img.thumbUrl}
+                      alt={img.title}
+                      loading="lazy"
+                      class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </button>
 
                   <!-- Badge de Licencia -->
                   <div class="absolute top-2 left-2 bg-black/75 backdrop-blur-xs text-[9px] font-mono uppercase tracking-wider text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/40 pointer-events-none">

@@ -19,9 +19,7 @@
   import { openGooglePicker } from '../lib/google-picker';
   import WikimediaGalleryInbox from './WikimediaGalleryInbox.svelte';
 
-  const GOOGLE_PICKER_KEY = (typeof import.meta !== 'undefined'
-    ? (import.meta as any).env?.PUBLIC_GOOGLE_PICKER_API_KEY
-    : null) ?? 'AIzaSyD7Cf-awQfcVb_9i1GJfmLKPngpp6bzoiM';
+  const GOOGLE_PICKER_KEY = import.meta.env.PUBLIC_GOOGLE_API_KEY;
 
   const GOOGLE_CLIENT_ID = (typeof import.meta !== 'undefined'
     ? (import.meta as any).env?.PUBLIC_GOOGLE_CLIENT_ID
