@@ -1214,8 +1214,8 @@ telegramRouter.post('/api/bot/generate', async (c) => {
     const modLabel = modelo === 'pro' ? 'Gemini Pro' : 'Gemini Flash';
     const redLabel = red === 'facebook' ? 'Facebook' : 'TikTok';
 
-    const isHemeroteca = destino === 'hemeroteca' || destino === 'alternative';
-    const targetLabel = isHemeroteca ? `Hemeroteca (${destino.toUpperCase()})` : redLabel;
+    const isHemeroteca = destino !== 'social' && destino !== 'facebook' && destino !== 'tiktok';
+    const targetLabel = isHemeroteca ? `Hemeroteca (${destino})` : redLabel;
 
     await fetch(`${BOT_API}/sendMessage`, {
       method: 'POST',

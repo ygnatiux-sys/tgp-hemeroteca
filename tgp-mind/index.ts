@@ -188,7 +188,7 @@ initTelegramRouter({
   visionClient:           visionClient,
 });
 
-// -- CORS para APIs del Ecosistema (/api/*) -----------------------------------
+// -- CORS Global para todo el ecosistema (Local, Producción, Pages) ------------
 const isAllowedOrigin = (origin: string) => {
   if (!origin) return true;
   return (
@@ -200,11 +200,20 @@ const isAllowedOrigin = (origin: string) => {
   );
 };
 
-app.use('/api/*', cors({
-  origin: (origin) => isAllowedOrigin(origin) ? origin : null,
+app.use('*', cors({
+  origin: (origin) => {
+    if (!origin) return '*';
+    if (isAllowedOrigin(origin)) return origin;
+    return null;
+  },
   allowHeaders: ['Content-Type', 'Authorization', 'x-api-key', 'X-Api-Key', 'X-Mini-App', 'x-mini-app'],
-  allowMethods: ['POST', 'GET', 'OPTIONS'],
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  exposeHeaders: ['Content-Length'],
+  maxAge: 86400,
+  credentials: true,
 }));
+
+app.options('*', (c) => c.body(null, 204));
 
 app.route('/', telegramRouter);
 // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬

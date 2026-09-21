@@ -141,6 +141,7 @@ export type RouteDecision =
         fuenteImg?: 'wiki' | 'telegram' | 'none';
         cantidadSecciones?: number;
         photoUrl?: string;
+        groundingMode?: boolean;
       };
     }
   | {
@@ -239,8 +240,7 @@ function parseSlashCommand(
     fuenteImg: params.fuenteImg,
     modoLibrePrompt: params.modoLibrePrompt,
     groundingMode: params.groundingMode,
-    // cantidadSecciones se añade como campo extra (el tipo lo permite vía params)
-    ...(cantSecciones && { cantidadSecciones }),
+    ...(cantSecciones ? { cantidadSecciones: cantSecciones } : {}),
   } as any;
 }
 
@@ -263,7 +263,7 @@ export async function routeIncomingMessage(input: RouteInput): Promise<RouteDeci
     if (slashParsed) {
       console.log(`[SemanticRouter] Slash command fast path:`, slashParsed);
       await clearHITLState(chatId, botContext);
-      return { type: 'execute_tool', toolName: 'publicar', params: slashParsed };
+      return { type: 'execute_tool', toolName: 'publicar', params: slashParsed as any };
     }
   }
 

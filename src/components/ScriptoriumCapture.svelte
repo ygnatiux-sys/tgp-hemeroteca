@@ -30,12 +30,13 @@
 
   // ── Config ────────────────────────────────────────────────────────────────
   const API_KEY = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_TGP_MIND_API_KEY : null) ?? '2771';
-  const TGP_MIND_URL = import.meta.env.DEV
-    ? 'http://localhost:3001'
+  const TGP_MIND_URL = (typeof import.meta !== 'undefined' && import.meta.env?.PUBLIC_TGP_MIND_URL)
+    ? import.meta.env.PUBLIC_TGP_MIND_URL
     : 'https://tgp-mind-713934653057.us-central1.run.app';
   const VISION_ENDPOINT = `${TGP_MIND_URL}/api/vision`;
   const EXHAUSTIVE_ENDPOINT = `${TGP_MIND_URL}/api/vision-exhaustivo`;
   const PREMIUM_ENDPOINT = `${TGP_MIND_URL}/api/redaccion-premium`;
+  const BOT_GENERATE_ENDPOINT = `${TGP_MIND_URL}/api/bot/generate`;
   const GOOGLE_PICKER_KEY = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_PICKER_API_KEY : null) ?? '';
   const GOOGLE_CLIENT_ID = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.PUBLIC_GOOGLE_CLIENT_ID : null) ?? '';
 
@@ -57,9 +58,12 @@
   let error: string | null = null;
   let pickerLoading = false;
 
-  // ── Estado Cascada Cognitiva ──────────────────────────────────────────────
-  let showManualPrompt = false;
+  // ── Estado Cascada Cognitiva & Puesto de Mando (Desk) ─────────────────────
+  let showManualPrompt = true;
   let activePillLabel = 'Informe Base';
+  let manualDensidad: 'breve' | 'profundo_breve' | 'premium' = 'profundo_breve';
+  let manualModelo: 'flash' | 'pro' = 'pro';
+  let selectedCollection = 'ensayosCinematicos';
 
   // Refs de DOM (Svelte bind:this)
   let promptEl: HTMLTextAreaElement;
@@ -161,23 +165,89 @@
     await handleSubmit(undefined, label, presetPrompt);
   }
 
-  // ── Submit a Gemini Vision / Data Lake OSINT ─────────────────────────────
+  // ── Submit a Gemini Vision / Data Lake OSINT / Puesto de Mando ────────────
   async function handleSubmit(e?: Event, labelOverride?: string, promptOverride?: string) {
     e?.preventDefault();
     const finalPrompt = (promptOverride ?? prompt).trim();
-    if (!hasImage || !finalPrompt || isLoading || !imageFile) return;
     const finalLabel = labelOverride ?? activePillLabel ?? 'Manual';
+    if (!finalPrompt || isLoading) return;
+    if (finalLabel !== 'Manual' && (!hasImage || !imageFile)) return;
+
     isLoading = true;
     error = null;
     try {
-      const { base64, mimeType } = await fileToBase64(imageFile);
-      const fullBase64 = `data:${mimeType};base64,${base64}`;
-
       let resultText = '';
       let d1Id: string | undefined = undefined;
       let r2Url: string | undefined = undefined;
 
-      // Pipeline Data Lake OSINT (R2 + D1 + Vision)
+      // FLUJO A: Puesto de Mando (ChatOps Desk) → Enrutador Maestro Cloud Run
+      if (finalLabel === 'Manual') {
+        let photoUrl = '';
+
+        if (imageFile) {
+          try {
+            const { base64, mimeType } = await fileToBase64(imageFile);
+            const fullBase64 = `data:${mimeType};base64,${base64}`;
+            const osintData = await ejecutarIngestaExhaustiva(EXHAUSTIVE_ENDPOINT, fullBase64, API_KEY);
+            photoUrl = osintData.imagen_url || '';
+            r2Url = osintData.imagen_url;
+            d1Id = osintData.id;
+          } catch (imgErr) {
+            console.warn('[Scriptorium Desk] Continuó sin R2 previo:', imgErr);
+          }
+        }
+
+        const res = await fetch(BOT_GENERATE_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': API_KEY,
+            'X-Mini-App': 'true',
+          },
+          body: JSON.stringify({
+            tema: finalPrompt,
+            destino: selectedCollection,
+            modelo: manualModelo,
+            densidad: manualDensidad,
+            modoLibrePrompt: finalPrompt,
+            photoUrl: photoUrl || previewUrl || '',
+            imagen: photoUrl ? 'r2' : (hasImage ? 'custom' : 'wikimedia'),
+          }),
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Orquestador TGP (${res.status}): ${errText}`);
+        }
+
+        const data = await res.json();
+        resultText = data.texto || data.response || '(Respuesta generada por TGP Mind)';
+        if (data.imagenUrl && !r2Url) {
+          r2Url = data.imagenUrl;
+        }
+
+        results = [{
+          prompt: finalPrompt,
+          pillLabel: `Puesto de Mando · ${selectedCollection}`,
+          response: resultText,
+          imagePreview: r2Url || previewUrl || '',
+          imageSource,
+          imageName: imageName || 'consulta-manual',
+          timestamp: new Date(),
+          transmuteStatus: 'idle',
+          d1Id,
+          r2Url,
+        }, ...results];
+
+        prompt = '';
+        setTimeout(() => resultsEl?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+        return;
+      }
+
+      // FLUJO B: Presets de Cascada Cognitiva (OSINT Data Lake Clásico)
+      const { base64, mimeType } = await fileToBase64(imageFile!);
+      const fullBase64 = `data:${mimeType};base64,${base64}`;
+
       try {
         const osintData = await ejecutarIngestaExhaustiva(EXHAUSTIVE_ENDPOINT, fullBase64, API_KEY);
         resultText = osintData.informe || '';
@@ -208,9 +278,6 @@
         r2Url,
       }, ...results];
 
-      if (showManualPrompt) {
-        prompt = '';
-      }
       setTimeout(() => resultsEl?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     } catch (err: any) {
       error = err.message ?? 'Error de conexión con TGP Mind.';
@@ -257,8 +324,6 @@
   }
 
   // ── Transmutación → Keystatic CMS ─────────────────────────────────────────
-  let selectedCollection = 'ensayosCinematicos';
-
   async function transmuteToKeystatic(index: number, r: VisionResult) {
     results = results.map((item, i) =>
       i === index ? { ...item, transmuteStatus: 'sending', transmuteError: undefined } : item
@@ -513,7 +578,7 @@
                 👁 Hermenéutica
               </button>
 
-              <!-- Chip 3: Manual (Ocultar/Revelar Textarea) -->
+              <!-- Chip 3: Puesto de Mando (Modo Manual / ChatOps) -->
               <button
                 type="button"
                 on:click={() => (showManualPrompt = !showManualPrompt)}
@@ -522,36 +587,128 @@
                   ? 'bg-zinc-900 border-zinc-900 text-white shadow-xs' 
                   : 'bg-white hover:bg-zinc-100 border-zinc-200 text-zinc-700 shadow-2xs'}"
               >
-                ✏ Manual {showManualPrompt ? '▲' : '▼'}
+                🎛 Puesto de Mando {showManualPrompt ? '▲' : '▼'}
               </button>
             </div>
 
-            <!-- Textarea Ocultable (Modo Manual) -->
+            <!-- PUESTO DE MANDO (DESK / INBOX AMPLIO) -->
             {#if showManualPrompt}
-              <div class="mt-2 space-y-2 pt-2 border-t border-zinc-200/70">
-                <div class="flex items-center justify-between">
-                  <span class="text-[11px] font-mono font-medium text-zinc-500 uppercase tracking-wider">
-                    Prompt Libre Personalizado
-                  </span>
+              <div class="mt-2 space-y-3 pt-3 border-t bg-zinc-50/60 p-4 rounded-2xl border border-zinc-200/90 shadow-2xs">
+                
+                <!-- Barra Superior del Desk: Destino Colección + Badges -->
+                <div class="flex flex-wrap items-center justify-between gap-2.5 pb-2 border-b border-zinc-200/70">
+                  <div class="flex items-center gap-2">
+                    <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-600 flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      Colección Destino:
+                    </span>
+                    <select
+                      bind:value={selectedCollection}
+                      class="text-xs py-1.5 px-3 bg-white border border-zinc-300 rounded-xl text-zinc-800 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-2xs cursor-pointer"
+                      title="Selecciona la colección de destino en Keystatic"
+                    >
+                      <option value="ensayosCinematicos">Ensayos Cinemáticos - GSAP</option>
+                      <option value="ensayos">Ensayos</option>
+                      <option value="arquetiposGlobales">Arquetipos Globales</option>
+                      <option value="direccionDeArte">Dirección de Arte - IA</option>
+                      <option value="georreferencias">Georreferencias Arqueosemióticas</option>
+                      <option value="informesPremium">Informes Premium</option>
+                    </select>
+                  </div>
                   <span class="text-[11px] font-mono text-zinc-400">Ctrl + Enter para enviar</span>
                 </div>
+
+                <!-- Panel de Control de Tiers (Densidad + Motor) -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                  <!-- Selector de Densidad (3 Tiers) -->
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold mr-1">Densidad:</span>
+                    <button
+                      type="button"
+                      on:click={() => (manualDensidad = 'breve')}
+                      class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer shadow-2xs
+                        {manualDensidad === 'breve'
+                          ? 'bg-emerald-600 text-white border-emerald-700 font-semibold'
+                          : 'bg-white text-zinc-700 hover:bg-zinc-100 border-zinc-200'}"
+                    >
+                      ⚡ Breve (~800t)
+                    </button>
+                    <button
+                      type="button"
+                      on:click={() => (manualDensidad = 'profundo_breve')}
+                      class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer shadow-2xs
+                        {manualDensidad === 'profundo_breve'
+                          ? 'bg-emerald-600 text-white border-emerald-700 font-semibold'
+                          : 'bg-white text-zinc-700 hover:bg-zinc-100 border-zinc-200'}"
+                    >
+                      🧠 Profundo (~1500t)
+                    </button>
+                    <button
+                      type="button"
+                      on:click={() => (manualDensidad = 'premium')}
+                      class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer shadow-2xs
+                        {manualDensidad === 'premium'
+                          ? 'bg-purple-700 text-white border-purple-800 font-semibold'
+                          : 'bg-white text-purple-900 hover:bg-purple-50 border-purple-200'}"
+                    >
+                      🏛️ Tratado (+4500t)
+                    </button>
+                  </div>
+
+                  <!-- Selector de Motor (Flash vs Pro) -->
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold mr-1">Motor:</span>
+                    <button
+                      type="button"
+                      on:click={() => (manualModelo = 'flash')}
+                      class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer shadow-2xs
+                        {manualModelo === 'flash'
+                          ? 'bg-amber-600 text-white border-amber-700 font-semibold'
+                          : 'bg-white text-zinc-700 hover:bg-amber-50 border-zinc-200'}"
+                    >
+                      ⚡ Flash
+                    </button>
+                    <button
+                      type="button"
+                      on:click={() => (manualModelo = 'pro')}
+                      class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer shadow-2xs
+                        {manualModelo === 'pro'
+                          ? 'bg-blue-600 text-white border-blue-700 font-semibold'
+                          : 'bg-white text-zinc-700 hover:bg-blue-50 border-zinc-200'}"
+                    >
+                      🧠 Pro (Grounded)
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Textarea Amplio Tipo Desk (Puesto de Mando) -->
                 <textarea
                   bind:this={promptEl}
                   bind:value={prompt}
-                  rows="3"
-                  class="w-full px-4 py-3 text-sm bg-white border border-zinc-300 rounded-2xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-none shadow-inner"
-                  placeholder="Escribe tu consulta o instrucción específica de análisis..."
+                  rows="6"
+                  class="w-full px-4 py-3.5 text-sm bg-white border border-zinc-300 rounded-2xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-y shadow-inner font-sans leading-relaxed min-h-35"
+                  placeholder="Escribe tu consulta, mini-charla reflexiva o instrucción ChatOps. Admite Slash Commands directos (ej: /video fascinum romano o /hemeroteca pro 1500t El mito de Ícaro)..."
                   on:keydown={handlePromptKeydown}
                   disabled={isLoading}
                 ></textarea>
-                <div class="flex justify-end">
+
+                <!-- Footer del Desk con Botón de Ejecución Directa -->
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                  <span class="text-[11px] font-mono text-zinc-500">
+                    💡 Admite diálogo extenso o Slash Commands directos hacia el Orquestador Cloud Run.
+                  </span>
                   <button
                     type="button"
-                    disabled={!hasImage || !prompt.trim() || isLoading}
+                    disabled={!prompt.trim() || isLoading}
                     on:click={() => handleSubmit(undefined, 'Manual')}
-                    class="px-4 py-2 bg-zinc-900 hover:bg-black text-white text-xs font-semibold rounded-xl transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                    class="px-5 py-2.5 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-xl transition-all shadow-sm hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
                   >
-                    {isLoading && activePillLabel === 'Manual' ? 'Analizando…' : 'Consultar Manualmente ↵'}
+                    {#if isLoading && activePillLabel === 'Manual'}
+                      <span class="animate-spin text-sm">⟳</span>
+                      <span>Orquestando en Cloud Run…</span>
+                    {:else}
+                      <span>⚡ Ejecutar en Puesto de Mando ↵</span>
+                    {/if}
                   </button>
                 </div>
               </div>
