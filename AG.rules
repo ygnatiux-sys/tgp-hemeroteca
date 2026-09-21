@@ -1,0 +1,17 @@
+# REGLAS DE PRESENTACIÓN DE URLS DE TEST (ANTIGRAVITY / AG.RULES)
+
+1. **URLs 100% Clickeables e Interactivas:**
+   - NUNCA entregar URLs de prueba como bloques de código inertes (`code blocks`) o texto plano para copiar y pegar.
+   - SIEMPRE formatear como hipervínculos Markdown directos y activos: `[Texto Descriptivo](https://url-de-prueba)`.
+
+2. **Enlaces de Diagnóstico en Vivo (Telegram Webhooks):**
+   - Para webhooks de Telegram, proveer enlaces GET directos a la API de Telegram con el método `getWebhookInfo` para que el usuario pueda auditar el estado del webhook, el pending update count y los errores con un solo clic desde el navegador:
+     `https://api.telegram.org/bot<TOKEN>/getWebhookInfo`
+
+3. **Categorización Estricta de Entornos:**
+   Al presentar URLs de test, estructurar siempre en categorías claras:
+   - **Diagnóstico de Webhooks en Vivo** (Telegram API `getWebhookInfo`)
+   - **Servicios Backend Cloud Run** (Health check GET y endpoints activos)
+   - **Acceso Directo a Bots** (`https://t.me/<handle>`)
+   - **Interfaces Svelte en Local** (`http://localhost:4321/...`)
+   - **Interfaces Svelte en Producción** (`https://thegreatpuzzleproject.com/...`)
