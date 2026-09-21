@@ -46,18 +46,13 @@ export async function getWikimediaGallery(
       iiprop: 'url|size|extmetadata',
       iiurlwidth: '600', // Genera miniatura optimizada CDN
       origin: '*',       // Permite CORS directo desde el navegador
+      'Api-User-Agent': 'TGPMind/1.0 (contact@thegreatpuzzleproject.com; Wikimedia Gallery)',
     });
 
     const targetUrl = `${WIKI_API_URL}?${params.toString()}`;
-    const proxyUrl = typeof window !== 'undefined'
-      ? `/api/wikimedia-proxy?url=${encodeURIComponent(targetUrl)}`
-      : targetUrl;
 
     try {
-      let response = await fetch(proxyUrl);
-      if (!response.ok && proxyUrl !== targetUrl) {
-        response = await fetch(targetUrl);
-      }
+      const response = await fetch(targetUrl);
       if (!response.ok) return [];
 
       const data = await response.json();
@@ -70,8 +65,8 @@ export async function getWikimediaGallery(
         if (!info || !info.url) return null;
 
         const rawUrl = info.url as string;
-        // Filtrar exclusivamente archivos de imagen (evitar PDFs, SVGs complejos, audios)
-        if (!/\.(jpe?g|png|webp)$/i.test(rawUrl)) return null;
+        // Filtrar exclusivamente archivos de imagen (ignorar query params de Wikimedia como ?utm_source)
+        if (!/\.(jpe?g|png|webp)(\?.*)?$/i.test(rawUrl)) return null;
 
         const extmeta = info.extmetadata || {};
         const authorHtml = extmeta.Artist?.value || '';
@@ -128,12 +123,40 @@ export async function downloadWikimediaImageAsFile(img: WikimediaImageItem): Pro
     }
   } catch {}
 
-  // 2. Fallback resiliente vía proxy de Astro SSR
-  const proxyUrl = `/api/wikimedia-proxy?url=${encodeURIComponent(img.url)}`;
-  const proxyRes = await fetch(proxyUrl);
-  if (!proxyRes.ok) {
-    throw new Error(`No se pudo descargar la imagen desde Wikimedia: HTTP ${proxyRes.status}`);
-  }
-  const blob = await proxyRes.blob();
-  return new File([blob], safeName, { type: blob.type || 'image/jpeg' });
+  // 2. Fallback a miniatura CDN
+  try {
+    const thumbRes = await fetch(img.thumbUrl, { mode: 'cors' });
+    if (thumbRes.ok) {
+      const blob = await thumbRes.blob();
+      return new File([blob], safeName, { type: blob.type || 'image/jpeg' });
+    }
+  } catch {}
+
+  // 3. Fallback a dibujo por HTML Canvas (resiliente sin CORS server proxy)
+  return new Promise<File>((resolve, reject) => {
+    const imageEl = new Image();
+    imageEl.crossOrigin = 'anonymous';
+    imageEl.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = imageEl.naturalWidth || 600;
+      canvas.height = imageEl.naturalHeight || 400;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('No se pudo inicializar Canvas 2D'));
+        return;
+      }
+      ctx.drawImage(imageEl, 0, 0);
+      canvas.toBlob((blob) => {
+        if (blob) {
+          resolve(new File([blob], safeName, { type: blob.type || 'image/jpeg' }));
+        } else {
+          reject(new Error('Error al exportar Blob desde Canvas'));
+        }
+      }, 'image/jpeg', 0.92);
+    };
+    imageEl.onerror = () => {
+      reject(new Error(`No se pudo cargar la imagen desde Wikimedia (${img.title})`));
+    };
+    imageEl.src = img.thumbUrl || img.url;
+  });
 }
