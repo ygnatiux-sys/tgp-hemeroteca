@@ -378,40 +378,42 @@
     </section>
   {/if}
 
+    <!-- Galería Wikimedia Commons Integrada Inline en el Scroll -->
+    <WikimediaGalleryInbox bind:isOpen={isWikiInboxOpen} onSelect={handleWikiSelect} />
+
+  </div>
 </div>
 
-<WikimediaGalleryInbox bind:isOpen={isWikiInboxOpen} onSelect={handleWikiSelect} />
-
 <style>
-  /* ── Root / tokens ────────────────────────────────────────────────────── */
+  /* ── Root / tokens (Modo Claro Limpio · Mesa de Trabajo) ─────────────────── */
   .vl-root {
-    --bg:           #0a0a0a;
-    --bg2:          #111;
-    --bg3:          #151718;
-    --border:       #2a2a2a;
-    --border-soft:  #222;
-    --accent-gold:  #c49a6c;
-    --accent-green: #34d399;
-    --accent-amber: #fbbf24;
-    --accent-blue:  #60a5fa;
-    --accent-purple:#c084fc;
-    --text:         #d1d5db;
-    --text-muted:   #9ca3af;
-    --text-dim:     #6b7280;
+    --bg:           #ffffff;
+    --bg2:          #f9fafb;
+    --bg3:          #f4f4f5;
+    --border:       #e4e4e7;
+    --border-soft:  #f4f4f5;
+    --accent-gold:  #b45309;
+    --accent-green: #047857;
+    --accent-amber: #b45309;
+    --accent-blue:  #1d4ed8;
+    --accent-purple:#6d28d9;
+    --text:         #18181b;
+    --text-muted:   #52525b;
+    --text-dim:     #71717a;
     --font-serif:   'Cinzel', 'Georgia', serif;
     --font-mono:    'IBM Plex Mono', monospace;
-    --radius:       12px;
-    --radius-sm:    8px;
+    --radius:       16px;
+    --radius-sm:    10px;
 
     background:    var(--bg);
     color:         var(--text);
     border:        1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding:       24px;
+    border-radius: var(--radius);
+    padding:       28px;
     max-width:     100%;
     margin:        0 auto;
     font-family:   var(--font-mono);
-    box-shadow:    none;
+    box-shadow:    0 1px 3px rgba(0,0,0,0.04);
   }
 
   /* ── Header ──────────────────────────────────────────────────────────── */
@@ -419,32 +421,34 @@
     display:         flex;
     align-items:     flex-start;
     justify-content: space-between;
-    border-bottom:   1px solid var(--border-soft);
-    padding-bottom:  16px;
-    margin-bottom:   22px;
+    border-bottom:   1px solid var(--border);
+    padding-bottom:  18px;
+    margin-bottom:   24px;
     gap:             12px;
     flex-wrap:       wrap;
   }
   .vl-header-left { display: flex; flex-direction: column; gap: 4px; }
   .vl-kicker {
-    font-size:      9px;
-    letter-spacing: 0.3em;
+    font-size:      10px;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
-    color:          rgba(196,154,108,0.8);
+    color:          var(--accent-green);
+    font-weight:    600;
   }
   .vl-title {
     font-family:    var(--font-serif);
-    font-size:      20px;
-    font-weight:    400;
-    color:          var(--accent-gold);
-    letter-spacing: 0.05em;
+    font-size:      22px;
+    font-weight:    500;
+    color:          var(--text);
+    letter-spacing: 0.02em;
     margin:         0;
   }
   .vl-badge {
     font-size:     10px;
+    font-weight:   500;
     padding:       4px 10px;
     border-radius: 6px;
-    background:    var(--bg2);
+    background:    var(--bg3);
     border:        1px solid var(--border);
     color:         var(--text-muted);
     white-space:   nowrap;
@@ -454,15 +458,16 @@
   /* ── Secciones ───────────────────────────────────────────────────────── */
   .vl-section {
     border-bottom:  1px solid var(--border-soft);
-    padding-bottom: 22px;
-    margin-bottom:  22px;
+    padding-bottom: 24px;
+    margin-bottom:  24px;
     display:        flex;
     flex-direction: column;
-    gap:            14px;
+    gap:            16px;
   }
   .vl-step-label {
-    font-size:      9px;
-    letter-spacing: 0.25em;
+    font-size:      10px;
+    font-weight:    700;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     color:          var(--text-muted);
   }
@@ -476,7 +481,7 @@
     border-radius:  var(--radius-sm);
     font-family:    var(--font-mono);
     font-size:      12px;
-    font-weight:    500;
+    font-weight:    600;
     cursor:         pointer;
     transition:     all 0.2s;
     border:         1px solid transparent;
@@ -486,44 +491,46 @@
   .vl-btn-icon { color: var(--accent-gold); }
 
   .vl-btn--primary {
-    background: var(--bg3);
-    border-color: var(--border);
-    color: #e5e7eb;
+    background: #ffffff;
+    border-color: #d4d4d8;
+    color: #18181b;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
   }
   .vl-btn--primary:hover:not(:disabled) {
-    background: #25282a;
-    border-color: rgba(196,154,108,0.5);
+    background: #f4f4f5;
+    border-color: #a1a1aa;
   }
   .vl-btn--green {
-    background:   rgba(6,78,59,0.25);
-    border-color: rgba(5,150,105,0.5);
-    color:        var(--accent-green);
+    background:   #ecfdf5;
+    border-color: #a7f3d0;
+    color:        #065f46;
+    box-shadow:   0 1px 2px rgba(0,0,0,0.03);
   }
-  .vl-btn--green:hover:not(:disabled) { background: rgba(6,78,59,0.45); }
+  .vl-btn--green:hover:not(:disabled) { background: #d1fae5; }
   .vl-btn--amber {
-    background:   rgba(120,53,15,0.25);
-    border-color: rgba(180,83,9,0.5);
-    color:        var(--accent-amber);
+    background:   #fffbeb;
+    border-color: #fde68a;
+    color:        #92400e;
   }
-  .vl-btn--amber:hover:not(:disabled) { background: rgba(120,53,15,0.45); }
+  .vl-btn--amber:hover:not(:disabled) { background: #fef3c7; }
   .vl-btn--blue {
-    background:   rgba(23,37,84,0.45);
-    border-color: rgba(59,130,246,0.5);
-    color:        var(--accent-blue);
+    background:   #eff6ff;
+    border-color: #bfdbfe;
+    color:        #1e40af;
   }
-  .vl-btn--blue:hover:not(:disabled) { background: rgba(23,37,84,0.7); }
+  .vl-btn--blue:hover:not(:disabled) { background: #dbeafe; }
   .vl-btn--purple {
-    background:   rgba(59,7,100,0.35);
-    border-color: rgba(147,51,234,0.5);
-    color:        var(--accent-purple);
+    background:   #faf5ff;
+    border-color: #e9d5ff;
+    color:        #6b21a8;
   }
-  .vl-btn--purple:hover:not(:disabled) { background: rgba(59,7,100,0.55); }
+  .vl-btn--purple:hover:not(:disabled) { background: #f3e8ff; }
   .vl-btn--gray {
-    background:   #1f2937;
-    border-color: #374151;
-    color:        #d1d5db;
+    background:   #f4f4f5;
+    border-color: #e4e4e7;
+    color:        #27272a;
   }
-  .vl-btn--gray:hover:not(:disabled) { background: #374151; }
+  .vl-btn--gray:hover:not(:disabled) { background: #e4e4e7; }
 
   /* ── Ingesta row ─────────────────────────────────────────────────────── */
   .vl-ingesta-row {
@@ -533,10 +540,11 @@
     gap:         10px;
   }
   .vl-file-chip {
-    font-size:     10px;
-    color:         var(--accent-green);
-    background:    rgba(6,78,59,0.25);
-    border:        1px solid rgba(5,150,105,0.4);
+    font-size:     11px;
+    font-weight:   600;
+    color:         #047857;
+    background:    #ecfdf5;
+    border:        1px solid #a7f3d0;
     padding:       5px 12px;
     border-radius: 6px;
   }
@@ -546,17 +554,17 @@
     display:       flex;
     align-items:   center;
     gap:           14px;
-    background:    var(--bg2);
-    border:        1px solid var(--border-soft);
+    background:    #f9fafb;
+    border:        1px solid var(--border);
     border-radius: var(--radius-sm);
-    padding:       10px 14px;
+    padding:       12px 16px;
   }
   .vl-original-img {
     width:         56px;
     height:        56px;
     object-fit:    cover;
-    border-radius: 6px;
-    border:        1px solid var(--border);
+    border-radius: 8px;
+    border:        1px solid #d4d4d8;
     flex-shrink:   0;
   }
   .vl-original-meta {
@@ -565,15 +573,16 @@
     gap:            3px;
   }
   .vl-original-name {
-    font-size:     11px;
+    font-size:     12px;
+    font-weight:   600;
     color:         var(--text);
     overflow:      hidden;
     text-overflow: ellipsis;
     white-space:   nowrap;
-    max-width:     300px;
+    max-width:     360px;
   }
   .vl-original-size {
-    font-size: 10px;
+    font-size: 11px;
     color:     var(--text-dim);
   }
 
@@ -590,23 +599,25 @@
     align-items:   center;
     gap:           12px;
     padding:       18px 20px;
-    background:    rgba(120,53,15,0.15);
-    border:        1px solid rgba(180,83,9,0.35);
+    background:    #fffbeb;
+    border:        1px solid #fde68a;
     border-radius: var(--radius-sm);
     margin-bottom: 20px;
-    color:         var(--accent-amber);
+    color:         #92400e;
     font-size:     13px;
+    font-weight:   500;
   }
 
   /* ── Resultado / panel de distribución ───────────────────────────────── */
   .vl-result-panel {
-    background:    var(--bg2);
-    border:        1px solid #262626;
+    background:    #f9fafb;
+    border:        1px solid var(--border);
     border-radius: var(--radius);
-    padding:       20px;
+    padding:       22px;
     display:       flex;
     flex-direction: column;
     gap:           16px;
+    box-shadow:    0 1px 2px rgba(0,0,0,0.03);
   }
   .vl-result-header {
     display:         flex;
@@ -617,7 +628,7 @@
     display:     flex;
     align-items: center;
     gap:         8px;
-    font-size:   10px;
+    font-size:   11px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color:       var(--accent-green);
@@ -631,29 +642,31 @@
     flex-shrink:   0;
   }
   .vl-result-format {
-    font-size: 9px;
+    font-size: 10px;
+    font-mono: var(--font-mono);
     color:     var(--text-dim);
   }
   .vl-result-img-wrap {
-    background:    rgba(0,0,0,0.6);
-    border:        1px solid var(--border-soft);
+    background:    #ffffff;
+    border:        1px solid var(--border);
     border-radius: var(--radius-sm);
-    padding:       12px;
+    padding:       14px;
     display:       flex;
     align-items:   center;
     justify-content: center;
   }
   .vl-result-img {
-    max-height:  280px;
+    max-height:  340px;
     max-width:   100%;
     object-fit:  contain;
-    border:      1px solid var(--border);
-    border-radius: 6px;
+    border:      1px solid #e4e4e7;
+    border-radius: 8px;
+    background:  #fafafa;
   }
 
   /* ── Panel distribución ──────────────────────────────────────────────── */
   .vl-dist-panel {
-    border-top:  1px solid var(--border-soft);
+    border-top:  1px solid var(--border);
     padding-top: 16px;
     display:     flex;
     flex-direction: column;
@@ -667,36 +680,37 @@
     gap:             10px;
   }
   .vl-dist-label {
-    font-size:      9px;
+    font-size:      10px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color:          var(--text-muted);
+    font-weight:    600;
   }
   .vl-folder-row {
     display:     flex;
     align-items: center;
     gap:         8px;
   }
-  .vl-folder-hint { font-size: 10px; color: var(--text-dim); }
+  .vl-folder-hint { font-size: 11px; color: var(--text-dim); }
   .vl-select {
-    background:    var(--bg);
-    border:        1px solid var(--border);
+    background:    #ffffff;
+    border:        1px solid #d4d4d8;
     color:         var(--text);
     font-family:   var(--font-mono);
-    font-size:     11px;
-    padding:       4px 10px;
+    font-size:     12px;
+    padding:       5px 12px;
     border-radius: 6px;
     outline:       none;
     cursor:        pointer;
     transition:    border-color 0.2s;
   }
-  .vl-select:focus { border-color: var(--accent-gold); }
+  .vl-select:focus { border-color: var(--accent-green); }
 
   /* ── Grid de acciones ────────────────────────────────────────────────── */
   .vl-actions-grid {
     display:               grid;
     grid-template-columns: repeat(3, 1fr);
-    gap:                   8px;
+    gap:                   10px;
   }
   @media (max-width: 600px) {
     .vl-actions-grid { grid-template-columns: 1fr; }
@@ -704,8 +718,8 @@
 
   /* ── R2 éxito ────────────────────────────────────────────────────────── */
   .vl-r2-success {
-    background:    rgba(6,78,59,0.2);
-    border:        1px solid rgba(5,150,105,0.45);
+    background:    #ecfdf5;
+    border:        1px solid #a7f3d0;
     border-radius: var(--radius-sm);
     padding:       14px;
     display:       flex;
@@ -718,44 +732,45 @@
     justify-content: space-between;
   }
   .vl-r2-label {
-    font-size:  10px;
-    color:      var(--accent-green);
+    font-size:  11px;
+    color:      #065f46;
     font-weight: 700;
   }
   .vl-copy-btn {
     font-family:   var(--font-mono);
-    font-size:     9px;
-    background:    rgba(6,78,59,0.5);
-    border:        none;
+    font-size:     10px;
+    font-weight:   600;
+    background:    #d1fae5;
+    border:        1px solid #a7f3d0;
     border-radius: 4px;
-    color:         #a7f3d0;
-    padding:       3px 10px;
+    color:         #065f46;
+    padding:       4px 10px;
     cursor:        pointer;
     transition:    background 0.2s;
   }
-  .vl-copy-btn:hover { background: rgba(6,78,59,0.8); }
+  .vl-copy-btn:hover { background: #a7f3d0; }
   .vl-r2-url-input {
     width:         100%;
-    background:    rgba(0,0,0,0.6);
-    border:        1px solid rgba(5,150,105,0.35);
-    border-radius: 4px;
-    padding:       6px 10px;
+    background:    #ffffff;
+    border:        1px solid #a7f3d0;
+    border-radius: 6px;
+    padding:       7px 12px;
     font-family:   var(--font-mono);
-    font-size:     11px;
-    color:         var(--text);
+    font-size:     12px;
+    color:         #065f46;
     outline:       none;
     box-sizing:    border-box;
   }
 
   /* ── Error global ────────────────────────────────────────────────────── */
   .vl-error {
-    background:    rgba(220,38,38,0.08);
-    border:        1px solid rgba(220,38,38,0.25);
+    background:    #fef2f2;
+    border:        1px solid #fecaca;
     border-radius: var(--radius-sm);
-    padding:       10px 14px;
-    font-size:     11px;
-    color:         #f87171;
-    margin-bottom: 14px;
+    padding:       12px 16px;
+    font-size:     12px;
+    color:         #b91c1c;
+    margin-bottom: 16px;
   }
 
   /* ── Spinners ────────────────────────────────────────────────────────── */
@@ -763,7 +778,7 @@
     display:       inline-block;
     width:         16px;
     height:        16px;
-    border:        2px solid rgba(251,191,36,0.3);
+    border:        2px solid rgba(180,83,9,0.3);
     border-top-color: var(--accent-amber);
     border-radius: 50%;
     animation:     vl-spin 0.75s linear infinite;
@@ -774,7 +789,7 @@
     height: 12px;
   }
   .vl-spinner--blue {
-    border-color:     rgba(96,165,250,0.3);
+    border-color:     rgba(29,78,216,0.3);
     border-top-color: var(--accent-blue);
   }
   @keyframes vl-spin {

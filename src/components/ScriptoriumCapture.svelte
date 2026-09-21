@@ -902,8 +902,12 @@
 
         </div>
       </div>
+
+      <!-- ── GALERÍA WIKIMEDIA COMMONS INLINE (En el scroll libre abajo de la mesa de trabajo) ──── -->
+      <div class="px-4 sm:px-6 pb-6 border-t border-zinc-200/80 bg-zinc-50/20">
+        <WikimediaGalleryInbox bind:isOpen={isWikiInboxOpen} onSelect={handleWikiSelect} />
+      </div>
+
     </div>
   </div>
 {/if}
-
-<WikimediaGalleryInbox bind:isOpen={isWikiInboxOpen} onSelect={handleWikiSelect} />

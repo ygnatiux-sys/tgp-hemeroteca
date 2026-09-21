@@ -48,8 +48,16 @@ export async function getWikimediaGallery(
       origin: '*',       // Permite CORS directo desde el navegador
     });
 
+    const targetUrl = `${WIKI_API_URL}?${params.toString()}`;
+    const proxyUrl = typeof window !== 'undefined'
+      ? `/api/wikimedia-proxy?url=${encodeURIComponent(targetUrl)}`
+      : targetUrl;
+
     try {
-      const response = await fetch(`${WIKI_API_URL}?${params.toString()}`);
+      let response = await fetch(proxyUrl);
+      if (!response.ok && proxyUrl !== targetUrl) {
+        response = await fetch(targetUrl);
+      }
       if (!response.ok) return [];
 
       const data = await response.json();
