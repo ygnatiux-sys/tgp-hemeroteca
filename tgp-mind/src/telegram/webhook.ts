@@ -5,55 +5,95 @@
 //   1. Detectar identidad del bot por token.
 //   2. ESCUDO R2: Si llega una foto → subir a R2 ANTES de hablar con Gemini.
 //      Inyectar la URL permanente como mensaje de sistema en el historial D1.
-//   3. Manejar comandos /nuevo y /cancel (borrar historial).
-//   4. Delegar todo el razonamiento a agent.ts (processTelegramMessage).
+//   3. Manejar callback_query (teclados inline): tratar callback_data como texto.
+//   4. Manejar comandos /nuevo, /cancel, /reset, /menu.
+//   5. Delegar todo el razonamiento a agent.ts (processTelegramMessage).
+//   6. Inyectar teclados inline en la respuesta cuando corresponde:
+//      - Ficha Visual → Teclado de Confirmación
+//      - Cualquier respuesta post-tool → Sin teclado (ya confirmaron)
 //
 // Garantía de datos: Ninguna imagen llega a Gemini como buffer en memoria.
 // Solo llegan URLs R2 permanentes. Toda imagen existe en storage antes del LLM.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { procesarFotoTelegramAR2 } from '../storage/r2.js';
-import { appendUserText, appendTurn, clearChatHistory } from '../storage/d1.js';
+import { appendTurn, clearChatHistory } from '../storage/d1.js';
 import { processTelegramMessage, BotIdentity } from '../ia/agent.js';
+import {
+  esFichaVisual,
+  TECLADO_CONFIRMACION,
+  MENUS_BY_BOT,
+  getMenuTitle,
+  type InlineKeyboard,
+} from './keyboards.js';
 
-// ── Envío simple a Telegram con Fallback de Seguridad ──────────────────────────
-async function sendTelegramMessage(
+// ── Helpers de Telegram API ───────────────────────────────────────────────────
+
+async function telegramPost(token: string, method: string, body: object): Promise<any> {
+  const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    console.warn(`[Telegram API] ${method} error ${res.status}: ${txt.slice(0, 300)}`);
+  }
+  return res.json().catch(() => ({}));
+}
+
+// ── Envío de mensaje con teclado opcional + Fallback sin Markdown ─────────────
+export async function sendTelegramMessage(
   chatId: number,
   token: string,
   text: string,
-  parseMode: 'Markdown' | 'HTML' | undefined = 'Markdown',
+  keyboard?: InlineKeyboard,
 ): Promise<void> {
-  const url = `https://api.telegram.org/bot${token}/sendMessage`;
+  const replyMarkup = keyboard
+    ? { inline_keyboard: keyboard }
+    : undefined;
+
+  const payload: any = {
+    chat_id: chatId,
+    text,
+    parse_mode: 'Markdown',
+    disable_web_page_preview: true,
+    ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
+  };
+
   try {
-    const res = await fetch(url, {
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text,
-        parse_mode: parseMode,
-        disable_web_page_preview: true,
-      }),
+      body: JSON.stringify(payload),
     });
+
     if (!res.ok) {
       const errText = await res.text();
-      console.warn(`[Webhook Telegram Error ${res.status}]: ${errText}`);
-      // Fallback: Si Telegram rechaza por sintaxis de Markdown (400), reintentar como texto plano
-      if (parseMode) {
-        await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text,
-            disable_web_page_preview: true,
-          }),
-        });
-      }
+      console.warn(`[Webhook] sendMessage Markdown falló (${res.status}). Reintentando sin parse_mode...`);
+      // Fallback: sin Markdown, pero conservar el teclado
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text,
+          disable_web_page_preview: true,
+          ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
+        }),
+      });
     }
   } catch (err) {
     console.error('[Webhook] Error enviando mensaje a Telegram:', err);
   }
+}
+
+// ── Responder a un callback_query (requerido por la API de Telegram) ──────────
+async function answerCallbackQuery(token: string, callbackQueryId: string, text?: string): Promise<void> {
+  await telegramPost(token, 'answerCallbackQuery', {
+    callback_query_id: callbackQueryId,
+    ...(text ? { text, show_alert: false } : {}),
+  });
 }
 
 // ── Handler principal ─────────────────────────────────────────────────────────
@@ -62,52 +102,105 @@ export async function handleTelegramWebhook(
   botIdentity: BotIdentity,
   botToken: string,
 ): Promise<void> {
+
+  // ── RAMA 1: Callback Query (botón inline pulsado) ──────────────────────────
+  // Se trata como mensaje de texto semántico. Stateless: callback_data ES el texto.
+  if (update?.callback_query) {
+    const cq      = update.callback_query;
+    const chatId  = cq.message?.chat?.id as number;
+    const data    = (cq.data || '').trim();
+    const cqId    = cq.id;
+
+    if (!chatId || !data) {
+      await answerCallbackQuery(botToken, cqId);
+      return;
+    }
+
+    console.log(`[Webhook CB] chat_id=${chatId} bot=${botIdentity} callback_data="${data}"`);
+
+    // Confirmar recepción del tap (requerido por Telegram, debe ser < 10 segundos)
+    await answerCallbackQuery(botToken, cqId);
+
+    // Comandos especiales dentro de callbacks
+    if (data === '/nuevo' || data === '/cancel' || data === '/reset') {
+      await clearChatHistory(chatId, botIdentity);
+      await sendTelegramMessage(chatId, botToken, '🔄 Sesión reiniciada. ¿En qué te ayudo?');
+      return;
+    }
+
+    if (data === '/menu' || data === 'menu') {
+      await sendTelegramMessage(
+        chatId, botToken,
+        getMenuTitle(botIdentity),
+        MENUS_BY_BOT[botIdentity],
+      );
+      return;
+    }
+
+    // Tratar callback_data como texto semántico → Gemini
+    try {
+      const responseText = await processTelegramMessage(chatId, data, botIdentity);
+      if (responseText) {
+        const keyboard = esFichaVisual(responseText) ? TECLADO_CONFIRMACION : undefined;
+        await sendTelegramMessage(chatId, botToken, responseText, keyboard);
+      }
+    } catch (err: any) {
+      const errMsg = err?.message || String(err);
+      console.error(`[Webhook CB] ❌ CRASH — chat_id=${chatId}: ${errMsg}`);
+      await sendTelegramMessage(chatId, botToken, '⚠️ Hubo un error. Intenta de nuevo.');
+    }
+    return;
+  }
+
+  // ── RAMA 2: Mensaje normal (texto / foto / caption) ───────────────────────
   const msg = update?.message || update?.edited_message;
   if (!msg) return;
 
   const chatId: number = msg.chat.id;
 
-  // ── Extraer texto: msg.text (mensaje plano) o msg.caption (pie de foto) ────
+  // Extraer texto: msg.text (mensaje plano) o msg.caption (pie de foto)
   // CRÍTICO: ambas fuentes son mutuamente excluyentes en la API de Telegram.
-  // msg.text solo existe en mensajes de texto puro.
-  // msg.caption existe cuando el usuario envía una imagen con texto adjunto.
   const rawText    = typeof msg.text    === 'string' ? msg.text.trim()    : '';
   const rawCaption = typeof msg.caption === 'string' ? msg.caption.trim() : '';
-  const text       = rawText || rawCaption; // el que exista
+  const text       = rawText || rawCaption;
   const textSource = rawText ? 'text' : rawCaption ? 'caption' : 'none';
 
-  const photos = msg.photo as Array<{ file_id: string; width: number; height: number }> | undefined;
+  const photos    = msg.photo as Array<{ file_id: string; width: number; height: number }> | undefined;
   const hasPhotos = Array.isArray(photos) && photos.length > 0;
 
-  console.log(`[Webhook] chat_id=${chatId} bot=${botIdentity} text_source=${textSource} has_photo=${hasPhotos} text="${text.slice(0, 80)}"`); 
+  console.log(`[Webhook] chat_id=${chatId} bot=${botIdentity} src=${textSource} photo=${hasPhotos} text="${text.slice(0, 80)}"`);
 
-  // ── Comandos de control ────────────────────────────────────────────────────
+  // ── Comandos de control ──────────────────────────────────────────────────
+  if (text === '/menu' || text === '/tools') {
+    await sendTelegramMessage(
+      chatId, botToken,
+      getMenuTitle(botIdentity),
+      MENUS_BY_BOT[botIdentity],
+    );
+    return;
+  }
+
   if (text.startsWith('/nuevo') || text.startsWith('/cancel') || text.startsWith('/reset')) {
-    await clearChatHistory(chatId, botIdentity); // Limpia solo la memoria de ESTE bot
+    await clearChatHistory(chatId, botIdentity);
     await sendTelegramMessage(chatId, botToken, '🔄 Sesión reiniciada. ¿En qué te ayudo?');
     return;
   }
 
   // ── ESCUDO R2: Interceptar foto ANTES de hablar con Gemini ────────────────
-  // Si hay foto, se sube a R2 y se crea un turno único en D1 fusionando:
-  //   - El contexto de imagen (URL R2)
-  //   - El caption/texto del usuario (si existe)
-  // Así Gemini recibe todo en un único turn coherente y no hay duplicados.
+  // Turno D1 fusionado: [contexto R2 URL] + [caption del usuario]
   let imageContextPrefix = '';
-  let fotoGuardadaEnD1   = false; // flag para no duplicar el guardado en el agente
+  let fotoGuardadaEnD1   = false;
 
   if (hasPhotos) {
     const bestPhoto = photos!.reduce((a, b) => (a.width > b.width ? a : b));
 
     try {
-      console.log(`[Webhook R2] Subiendo foto file_id=${bestPhoto.file_id} a R2 (chat_id=${chatId})...`);
+      console.log(`[Webhook R2] Subiendo foto file_id=${bestPhoto.file_id} (chat_id=${chatId})...`);
       const { url: r2Url } = await procesarFotoTelegramAR2(bestPhoto.file_id, 'telegram', botToken);
-      console.log(`[Webhook R2] ✅ Imagen respaldada en R2: ${r2Url}`);
+      console.log(`[Webhook R2] ✅ Imagen en R2: ${r2Url}`);
 
       imageContextPrefix = `[Sistema: Imagen recibida. URL permanente en R2: ${r2Url}. Usa esta URL como url_imagen en la Ficha Visual y en la Tool publish_social.]`;
 
-      // Turno fusionado: contexto R2 + caption (si hay) en un solo turno D1
-      // AISLAMIENTO: se escribe en la partición exclusiva de este bot.
       const partsD1: Array<{ text: string }> = [{ text: imageContextPrefix }];
       if (text) partsD1.push({ text: `Caption del usuario: ${text}` });
 
@@ -115,17 +208,14 @@ export async function handleTelegramWebhook(
       fotoGuardadaEnD1 = true;
 
     } catch (err: any) {
-      // Log detallado del crash de R2 para diagnóstico en Cloud Run
       const errMsg    = err?.message || String(err);
       const errStatus = err?.status  || err?.statusCode || 'N/A';
       const errBody   = err?.body    || err?.data       || '';
-      console.error(`[Webhook R2] ❌ CRASH en Escudo R2 — chat_id=${chatId} file_id=${bestPhoto.file_id}`);
-      console.error(`[Webhook R2] Error message: ${errMsg}`);
-      console.error(`[Webhook R2] HTTP status: ${errStatus}`);
-      if (errBody) console.error(`[Webhook R2] Response body: ${JSON.stringify(errBody).slice(0, 500)}`);
+      console.error(`[Webhook R2] ❌ CRASH — chat_id=${chatId} file_id=${bestPhoto.file_id}`);
+      console.error(`[Webhook R2] Error: ${errMsg} | HTTP: ${errStatus}`);
+      if (errBody) console.error(`[Webhook R2] Body: ${JSON.stringify(errBody).slice(0, 500)}`);
       console.error(`[Webhook R2] Stack:`, err?.stack || '(sin stack)');
 
-      // Continuar el flujo con aviso al agente (no bloqueamos al usuario)
       imageContextPrefix = `[Sistema: El usuario envió una foto pero falló la subida a R2 (error: ${errMsg}). No hay URL disponible. Informa al usuario y pide que reenvíe la imagen.]`;
       const partsD1: Array<{ text: string }> = [{ text: imageContextPrefix }];
       if (text) partsD1.push({ text: `Caption del usuario: ${text}` });
@@ -134,38 +224,30 @@ export async function handleTelegramWebhook(
     }
   }
 
-  // ── Sanity check: ignorar mensajes vacíos sin foto ────────────────────────
+  // ── Sanity check ──────────────────────────────────────────────────────────
   const userTextForAgent = text || (hasPhotos ? '(imagen adjunta sin caption)' : '');
   if (!userTextForAgent && !fotoGuardadaEnD1) {
     console.warn(`[Webhook] Mensaje vacío ignorado para chat_id=${chatId}`);
     return;
   }
 
+  // ── Llamada al Agente Orquestador ─────────────────────────────────────────
   try {
-    // CRÍTICO: Si la foto + caption ya fueron guardados como un turno fusionado
-    // en D1 (fotoGuardadaEnD1 = true), NO le pasamos imageContextPrefix al agente.
-    // processTelegramMessage llamará appendUserText(userTextForAgent) internamente,
-    // pero dado que el caption ya está en el turno de imagen, aquí enviamos un
-    // texto vacío de marcador si no queremos duplicar.
-    //
-    // Solución limpia: si ya guardamos en D1 via appendTurn (foto+caption fusionado),
-    // pasamos userTextForAgent vacío para que processTelegramMessage no duplique el
-    // guardado (usa '' como señal de que el turno ya existe).
-    const textParaAgente = fotoGuardadaEnD1
-      ? ''          // El historial D1 ya tiene el turno completo (R2 URL + caption)
-      : userTextForAgent;
+    // Si la foto + caption ya se guardaron en D1 como turno fusionado (fotoGuardadaEnD1),
+    // pasamos textParaAgente='' para que agent.ts no duplique el guardado.
+    const textParaAgente = fotoGuardadaEnD1 ? '' : userTextForAgent;
 
     const responseText = await processTelegramMessage(
       chatId,
       textParaAgente,
       botIdentity,
-      // Cuando hay foto con texto y ya se guardó en D1, pasamos imageContextPrefix
-      // como contexto adicional para que Gemini sepa que hay una imagen disponible.
       fotoGuardadaEnD1 ? imageContextPrefix : undefined,
     );
 
     if (responseText) {
-      await sendTelegramMessage(chatId, botToken, responseText);
+      // Detectar Ficha Visual → adjuntar teclado de confirmación
+      const keyboard = esFichaVisual(responseText) ? TECLADO_CONFIRMACION : undefined;
+      await sendTelegramMessage(chatId, botToken, responseText, keyboard);
     }
   } catch (err: any) {
     const errMsg = err?.message || String(err);
