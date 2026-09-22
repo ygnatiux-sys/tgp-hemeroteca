@@ -35,6 +35,8 @@ interface Props {
   ctaLabel?: string;
   ctaSecondaryHref?: string;
   ctaSecondaryLabel?: string;
+  /** Modo de presentación del Acto I: grilla simultánea (por defecto) o secuencia centrada ("guest") */
+  actOneMode?: 'grid' | 'sequence';
 }
 
 const {
@@ -47,6 +49,7 @@ const {
   ctaLabel = 'Ver Todas las Colecciones',
   ctaSecondaryHref = '/archivo/',
   ctaSecondaryLabel = 'Archivo Completo',
+  actOneMode = 'grid',
 } = Astro.props;
 
 const stageId    = `triptico-stage-${instanceId}`;
@@ -82,18 +85,20 @@ const slicedPosts = posts.slice(0, 3);
   >
 
     <!-- ═══════════════════════════════ -->
-    <!-- ACTO I — Novedades (Grid 3)    -->
+    <!-- ACTO I — Novedades (Grid 3 o Seq)-->
     <!-- ═══════════════════════════════ -->
     <div
       id={acto1Id}
-      class="triptico-acto absolute inset-0 grid grid-cols-1 sm:grid-cols-3"
+      class={`triptico-acto absolute inset-0 ${actOneMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-3' : 'flex items-center justify-center'}`}
       style="visibility: visible; opacity: 1;"
     >
       {slicedPosts.map((post, i) => (
         <a
           href={post.href}
-          class="group relative overflow-hidden bg-[#0a0a0b] flex flex-col justify-end border-r border-white/5 last:border-r-0 transition-all duration-500"
-          style={`transition-delay:${i * 60}ms`}
+          class={actOneMode === 'grid' 
+            ? "group relative overflow-hidden bg-[#0a0a0b] flex flex-col justify-end border-r border-white/5 last:border-r-0 transition-all duration-500"
+            : "triptico-seq-card absolute inset-0 group overflow-hidden bg-[#0a0a0b] flex flex-col justify-end transition-all duration-500 invisible opacity-0"}
+          style={actOneMode === 'grid' ? `transition-delay:${i * 60}ms` : ''}
         >
           <div class="absolute inset-0 z-0">
             <img
@@ -119,11 +124,13 @@ const slicedPosts = posts.slice(0, 3);
                 {post.excerpt}
               </p>
             )}
-            <span class="font-mono text-[9px] uppercase tracking-[0.3em] text-white/25 group-hover:text-rust-orange/60 transition-colors mt-1">
+            <span class={`font-mono uppercase text-white/25 group-hover:text-rust-orange/60 transition-colors mt-1 ${actOneMode === 'grid' ? 'text-[9px] tracking-[0.3em]' : 'text-[11px] tracking-[0.4em] drop-shadow-md'}`}>
               Explorar Dossier →
             </span>
           </div>
-          <div class="absolute left-0 top-0 h-full w-0.5 bg-rust-orange scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-bottom z-20"></div>
+          {actOneMode === 'grid' && (
+            <div class="absolute left-0 top-0 h-full w-0.5 bg-rust-orange scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-bottom z-20"></div>
+          )}
         </a>
       ))}
       <div class="absolute top-4 right-5 z-30 font-mono text-[8px] uppercase tracking-[0.4em] text-white/20">
@@ -247,7 +254,7 @@ const slicedPosts = posts.slice(0, 3);
   </div>
 </section>
 
-<script define:vars={{ stageId, acto1Id, acto2Id, acto3Id, dotsId, progressId }}>
+<script define:vars={{ stageId, acto1Id, acto2Id, acto3Id, dotsId, progressId, actOneMode }}>
   const initTriptico = () => {
     const stage = document.getElementById(stageId);
     if (!stage || stage.__triptico_init) return;
@@ -263,13 +270,26 @@ const slicedPosts = posts.slice(0, 3);
 
     const STAY = 6;
     const FADE = 1.2;
+    const SEQ_STAY = 3.5;
+    const SEQ_FADE = 1.5;
+    
     const actos = [acto1, acto2, acto3];
     let currentActo = 0;
     let loopTimeout = null;
     let progressRaf = null;
     let paused = false;
     let progressStart = 0;
-    const progressDuration = (STAY + FADE) * 1000;
+    let timeRemaining = 0;
+    
+    let act1Timeline = null;
+    
+    const getDurationForAct = (idx) => {
+      if (idx === 0 && actOneMode === 'sequence') {
+        const cardsCount = document.querySelectorAll(`#${acto1Id} .triptico-seq-card`).length;
+        return (SEQ_STAY + SEQ_FADE) * cardsCount * 1000;
+      }
+      return (STAY + FADE) * 1000;
+    };
 
     const loadGSAP = () => {
       return new Promise((resolve) => {
@@ -299,10 +319,12 @@ const slicedPosts = posts.slice(0, 3);
       if (!progressBar) return;
       if (progressRaf) cancelAnimationFrame(progressRaf);
       progressStart = performance.now();
+      const currentDuration = getDurationForAct(currentActo);
+      
       const tick = (now) => {
         if (paused) { progressRaf = requestAnimationFrame(tick); return; }
         const elapsed = now - progressStart;
-        const pct = Math.min((elapsed / progressDuration) * 100, 100);
+        const pct = Math.min((elapsed / currentDuration) * 100, 100);
         progressBar.style.width = `${pct}%`;
         if (pct < 100) progressRaf = requestAnimationFrame(tick);
       };
@@ -310,10 +332,11 @@ const slicedPosts = posts.slice(0, 3);
     };
 
     const crossfade = (gsap, nextIdx) => {
+      const currentDuration = getDurationForAct(nextIdx);
+      
       // Fade out current act
       gsap.to(actos[currentActo], { autoAlpha: 0, duration: FADE, ease: 'power2.inOut' });
       
-      // If leaving Act 3, reset its inner animations
       if (currentActo === 2) {
         gsap.set(`#${acto3Id} .triptico-a3-anim`, { opacity: 0, y: 30, filter: "blur(12px)" });
       }
@@ -321,35 +344,70 @@ const slicedPosts = posts.slice(0, 3);
       // Fade in next act
       gsap.to(actos[nextIdx], { autoAlpha: 1, duration: FADE, ease: 'power2.inOut' });
 
-      // If entering Act 3, trigger stagger animation
+      // Animations inside the Acts
       if (nextIdx === 2) {
         gsap.fromTo(`#${acto3Id} .triptico-a3-anim`, 
           { opacity: 0, y: 40, filter: "blur(16px)" },
           { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.4, stagger: 0.15, ease: 'power3.out', delay: FADE * 0.4 }
         );
+      } else if (nextIdx === 0 && actOneMode === 'sequence') {
+        const seqCards = document.querySelectorAll(`#${acto1Id} .triptico-seq-card`);
+        if (act1Timeline) act1Timeline.kill();
+        act1Timeline = gsap.timeline();
+        
+        seqCards.forEach((card, i) => {
+          act1Timeline.fromTo(card,
+            { autoAlpha: 0, scale: 0.95, filter: "blur(10px)" },
+            { autoAlpha: 1, scale: 1, filter: "blur(0px)", duration: SEQ_FADE, ease: 'power2.out' },
+            i * (SEQ_STAY + SEQ_FADE)
+          );
+          act1Timeline.to(card,
+            { autoAlpha: 0, scale: 1.05, filter: "blur(6px)", duration: SEQ_FADE, ease: 'power2.in' },
+            i * (SEQ_STAY + SEQ_FADE) + SEQ_STAY
+          );
+        });
       }
 
       currentActo = nextIdx;
       updateDots(currentActo);
       animateProgress();
+      
+      timeRemaining = currentDuration;
+      scheduleNext(gsap, timeRemaining);
     };
 
-    const scheduleNext = (gsap) => {
+    const scheduleNext = (gsap, durationMs) => {
       if (loopTimeout) clearTimeout(loopTimeout);
       loopTimeout = setTimeout(() => {
-        if (!paused) crossfade(gsap, (currentActo + 1) % 3);
-        scheduleNext(gsap);
-      }, (STAY + FADE) * 1000);
+        if (!paused) {
+          crossfade(gsap, (currentActo + 1) % 3);
+        }
+      }, durationMs);
     };
 
     // Hover pause
-    stage.addEventListener('mouseenter', () => { paused = true; });
+    stage.addEventListener('mouseenter', () => { 
+      paused = true;
+      if (act1Timeline && currentActo === 0 && actOneMode === 'sequence') act1Timeline.pause();
+      if (loopTimeout) clearTimeout(loopTimeout);
+      
+      if (progressBar) {
+        const currentDuration = getDurationForAct(currentActo);
+        const elapsed = parseFloat(progressBar.style.width || '0') / 100 * currentDuration;
+        timeRemaining = currentDuration - elapsed;
+      }
+    });
+    
     stage.addEventListener('mouseleave', () => {
       paused = false;
+      if (act1Timeline && currentActo === 0 && actOneMode === 'sequence') act1Timeline.play();
+      
       if (progressBar) {
-        const elapsed = parseFloat(progressBar.style.width || '0') / 100 * progressDuration;
-        progressStart = performance.now() - elapsed;
+        const currentDuration = getDurationForAct(currentActo);
+        progressStart = performance.now() - (currentDuration - timeRemaining);
       }
+      
+      loadGSAP().then((gsap) => scheduleNext(gsap, timeRemaining));
     });
 
     // Dots manuales
@@ -379,9 +437,28 @@ const slicedPosts = posts.slice(0, 3);
       gsap.set(acto1, { autoAlpha: 1 });
       gsap.set(acto2, { autoAlpha: 0 });
       gsap.set(acto3, { autoAlpha: 0 });
+      
+      // Boot up sequence if in sequence mode
+      if (actOneMode === 'sequence') {
+        const seqCards = document.querySelectorAll(`#${acto1Id} .triptico-seq-card`);
+        act1Timeline = gsap.timeline();
+        seqCards.forEach((card, i) => {
+          act1Timeline.fromTo(card,
+            { autoAlpha: 0, scale: 0.95, filter: "blur(10px)" },
+            { autoAlpha: 1, scale: 1, filter: "blur(0px)", duration: SEQ_FADE, ease: 'power2.out' },
+            i * (SEQ_STAY + SEQ_FADE)
+          );
+          act1Timeline.to(card,
+            { autoAlpha: 0, scale: 1.05, filter: "blur(6px)", duration: SEQ_FADE, ease: 'power2.in' },
+            i * (SEQ_STAY + SEQ_FADE) + SEQ_STAY
+          );
+        });
+      }
+      
       updateDots(0);
       animateProgress();
-      scheduleNext(gsap);
+      timeRemaining = getDurationForAct(0);
+      scheduleNext(gsap, timeRemaining);
     });
   };
 

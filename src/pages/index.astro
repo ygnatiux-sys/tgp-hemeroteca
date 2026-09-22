@@ -16,6 +16,7 @@ import BlockCarousel from '../components/BlockCarousel.astro';
 import SpotlightHero from '../components/SpotlightHero.astro';
 import CinematicGrid from '../components/CinematicGrid.astro';
 import MubiBlockCinematic, { type MubiCinematicItem } from '../components/MubiBlockCinematic.astro';
+import TriplicoRevelacion, { type TriplicoPost } from '../components/TriplicoRevelacion.astro';
 import {
   type EssayEntry,
   getPublishableEssays,
@@ -255,6 +256,23 @@ const spotlightPosts = publishableCinematicos.map(item => ({
   isCinematicGSAP: true,
 }));
 
+// ─── POSTS PARA TRIPLICO DE PRUEBA (MODO SEQUENCE) ───
+const triplicoPruebaPosts: TriplicoPost[] = resolvedRecent.slice(0, 3).map(e => {
+  const rawImg = e.img;
+  const imgUrl = sanitizeImageUrl(
+    typeof rawImg === 'object' && (rawImg as any)?.src
+      ? (rawImg as any).src
+      : typeof rawImg === 'string' ? rawImg : ''
+  );
+  return {
+    title: e.entry.title || 'Ensayo Cinemático',
+    excerpt: (e.entry.dek || e.entry.excerpt || '') as string,
+    img: imgUrl,
+    href: (e as any).isCinematicGSAP ? `/ensayos-cinematicos/${e.slug}` : `/hemeroteca/${e.slug}`,
+    badge: 'Guest Appearance',
+  };
+});
+
 // ─── POSTS PARA CINEMATIC GRID (NUEVO) ───
 const gridItems = publishableCinematicos.map(item => {
   const aiText = item.entry.generadorTexto || '';
@@ -408,6 +426,29 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
             actionText={`Ver Catálogo Completo (${publishable.length}) →`}
             actionHref="/archivo/"
             cardAspect="vertical"
+          />
+        </section>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          BLOQUE 3.5: PRUEBA DE TRÍPTICO EN MODO SECUENCIA
+      ═══════════════════════════════════════════════════════════════════ */}
+      {triplicoPruebaPosts.length > 0 && (
+        <section class="flex flex-col gap-8 reveal-item">
+          <div class="flex flex-col items-center text-center">
+            <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Testing Component</span>
+            <h2 class="text-2xl sm:text-3xl font-cinzel font-extrabold tracking-tight text-white">
+              Secuencia Cinemática (Modo Guest)
+            </h2>
+          </div>
+          <TriplicoRevelacion
+            instanceId="home-sequence"
+            posts={triplicoPruebaPosts}
+            actOneMode="sequence"
+            label="Guest Sequence"
+            headline="El Centro. La Escena. La Obra."
+            ctaHref="/archivo/"
+            ctaLabel="Explorar Archivo"
           />
         </section>
       )}
