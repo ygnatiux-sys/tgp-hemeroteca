@@ -96,12 +96,31 @@ async function answerCallbackQuery(token: string, callbackQueryId: string, text?
   });
 }
 
+// ── Deduplicación de Updates (anti-retries Telegram) ──────────────────────────
+const seenUpdateIds = new Set<number>();
+function isDuplicateUpdate(updateId?: number): boolean {
+  if (!updateId) return false;
+  if (seenUpdateIds.has(updateId)) return true;
+  seenUpdateIds.add(updateId);
+  if (seenUpdateIds.size > 2000) {
+    const firstItem = seenUpdateIds.values().next().value;
+    if (firstItem !== undefined) seenUpdateIds.delete(firstItem);
+  }
+  return false;
+}
+
 // ── Handler principal ─────────────────────────────────────────────────────────
 export async function handleTelegramWebhook(
   update: any,
   botIdentity: BotIdentity,
   botToken: string,
 ): Promise<void> {
+
+  // Anti-retries: ignorar si el update_id ya fue procesado o está en curso
+  if (isDuplicateUpdate(update?.update_id)) {
+    console.warn(`[Webhook Anti-Retry] update_id=${update?.update_id} ya en curso o procesado (${botIdentity}). Ignorando.`);
+    return;
+  }
 
   // ── RAMA 1: Callback Query (botón inline pulsado) ──────────────────────────
   // Se trata como mensaje de texto semántico. Stateless: callback_data ES el texto.

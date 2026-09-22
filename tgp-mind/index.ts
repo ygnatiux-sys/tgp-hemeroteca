@@ -179,69 +179,49 @@ app.use('*', cors({
 
 app.options('*', (c) => c.body(null, 204));
 
-// ── Rutas de Webhook Multi-Bot (Cloud Run / Producción) ───────────────────────
+// ── Rutas de Webhook Multi-Bot (Desacopladas / No Bloqueantes) ─────────────────
+// Devuelven HTTP 200 OK inmediatamente (<50ms) para evitar timeouts y retries de Telegram.
+// El procesamiento real corre en segundo plano (Background Execution).
+function handleWebhookRoute(botType: 'redes' | 'omni' | 'assistant' | 'liminal', token: string) {
+  return async (c: any) => {
+    try {
+      const update = await c.req.json();
+      const task = handleTelegramWebhook(update, botType, token).catch((err: any) => {
+        console.error(`[Background Webhook Error - ${botType}]:`, err);
+      });
+      // Soporte para Cloudflare Workers / Serverless execution context si existe
+      if (c.executionCtx && typeof c.executionCtx.waitUntil === 'function') {
+        c.executionCtx.waitUntil(task);
+      }
+    } catch (parseErr: any) {
+      console.error(`[Webhook Parse Error - ${botType}]:`, parseErr?.message);
+    }
+    return c.text('OK');
+  };
+}
+
 // Endpoints específicos registrados en Telegram Bot API:
-app.post('/webhook/telegram-social', async (c) => {
-  const update = await c.req.json();
-  await handleTelegramWebhook(update, 'redes', TELEGRAM_SOCIAL_TOKEN);
-  return c.text('OK');
-});
-
-app.post('/telegram-webhook', async (c) => {
-  const update = await c.req.json();
-  await handleTelegramWebhook(update, 'omni', TELEGRAM_TOKEN);
-  return c.text('OK');
-});
-
-app.post('/webhook/telegram-omni', async (c) => {
-  const update = await c.req.json();
-  await handleTelegramWebhook(update, 'omni', TELEGRAM_TOKEN);
-  return c.text('OK');
-});
-
-app.post('/webhook/telegram', async (c) => {
-  const update = await c.req.json();
-  await handleTelegramWebhook(update, 'assistant', TELEGRAM_TGP_CLOUD_TOKEN);
-  return c.text('OK');
-});
-
-app.post('/webhook-dev', async (c) => {
-  const update = await c.req.json();
-  await handleTelegramWebhook(update, 'liminal', TELEGRAM_DEV_TOKEN);
-  return c.text('OK');
-});
+app.post('/webhook/telegram-social', handleWebhookRoute('redes', TELEGRAM_SOCIAL_TOKEN));
+app.post('/telegram-webhook',        handleWebhookRoute('omni', TELEGRAM_TOKEN));
+app.post('/webhook/telegram-omni',   handleWebhookRoute('omni', TELEGRAM_TOKEN));
+app.post('/webhook/telegram',        handleWebhookRoute('assistant', TELEGRAM_TGP_CLOUD_TOKEN));
+app.post('/webhook-dev',             handleWebhookRoute('liminal', TELEGRAM_DEV_TOKEN));
 
 // Rutas secundarias /bot<TOKEN>:
 if (TELEGRAM_TOKEN) {
-  app.post(`/bot${TELEGRAM_TOKEN}`, async (c) => {
-    const update = await c.req.json();
-    await handleTelegramWebhook(update, 'omni', TELEGRAM_TOKEN);
-    return c.text('OK');
-  });
+  app.post(`/bot${TELEGRAM_TOKEN}`, handleWebhookRoute('omni', TELEGRAM_TOKEN));
 }
 
 if (TELEGRAM_SOCIAL_TOKEN) {
-  app.post(`/bot${TELEGRAM_SOCIAL_TOKEN}`, async (c) => {
-    const update = await c.req.json();
-    await handleTelegramWebhook(update, 'redes', TELEGRAM_SOCIAL_TOKEN);
-    return c.text('OK');
-  });
+  app.post(`/bot${TELEGRAM_SOCIAL_TOKEN}`, handleWebhookRoute('redes', TELEGRAM_SOCIAL_TOKEN));
 }
 
 if (TELEGRAM_TGP_CLOUD_TOKEN) {
-  app.post(`/bot${TELEGRAM_TGP_CLOUD_TOKEN}`, async (c) => {
-    const update = await c.req.json();
-    await handleTelegramWebhook(update, 'assistant', TELEGRAM_TGP_CLOUD_TOKEN);
-    return c.text('OK');
-  });
+  app.post(`/bot${TELEGRAM_TGP_CLOUD_TOKEN}`, handleWebhookRoute('assistant', TELEGRAM_TGP_CLOUD_TOKEN));
 }
 
 if (TELEGRAM_DEV_TOKEN) {
-  app.post(`/bot${TELEGRAM_DEV_TOKEN}`, async (c) => {
-    const update = await c.req.json();
-    await handleTelegramWebhook(update, 'liminal', TELEGRAM_DEV_TOKEN);
-    return c.text('OK');
-  });
+  app.post(`/bot${TELEGRAM_DEV_TOKEN}`, handleWebhookRoute('liminal', TELEGRAM_DEV_TOKEN));
 }
 
 // -- Google Photos Picker API -- CORS-safe, credenciales en server -----------
