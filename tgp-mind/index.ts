@@ -1,13 +1,13 @@
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
-// TGP MIND Ã¢â‚¬â€ Orquestador IA con Hono + Gemini + Inline Keyboard Wizard
+// Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬
+// TGP MIND Ã¢â‚¬â€  Orquestador IA con Hono + Gemini + Inline Keyboard Wizard
 // Autor: TGP / Xavier BenÃƒÂ­tez
 // Deploy: Google Cloud Run
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬
 
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { cors } from 'hono/cors';
-// Ã¢â€â‚¬Ã¢â€â‚¬ Gemini (ver src/ia/gemini.ts) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// Ã¢â€ â‚¬Ã¢â€ â‚¬ Gemini (ver src/ia/gemini.ts) Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬
 import {
   GEMINI_API_KEY,
   genai,
@@ -15,30 +15,8 @@ import {
   callGemini,
   crearModeloEnsayo,
 } from './src/ia/gemini.js';
-// Ã¢â€â‚¬Ã¢â€â‚¬ Telegram Bot Principal (ver src/telegram/helpers.ts) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
-import {
-  initTelegramHelpers,
-  SesionConfig,
-  sesiones,
-  pendingTextQueries,
-  buildInlineKeyboard,
-  sendTelegram,
-  answerCallbackQuery,
-  editMessageReplyMarkup,
-  editMessageText,
-} from './src/telegram/helpers.js';
-// Ã¢â€â‚¬Ã¢â€â‚¬ Telegram Bot Social + Zernio (ver src/telegram/social.ts) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
-import {
-  initSocialBot,
-  SesionSocialConfig,
-  sesionesSocial,
-  buildSocialInlineKeyboard,
-  sendTelegramSocial,
-  answerCallbackQuerySocial,
-  editMessageReplyMarkupSocial,
-  editMessageTextSocial,
-  publicarEnZernio,
-} from './src/telegram/social.js';
+// -- Telegram Webhook Unificado Multi-Bot (ver src/telegram/webhook.ts) --------
+import { handleTelegramWebhook } from './src/telegram/webhook.js';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 // -- Storage: R2 (ver src/storage/r2.ts) ----------------------------------------
 import {
@@ -89,7 +67,7 @@ const DIALOGFLOW_AGENT_ID = process.env.DIALOGFLOW_AGENT_ID || '';
 const TELEGRAM_API        = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
 const TELEGRAM_SOCIAL_TOKEN     = process.env.REDES_TOKEN || process.env.TELEGRAM_SOCIAL_TOKEN || '';
 const TELEGRAM_TGP_CLOUD_TOKEN  = process.env.ASSISTANT_TOKEN || process.env.TELEGRAM_TGP_CLOUD_TOKEN || '';
-const TELEGRAM_DEV_TOKEN        = process.env.TELEGRAM_DEV_BOT_TOKEN   || '';
+const TELEGRAM_DEV_TOKEN = process.env.TELEGRAM_DEV_BOT_TOKEN || process.env.LIMINAL_TOKEN || '';
 const ZERNIO_API_KEY        = process.env.ZERNIO_API_KEY || '';
 const ZERNIO_FB_ID          = process.env.ZERNIO_FB_ID || '';
 const ZERNIO_TIKTOK_ID      = process.env.ZERNIO_TIKTOK_ID || '';
@@ -151,7 +129,6 @@ initPublicacion();
 // sendTelegram, answerCallbackQuery, editMessageReplyMarkup, editMessageText
 // Ã¢â€ â€™ importados desde ./src/telegram/helpers.js
 
-import { devBotApp } from './src/devBot.js';
 
 // Ã¢â€â‚¬Ã¢â€â‚¬ Hono App Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 const app = new Hono();
@@ -173,11 +150,7 @@ app.use('*', cors({
 
 app.get('/', (c) => c.json({ status: 'TGP Mind activo', ts: new Date().toISOString() }));
 
-// Ã¢â€â‚¬Ã¢â€â‚¬ RUTA AISLADA DE DESARROLLO (@UXliminal_bot) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
-app.route('/webhook-dev', devBotApp);
 
-// -- Nuevo Webhook Unificado Multi-Bot -----------------------------------------
-import { handleTelegramWebhook } from './src/telegram/webhook.js';
 
 // Las rutas se registrarán más abajo.
 const isAllowedOrigin = (origin: string) => {
@@ -206,30 +179,70 @@ app.use('*', cors({
 
 app.options('*', (c) => c.body(null, 204));
 
-// Rutas de Webhook Multi-Bot
-app.post(`/bot${TELEGRAM_TOKEN}`, async (c) => {
-  const update = await c.req.json();
-  await handleTelegramWebhook(update, 'omni', TELEGRAM_TOKEN);
-  return c.text('OK');
-});
-
-app.post(`/bot${TELEGRAM_SOCIAL_TOKEN}`, async (c) => {
+// ── Rutas de Webhook Multi-Bot (Cloud Run / Producción) ───────────────────────
+// Endpoints específicos registrados en Telegram Bot API:
+app.post('/webhook/telegram-social', async (c) => {
   const update = await c.req.json();
   await handleTelegramWebhook(update, 'redes', TELEGRAM_SOCIAL_TOKEN);
   return c.text('OK');
 });
 
-app.post(`/bot${TELEGRAM_TGP_CLOUD_TOKEN}`, async (c) => {
+app.post('/telegram-webhook', async (c) => {
+  const update = await c.req.json();
+  await handleTelegramWebhook(update, 'omni', TELEGRAM_TOKEN);
+  return c.text('OK');
+});
+
+app.post('/webhook/telegram-omni', async (c) => {
+  const update = await c.req.json();
+  await handleTelegramWebhook(update, 'omni', TELEGRAM_TOKEN);
+  return c.text('OK');
+});
+
+app.post('/webhook/telegram', async (c) => {
   const update = await c.req.json();
   await handleTelegramWebhook(update, 'assistant', TELEGRAM_TGP_CLOUD_TOKEN);
   return c.text('OK');
 });
 
-app.post(`/bot${TELEGRAM_DEV_TOKEN}`, async (c) => {
+app.post('/webhook-dev', async (c) => {
   const update = await c.req.json();
   await handleTelegramWebhook(update, 'liminal', TELEGRAM_DEV_TOKEN);
   return c.text('OK');
 });
+
+// Rutas secundarias /bot<TOKEN>:
+if (TELEGRAM_TOKEN) {
+  app.post(`/bot${TELEGRAM_TOKEN}`, async (c) => {
+    const update = await c.req.json();
+    await handleTelegramWebhook(update, 'omni', TELEGRAM_TOKEN);
+    return c.text('OK');
+  });
+}
+
+if (TELEGRAM_SOCIAL_TOKEN) {
+  app.post(`/bot${TELEGRAM_SOCIAL_TOKEN}`, async (c) => {
+    const update = await c.req.json();
+    await handleTelegramWebhook(update, 'redes', TELEGRAM_SOCIAL_TOKEN);
+    return c.text('OK');
+  });
+}
+
+if (TELEGRAM_TGP_CLOUD_TOKEN) {
+  app.post(`/bot${TELEGRAM_TGP_CLOUD_TOKEN}`, async (c) => {
+    const update = await c.req.json();
+    await handleTelegramWebhook(update, 'assistant', TELEGRAM_TGP_CLOUD_TOKEN);
+    return c.text('OK');
+  });
+}
+
+if (TELEGRAM_DEV_TOKEN) {
+  app.post(`/bot${TELEGRAM_DEV_TOKEN}`, async (c) => {
+    const update = await c.req.json();
+    await handleTelegramWebhook(update, 'liminal', TELEGRAM_DEV_TOKEN);
+    return c.text('OK');
+  });
+}
 
 // -- Google Photos Picker API -- CORS-safe, credenciales en server -----------
 import {
