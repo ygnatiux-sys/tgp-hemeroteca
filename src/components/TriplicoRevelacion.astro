@@ -89,7 +89,7 @@ const slicedPosts = posts.slice(0, 3);
     <!-- ═══════════════════════════════ -->
     <div
       id={acto1Id}
-      class={`triptico-acto absolute inset-0 ${actOneMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-3' : 'flex items-center justify-center'}`}
+      class="triptico-acto absolute inset-0 grid grid-cols-1 sm:grid-cols-3"
       style="visibility: visible; opacity: 1;"
     >
       {slicedPosts.map((post, i) => (
@@ -97,7 +97,7 @@ const slicedPosts = posts.slice(0, 3);
           href={post.href}
           class={actOneMode === 'grid' 
             ? "group relative overflow-hidden bg-[#0a0a0b] flex flex-col justify-end border-r border-white/5 last:border-r-0 transition-all duration-500"
-            : "triptico-seq-card absolute inset-0 group overflow-hidden bg-[#0a0a0b] flex flex-col justify-end transition-all duration-500 invisible opacity-0"}
+            : "triptico-seq-card relative group overflow-hidden bg-[#0a0a0b] flex flex-col justify-end border-r border-white/5 last:border-r-0 invisible opacity-0"}
           style={actOneMode === 'grid' ? `transition-delay:${i * 60}ms` : ''}
         >
           <div class="absolute inset-0 z-0">
@@ -351,19 +351,24 @@ const slicedPosts = posts.slice(0, 3);
           { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.4, stagger: 0.15, ease: 'power3.out', delay: FADE * 0.4 }
         );
       } else if (nextIdx === 0 && actOneMode === 'sequence') {
-        const seqCards = document.querySelectorAll(`#${acto1Id} .triptico-seq-card`);
+        const seqCards = Array.from(document.querySelectorAll(`#${acto1Id} .triptico-seq-card`));
         if (act1Timeline) act1Timeline.kill();
         act1Timeline = gsap.timeline();
         
-        seqCards.forEach((card, i) => {
+        // Orden estelar: Centro (1), Derecha (2), Izquierda (0)
+        const sequenceOrder = [1, 2, 0];
+        
+        sequenceOrder.forEach((cardIndex, stepIndex) => {
+          const card = seqCards[cardIndex];
+          if (!card) return;
           act1Timeline.fromTo(card,
             { autoAlpha: 0, scale: 0.95, filter: "blur(10px)" },
             { autoAlpha: 1, scale: 1, filter: "blur(0px)", duration: SEQ_FADE, ease: 'power2.out' },
-            i * (SEQ_STAY + SEQ_FADE)
+            stepIndex * (SEQ_STAY + SEQ_FADE)
           );
           act1Timeline.to(card,
             { autoAlpha: 0, scale: 1.05, filter: "blur(6px)", duration: SEQ_FADE, ease: 'power2.in' },
-            i * (SEQ_STAY + SEQ_FADE) + SEQ_STAY
+            stepIndex * (SEQ_STAY + SEQ_FADE) + SEQ_STAY
           );
         });
       }
@@ -440,17 +445,20 @@ const slicedPosts = posts.slice(0, 3);
       
       // Boot up sequence if in sequence mode
       if (actOneMode === 'sequence') {
-        const seqCards = document.querySelectorAll(`#${acto1Id} .triptico-seq-card`);
+        const seqCards = Array.from(document.querySelectorAll(`#${acto1Id} .triptico-seq-card`));
         act1Timeline = gsap.timeline();
-        seqCards.forEach((card, i) => {
+        const sequenceOrder = [1, 2, 0];
+        sequenceOrder.forEach((cardIndex, stepIndex) => {
+          const card = seqCards[cardIndex];
+          if (!card) return;
           act1Timeline.fromTo(card,
             { autoAlpha: 0, scale: 0.95, filter: "blur(10px)" },
             { autoAlpha: 1, scale: 1, filter: "blur(0px)", duration: SEQ_FADE, ease: 'power2.out' },
-            i * (SEQ_STAY + SEQ_FADE)
+            stepIndex * (SEQ_STAY + SEQ_FADE)
           );
           act1Timeline.to(card,
             { autoAlpha: 0, scale: 1.05, filter: "blur(6px)", duration: SEQ_FADE, ease: 'power2.in' },
-            i * (SEQ_STAY + SEQ_FADE) + SEQ_STAY
+            stepIndex * (SEQ_STAY + SEQ_FADE) + SEQ_STAY
           );
         });
       }

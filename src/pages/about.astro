@@ -10,7 +10,7 @@ import KitLeadMagnet from '../components/KitLeadMagnet.astro';
 import Marquee from '../components/Marquee.astro';
 import CinematicExcerptRest from '../components/CinematicExcerptRest.astro';
 import MazoCartasGSAP from '../components/MazoCartasGSAP.astro';
-import MubiBlockCinematic, { type MubiCinematicItem } from '../components/MubiBlockCinematic.astro';
+import { type MubiCinematicItem } from '../components/MubiBlockCinematic.astro';
 import TriplicoRevelacion, { type TriplicoPost } from '../components/TriplicoRevelacion.astro';
 import { sanitizeImageUrl, getPublishableEssays, resolveEssayImage, isValidImageSrc } from '../lib/content-filter';
 
@@ -415,24 +415,18 @@ const triplicoHero: TriplicoPost | undefined = mubiCinematicItems.slice(3).find(
   )}
 
   {/* ══════════════════════════════════════════════════════════════════
-      SHOWCASE MUBI CINEMÁTICO: Bloques rígidos de 3 tarjetas con GSAP
-  ══════════════════════════════════════════════════════════════════ */}
-  {mubiCinematicItems.length > 0 && (
-    <MubiBlockCinematic
-      items={mubiCinematicItems}
-      titulo="Colección Cinemática"
-      subtitulo="Experiencias Visuales en Tres Actos"
-    />
-  )}
-
-  {/* ══════════════════════════════════════════════════════════════════
-      TRÍPTICO DE REVELACIÓN — Cinematic Reveal Loop
-      Tres actos en rotación: posts recientes / colección hero / CTA umbral
+      TRÍPTICO DE REVELACIÓN — Cinematic Reveal Loop (MODO SEQUENCE)
   ══════════════════════════════════════════════════════════════════ */}
   {triplicoPosts.length > 0 && (
     <TriplicoRevelacion
+      instanceId="about-sequence"
       posts={triplicoPosts}
       heroPost={triplicoHero}
+      actOneMode="sequence"
+      label="Colección Cinemática"
+      headline="Experiencias Visuales. En Tres Actos."
+      ctaHref="/ensayos-cinematicos/"
+      ctaLabel="Explorar Archivo Cinemático"
     />
   )}
 
