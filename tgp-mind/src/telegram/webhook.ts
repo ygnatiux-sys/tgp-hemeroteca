@@ -66,8 +66,20 @@ export async function handleTelegramWebhook(
   if (!msg) return;
 
   const chatId: number = msg.chat.id;
-  const text: string   = (msg.text || msg.caption || '').trim();
-  const photos         = msg.photo as Array<{ file_id: string; width: number; height: number }> | undefined;
+
+  // ── Extraer texto: msg.text (mensaje plano) o msg.caption (pie de foto) ────
+  // CRÍTICO: ambas fuentes son mutuamente excluyentes en la API de Telegram.
+  // msg.text solo existe en mensajes de texto puro.
+  // msg.caption existe cuando el usuario envía una imagen con texto adjunto.
+  const rawText    = typeof msg.text    === 'string' ? msg.text.trim()    : '';
+  const rawCaption = typeof msg.caption === 'string' ? msg.caption.trim() : '';
+  const text       = rawText || rawCaption; // el que exista
+  const textSource = rawText ? 'text' : rawCaption ? 'caption' : 'none';
+
+  const photos = msg.photo as Array<{ file_id: string; width: number; height: number }> | undefined;
+  const hasPhotos = Array.isArray(photos) && photos.length > 0;
+
+  console.log(`[Webhook] chat_id=${chatId} bot=${botIdentity} text_source=${textSource} has_photo=${hasPhotos} text="${text.slice(0, 80)}"`); 
 
   // ── Comandos de control ────────────────────────────────────────────────────
   if (text.startsWith('/nuevo') || text.startsWith('/cancel') || text.startsWith('/reset')) {
@@ -77,41 +89,54 @@ export async function handleTelegramWebhook(
   }
 
   // ── ESCUDO R2: Interceptar foto ANTES de hablar con Gemini ────────────────
-  // Si el mensaje incluye fotos, se procesan en R2 primero.
-  // El resultado es una URL permanente que Gemini puede usar en la Ficha Visual.
+  // Si hay foto, se sube a R2 y se crea un turno único en D1 fusionando:
+  //   - El contexto de imagen (URL R2)
+  //   - El caption/texto del usuario (si existe)
+  // Así Gemini recibe todo en un único turn coherente y no hay duplicados.
   let imageContextPrefix = '';
-  if (photos && photos.length > 0) {
-    // Obtener la foto de mayor resolución
-    const bestPhoto = photos.reduce((a, b) => (a.width > b.width ? a : b));
+  let fotoGuardadaEnD1   = false; // flag para no duplicar el guardado en el agente
+
+  if (hasPhotos) {
+    const bestPhoto = photos!.reduce((a, b) => (a.width > b.width ? a : b));
 
     try {
-      console.log(`[Webhook R2] Interceptando foto file_id=${bestPhoto.file_id} para chat_id=${chatId}`);
+      console.log(`[Webhook R2] Subiendo foto file_id=${bestPhoto.file_id} a R2 (chat_id=${chatId})...`);
       const { url: r2Url } = await procesarFotoTelegramAR2(bestPhoto.file_id, 'telegram', botToken);
+      console.log(`[Webhook R2] ✅ Imagen respaldada en R2: ${r2Url}`);
 
-      // Mensaje de sistema transparente para inyectar en el historial
-      imageContextPrefix = `[Sistema: Imagen recibida y respaldada permanentemente en R2. URL disponible para la Ficha y para Tool publish_social: ${r2Url}]`;
+      imageContextPrefix = `[Sistema: Imagen recibida. URL permanente en R2: ${r2Url}. Usa esta URL como url_imagen en la Ficha Visual y en la Tool publish_social.]`;
 
-      // Guardar el mensaje de sistema en D1 como turno de usuario para que
-      // Gemini lo vea en el historial. Se usa appendTurn directamente porque
-      // es un mensaje de sistema, no texto del usuario.
-      await appendTurn(chatId, 'user', [{ text: imageContextPrefix }]);
+      // Turno fusionado: contexto R2 + caption (si hay) en un solo turno D1
+      const partsD1: Array<{ text: string }> = [{ text: imageContextPrefix }];
+      if (text) partsD1.push({ text: `Caption del usuario: ${text}` });
 
-      console.log(`[Webhook R2] Imagen respaldada exitosamente: ${r2Url}`);
+      await appendTurn(chatId, 'user', partsD1);
+      fotoGuardadaEnD1 = true;
+
     } catch (err: any) {
-      console.error('[Webhook R2] Error en Escudo R2:', err?.message);
-      // No bloqueamos el flujo si falla el upload. Notificamos al agente.
-      imageContextPrefix = '[Sistema: Se recibió una foto pero falló la subida a R2. No hay URL disponible.]';
-      await appendTurn(chatId, 'user', [{ text: imageContextPrefix }]);
+      // Log detallado del crash de R2 para diagnóstico en Cloud Run
+      const errMsg    = err?.message || String(err);
+      const errStatus = err?.status  || err?.statusCode || 'N/A';
+      const errBody   = err?.body    || err?.data       || '';
+      console.error(`[Webhook R2] ❌ CRASH en Escudo R2 — chat_id=${chatId} file_id=${bestPhoto.file_id}`);
+      console.error(`[Webhook R2] Error message: ${errMsg}`);
+      console.error(`[Webhook R2] HTTP status: ${errStatus}`);
+      if (errBody) console.error(`[Webhook R2] Response body: ${JSON.stringify(errBody).slice(0, 500)}`);
+      console.error(`[Webhook R2] Stack:`, err?.stack || '(sin stack)');
+
+      // Continuar el flujo con aviso al agente (no bloqueamos al usuario)
+      imageContextPrefix = `[Sistema: El usuario envió una foto pero falló la subida a R2 (error: ${errMsg}). No hay URL disponible. Informa al usuario y pide que reenvíe la imagen.]`;
+      const partsD1: Array<{ text: string }> = [{ text: imageContextPrefix }];
+      if (text) partsD1.push({ text: `Caption del usuario: ${text}` });
+      await appendTurn(chatId, 'user', partsD1);
+      fotoGuardadaEnD1 = true;
     }
   }
 
-  // ── Pasar control al Agente Orquestador ────────────────────────────────────
-  // Si no hay texto y solo había una foto, usamos un texto por defecto
-  // para que el agente sepa que el usuario envió algo.
-  const userTextForAgent = text || (photos?.length ? '(imagen adjunta)' : '');
-
-  if (!userTextForAgent && !imageContextPrefix) {
-    // Mensaje vacío sin foto: ignorar.
+  // ── Sanity check: ignorar mensajes vacíos sin foto ────────────────────────
+  const userTextForAgent = text || (hasPhotos ? '(imagen adjunta sin caption)' : '');
+  if (!userTextForAgent && !fotoGuardadaEnD1) {
+    console.warn(`[Webhook] Mensaje vacío ignorado para chat_id=${chatId}`);
     return;
   }
 
