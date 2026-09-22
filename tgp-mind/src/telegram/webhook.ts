@@ -89,10 +89,29 @@ export async function sendTelegramMessage(
 }
 
 // ── Responder a un callback_query (requerido por la API de Telegram) ──────────
-async function answerCallbackQuery(token: string, callbackQueryId: string, text?: string): Promise<void> {
+async function answerCallbackQuery(
+  token: string,
+  callbackQueryId: string,
+  text?: string,
+  showAlert = false,
+): Promise<void> {
   await telegramPost(token, 'answerCallbackQuery', {
     callback_query_id: callbackQueryId,
-    ...(text ? { text, show_alert: false } : {}),
+    ...(text ? { text, show_alert: showAlert } : {}),
+  });
+}
+
+// ── Editar teclado de un mensaje existente ───────────────────────────────────
+async function editMessageReplyMarkup(
+  token: string,
+  chatId: number,
+  messageId: number,
+  keyboard?: InlineKeyboard,
+): Promise<void> {
+  await telegramPost(token, 'editMessageReplyMarkup', {
+    chat_id: chatId,
+    message_id: messageId,
+    reply_markup: keyboard ? { inline_keyboard: keyboard } : { inline_keyboard: [] },
   });
 }
 
@@ -125,23 +144,52 @@ export async function handleTelegramWebhook(
   // ── RAMA 1: Callback Query (botón inline pulsado) ──────────────────────────
   // Se trata como mensaje de texto semántico. Stateless: callback_data ES el texto.
   if (update?.callback_query) {
-    const cq      = update.callback_query;
-    const chatId  = cq.message?.chat?.id as number;
-    const data    = (cq.data || '').trim();
-    const cqId    = cq.id;
+    const cq        = update.callback_query;
+    const chatId    = cq.message?.chat?.id as number;
+    const messageId = cq.message?.message_id as number;
+    const data      = (cq.data || '').trim();
+    const cqId      = cq.id;
 
     if (!chatId || !data) {
       await answerCallbackQuery(botToken, cqId);
       return;
     }
 
+    // Botón deshabilitado durante ejecución
+    if (data === 'disabled' || data === 'noop') {
+      await answerCallbackQuery(botToken, cqId, '⏳ La tarea ya está en proceso...', false);
+      return;
+    }
+
     console.log(`[Webhook CB] chat_id=${chatId} bot=${botIdentity} callback_data="${data}"`);
 
-    // Confirmar recepción del tap (requerido por Telegram, debe ser < 10 segundos)
-    await answerCallbackQuery(botToken, cqId);
+    // 1. Determinar cartel Toast de devolución
+    let toastText = '⚡ Procesando...';
+    if (data === 'ok') {
+      toastText = '⏳ ¡Confirmado! Generando ensayo y multimedia...';
+    } else if (data === '/cancel' || data === 'cancel') {
+      toastText = '❌ Operación cancelada.';
+    } else if (data === '/nuevo' || data === '/reset') {
+      toastText = '🔄 Reiniciando sesión...';
+    } else if (data.includes('modificar')) {
+      toastText = '✏️ Ajustando parámetros...';
+    }
+
+    // Enviar cartel Toast inmediato (< 10s requerido por Telegram)
+    await answerCallbackQuery(botToken, cqId, toastText, false);
+
+    // 2. Si pulsaron Confirmar, congelar el teclado del mensaje para evitar doble clic y errores
+    if (data === 'ok' && messageId) {
+      await editMessageReplyMarkup(botToken, chatId, messageId, [
+        [{ text: '⏳ Procesando publicación...', callback_data: 'disabled' }],
+      ]);
+    }
 
     // Comandos especiales dentro de callbacks
     if (data === '/nuevo' || data === '/cancel' || data === '/reset') {
+      if (messageId) {
+        await editMessageReplyMarkup(botToken, chatId, messageId);
+      }
       await clearChatHistory(chatId, botIdentity);
       await sendTelegramMessage(chatId, botToken, '🔄 Sesión reiniciada. ¿En qué te ayudo?');
       return;
@@ -160,12 +208,22 @@ export async function handleTelegramWebhook(
     try {
       const responseText = await processTelegramMessage(chatId, data, botIdentity);
       if (responseText) {
+        if (data === 'ok' && messageId) {
+          await editMessageReplyMarkup(botToken, chatId, messageId, [
+            [{ text: '✅ Confirmado y procesado', callback_data: 'disabled' }],
+          ]);
+        }
         const keyboard = esFichaVisual(responseText) ? TECLADO_CONFIRMACION : undefined;
         await sendTelegramMessage(chatId, botToken, responseText, keyboard);
       }
     } catch (err: any) {
       const errMsg = err?.message || String(err);
       console.error(`[Webhook CB] ❌ CRASH — chat_id=${chatId}: ${errMsg}`);
+      if (data === 'ok' && messageId) {
+        await editMessageReplyMarkup(botToken, chatId, messageId, [
+          [{ text: '⚠️ Error en la generación', callback_data: 'disabled' }],
+        ]);
+      }
       await sendTelegramMessage(chatId, botToken, '⚠️ Hubo un error. Intenta de nuevo.');
     }
     return;
