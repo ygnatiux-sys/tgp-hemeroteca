@@ -42,9 +42,10 @@ export function generarMarkdoc(ensayo: {
 }): { slug: string; contenidoMdoc: string } {
   const slug       = generarSlug(ensayo.titulo || 'ensayo-cinematico');
   const fechaHoy   = new Date().toISOString().split('T')[0];
-  const coverImage = ensayo.secciones?.[0]?.imagen_url || ensayo.secciones?.[0]?.busqueda_wikimedia || '';
-  const excerpt    = ensayo.secciones?.[0]?.parrafo
-    ? ensayo.secciones[0].parrafo.slice(0, 180) + '...'
+  const coverImage = ensayo.secciones?.[0]?.imagen_url?.startsWith('http') ? ensayo.secciones[0].imagen_url : '';
+  const primerParrafo = ensayo.secciones?.[0]?.parrafo || '';
+  const excerpt    = primerParrafo
+    ? primerParrafo.slice(0, 180) + '...'
     : '';
 
   let mdoc = `---
@@ -60,8 +61,9 @@ generador: "TGP Mind (Gemini + R2 + GitOps)"
 
   if (Array.isArray(ensayo.secciones)) {
     ensayo.secciones.forEach((seccion, idx) => {
-      const img = seccion.imagen_url || seccion.busqueda_wikimedia;
-      if (img) mdoc += `![${ensayo.titulo} -- Seccion ${idx + 1}](${img})\n\n`;
+      if (seccion.imagen_url && seccion.imagen_url.startsWith('http')) {
+        mdoc += `![${ensayo.titulo} -- Sección ${idx + 1}](${seccion.imagen_url})\n\n`;
+      }
       if (seccion.parrafo) mdoc += `${seccion.parrafo.trim()}\n\n`;
     });
   }

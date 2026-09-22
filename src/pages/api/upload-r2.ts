@@ -1,15 +1,28 @@
-﻿import type { APIRoute } from 'astro';
+import type { APIRoute } from 'astro';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
 export const prerender = false;
 
 const R2_PUBLIC_BASE = 'https://storage.thegreatpuzzleproject.com';
 
-function getS3Client() {
-  const accountId = process.env.R2_ACCOUNT_ID;
-  const accessKeyId = process.env.R2_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-  const endpoint = process.env.R2_ENDPOINT || (accountId ? `https://${accountId}.r2.cloudflarestorage.com` : null);
+function getS3Client(cloudflareEnv?: any) {
+  const accountId =
+    cloudflareEnv?.R2_ACCOUNT_ID ||
+    process.env.R2_ACCOUNT_ID ||
+    (import.meta as any).env?.R2_ACCOUNT_ID;
+  const accessKeyId =
+    cloudflareEnv?.R2_ACCESS_KEY_ID ||
+    process.env.R2_ACCESS_KEY_ID ||
+    (import.meta as any).env?.R2_ACCESS_KEY_ID;
+  const secretAccessKey =
+    cloudflareEnv?.R2_SECRET_ACCESS_KEY ||
+    process.env.R2_SECRET_ACCESS_KEY ||
+    (import.meta as any).env?.R2_SECRET_ACCESS_KEY;
+  const endpoint =
+    cloudflareEnv?.R2_ENDPOINT ||
+    process.env.R2_ENDPOINT ||
+    (import.meta as any).env?.R2_ENDPOINT ||
+    (accountId ? `https://${accountId}.r2.cloudflarestorage.com` : null);
 
   if (!accessKeyId || !secretAccessKey || !endpoint) {
     throw new Error('Credenciales de Cloudflare R2 incompletas en variables de entorno.');
@@ -22,11 +35,15 @@ function getS3Client() {
       credentials: { accessKeyId, secretAccessKey },
       forcePathStyle: false,
     }),
-    bucket: process.env.R2_BUCKET_NAME || 'tgp-storage',
+    bucket:
+      cloudflareEnv?.R2_BUCKET_NAME ||
+      process.env.R2_BUCKET_NAME ||
+      (import.meta as any).env?.R2_BUCKET_NAME ||
+      'tgp-storage',
   };
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
@@ -104,7 +121,7 @@ export const POST: APIRoute = async ({ request }) => {
     const key = cleanFolder ? `${cleanFolder}/${filename}` : filename;
     const buffer = Buffer.from(base64Data, 'base64');
 
-    const { client, bucket } = getS3Client();
+    const { client, bucket } = getS3Client((locals as any)?.runtime?.env);
 
     await client.send(
       new PutObjectCommand({

@@ -367,7 +367,7 @@
         <!-- Feedback R2: error -->
         {#if estadoR2 === 'error'}
           <div class="vl-error" style="margin-top:10px">
-            Error al subir a R2. Revisá la consola para más detalles.
+            {errorMsg || 'Error al subir a R2. Revisá la consola para más detalles.'}
           </div>
         {/if}
       </div>

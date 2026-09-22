@@ -1,7 +1,7 @@
 import { registrarResguardoD1 } from '../../storage/d1.js';
 import { crearModeloEnsayo, buildDensityInstruction } from '../gemini.js';
 import { generarMarkdoc, publicarEntradaKeystaticGitHub } from '../../servicios/publicacion.js';
-import { buscarPageImageWikipedia, resolverEntidadCanonica } from '../../vision/wikimedia.js';
+import { procesarImagen } from '../../vision/wikimedia.js';
 
 // ── SCHEMA DE LA TOOL ─────────────────────────────────────────────────────────
 // FIX: origen_fotos removido de 'required'. Gemini puede no pasarlo si el
@@ -118,22 +118,48 @@ Para cada sección, incluye una búsqueda de Wikimedia precisa en inglés o espa
 
     console.log(`[Tool:generar_ensayo] Paso 5 OK — título: "${ensayoJSON.titulo}" (${ensayoJSON.secciones.length} secciones)`);
 
-    // PASO 6 — Buscar imágenes en Wikimedia (si origen_fotos es 'solo_wiki')
-    if (origenFotos === 'solo_wiki') {
-      console.log('[Tool:generar_ensayo] Paso 6 — Buscando imágenes en Wikimedia...');
-      for (const seccion of ensayoJSON.secciones) {
-        if (seccion.busqueda_wikimedia && !seccion.imagen_url) {
+    // PASO 6 — Buscar e inyectar imágenes en Wikimedia / R2
+    if (origenFotos === 'solo_wiki' || origenFotos === 'mix_propias_wiki') {
+      console.log(`[Tool:generar_ensayo] Paso 6 — Buscando imágenes en Wikimedia y subiendo a R2 (origen=${origenFotos})...`);
+      for (let i = 0; i < ensayoJSON.secciones.length; i++) {
+        const seccion = ensayoJSON.secciones[i];
+        if (!seccion.imagen_url) {
+          const termino = seccion.busqueda_wikimedia || (i === 0 ? tema : `${tema} ${i + 1}`);
           try {
-            const entidad = await resolverEntidadCanonica(seccion.busqueda_wikimedia);
-            const imageUrl = await buscarPageImageWikipedia(entidad.wikiEn, 'en')
-              || await buscarPageImageWikipedia(entidad.wikiEs, 'es');
-            if (imageUrl) seccion.imagen_url = imageUrl;
+            console.log(`[Tool:generar_ensayo] Buscando imagen para sección ${i + 1}: "${termino}"`);
+            const r2Url = await procesarImagen(termino);
+            if (r2Url) {
+              seccion.imagen_url = r2Url;
+              console.log(`[Tool:generar_ensayo] ✓ Sección ${i + 1} imagen asignada: ${r2Url}`);
+            } else {
+              console.warn(`[Tool:generar_ensayo] Sin imagen verificada para sección ${i + 1} ("${termino}")`);
+            }
           } catch (imgErr: any) {
-            console.warn(`[Tool:generar_ensayo] Imagen fallida para "${seccion.busqueda_wikimedia}": ${imgErr.message}`);
+            console.warn(`[Tool:generar_ensayo] Error buscando imagen para sección ${i + 1}:`, imgErr.message);
           }
         }
       }
+
+      // Garantía de Portada: Si la primera sección no obtuvo imagen, buscar directamente con el tema general
+      if (!ensayoJSON.secciones[0]?.imagen_url) {
+        console.log(`[Tool:generar_ensayo] Portada vacía. Buscando fallback con tema principal: "${tema}"...`);
+        try {
+          const portadaFallback = await procesarImagen(tema);
+          if (portadaFallback && ensayoJSON.secciones[0]) {
+            ensayoJSON.secciones[0].imagen_url = portadaFallback;
+            console.log(`[Tool:generar_ensayo] ✓ Portada asignada via fallback: ${portadaFallback}`);
+          }
+        } catch (err: any) {
+          console.warn(`[Tool:generar_ensayo] Fallback de portada fallido:`, err.message);
+        }
+      }
     }
+
+    const coverUrl = ensayoJSON.secciones?.[0]?.imagen_url || '';
+    const primerParrafo = ensayoJSON.secciones?.[0]?.parrafo || '';
+    const excerpt = primerParrafo ? primerParrafo.slice(0, 180) + '...' : '';
+    const dek = primerParrafo ? primerParrafo.slice(0, 110) + '...' : '';
+    const fechaHoy = new Date().toISOString().split('T')[0];
 
     // PASO 7 — Resguardo obligatorio en D1 antes de publicar
     console.log('[Tool:generar_ensayo] Paso 7 — Guardando en D1...');
@@ -142,19 +168,25 @@ Para cada sección, incluye una búsqueda de Wikimedia precisa en inglés o espa
       destino: 'hemeroteca',
       tema: ensayoJSON.titulo || tema,
       textoGenerado: JSON.stringify(ensayoJSON, null, 2),
+      metadatos: { titulo: ensayoJSON.titulo, coverImage: coverUrl },
+      imagenR2Url: coverUrl,
       chatId: chatId,
     });
 
-    // PASO 8 — Generar Markdoc
+    // PASO 8 — Generar Markdoc y Estructura Keystatic index.json
     const { slug, contenidoMdoc } = generarMarkdoc(ensayoJSON);
     const indexJson = {
-      titulo: ensayoJSON.titulo,
-      secciones: cantSecciones,
-      generador: 'TGP Mind Agent v2',
-      fecha: new Date().toISOString().split('T')[0],
+      title: ensayoJSON.titulo,
+      generadorTexto: JSON.stringify({ text: contenidoMdoc, image: coverUrl }),
+      atmosfera: { discriminant: 'obsidiana' },
+      gallery: [],
+      dek,
+      coverImage: coverUrl,
+      date: fechaHoy,
+      excerpt,
     };
 
-    console.log(`[Tool:generar_ensayo] Paso 8 OK — slug: "${slug}"`);
+    console.log(`[Tool:generar_ensayo] Paso 8 OK — slug: "${slug}" coverImage: "${coverUrl}"`);
 
     // PASO 9 — Publicar en GitHub via Keystatic
     const githubToken = process.env.GITHUB_TOKEN_HEMEROTECA || process.env.GITHUB_TOKEN || '';
@@ -175,7 +207,13 @@ Para cada sección, incluye una búsqueda de Wikimedia precisa en inglés o espa
     const urlWeb = `https://thegreatpuzzleproject.com/ensayos-cinematicos/${slug}`;
     console.log(`[Tool:generar_ensayo] ÉXITO — "${ensayoJSON.titulo}" publicado: ${urlCommit}`);
 
-    return `Ensayo **"${ensayoJSON.titulo}"** publicado en la Hemeroteca.\n\n🌐 Ver en la Web:\n${urlWeb}\n\n📦 Commit en GitHub:\n${urlCommit}`;
+    let respuestaFinal = `Ensayo **"${ensayoJSON.titulo}"** publicado en la Hemeroteca.\n\n`;
+    if (coverUrl) {
+      respuestaFinal += `🖼️ **Imagen de Cabecera:** ${coverUrl}\n\n`;
+    }
+    respuestaFinal += `🌐 Ver en la Web:\n${urlWeb}\n\n📦 Commit en GitHub:\n${urlCommit}`;
+
+    return respuestaFinal;
 
   } catch (err: any) {
     // Log detallado del crash real (visible en Cloud Run logs)
