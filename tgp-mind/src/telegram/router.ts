@@ -120,13 +120,18 @@ const PHOTO_CAPTION_KEYBOARD = {
   ],
 };
 
-// ── Reset de sesión completo (historial + pendingPhoto) ───────────────────────
+// ── Reset de sesión completo (historial + pendingPhoto + D1 HITL) ────────────
 function resetSession(chatId: number) {
   clearHistory(`hemeroteca-${chatId}`);
   clearHistory(`social-${chatId}`);
   clearHistory(`omni-${chatId}`);
+  clearHistory(`liminal-${chatId}`);
   clearHistory(String(chatId));
   clearPendingPhoto(chatId);
+  // Limpiar estados HITL de todos los bots en D1
+  clearHITLState(chatId, 'hemeroteca').catch(() => {});
+  clearHITLState(chatId, 'social').catch(() => {});
+  clearHITLState(chatId, 'liminal').catch(() => {});
 }
 
 
@@ -293,23 +298,26 @@ async function answerCallbackAssistant(callbackQueryId: string, text?: string): 
   } catch {}
 }
 
-export async function ejecutarDecisionAssistant(chatId: number, decision: any, apiOverride?: string) {
-  if (decision.type === 'micro_prompt') {
-    const promptText = formatearTextoPrompt(decision.text, 'hemeroteca');
-    const replyMarkup = generarTecladoParaPrompt(decision.text, 'hemeroteca');
-    await sendTelegramAssistant(chatId, promptText, replyMarkup, apiOverride);
-    return;
-  }
+// ── Helper: Ficha de Confirmación (Assistant + Liminal) ──────────────────────
+function renderFichaAssistant(params: any, actionPrefix: string): { text: string; reply_markup: any } {
+  const densLabel = params.densidad === 'premium' ? 'Premium (+4500t)'
+    : (params.densidad === 'breve' ? 'Breve (~800-1000t)' : 'Profundo (~1500t)');
+  const motorLabel = params.modelo === 'pro'
+    ? `Pro${params.fuenteImg === 'none' ? ' (Solo Texto)' : ' + Wikimedia'}`
+    : 'Flash + Wikimedia';
+  const text = `📋 *Ficha de Publicación TGP Mind:*\n• 📌 *Tema:* ${params.tema}\n• 🎯 *Destino:* Hemeroteca Keystatic\n• ⚖️ *Densidad:* ${densLabel}\n• 🧠 *Motor:* ${motorLabel}${params.modoLibrePrompt ? `\n• ✍️ *Modo Libre:* "${params.modoLibrePrompt}"` : ''}\n\n¿Confirmamos y procedemos al commit?`;
+  const reply_markup = {
+    inline_keyboard: [
+      [{ text: '✅ Confirmar y Publicar', callback_data: `${actionPrefix}:confirm` }],
+      [{ text: '❌ Cancelar', callback_data: `${actionPrefix}:cancel` }],
+    ],
+  };
+  return { text, reply_markup };
+}
 
-  if (decision.type === 'direct_answer') {
-    await sendTelegramAssistant(chatId, decision.text, undefined, apiOverride);
-    return;
-  }
-
-  // Ejecución de publicación directa (Bypass o Tool Call)
-  const params = decision.params;
-  // Xavier-Assistant es estrictamente Hemeroteca
-  params.destino = 'hemeroteca';
+// ── Helper: Ejecución real del ensayo (extraído de ejecutarDecisionAssistant) ──
+async function _ejecutarEnsayoAssistant(chatId: number, params: any, apiOverride?: string) {
+  params.destino = params.destino || 'hemeroteca';
   const modeloLabel = params.modelo === 'pro' ? 'Pro' : 'Flash';
   const modelName = params.modelo === 'pro' ? 'gemini-3.1-pro-preview' : 'gemini-3.8-flash';
   const cantSecciones = params.cantidadSecciones || (params.densidad === 'premium' ? 7 : (params.densidad === 'breve' ? 2 : 4));
@@ -449,6 +457,40 @@ export async function ejecutarDecisionAssistant(chatId: number, decision: any, a
   }
 }
 
+// ── Punto de entrada público para ejecutar desde D1 (callback confirm) ────────
+export async function ejecutarEnsayoAssistantDesdeD1(chatId: number, apiOverride?: string, botContext: 'hemeroteca' | 'liminal' = 'hemeroteca') {
+  const state = await getHITLState(chatId, botContext);
+  if (!state) {
+    await sendTelegramAssistant(chatId, '⚠️ No hay sesión activa. Escribí un nuevo tema.', undefined, apiOverride);
+    return;
+  }
+  await clearHITLState(chatId, botContext);
+  await _ejecutarEnsayoAssistant(chatId, state, apiOverride);
+}
+
+export async function ejecutarDecisionAssistant(chatId: number, decision: any, apiOverride?: string, botContext: 'hemeroteca' | 'liminal' = 'hemeroteca') {
+  if (decision.type === 'micro_prompt') {
+    const promptText = formatearTextoPrompt(decision.text, 'hemeroteca');
+    const replyMarkup = generarTecladoParaPrompt(decision.text, 'hemeroteca');
+    await sendTelegramAssistant(chatId, promptText, replyMarkup, apiOverride);
+    return;
+  }
+
+  if (decision.type === 'direct_answer') {
+    await sendTelegramAssistant(chatId, decision.text, undefined, apiOverride);
+    return;
+  }
+
+  // Guardar en D1 y mostrar Ficha de Confirmación (D1 HITL — previene contaminación de contexto)
+  const params = decision.params;
+  params.destino = 'hemeroteca';
+  const actionPrefix = botContext === 'liminal' ? 'liminal_action' : 'assistant_action';
+
+  await setHITLState(chatId, params as any, botContext);
+  const ficha = renderFichaAssistant(params, actionPrefix);
+  await sendTelegramAssistant(chatId, ficha.text, ficha.reply_markup, apiOverride);
+}
+
 telegramRouter.post('/webhook/telegram', async (c) => {
   let body: any;
   try { body = await c.req.json(); } catch { return c.json({ ok: true }); }
@@ -575,6 +617,22 @@ telegramRouter.post('/webhook/telegram', async (c) => {
       }
 
       await answerCallbackAssistant(callbackId);
+      return c.json({ ok: true });
+    }
+
+    // ── assistant_action: — Confirmación/Cancelación D1 HITL ─────────────────
+    // DEBE ir antes del fallback routeIncomingMessage para evitar q el callback
+    // se interprete como nuevo tema (bug "Confirmar y publicar").
+    if (data.startsWith('assistant_action:')) {
+      await answerCallbackAssistant(callbackId);
+      if (data === 'assistant_action:confirm') {
+        await sendTelegramAssistant(chatId, '⚡ Confirmado. Iniciando redacción y publicación...');
+        await ejecutarEnsayoAssistantDesdeD1(chatId, undefined, 'hemeroteca');
+      } else if (data === 'assistant_action:cancel') {
+        await clearHITLState(chatId, 'hemeroteca');
+        resetSession(chatId);
+        await sendTelegramAssistant(chatId, '🛑 Publicación cancelada. Sesión reiniciada. Escribí un nuevo tema.');
+      }
       return c.json({ ok: true });
     }
 
