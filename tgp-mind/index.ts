@@ -1,4 +1,4 @@
-﻿// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 // TGP MIND Ã¢â‚¬â€ Orquestador IA con Hono + Gemini + Inline Keyboard Wizard
 // Autor: TGP / Xavier BenÃƒÂ­tez
 // Deploy: Google Cloud Run
@@ -181,31 +181,10 @@ app.get('/', (c) => c.json({ status: 'TGP Mind activo', ts: new Date().toISOStri
 // Ã¢â€â‚¬Ã¢â€â‚¬ RUTA AISLADA DE DESARROLLO (@UXliminal_bot) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 app.route('/webhook-dev', devBotApp);
 
-// -- Telegram Router Modular (Webhooks + Semantic Router HITL) -----------------
-import { initTelegramRouter, telegramRouter } from './src/telegram/router.js';
+// -- Nuevo Webhook Unificado Multi-Bot -----------------------------------------
+import { handleTelegramWebhook } from './src/telegram/webhook.js';
 
-initTelegramRouter({
-  telegramToken:          TELEGRAM_TOKEN,
-  telegramApi:            TELEGRAM_API,
-  telegramBotName:        TELEGRAM_BOT_NAME,
-  telegramSocialToken:    TELEGRAM_SOCIAL_TOKEN,
-  telegramSocialApi:      TELEGRAM_SOCIAL_API,
-  telegramTgpCloudToken:  TELEGRAM_TGP_CLOUD_TOKEN,
-  telegramAssistantApi:   TELEGRAM_ASSISTANT_API,
-  xavierChatId:           XAVIER_CHAT_ID,
-  miniAppUrl:             MINI_APP_URL,
-  githubTokenHemeroteca:  GITHUB_TOKEN_HEMEROTECA,
-  githubRepoHemeroteca:   GITHUB_REPO_HEMEROTECA,
-  githubTokenAlternative: GITHUB_TOKEN_ALTERNATIVE,
-  githubRepoAlternative:  GITHUB_REPO_ALTERNATIVE,
-  zernioApiKey:           ZERNIO_API_KEY,
-  zernioFbId:             ZERNIO_FB_ID,
-  zernioTiktokId:         ZERNIO_TIKTOK_ID,
-  fallbackImageUrl:       FALLBACK_IMAGE_URL,
-  visionClient:           visionClient,
-});
-
-// -- CORS Global para todo el ecosistema (Local, Producción, Pages) ------------
+// Las rutas se registrarán más abajo.
 const isAllowedOrigin = (origin: string) => {
   if (!origin) return true;
   return (
@@ -232,7 +211,30 @@ app.use('*', cors({
 
 app.options('*', (c) => c.body(null, 204));
 
-app.route('/', telegramRouter);
+// Rutas de Webhook Multi-Bot
+app.post(`/bot${TELEGRAM_TOKEN}`, async (c) => {
+  const update = await c.req.json();
+  await handleTelegramWebhook(update, 'omni', TELEGRAM_TOKEN);
+  return c.text('OK');
+});
+
+app.post(`/bot${TELEGRAM_SOCIAL_TOKEN}`, async (c) => {
+  const update = await c.req.json();
+  await handleTelegramWebhook(update, 'redes', TELEGRAM_SOCIAL_TOKEN);
+  return c.text('OK');
+});
+
+app.post(`/bot${TELEGRAM_TGP_CLOUD_TOKEN}`, async (c) => {
+  const update = await c.req.json();
+  await handleTelegramWebhook(update, 'assistant', TELEGRAM_TGP_CLOUD_TOKEN);
+  return c.text('OK');
+});
+
+app.post(`/bot${TELEGRAM_DEV_TOKEN}`, async (c) => {
+  const update = await c.req.json();
+  await handleTelegramWebhook(update, 'liminal', TELEGRAM_DEV_TOKEN);
+  return c.text('OK');
+});
 
 // -- Google Photos Picker API -- CORS-safe, credenciales en server -----------
 import {

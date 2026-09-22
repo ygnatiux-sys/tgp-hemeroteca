@@ -361,3 +361,166 @@ export async function clearHITLState(chatId: number, botContext?: string): Promi
     }
   } catch (err) { console.warn('[HITL D1] Error limpiando estado:', err); }
 }
+
+
+// ── Agentic Chat History ─────────────────────────────────────────────────────
+//
+// La tabla messages almacena la estructura NATIVA de la API de Gemini:
+//   - role: 'user' | 'model' | 'function'
+//   - content_json: Serialización completa del array Parts[] de Gemini.
+//
+// Esto permite guardar sin pérdida:
+//   { role: 'model', parts: [{ text: 'Aquí está tu Ficha...' }] }
+//   { role: 'model', parts: [{ functionCall: { name: 'generar_ensayo', args: {...} } }] }
+//   { role: 'function', parts: [{ functionResponse: { name: 'generar_ensayo', response: {...} } }] }
+//
+// Si se omitieran functionCall y functionResponse, Gemini sufriría amnesia
+// justo después de ejecutar una herramienta.
+// ───────────────────────────────────────────────────────────────────────────────
+
+// Tipos Gemini-nativos para el historial
+export type GeminiRole = 'user' | 'model' | 'function';
+
+export interface GeminiPart {
+  text?: string;
+  functionCall?: { name: string; args: Record<string, any> };
+  functionResponse?: { name: string; response: Record<string, any> };
+}
+
+export interface GeminiTurn {
+  role: GeminiRole;
+  parts: GeminiPart[];
+}
+
+export async function asegurarTablaMessages(): Promise<void> {
+  if (!_DATABASE_ID || !_API_TOKEN) return;
+  // Columna content_json almacena Parts[] serializado como JSON.
+  // Columna role: 'user' | 'model' | 'function'
+  const schemaQuery1 = `
+    CREATE TABLE IF NOT EXISTS messages (
+      id          TEXT PRIMARY KEY,
+      chat_id     TEXT NOT NULL,
+      role        TEXT NOT NULL,
+      content_json TEXT NOT NULL,
+      created_at  TEXT NOT NULL
+    );
+  `;
+  const schemaQuery2 = `CREATE INDEX IF NOT EXISTS idx_messages_chat_id ON messages(chat_id);`;
+  const schemaQuery3 = `CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at);`;
+
+  try {
+    for (const sql of [schemaQuery1, schemaQuery2, schemaQuery3]) {
+      await fetch(d1Url(), {
+        method: 'POST',
+        headers: d1Headers(),
+        body: JSON.stringify({ sql }),
+      });
+    }
+  } catch (err) {
+    console.warn('[D1 Messages Schema Warning]:', err);
+  }
+}
+
+/**
+ * Retorna el historial de la conversación como un array de GeminiTurn,
+ * listo para inyectar directamente en el campo `contents` de generateContent().
+ * Incluye turnos de texto, functionCall y functionResponse para que Gemini
+ * nunca pierda el hilo tras ejecutar una herramienta.
+ */
+export async function getConversationHistory(chatId: number, limit = 12): Promise<GeminiTurn[]> {
+  if (!_DATABASE_ID || !_API_TOKEN) return [];
+  try {
+    const res = await fetch(d1Url(), {
+      method: 'POST',
+      headers: d1Headers(),
+      body: JSON.stringify({
+        sql: `SELECT role, content_json FROM messages WHERE chat_id = ? ORDER BY created_at DESC LIMIT ?`,
+        params: [String(chatId), limit],
+      }),
+    });
+    const data: any = await res.json();
+    const rows: Array<{ role: string; content_json: string }> = data?.result?.[0]?.results || [];
+    // Las filas vienen DESC (más recientes primero). Invertir para contexto cronológico.
+    return rows.reverse().map((r) => ({
+      role: r.role as GeminiRole,
+      parts: JSON.parse(r.content_json) as GeminiPart[],
+    }));
+  } catch (err) {
+    console.warn('[D1 Messages] Error obteniendo historial:', err);
+    return [];
+  }
+}
+
+/**
+ * Persiste un turno completo de la API de Gemini en D1.
+ *
+ * @param chatId   - ID del chat de Telegram.
+ * @param role     - Rol nativo de Gemini: 'user' | 'model' | 'function'.
+ * @param parts    - Array de GeminiPart (texto, functionCall o functionResponse).
+ *
+ * Ejemplos de uso:
+ *   // Guardar texto del usuario
+ *   await appendTurn(chatId, 'user', [{ text: 'Escribe un ensayo sobre Roma' }]);
+ *
+ *   // Guardar Ficha Visual que el modelo envió
+ *   await appendTurn(chatId, 'model', [{ text: '\uD83C\uDFAC **Ficha TGP...**' }]);
+ *
+ *   // Guardar el Tool Call que emitió el modelo tras el "ok"
+ *   await appendTurn(chatId, 'model', [{ functionCall: { name: 'generar_ensayo', args: {...} } }]);
+ *
+ *   // Guardar el resultado del Worker devuelto a Gemini
+ *   await appendTurn(chatId, 'function', [{ functionResponse: { name: 'generar_ensayo', response: { result: 'https://...' } } }]);
+ */
+export async function appendTurn(chatId: number, role: GeminiRole, parts: GeminiPart[]): Promise<void> {
+  if (!_DATABASE_ID || !_API_TOKEN) return;
+  try {
+    await asegurarTablaMessages();
+    const id = crypto.randomUUID();
+    await fetch(d1Url(), {
+      method: 'POST',
+      headers: d1Headers(),
+      body: JSON.stringify({
+        sql: `INSERT INTO messages (id, chat_id, role, content_json, created_at) VALUES (?, ?, ?, ?, ?)`,
+        params: [id, String(chatId), role, JSON.stringify(parts), new Date().toISOString()],
+      }),
+    });
+  } catch (err) {
+    console.warn('[D1 Messages] Error guardando turno:', err);
+  }
+}
+
+/**
+ * Atajos semánticos para los casos más comunes.
+ * Usan appendTurn internamente.
+ */
+export const appendUserText = (chatId: number, text: string) =>
+  appendTurn(chatId, 'user', [{ text }]);
+
+export const appendModelText = (chatId: number, text: string) =>
+  appendTurn(chatId, 'model', [{ text }]);
+
+export const appendFunctionCall = (chatId: number, name: string, args: Record<string, any>) =>
+  appendTurn(chatId, 'model', [{ functionCall: { name, args } }]);
+
+export const appendFunctionResponse = (chatId: number, name: string, response: Record<string, any>) =>
+  appendTurn(chatId, 'function', [{ functionResponse: { name, response } }]);
+
+export async function clearChatHistory(chatId: number): Promise<void> {
+  if (!_DATABASE_ID || !_API_TOKEN) return;
+  try {
+    await fetch(d1Url(), {
+      method: 'POST',
+      headers: d1Headers(),
+      body: JSON.stringify({
+        sql: 'DELETE FROM messages WHERE chat_id = ?',
+        params: [String(chatId)],
+      }),
+    });
+    console.log(`[D1 Messages] Historial borrado para chat_id: ${chatId}`);
+  } catch (err) {
+    console.warn('[D1 Messages] Error limpiando historial:', err);
+  }
+}
+
+
+
