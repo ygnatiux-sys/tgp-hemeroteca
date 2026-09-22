@@ -441,8 +441,9 @@ export async function getConversationHistory(chatId: number, limit = 12): Promis
     const data: any = await res.json();
     const rows: Array<{ role: string; content_json: string }> = data?.result?.[0]?.results || [];
     // Las filas vienen DESC (más recientes primero). Invertir para contexto cronológico.
+    // Mapear role: 'function' -> 'user' para estricta compatibilidad con Gemini REST API.
     return rows.reverse().map((r) => ({
-      role: r.role as GeminiRole,
+      role: (r.role === 'function' ? 'user' : r.role) as GeminiRole,
       parts: JSON.parse(r.content_json) as GeminiPart[],
     }));
   } catch (err) {
