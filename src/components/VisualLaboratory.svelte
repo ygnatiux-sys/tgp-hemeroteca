@@ -638,7 +638,7 @@
   }
   .vl-result-format {
     font-size: 10px;
-    font-mono: var(--font-mono);
+    font-family: var(--font-mono);
     color:     var(--text-dim);
   }
   .vl-result-img-wrap {

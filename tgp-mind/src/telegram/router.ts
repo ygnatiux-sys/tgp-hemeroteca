@@ -133,7 +133,7 @@ export function getBotApi(botId?: string): { api: string; token: string } {
 export const telegramRouter = new Hono();
 
 // ── Helpers de Teclados Dinámicos y Textos HITL ─────────────────────────────
-function formatearTextoPrompt(texto: string, botContext?: 'hemeroteca' | 'social' | 'omni'): string {
+export function formatearTextoPrompt(texto: string, botContext?: 'hemeroteca' | 'social' | 'omni'): string {
   let promptText = texto;
   if (!promptText.includes('1.') && !promptText.includes('1️⃣') && !promptText.includes('1-')) {
     const lower = promptText.toLowerCase();
@@ -148,7 +148,7 @@ function formatearTextoPrompt(texto: string, botContext?: 'hemeroteca' | 'social
   return promptText;
 }
 
-function generarTecladoParaPrompt(texto: string, botContext?: 'hemeroteca' | 'social' | 'omni'): any {
+export function generarTecladoParaPrompt(texto: string, botContext?: 'hemeroteca' | 'social' | 'omni'): any {
   const lower = texto.toLowerCase();
 
   // 1. Ficha Técnica / Confirmación Final con Tilde (Paso 4)
@@ -218,12 +218,12 @@ function generarTecladoParaPrompt(texto: string, botContext?: 'hemeroteca' | 'so
 }
 
 // ── RUTA 1: /webhook/telegram (Hemeroteca / Xavier-Assistant @tgp_cloud_bot) ──
-async function sendTelegramAssistant(chatId: number, text: string, replyMarkup?: any): Promise<void> {
-  const api = cfg.telegramAssistantApi || cfg.telegramApi;
+async function sendTelegramAssistant(chatId: number, text: string, replyMarkup?: any, apiOverride?: string): Promise<void> {
+  const api = apiOverride || cfg.telegramAssistantApi || cfg.telegramApi;
   try {
     const MAX_CHUNK = 4000;
     if (text.length > MAX_CHUNK) {
-      for (let i = 0; i < text.length; i += MAX_CHUNK) await sendTelegramAssistant(chatId, text.slice(i, i + MAX_CHUNK), replyMarkup);
+      for (let i = 0; i < text.length; i += MAX_CHUNK) await sendTelegramAssistant(chatId, text.slice(i, i + MAX_CHUNK), replyMarkup, apiOverride);
       return;
     }
     const res = await fetch(`${api}/sendMessage`, {
@@ -246,16 +246,16 @@ async function answerCallbackAssistant(callbackQueryId: string, text?: string): 
   } catch {}
 }
 
-async function ejecutarDecisionAssistant(chatId: number, decision: any) {
+export async function ejecutarDecisionAssistant(chatId: number, decision: any, apiOverride?: string) {
   if (decision.type === 'micro_prompt') {
     const promptText = formatearTextoPrompt(decision.text, 'hemeroteca');
     const replyMarkup = generarTecladoParaPrompt(decision.text, 'hemeroteca');
-    await sendTelegramAssistant(chatId, promptText, replyMarkup);
+    await sendTelegramAssistant(chatId, promptText, replyMarkup, apiOverride);
     return;
   }
 
   if (decision.type === 'direct_answer') {
-    await sendTelegramAssistant(chatId, decision.text);
+    await sendTelegramAssistant(chatId, decision.text, undefined, apiOverride);
     return;
   }
 
@@ -269,7 +269,7 @@ async function ejecutarDecisionAssistant(chatId: number, decision: any) {
   // Correción 1: La extensión se controla con directivas en el prompt, NUNCA con maxOutputTokens bajo.
   const densityDirective = buildDensityInstruction(params.densidad, params.groundingMode ?? params.densidad === 'premium');
 
-  await sendTelegramAssistant(chatId, `⚡ Agente TGP: Redactando ensayo sobre "${params.tema}" (${modeloLabel}, ${cantSecciones} secciones)...`);
+  await sendTelegramAssistant(chatId, `⚡ Agente TGP: Redactando ensayo sobre "${params.tema}" (${modeloLabel}, ${cantSecciones} secciones)...`, undefined, apiOverride);
 
   try {
     let parsed: any;
@@ -312,7 +312,7 @@ async function ejecutarDecisionAssistant(chatId: number, decision: any) {
       parsed = JSON.parse(result.response.text());
     }
 
-    await sendTelegramAssistant(chatId, `Ensayo: "${parsed.titulo}". Procesando imágenes...`);
+    await sendTelegramAssistant(chatId, `Ensayo: "${parsed.titulo}". Procesando imágenes...`, undefined, apiOverride);
 
     if (params.fuenteImg === 'telegram' && params.photoUrl && Array.isArray(parsed.secciones)) {
       if (parsed.secciones.length > 0) parsed.secciones[0].imagen_url = params.photoUrl;
@@ -325,7 +325,7 @@ async function ejecutarDecisionAssistant(chatId: number, decision: any) {
       }
     }
 
-    await sendTelegramAssistant(chatId, 'Compilando estructura Keystatic y publicando en GitHub...');
+    await sendTelegramAssistant(chatId, 'Compilando estructura Keystatic y publicando en GitHub...', undefined, apiOverride);
     const { slug, contenidoMdoc } = generarMarkdoc(parsed);
     const token = params.destino === 'hemeroteca' ? cfg.githubTokenHemeroteca : cfg.githubTokenAlternative;
     const repoFull = params.destino === 'hemeroteca' ? cfg.githubRepoHemeroteca : cfg.githubRepoAlternative;
@@ -395,10 +395,10 @@ async function ejecutarDecisionAssistant(chatId: number, decision: any) {
       ? `https://thegreatpuzzleproject.com/ensayos-cinematicos/${slug}`
       : `https://alternative.thegreatpuzzleproject.com/ensayos/${slug}`;
 
-    await sendTelegramAssistant(chatId, `"${parsed.titulo}" publicado en ${params.destino}.\n\n🔗 Ver en la Web:\n${webUrl}\n\n📦 Commit en GitHub:\n${githubUrl}`);
+    await sendTelegramAssistant(chatId, `"${parsed.titulo}" publicado en ${params.destino}.\n\n🔗 Ver en la Web:\n${webUrl}\n\n📦 Commit en GitHub:\n${githubUrl}`, undefined, apiOverride);
   } catch (err: any) {
     console.error('[Telegram Agéntico Error]:', err);
-    await sendTelegramAssistant(chatId, `⚠️ Error en TGP Mind: ${err?.message || 'Fallo desconocido'}`);
+    await sendTelegramAssistant(chatId, `⚠️ Error en TGP Mind: ${err?.message || 'Fallo desconocido'}`, undefined, apiOverride);
   }
 }
 
@@ -488,18 +488,35 @@ telegramRouter.post('/webhook/telegram-social', async (c) => {
   const message = body?.message;
   if (message) {
     const chatId: number | undefined = message?.chat?.id;
-    const text: string = message?.text ?? '';
-    if (!chatId || !text) return c.json({ ok: true });
+    const hasPhoto = Array.isArray(message?.photo) && message.photo.length > 0;
+    const text: string = message?.text ?? message?.caption ?? '';
+    if (!chatId || (!text && !hasPhoto)) return c.json({ ok: true });
+    
     if (cfg.xavierChatId && chatId !== cfg.xavierChatId) {
       await sendTelegramSocial(chatId, 'Acceso denegado.');
       return c.json({ ok: true });
+    }
+
+    let imagenR2Url = '';
+    if (hasPhoto) {
+      const bestPhoto = message.photo[message.photo.length - 1];
+      const baseSlug = generarSlug(text ? text.slice(0, 30) : 'foto-telegram-social');
+      try {
+        await sendTelegramSocial(chatId, '📷 Descargando imagen y subiendo a Cloudflare R2...');
+        const r2Res = await procesarFotoTelegramAR2(bestPhoto.file_id, baseSlug, cfg.telegramSocialToken);
+        imagenR2Url = r2Res.url;
+        await sendTelegramSocial(chatId, `✅ Imagen alojada en Cloudflare R2:\n${imagenR2Url}`);
+      } catch (errUpload: any) {
+        await sendTelegramSocial(chatId, `⚠️ Error subiendo imagen: ${errUpload?.message || 'Error'}`);
+      }
     }
 
     // Clasificación Semántica Agéntica (HITL)
     const decision = await routeIncomingMessage({
       chatId,
       text,
-      hasPhoto: false,
+      hasPhoto,
+      photoUrl: imagenR2Url || undefined,
       botContext: 'social',
     });
 

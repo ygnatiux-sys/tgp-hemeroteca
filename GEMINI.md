@@ -14,3 +14,6 @@ Antes de ejecutar cualquier tarea de generaci贸n o refactorizaci贸n de c贸digo, 
    - SIEMPRE formatear como hiperv铆nculos Markdown directos y activos: `[Texto Descriptivo](https://url-de-prueba)`.
    - Incluir diagn贸sticos en vivo (ej. `getWebhookInfo` de Telegram) y separar entornos local vs. producci贸n.
 
+
+# PROTECCI覰 DE TOKENS EN DESPLIEGUES Y .ENV
+NUNCA modifiques, elimines, renombres ni sobreescribas las variables de entorno de los tokens de Telegram (OMNI_TOKEN, ASSISTANT_TOKEN, REDES_TOKEN) en los archivos .env, .env.example, o scripts de despliegue sin la autorizaci髇 EXPL虲ITA del usuario. Si vas a generar o sugerir la creaci髇 de un nuevo .env, DEBES asegurarte de incluir las variables de entorno de autenticaci髇 ya existentes para no romper la conexi髇 con las APIs de Telegram en producci髇 (Cloud Run).

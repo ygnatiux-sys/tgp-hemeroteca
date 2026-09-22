@@ -78,7 +78,7 @@ import 'dotenv/config';
 
 // Ã¢â€â‚¬Ã¢â€â‚¬ ConfiguraciÃƒÂ³n Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 const PORT               = parseInt(process.env.PORT || '3001');
-const TELEGRAM_TOKEN     = (process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_TOKEN || '').replace(/['"]/g, '').trim();
+const TELEGRAM_TOKEN     = (process.env.OMNI_TOKEN || process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_TOKEN || '').replace(/['"]/g, '').trim();
 const TELEGRAM_BOT_NAME  = (process.env.TELEGRAM_BOT_NAME || 'Analista_IMG_bot').replace(/['"]/g, '').trim();
 // GEMINI_API_KEY importada desde ./src/ia/gemini.js
 const TGP_MIND_API_KEY   = (process.env.TGP_MIND_API_KEY || '').replace(/['"]/g, '').trim();
@@ -87,8 +87,8 @@ const DIALOGFLOW_PROJECT  = process.env.DIALOGFLOW_PROJECT  || '';
 const DIALOGFLOW_LOCATION = process.env.DIALOGFLOW_LOCATION || 'us-central1';
 const DIALOGFLOW_AGENT_ID = process.env.DIALOGFLOW_AGENT_ID || '';
 const TELEGRAM_API        = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
-const TELEGRAM_SOCIAL_TOKEN     = process.env.TELEGRAM_SOCIAL_TOKEN || '';
-const TELEGRAM_TGP_CLOUD_TOKEN  = process.env.TELEGRAM_TGP_CLOUD_TOKEN || '';
+const TELEGRAM_SOCIAL_TOKEN     = process.env.REDES_TOKEN || process.env.TELEGRAM_SOCIAL_TOKEN || '';
+const TELEGRAM_TGP_CLOUD_TOKEN  = process.env.ASSISTANT_TOKEN || process.env.TELEGRAM_TGP_CLOUD_TOKEN || '';
 const TELEGRAM_DEV_TOKEN        = process.env.TELEGRAM_DEV_BOT_TOKEN   || '';
 const ZERNIO_API_KEY        = process.env.ZERNIO_API_KEY || '';
 const ZERNIO_FB_ID          = process.env.ZERNIO_FB_ID || '';

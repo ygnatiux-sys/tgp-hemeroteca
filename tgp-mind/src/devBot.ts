@@ -6,6 +6,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { Hono } from 'hono';
+import { routeIncomingMessage } from './ia/semantic-router.js';
+import { ejecutarDecisionAssistant } from './telegram/router.js';
 
 export const devBotApp = new Hono();
 
@@ -131,12 +133,17 @@ devBotApp.post('/', async (c) => {
       return c.json({ ok: true });
     }
 
-    // Texto libre de prueba
-    if (text.trim()) {
-      await sendDevTelegramMessage(
+    // Redacción HITL con Semantic Router (Igual que Assistant)
+    if (text.trim() || message.photo) {
+      const decision = await routeIncomingMessage({
         chatId,
-        `🧪 *[Dev Update @${getDevBotName()}]:*\n\nMensaje recibido en entorno de desarrollo:\n\n> "${text.trim()}"`
-      );
+        text,
+        hasPhoto: !!message.photo,
+        photoUrl: undefined, // En DevBot aislado no procesamos la foto hacia R2 antes del router, simplificado
+        botContext: 'hemeroteca',
+      });
+      const apiOverride = getTelegramDevApiUrl();
+      await ejecutarDecisionAssistant(chatId, decision, apiOverride);
       return c.json({ ok: true });
     }
   }
@@ -147,8 +154,16 @@ devBotApp.post('/', async (c) => {
     const chatId = callbackQuery.message?.chat?.id;
     const data = callbackQuery.data;
 
-    if (chatId) {
-      await sendDevTelegramMessage(chatId, `🔘 *[Dev Callback]:* Seleccionaste \`${data}\``);
+    if (chatId && data) {
+      // Simular text input con el dato del callback para avanzar el HITL
+      const decision = await routeIncomingMessage({
+        chatId,
+        text: data,
+        hasPhoto: false,
+        botContext: 'hemeroteca',
+      });
+      const apiOverride = getTelegramDevApiUrl();
+      await ejecutarDecisionAssistant(chatId, decision, apiOverride);
     }
     return c.json({ ok: true });
   }
