@@ -68,7 +68,7 @@ export async function convertirAWebP(inputBuffer: Buffer, quality = 85): Promise
  * Normaliza y almacena cualquier imagen (URL remota o Buffer binario) como WebP permanente en R2.
  * Origen de la verdad universal para todas las imágenes del ecosistema.
  */
-export async function estandarizarYSubirImagenAR2(input: Buffer | string, prefix = 'media'): Promise<string> {
+export async function estandarizarYSubirImagenAR2(input: Buffer | string, prefix = 'media', customFilename?: string): Promise<string> {
   let rawBuffer: Buffer;
 
   if (typeof input === 'string') {
@@ -85,8 +85,14 @@ export async function estandarizarYSubirImagenAR2(input: Buffer | string, prefix
   }
 
   const webpBuffer = await convertirAWebP(rawBuffer);
-  const uid = crypto.randomUUID().slice(0, 8);
-  const fileKey = `${prefix}/${Date.now()}-${uid}.webp`;
+  let fileKey: string;
+  if (customFilename) {
+    const cleanName = customFilename.replace(/\.[^/.]+$/, '').replace(/[^a-z0-9\-_]/gi, '-');
+    fileKey = `${prefix}/${cleanName}.webp`;
+  } else {
+    const uid = crypto.randomUUID().slice(0, 8);
+    fileKey = `${prefix}/${Date.now()}-${uid}.webp`;
+  }
 
   await getClient().send(new PutObjectCommand({
     Bucket:       _R2_BUCKET_NAME,

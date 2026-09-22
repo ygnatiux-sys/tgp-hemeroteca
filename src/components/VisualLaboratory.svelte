@@ -11,6 +11,7 @@
     : null) ?? 'http://localhost:3001';
 
   const CLOUD_RUN_ENDPOINT = `${CLOUD_RUN_BASE.replace(/\/$/, '')}/process-image`;
+  const CLOUD_RUN_UPLOAD_R2 = `${CLOUD_RUN_BASE.replace(/\/$/, '')}/api/upload-r2`;
 
   const API_TOKEN = (typeof import.meta !== 'undefined'
     ? (import.meta as any).env?.TGP_MIND_API_KEY || (import.meta as any).env?.TGP_API_TOKEN
@@ -125,16 +126,38 @@
     copiado  = false;
     errorMsg = null;
 
+    const payload = {
+      dataUri : imagenProcesada,
+      folder  : r2Folder || 'laboratorio-visual',
+      filename: `tgp-curada-${Date.now()}`,
+      tema    : 'Laboratorio Visual · Curaduría',
+      origen  : 'laboratorio-visual',
+    };
+
     try {
-      const res = await fetch('/api/upload-r2', {
+      // 1. Prioridad: Pipeline centralizado de TGP Mind (Sharp WebP + R2 CDN + D1)
+      let res = await fetch(CLOUD_RUN_UPLOAD_R2, {
         method : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body   : JSON.stringify({
-          dataUri : imagenProcesada,
-          folder  : r2Folder || 'laboratorio-visual',
-          filename: `tgp-curada-${Date.now()}`,
-        }),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_TOKEN,
+          'x-api-token': API_TOKEN,
+        },
+        body   : JSON.stringify(payload),
+      }).catch((fetchErr) => {
+        console.warn('Cloud Run upload unreachable, trying local fallback:', fetchErr);
+        return null;
       });
+
+      // 2. Fallback resiliente a endpoint local de Astro si Cloud Run no responde
+      if (!res || !res.ok) {
+        console.warn('Fallo en Cloud Run R2, ejecutando fallback a /api/upload-r2...');
+        res = await fetch('/api/upload-r2', {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify(payload),
+        });
+      }
 
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error || 'Error al subir a Cloudflare R2');

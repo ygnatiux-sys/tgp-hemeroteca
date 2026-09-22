@@ -1,4 +1,4 @@
-// Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬
+﻿// Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬
 // TGP MIND Ã¢â‚¬â€  Orquestador IA con Hono + Gemini + Inline Keyboard Wizard
 // Autor: TGP / Xavier BenÃƒÂ­tez
 // Deploy: Google Cloud Run
@@ -38,6 +38,7 @@ import {
   getHITLState,
   setHITLState,
   clearHITLState,
+  registrarResguardoD1,
 } from './src/storage/d1.js';
 // -- Vision: Wikimedia Anti-Drift (ver src/vision/wikimedia.ts) ------------------
 import { procesarImagen, resolverEntidadCanonica, buscarPageImageWikipedia } from './src/vision/wikimedia.js';
@@ -53,7 +54,6 @@ import { Octokit } from '@octokit/rest';
 import vision from '@google-cloud/vision';
 import crypto from 'node:crypto';
 import 'dotenv/config';
-
 // Ã¢â€â‚¬Ã¢â€â‚¬ ConfiguraciÃƒÂ³n Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 const PORT               = parseInt(process.env.PORT || '3001');
 const TELEGRAM_TOKEN     = (process.env.OMNI_TOKEN || process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_TOKEN || '').replace(/['"]/g, '').trim();
@@ -306,6 +306,109 @@ app.post('/process-image', async (c) => {
   } catch (err: any) {
     console.error('[Process-Image Error]:', err);
     return c.json({ error: err?.message || 'Error al procesar la imagen.' }, 500);
+  }
+});
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// RUTA: /api/upload-r2 -- Ingesta Universal a Cloudflare R2 + Registro en D1
+// Unifica el pipeline del Laboratorio Visual, Scriptorium y Bots de Telegram.
+// Convierte a WebP con Sharp, aloja en R2 y audita en D1.
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+app.post('/api/upload-r2', async (c) => {
+  try {
+    let rawBuffer: Buffer | null = null;
+    let folder = 'laboratorio-visual';
+    let filename = '';
+    let tema = '';
+    let metadatos: any = {};
+    let origen = 'laboratorio-visual';
+
+    const contentType = c.req.header('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+      const body = await c.req.json();
+      const dataUri = body.dataUri || body.image || '';
+      folder = (body.folder || 'laboratorio-visual').replace(/[^a-z0-9\-_/]/gi, '');
+      filename = body.filename || '';
+      tema = body.tema || '';
+      metadatos = body.metadatos || {};
+      origen = body.origen || 'laboratorio-visual';
+
+      if (!dataUri) {
+        return c.json({ error: 'Se requiere dataUri o image en formato Base64 o URL.' }, 400);
+      }
+
+      if (dataUri.startsWith('http://') || dataUri.startsWith('https://')) {
+        const ua = 'TGPMind/1.0 (contact@thegreatpuzzleproject.com)';
+        const res = await fetch(dataUri, { headers: { 'User-Agent': ua } });
+        if (!res.ok) throw new Error(`Error ${res.status} al descargar imagen desde URL remota`);
+        rawBuffer = Buffer.from(await res.arrayBuffer());
+      } else {
+        const match = dataUri.match(/^data:([^;]+);base64,(.+)$/);
+        const base64Data = match ? match[2] : dataUri;
+        rawBuffer = Buffer.from(base64Data, 'base64');
+      }
+    } else if (contentType.includes('multipart/form-data')) {
+      const formData = await c.req.parseBody();
+      const file = formData['file'] as File | undefined;
+      folder = ((formData['folder'] as string) || 'laboratorio-visual').replace(/[^a-z0-9\-_/]/gi, '');
+      filename = (formData['filename'] as string) || '';
+      tema = (formData['tema'] as string) || '';
+      origen = (formData['origen'] as string) || 'laboratorio-visual';
+
+      if (!file) {
+        return c.json({ error: 'Se requiere archivo en FormData (campo "file").' }, 400);
+      }
+      const arrayBuffer = await file.arrayBuffer();
+      rawBuffer = Buffer.from(arrayBuffer);
+    } else {
+      return c.json({ error: 'Content-Type no soportado. Usa application/json o multipart/form-data.' }, 400);
+    }
+
+    if (!rawBuffer || rawBuffer.length === 0) {
+      return c.json({ error: 'Buffer de imagen vacÃ­o o invÃ¡lido.' }, 400);
+    }
+
+    // 1. ConversiÃ³n y subida a R2 vÃ­a pipeline estandarizado WebP
+    const publicUrl = await estandarizarYSubirImagenAR2(rawBuffer, folder, filename);
+
+    // 2. Registro obligatorio de resguardo documental en Cloudflare D1
+    const d1Id = crypto.randomUUID();
+    let d1Guardado = false;
+    try {
+      await registrarResguardoD1({
+        id: d1Id,
+        origen,
+        destino: 'r2',
+        tema: tema || filename || 'Asset Visual Curado',
+        textoGenerado: `Asset visual procesado y alojado en R2 CDN (${folder})`,
+        metadatos: {
+          ...metadatos,
+          publicUrl,
+          folder,
+          filename,
+          sizeBytes: rawBuffer.length,
+          timestamp: new Date().toISOString(),
+        },
+        imagenR2Url: publicUrl,
+      });
+      d1Guardado = true;
+    } catch (d1Err: any) {
+      console.warn('[API /upload-r2] Advertencia al registrar en D1:', d1Err?.message);
+    }
+
+    console.log(`[API /upload-r2] Ã‰xito: ${publicUrl} (D1: ${d1Id})`);
+
+    return c.json({
+      success: true,
+      url: publicUrl,
+      d1_id: d1Id,
+      d1_guardado: d1Guardado,
+      sizeBytes: rawBuffer.length,
+    });
+  } catch (err: any) {
+    console.error('[API /upload-r2 Error]:', err);
+    return c.json({ error: err?.message || 'Error al procesar y subir a Cloudflare R2' }, 500);
   }
 });
 
