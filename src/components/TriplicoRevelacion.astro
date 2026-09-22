@@ -1,0 +1,365 @@
+---
+/**
+ * TriplicoRevelacion.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Tríptico de Revelación — Cinematic Reveal Loop
+ *
+ * Tres actos superpuestos con crossfade GSAP (autoAlpha):
+ *   Acto I  (Novedades)   → Grid de 3 tarjetas de posts recientes
+ *   Acto II (Profundidad) → Bento Card a pantalla completa con imagen hero
+ *   Acto III (Umbral)     → CTA minimalista "Explorar colecciones"
+ *
+ * Dimensiones: w-full, h = 62vh (equivalente a ~3 tarjetas individuales)
+ * Ubicación en About: antes del footer, después de MubiBlockCinematic.
+ */
+
+export interface TriplicoPost {
+  title: string;
+  excerpt?: string;
+  img: string;
+  href: string;
+  badge?: string;
+}
+
+interface Props {
+  posts: TriplicoPost[];       // Acto I — últimos posts (idealmente 3)
+  heroPost?: TriplicoPost;     // Acto II — colección destacada (imagen grande)
+}
+
+const { posts = [], heroPost } = Astro.props;
+
+const hero = heroPost ?? posts[0] ?? null;
+const slicedPosts = posts.slice(0, 3);
+---
+
+<section
+  id="triptico-revelacion"
+  class="triptico-root w-full max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 py-16 md:py-24"
+  aria-label="Tríptico de Revelación — Colecciones en Rotación"
+>
+  <!-- Encabezado editorial -->
+  <header class="mb-8 flex flex-col gap-1.5">
+    <span class="font-mono text-[10px] uppercase tracking-[0.5em] text-rust-orange font-bold opacity-70">
+      Tríptico de Revelación
+    </span>
+    <h2 class="font-cinzel font-extrabold text-3xl md:text-4xl lg:text-5xl gradient-steel-titanium tracking-tight leading-[0.95]">
+      Lo Reciente. Lo Profundo. El Umbral.
+    </h2>
+  </header>
+
+  <!-- CONTENEDOR DE LOS TRES ACTOS -->
+  <div
+    id="triptico-stage"
+    class="relative w-full overflow-hidden rounded-3xl border border-white/5"
+    style="height: 62vh; min-height: 480px;"
+  >
+
+    <!-- ═══════════════════════════════ -->
+    <!-- ACTO I — Novedades (Grid 3)    -->
+    <!-- ═══════════════════════════════ -->
+    <div
+      id="triptico-acto1"
+      class="triptico-acto absolute inset-0 grid grid-cols-1 sm:grid-cols-3"
+      style="visibility: visible; opacity: 1;"
+    >
+      {slicedPosts.map((post, i) => (
+        <a
+          href={post.href}
+          class="group relative overflow-hidden bg-[#0a0a0b] flex flex-col justify-end border-r border-white/5 last:border-r-0 transition-all duration-500"
+          style={`transition-delay:${i * 60}ms`}
+        >
+          <div class="absolute inset-0 z-0">
+            <img
+              src={post.img}
+              alt={post.title}
+              loading="lazy"
+              decoding="async"
+              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/10"></div>
+          </div>
+          <div class="relative z-10 p-5 md:p-6 flex flex-col gap-2">
+            {post.badge && (
+              <span class="font-mono text-[8px] uppercase tracking-[0.4em] text-rust-orange font-bold opacity-70">
+                {post.badge}
+              </span>
+            )}
+            <h3 class="font-cinzel font-bold text-white text-sm md:text-base lg:text-lg leading-snug line-clamp-3 group-hover:text-rust-orange transition-colors duration-300">
+              {post.title}
+            </h3>
+            {post.excerpt && (
+              <p class="font-sans text-[11px] text-white/45 leading-relaxed line-clamp-2 hidden md:block">
+                {post.excerpt}
+              </p>
+            )}
+            <span class="font-mono text-[9px] uppercase tracking-[0.3em] text-white/25 group-hover:text-rust-orange/60 transition-colors mt-1">
+              Explorar Dossier →
+            </span>
+          </div>
+          <div class="absolute left-0 top-0 h-full w-[2px] bg-rust-orange scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-bottom z-20"></div>
+        </a>
+      ))}
+      <div class="absolute top-4 right-5 z-30 font-mono text-[8px] uppercase tracking-[0.4em] text-white/20">
+        Acto I — Novedades
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ -->
+    <!-- ACTO II — Bento Colección Hero     -->
+    <!-- ═══════════════════════════════════ -->
+    <div
+      id="triptico-acto2"
+      class="triptico-acto absolute inset-0"
+      style="visibility: hidden; opacity: 0;"
+    >
+      {hero ? (
+        <a href={hero.href} class="group relative w-full h-full flex items-end overflow-hidden block">
+          <div class="absolute inset-0 z-0">
+            <img
+              src={hero.img}
+              alt={hero.title}
+              loading="lazy"
+              decoding="async"
+              class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+            />
+            <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/95"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-black/40"></div>
+          </div>
+          <div class="relative z-10 p-8 md:p-12 lg:p-16 max-w-3xl flex flex-col gap-4">
+            <span class="font-mono text-[9px] uppercase tracking-[0.5em] text-rust-orange font-bold">
+              Colección Destacada
+            </span>
+            <h3 class="font-cinzel font-black text-white text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-[0.95] tracking-tight drop-shadow-2xl">
+              {hero.title}
+            </h3>
+            {hero.excerpt && (
+              <p class="font-serif italic text-white/55 text-base md:text-lg leading-relaxed max-w-xl">
+                {hero.excerpt}
+              </p>
+            )}
+            <span class="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.4em] text-white/30 group-hover:text-rust-orange transition-colors mt-2">
+              <span class="w-8 h-px bg-rust-orange/40 group-hover:bg-rust-orange transition-colors"></span>
+              Explorar colección completa →
+            </span>
+          </div>
+        </a>
+      ) : (
+        <div class="w-full h-full flex items-center justify-center bg-[#0a0a0b]">
+          <span class="font-mono text-white/20 text-sm">Sin datos de colección destacada</span>
+        </div>
+      )}
+      <div class="absolute top-4 right-5 z-30 font-mono text-[8px] uppercase tracking-[0.4em] text-white/20">
+        Acto II — Profundidad
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ -->
+    <!-- ACTO III — Umbral CTA          -->
+    <!-- ═══════════════════════════════ -->
+    <div
+      id="triptico-acto3"
+      class="triptico-acto absolute inset-0 flex flex-col items-center justify-center gap-8 bg-[#060607]"
+      style="visibility: hidden; opacity: 0;"
+    >
+      <!-- Ruido sutil de fondo -->
+      <div class="absolute inset-0 opacity-[0.018]" style="background-image:url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC42NSIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbikiIG9wYWNpdHk9IjEiLz48L3N2Zz4=);"></div>
+
+      <div class="relative z-10 flex flex-col items-center gap-8 text-center px-8 max-w-2xl">
+        <!-- Eyebrow ornamental -->
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-px bg-rust-orange/30"></div>
+          <span class="font-mono text-[9px] uppercase tracking-[0.6em] text-rust-orange/60 font-bold">El Umbral</span>
+          <div class="w-12 h-px bg-rust-orange/30"></div>
+        </div>
+
+        <!-- Headline -->
+        <h3 class="font-cinzel font-black text-white text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[0.9] tracking-tight">
+          Explorar<br />
+          <span class="gradient-steel-titanium">Colecciones</span>
+        </h3>
+
+        <p class="font-serif italic text-white/30 text-lg md:text-xl leading-relaxed">
+          Ensayos cinemáticos, arqueosemiótica, arquetipos y dirección de arte.<br />
+          <span class="text-white/20">Un archivo vivo de pensamiento visual.</span>
+        </p>
+
+        <div class="flex flex-col sm:flex-row items-center gap-4 mt-2">
+          <a
+            href="/colecciones/"
+            class="group/cta inline-flex items-center gap-3 px-8 py-4 rounded-full border border-white/15 bg-white/3 backdrop-blur-sm font-mono text-[10px] uppercase tracking-[0.4em] text-white/50 hover:border-rust-orange/50 hover:bg-rust-orange/8 hover:text-white transition-all duration-500"
+          >
+            <span>Ver Todas las Colecciones</span>
+            <span class="group-hover/cta:translate-x-1 transition-transform duration-300">→</span>
+          </a>
+          <a
+            href="/archivo/"
+            class="group/arch inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.35em] text-white/25 hover:text-rust-orange transition-colors duration-400"
+          >
+            <span>Archivo Completo</span>
+            <span class="group-hover/arch:translate-x-0.5 transition-transform duration-300">↗</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="absolute top-4 right-5 z-30 font-mono text-[8px] uppercase tracking-[0.4em] text-white/15">
+        Acto III — Umbral
+      </div>
+    </div>
+
+    <!-- Dots de navegación -->
+    <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2.5" id="triptico-dots" role="tablist">
+      {[1, 2, 3].map((n) => (
+        <button
+          type="button"
+          class={`triptico-dot rounded-full transition-all duration-500 cursor-pointer border-none outline-none flex-shrink-0 ${n === 1 ? 'bg-rust-orange w-5 h-1.5' : 'bg-white/20 hover:bg-white/40 w-1.5 h-1.5'}`}
+          data-acto={n}
+          aria-label={`Acto ${n}`}
+          aria-selected={n === 1 ? 'true' : 'false'}
+        />
+      ))}
+    </div>
+
+    <!-- Barra de progreso -->
+    <div class="absolute bottom-0 left-0 z-40 h-[2px] bg-white/5 w-full" aria-hidden="true">
+      <div id="triptico-progress" class="h-full bg-rust-orange/60 w-0"></div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  const initTriptico = () => {
+    const stage = document.getElementById('triptico-stage');
+    if (!stage || (stage as any).__triptico_init) return;
+    (stage as any).__triptico_init = true;
+
+    const acto1 = document.getElementById('triptico-acto1');
+    const acto2 = document.getElementById('triptico-acto2');
+    const acto3 = document.getElementById('triptico-acto3');
+    const progressBar = document.getElementById('triptico-progress');
+    const dots = Array.from(document.querySelectorAll<HTMLButtonElement>('#triptico-dots .triptico-dot'));
+
+    if (!acto1 || !acto2 || !acto3) return;
+
+    const STAY = 6;
+    const FADE = 1.2;
+    const actos = [acto1, acto2, acto3];
+    let currentActo = 0;
+    let loopTimeout: ReturnType<typeof setTimeout> | null = null;
+    let progressRaf: number | null = null;
+    let paused = false;
+    let progressStart = 0;
+    let progressDuration = (STAY + FADE) * 1000;
+
+    const loadGSAP = (): Promise<any> => {
+      return new Promise((resolve) => {
+        if ((window as any).gsap) { resolve((window as any).gsap); return; }
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+        s.onload = () => resolve((window as any).gsap);
+        document.head.appendChild(s);
+      });
+    };
+
+    const updateDots = (idx: number) => {
+      dots.forEach((dot, i) => {
+        const active = i === idx;
+        dot.setAttribute('aria-selected', String(active));
+        if (active) {
+          dot.classList.add('bg-rust-orange', 'w-5');
+          dot.classList.remove('bg-white/20', 'w-1.5');
+        } else {
+          dot.classList.remove('bg-rust-orange', 'w-5');
+          dot.classList.add('bg-white/20', 'w-1.5');
+        }
+      });
+    };
+
+    const animateProgress = () => {
+      if (!progressBar) return;
+      if (progressRaf) cancelAnimationFrame(progressRaf);
+      progressStart = performance.now();
+      const tick = (now: number) => {
+        if (paused) { progressRaf = requestAnimationFrame(tick); return; }
+        const elapsed = now - progressStart;
+        const pct = Math.min((elapsed / progressDuration) * 100, 100);
+        progressBar.style.width = `${pct}%`;
+        if (pct < 100) progressRaf = requestAnimationFrame(tick);
+      };
+      progressRaf = requestAnimationFrame(tick);
+    };
+
+    const crossfade = (gsap: any, nextIdx: number) => {
+      gsap.to(actos[currentActo], { autoAlpha: 0, duration: FADE, ease: 'power2.inOut' });
+      gsap.to(actos[nextIdx],    { autoAlpha: 1, duration: FADE, ease: 'power2.inOut' });
+      currentActo = nextIdx;
+      updateDots(currentActo);
+      animateProgress();
+    };
+
+    const scheduleNext = (gsap: any) => {
+      if (loopTimeout) clearTimeout(loopTimeout);
+      loopTimeout = setTimeout(() => {
+        if (!paused) {
+          crossfade(gsap, (currentActo + 1) % 3);
+        }
+        scheduleNext(gsap);
+      }, (STAY + FADE) * 1000);
+    };
+
+    // Hover pause
+    stage.addEventListener('mouseenter', () => { paused = true; });
+    stage.addEventListener('mouseleave', () => {
+      paused = false;
+      // Reanudar progreso desde donde quedó
+      if (progressBar) {
+        const elapsed = parseFloat(progressBar.style.width || '0') / 100 * progressDuration;
+        progressStart = performance.now() - elapsed;
+      }
+    });
+
+    // Dots manuales
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        if (i === currentActo) return;
+        loadGSAP().then((gsap) => {
+          if (loopTimeout) clearTimeout(loopTimeout);
+          crossfade(gsap, i);
+          scheduleNext(gsap);
+        });
+      });
+    });
+
+    // Precargar imagen del Acto II
+    const heroImg = acto2.querySelector('img');
+    if (heroImg?.src) {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = heroImg.src;
+      document.head.appendChild(link);
+    }
+
+    // Arranque
+    loadGSAP().then((gsap) => {
+      gsap.set(acto1, { autoAlpha: 1 });
+      gsap.set(acto2, { autoAlpha: 0 });
+      gsap.set(acto3, { autoAlpha: 0 });
+      updateDots(0);
+      animateProgress();
+      scheduleNext(gsap);
+    });
+  };
+
+  document.addEventListener('DOMContentLoaded', initTriptico);
+  document.addEventListener('astro:page-load', initTriptico);
+</script>
+
+<style>
+  .triptico-acto { will-change: opacity, visibility; }
+  .triptico-dot:focus-visible {
+    outline: 2px solid rgba(239,235,227,0.5);
+    outline-offset: 3px;
+    border-radius: 999px;
+  }
+</style>

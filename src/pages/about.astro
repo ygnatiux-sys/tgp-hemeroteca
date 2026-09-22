@@ -11,6 +11,7 @@ import Marquee from '../components/Marquee.astro';
 import CinematicExcerptRest from '../components/CinematicExcerptRest.astro';
 import MazoCartasGSAP from '../components/MazoCartasGSAP.astro';
 import MubiBlockCinematic, { type MubiCinematicItem } from '../components/MubiBlockCinematic.astro';
+import TriplicoRevelacion, { type TriplicoPost } from '../components/TriplicoRevelacion.astro';
 import { sanitizeImageUrl, getPublishableEssays, resolveEssayImage, isValidImageSrc } from '../lib/content-filter';
 
 // Portada Hero Cinemática (Monjes Novicios Leyendo en el Templo - Wikimedia Commons)
@@ -77,6 +78,21 @@ const mubiCinematicItems: MubiCinematicItem[] = allCinematicosRaw
   })
   .filter(item => typeof item.img === 'string' && item.img.length > 4)
   .slice(0, 6);
+
+// ── Datos para el Tríptico de Revelación ──
+// Acto I: últimos 3 posts cinemáticos (como tarjetas)
+// Acto II: el post más destacado (con la mejor imagen, como hero)
+const triplicoPosts: TriplicoPost[] = mubiCinematicItems.slice(0, 3).map(item => ({
+  title: item.title,
+  excerpt: item.excerpt,
+  img: item.img,
+  href: item.href,
+  badge: item.badge || 'Ensayo Cinemático',
+}));
+// Hero: buscar el post con mayor índice que tenga imagen R2 (empezando del 3 en adelante, o fallback al primero)
+const triplicoHero: TriplicoPost | undefined = mubiCinematicItems.slice(3).find(item => !!item.img)
+  ? { ...mubiCinematicItems.slice(3).find(item => !!item.img)! }
+  : triplicoPosts[0];
 ---
 
 <Layout
@@ -406,6 +422,17 @@ const mubiCinematicItems: MubiCinematicItem[] = allCinematicosRaw
       items={mubiCinematicItems}
       titulo="Colección Cinemática"
       subtitulo="Experiencias Visuales en Tres Actos"
+    />
+  )}
+
+  {/* ══════════════════════════════════════════════════════════════════
+      TRÍPTICO DE REVELACIÓN — Cinematic Reveal Loop
+      Tres actos en rotación: posts recientes / colección hero / CTA umbral
+  ══════════════════════════════════════════════════════════════════ */}
+  {triplicoPosts.length > 0 && (
+    <TriplicoRevelacion
+      posts={triplicoPosts}
+      heroPost={triplicoHero}
     />
   )}
 
