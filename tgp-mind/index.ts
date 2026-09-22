@@ -15,6 +15,8 @@ import {
   callGemini,
   crearModeloEnsayo,
   SYSTEM_PROMPT_NATGEO_GROUNDED,
+  TGP_SYSTEM_PROMPT,
+  buildDensityInstruction,
 } from './src/ia/gemini.js';
 // -- Telegram Webhook Unificado Multi-Bot (ver src/telegram/webhook.ts) --------
 import { handleTelegramWebhook } from './src/telegram/webhook.js';
