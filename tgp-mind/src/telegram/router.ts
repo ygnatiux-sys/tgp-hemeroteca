@@ -7,7 +7,7 @@
 import { Hono } from 'hono';
 import crypto from 'node:crypto';
 import { routeIncomingMessage } from '../ia/semantic-router.js';
-import { callGemini, crearModeloEnsayo, genai, TGP_SYSTEM_PROMPT, buildDensityInstruction } from '../ia/gemini.js';
+import { callGemini, crearModeloEnsayo, genai, TGP_SYSTEM_PROMPT, buildDensityInstruction, clearHistory } from '../ia/gemini.js';
 import {
   sendTelegram,
   editMessageText,
@@ -82,6 +82,53 @@ let cfg: TelegramRouterConfig = {
 export function initTelegramRouter(config: Partial<TelegramRouterConfig>) {
   cfg = { ...cfg, ...config };
 }
+
+// ── Estado Pendiente de Foto Sin Caption ─────────────────────────────────────
+// Persiste la URL de R2 de una imagen subida sin caption hasta que el usuario
+// proporcione un tema. Se expira automáticamente a los 10 minutos.
+interface PendingPhoto {
+  photoUrl: string;
+  bot: 'hemeroteca' | 'social' | 'omni';
+  uploadedAt: number;
+}
+const pendingPhotoState = new Map<number, PendingPhoto>();
+const PENDING_PHOTO_TTL_MS = 10 * 60 * 1000; // 10 minutos
+
+function setPendingPhoto(chatId: number, photoUrl: string, bot: 'hemeroteca' | 'social' | 'omni') {
+  pendingPhotoState.set(chatId, { photoUrl, bot, uploadedAt: Date.now() });
+}
+
+function getPendingPhoto(chatId: number): PendingPhoto | null {
+  const entry = pendingPhotoState.get(chatId);
+  if (!entry) return null;
+  if (Date.now() - entry.uploadedAt > PENDING_PHOTO_TTL_MS) {
+    pendingPhotoState.delete(chatId);
+    return null;
+  }
+  return entry;
+}
+
+function clearPendingPhoto(chatId: number) {
+  pendingPhotoState.delete(chatId);
+}
+
+// ── Teclado inline para foto sin caption ─────────────────────────────────────
+const PHOTO_CAPTION_KEYBOARD = {
+  inline_keyboard: [
+    [{ text: '🔍 Flash propone tema + hook académico', callback_data: 'photo_action:propose_theme' }],
+    [{ text: '✍️ Yo propongo el tema', callback_data: 'photo_action:user_theme' }],
+  ],
+};
+
+// ── Reset de sesión completo (historial + pendingPhoto) ───────────────────────
+function resetSession(chatId: number) {
+  clearHistory(`hemeroteca-${chatId}`);
+  clearHistory(`social-${chatId}`);
+  clearHistory(`omni-${chatId}`);
+  clearHistory(String(chatId));
+  clearPendingPhoto(chatId);
+}
+
 
 // ── Helpers Mini App & Autenticación ──────────────────────────────────────────
 export function verifyTelegramInitData(initData: string, botToken: string): boolean {
@@ -425,6 +472,12 @@ telegramRouter.post('/webhook/telegram', async (c) => {
       return c.json({ ok: true });
     }
 
+    if (text.trim() === '/nuevo') {
+      resetSession(chatId);
+      await sendTelegramAssistant(chatId, '✅ Sesión reiniciada. Comenzamos de cero. Enviáme un nuevo tema o una foto.');
+      return c.json({ ok: true });
+    }
+
     let imagenR2Url = '';
     if (hasPhoto) {
       const fileId = hasPhotoArray ? message.photo[message.photo.length - 1].file_id : message.document.file_id;
@@ -436,6 +489,22 @@ telegramRouter.post('/webhook/telegram', async (c) => {
         await sendTelegramAssistant(chatId, `✅ Imagen alojada en Cloudflare R2:\n${imagenR2Url}`);
       } catch (errUpload: any) {
         await sendTelegramAssistant(chatId, `⚠️ Error subiendo imagen: ${errUpload?.message || 'Error'}`);
+      }
+
+      // Si no tiene caption, mostrar teclado inline en lugar de pasar texto vacío al HITL
+      if (!text && imagenR2Url) {
+        setPendingPhoto(chatId, imagenR2Url, 'hemeroteca');
+        await sendTelegramAssistant(chatId, '❓ Esta imagen no tiene pie de foto. ¿Qué hacemos?', PHOTO_CAPTION_KEYBOARD);
+        return c.json({ ok: true });
+      }
+    }
+
+    // Si llega texto y hay una foto pendiente, inyectarla como photoUrl del HITL
+    if (!hasPhoto && text) {
+      const pending = getPendingPhoto(chatId);
+      if (pending && pending.bot === 'hemeroteca') {
+        clearPendingPhoto(chatId);
+        imagenR2Url = pending.photoUrl;
       }
     }
 
@@ -465,14 +534,58 @@ telegramRouter.post('/webhook/telegram', async (c) => {
         return c.json({ ok: true });
       }
 
-      await answerCallbackAssistant(callbackId);
+    // photo_action callbacks (foto sin caption)
+    if (data.startsWith('photo_action:')) {
+      const action = data.split(':')[1];
+      const pending = getPendingPhoto(chatId);
 
-      const decision = await routeIncomingMessage({
-        chatId,
-        text: data,
-        hasPhoto: false,
-        botContext: 'hemeroteca',
-      });
+      if (action === 'user_theme') {
+        await answerCallbackAssistant(callbackId);
+        await sendTelegramAssistant(chatId, '> ¿Cuál es el tema o título para esta imagen?');
+        return c.json({ ok: true });
+      }
+
+      if (action === 'propose_theme' && pending) {
+        await answerCallbackAssistant(callbackId);
+        await sendTelegramAssistant(chatId, '🔍 Analizando la imagen con Flash...');
+        try {
+          const propuesta = await callGemini(
+            `img-propose-${chatId}`,
+            `Analizá esta imagen: ${pending.photoUrl} y proponé un título académico estilo Dark Academia y un hook de apertura para un ensayo histórico TGP. Respondé únicamente con este JSON: {"titulo": "...", "hook": "..."}`,
+            'gemini-3.8-flash',
+            'Eres el motor cognitivo de TGP. Respondes solo con JSON válido, sin bloques de código.'
+          );
+          const jsonMatch = propuesta.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            await sendTelegramAssistant(chatId,
+              `📌 *Propuesta de tema:*\n\n*Título:* ${parsed.titulo}\n\n*Hook:* ${parsed.hook}\n\n> ¿Usamos este título? Confirmá con \"sí\" o escribí el tuyo.`,
+              undefined
+            );
+            // Guardamos el titulo propuesto como contexto en el pending
+            clearPendingPhoto(chatId);
+            setPendingPhoto(chatId, pending.photoUrl, 'hemeroteca');
+          } else {
+            await sendTelegramAssistant(chatId, '> ¿Cuál es el tema o título para esta imagen?');
+          }
+        } catch {
+          await sendTelegramAssistant(chatId, '> ¿Cuál es el tema o título para esta imagen?');
+        }
+        return c.json({ ok: true });
+      }
+
+      await answerCallbackAssistant(callbackId);
+      return c.json({ ok: true });
+    }
+
+    await answerCallbackAssistant(callbackId);
+
+    const decision = await routeIncomingMessage({
+      chatId,
+      text: data,
+      hasPhoto: false,
+      botContext: 'hemeroteca',
+    });
 
       await ejecutarDecisionAssistant(chatId, decision);
     }
@@ -501,6 +614,12 @@ telegramRouter.post('/webhook/telegram-social', async (c) => {
       return c.json({ ok: true });
     }
 
+    if (text.trim() === '/nuevo') {
+      resetSession(chatId);
+      await sendTelegramSocial(chatId, '✅ Sesión reiniciada. Comenzamos de cero. Enviame un nuevo tema o una foto.');
+      return c.json({ ok: true });
+    }
+
     let imagenR2Url = '';
     if (hasPhoto) {
       const fileId = hasPhotoArray ? message.photo[message.photo.length - 1].file_id : message.document.file_id;
@@ -513,6 +632,28 @@ telegramRouter.post('/webhook/telegram-social', async (c) => {
       } catch (errUpload: any) {
         await sendTelegramSocial(chatId, `⚠️ Error subiendo imagen: ${errUpload?.message || 'Error'}`);
       }
+
+      // Si no tiene caption, mostrar teclado inline
+      if (!text && imagenR2Url) {
+        setPendingPhoto(chatId, imagenR2Url, 'social');
+        await sendTelegramSocial(chatId, '❓ Esta imagen no tiene pie de foto. ¿Qué hacemos?');
+        // Social bot no tiene answerCallback helper en este scope, enviamos teclado via fetch directo
+        await fetch(`${cfg.telegramSocialApi}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text: '❓ Esta imagen no tiene pie de foto. ¿Qué hacemos?', reply_markup: PHOTO_CAPTION_KEYBOARD }),
+        });
+        return c.json({ ok: true });
+      }
+    }
+
+    // Si llega texto y hay foto pendiente, inyectarla
+    if (!hasPhoto && text) {
+      const pending = getPendingPhoto(chatId);
+      if (pending && pending.bot === 'social') {
+        clearPendingPhoto(chatId);
+        imagenR2Url = pending.photoUrl;
+      }
     }
 
     // Clasificación Semántica Agéntica (HITL)
@@ -523,6 +664,7 @@ telegramRouter.post('/webhook/telegram-social', async (c) => {
       photoUrl: imagenR2Url || undefined,
       botContext: 'social',
     });
+
 
     if (decision.type === 'micro_prompt') {
       await sendTelegramSocial(chatId, decision.text);
@@ -1151,6 +1293,18 @@ telegramRouter.post('/telegram-webhook', async (c) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chat_id: chatId, text: '🛑 Operación cancelada. El canal de Omni Bot quedó libre.' }),
+      });
+      return c.json({ ok: true });
+    }
+
+    // Comando /nuevo: limpia historial, pendingPhoto y estado HITL activo
+    if (text.trim() === '/nuevo') {
+      resetSession(chatId);
+      await clearHITLState(chatId, 'omni');
+      await fetch(`${cfg.telegramApi}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: '✅ Sesión reiniciada. Comenzamos de cero. Escribí un nuevo tema.' }),
       });
       return c.json({ ok: true });
     }

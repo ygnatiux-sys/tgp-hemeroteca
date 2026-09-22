@@ -58,6 +58,10 @@ export function pushToHistory(sessionId: string, role: 'user' | 'model', text: s
   if (history.length > MAX_TURNS * 2) history.splice(0, 2);
 }
 
+export function clearHistory(sessionId: string) {
+  conversationHistory.delete(sessionId);
+}
+
 // ── Llamada a Gemini con contexto ─────────────────────────────────────────────
 export async function callGemini(
   sessionId: string,
