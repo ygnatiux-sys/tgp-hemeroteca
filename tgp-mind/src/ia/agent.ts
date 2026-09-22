@@ -213,14 +213,25 @@ export async function processTelegramMessage(
   imageContextPrefix?: string,
 ): Promise<string> {
   // ── Paso 1: Guardar turno del usuario en D1 ────────────────────────────────
+  // AISLAMIENTO: Se usa botIdentity como botId para que cada bot tenga su
+  // propia memoria. La clave en D1 es "{chatId}:{botIdentity}" (ej: "123:omni").
+  // Si userText está vacío, el webhook ya guardó el turno en D1 (foto+caption
+  // fusionados). No guardamos de nuevo para evitar un turno duplicado.
   const textToSave = imageContextPrefix
     ? `${imageContextPrefix}\n\nUsuario: ${userText}`.trim()
-    : userText;
-  await appendUserText(chatId, textToSave);
+    : userText.trim();
 
-  // ── Paso 2: Cargar historial nativo de Gemini desde D1 ────────────────────
-  // Incluye: user, model (texto + functionCall), function (functionResponse)
-  const history: GeminiTurn[] = await getConversationHistory(chatId, 12);
+  if (textToSave) {
+    console.log(`[Agent:${botIdentity}] Guardando turno usuario en D1 (${textToSave.length} chars) key="${chatId}:${botIdentity}"`);
+    await appendUserText(chatId, textToSave, botIdentity);
+  } else {
+    // turno ya existe en D1 (guardado por webhook al interceptar la foto)
+    console.log(`[Agent:${botIdentity}] Turno de usuario ya guardado en D1 por webhook. Saltando appendUserText.`);
+  }
+
+  // ── Paso 2: Cargar historial nativo de Gemini desde D1 ────────────────────────────────
+  // Solo carga el historial de ESTE bot (botIdentity). Aislamiento garantizado.
+  const history: GeminiTurn[] = await getConversationHistory(chatId, 12, botIdentity);
 
   // history ya incluye el turno del usuario recién guardado porque
   // appendUserText es síncrono antes de esta llamada.
@@ -238,11 +249,11 @@ export async function processTelegramMessage(
     },
   });
 
-  // ── Paso 4a: Respuesta de texto ────────────────────────────────────────────
+  // ── Paso 4a: Respuesta de texto ────────────────────────────────────────────────────
   const functionCalls = response.functionCalls;
   if (!functionCalls || functionCalls.length === 0) {
     const text = (response.text || '').trim();
-    await appendModelText(chatId, text);
+    await appendModelText(chatId, text, botIdentity);
     return text;
   }
 
@@ -251,20 +262,19 @@ export async function processTelegramMessage(
   const toolName = call.name || '';
   const toolArgs = (call.args as Record<string, any>) || {};
 
-  console.log(`[Agent] Tool Call recibido: ${toolName}`, toolArgs);
+  console.log(`[Agent:${botIdentity}] Tool Call recibido: ${toolName}`, toolArgs);
 
-  // Guardar el functionCall emitido por el modelo
-  await appendFunctionCall(chatId, toolName, toolArgs);
+  // Guardar el functionCall emitido por el modelo (con aislamiento de bot)
+  await appendFunctionCall(chatId, toolName, toolArgs, botIdentity);
 
   // Ejecutar la función localmente
   const toolResult = await ejecutarTool(toolName, toolArgs, chatId);
 
-  // Guardar el functionResponse para que Gemini recuerde el resultado
-  await appendFunctionResponse(chatId, toolName, toolResult);
+  // Guardar el functionResponse (con aislamiento de bot)
+  await appendFunctionResponse(chatId, toolName, toolResult, botIdentity);
 
-  // Llamada adicional a Gemini para que genere la respuesta textual final
-  // usando el resultado de la herramienta como contexto.
-  const historyConResult: GeminiTurn[] = await getConversationHistory(chatId, 12);
+  // Llamada adicional a Gemini para la respuesta textual final (con historial aislado)
+  const historyConResult: GeminiTurn[] = await getConversationHistory(chatId, 12, botIdentity);
   const finalResponse = await genai.models.generateContent({
     model: 'gemini-3.8-flash',
     contents: historyConResult as any,
@@ -277,6 +287,6 @@ export async function processTelegramMessage(
   });
 
   const finalText = (finalResponse.text || `✅ ${toolName} ejecutado correctamente.`).trim();
-  await appendModelText(chatId, finalText);
+  await appendModelText(chatId, finalText, botIdentity);
   return finalText;
 }

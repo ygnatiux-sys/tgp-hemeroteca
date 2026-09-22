@@ -396,6 +396,7 @@ export async function asegurarTablaMessages(): Promise<void> {
   if (!_DATABASE_ID || !_API_TOKEN) return;
   // Columna content_json almacena Parts[] serializado como JSON.
   // Columna role: 'user' | 'model' | 'function'
+  // Columna chat_id usa clave compuesta "{chatId}:{botId}" para aislamiento.
   const schemaQuery1 = `
     CREATE TABLE IF NOT EXISTS messages (
       id          TEXT PRIMARY KEY,
@@ -426,16 +427,21 @@ export async function asegurarTablaMessages(): Promise<void> {
  * listo para inyectar directamente en el campo `contents` de generateContent().
  * Incluye turnos de texto, functionCall y functionResponse para que Gemini
  * nunca pierda el hilo tras ejecutar una herramienta.
+ *
+ * AISLAMIENTO: La clave de búsqueda es "{chatId}:{botId}" (ej: "123456789:omni").
+ * Cada bot tiene su propia memoria aunque el usuario sea el mismo.
  */
-export async function getConversationHistory(chatId: number, limit = 12): Promise<GeminiTurn[]> {
+export async function getConversationHistory(chatId: number, limit = 12, botId = 'default'): Promise<GeminiTurn[]> {
   if (!_DATABASE_ID || !_API_TOKEN) return [];
+  // Clave compuesta para aislamiento: el mismo patrón que usa HITLState
+  const key = `${chatId}:${botId}`;
   try {
     const res = await fetch(d1Url(), {
       method: 'POST',
       headers: d1Headers(),
       body: JSON.stringify({
         sql: `SELECT role, content_json FROM messages WHERE chat_id = ? ORDER BY created_at DESC LIMIT ?`,
-        params: [String(chatId), limit],
+        params: [key, limit],
       }),
     });
     const data: any = await res.json();
@@ -458,22 +464,13 @@ export async function getConversationHistory(chatId: number, limit = 12): Promis
  * @param chatId   - ID del chat de Telegram.
  * @param role     - Rol nativo de Gemini: 'user' | 'model' | 'function'.
  * @param parts    - Array de GeminiPart (texto, functionCall o functionResponse).
+ * @param botId    - Identidad del bot ('redes'|'omni'|'assistant'|'liminal'). Default: 'default'.
  *
- * Ejemplos de uso:
- *   // Guardar texto del usuario
- *   await appendTurn(chatId, 'user', [{ text: 'Escribe un ensayo sobre Roma' }]);
- *
- *   // Guardar Ficha Visual que el modelo envió
- *   await appendTurn(chatId, 'model', [{ text: '\uD83C\uDFAC **Ficha TGP...**' }]);
- *
- *   // Guardar el Tool Call que emitió el modelo tras el "ok"
- *   await appendTurn(chatId, 'model', [{ functionCall: { name: 'generar_ensayo', args: {...} } }]);
- *
- *   // Guardar el resultado del Worker devuelto a Gemini
- *   await appendTurn(chatId, 'function', [{ functionResponse: { name: 'generar_ensayo', response: { result: 'https://...' } } }]);
+ * La clave de partición en D1 es "{chatId}:{botId}" para aislar la memoria de cada bot.
  */
-export async function appendTurn(chatId: number, role: GeminiRole, parts: GeminiPart[]): Promise<void> {
+export async function appendTurn(chatId: number, role: GeminiRole, parts: GeminiPart[], botId = 'default'): Promise<void> {
   if (!_DATABASE_ID || !_API_TOKEN) return;
+  const key = `${chatId}:${botId}`;
   try {
     await asegurarTablaMessages();
     const id = crypto.randomUUID();
@@ -482,7 +479,7 @@ export async function appendTurn(chatId: number, role: GeminiRole, parts: Gemini
       headers: d1Headers(),
       body: JSON.stringify({
         sql: `INSERT INTO messages (id, chat_id, role, content_json, created_at) VALUES (?, ?, ?, ?, ?)`,
-        params: [id, String(chatId), role, JSON.stringify(parts), new Date().toISOString()],
+        params: [id, key, role, JSON.stringify(parts), new Date().toISOString()],
       }),
     });
   } catch (err) {
@@ -493,31 +490,51 @@ export async function appendTurn(chatId: number, role: GeminiRole, parts: Gemini
 /**
  * Atajos semánticos para los casos más comunes.
  * Usan appendTurn internamente.
+ * @param botId - Identidad del bot para aislamiento de memoria.
  */
-export const appendUserText = (chatId: number, text: string) =>
-  appendTurn(chatId, 'user', [{ text }]);
+export const appendUserText = (chatId: number, text: string, botId = 'default') =>
+  appendTurn(chatId, 'user', [{ text }], botId);
 
-export const appendModelText = (chatId: number, text: string) =>
-  appendTurn(chatId, 'model', [{ text }]);
+export const appendModelText = (chatId: number, text: string, botId = 'default') =>
+  appendTurn(chatId, 'model', [{ text }], botId);
 
-export const appendFunctionCall = (chatId: number, name: string, args: Record<string, any>) =>
-  appendTurn(chatId, 'model', [{ functionCall: { name, args } }]);
+export const appendFunctionCall = (chatId: number, name: string, args: Record<string, any>, botId = 'default') =>
+  appendTurn(chatId, 'model', [{ functionCall: { name, args } }], botId);
 
-export const appendFunctionResponse = (chatId: number, name: string, response: Record<string, any>) =>
-  appendTurn(chatId, 'function', [{ functionResponse: { name, response } }]);
+export const appendFunctionResponse = (chatId: number, name: string, response: Record<string, any>, botId = 'default') =>
+  appendTurn(chatId, 'function', [{ functionResponse: { name, response } }], botId);
 
-export async function clearChatHistory(chatId: number): Promise<void> {
+/**
+ * Limpia el historial de un chat para un bot específico (o todos los bots).
+ * @param botId - Si se omite, borra el historial de TODOS los bots del chatId.
+ */
+export async function clearChatHistory(chatId: number, botId?: string): Promise<void> {
   if (!_DATABASE_ID || !_API_TOKEN) return;
   try {
-    await fetch(d1Url(), {
-      method: 'POST',
-      headers: d1Headers(),
-      body: JSON.stringify({
-        sql: 'DELETE FROM messages WHERE chat_id = ?',
-        params: [String(chatId)],
-      }),
-    });
-    console.log(`[D1 Messages] Historial borrado para chat_id: ${chatId}`);
+    if (botId) {
+      // Borrar solo el historial de este bot
+      const key = `${chatId}:${botId}`;
+      await fetch(d1Url(), {
+        method: 'POST',
+        headers: d1Headers(),
+        body: JSON.stringify({
+          sql: 'DELETE FROM messages WHERE chat_id = ?',
+          params: [key],
+        }),
+      });
+      console.log(`[D1 Messages] Historial borrado para ${key}`);
+    } else {
+      // Borrar todos los bots del mismo usuario
+      await fetch(d1Url(), {
+        method: 'POST',
+        headers: d1Headers(),
+        body: JSON.stringify({
+          sql: 'DELETE FROM messages WHERE chat_id = ? OR chat_id LIKE ?',
+          params: [String(chatId), `${chatId}:%`],
+        }),
+      });
+      console.log(`[D1 Messages] Historial borrado para todos los bots de chat_id: ${chatId}`);
+    }
   } catch (err) {
     console.warn('[D1 Messages] Error limpiando historial:', err);
   }

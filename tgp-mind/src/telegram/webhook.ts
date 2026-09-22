@@ -83,7 +83,7 @@ export async function handleTelegramWebhook(
 
   // ── Comandos de control ────────────────────────────────────────────────────
   if (text.startsWith('/nuevo') || text.startsWith('/cancel') || text.startsWith('/reset')) {
-    await clearChatHistory(chatId);
+    await clearChatHistory(chatId, botIdentity); // Limpia solo la memoria de ESTE bot
     await sendTelegramMessage(chatId, botToken, '🔄 Sesión reiniciada. ¿En qué te ayudo?');
     return;
   }
@@ -107,10 +107,11 @@ export async function handleTelegramWebhook(
       imageContextPrefix = `[Sistema: Imagen recibida. URL permanente en R2: ${r2Url}. Usa esta URL como url_imagen en la Ficha Visual y en la Tool publish_social.]`;
 
       // Turno fusionado: contexto R2 + caption (si hay) en un solo turno D1
+      // AISLAMIENTO: se escribe en la partición exclusiva de este bot.
       const partsD1: Array<{ text: string }> = [{ text: imageContextPrefix }];
       if (text) partsD1.push({ text: `Caption del usuario: ${text}` });
 
-      await appendTurn(chatId, 'user', partsD1);
+      await appendTurn(chatId, 'user', partsD1, botIdentity);
       fotoGuardadaEnD1 = true;
 
     } catch (err: any) {
@@ -128,7 +129,7 @@ export async function handleTelegramWebhook(
       imageContextPrefix = `[Sistema: El usuario envió una foto pero falló la subida a R2 (error: ${errMsg}). No hay URL disponible. Informa al usuario y pide que reenvíe la imagen.]`;
       const partsD1: Array<{ text: string }> = [{ text: imageContextPrefix }];
       if (text) partsD1.push({ text: `Caption del usuario: ${text}` });
-      await appendTurn(chatId, 'user', partsD1);
+      await appendTurn(chatId, 'user', partsD1, botIdentity);
       fotoGuardadaEnD1 = true;
     }
   }
@@ -141,22 +142,35 @@ export async function handleTelegramWebhook(
   }
 
   try {
-    // El agente guardará el texto del usuario en D1 como primer paso.
-    // Si ya guardamos imageContextPrefix como turno separado, no lo duplicamos.
+    // CRÍTICO: Si la foto + caption ya fueron guardados como un turno fusionado
+    // en D1 (fotoGuardadaEnD1 = true), NO le pasamos imageContextPrefix al agente.
+    // processTelegramMessage llamará appendUserText(userTextForAgent) internamente,
+    // pero dado que el caption ya está en el turno de imagen, aquí enviamos un
+    // texto vacío de marcador si no queremos duplicar.
+    //
+    // Solución limpia: si ya guardamos en D1 via appendTurn (foto+caption fusionado),
+    // pasamos userTextForAgent vacío para que processTelegramMessage no duplique el
+    // guardado (usa '' como señal de que el turno ya existe).
+    const textParaAgente = fotoGuardadaEnD1
+      ? ''          // El historial D1 ya tiene el turno completo (R2 URL + caption)
+      : userTextForAgent;
+
     const responseText = await processTelegramMessage(
       chatId,
-      userTextForAgent,
+      textParaAgente,
       botIdentity,
-      // Solo pasamos el prefijo de imagen al agente si hay texto adicional
-      // del usuario que acompañe la foto. El agente lo fusionará en un solo turno.
-      photos?.length && text ? imageContextPrefix : undefined,
+      // Cuando hay foto con texto y ya se guardó en D1, pasamos imageContextPrefix
+      // como contexto adicional para que Gemini sepa que hay una imagen disponible.
+      fotoGuardadaEnD1 ? imageContextPrefix : undefined,
     );
 
     if (responseText) {
       await sendTelegramMessage(chatId, botToken, responseText);
     }
   } catch (err: any) {
-    console.error('[Webhook] Error en processTelegramMessage:', err?.message);
+    const errMsg = err?.message || String(err);
+    console.error(`[Webhook] ❌ CRASH en processTelegramMessage — chat_id=${chatId}: ${errMsg}`);
+    console.error('[Webhook] Stack:', err?.stack || '(sin stack)');
     await sendTelegramMessage(
       chatId,
       botToken,
