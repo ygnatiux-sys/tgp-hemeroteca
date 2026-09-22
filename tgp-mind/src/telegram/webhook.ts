@@ -16,7 +16,7 @@ import { procesarFotoTelegramAR2 } from '../storage/r2.js';
 import { appendUserText, appendTurn, clearChatHistory } from '../storage/d1.js';
 import { processTelegramMessage, BotIdentity } from '../ia/agent.js';
 
-// ── Envío simple a Telegram ───────────────────────────────────────────────────
+// ── Envío simple a Telegram con Fallback de Seguridad ──────────────────────────
 async function sendTelegramMessage(
   chatId: number,
   token: string,
@@ -25,7 +25,7 @@ async function sendTelegramMessage(
 ): Promise<void> {
   const url = `https://api.telegram.org/bot${token}/sendMessage`;
   try {
-    await fetch(url, {
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -35,6 +35,22 @@ async function sendTelegramMessage(
         disable_web_page_preview: true,
       }),
     });
+    if (!res.ok) {
+      const errText = await res.text();
+      console.warn(`[Webhook Telegram Error ${res.status}]: ${errText}`);
+      // Fallback: Si Telegram rechaza por sintaxis de Markdown (400), reintentar como texto plano
+      if (parseMode) {
+        await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text,
+            disable_web_page_preview: true,
+          }),
+        });
+      }
+    }
   } catch (err) {
     console.error('[Webhook] Error enviando mensaje a Telegram:', err);
   }
