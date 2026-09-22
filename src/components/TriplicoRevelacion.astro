@@ -24,41 +24,68 @@ export interface TriplicoPost {
 interface Props {
   posts: TriplicoPost[];       // Acto I — últimos posts (idealmente 3)
   heroPost?: TriplicoPost;     // Acto II — colección destacada (imagen grande)
+  /** ID único para permitir múltiples instancias en la misma página sin colisión de DOM */
+  instanceId?: string;
+  /** Etiqueta editorial (eyebrow) */
+  label?: string;
+  /** Titular principal del encabezado */
+  headline?: string;
+  /** Texto del CTA secundario en Acto III */
+  ctaHref?: string;
+  ctaLabel?: string;
+  ctaSecondaryHref?: string;
+  ctaSecondaryLabel?: string;
 }
 
-const { posts = [], heroPost } = Astro.props;
+const {
+  posts = [],
+  heroPost,
+  instanceId = 'default',
+  label = 'Tríptico de Revelación',
+  headline = 'Lo Reciente. Lo Profundo. El Umbral.',
+  ctaHref = '/colecciones/',
+  ctaLabel = 'Ver Todas las Colecciones',
+  ctaSecondaryHref = '/archivo/',
+  ctaSecondaryLabel = 'Archivo Completo',
+} = Astro.props;
+
+const stageId    = `triptico-stage-${instanceId}`;
+const acto1Id    = `triptico-acto1-${instanceId}`;
+const acto2Id    = `triptico-acto2-${instanceId}`;
+const acto3Id    = `triptico-acto3-${instanceId}`;
+const dotsId     = `triptico-dots-${instanceId}`;
+const progressId = `triptico-progress-${instanceId}`;
 
 const hero = heroPost ?? posts[0] ?? null;
 const slicedPosts = posts.slice(0, 3);
 ---
 
 <section
-  id="triptico-revelacion"
-  class="triptico-root w-full max-w-350 mx-auto px-4 md:px-8 lg:px-12 py-16 md:py-24"
+  id={`triptico-revelacion-${instanceId}`}
+  class="triptico-root w-full max-w-360 mx-auto px-4 md:px-8 lg:px-12 py-16 md:py-24"
   aria-label="Tríptico de Revelación — Colecciones en Rotación"
 >
   <!-- Encabezado editorial -->
   <header class="mb-8 flex flex-col gap-1.5">
     <span class="font-mono text-[10px] uppercase tracking-[0.5em] text-rust-orange font-bold opacity-70">
-      Tríptico de Revelación
+      {label}
     </span>
     <h2 class="font-cinzel font-extrabold text-3xl md:text-4xl lg:text-5xl gradient-steel-titanium tracking-tight leading-[0.95]">
-      Lo Reciente. Lo Profundo. El Umbral.
+      {headline}
     </h2>
   </header>
 
   <!-- CONTENEDOR DE LOS TRES ACTOS -->
   <div
-    id="triptico-stage"
-    class="relative w-full overflow-hidden rounded-3xl border border-white/5"
-    style="height: 62vh; min-height: 480px;"
+    id={stageId}
+    class="relative w-full overflow-hidden rounded-2xl md:rounded-3xl border border-white/5 shadow-2xl min-h-[82vh] md:min-h-180 lg:min-h-205 bg-black"
   >
 
     <!-- ═══════════════════════════════ -->
     <!-- ACTO I — Novedades (Grid 3)    -->
     <!-- ═══════════════════════════════ -->
     <div
-      id="triptico-acto1"
+      id={acto1Id}
       class="triptico-acto absolute inset-0 grid grid-cols-1 sm:grid-cols-3"
       style="visibility: visible; opacity: 1;"
     >
@@ -108,7 +135,7 @@ const slicedPosts = posts.slice(0, 3);
     <!-- ACTO II — Bento Colección Hero     -->
     <!-- ═══════════════════════════════════ -->
     <div
-      id="triptico-acto2"
+      id={acto2Id}
       class="triptico-acto absolute inset-0"
       style="visibility: hidden; opacity: 0;"
     >
@@ -157,46 +184,39 @@ const slicedPosts = posts.slice(0, 3);
     <!-- ACTO III — Umbral CTA          -->
     <!-- ═══════════════════════════════ -->
     <div
-      id="triptico-acto3"
+      id={acto3Id}
       class="triptico-acto absolute inset-0 flex flex-col items-center justify-center gap-8 bg-[#060607]"
       style="visibility: hidden; opacity: 0;"
     >
       <!-- Ruido sutil de fondo -->
       <div class="absolute inset-0 opacity-[0.018]" style="background-image:url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC42NSIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbikiIG9wYWNpdHk9IjEiLz48L3N2Zz4=);"></div>
 
-      <div class="relative z-10 flex flex-col items-center gap-8 text-center px-8 max-w-2xl">
+      <div class="relative z-10 flex flex-col items-center gap-8 md:gap-10 text-center px-8 max-w-4xl">
         <!-- Eyebrow ornamental -->
-        <div class="flex items-center gap-4">
+        <div class="triptico-a3-anim flex items-center gap-4 opacity-0">
           <div class="w-12 h-px bg-rust-orange/30"></div>
-          <span class="font-mono text-[9px] uppercase tracking-[0.6em] text-rust-orange/60 font-bold">El Umbral</span>
+          <span class="font-mono text-[10px] uppercase tracking-[0.6em] text-rust-orange/80 font-bold">El Umbral</span>
           <div class="w-12 h-px bg-rust-orange/30"></div>
         </div>
 
         <!-- Headline -->
-        <h3 class="font-cinzel font-black text-white text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[0.9] tracking-tight">
-          Explorar<br />
-          <span class="gradient-steel-titanium">Colecciones</span>
+        <h3 class="triptico-a3-anim font-cinzel font-black text-white text-5xl md:text-7xl lg:text-[6rem] xl:text-[8rem] leading-[0.85] tracking-tight drop-shadow-[0_0_40px_rgba(255,255,255,0.15)] opacity-0">
+          {headline.split('.')[0]}<br />
+          <span class="gradient-steel-titanium drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">{headline.split('.').slice(1).join('.')}</span>
         </h3>
 
-        <p class="font-serif italic text-white/30 text-lg md:text-xl leading-relaxed">
+        <p class="triptico-a3-anim font-serif italic text-white/40 text-xl md:text-2xl leading-relaxed max-w-2xl mx-auto opacity-0">
           Ensayos cinemáticos, arqueosemiótica, arquetipos y dirección de arte.<br />
           <span class="text-white/20">Un archivo vivo de pensamiento visual.</span>
         </p>
 
-        <div class="flex flex-col sm:flex-row items-center gap-4 mt-2">
+        <div class="triptico-a3-anim flex items-center justify-center mt-4 opacity-0">
           <a
-            href="/colecciones/"
-            class="group/cta inline-flex items-center gap-3 px-8 py-4 rounded-full border border-white/15 bg-white/3 backdrop-blur-sm font-mono text-[10px] uppercase tracking-[0.4em] text-white/50 hover:border-rust-orange/50 hover:bg-rust-orange/8 hover:text-white transition-all duration-500"
+            href={ctaHref}
+            class="group/cta inline-flex items-center gap-4 px-10 py-5 bg-black/40 backdrop-blur-md border border-white/10 font-mono font-bold text-[14px] tracking-[0.3em] uppercase text-white/80 rounded-full transition-all duration-500 hover:border-rust-orange/60 hover:bg-rust-orange/10 hover:text-white hover:shadow-[0_0_40px_rgba(217,119,6,0.25)] active:scale-95"
           >
-            <span>Ver Todas las Colecciones</span>
-            <span class="group-hover/cta:translate-x-1 transition-transform duration-300">→</span>
-          </a>
-          <a
-            href="/archivo/"
-            class="group/arch inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.35em] text-white/25 hover:text-rust-orange transition-colors duration-400"
-          >
-            <span>Archivo Completo</span>
-            <span class="group-hover/arch:translate-x-0.5 transition-transform duration-300">↗</span>
+            <span>{ctaLabel}</span>
+            <span class="opacity-70 group-hover/cta:translate-x-1.5 transition-transform duration-300">▸</span>
           </a>
         </div>
       </div>
@@ -207,7 +227,7 @@ const slicedPosts = posts.slice(0, 3);
     </div>
 
     <!-- Dots de navegación -->
-    <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2.5" id="triptico-dots" role="tablist">
+    <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2.5" id={dotsId} role="tablist">
       {[1, 2, 3].map((n) => (
         <button
           type="button"
@@ -219,25 +239,25 @@ const slicedPosts = posts.slice(0, 3);
       ))}
     </div>
 
-    <!-- Barra de progreso -->
-    <div class="absolute bottom-0 left-0 z-40 h-0.5 bg-white/5 w-full" aria-hidden="true">
-      <div id="triptico-progress" class="h-full bg-rust-orange/60 w-0"></div>
+    <!-- Barra de progreso (oculta a petición, conservada para lógica de JS) -->
+    <div class="absolute bottom-0 left-0 z-40 h-0.5 w-full opacity-0 pointer-events-none" aria-hidden="true">
+      <div id={progressId} class="h-full w-0"></div>
     </div>
 
   </div>
 </section>
 
-<script>
+<script define:vars={{ stageId, acto1Id, acto2Id, acto3Id, dotsId, progressId }}>
   const initTriptico = () => {
-    const stage = document.getElementById('triptico-stage');
-    if (!stage || (stage as any).__triptico_init) return;
-    (stage as any).__triptico_init = true;
+    const stage = document.getElementById(stageId);
+    if (!stage || stage.__triptico_init) return;
+    stage.__triptico_init = true;
 
-    const acto1 = document.getElementById('triptico-acto1');
-    const acto2 = document.getElementById('triptico-acto2');
-    const acto3 = document.getElementById('triptico-acto3');
-    const progressBar = document.getElementById('triptico-progress');
-    const dots = Array.from(document.querySelectorAll<HTMLButtonElement>('#triptico-dots .triptico-dot'));
+    const acto1 = document.getElementById(acto1Id);
+    const acto2 = document.getElementById(acto2Id);
+    const acto3 = document.getElementById(acto3Id);
+    const progressBar = document.getElementById(progressId);
+    const dots = Array.from(document.querySelectorAll(`#${dotsId} .triptico-dot`));
 
     if (!acto1 || !acto2 || !acto3) return;
 
@@ -245,23 +265,23 @@ const slicedPosts = posts.slice(0, 3);
     const FADE = 1.2;
     const actos = [acto1, acto2, acto3];
     let currentActo = 0;
-    let loopTimeout: ReturnType<typeof setTimeout> | null = null;
-    let progressRaf: number | null = null;
+    let loopTimeout = null;
+    let progressRaf = null;
     let paused = false;
     let progressStart = 0;
-    let progressDuration = (STAY + FADE) * 1000;
+    const progressDuration = (STAY + FADE) * 1000;
 
-    const loadGSAP = (): Promise<any> => {
+    const loadGSAP = () => {
       return new Promise((resolve) => {
-        if ((window as any).gsap) { resolve((window as any).gsap); return; }
+        if (window.gsap) { resolve(window.gsap); return; }
         const s = document.createElement('script');
         s.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
-        s.onload = () => resolve((window as any).gsap);
+        s.onload = () => resolve(window.gsap);
         document.head.appendChild(s);
       });
     };
 
-    const updateDots = (idx: number) => {
+    const updateDots = (idx) => {
       dots.forEach((dot, i) => {
         const active = i === idx;
         dot.setAttribute('aria-selected', String(active));
@@ -279,7 +299,7 @@ const slicedPosts = posts.slice(0, 3);
       if (!progressBar) return;
       if (progressRaf) cancelAnimationFrame(progressRaf);
       progressStart = performance.now();
-      const tick = (now: number) => {
+      const tick = (now) => {
         if (paused) { progressRaf = requestAnimationFrame(tick); return; }
         const elapsed = now - progressStart;
         const pct = Math.min((elapsed / progressDuration) * 100, 100);
@@ -289,20 +309,35 @@ const slicedPosts = posts.slice(0, 3);
       progressRaf = requestAnimationFrame(tick);
     };
 
-    const crossfade = (gsap: any, nextIdx: number) => {
+    const crossfade = (gsap, nextIdx) => {
+      // Fade out current act
       gsap.to(actos[currentActo], { autoAlpha: 0, duration: FADE, ease: 'power2.inOut' });
-      gsap.to(actos[nextIdx],    { autoAlpha: 1, duration: FADE, ease: 'power2.inOut' });
+      
+      // If leaving Act 3, reset its inner animations
+      if (currentActo === 2) {
+        gsap.set(`#${acto3Id} .triptico-a3-anim`, { opacity: 0, y: 30, filter: "blur(12px)" });
+      }
+
+      // Fade in next act
+      gsap.to(actos[nextIdx], { autoAlpha: 1, duration: FADE, ease: 'power2.inOut' });
+
+      // If entering Act 3, trigger stagger animation
+      if (nextIdx === 2) {
+        gsap.fromTo(`#${acto3Id} .triptico-a3-anim`, 
+          { opacity: 0, y: 40, filter: "blur(16px)" },
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.4, stagger: 0.15, ease: 'power3.out', delay: FADE * 0.4 }
+        );
+      }
+
       currentActo = nextIdx;
       updateDots(currentActo);
       animateProgress();
     };
 
-    const scheduleNext = (gsap: any) => {
+    const scheduleNext = (gsap) => {
       if (loopTimeout) clearTimeout(loopTimeout);
       loopTimeout = setTimeout(() => {
-        if (!paused) {
-          crossfade(gsap, (currentActo + 1) % 3);
-        }
+        if (!paused) crossfade(gsap, (currentActo + 1) % 3);
         scheduleNext(gsap);
       }, (STAY + FADE) * 1000);
     };
@@ -311,7 +346,6 @@ const slicedPosts = posts.slice(0, 3);
     stage.addEventListener('mouseenter', () => { paused = true; });
     stage.addEventListener('mouseleave', () => {
       paused = false;
-      // Reanudar progreso desde donde quedó
       if (progressBar) {
         const elapsed = parseFloat(progressBar.style.width || '0') / 100 * progressDuration;
         progressStart = performance.now() - elapsed;

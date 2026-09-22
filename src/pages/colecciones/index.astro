@@ -12,6 +12,7 @@ import CoverflowCarousel, { type CoverflowPost } from '../../components/Coverflo
 import CollectionEpigraph from '../../components/CollectionEpigraph.astro';
 import VerticalCollectionsStack from '../../components/VerticalCollectionsStack.astro';
 import CinematicCollectionCardEngine from '../../components/CinematicCollectionCardEngine.astro';
+import TriplicoRevelacion, { type TriplicoPost } from '../../components/TriplicoRevelacion.astro';
 import {
   getPublishableEssays,
   groupByCategory,
@@ -75,6 +76,52 @@ const collections = Array.from(categoryGroups.entries())
 
 const indexCover = collections[0]?.coverEssay?.img ?? null;
 const indexCoverUrl = sanitizeImageUrl((indexCover as any)?.src ?? indexCover ?? '');
+
+/**
+ * Convierte los essays de una colección al formato TriplicoPost.
+ * Toma hasta 3, priorizando los que tienen imagen.
+ */
+const toTriplicoPosts = (col: typeof collections[number] | undefined): TriplicoPost[] => {
+  if (!col) return [];
+  return col.essays
+    .filter(e => e.img)
+    .slice(0, 3)
+    .map(e => {
+      const rawImg = e.img;
+      const imgUrl = sanitizeImageUrl(
+        typeof rawImg === 'object' && (rawImg as any)?.src
+          ? (rawImg as any).src
+          : typeof rawImg === 'string' ? rawImg : ''
+      );
+      return {
+        title:   e.entry.title ?? 'Sin título',
+        excerpt: (e.entry as any).excerpt ?? undefined,
+        img:     imgUrl,
+        href:    `/colecciones/${col.key}/`,
+        badge:   col.label,
+      };
+    });
+};
+
+const georefPosts: TriplicoPost[] = publishableGeorefs
+  .map(e => ({ ...e, img: resolveEssayImage(e.entry, e.slug) }))
+  .filter(e => e.img)
+  .slice(0, 3)
+  .map(e => {
+    const rawImg = e.img;
+    const imgUrl = sanitizeImageUrl(
+      typeof rawImg === 'object' && (rawImg as any)?.src
+        ? (rawImg as any).src
+        : typeof rawImg === 'string' ? rawImg : ''
+    );
+    return {
+      title: e.entry.title ?? 'Sin título',
+      excerpt: (e.entry as any).excerpt ?? undefined,
+      img: imgUrl,
+      href: `/colecciones/arqueosemiotica/${e.slug}`,
+      badge: 'Georreferencias',
+    };
+  });
 // ─── COLECCIONES PARA SPOTLIGHT MEDIA TRAY (NORMALIZADO A HEREDADOS DE LA PÁGINA) ───
 const coleccionesTrayItems: TrayCollectionItem[] = collections
   .filter(col => col.coverEssay?.img)
@@ -178,20 +225,18 @@ const epigraphMap: Record<string, string> = {
 
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16 pt-8 md:pt-12">
 
-      {/* BANNER DESTACADO: SITIOS GEOHISTÓRICOS & ARQUEOSEMIÓTICA (Hero Card Cinemática con Modo Abajo 75/25) */}
+      {/* BANNER DESTACADO: SITIOS GEOHISTÓRICOS & ARQUEOSEMIÓTICA */}
       <section class="reveal-brote w-full">
-        <CinematicCollectionCardEngine
-          collectionKey="arqueosemiotica"
-          label="Sitios Geohistóricos & Arqueohistóricos"
-          badge="Colección Especializada · Georreferencias"
-          count={publishableGeorefs.length}
-          coverImage={georefCoverEssay?.img}
-          coverTitle="Aramu Muru · Tikal · Bonampak · Cartago · Qapaq Ñan · Yonaguni"
-          link="/colecciones/arqueosemiotica/"
-          index={0}
-          mode="bottom"
-          ctaLabel="Explorar Cartografía"
-        />
+        {georefPosts.length > 0 && (
+          <TriplicoRevelacion
+            instanceId="arqueosemiotica"
+            posts={georefPosts}
+            label="Colección Especializada · Georreferencias"
+            headline="Sitios Geohistóricos & Arqueohistóricos"
+            ctaHref="/colecciones/arqueosemiotica/"
+            ctaLabel="Explorar Cartografía"
+          />
+        )}
       </section>
 
       {/* ─── EPIGRAFE CINEMATICO: entre Sitios Geohistóricos y las Colecciones Temáticas ─── */}
@@ -205,6 +250,7 @@ const epigraphMap: Record<string, string> = {
       <section class="flex flex-col gap-12 sm:gap-16 md:gap-24 w-full">
         {collections.slice(0, 3).map((col, index) => {
           const epigraphText = epigraphMap[col.key] || `**${col.label}:** una [[colección]] de registros del pensamiento humano en expansión.`;
+          const colPosts = toTriplicoPosts(col);
 
           return (
             <div class="flex flex-col w-full gap-8 md:gap-12">
@@ -213,16 +259,16 @@ const epigraphMap: Record<string, string> = {
                 <CollectionEpigraph text={epigraphText} />
               )}
 
-              <CinematicCollectionCardEngine
-                collectionKey={col.key}
-                label={col.label}
-                count={col.count}
-                coverImage={col.coverEssay?.img}
-                coverTitle={col.coverEssay?.entry?.title}
-                link={`/colecciones/${col.key}/`}
-                index={index + 1}
-                mode={(col.key === 'arqueosemiotica' || col.key.includes('historia') || col.key.includes('cinematic')) ? 'bottom' : 'bottom-right'}
-              />
+              {colPosts.length > 0 && (
+                <TriplicoRevelacion
+                  instanceId={`col-${col.key}`}
+                  posts={colPosts}
+                  label={col.label}
+                  headline={`${col.label}. En Profundidad.`}
+                  ctaHref={`/colecciones/${col.key}/`}
+                  ctaLabel={`Explorar ${col.label}`}
+                />
+              )}
             </div>
           );
         })}
