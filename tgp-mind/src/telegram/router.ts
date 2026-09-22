@@ -723,7 +723,6 @@ telegramRouter.post('/webhook/telegram-social', async (c) => {
       botContext: 'social',
     });
 
-
     if (decision.type === 'micro_prompt') {
       await sendTelegramSocial(chatId, decision.text);
       return c.json({ ok: true });
@@ -734,54 +733,95 @@ telegramRouter.post('/webhook/telegram-social', async (c) => {
       return c.json({ ok: true });
     }
 
-    // Publicación Directa en Zernio
+    // Guardar en D1 y mostrar Ficha de Confirmación antes de publicar en Zernio
     const params = decision.params;
-    const red = params.red || 'facebook';
-    const modelo = params.modelo || 'flash';
-    const modelName = modelo === 'pro' ? 'gemini-3.1-pro-preview' : 'gemini-3.8-flash';
+    params.photoUrl = params.photoUrl || imagenR2Url || '';
+    await setHITLState(chatId, params as any, 'social');
 
-    await sendTelegramSocial(chatId, `⏳ Redactando y publicando en ${red === 'facebook' ? 'Facebook 🔵' : 'TikTok ⚫'}...`);
+    const redLabel = (params.red || 'facebook') === 'tiktok' ? 'TikTok ⚫' : 'Facebook 🔵';
+    const socialFichaText = `📋 *Ficha de Publicación TGP Redes:*\n• 📌 *Tema:* ${params.tema}\n• 📡 *Red:* ${redLabel}\n• 🧠 *Motor:* ${params.modelo === 'pro' ? 'Pro' : 'Flash'}${params.photoUrl ? '\n• 🖼 Imagen adjunta' : ''}\n\n¿Publicamos?`;
+    await fetch(`${cfg.telegramSocialApi}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: socialFichaText,
+        parse_mode: 'Markdown',
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '✅ Confirmar y Publicar', callback_data: 'social_action:confirm' }],
+            [{ text: '❌ Cancelar', callback_data: 'social_action:cancel' }],
+          ],
+        },
+      }),
+    });
+    return c.json({ ok: true });
+  }
 
-    try {
-      const userPrompt = `Genera un texto magnético y reflexivo para redes sociales sobre: ${params.tema}. Estilo directo, sobrio y atrapante. Máximo 2 párrafos cortos y 3 hashtags.`;
-      const SOCIAL_PROMPT = 'Eres un redactor cultural y turístico experto. Crea descripciones grounded basadas en hechos. Tono: Informativo, directo y claro.';
-      const textoGenerado = await callGemini(`social-${chatId}`, userPrompt, modelName, SOCIAL_PROMPT);
+  // ── Callback Queries del Social Bot (D1 HITL) ────────────────────────────────
+  const callbackQuery = body?.callback_query;
+  if (callbackQuery) {
+    const chatId: number = callbackQuery?.message?.chat?.id;
+    const callbackId: string = callbackQuery?.id ?? '';
+    const data: string = callbackQuery?.data ?? '';
 
-      let urlR2 = params.photoUrl || '';
-      if (!urlR2 && params.fuenteImg !== 'none') {
-        urlR2 = (await procesarImagen(params.tema)) || (red === 'tiktok' ? cfg.fallbackImageUrl : '');
+    // Responder el callback query para quitar el spinner del botón
+    await fetch(`${cfg.telegramSocialApi}/answerCallbackQuery`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ callback_query_id: callbackId }),
+    });
+
+    if (chatId && data.startsWith('social_action:')) {
+      if (data === 'social_action:confirm') {
+        const state = await getHITLState(chatId, 'social');
+        if (!state) {
+          await sendTelegramSocial(chatId, '⚠️ No hay sesión activa. Escribí un nuevo tema.');
+          return c.json({ ok: true });
+        }
+        await clearHITLState(chatId, 'social');
+        const params = state as any;
+        const red = params.red || 'facebook';
+        const modelo = params.modelo || 'flash';
+        const modelName = modelo === 'pro' ? 'gemini-3.1-pro-preview' : 'gemini-3.8-flash';
+
+        await sendTelegramSocial(chatId, `⏳ Redactando y publicando en ${red === 'facebook' ? 'Facebook 🔵' : 'TikTok ⚫'}...`);
+        try {
+          const userPrompt = `Genera un texto magnético y reflexivo para redes sociales sobre: ${params.tema}. Estilo directo, sobrio y atrapante. Máximo 2 párrafos cortos y 3 hashtags.`;
+          const SOCIAL_PROMPT = 'Eres un redactor cultural y turístico experto. Crea descripciones grounded basadas en hechos. Tono: Informativo, directo y claro.';
+          const textoGenerado = await callGemini(`social-${chatId}`, userPrompt, modelName, SOCIAL_PROMPT);
+
+          let urlR2 = params.photoUrl || '';
+          if (!urlR2 && params.fuenteImg !== 'none') {
+            urlR2 = (await procesarImagen(params.tema)) || (red === 'tiktok' ? cfg.fallbackImageUrl : '');
+          }
+          if (urlR2) { try { urlR2 = await estandarizarYSubirImagenAR2(urlR2, 'social'); } catch {} }
+
+          await registrarResguardoD1({
+            origen: 'telegram-social',
+            destino: 'social',
+            tema: params.tema,
+            textoGenerado,
+            metadatos: { red, modelo },
+            imagenR2Url: urlR2,
+            chatId,
+          });
+
+          const resZernio = await publicarEnZernio({ redes: red, texto: textoGenerado, urlImagen: urlR2 || undefined });
+          const urlLine = resZernio.postUrl
+            ? `\n\n🔗 Enlace: ${resZernio.postUrl}`
+            : (resZernio.postId && resZernio.postId !== 'N/A' ? `\n\n⚙️ Zernio Dashboard: https://app.zernio.com/posts/${resZernio.postId}` : '');
+          const imgLine = urlR2 ? `\n🖼 Imagen: ${urlR2}` : '';
+          await sendTelegramSocial(chatId, `✅ Publicación enviada con éxito.\n\n${textoGenerado}${urlLine}${imgLine}`);
+        } catch (err: any) {
+          console.error('[Social D1 HITL Error]:', err);
+          await sendTelegramSocial(chatId, `⚠️ Error al publicar: ${err?.message || 'Fallo'}`);
+        }
+      } else if (data === 'social_action:cancel') {
+        await clearHITLState(chatId, 'social');
+        await sendTelegramSocial(chatId, '🔴 Publicación cancelada. Escribí un nuevo tema.');
       }
-      if (urlR2) {
-        try { urlR2 = await estandarizarYSubirImagenAR2(urlR2, 'social'); } catch {}
-      }
-
-      // Resguardo Documental Previo en Cloudflare D1
-      await registrarResguardoD1({
-        origen: 'telegram-social',
-        destino: 'social',
-        tema: params.tema,
-        textoGenerado,
-        metadatos: { red, modelo: params.modelo },
-        imagenR2Url: urlR2,
-        chatId,
-      });
-
-      const resZernio = await publicarEnZernio({
-        redes: red,
-        texto: textoGenerado,
-        urlImagen: urlR2 || undefined,
-      });
-
-      const urlLine = resZernio.postUrl 
-        ? `\n\n🔗 Enlace: ${resZernio.postUrl}` 
-        : (resZernio.postId && resZernio.postId !== 'N/A' ? `\n\n⚙️ Zernio Dashboard: https://app.zernio.com/posts/${resZernio.postId}` : '');
-      const imgLine = urlR2 ? `\n🖼 Imagen: ${urlR2}` : '';
-      await sendTelegramSocial(chatId, `✅ Publicación enviada con éxito.\n\n${textoGenerado}${urlLine}${imgLine}`);
-    } catch (err: any) {
-      console.error('[Social Router Error]:', err);
-      await sendTelegramSocial(chatId, `⚠️ Error al publicar: ${err?.message || 'Fallo'}`);
     }
-
     return c.json({ ok: true });
   }
 

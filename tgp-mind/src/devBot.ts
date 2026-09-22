@@ -1,13 +1,18 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// TGP MIND — Dev Bot Handler (Entorno Aislado de Pruebas)
+// TGP MIND — Dev Bot Handler (Entorno Aislado de Pruebas / Liminal)
 // Bot Name: @UXliminal_bot
 // Endpoint Webhook: POST /webhook-dev
 // Totalmente desacoplado de la lógica y tokens del bot de producción.
+// D1 HITL activo: botContext 'liminal' → claves "chatId:liminal" en D1.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { Hono } from 'hono';
 import { routeIncomingMessage } from './ia/semantic-router.js';
-import { ejecutarDecisionAssistant } from './telegram/router.js';
+import {
+  ejecutarDecisionAssistant,
+  ejecutarEnsayoAssistantDesdeD1,
+} from './telegram/router.js';
+import { getHITLState, clearHITLState } from './storage/d1.js';
 
 export const devBotApp = new Hono();
 
@@ -24,7 +29,7 @@ const getDevBotName = () =>
 
 const getTelegramDevApiUrl = () => `https://api.telegram.org/bot${getDevToken()}`;
 
-// ── Helper aislado para comunicación con Telegram API ──────────────────────────
+// ── Helper aislado para comunicación con Telegram API ────────────────────────
 async function sendDevTelegramMessage(chatId: number | string, text: string, options: Record<string, any> = {}): Promise<any> {
   const token = getDevToken();
   if (!token) {
@@ -55,7 +60,7 @@ async function sendDevTelegramMessage(chatId: number | string, text: string, opt
   }
 }
 
-// ── GET /status — Healthcheck exclusivo de DevBot ─────────────────────────────
+// ── GET /status — Healthcheck exclusivo de DevBot ────────────────────────────
 devBotApp.get('/status', (c) => {
   const token = getDevToken();
   const maskedToken = token ? `${token.slice(0, 8)}...${token.slice(-6)}` : 'NO_CONFIGURADO';
@@ -65,11 +70,12 @@ devBotApp.get('/status', (c) => {
     status: 'online',
     masked_token: maskedToken,
     webhook_endpoint: '/webhook-dev',
+    hitl_d1_context: 'liminal',
     timestamp: new Date().toISOString(),
   });
 });
 
-// ── POST / — Webhook Handler principal para Telegram Dev ───────────────────────
+// ── POST / — Webhook Handler principal para Telegram Dev (Liminal) ────────────
 devBotApp.post('/', async (c) => {
   let body: any;
   try {
@@ -80,6 +86,47 @@ devBotApp.post('/', async (c) => {
 
   console.log(`[DevBot @${getDevBotName()}] Webhook update recibido:`, JSON.stringify(body).slice(0, 200));
 
+  // ── Callback Queries (D1 HITL para Liminal) ───────────────────────────────
+  const callbackQuery = body?.callback_query;
+  if (callbackQuery) {
+    const chatId = callbackQuery.message?.chat?.id;
+    const callbackId = callbackQuery.id;
+    const data = callbackQuery.data || '';
+    const apiOverride = getTelegramDevApiUrl();
+
+    // Responder callback para quitar el spinner del botón
+    await fetch(`${apiOverride}/answerCallbackQuery`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ callback_query_id: callbackId }),
+    });
+
+    if (chatId) {
+      // ── liminal_action: interceptado antes del fallback ───────────────────
+      if (data.startsWith('liminal_action:')) {
+        if (data === 'liminal_action:confirm') {
+          await sendDevTelegramMessage(chatId, '⚡ Confirmado. Iniciando redacción (Liminal)...');
+          await ejecutarEnsayoAssistantDesdeD1(chatId, apiOverride, 'liminal');
+        } else if (data === 'liminal_action:cancel') {
+          await clearHITLState(chatId, 'liminal');
+          await sendDevTelegramMessage(chatId, '🛑 Publicación cancelada. Escribí un nuevo tema.');
+        }
+        return c.json({ ok: true });
+      }
+
+      // Fallback: otros callbacks pasan por el semantic router (photo_action, etc.)
+      const decision = await routeIncomingMessage({
+        chatId,
+        text: data,
+        hasPhoto: false,
+        botContext: 'hemeroteca',
+      });
+      await ejecutarDecisionAssistant(chatId, decision, apiOverride, 'liminal');
+    }
+    return c.json({ ok: true });
+  }
+
+  // ── Mensajes de texto ────────────────────────────────────────────────────
   const message = body?.message;
   if (message) {
     const chatId = message.chat?.id;
@@ -92,14 +139,15 @@ devBotApp.post('/', async (c) => {
     if (text.trim().startsWith('/start')) {
       await sendDevTelegramMessage(
         chatId,
-        `🧪 *¡Hola, ${senderName}!* Bienvenido al entorno aislado de *@${getDevBotName()}*.\n\n` +
+        `🧪 *¡Hola, ${senderName}!* Bienvenido al entorno aislado de *@${getDevBotName()}* (Liminal).\n\n` +
           `Este bot opera en un canal de desarrollo independiente sin alterar la producción.\n\n` +
-          `📌 *Comandos de prueba disponibles:*\n` +
-          `• \`/start\` — Muestra este mensaje informativo\n` +
-          `• \`/ping\` — Prueba de latencia y estado de API Dev\n` +
-          `• \`/status\` — Muestra el estado del entorno de desarrollo\n` +
-          `• \`/echo <texto>\` — Repite un mensaje de prueba\n\n` +
-          `💬 Enviar cualquier otro texto ejecutará un análisis de prueba aislado.`
+          `📌 *Comandos disponibles:*\n` +
+          `• \`/start\` — Muestra este mensaje\n` +
+          `• \`/ping\` — Prueba de latencia\n` +
+          `• \`/status\` — Estado del entorno\n` +
+          `• \`/nuevo\` — Reinicia la sesión y limpia el estado D1\n` +
+          `• \`/echo <texto>\` — Repite un mensaje\n\n` +
+          `💬 Cualquier texto ejecutará el flujo HITL de Hemeroteca en modo Liminal.`
       );
       return c.json({ ok: true });
     }
@@ -107,7 +155,7 @@ devBotApp.post('/', async (c) => {
     // Comando /ping
     if (text.trim().startsWith('/ping')) {
       const now = new Date().toISOString();
-      await sendDevTelegramMessage(chatId, `⚡ *Pong!* Bot de desarrollo en línea.\n📅 \`${now}\``);
+      await sendDevTelegramMessage(chatId, `⚡ *Pong!* Liminal en línea.\n📅 \`${now}\``);
       return c.json({ ok: true });
     }
 
@@ -115,14 +163,24 @@ devBotApp.post('/', async (c) => {
     if (text.trim().startsWith('/status')) {
       const token = getDevToken();
       const masked = token ? `${token.slice(0, 10)}...${token.slice(-5)}` : 'Sin token';
+      const state = await getHITLState(chatId, 'liminal');
       await sendDevTelegramMessage(
         chatId,
         `🛠️ *Estado del Bot Dev (@${getDevBotName()}):*\n\n` +
           `• *Entorno:* Isolation / Dev\n` +
           `• *Bot Name:* \`${getDevBotName()}\`\n` +
           `• *Token Activo:* \`${masked}\`\n` +
+          `• *D1 Context:* liminal\n` +
+          `• *Sesión D1 activa:* ${state ? `✅ Tema: "${state.tema}"` : '❌ Sin sesión'}\n` +
           `• *Status:* Operativo 🚀`
       );
+      return c.json({ ok: true });
+    }
+
+    // Comando /nuevo — limpia historial Gemini y estado D1 de Liminal
+    if (text.trim() === '/nuevo') {
+      await clearHITLState(chatId, 'liminal');
+      await sendDevTelegramMessage(chatId, '✅ Sesión Liminal reiniciada. Comenzamos de cero. Escribí un nuevo tema.');
       return c.json({ ok: true });
     }
 
@@ -133,39 +191,19 @@ devBotApp.post('/', async (c) => {
       return c.json({ ok: true });
     }
 
-    // Redacción HITL con Semantic Router (Igual que Assistant)
+    // Redacción HITL con Semantic Router → D1 HITL Liminal
     if (text.trim() || message.photo) {
       const decision = await routeIncomingMessage({
         chatId,
         text,
         hasPhoto: !!message.photo,
-        photoUrl: undefined, // En DevBot aislado no procesamos la foto hacia R2 antes del router, simplificado
+        photoUrl: undefined,
         botContext: 'hemeroteca',
       });
       const apiOverride = getTelegramDevApiUrl();
-      await ejecutarDecisionAssistant(chatId, decision, apiOverride);
+      await ejecutarDecisionAssistant(chatId, decision, apiOverride, 'liminal');
       return c.json({ ok: true });
     }
-  }
-
-  // Soporte para Callback Queries aislados
-  const callbackQuery = body?.callback_query;
-  if (callbackQuery) {
-    const chatId = callbackQuery.message?.chat?.id;
-    const data = callbackQuery.data;
-
-    if (chatId && data) {
-      // Simular text input con el dato del callback para avanzar el HITL
-      const decision = await routeIncomingMessage({
-        chatId,
-        text: data,
-        hasPhoto: false,
-        botContext: 'hemeroteca',
-      });
-      const apiOverride = getTelegramDevApiUrl();
-      await ejecutarDecisionAssistant(chatId, decision, apiOverride);
-    }
-    return c.json({ ok: true });
   }
 
   return c.json({ ok: true });
