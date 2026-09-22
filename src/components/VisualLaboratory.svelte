@@ -377,7 +377,6 @@
     <!-- Galería Wikimedia Commons Integrada Inline en el Scroll -->
     <WikimediaGalleryInbox bind:isOpen={isWikiInboxOpen} onSelect={handleWikiSelect} />
 
-  </div>
 </div>
 
 <style>
