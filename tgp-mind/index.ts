@@ -280,9 +280,156 @@ app.post('/api/mind', async (c) => {
   return c.json({ response: responseText, model, sessionId });
 });
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
-// RUTA: /process-image -- TransformaciÃƒÂ³n Estructural & Deriva EstÃƒÂ©tica (Laboratorio Visual)
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// ── RUTA: /api/bot/generate -- Puesto de Mando (Scriptorium) & Telegram Mini App ──
+app.post('/api/bot/generate', async (c) => {
+  const apiKey = c.req.header('x-api-key') || (c.req.header('Authorization') ?? '').replace('Bearer ', '').trim();
+  const isMiniAppHeader = c.req.header('X-Mini-App') === 'true' || c.req.header('x-mini-app') === 'true';
+  const origin = c.req.header('Origin') ?? '';
+
+  if (origin && !isAllowedOrigin(origin) && !isMiniAppHeader) {
+    return c.json({ error: 'Origen no permitido.' }, 403);
+  }
+
+  if (TGP_MIND_API_KEY && apiKey && apiKey !== TGP_MIND_API_KEY && !isMiniAppHeader) {
+    return c.json({ error: 'No autorizado: API Key inválida.' }, 401);
+  }
+
+  let body: any;
+  try { body = await c.req.json(); } catch { return c.json({ error: 'JSON inválido.' }, 400); }
+
+  const {
+    initData,
+    tema,
+    red = 'facebook',
+    modelo = 'flash',
+    densidad = 'profundo_breve',
+    modoLibrePrompt = '',
+    imagen = 'wikimedia',
+    destino = 'ensayosCinematicos',
+    photoUrl = '',
+    bot = 'omni',
+    formato = 'tgp',
+  } = body;
+
+  if (!tema || typeof tema !== 'string' || !tema.trim()) {
+    return c.json({ error: 'El campo "tema" es obligatorio.' }, 400);
+  }
+
+  let botToken = TELEGRAM_TOKEN;
+  if (bot === 'assistant') botToken = TELEGRAM_TGP_CLOUD_TOKEN || TELEGRAM_TOKEN;
+  else if (bot === 'redes') botToken = TELEGRAM_SOCIAL_TOKEN || TELEGRAM_TOKEN;
+  else if (bot === 'liminal') botToken = TELEGRAM_DEV_TOKEN || TELEGRAM_TOKEN;
+
+  let chatId: number = XAVIER_CHAT_ID;
+  if (initData) {
+    try {
+      const params = new URLSearchParams(initData);
+      const userStr = params.get('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        if (user.id) chatId = user.id;
+      }
+    } catch {}
+  }
+
+  try {
+    const modelName = modelo === 'pro' ? 'gemini-2.5-pro' : 'gemini-3.8-flash';
+    const modLabel = modelo === 'pro' ? 'Gemini Pro' : 'Gemini Flash';
+    const redLabel = red === 'facebook' ? 'Facebook' : 'TikTok';
+
+    const isHemeroteca = destino !== 'social' && destino !== 'facebook' && destino !== 'tiktok';
+    const targetLabel = isHemeroteca ? `Hemeroteca (${destino})` : redLabel;
+
+    if (botToken && chatId) {
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: `⏳ Generando para ${targetLabel} con ${modLabel}...` }),
+      }).catch(() => {});
+    }
+
+    const directivaDensidad = buildDensityInstruction(densidad, densidad === 'premium');
+    const modoLibre = modoLibrePrompt?.trim()
+      ? `\n\nDIRECTIVA PERSONALIZADA DEL AUTOR (MODO LIBRE):\n${modoLibrePrompt.trim()}`
+      : '';
+
+    let textoGenerado = '';
+    if (isHemeroteca) {
+      const userPrompt = `Escribe un ensayo reflexivo, denso y profundo para Hemeroteca TGP sobre: "${tema.trim()}". Estilo ensayo argentino contemporáneo. ${directivaDensidad}${modoLibre}`;
+      textoGenerado = await callGemini(`desk-${chatId}`, userPrompt, modelName, TGP_SYSTEM_PROMPT, 8192);
+    } else {
+      const userPrompt = `Genera un texto magnético y reflexivo para redes sociales (${red}) sobre: ${tema.trim()}. ${directivaDensidad}${modoLibre}`;
+      const SOCIAL_PROMPT = 'Eres un redactor cultural y turístico experto. Crea descripciones grounded basadas en hechos. Tono: Informativo, directo y claro.';
+      textoGenerado = await callGemini(`desk-${chatId}`, userPrompt, modelName, SOCIAL_PROMPT, 8192);
+    }
+
+    let imagenUrl = photoUrl || '';
+    if (!imagenUrl && imagen === 'wikimedia') {
+      try {
+        const entidad = await resolverEntidadCanonica(tema);
+        imagenUrl = (await buscarPageImageWikipedia(entidad.wikiEn, 'en')) || (await buscarPageImageWikipedia(entidad.wikiEs, 'es')) || '';
+      } catch (errWiki) {
+        console.warn('[bot/generate] Error buscando imagen Wikipedia:', errWiki);
+      }
+    }
+
+    if (imagenUrl && (imagenUrl.startsWith('http://') || imagenUrl.startsWith('https://')) && !imagenUrl.includes('thegreatpuzzleproject.com')) {
+      try {
+        imagenUrl = await estandarizarYSubirImagenAR2(imagenUrl, 'miniapp');
+      } catch (errImg: any) {
+        console.warn('[bot/generate] Falló estandarización WebP R2, usando URL original:', errImg?.message);
+      }
+    }
+
+    try {
+      await registrarResguardoD1({
+        id: crypto.randomUUID(),
+        origen: isMiniAppHeader ? 'miniapp-svelte' : 'scriptorium-desk',
+        destino,
+        tema: tema.trim(),
+        textoGenerado,
+        metadatos: { bot, red, modelo, densidad, imagen, formato, isMiniAppHeader },
+        imagenR2Url: imagenUrl,
+        chatId,
+      });
+    } catch (d1Err: any) {
+      console.warn('[bot/generate] Error registrando en D1:', d1Err?.message);
+    }
+
+    if (botToken && chatId) {
+      const headerText = isHemeroteca
+        ? `📚 Hemeroteca TGP (${modLabel}):\n\n${textoGenerado}`
+        : `${redLabel} via TGP Mind (${modLabel}):\n\n${textoGenerado}`;
+
+      if (imagenUrl) {
+        fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            photo: imagenUrl,
+            caption: headerText.slice(0, 1024),
+          }),
+        }).catch(() => {});
+      } else {
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text: headerText.slice(0, 4000) }),
+        }).catch(() => {});
+      }
+    }
+
+    return c.json({ ok: true, texto: textoGenerado, response: textoGenerado, imagenUrl });
+  } catch (err: any) {
+    console.error('[bot/generate Error]:', err);
+    return c.json({ error: err?.message || 'Error interno al generar' }, 500);
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RUTA: /process-image -- Transformación Estructural & Deriva Estética (Laboratorio Visual)
+// ─────────────────────────────────────────────────────────────────────────────
 app.post('/process-image', async (c) => {
   try {
     const formData = await c.req.parseBody();
