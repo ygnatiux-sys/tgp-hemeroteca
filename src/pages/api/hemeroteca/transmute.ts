@@ -106,27 +106,112 @@ export const POST: APIRoute = async ({ request }) => {
     const entryDir = path.join(cwd, 'src', 'content', folderName, slug);
     await fs.mkdir(entryDir, { recursive: true });
 
-    // 1. index.json: Metadatos para Keystatic y Astro Content Layer
-    const metadata = {
-      title: `Captura ${pillLabel} — ${imageName || slug}`,
-      slug,
-      date: dateStr,
-      category: 'Historia',
-      themeColor: 'british-green',
-      draft: false,
-      generador: response,
-      generadorTexto: response,
-      dek: `Captura multimodal (${pillLabel}): ${prompt.slice(0, 100)}...`,
-      excerpt: prompt,
-      imageSource: imageSource || 'local',
-      imageUrl: r2Url || undefined,
-      d1Id: d1Id || undefined,
-      capturedAt: date.toISOString(),
-    };
-    await fs.writeFile(path.join(entryDir, 'index.json'), JSON.stringify(metadata, null, 2), 'utf-8');
+    // 1. Crear Metadatos y Estructura de Archivos según la colección destino
+    const commonTitle = `Captura ${pillLabel} — ${imageName || slug}`;
+    
+    if (targetCollection === 'informesPremium') {
+      // Keystatic usa format: { contentField: 'contenido' } con path 'src/content/informes/*/'
+      // Esto significa que genera un archivo index.mdoc con frontmatter (YAML)
+      const yaml = `---
+titulo: "${commonTitle.replace(/"/g, '\\"')}"
+coleccion: liminal
+fuenteVisual: wikimedia
+volanta: "Captura ${pillLabel}"${r2Url ? `\nimagenDestacada: "${r2Url}"` : ''}
+---
 
-    // 2. content.mdoc: Cuerpo Markdoc para el editor de Keystatic y el renderizador de la web
-    await fs.writeFile(path.join(entryDir, 'content.mdoc'), response, 'utf-8');
+${response}`;
+      await fs.writeFile(path.join(entryDir, 'index.mdoc'), yaml, 'utf-8');
+
+    } else if (targetCollection === 'direccionDeArte') {
+      // Keystatic usa format: { data: 'json' } con path 'src/content/estilos-visuales/*'
+      // Esto significa un único archivo JSON, NO un directorio.
+      // Borramos el dir que creamos y guardamos un .json
+      await fs.rm(entryDir, { recursive: true, force: true }).catch(() => {});
+      const jsonPath = path.join(cwd, 'src', 'content', folderName, `${slug}.json`);
+      const metadata = {
+        nombre: commonTitle,
+        constructorEstilo: {
+           conceptoBase: prompt,
+           sujetoIA: pillLabel,
+           lineaEditorial: 'archivo-museo',
+           usarManuales: false,
+           overrideCamara: '',
+           overrideIluminacion: '',
+           overrideColor: '',
+           imagenBase64: r2Url || ''
+        }
+      };
+      await fs.writeFile(jsonPath, JSON.stringify(metadata, null, 2), 'utf-8');
+
+    } else {
+      // Colecciones estándar con format: { data: 'json' } y path '.../*/'
+      // Requieren index.json y content.mdoc (porque tienen content: fields.document)
+      let metadata: any = {};
+      
+      if (targetCollection === 'ensayosCinematicos') {
+        metadata = {
+          title: commonTitle,
+          date: dateStr,
+          generadorTexto: JSON.stringify({ text: response, image: r2Url || '' }),
+          atmosfera: { discriminant: 'obsidiana' },
+          excerpt: prompt,
+          dek: `Captura multimodal (${pillLabel}): ${prompt.slice(0, 100)}...`,
+        };
+        if (r2Url) metadata.coverImage = r2Url;
+      } else if (targetCollection === 'ensayos') {
+        metadata = {
+          title: commonTitle,
+          date: dateStr,
+          volanta: `Captura ${pillLabel}`,
+          generador: 'Scriptorium Visor',
+          generadorTexto: JSON.stringify({ text: response, image: r2Url || '' }),
+          category: 'Historia',
+          themeColor: 'british-green',
+          sitioGeohistorico: '',
+          publicarConImagen: !!r2Url,
+          draft: false,
+          isCinematic: false,
+          excerpt: prompt,
+          dek: `Captura multimodal (${pillLabel}): ${prompt.slice(0, 100)}...`,
+        };
+        if (r2Url) metadata.coverImage = r2Url;
+      } else if (targetCollection === 'arquetiposGlobales') {
+        metadata = {
+          title: commonTitle,
+          date: dateStr,
+          volanta: `Captura ${pillLabel}`,
+          generador: 'Scriptorium Visor',
+          generadorTexto: JSON.stringify({ text: response, image: r2Url || '' }),
+          category: 'Arquetipos Globales',
+          themeColor: 'rust-orange',
+          sitioGeohistorico: '',
+          publicarConImagen: !!r2Url,
+          draft: false,
+          isCinematic: false,
+          excerpt: prompt,
+          dek: `Captura multimodal (${pillLabel}): ${prompt.slice(0, 100)}...`,
+        };
+        if (r2Url) metadata.coverImage = r2Url;
+      } else if (targetCollection === 'georreferencias') {
+        metadata = {
+          title: commonTitle,
+          date: dateStr,
+          generadorGeoref: response,
+          sitioGeohistorico: '',
+          volantaHook: '',
+          saberMasDato: '',
+          category: 'Arqueosemiótica',
+          publicarConImagen: !!r2Url,
+          draft: false,
+          excerpt: prompt,
+          dek: `Captura multimodal (${pillLabel}): ${prompt.slice(0, 100)}...`,
+        };
+        if (r2Url) metadata.coverImage = r2Url;
+      }
+
+      await fs.writeFile(path.join(entryDir, 'index.json'), JSON.stringify(metadata, null, 2), 'utf-8');
+      await fs.writeFile(path.join(entryDir, 'content.mdoc'), response, 'utf-8');
+    }
 
     return new Response(
       JSON.stringify({
