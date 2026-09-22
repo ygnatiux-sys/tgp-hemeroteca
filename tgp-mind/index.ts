@@ -40,9 +40,9 @@ import {
   setHITLState,
   clearHITLState,
   registrarResguardoD1,
-} from './src/storage/d1.js';
+} from './src/storage/d1.ts';
 // -- Vision: Wikimedia Anti-Drift (ver src/vision/wikimedia.ts) ------------------
-import { procesarImagen, resolverEntidadCanonica, buscarPageImageWikipedia } from './src/vision/wikimedia.js';
+import { procesarImagen, resolverEntidadCanonica, buscarPageImageWikipedia } from './src/vision/wikimedia.ts';
 // -- Servicios: Publicacion GitOps (ver src/servicios/publicacion.ts) -------------
 import {
   initPublicacion,
