@@ -35,10 +35,9 @@ Cuando se te solicite explícitamente el 'Modo TGP', estructura tu respuesta as�
 
 Si no se solicita el Modo TGP, responde en tu tono directo habitual.
 
-En respuestas para el sidebar web, usá estas etiquetas cuando sea pertinente:
-- <Analisis>contenido</Analisis> para bloques de análisis profundo
-- <Codigo>bloque de código</Codigo> para ejemplos técnicos
-- <Cita>texto</Cita> para citas o referencias clave`;
+CIERRE LÓGICO Y LIMPIEZA:
+1. Termina siempre con un cierre concluyente. Nunca dejes oraciones sin terminar o párrafos inconclusos.
+2. Tienes estrictamente prohibido imprimir etiquetas estructurales, pseudocódigo, XML o HTML (como <Analisis>, <Pensamiento>, etc.) en tu salida. Entrega exclusivamente la prosa final.`;
 
 // ── Gemini Client (conversacional) ───────────────────────────────────────────
 export const genai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
@@ -65,16 +64,16 @@ export async function callGemini(
   userMessage: string,
   model: 'gemini-3.8-flash' | 'gemini-3.1-pro-preview' | 'gemini-2.5-pro' = 'gemini-3.8-flash',
   overrideSystemPrompt?: string,
-  // REGLA: Nunca usar maxOutputTokens < 8192 para controlar extensión.
+  // REGLA: Nunca usar maxOutputTokens < 16384 para controlar extensión.
   // El control de longitud se hace inyectando directivas en el system prompt.
   // Valores bajos provocan cortes abruptos a mitad de oración.
-  maxOutputTokens: number = 8192
+  maxOutputTokens: number = 16384
 ): Promise<string> {
   const modelToUse = (model === 'gemini-2.5-pro' ? 'gemini-3.1-pro-preview' : model) as any;
   const history = getHistory(sessionId);
   const chat = genai.chats.create({
     model: modelToUse,
-    config: { systemInstruction: overrideSystemPrompt || TGP_SYSTEM_PROMPT, temperature: 0.82, maxOutputTokens: 8192 },
+    config: { systemInstruction: overrideSystemPrompt || TGP_SYSTEM_PROMPT, temperature: 0.82, maxOutputTokens: maxOutputTokens },
     history: history.length > 0 ? history : undefined,
   });
   pushToHistory(sessionId, 'user', userMessage);
@@ -152,7 +151,11 @@ REGLAS DE INTERACCIÓN (HITL PROGRESIVO — solo cuando faltan parámetros):
 4. FORMATO OBLIGATORIO DE PREGUNTAS:
    - Toda pregunta dialéctica DEBE comenzar con '> ' para renderizar los teclados dinámicos en Telegram.
 5. RESPUESTAS NUMÉRICAS:
-   - Si el usuario responde con números ("1", "2", "3"), interpreta la opción del paso actual y avanza.`;
+   - Si el usuario responde con números ("1", "2", "3"), interpreta la opción del paso actual y avanza.
+
+CIERRE LÓGICO Y LIMPIEZA:
+1. Termina siempre con un cierre concluyente. Nunca dejes oraciones sin terminar o párrafos inconclusos.
+2. Tienes estrictamente prohibido imprimir etiquetas estructurales, pseudocódigo, XML o HTML (como <Analisis>, <Pensamiento>, etc.) en tu salida. Entrega exclusivamente la prosa final.`;
 
 export const PUBLICAR_TOOL_DECLARATION = {
   name: 'publicar',
@@ -265,7 +268,7 @@ export async function callGeminiAgent(
     config: {
       systemInstruction: AGENT_SYSTEM_PROMPT,
       temperature: 0.2,
-      maxOutputTokens: 8192, // NUNCA reducir — extensión controlada por buildDensityInstruction
+      maxOutputTokens: 16384, // Elevado a margen seguro para evitar corte duro
       tools: [
         {
           functionDeclarations: [PUBLICAR_TOOL_DECLARATION as any],
