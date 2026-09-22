@@ -270,16 +270,31 @@ const slicedPosts = posts.slice(0, 3);
 
     const STAY = 6;
     const FADE = 1.2;
-    // Secuencia Guest Star — tiempos pensados para el ojo humano
-    const SEQ_ENTER  = 1.2;   // fade-in de la card (segundos)
-    const SEQ_HOLD   = 3.5;   // cuánto tiempo permanece visible y en reposo
-    const SEQ_SWAY   = 4.0;   // duración total del balanceo (se solapa con HOLD)
-    const SEQ_EXIT   = 1.0;   // fade-out
-    const SEQ_GAP    = 0.6;   // negro entre una card y la siguiente
-    const SWAY_PX    = 5;     // píxeles de balanceo lateral máximo
-    const SWAY_HALF  = 0.9;   // duración de cada medio-balanceo
-    // Tiempo total por card = SEQ_ENTER + MAX(SEQ_HOLD, SEQ_SWAY) + SEQ_EXIT + SEQ_GAP
-    const PER_CARD   = SEQ_ENTER + Math.max(SEQ_HOLD, SEQ_SWAY) + SEQ_EXIT + SEQ_GAP;
+    // Secuencia Guest Star — tiempos para el ojo humano
+    const SEQ_ENTER   = 1.2;    // fade-in
+    const SEQ_HOLD    = 3.5;    // tiempo en reposo
+    const SEQ_SWAY    = 4.0;    // duración total del balanceo
+    const SEQ_EXIT    = 1.0;    // fade-out
+    const SEQ_GAP     = 0.6;    // negro entre cards
+    const SWAY_PX     = 5;      // píxeles de balanceo lateral individual
+    const SWAY_HALF   = 0.9;    // duración de cada medio-balanceo
+    const PER_CARD    = SEQ_ENTER + Math.max(SEQ_HOLD, SEQ_SWAY) + SEQ_EXIT + SEQ_GAP;
+    // Finale group — las 3 aparecen juntas solapadas
+    const FIN_ENTER   = 1.0;
+    const FIN_HOLD    = 2.2;
+    const FIN_EXIT    = 1.0;
+    const FIN_SWAY    = 3;      // píxeles del balanceo grupal
+    const FIN_SWAY_D  = 0.45;   // duración de cada medio-balanceo grupal
+    const FIN_OVERLAP = 55;     // px que las cards late/right se corren al centro
+    const FIN_TOTAL   = FIN_ENTER + FIN_HOLD + FIN_EXIT;
+
+    // Config por card: qué scale y qué x-drift en su momento estelar
+    // orden de aparición: Centro(1) → Derecha(2) → Izquierda(0)
+    const SEQ_CONFIG = [
+      { cardIndex: 1, xDrift:   0,  scale: 1.12 }, // Centro — no se mueve
+      { cardIndex: 2, xDrift: -48,  scale: 1.18 }, // Derecha — se corre hacia el centro
+      { cardIndex: 0, xDrift:  48,  scale: 1.18 }, // Izquierda — se corre hacia el centro
+    ];
     
     const actos = [acto1, acto2, acto3];
     let currentActo = 0;
@@ -288,13 +303,12 @@ const slicedPosts = posts.slice(0, 3);
     let paused = false;
     let progressStart = 0;
     let timeRemaining = 0;
-    
     let act1Timeline = null;
     
     const getDurationForAct = (idx) => {
       if (idx === 0 && actOneMode === 'sequence') {
         const cardsCount = document.querySelectorAll(`#${acto1Id} .triptico-seq-card`).length;
-        return PER_CARD * cardsCount * 1000;
+        return (PER_CARD * cardsCount + FIN_TOTAL) * 1000;
       }
       return (STAY + FADE) * 1000;
     };
@@ -361,43 +375,63 @@ const slicedPosts = posts.slice(0, 3);
       } else if (nextIdx === 0 && actOneMode === 'sequence') {
         const seqCards = Array.from(document.querySelectorAll(`#${acto1Id} .triptico-seq-card`));
         if (act1Timeline) act1Timeline.kill();
-        
-        // Reset all cards to invisible+black immediately
-        gsap.set(seqCards, { autoAlpha: 0, x: 0, scale: 1, filter: 'blur(0px)' });
-        
+        gsap.set(seqCards, { autoAlpha: 0, x: 0, scale: 1, filter: 'blur(0px)', zIndex: 1 });
         act1Timeline = gsap.timeline();
-        
-        // Orden estelar: Centro (1) → Derecha (2) → Izquierda (0)
-        const sequenceOrder = [1, 2, 0];
-        let cursor = 0; // posición en la timeline (segundos)
-        
-        sequenceOrder.forEach((cardIndex) => {
+        let cursor = 0;
+
+        // ── Actos individuales ──
+        SEQ_CONFIG.forEach(({ cardIndex, xDrift, scale: cardScale }) => {
           const card = seqCards[cardIndex];
           if (!card) { cursor += PER_CARD; return; }
-          
-          // ① Entrada: aparece con fade + scale prominente
+
+          // ① Entrada: fade-in + drift hacia centro + scale
           act1Timeline.fromTo(card,
-            { autoAlpha: 0, scale: 0.90, filter: 'blur(12px)', y: 8, zIndex: 1 },
-            { autoAlpha: 1, scale: 1.12, filter: 'blur(0px)',  y: 0, zIndex: 10, duration: SEQ_ENTER, ease: 'power2.out' },
+            { autoAlpha: 0, scale: 0.88, filter: 'blur(12px)', y: 8, x: 0,      zIndex: 1  },
+            { autoAlpha: 1, scale: cardScale, filter: 'blur(0px)', y: 0, x: xDrift, zIndex: 10,
+              duration: SEQ_ENTER, ease: 'power2.out' },
             cursor
           );
-          
-          // ② Balanceo suave mientras está visible (solapado con la entrada)
+          // ② Balanceo (oscila alrededor del xDrift actual)
           act1Timeline.to(card, {
-            x: SWAY_PX,
-            duration: SWAY_HALF,
-            ease: 'sine.inOut',
-            yoyo: true,
-            repeat: Math.round((SEQ_SWAY / SWAY_HALF) - 1),
+            x: xDrift + SWAY_PX, duration: SWAY_HALF, ease: 'sine.inOut',
+            yoyo: true, repeat: Math.round((SEQ_SWAY / SWAY_HALF) - 1),
           }, cursor + SEQ_ENTER * 0.5);
-          
-          // ③ Salida: scale out + fade + blur
+          // ③ Salida: scale-up y fade-out
           act1Timeline.to(card,
-            { autoAlpha: 0, scale: 1.22, filter: 'blur(8px)', x: 0, zIndex: 1, duration: SEQ_EXIT, ease: 'power2.in' },
+            { autoAlpha: 0, scale: cardScale + 0.1, filter: 'blur(8px)', x: xDrift, zIndex: 1,
+              duration: SEQ_EXIT, ease: 'power2.in' },
             cursor + SEQ_ENTER + Math.max(SEQ_HOLD, SEQ_SWAY)
           );
-          
           cursor += PER_CARD;
+        });
+
+        // ── FINALE: las 3 juntas solapadas ──
+        const finStart = cursor;
+        const finaleConfig = [
+          { card: seqCards[0], x:  FIN_OVERLAP, z: 7,  scale: 1.03 }, // Izquierda — 3er puesto
+          { card: seqCards[1], x:  0,           z: 12, scale: 1.12 }, // Centro — 1er puesto (más grande)
+          { card: seqCards[2], x: -FIN_OVERLAP, z: 9,  scale: 1.06 }, // Derecha — 2do puesto
+        ];
+        finaleConfig.forEach(({ card, x, z, scale: finScale }) => {
+          if (!card) return;
+          // Aparecen simultáneamente con escala de podio
+          act1Timeline.fromTo(card,
+            { autoAlpha: 0, scale: 0.90, x: 0,  zIndex: z, filter: 'blur(6px)' },
+            { autoAlpha: 1, scale: finScale, x, zIndex: z, filter: 'blur(0px)',
+              duration: FIN_ENTER, ease: 'power2.out' },
+            finStart
+          );
+          // Balanceo grupal
+          act1Timeline.to(card, {
+            x: x + FIN_SWAY, duration: FIN_SWAY_D, ease: 'sine.inOut',
+            yoyo: true, repeat: Math.round((FIN_HOLD / FIN_SWAY_D) - 1),
+          }, finStart + FIN_ENTER);
+          // Salida sincronizada
+          act1Timeline.to(card,
+            { autoAlpha: 0, scale: finScale + 0.06, filter: 'blur(10px)', x,
+              duration: FIN_EXIT, ease: 'power2.in' },
+            finStart + FIN_ENTER + FIN_HOLD
+          );
         });
       }
 
@@ -474,41 +508,57 @@ const slicedPosts = posts.slice(0, 3);
       // Boot up sequence if in sequence mode
       if (actOneMode === 'sequence') {
         const seqCards = Array.from(document.querySelectorAll(`#${acto1Id} .triptico-seq-card`));
-        
-        // Set all cards invisible initially
-        gsap.set(seqCards, { autoAlpha: 0, x: 0, scale: 1 });
-        
+        gsap.set(seqCards, { autoAlpha: 0, x: 0, scale: 1, zIndex: 1 });
         act1Timeline = gsap.timeline();
-        const sequenceOrder = [1, 2, 0];
         let cursor = 0;
-        
-        sequenceOrder.forEach((cardIndex) => {
+
+        // ── Actos individuales ──
+        SEQ_CONFIG.forEach(({ cardIndex, xDrift, scale: cardScale }) => {
           const card = seqCards[cardIndex];
           if (!card) { cursor += PER_CARD; return; }
-          
-          // ① Entrada
+
           act1Timeline.fromTo(card,
-            { autoAlpha: 0, scale: 0.90, filter: 'blur(12px)', y: 8, zIndex: 1 },
-            { autoAlpha: 1, scale: 1.12, filter: 'blur(0px)',  y: 0, zIndex: 10, duration: SEQ_ENTER, ease: 'power2.out' },
+            { autoAlpha: 0, scale: 0.88, filter: 'blur(12px)', y: 8, x: 0,      zIndex: 1  },
+            { autoAlpha: 1, scale: cardScale, filter: 'blur(0px)', y: 0, x: xDrift, zIndex: 10,
+              duration: SEQ_ENTER, ease: 'power2.out' },
             cursor
           );
-          
-          // ② Balanceo
           act1Timeline.to(card, {
-            x: SWAY_PX,
-            duration: SWAY_HALF,
-            ease: 'sine.inOut',
-            yoyo: true,
-            repeat: Math.round((SEQ_SWAY / SWAY_HALF) - 1),
+            x: xDrift + SWAY_PX, duration: SWAY_HALF, ease: 'sine.inOut',
+            yoyo: true, repeat: Math.round((SEQ_SWAY / SWAY_HALF) - 1),
           }, cursor + SEQ_ENTER * 0.5);
-          
-          // ③ Salida
           act1Timeline.to(card,
-            { autoAlpha: 0, scale: 1.22, filter: 'blur(8px)', x: 0, zIndex: 1, duration: SEQ_EXIT, ease: 'power2.in' },
+            { autoAlpha: 0, scale: cardScale + 0.1, filter: 'blur(8px)', x: xDrift, zIndex: 1,
+              duration: SEQ_EXIT, ease: 'power2.in' },
             cursor + SEQ_ENTER + Math.max(SEQ_HOLD, SEQ_SWAY)
           );
-          
           cursor += PER_CARD;
+        });
+
+        // ── FINALE: las 3 juntas solapadas ──
+        const finStart = cursor;
+        const finaleConfig = [
+          { card: seqCards[0], x:  FIN_OVERLAP, z: 7,  scale: 1.03 }, // Izquierda — 3er puesto
+          { card: seqCards[1], x:  0,           z: 12, scale: 1.12 }, // Centro — 1er puesto
+          { card: seqCards[2], x: -FIN_OVERLAP, z: 9,  scale: 1.06 }, // Derecha — 2do puesto
+        ];
+        finaleConfig.forEach(({ card, x, z, scale: finScale }) => {
+          if (!card) return;
+          act1Timeline.fromTo(card,
+            { autoAlpha: 0, scale: 0.90, x: 0,  zIndex: z, filter: 'blur(6px)' },
+            { autoAlpha: 1, scale: finScale, x, zIndex: z, filter: 'blur(0px)',
+              duration: FIN_ENTER, ease: 'power2.out' },
+            finStart
+          );
+          act1Timeline.to(card, {
+            x: x + FIN_SWAY, duration: FIN_SWAY_D, ease: 'sine.inOut',
+            yoyo: true, repeat: Math.round((FIN_HOLD / FIN_SWAY_D) - 1),
+          }, finStart + FIN_ENTER);
+          act1Timeline.to(card,
+            { autoAlpha: 0, scale: finScale + 0.06, filter: 'blur(10px)', x,
+              duration: FIN_EXIT, ease: 'power2.in' },
+            finStart + FIN_ENTER + FIN_HOLD
+          );
         });
       }
       
