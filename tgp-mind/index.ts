@@ -1,4 +1,4 @@
-﻿// Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬
+// Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬
 // TGP MIND Ã¢â‚¬â€  Orquestador IA con Hono + Gemini + Inline Keyboard Wizard
 // Autor: TGP / Xavier BenÃƒÂ­tez
 // Deploy: Google Cloud Run
@@ -14,6 +14,7 @@ import {
   googleAI,
   callGemini,
   crearModeloEnsayo,
+  SYSTEM_PROMPT_NATGEO_GROUNDED,
 } from './src/ia/gemini.js';
 // -- Telegram Webhook Unificado Multi-Bot (ver src/telegram/webhook.ts) --------
 import { handleTelegramWebhook } from './src/telegram/webhook.js';
@@ -598,24 +599,18 @@ app.post('/api/redaccion-premium', async (c) => {
       return c.json({ error: 'No se encontrÃƒÂ³ el informe OSINT para redactar el ensayo.' }, 400);
     }
 
-    console.log(`[RedacciÃƒÂ³n Premium] Redactando ensayo con Gemini 1.5 Pro + Grounding (ID: ${id})...`);
-    const SYSTEM_PROMPT_PREMIUM = `ActÃƒÂºa en Modo TGP. Eres un ensayista y crÃƒÂ­tico cultural contemporÃƒÂ¡neo de alto nivel.
-Usa este informe tÃƒÂ©cnico para redactar un ensayo cultural y filosÃƒÂ³fico breve, profundo y crÃƒÂ­tico.
-Estructura rigurosa TGP:
-1) Gancho visual evocador y misterioso
-2) Contexto histÃƒÂ³rico y arqueolÃƒÂ³gico preciso
-3) Concepto filosÃƒÂ³fico o tÃƒÂ©cnico nuclear
-4) Cierre existencial y universal sobre la condiciÃƒÂ³n humana.
-Estilo: Ensayo argentino contemporÃƒÂ¡neo. Denso, sin introducciones vacÃƒÂ­as, con ritmo narrativo y elegancia Dark Academia.`;
+    console.log(`[RedacciÃ³n Documental NatGeo] Redactando artÃ­culo forense/arqueolÃ³gico con Gemini Flash (Temp: 0.2) (ID: ${id})...`);
+    
+    // Super Prompt Granular (Estilo NatGeo / BrÃºjula Verde Â· Modo Grounded Â· Temp 0.2)
+    const promptUsuario = `${SYSTEM_PROMPT_NATGEO_GROUNDED}\n\n[INFORME TÃ‰CNICO Y CONTEXTO]:\n${informeTexto}`;
 
     const responseGemini = await genai.models.generateContent({
-      model: 'gemini-2.5-pro',
-      contents: [{ text: `INFORME TÃƒâ€°CNICO (DATA LAKE):\n\n${informeTexto}\n\nEscribe el ensayo definitivo TGP.` }],
+      model: 'gemini-3.8-flash',
+      contents: [{ text: promptUsuario }],
       config: {
-        systemInstruction: SYSTEM_PROMPT_PREMIUM,
-        temperature: 0.75,
-        maxOutputTokens: 2500,
-        tools: [{ googleSearch: {} }],
+        systemInstruction: SYSTEM_PROMPT_NATGEO_GROUNDED,
+        temperature: 0.2,
+        maxOutputTokens: 8192,
       },
     });
 
