@@ -409,7 +409,9 @@ telegramRouter.post('/webhook/telegram', async (c) => {
   const message = body?.message;
   if (message) {
     const chatId: number | undefined = message?.chat?.id;
-    const hasPhoto = Array.isArray(message?.photo) && message.photo.length > 0;
+    const hasPhotoArray = Array.isArray(message?.photo) && message.photo.length > 0;
+    const isImageDocument = message?.document?.mime_type?.startsWith('image/');
+    const hasPhoto = hasPhotoArray || !!isImageDocument;
     const text: string = message?.text ?? message?.caption ?? '';
     if (!chatId || (!text && !hasPhoto)) return c.json({ ok: true });
 
@@ -425,11 +427,11 @@ telegramRouter.post('/webhook/telegram', async (c) => {
 
     let imagenR2Url = '';
     if (hasPhoto) {
-      const bestPhoto = message.photo[message.photo.length - 1];
+      const fileId = hasPhotoArray ? message.photo[message.photo.length - 1].file_id : message.document.file_id;
       const baseSlug = generarSlug(text ? text.slice(0, 30) : 'foto-telegram');
       try {
         await sendTelegramAssistant(chatId, '📷 Descargando imagen y subiendo a Cloudflare R2...');
-        const r2Res = await procesarFotoTelegramAR2(bestPhoto.file_id, baseSlug, cfg.telegramTgpCloudToken);
+        const r2Res = await procesarFotoTelegramAR2(fileId, baseSlug, cfg.telegramTgpCloudToken);
         imagenR2Url = r2Res.url;
         await sendTelegramAssistant(chatId, `✅ Imagen alojada en Cloudflare R2:\n${imagenR2Url}`);
       } catch (errUpload: any) {
@@ -488,7 +490,9 @@ telegramRouter.post('/webhook/telegram-social', async (c) => {
   const message = body?.message;
   if (message) {
     const chatId: number | undefined = message?.chat?.id;
-    const hasPhoto = Array.isArray(message?.photo) && message.photo.length > 0;
+    const hasPhotoArray = Array.isArray(message?.photo) && message.photo.length > 0;
+    const isImageDocument = message?.document?.mime_type?.startsWith('image/');
+    const hasPhoto = hasPhotoArray || !!isImageDocument;
     const text: string = message?.text ?? message?.caption ?? '';
     if (!chatId || (!text && !hasPhoto)) return c.json({ ok: true });
     
@@ -499,11 +503,11 @@ telegramRouter.post('/webhook/telegram-social', async (c) => {
 
     let imagenR2Url = '';
     if (hasPhoto) {
-      const bestPhoto = message.photo[message.photo.length - 1];
+      const fileId = hasPhotoArray ? message.photo[message.photo.length - 1].file_id : message.document.file_id;
       const baseSlug = generarSlug(text ? text.slice(0, 30) : 'foto-telegram-social');
       try {
         await sendTelegramSocial(chatId, '📷 Descargando imagen y subiendo a Cloudflare R2...');
-        const r2Res = await procesarFotoTelegramAR2(bestPhoto.file_id, baseSlug, cfg.telegramSocialToken);
+        const r2Res = await procesarFotoTelegramAR2(fileId, baseSlug, cfg.telegramSocialToken);
         imagenR2Url = r2Res.url;
         await sendTelegramSocial(chatId, `✅ Imagen alojada en Cloudflare R2:\n${imagenR2Url}`);
       } catch (errUpload: any) {
@@ -568,7 +572,9 @@ telegramRouter.post('/webhook/telegram-social', async (c) => {
         urlImagen: urlR2 || undefined,
       });
 
-      const urlLine = resZernio.postUrl ? `\n\n🔗 Enlace: ${resZernio.postUrl}` : '';
+      const urlLine = resZernio.postUrl 
+        ? `\n\n🔗 Enlace: ${resZernio.postUrl}` 
+        : (resZernio.postId && resZernio.postId !== 'N/A' ? `\n\n⚙️ Zernio Dashboard: https://app.zernio.com/posts/${resZernio.postId}` : '');
       const imgLine = urlR2 ? `\n🖼 Imagen: ${urlR2}` : '';
       await sendTelegramSocial(chatId, `✅ Publicación enviada con éxito.\n\n${textoGenerado}${urlLine}${imgLine}`);
     } catch (err: any) {
@@ -796,6 +802,7 @@ async function ejecutarDecisionOmni(chatId: number, decision: any) {
       });
 
       let postUrl = '';
+      let postId = '';
       try {
         const resZernio = await publicarEnZernio({
           redes: red === 'tiktok' ? 'tiktok' : 'facebook',
@@ -803,11 +810,14 @@ async function ejecutarDecisionOmni(chatId: number, decision: any) {
           urlImagen: imagenUrl || undefined,
         });
         postUrl = resZernio.postUrl || '';
+        postId = resZernio.postId || '';
       } catch (zErr: any) {
         console.warn('[Omni Zernio Warning]:', zErr?.message);
       }
 
-      const urlLine = postUrl ? `\n\n🔗 Enlace: ${postUrl}` : '';
+      const urlLine = postUrl 
+        ? `\n\n🔗 Enlace: ${postUrl}` 
+        : (postId && postId !== 'N/A' ? `\n\n⚙️ Zernio Dashboard: https://app.zernio.com/posts/${postId}` : '');
       if (imagenUrl) {
         await fetch(`${cfg.telegramApi}/sendPhoto`, {
           method: 'POST',
