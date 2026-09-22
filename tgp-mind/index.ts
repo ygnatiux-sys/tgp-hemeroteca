@@ -120,13 +120,8 @@ const GITHUB_REPO_ALTERNATIVE  = process.env.GITHUB_REPO              || 'ygnati
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
 // Ã¢â€â‚¬Ã¢â€â‚¬ Inicializar mÃƒÂ³dulos de Telegram/Social con la config del entorno Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
-initTelegramHelpers(TELEGRAM_API, XAVIER_CHAT_ID);
-initSocialBot({
-  telegramSocialApi: TELEGRAM_SOCIAL_API,
-  zernioApiKey:      ZERNIO_API_KEY,
-  zernioFbId:        ZERNIO_FB_ID,
-  zernioTiktokId:    ZERNIO_TIKTOK_ID,
-});
+// [Legacy archive] initTelegramHelpers / initSocialBot — eliminados en Migración v2
+
 
 // TGP_SYSTEM_PROMPT, genai, googleAI, callGemini, crearModeloEnsayo
 // Ã¢â€ â€™ importados desde ./src/ia/gemini.js
