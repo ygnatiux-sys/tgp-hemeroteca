@@ -85,6 +85,20 @@ Formato de Ficha Visual (texto plano Markdown):
 ¿Confirmamos? Responde **ok** para ejecutar.
 `.trim();
 
+const REGLA_CONFIRMACION_PUBLICACION = `
+REGLA DE CONFIRMACIÓN POST-PUBLICACIÓN (Obligatoria e Invariable):
+
+Cuando cualquier herramienta de publicación (generar_ensayo, publish_social, generate_cinematic_pipeline)
+devuelva un resultado exitoso, tu respuesta FINAL al usuario DEBE tener EXACTAMENTE este formato:
+
+✅ Publicado con éxito.
+
+[Copia aquí el texto del resultado de la herramienta sin parafrasear ni resumir]
+
+NUNCA sustituyas los URLs reales por frases como "el ensayo ha quedado registrado" o similar.
+Si el resultado de la herramienta contiene URLs (🌐 Ver en la Web, 📦 Commit GitHub), cópialos literalmente.
+`.trim();
+
 const BASE_SYSTEM_PROMPT = `Eres el motor cognitivo de TGP Project y el socio analítico de Xavier Benítez.
 Tu función es reinterpretar la historia y la complejidad para comprender la condición humana.
 Tono: Dark Academia accesible. Preciso, sobrio, agudo, con calidez humanista.
@@ -92,7 +106,9 @@ Modo por defecto: Directo, sin introducciones ni redundancias.
 Nunca declares tu rol ni uses fórmulas autorreferenciales.
 Tienes estrictamente prohibido imprimir etiquetas estructurales, pseudocódigo, XML o HTML en tu salida.
 
-${PROTOCOLO_FICHA_VISUAL}`;
+${PROTOCOLO_FICHA_VISUAL}
+
+${REGLA_CONFIRMACION_PUBLICACION}`;
 
 const SYSTEM_PROMPTS: Record<BotIdentity, string> = {
   redes: `${BASE_SYSTEM_PROMPT}
@@ -129,30 +145,32 @@ async function ejecutarTool(
     let result: string;
 
     if (name === 'generar_ensayo') {
+      // Pasamos todos los args sin cast restrictivo para aprovechar la normalización
+      // tolerante de enums en tool-generar-ensayo.ts (solowiki -> solo_wiki, etc.)
       result = await ejecutarGenerarEnsayo({
-        tema: args.tema as string,
-        longitud: args.longitud as 'breve_1500' | 'pro_4500',
-        motor: args.motor as 'flash' | 'pro',
-        origen_fotos: args.origen_fotos as 'solo_wiki' | 'mix_propias_wiki',
+        tema: String(args.tema || ''),
+        longitud: args.longitud,
+        motor: args.motor,
+        origen_fotos: args.origen_fotos,
         chatId,
       });
     } else if (name === 'publish_social') {
       result = await ejecutarPublishSocial({
-        tema: args.tema as string,
+        tema: String(args.tema || ''),
         red: args.red as 'facebook' | 'tiktok',
         motor: args.motor as 'flash' | 'pro',
-        url_imagen: args.url_imagen as string,
+        url_imagen: String(args.url_imagen || ''),
         chatId,
       });
     } else if (name === 'generate_cinematic_pipeline') {
       result = await ejecutarCinematicPipeline({
-        tema: args.tema as string,
-        estilo: args.estilo as string,
+        tema: String(args.tema || ''),
+        estilo: String(args.estilo || ''),
         chatId,
       });
     } else if (name === 'extract_neo4j_entities') {
       result = await ejecutarNeo4jExtraction({
-        texto: args.texto as string,
+        texto: String(args.texto || ''),
         chatId,
       });
     } else if (name === 'request_human_action') {
@@ -161,10 +179,14 @@ async function ejecutarTool(
       result = `Herramienta "${name}" no reconocida.`;
     }
 
+    // Devolver resultado como objeto estructurado para que Gemini lo incluya literalmente
+    console.log(`[Agent] Tool "${name}" completada. Resultado (primeros 200 chars): ${result.slice(0, 200)}`);
     return { result };
   } catch (err: any) {
-    console.error(`[Agent] Error ejecutando tool "${name}":`, err);
-    return { error: err.message || 'Error desconocido.' };
+    const errMsg = err?.message || String(err);
+    console.error(`[Agent] CRASH en tool "${name}": ${errMsg}`);
+    console.error(`[Agent] Args recibidos:`, JSON.stringify(args));
+    return { error: errMsg };
   }
 }
 
