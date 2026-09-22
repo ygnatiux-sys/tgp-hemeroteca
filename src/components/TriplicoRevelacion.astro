@@ -97,8 +97,8 @@ const slicedPosts = posts.slice(0, 3);
           href={post.href}
           class={actOneMode === 'grid' 
             ? "group relative overflow-hidden bg-[#0a0a0b] flex flex-col justify-end border-r border-white/5 last:border-r-0 transition-all duration-500"
-            : "triptico-seq-card relative group overflow-hidden bg-[#0a0a0b] flex flex-col justify-end border-r border-white/5 last:border-r-0 invisible opacity-0"}
-          style={actOneMode === 'grid' ? `transition-delay:${i * 60}ms` : ''}
+            : "triptico-seq-card relative group overflow-hidden bg-black flex flex-col justify-end"}
+          style={actOneMode === 'grid' ? `transition-delay:${i * 60}ms` : 'will-change: transform, opacity;'}
         >
           <div class="absolute inset-0 z-0">
             <img
@@ -270,8 +270,16 @@ const slicedPosts = posts.slice(0, 3);
 
     const STAY = 6;
     const FADE = 1.2;
-    const SEQ_STAY = 3.5;
-    const SEQ_FADE = 1.5;
+    // Secuencia Guest Star — tiempos pensados para el ojo humano
+    const SEQ_ENTER  = 1.2;   // fade-in de la card (segundos)
+    const SEQ_HOLD   = 3.5;   // cuánto tiempo permanece visible y en reposo
+    const SEQ_SWAY   = 4.0;   // duración total del balanceo (se solapa con HOLD)
+    const SEQ_EXIT   = 1.0;   // fade-out
+    const SEQ_GAP    = 0.6;   // negro entre una card y la siguiente
+    const SWAY_PX    = 5;     // píxeles de balanceo lateral máximo
+    const SWAY_HALF  = 0.9;   // duración de cada medio-balanceo
+    // Tiempo total por card = SEQ_ENTER + MAX(SEQ_HOLD, SEQ_SWAY) + SEQ_EXIT + SEQ_GAP
+    const PER_CARD   = SEQ_ENTER + Math.max(SEQ_HOLD, SEQ_SWAY) + SEQ_EXIT + SEQ_GAP;
     
     const actos = [acto1, acto2, acto3];
     let currentActo = 0;
@@ -286,7 +294,7 @@ const slicedPosts = posts.slice(0, 3);
     const getDurationForAct = (idx) => {
       if (idx === 0 && actOneMode === 'sequence') {
         const cardsCount = document.querySelectorAll(`#${acto1Id} .triptico-seq-card`).length;
-        return (SEQ_STAY + SEQ_FADE) * cardsCount * 1000;
+        return PER_CARD * cardsCount * 1000;
       }
       return (STAY + FADE) * 1000;
     };
@@ -353,23 +361,43 @@ const slicedPosts = posts.slice(0, 3);
       } else if (nextIdx === 0 && actOneMode === 'sequence') {
         const seqCards = Array.from(document.querySelectorAll(`#${acto1Id} .triptico-seq-card`));
         if (act1Timeline) act1Timeline.kill();
+        
+        // Reset all cards to invisible+black immediately
+        gsap.set(seqCards, { autoAlpha: 0, x: 0, scale: 1, filter: 'blur(0px)' });
+        
         act1Timeline = gsap.timeline();
         
-        // Orden estelar: Centro (1), Derecha (2), Izquierda (0)
+        // Orden estelar: Centro (1) → Derecha (2) → Izquierda (0)
         const sequenceOrder = [1, 2, 0];
+        let cursor = 0; // posición en la timeline (segundos)
         
-        sequenceOrder.forEach((cardIndex, stepIndex) => {
+        sequenceOrder.forEach((cardIndex) => {
           const card = seqCards[cardIndex];
-          if (!card) return;
+          if (!card) { cursor += PER_CARD; return; }
+          
+          // ① Entrada: aparece con fade + scale prominente
           act1Timeline.fromTo(card,
-            { autoAlpha: 0, scale: 0.95, filter: "blur(10px)" },
-            { autoAlpha: 1, scale: 1, filter: "blur(0px)", duration: SEQ_FADE, ease: 'power2.out' },
-            stepIndex * (SEQ_STAY + SEQ_FADE)
+            { autoAlpha: 0, scale: 0.90, filter: 'blur(12px)', y: 8, zIndex: 1 },
+            { autoAlpha: 1, scale: 1.12, filter: 'blur(0px)',  y: 0, zIndex: 10, duration: SEQ_ENTER, ease: 'power2.out' },
+            cursor
           );
+          
+          // ② Balanceo suave mientras está visible (solapado con la entrada)
+          act1Timeline.to(card, {
+            x: SWAY_PX,
+            duration: SWAY_HALF,
+            ease: 'sine.inOut',
+            yoyo: true,
+            repeat: Math.round((SEQ_SWAY / SWAY_HALF) - 1),
+          }, cursor + SEQ_ENTER * 0.5);
+          
+          // ③ Salida: scale out + fade + blur
           act1Timeline.to(card,
-            { autoAlpha: 0, scale: 1.05, filter: "blur(6px)", duration: SEQ_FADE, ease: 'power2.in' },
-            stepIndex * (SEQ_STAY + SEQ_FADE) + SEQ_STAY
+            { autoAlpha: 0, scale: 1.22, filter: 'blur(8px)', x: 0, zIndex: 1, duration: SEQ_EXIT, ease: 'power2.in' },
+            cursor + SEQ_ENTER + Math.max(SEQ_HOLD, SEQ_SWAY)
           );
+          
+          cursor += PER_CARD;
         });
       }
 
@@ -446,20 +474,41 @@ const slicedPosts = posts.slice(0, 3);
       // Boot up sequence if in sequence mode
       if (actOneMode === 'sequence') {
         const seqCards = Array.from(document.querySelectorAll(`#${acto1Id} .triptico-seq-card`));
+        
+        // Set all cards invisible initially
+        gsap.set(seqCards, { autoAlpha: 0, x: 0, scale: 1 });
+        
         act1Timeline = gsap.timeline();
         const sequenceOrder = [1, 2, 0];
-        sequenceOrder.forEach((cardIndex, stepIndex) => {
+        let cursor = 0;
+        
+        sequenceOrder.forEach((cardIndex) => {
           const card = seqCards[cardIndex];
-          if (!card) return;
+          if (!card) { cursor += PER_CARD; return; }
+          
+          // ① Entrada
           act1Timeline.fromTo(card,
-            { autoAlpha: 0, scale: 0.95, filter: "blur(10px)" },
-            { autoAlpha: 1, scale: 1, filter: "blur(0px)", duration: SEQ_FADE, ease: 'power2.out' },
-            stepIndex * (SEQ_STAY + SEQ_FADE)
+            { autoAlpha: 0, scale: 0.90, filter: 'blur(12px)', y: 8, zIndex: 1 },
+            { autoAlpha: 1, scale: 1.12, filter: 'blur(0px)',  y: 0, zIndex: 10, duration: SEQ_ENTER, ease: 'power2.out' },
+            cursor
           );
+          
+          // ② Balanceo
+          act1Timeline.to(card, {
+            x: SWAY_PX,
+            duration: SWAY_HALF,
+            ease: 'sine.inOut',
+            yoyo: true,
+            repeat: Math.round((SEQ_SWAY / SWAY_HALF) - 1),
+          }, cursor + SEQ_ENTER * 0.5);
+          
+          // ③ Salida
           act1Timeline.to(card,
-            { autoAlpha: 0, scale: 1.05, filter: "blur(6px)", duration: SEQ_FADE, ease: 'power2.in' },
-            stepIndex * (SEQ_STAY + SEQ_FADE) + SEQ_STAY
+            { autoAlpha: 0, scale: 1.22, filter: 'blur(8px)', x: 0, zIndex: 1, duration: SEQ_EXIT, ease: 'power2.in' },
+            cursor + SEQ_ENTER + Math.max(SEQ_HOLD, SEQ_SWAY)
           );
+          
+          cursor += PER_CARD;
         });
       }
       
