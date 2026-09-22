@@ -29,8 +29,10 @@ export async function openGooglePicker(options: GooglePickerOptions): Promise<vo
   const { onSelect, onError } = options;
 
   // ── 0. Abrir pestaña vacía SÍNCRONAMENTE para evadir el Popup Blocker ──
-  // Los navegadores modernos bloquean window.open si ocurre después de un await (ej. fetch)
-  const pickerTab = window.open('', '_blank', 'noopener,noreferrer');
+  // CRÍTICO: NO usar 'noopener,noreferrer' — en Chromium, window.open() con noopener
+  // devuelve null, haciendo que el código asuma bloqueo aunque la pestaña SÍ se abrió.
+  // Sin noopener podemos mantener la referencia y asignarle location.href luego del fetch.
+  const pickerTab = window.open('', '_blank');
   if (!pickerTab) {
     if (onError) onError(new Error('El navegador bloqueó la pestaña de Google Photos. Habilita las ventanas emergentes.'));
     return;
