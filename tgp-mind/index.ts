@@ -1,13 +1,13 @@
-// Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬
-// TGP MIND Ã¢â‚¬â€  Orquestador IA con Hono + Gemini + Inline Keyboard Wizard
-// Autor: TGP / Xavier BenÃƒÂ­tez
+// ─────────────────────────────────────────────────────────────────────────────
+// TGP MIND — Orquestador IA con Hono + Gemini + Inline Keyboard Wizard
+// Autor: TGP / Xavier Benítez
 // Deploy: Google Cloud Run
-// Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬
+// ─────────────────────────────────────────────────────────────────────────────
 
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { cors } from 'hono/cors';
-// Ã¢â€ â‚¬Ã¢â€ â‚¬ Gemini (ver src/ia/gemini.ts) Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬Ã¢â€ â‚¬
+// ── Gemini (ver src/ia/gemini.ts) ─────────────────────────────────────────────────────────────────────────────
 import {
   GEMINI_API_KEY,
   genai,
@@ -57,7 +57,7 @@ import { Octokit } from '@octokit/rest';
 import vision from '@google-cloud/vision';
 import crypto from 'node:crypto';
 import 'dotenv/config';
-// Ã¢â€â‚¬Ã¢â€â‚¬ ConfiguraciÃƒÂ³n Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// Ã¢â€â‚¬Ã¢â€â‚¬ Configuración Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 const PORT               = parseInt(process.env.PORT || '3001');
 const TELEGRAM_TOKEN     = (process.env.OMNI_TOKEN || process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_TOKEN || '').replace(/['"]/g, '').trim();
 const TELEGRAM_BOT_NAME  = (process.env.TELEGRAM_BOT_NAME || 'Analista_IMG_bot').replace(/['"]/g, '').trim();
@@ -100,12 +100,12 @@ const GITHUB_REPO_ALTERNATIVE  = process.env.GITHUB_REPO              || 'ygnati
 // Singleton solo para rutas no-webhook
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
-// Ã¢â€â‚¬Ã¢â€â‚¬ Inicializar mÃƒÂ³dulos de Telegram/Social con la config del entorno Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// Ã¢â€â‚¬Ã¢â€â‚¬ Inicializar módulos de Telegram/Social con la config del entorno Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 // [Legacy archive] initTelegramHelpers / initSocialBot — eliminados en Migración v2
 
 
 // TGP_SYSTEM_PROMPT, genai, googleAI, callGemini, crearModeloEnsayo
-// Ã¢â€ â€™ importados desde ./src/ia/gemini.js
+// → importados desde ./src/ia/gemini.js
 
 // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ URL de imagen de reserva alojada en R2 (usada cuando ninguna busqueda da resultado) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 const FALLBACK_IMAGE_URL = 'https://storage.thegreatpuzzleproject.com/tgp-fallback.jpg';
@@ -130,49 +130,14 @@ initD1({
 initPublicacion();
 // SesionConfig, sesiones, pendingTextQueries, buildInlineKeyboard,
 // sendTelegram, answerCallbackQuery, editMessageReplyMarkup, editMessageText
-// Ã¢â€ â€™ importados desde ./src/telegram/helpers.js
+// → importados desde ./src/telegram/helpers.js
 
 
 // Ã¢â€â‚¬Ã¢â€â‚¬ Hono App Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 const app = new Hono();
 
 // ── CORS global (permite x-api-key, x-api-token y x-mini-app desde los orígenes del proyecto) ──
-app.use('*', cors({
-  origin: [
-    'https://thegreatpuzzleproject.com',
-    'https://www.thegreatpuzzleproject.com',
-    'http://localhost:4321',
-    'http://127.0.0.1:4321',
-  ],
-  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization', 'x-api-key', 'x-api-token', 'x-mini-app', 'X-Mini-App'],
-  exposeHeaders: ['Content-Length'],
-  maxAge: 86400,
-  credentials: true,
-}));
-
 app.get('/', (c) => c.json({ status: 'TGP Mind activo', ts: new Date().toISOString() }));
-
-app.get('/debug-d1', async (c) => {
-  try {
-    const url = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${CLOUDFLARE_D1_DATABASE_ID}/query`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${CLOUDFLARE_API_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ sql: "SELECT id, origen, destino, tema, fecha_creacion, length(texto_generado) as len FROM resguardo_documental ORDER BY fecha_creacion DESC LIMIT 20" })
-    });
-    const data = await response.json();
-    return c.json(data);
-  } catch(e) {
-    return c.json({ error: String(e) });
-  }
-});
-
-
-
 // Las rutas se registrarán más abajo.
 const isAllowedOrigin = (origin: string) => {
   if (!origin) return true;
@@ -455,7 +420,7 @@ app.post('/process-image', async (c) => {
     const mode = (formData['mode'] as string) || 'opencv';
 
     if (!file) {
-      return c.json({ error: 'No se enviÃƒÂ³ ningÃƒÂºn archivo de imagen.' }, 400);
+      return c.json({ error: 'No se envió ningún archivo de imagen.' }, 400);
     }
 
     const arrayBuffer = await file.arrayBuffer();
@@ -619,14 +584,14 @@ app.post('/api/vision', async (c) => {
 app.post('/api/vision-exhaustivo', async (c) => {
   const apiKey = c.req.header('x-api-key') || (c.req.header('Authorization') ?? '').replace('Bearer ', '').trim();
   if (TGP_MIND_API_KEY && apiKey !== TGP_MIND_API_KEY) {
-    return c.json({ error: 'No autorizado: API Key invÃƒÂ¡lida.' }, 401);
+    return c.json({ error: 'No autorizado: API Key inválida.' }, 401);
   }
 
   let body: { imageBase64?: string; mimeType?: string };
   try { body = await c.req.json(); } catch { return c.json({ error: 'Payload JSON malformado.' }, 400); }
 
   const { imageBase64, mimeType = 'image/webp' } = body;
-  if (!imageBase64) return c.json({ error: 'Se requiere el parÃƒÂ¡metro "imageBase64".' }, 400);
+  if (!imageBase64) return c.json({ error: 'Se requiere el parámetro "imageBase64".' }, 400);
 
   const rawBase64 = imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64;
   const imageBuffer = Buffer.from(rawBase64, 'base64');
@@ -639,10 +604,10 @@ app.post('/api/vision-exhaustivo', async (c) => {
     try {
       imagenPublicUrl = await subirBufferOsintAR2(imageBuffer, recordId, mimeType);
     } catch (errR2: any) {
-      console.warn('[Vision-Exhaustivo] FallÃƒÂ³ subida a R2, continuando pipeline:', errR2?.message);
+      console.warn('[Vision-Exhaustivo] Falló subida a R2, continuando pipeline:', errR2?.message);
     }
 
-    // 2. ExtracciÃƒÂ³n con Google Cloud Vision
+    // 2. Extracción con Google Cloud Vision
     console.log('[Vision-Exhaustivo] Extrayendo datos con Cloud Vision...');
     const [webResult, landmarkResult] = await Promise.all([
       visionClient.webDetection({ image: { content: imageBuffer } }),
@@ -661,12 +626,12 @@ app.post('/api/vision-exhaustivo', async (c) => {
       .filter((p) => p.url)
       .map((p) => ({
         url: p.url || '',
-        titulo: p.pageTitle || 'Sin tÃƒÂ­tulo',
+        titulo: p.pageTitle || 'Sin título',
       }));
 
     const landmarks = landmarkResult[0]?.landmarkAnnotations || [];
     const coords = landmarks.map((l) => ({
-      nombre: l.description || 'Punto de InterÃƒÂ©s Desconocido',
+      nombre: l.description || 'Punto de Interés Desconocido',
       score: Number((l.score || 0).toFixed(3)),
       lat: l.locations?.[0]?.latLng?.latitude || null,
       lng: l.locations?.[0]?.latLng?.longitude || null,
@@ -674,9 +639,9 @@ app.post('/api/vision-exhaustivo', async (c) => {
 
     const metadatos = { entidades, urls, coords };
 
-    // 3. ExpansiÃƒÂ³n Cognitiva con Gemini 1.5 Flash (~3000 tokens)
-    console.log('[Vision-Exhaustivo] Generando monografÃƒÂ­a en Gemini 1.5 Flash...');
-    const promptOSINT = `ActÃƒÂºa como un investigador de OSINT y arqueologÃƒÂ­a. Usa estas etiquetas, coordenadas y URLs para elaborar un informe enciclopÃƒÂ©dico exhaustivo y estructurado (alrededor de 3000 tokens). Detalla: historia, geologÃƒÂ­a, descubrimientos, referencias a Wikipedia y anÃƒÂ¡lisis de las fuentes web. MantÃƒÂ©n un tono neutro y descriptivo (Data Lake), sin conclusiones ensayÃƒÂ­sticas.
+    // 3. Expansión Cognitiva con Gemini 1.5 Flash (~3000 tokens)
+    console.log('[Vision-Exhaustivo] Generando monografía en Gemini 1.5 Flash...');
+    const promptOSINT = `Actúa como un investigador de OSINT y arqueología. Usa estas etiquetas, coordenadas y URLs para elaborar un informe enciclopédico exhaustivo y estructurado (alrededor de 3000 tokens). Detalla: historia, geología, descubrimientos, referencias a Wikipedia y análisis de las fuentes web. Mantén un tono neutro y descriptivo (Data Lake), sin conclusiones ensayísticas.
 
 URL PÃƒÅ¡BLICA DE LA IMAGEN EN R2: ${imagenPublicUrl}
 
@@ -687,17 +652,17 @@ ${coords.length > 0 ? JSON.stringify(coords, null, 2) : 'No se identificaron mon
 ${entidades.length > 0 ? entidades.map((e) => `- ${e.descripcion} (Confianza: ${e.score})`).join('\n') : 'Sin entidades web detectadas.'}
 
 [FUENTES WEB COINCIDENTES]:
-${urls.length > 0 ? urls.map((u) => `- [${u.titulo}](${u.url})`).join('\n') : 'Sin pÃƒÂ¡ginas indexadas coincidentes.'}
+${urls.length > 0 ? urls.map((u) => `- [${u.titulo}](${u.url})`).join('\n') : 'Sin páginas indexadas coincidentes.'}
 
 ESTRUCTURA OBLIGATORIA DEL INFORME:
-# INFORME TÃƒâ€°CNICO DE INGESTA VISUAL (DATA LAKE ARCHIVO TGP)
+# INFORME TÉCNICO DE INGESTA VISUAL (DATA LAKE ARCHIVO TGP)
 ## 1. IDENTIFICACIÃƒâ€œN CANÃƒâ€œNICA Y TOPONIMIA
 ## 2. GEORREFERENCIACIÃƒâ€œN Y CONTEXTO ESPACIAL
 ## 3. HISTORIA DOCUMENTAL Y REGISTRO ARQUEOLÃƒâ€œGICO
 ## 4. CONSTITUCIÃƒâ€œN GEOLÃƒâ€œGICA / MATERIAL
-## 5. HISTORIOGRAFÃƒÂA Y DESCUBRIMIENTOS CLAVE
-## 6. MAPEO DE FUENTES WEB Y REFERENCIAS ACADÃƒâ€°MICAS
-## 7. DISCREPANCIAS, DUDAS ABIERTAS Y ANÃƒÂLISIS OSINT`;
+## 5. HISTORIOGRAFíA Y DESCUBRIMIENTOS CLAVE
+## 6. MAPEO DE FUENTES WEB Y REFERENCIAS ACADÉMICAS
+## 7. DISCREPANCIAS, DUDAS ABIERTAS Y ANíLISIS OSINT`;
 
     const responseGemini = await genai.models.generateContent({
       model: 'gemini-3.8-flash',
@@ -738,16 +703,16 @@ ESTRUCTURA OBLIGATORIA DEL INFORME:
 });
 
 // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
-// RUTA 3C: /api/redaccion-premium -- Fase de ProducciÃƒÂ³n Literaria TGP
+// RUTA 3C: /api/redaccion-premium -- Fase de Producción Literaria TGP
 // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 app.post('/api/redaccion-premium', async (c) => {
   const apiKey = c.req.header('x-api-key') || (c.req.header('Authorization') ?? '').replace('Bearer ', '').trim();
   if (TGP_MIND_API_KEY && apiKey !== TGP_MIND_API_KEY) {
-    return c.json({ error: 'No autorizado: API Key invÃƒÂ¡lida.' }, 401);
+    return c.json({ error: 'No autorizado: API Key inválida.' }, 401);
   }
 
   let body: { id?: string; informe_directo?: string };
-  try { body = await c.req.json(); } catch { return c.json({ error: 'Payload JSON invÃƒÂ¡lido.' }, 400); }
+  try { body = await c.req.json(); } catch { return c.json({ error: 'Payload JSON inválido.' }, 400); }
 
   const id = body?.id || crypto.randomUUID();
   let informeTexto = body?.informe_directo || '';
@@ -763,7 +728,7 @@ app.post('/api/redaccion-premium', async (c) => {
     }
 
     if (!informeTexto) {
-      return c.json({ error: 'No se encontrÃƒÂ³ el informe OSINT para redactar el ensayo.' }, 400);
+      return c.json({ error: 'No se encontró el informe OSINT para redactar el ensayo.' }, 400);
     }
 
     console.log(`[RedacciÃ³n Documental NatGeo] Redactando artÃ­culo forense/arqueolÃ³gico con Gemini Flash (Temp: 0.2) (ID: ${id})...`);
@@ -783,13 +748,13 @@ app.post('/api/redaccion-premium', async (c) => {
 
     const ensayoFinal = responseGemini.text || 'Error al generar el ensayo.';
 
-    console.log('[RedacciÃƒÂ³n Premium] Sintetizando audio narrativo en R2...');
+    console.log('[Redacción Premium] Sintetizando audio narrativo en R2...');
     const audioUrl = await generarYGuardarAudioTTS(id, ensayoFinal);
 
     try {
       await actualizarRegistroD1(id, ensayoFinal, audioUrl);
     } catch (errD1) {
-      console.warn('[RedacciÃƒÂ³n Premium] Aviso actualizando D1:', errD1);
+      console.warn('[Redacción Premium] Aviso actualizando D1:', errD1);
     }
 
     return c.json({
@@ -799,7 +764,7 @@ app.post('/api/redaccion-premium', async (c) => {
       imagen_url: imagenUrl,
     });
   } catch (err: any) {
-    console.error('[RedacciÃƒÂ³n Premium Error]:', err);
+    console.error('[Redacción Premium Error]:', err);
     return c.json({ error: 'Fallo al procesar el ensayo premium.', detalles: err?.message }, 500);
   }
 });
