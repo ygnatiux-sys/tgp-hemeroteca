@@ -7,12 +7,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { Hono } from 'hono';
-import { routeIncomingMessage } from './ia/semantic-router.js';
+import { routeIncomingMessage } from '../ia/semantic-router.js';
 import {
   ejecutarDecisionAssistant,
   ejecutarEnsayoAssistantDesdeD1,
-} from './telegram/router.js';
-import { getHITLState, clearHITLState } from './storage/d1.js';
+} from '../telegram/router.js';
+import { getHITLState, clearHITLState } from '../storage/d1.js';
 
 export const devBotApp = new Hono();
 

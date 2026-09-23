@@ -6,8 +6,8 @@
 
 import { Hono } from 'hono';
 import crypto from 'node:crypto';
-import { routeIncomingMessage } from '../ia/semantic-router.js';
-import { callGemini, crearModeloEnsayo, genai, TGP_SYSTEM_PROMPT, buildDensityInstruction, clearHistory } from '../ia/gemini.js';
+import { routeIncomingMessage } from '../../../ia/semantic-router.js';
+import { callGemini, crearModeloEnsayo, genai, TGP_SYSTEM_PROMPT, buildDensityInstruction, clearHistory } from '../../../ia/gemini.js';
 import {
   sendTelegram,
   editMessageText,
@@ -28,15 +28,15 @@ import {
   publicarEnZernio,
   SesionSocialConfig,
 } from './social.js';
-import { procesarFotoTelegramAR2, subirBufferOsintAR2, estandarizarYSubirImagenAR2 } from '../storage/r2.js';
-import { guardarEnCloudflareD1, obtenerInformeD1, registrarResguardoD1, getHITLState, setHITLState, clearHITLState } from '../storage/d1.js';
-import { procesarImagen, resolverEntidadCanonica, buscarPageImageWikipedia } from '../vision/wikimedia.js';
+import { procesarFotoTelegramAR2, subirBufferOsintAR2, estandarizarYSubirImagenAR2 } from '../../../storage/r2.js';
+import { guardarEnCloudflareD1, obtenerInformeD1, registrarResguardoD1, getHITLState, setHITLState, clearHITLState } from '../../../storage/d1.js';
+import { procesarImagen, resolverEntidadCanonica, buscarPageImageWikipedia } from '../../../vision/wikimedia.js';
 import {
   generarSlug,
   generarMarkdoc,
   publicarEntradaKeystaticGitHub,
   publicarEnGitHub,
-} from '../servicios/publicacion.js';
+} from '../../../servicios/publicacion.js';
 
 export interface TelegramRouterConfig {
   telegramToken: string;
