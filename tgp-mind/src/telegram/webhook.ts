@@ -19,7 +19,7 @@
 import { procesarFotoTelegramAR2 } from '../storage/r2.js';
 import { appendTurn, clearChatHistory, getConversationHistory } from '../storage/d1.js';
 import { processTelegramMessage, BotIdentity } from '../ia/agent.js';
-// import { EruditoAgent } from '../core/agents/EruditoAgent.js';
+import { EruditoAgent } from '../core/agents/EruditoAgent.js';
 import {
   esFichaVisual,
   TECLADO_CONFIRMACION,
@@ -210,11 +210,26 @@ export async function handleTelegramWebhook(
 
     // Tratar callback_data como texto semántico → Gemini
     try {
-      // ── MODO HITL PARA ERUDITO SDK (TEST LIMINAL) ── [CUARENTENA TEMP]
-      // EruditoAgent en cuarentena hasta confirmar deploy estable.
-      // El bloque resume() se reactivará en la siguiente etapa.
-      if (botIdentity === 'liminal' && data.startsWith('approve_tool|')) {
-        await sendTelegramMessage(chatId, botToken, '🔧 [Cuarentena] Aprobación HITL registrada. Erudito SDK se reactivará pronto.');
+      // ── MODO HITL PARA ERUDITO SDK (TEST LIMINAL) ──
+      if (botIdentity === 'liminal' && (data === 'erudito_pro' || data === 'erudito_flash')) {
+        const usePro = data === 'erudito_pro';
+        await editMessageReplyMarkup(botToken, chatId, messageId!, [
+          [{ text: usePro ? '💎 Generando con Pro...' : '⚡ Generando con Flash...', callback_data: 'disabled' }]
+        ]);
+        
+        const erudito = new EruditoAgent(process.env.GEMINI_API_KEY || '');
+        const history = await getConversationHistory(chatId, 12, botIdentity);
+        
+        // El Agent usa history para entender el contexto. Pasamos tema=""
+        const response = await erudito.generateEssay('', '', 'divulgativo', history, usePro);
+        
+        if (response.status === 'COMPLETED') {
+           const keyboard = esFichaVisual(response.content || '') ? TECLADO_CONFIRMACION : undefined;
+           await sendTelegramMessage(chatId, botToken, response.content || '', keyboard);
+           await appendTurn(chatId, 'model', [{ text: response.content || '' }], botIdentity);
+        } else if (response.status === 'REQUIRES_ACTION') {
+           await sendTelegramMessage(chatId, botToken, `🔧 [HITL] Erudito solicitó Tool: ${response.toolCall?.name}`);
+        }
         return;
       }
 
@@ -330,7 +345,37 @@ export async function handleTelegramWebhook(
 
     // ── MODO HITL PARA ERUDITO SDK (TEST LIMINAL) ──
     if (botIdentity === 'liminal') {
-      await sendTelegramMessage(chatId, botToken, "🤖 [TGP Cuarentena] Liminal está en mantenimiento programado. Vuelvo pronto.");
+      const erudito = new EruditoAgent(process.env.GEMINI_API_KEY || '');
+      
+      // En EruditoAgent, la función execute() apendea el userText. 
+      // Por eso pasamos history. NO lo guardamos en D1 todavía para no duplicarlo,
+      // o bien lo guardamos y le pasamos history SIN el último turno.
+      // Para mayor simplicidad y mantener la base de datos limpia, Erudito maneja
+      // la charla y nosotros lo guardamos.
+      
+      await appendTurn(chatId, 'user', [{ text: textParaAgente }], botIdentity);
+      const history = await getConversationHistory(chatId, 12, botIdentity);
+      
+      // En Telegram, el "tema" es implícito por el historial, así que mandamos ''
+      const response = await erudito.generateEssay('', '', 'divulgativo', history, false);
+
+      if (response.status === 'COMPLETED') {
+         let customKeyboard = esFichaVisual(response.content || '') ? TECLADO_CONFIRMACION : undefined;
+         
+         // Inyectar teclado para sugerencia de Pro
+         if (response.content?.includes('sí, usá Pro')) {
+           customKeyboard = [
+             [{ text: '💎 Sí, usar Pro', callback_data: 'erudito_pro' }],
+             [{ text: '⚡ Generar ahora con Flash', callback_data: 'erudito_flash' }]
+           ];
+         }
+         
+         await sendTelegramMessage(chatId, botToken, response.content || '', customKeyboard);
+         await appendTurn(chatId, 'model', [{ text: response.content || '' }], botIdentity);
+      } else if (response.status === 'REQUIRES_ACTION') {
+         // Lógica HITL
+         await sendTelegramMessage(chatId, botToken, `🔧 [HITL] Erudito requiere ejecutar: ${response.toolCall?.name}`);
+      }
       return;
     }
 
