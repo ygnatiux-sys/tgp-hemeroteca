@@ -153,6 +153,24 @@ app.use('*', cors({
 
 app.get('/', (c) => c.json({ status: 'TGP Mind activo', ts: new Date().toISOString() }));
 
+app.get('/debug-d1', async (c) => {
+  try {
+    const url = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${CLOUDFLARE_D1_DATABASE_ID}/query`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${CLOUDFLARE_API_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ sql: "SELECT id, origen, destino, tema, fecha_creacion, length(texto_generado) as len FROM resguardo_documental ORDER BY fecha_creacion DESC LIMIT 20" })
+    });
+    const data = await response.json();
+    return c.json(data);
+  } catch(e) {
+    return c.json({ error: String(e) });
+  }
+});
+
 
 
 // Las rutas se registrarán más abajo.

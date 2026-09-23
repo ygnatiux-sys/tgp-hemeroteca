@@ -223,6 +223,7 @@ export async function handleTelegramWebhook(
       const errMsg = err?.message || String(err);
       console.error(`[Webhook CB] ❌ CRASH — chat_id=${chatId}: ${errMsg}`);
       console.error(err);
+      try { (await import('node:fs')).appendFileSync('../scratch/bot_error.log', new Date().toISOString() + ' CB Error: ' + (err?.stack || errMsg) + '\n'); } catch (e) {}
       if (data === 'ok' && messageId) {
         await editMessageReplyMarkup(botToken, chatId, messageId, [
           [{ text: '⚠️ Error en la generación', callback_data: 'disabled' }],
@@ -335,6 +336,7 @@ export async function handleTelegramWebhook(
     console.error(`[Webhook] ❌ CRASH en processTelegramMessage — chat_id=${chatId}: ${errMsg}`);
     console.error('[Webhook] Stack:', err?.stack || '(sin stack)');
     console.error(err);
+    try { (await import('node:fs')).appendFileSync('../scratch/bot_error.log', new Date().toISOString() + ' MSG Error: ' + (err?.stack || errMsg) + '\n'); } catch (e) {}
     await sendTelegramMessage(
       chatId,
       botToken,

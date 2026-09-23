@@ -6,11 +6,16 @@
 .env.local
 .env.*
 !.env.example
+tgp-mind/.env
+tgp-mind/.env.*
+!tgp-mind/.env.example
+
 dist/
 node_modules/
 .history/
 node_modules
 tgp-mind-*.json
+
 # Cloudflare local state
 .wrangler/
 
@@ -20,5 +25,6 @@ tgp-scraper/Config.js
 tgp-scraper/.clasp.json
 tgp-scraper/node_modules/
 
-# Local utility scripts
+# Local utility scripts (pueden contener secretos hardcodeados)
 *.bat
+scratch/
