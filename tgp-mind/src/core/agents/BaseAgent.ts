@@ -1,10 +1,10 @@
-﻿import { GoogleGenAI, Type } from '@google/genai';
+import { GoogleGenAI, Type } from '@google/genai';
 import type { AgentResponse, TgpTool, AgentStatus } from './types.js';
 
 export abstract class BaseAgent {
   protected ai: GoogleGenAI;
   protected tools: TgpTool[] = [];
-  protected modelName: string = 'gemini-3.1-pro-preview';
+  protected modelName: string = 'gemini-2.5-flash';  // Default: Flash para tests seguros. Pro es opt-in.
   protected temperature: number = 0.7;
 
   constructor(apiKey: string) {

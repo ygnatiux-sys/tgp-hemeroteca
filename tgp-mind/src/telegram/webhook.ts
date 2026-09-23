@@ -19,7 +19,7 @@
 import { procesarFotoTelegramAR2 } from '../storage/r2.js';
 import { appendTurn, clearChatHistory, getConversationHistory } from '../storage/d1.js';
 import { processTelegramMessage, BotIdentity } from '../ia/agent.js';
-import { EruditoAgent } from '../core/agents/EruditoAgent.js';
+// import { EruditoAgent } from '../core/agents/EruditoAgent.js';
 import {
   esFichaVisual,
   TECLADO_CONFIRMACION,
@@ -210,28 +210,11 @@ export async function handleTelegramWebhook(
 
     // Tratar callback_data como texto semántico → Gemini
     try {
-      // ── MODO HITL PARA ERUDITO SDK (TEST LIMINAL) ──
+      // ── MODO HITL PARA ERUDITO SDK (TEST LIMINAL) ── [CUARENTENA TEMP]
+      // EruditoAgent en cuarentena hasta confirmar deploy estable.
+      // El bloque resume() se reactivará en la siguiente etapa.
       if (botIdentity === 'liminal' && data.startsWith('approve_tool|')) {
-        const parts = data.split('|');
-        const toolName = parts[1];
-        
-        // Simular ejecución del tool (en producción invocarías el execute del tool real)
-        await editMessageReplyMarkup(botToken, chatId, messageId, [
-          [{ text: '⚡ Ejecutando ' + toolName + '...', callback_data: 'disabled' }],
-        ]);
-        
-        // Como es una prueba rápida, le decimos al LLM que la herramienta tuvo éxito
-        const toolResult = { success: true, message: `Tool ${toolName} ejecutado con éxito por el humano.` };
-        
-        const rawHistory = await getConversationHistory(chatId, 12, botIdentity);
-        const history = rawHistory as any[];
-        
-        const erudito = new EruditoAgent(process.env.GEMINI_API_KEY!);
-        const res = await erudito.resume(toolName, toolResult, "Continúa", "", history);
-        
-        if (res.status === 'COMPLETED' && res.content) {
-          await sendTelegramMessage(chatId, botToken, res.content);
-        }
+        await sendTelegramMessage(chatId, botToken, '🔧 [Cuarentena] Aprobación HITL registrada. Erudito SDK se reactivará pronto.');
         return;
       }
 
@@ -347,29 +330,7 @@ export async function handleTelegramWebhook(
 
     // ── MODO HITL PARA ERUDITO SDK (TEST LIMINAL) ──
     if (botIdentity === 'liminal') {
-      const erudito = new EruditoAgent(process.env.GEMINI_API_KEY!);
-      const rawHistory = await getConversationHistory(chatId, 12, botIdentity);
-      const history = rawHistory as any[];
-      
-      const res = await erudito.generateEssay(textParaAgente, "", "divulgativo", history);
-      
-      // Guardar en D1
-      if (textParaAgente) {
-         await appendTurn(chatId, 'user', [{ text: textParaAgente }], botIdentity);
-      }
-      
-      if (res.status === 'REQUIRES_ACTION' && res.toolCall) {
-        const msgText = `🤖 *El Agente Erudito requiere tu aprobación.*\n\nDesea usar la herramienta: \`${res.toolCall.name}\`\nCon argumentos:\n\`\`\`json\n${JSON.stringify(res.toolCall.args, null, 2)}\n\`\`\``;
-        const kb: InlineKeyboard = [[
-          { text: '✅ Aprobar Acción', callback_data: `approve_tool|${res.toolCall.name}` }
-        ]];
-        await sendTelegramMessage(chatId, botToken, msgText, kb);
-      } else if (res.status === 'COMPLETED' && res.content) {
-        await appendTurn(chatId, 'model', [{ text: res.content }], botIdentity);
-        await sendTelegramMessage(chatId, botToken, res.content);
-      } else if (res.status === 'ERROR') {
-        await sendTelegramMessage(chatId, botToken, `⚠️ Error en SDK: ${res.error}`);
-      }
+      await sendTelegramMessage(chatId, botToken, "🤖 [TGP Cuarentena] Liminal está en mantenimiento programado. Vuelvo pronto.");
       return;
     }
 
