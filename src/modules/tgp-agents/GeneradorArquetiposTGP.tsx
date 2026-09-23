@@ -4,25 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 // Keystatic usa inputs controlados por React. El simple `element.value = x`
 // no dispara el estado interno de React. Este helper usa el setter nativo
 // del prototipo para forzar que React detecte el cambio.
-function setNativeValue(element: HTMLElement, value: string): void {
-  const proto = Object.getPrototypeOf(element);
-  const descriptor =
-    Object.getOwnPropertyDescriptor(proto, 'value') ||
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value') ||
-    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
-
-  if (descriptor && descriptor.set) {
-    descriptor.set.call(element, value);
-  } else {
-    // Fallback: asignacion directa si no se encontro el descriptor
-    (element as any).value = value;
-  }
-
-  // Disparar todos los eventos que React 18 necesita para detectar el cambio
-  element.dispatchEvent(new Event('input',  { bubbles: true }));
-  element.dispatchEvent(new Event('change', { bubbles: true }));
-  element.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true }));
-}
+import { setNativeValue } from '../lib/keystaticDomHacks';
+import { getTgpBackup, saveTgpBackup, clearTgpBackup } from '../hooks/useTgpBackup';
 
 export function GeneradorArquetiposTGP({ value, onChange }: any) {
   const [titulo, setTitulo] = useState('');
@@ -73,33 +56,21 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
     if (value && value !== informe) {
       setInforme(value);
     } else if (!value) {
-      try {
-        const savedBackup = localStorage.getItem(BACKUP_KEY);
-        if (savedBackup && currentSlug !== 'new' && currentSlug !== 'nuevo_arquetipo') {
-          const parsed = JSON.parse(savedBackup);
-          if (parsed.informe && !informe) {
-            setInforme(parsed.informe);
-            if (parsed.volantaIA) setVolantaIA(parsed.volantaIA);
-            if (parsed.excerptIA) setExcerptIA(parsed.excerptIA);
-            if (parsed.categoryIA) setCategoryIA(parsed.categoryIA);
-            if (parsed.arteResult) setArteResult(parsed.arteResult);
-          }
+      const parsed = getTgpBackup(BACKUP_KEY, currentSlug);
+      if (parsed) {
+        if (parsed.informe && !informe) {
+          setInforme(parsed.informe);
+          if (parsed.volantaIA) setVolantaIA(parsed.volantaIA);
+          if (parsed.excerptIA) setExcerptIA(parsed.excerptIA);
+          if (parsed.categoryIA) setCategoryIA(parsed.categoryIA);
+          if (parsed.arteResult) setArteResult(parsed.arteResult);
         }
-      } catch (e) {}
+      }
     }
   }, [value, currentSlug]);
 
   const saveToLocalBackup = (dataToSave: any) => {
-    try {
-      const currentBackup = JSON.parse(localStorage.getItem(BACKUP_KEY) || '{}');
-      const updated = {
-        ...currentBackup,
-        ...dataToSave,
-        slug: currentSlug,
-        updatedAt: new Date().toISOString()
-      };
-      localStorage.setItem(BACKUP_KEY, JSON.stringify(updated));
-    } catch (e) {}
+    saveTgpBackup(BACKUP_KEY, currentSlug, dataToSave);
   };
 
   // Helper: bloquea/desbloquea el botón Save nativo de Keystatic
@@ -132,7 +103,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
     setArteResult(null);
     setTitulo('');
     pendingRef.current = {};
-    try { localStorage.removeItem(BACKUP_KEY); } catch (e) {}
+    clearTgpBackup(BACKUP_KEY);
   };
 
   const detectPostTitle = (): string => {

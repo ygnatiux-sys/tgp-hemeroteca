@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { setNativeValue, injectIntoKeystaticDocumentEditor } from './GeneradorGeorreferenciaTGP';
+import { setNativeValue, injectIntoKeystaticDocumentEditor } from '../lib/keystaticDomHacks';
+import { getTgpBackup, saveTgpBackup } from '../hooks/useTgpBackup';
 
 export function GeneradorTextoTGP({ value, onChange }: any) {
   const [titulo, setTitulo] = useState('');
@@ -49,19 +50,14 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
     if (value && value !== ensayo) {
       setEnsayo(value);
     } else if (!value) {
-      try {
-        const savedBackup = localStorage.getItem(BACKUP_KEY);
-        if (savedBackup && currentSlug !== 'new' && currentSlug !== 'nuevo_post') {
-          const parsed = JSON.parse(savedBackup);
-          if (parsed.ensayo && !ensayo) {
-            setEnsayo(parsed.ensayo);
-            if (parsed.excerptIA) setExcerptIA(parsed.excerptIA);
-            if (parsed.categoryIA) setCategoryIA(parsed.categoryIA);
-            if (parsed.arteResult) setArteResult(parsed.arteResult);
-          }
+      const parsed = getTgpBackup(BACKUP_KEY, currentSlug);
+      if (parsed) {
+        if (parsed.ensayo && !ensayo) {
+          setEnsayo(parsed.ensayo);
+          if (parsed.excerptIA) setExcerptIA(parsed.excerptIA);
+          if (parsed.categoryIA) setCategoryIA(parsed.categoryIA);
+          if (parsed.arteResult) setArteResult(parsed.arteResult);
         }
-      } catch (e) {
-        console.warn('Error leyendo backup local:', e);
       }
     }
   }, [value, currentSlug]);
@@ -73,18 +69,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
     categoryIA?: string;
     arteResult?: any;
   }) => {
-    try {
-      const currentBackup = JSON.parse(localStorage.getItem(BACKUP_KEY) || '{}');
-      const updated = {
-        ...currentBackup,
-        ...dataToSave,
-        slug: currentSlug,
-        updatedAt: new Date().toISOString()
-      };
-      localStorage.setItem(BACKUP_KEY, JSON.stringify(updated));
-    } catch (e) {
-      console.warn('Error guardando en backup local:', e);
-    }
+    saveTgpBackup(BACKUP_KEY, currentSlug, dataToSave);
   };
 
   // Limpiar lienzo para empezar de cero sin arrastrar datos viejos

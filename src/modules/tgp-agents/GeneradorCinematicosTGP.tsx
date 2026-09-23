@@ -4,100 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 // Keystatic usa inputs controlados por React. El simple `element.value = x`
 // no dispara el estado interno de React. Este helper usa el setter nativo
 // del prototipo para forzar que React detecte el cambio y valide el slug.
-// setNativeValue: función interna (no re-exportada para evitar colisión con GeneradorGeorreferenciaTGP)
-function setNativeValue(element: HTMLElement, value: string): void {
-  const proto = Object.getPrototypeOf(element);
-  const descriptor =
-    Object.getOwnPropertyDescriptor(proto, 'value') ||
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value') ||
-    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
-
-  if (descriptor && descriptor.set) {
-    descriptor.set.call(element, value);
-  } else {
-    (element as any).value = value;
-  }
-
-  // Disparar todos los eventos que React 18 necesita para detectar el cambio
-  element.dispatchEvent(new Event('input',  { bubbles: true }));
-  element.dispatchEvent(new Event('change', { bubbles: true }));
-  element.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true }));
-}
-
-// ─── Helper: inyectar en el editor ProseMirror de KS (fields.document "Contenido") ───────
-function injectIntoKSDocumentEditor(markdownText: string): boolean {
-  if (typeof document === 'undefined' || !markdownText) return false;
-  
-  // Buscar el editor ProseMirror de Keystatic (campo Contenido)
-  const editorEl = document.querySelector<HTMLDivElement>(
-    '.ProseMirror[contenteditable="true"], [contenteditable="true"].ProseMirror, div[contenteditable="true"][role="textbox"], [contenteditable="true"]'
-  );
-  if (!editorEl) {
-    console.warn('[TGP] Editor ProseMirror no encontrado en el DOM.');
-    return false;
-  }
-
-  try {
-    // 1. Enfocar el editor
-    editorEl.focus();
-
-    // 2. Seleccionar todo el contenido existente
-    const sel = window.getSelection();
-    const range = document.createRange();
-    range.selectNodeContents(editorEl);
-    sel?.removeAllRanges();
-    sel?.addRange(range);
-
-    // 3. Método Primario: Simulación de Pegado con DataTransfer (ProseMirror nativo)
-    const dt = new DataTransfer();
-    dt.setData('text/plain', markdownText);
-    const htmlFormatted = markdownText
-      .split('\n\n')
-      .filter(Boolean)
-      .map(p => p.startsWith('#') ? `<h2>${p.replace(/^#+\s*/, '')}</h2>` : `<p>${p}</p>`)
-      .join('');
-    dt.setData('text/html', htmlFormatted);
-
-    const pasteEvt = new ClipboardEvent('paste', {
-      clipboardData: dt,
-      bubbles: true,
-      cancelable: true,
-      composed: true
-    });
-    editorEl.dispatchEvent(pasteEvt);
-
-    // 4. Método Secundario: execCommand insertText
-    try {
-      document.execCommand('insertText', false, markdownText);
-    } catch (e) {}
-
-    // 5. Método Terciario: InputEvent beforeinput
-    try {
-      const inputEvt = new InputEvent('beforeinput', {
-        inputType: 'insertText',
-        data: markdownText,
-        bubbles: true,
-        cancelable: true,
-        composed: true
-      });
-      editorEl.dispatchEvent(inputEvt);
-    } catch (e) {}
-
-    // 6. Copiar automáticamente al portapapeles como respaldo
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(markdownText);
-      }
-    } catch (e) {}
-
-    // 7. Notificar cambio de input
-    editorEl.dispatchEvent(new Event('input', { bubbles: true }));
-    return true;
-  } catch (err) {
-    console.error('[TGP] Error inyectando en ProseMirror:', err);
-    return false;
-  }
-}
+import { setNativeValue, injectIntoKeystaticDocumentEditor as injectIntoKSDocumentEditor } from '../lib/keystaticDomHacks';
+import { getTgpBackup, saveTgpBackup } from '../hooks/useTgpBackup';
 
 export interface GeminiCinematicProps {
   value: string;
@@ -157,33 +65,25 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
         setGeneratedText(value);
       }
     } else if (!value) {
-      try {
-        const savedBackup = localStorage.getItem(BACKUP_KEY);
-        if (savedBackup && currentSlug !== 'new' && currentSlug !== 'nuevo_ensayo_cinematico') {
-          const parsed = JSON.parse(savedBackup);
-          if (parsed.text && !generatedText) {
-            setGeneratedText(parsed.text);
-            if (parsed.image) setPreviewImage(parsed.image);
-            if (parsed.excerpt) setExcerptIA(parsed.excerpt);
-          }
+      const parsed = getTgpBackup(BACKUP_KEY, currentSlug);
+      if (parsed) {
+        if (parsed.text && !generatedText) {
+          setGeneratedText(parsed.text);
+          if (parsed.image) setPreviewImage(parsed.image);
+          if (parsed.excerpt) setExcerptIA(parsed.excerpt);
         }
-      } catch (e) {}
+      }
     }
   }, [value, currentSlug]);
 
-  // Sincronizar hacia Keystatic
   const syncToKeystatic = (newText: string, newImage: string | null) => {
     const payload = JSON.stringify({ text: newText, image: newImage });
     onChange(payload);
-    try {
-      localStorage.setItem(BACKUP_KEY, JSON.stringify({
-        text: newText,
-        image: newImage,
-        excerpt: excerptIA,
-        slug: currentSlug,
-        updatedAt: new Date().toISOString()
-      }));
-    } catch (e) {}
+    saveTgpBackup(BACKUP_KEY, currentSlug, {
+      text: newText,
+      image: newImage,
+      excerpt: excerptIA
+    });
   };
 
   // Helper: bloquea/desbloquea el botón Save nativo de Keystatic

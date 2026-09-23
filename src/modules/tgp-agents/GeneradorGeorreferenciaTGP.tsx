@@ -1,74 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-/**
- * Helper para forzar la actualización del valor en inputs y textareas de React 18
- */
-export function setNativeValue(element: HTMLElement | null, value: string) {
-  if (!element || value === undefined || value === null) return;
-  const proto = Object.getPrototypeOf(element);
-  const descriptor =
-    Object.getOwnPropertyDescriptor(proto, 'value') ||
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value') ||
-    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value') ||
-    Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
-
-  if (descriptor && descriptor.set) {
-    descriptor.set.call(element, value);
-  } else {
-    (element as any).value = value;
-  }
-
-  // Disparar los eventos sintéticos que React 18 escucha
-  element.dispatchEvent(new Event('input', { bubbles: true }));
-  element.dispatchEvent(new Event('change', { bubbles: true }));
-  element.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true }));
-}
-
-/**
- * Helper para inyectar programáticamente texto Markdown en el editor ProseMirror (fields.document) de Keystatic
- */
-export function injectIntoKeystaticDocumentEditor(markdownText: string): boolean {
-  if (typeof document === 'undefined' || !markdownText) return false;
-
-  const editorEl = document.querySelector<HTMLDivElement>(
-    '[contenteditable="true"].ProseMirror, [contenteditable="true"][role="textbox"], [contenteditable="true"]'
-  );
-
-  if (!editorEl) {
-    console.warn('[TGP] No se encontró el editor ProseMirror en el DOM.');
-    return false;
-  }
-
-  try {
-    editorEl.focus();
-
-    // Seleccionar todo el contenido actual del editor para sobreescribirlo limpiamente
-    const selection = window.getSelection();
-    const range = document.createRange();
-    range.selectNodeContents(editorEl);
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-
-    // 1. Intentar execCommand('insertText')
-    const success = document.execCommand('insertText', false, markdownText);
-
-    // 2. Si no funcionó execCommand, intentar evento de pegado sintético (ClipboardEvent)
-    if (!success) {
-      const dataTransfer = new DataTransfer();
-      dataTransfer.setData('text/plain', markdownText);
-      const pasteEvent = new ClipboardEvent('paste', {
-        clipboardData: dataTransfer,
-        bubbles: true,
-        cancelable: true,
-      });
-      editorEl.dispatchEvent(pasteEvent);
-    }
-    return true;
-  } catch (err) {
-    console.error('[TGP] Error inyectando en el editor ProseMirror:', err);
-    return false;
-  }
-}
+import { setNativeValue, injectIntoKeystaticDocumentEditor, lockKeystaticSave as lockKeystatiSave } from '../lib/keystaticDomHacks';
+import { getTgpBackup, saveTgpBackup, clearTgpBackup } from '../hooks/useTgpBackup';
 
 export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
   const [lugar, setLugar] = useState('');
@@ -253,21 +186,18 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       }
     } else if (!value) {
       // Solo recuperar backup SI coincide exactamente con este post
-      try {
-        const saved = localStorage.getItem(BACKUP_KEY);
-        if (saved && currentSlug !== 'new' && currentSlug !== 'nuevo_post') {
-          const parsed = JSON.parse(saved);
-          if (parsed.informe && !informe) {
-            setInforme(parsed.informe);
-            if (parsed.volanta) setVolanta(parsed.volanta);
-            if (parsed.saberMas) setSaberMas(parsed.saberMas);
-            if (parsed.excerpt) setExcerpt(parsed.excerpt);
-            if (parsed.imageUrl) setImageUrl(parsed.imageUrl);
-            if (parsed.titulosSugeridos) setTitulosSugeridos(parsed.titulosSugeridos);
-            setStatusFeedback('Borrador restaurado para este post');
-          }
+      const parsed = getTgpBackup(BACKUP_KEY, currentSlug);
+      if (parsed) {
+        if (parsed.informe && !informe) {
+          setInforme(parsed.informe);
+          if (parsed.volanta) setVolanta(parsed.volanta);
+          if (parsed.saberMas) setSaberMas(parsed.saberMas);
+          if (parsed.excerpt) setExcerpt(parsed.excerpt);
+          if (parsed.imageUrl) setImageUrl(parsed.imageUrl);
+          if (parsed.titulosSugeridos) setTitulosSugeridos(parsed.titulosSugeridos);
+          setStatusFeedback('Borrador restaurado para este post');
         }
-      } catch (e) {}
+      }
     }
 
     // Escuchar selección de portada desde BuscadorWikimediaTGP
@@ -292,10 +222,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
   }, [value, currentSlug]);
 
   const saveToLocalBackup = (data: any) => {
-    try {
-      const current = JSON.parse(localStorage.getItem(BACKUP_KEY) || '{}');
-      localStorage.setItem(BACKUP_KEY, JSON.stringify({ ...current, ...data, slug: currentSlug, updatedAt: new Date().toISOString() }));
-    } catch (e) {}
+    saveTgpBackup(BACKUP_KEY, currentSlug, data);
   };
 
   // BOTÓN DE RESET / LIMPIEZA DE LIENZO (Evita mezclas indeseadas)
@@ -312,9 +239,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
     setTitulosSugeridos([]);
     setLugar('');
     pendingRef.current = {};
-    try {
-      localStorage.removeItem(BACKUP_KEY);
-    } catch (e) {}
+    clearTgpBackup(BACKUP_KEY);
     setStatusFeedback('Lienzo reseteado y en blanco para nueva edición');
   };
 
@@ -436,29 +361,7 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
     }
   };
 
-  // Helper: habilita / deshabilita el botón Save nativo de Keystatic en el DOM
-  const lockKeystatiSave = (lock: boolean) => {
-    if (typeof document === 'undefined') return;
-    const saveButtons = document.querySelectorAll<HTMLButtonElement>(
-      'button[type="submit"], form button[type="submit"], [data-keystatic-save-button], button'
-    );
-    saveButtons.forEach(btn => {
-      const label = (btn.textContent || '').trim().toLowerCase();
-      if (label === 'save' || label === 'guardar' || label === 'create') {
-        if (lock) {
-          btn.setAttribute('disabled', 'true');
-          btn.setAttribute('title', '⚠️ Primero presiona «Traspasar Todo» para inyectar el contenido');
-          btn.style.opacity = '0.35';
-          btn.style.cursor = 'not-allowed';
-        } else {
-          btn.removeAttribute('disabled');
-          btn.removeAttribute('title');
-          btn.style.opacity = '';
-          btn.style.cursor = '';
-        }
-      }
-    });
-  };
+
 
   // Activar lock al montar si no hay contenido sinc. — diferido para no interferir con Slate.
   useEffect(() => { setTimeout(() => { if (!isSynced) lockKeystatiSave(true); }, 1200); }, []);
