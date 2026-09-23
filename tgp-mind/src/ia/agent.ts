@@ -241,10 +241,12 @@ export async function processTelegramMessage(
     ? history
     : [{ role: 'user', parts: [{ text: userText || imageContextPrefix || 'Hola' }] }];
 
+  console.log(`[Agent:${botIdentity}] Preparing to send contents to Gemini:`, JSON.stringify(safeContents, null, 2));
+
   // ── Paso 3: Llamar a Gemini ────────────────────────────────────────────────
   const toolsForBot = TOOLS_BY_BOT[botIdentity];
   const response = await genai.models.generateContent({
-    model: 'gemini-3.8-flash',
+    model: 'gemini-2.5-flash',
     contents: safeContents as any,
     config: {
       systemInstruction: SYSTEM_PROMPTS[botIdentity],
@@ -280,8 +282,10 @@ export async function processTelegramMessage(
 
   // Llamada adicional a Gemini para la respuesta textual final (con historial aislado)
   const historyConResult: GeminiTurn[] = await getConversationHistory(chatId, 12, botIdentity);
+  console.log(`[Agent:${botIdentity}] Post-Tool history:`, JSON.stringify(historyConResult, null, 2));
+  
   const finalResponse = await genai.models.generateContent({
-    model: 'gemini-3.8-flash',
+    model: 'gemini-2.5-flash',
     contents: historyConResult as any,
     config: {
       systemInstruction: SYSTEM_PROMPTS[botIdentity],
