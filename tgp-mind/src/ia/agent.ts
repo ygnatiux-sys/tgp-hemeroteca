@@ -233,14 +233,19 @@ export async function processTelegramMessage(
   // Solo carga el historial de ESTE bot (botIdentity). Aislamiento garantizado.
   const history: GeminiTurn[] = await getConversationHistory(chatId, 12, botIdentity);
 
-  // history ya incluye el turno del usuario recién guardado porque
-  // appendUserText es síncrono antes de esta llamada.
+  // GUARD: Si el historial está vacío (primera vez, o D1 falló) e igualmente
+  // textToSave fue vacío (foto interceptada por webhook), necesitamos al menos
+  // un turn para que Gemini no explote con 'contents are required'.
+  // Usamos userText como fallback de emergencia.
+  const safeContents: GeminiTurn[] = history.length > 0
+    ? history
+    : [{ role: 'user', parts: [{ text: userText || imageContextPrefix || 'Hola' }] }];
 
   // ── Paso 3: Llamar a Gemini ────────────────────────────────────────────────
   const toolsForBot = TOOLS_BY_BOT[botIdentity];
   const response = await genai.models.generateContent({
     model: 'gemini-3.8-flash',
-    contents: history as any,
+    contents: safeContents as any,
     config: {
       systemInstruction: SYSTEM_PROMPTS[botIdentity],
       temperature: 0.2,
