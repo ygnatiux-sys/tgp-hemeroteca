@@ -34,6 +34,7 @@ async function telegramPost(token: string, method: string, body: object): Promis
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(10000), // 10s timeout
   });
   if (!res.ok) {
     const txt = await res.text();
@@ -66,6 +67,7 @@ export async function sendTelegramMessage(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(10000), // 10s timeout
     });
 
     if (!res.ok) {
@@ -81,6 +83,7 @@ export async function sendTelegramMessage(
           disable_web_page_preview: true,
           ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
         }),
+        signal: AbortSignal.timeout(10000), // 10s timeout
       });
     }
   } catch (err) {
@@ -219,6 +222,7 @@ export async function handleTelegramWebhook(
     } catch (err: any) {
       const errMsg = err?.message || String(err);
       console.error(`[Webhook CB] ❌ CRASH — chat_id=${chatId}: ${errMsg}`);
+      console.error(err);
       if (data === 'ok' && messageId) {
         await editMessageReplyMarkup(botToken, chatId, messageId, [
           [{ text: '⚠️ Error en la generación', callback_data: 'disabled' }],
@@ -330,6 +334,7 @@ export async function handleTelegramWebhook(
     const errMsg = err?.message || String(err);
     console.error(`[Webhook] ❌ CRASH en processTelegramMessage — chat_id=${chatId}: ${errMsg}`);
     console.error('[Webhook] Stack:', err?.stack || '(sin stack)');
+    console.error(err);
     await sendTelegramMessage(
       chatId,
       botToken,
