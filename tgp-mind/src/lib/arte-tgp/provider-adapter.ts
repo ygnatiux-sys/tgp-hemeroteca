@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ADAPTADOR DE PROVEEDOR DE IMAGEN Y MODELOS TGP V2
  * Centraliza configuraciones de modelos de Gemini, llamadas al SDK @google/genai y cláusulas negativas.
  */
@@ -146,10 +146,7 @@ export async function generateImageWithGemini(
 ): Promise<ProviderImageResponse> {
   const { prompt, aspectRatio = '16:9', slug = null } = options;
 
-  let apiKey = options.apiKey || import.meta.env.GEMINI_API_KEY;
-  if (!apiKey && typeof process !== 'undefined' && process.env) {
-    apiKey = process.env.GEMINI_API_KEY;
-  }
+  let apiKey = options.apiKey || (typeof process !== 'undefined' ? process.env?.GEMINI_API_KEY : undefined);
 
   if (!apiKey) {
     return {

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ROUTER SEMÁNTICO TGP V2
  * Analiza el título y concepto del ensayo mediante Gemini para inferir el modo narrativo,
  * tratamiento de sujeto, entorno y anclajes históricos con respaldo heurístico.
@@ -21,10 +21,7 @@ export interface SemanticRouterOptions {
 export async function runSemanticRouter(options: SemanticRouterOptions): Promise<SemanticRoutingResult> {
   const { title, concept = '', contextNotes = '', apiKey } = options;
 
-  let key = apiKey || import.meta.env.GEMINI_API_KEY;
-  if (!key && typeof process !== 'undefined' && process.env) {
-    key = process.env.GEMINI_API_KEY;
-  }
+  let key = apiKey || (typeof process !== 'undefined' ? process.env?.GEMINI_API_KEY : undefined);
 
   // Fallback heurístico básico basado en palabras clave del título y concepto
   const fallbackResult: SemanticRoutingResult = inferHeuristicRouting(title, concept);

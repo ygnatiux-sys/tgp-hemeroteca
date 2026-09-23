@@ -1,4 +1,4 @@
-﻿/**
+/**
  * REDACTOR DE PROMPTS VISUALES TGP V2
  * Sintetiza la dirección visual resuelta en un prompt en inglés (70-140 palabras)
  * optimizado para gemini-3.1-flash-image-preview, cerrando con la cláusula negativa dinámica.
@@ -64,10 +64,7 @@ export async function buildFinalImagePrompt(options: PromptWriterOptions): Promi
   const { direction, apiKey, useLLM = true } = options;
   const fallback = buildTemplateImagePrompt(direction);
 
-  let key = apiKey || import.meta.env.GEMINI_API_KEY;
-  if (!key && typeof process !== 'undefined' && process.env) {
-    key = process.env.GEMINI_API_KEY;
-  }
+  let key = apiKey || (typeof process !== 'undefined' ? process.env?.GEMINI_API_KEY : undefined);
 
   if (!useLLM || !key) {
     return fallback;

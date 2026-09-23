@@ -446,12 +446,59 @@ export async function getConversationHistory(chatId: number, limit = 12, botId =
     });
     const data: any = await res.json();
     const rows: Array<{ role: string; content_json: string }> = data?.result?.[0]?.results || [];
-    // Las filas vienen DESC (más recientes primero). Invertir para contexto cronológico.
-    // Mapear role: 'function' -> 'user' para estricta compatibilidad con Gemini REST API.
-    return rows.reverse().map((r) => ({
+    
+    // Las filas vienen DESC (más recientes primero). Invertir para orden cronológico.
+    const rawHistory = rows.reverse().map((r) => ({
       role: (r.role === 'function' ? 'user' : r.role) as GeminiRole,
       parts: JSON.parse(r.content_json) as GeminiPart[],
     }));
+    
+    // SANITIZACIÓN ROBUSTA: Garantizar que Gemini API nunca reciba functionCall / functionResponse
+    // desemparejados causados por LIMIT de SQL o interrupciones.
+    // Reglas de Gemini API:
+    // 1. Un functionResponse DEBE estar precedido inmediatamente por su functionCall correspondiente.
+    // 2. Un functionCall DEBE estar seguido inmediatamente por su functionResponse correspondiente.
+    // 3. El primer turno de la conversación DEBE ser de rol 'user'.
+    const validTurns: GeminiTurn[] = [];
+    for (let i = 0; i < rawHistory.length; i++) {
+      const turn = rawHistory[i];
+      const hasFuncCall = turn.parts?.some(p => p.functionCall);
+      const hasFuncResp = turn.parts?.some(p => p.functionResponse);
+
+      if (hasFuncResp) {
+        const respName = turn.parts?.find(p => p.functionResponse)?.functionResponse?.name;
+        const prevTurn = validTurns[validTurns.length - 1];
+        const prevHasMatchingCall = prevTurn?.role === 'model' &&
+          prevTurn?.parts?.some(p => p.functionCall && p.functionCall.name === respName);
+
+        if (!prevHasMatchingCall) {
+          console.warn(`[D1 Sanitizer] Descartando functionResponse huérfano '${respName}' sin functionCall previo.`);
+          continue;
+        }
+      }
+
+      if (hasFuncCall) {
+        const callName = turn.parts?.find(p => p.functionCall)?.functionCall?.name;
+        const nextTurn = rawHistory[i + 1];
+        const nextHasMatchingResp = nextTurn?.parts?.some(
+          p => p.functionResponse && p.functionResponse.name === callName
+        );
+
+        if (!nextHasMatchingResp) {
+          console.warn(`[D1 Sanitizer] Descartando functionCall huérfano '${callName}' sin functionResponse posterior.`);
+          continue;
+        }
+      }
+
+      validTurns.push(turn);
+    }
+
+    // Asegurar que el historial no arranque con turno de 'model'
+    while (validTurns.length > 0 && validTurns[0].role === 'model') {
+      validTurns.shift();
+    }
+
+    return validTurns;
   } catch (err) {
     console.warn('[D1 Messages] Error obteniendo historial:', err);
     return [];
