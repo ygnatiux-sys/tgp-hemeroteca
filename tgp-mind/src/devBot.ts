@@ -18,7 +18,7 @@ export const devBotApp = new Hono();
 
 // Obtención aislada de credenciales del bot de desarrollo
 const getDevToken = () =>
-  (process.env.TELEGRAM_DEV_BOT_TOKEN || '8981969434:AAG5KsziYoTCELD_euML7FKJVTYF3_SuyqY')
+  (process.env.TELEGRAM_DEV_BOT_TOKEN || '')
     .replace(/['"]/g, '')
     .trim();
 

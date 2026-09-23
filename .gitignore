@@ -1,20 +1,30 @@
 # Astro build & dev runtime cache
 .astro/
 
-# Environment variables and secrets
+# Environment variables and secrets (en raíz y cualquier subcarpeta)
 .env
-.env.local
 .env.*
+**/.env
+**/.env.*
 !.env.example
-tgp-mind/.env
-tgp-mind/.env.*
-!tgp-mind/.env.example
+!**/.env.example
 
 dist/
 node_modules/
 .history/
 node_modules
 tgp-mind-*.json
+*credentials*.json
+*service-account*.json
+*.pem
+*.key
+*_out.json
+*output*.json
+d1_*.json
+
+# Logs
+*.log
+npm-debug.log*
 
 # Cloudflare local state
 .wrangler/
