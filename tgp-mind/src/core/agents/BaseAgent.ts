@@ -59,8 +59,8 @@ export abstract class BaseAgent {
         return {
           status: 'REQUIRES_ACTION',
           toolCall: {
-            name: functionCall.name,
-            args: functionCall.args,
+            name: functionCall.name ?? '',
+            args: (functionCall.args ?? {}) as Record<string, any>,
           }
         };
       }
