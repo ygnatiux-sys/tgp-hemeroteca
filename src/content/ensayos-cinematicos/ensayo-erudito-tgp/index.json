@@ -1,0 +1,4 @@
+{
+  "title": "Ensayo Erudito TGP",
+  "generadorTexto": "{\"text\":\"---\\ntitle: \\\"Ensayo Erudito TGP\\\"\\ndate: \\\"2026-09-24\\\"\\natmosfera: \\\"obsidiana\\\"\\ncoverImage: \\\"\\\"\\nexcerpt: \\\"✍️ *Erudito detectó que este ensayo podría beneficiarse del motor Pro.*\\n\\nEstoy usando **Flash** (rápido y analítico) por defecto.\\nSi querés la versión Premium completa con mayor pr...\\\"\\ngenerador: \\\"TGP Mind (Gemini + R2 + GitOps)\\\"\\n---\\n\\n✍️ *Erudito detectó que este ensayo podría beneficiarse del motor Pro.*\\n\\nEstoy usando **Flash** (rápido y analítico) por defecto.\\nSi querés la versión Premium completa con mayor profundidad analítica, respondé:\\n\\n> **\\\"usá Pro\\\"** — para activar *gemini-3.1-pro-preview* en este ensayo.\\n> **\\\"adelante\\\"** o **\\\"continúa\\\"** — para generar ahora con Flash.\\n\"}"
+}
