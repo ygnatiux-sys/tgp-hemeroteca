@@ -57,7 +57,21 @@ Responde ÚNICAMENTE con el string de búsqueda. Ejemplo: "Visočica hill" incat
     });
 
     if (!res.ok) throw new Error(`Error en Wikimedia Commons API: ${res.status}`);
-    const data = await res.json();
+    let data: any = await res.json();
+
+    // Fallback: Si la query avanzada de Flash no arrojó resultados, reintentar con la query natural
+    if ((!data.query || !data.query.pages) && advancedQuery !== rawQuery) {
+      console.warn(`[WikimediaTool] Query avanzada sin resultados ('${advancedQuery}'), reintentando con rawQuery: '${rawQuery}'`);
+      const fallbackEndpoint = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(
+        rawQuery
+      )}&gsrnamespace=6&gsrlimit=5&prop=imageinfo&iiprop=url|extmetadata&iiextmetadatafilter=LicenseShortName|Artist|ImageDescription&format=json&origin=*`;
+      const fallbackRes = await fetch(fallbackEndpoint, {
+        headers: { 'User-Agent': 'TGPMind/2.0 (contact@thegreatpuzzleproject.com)' },
+      });
+      if (fallbackRes.ok) {
+        data = await fallbackRes.json();
+      }
+    }
 
     if (!data.query || !data.query.pages) {
       return { success: false, message: 'No se encontraron imágenes para esta búsqueda.' };
