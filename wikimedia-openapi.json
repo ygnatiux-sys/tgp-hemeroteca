@@ -1,0 +1,66 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "TGP Wikimedia Tool",
+    "description": "Busca fotografías reales y de alta calidad en Wikimedia Commons para ensayos.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://tgp-mind-713934653057.us-central1.run.app",
+      "description": "Servidor de producción TGP Cloud Run"
+    }
+  ],
+  "paths": {
+    "/cx-tool-wikimedia": {
+      "post": {
+        "summary": "Buscar imagen en Wikimedia",
+        "operationId": "searchWikimedia",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "Término de búsqueda natural o ambiguo (ej. 'Augusto César')."
+                  }
+                },
+                "required": ["query"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultados estructurados de la búsqueda",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "originalQuery": { "type": "string" },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "title": { "type": "string" },
+                          "url": { "type": "string" },
+                          "author": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -45,6 +45,7 @@ import {
 } from './src/storage/d1.js';
 // -- Vision: Wikimedia Anti-Drift (ver src/vision/wikimedia.ts) ------------------
 import { procesarImagen, resolverEntidadCanonica, buscarPageImageWikipedia } from './src/vision/wikimedia.js';
+import { wikimediaTool } from './src/core/tools/wikimediaTool.js';
 // -- Servicios: Publicacion GitOps (ver src/servicios/publicacion.ts) -------------
 import {
   initPublicacion,
@@ -203,6 +204,30 @@ if (TELEGRAM_TGP_CLOUD_TOKEN) {
 if (TELEGRAM_DEV_TOKEN) {
   app.post(`/bot${TELEGRAM_DEV_TOKEN}`, handleWebhookRoute('liminal', TELEGRAM_DEV_TOKEN));
 }
+
+// ── Dialogflow CX Custom Tool: Wikimedia Commons ─────────────────────────────
+app.post('/cx-tool-wikimedia', async (c) => {
+  try {
+    // 1. Recibir el payload exacto definido por el schema OpenAPI
+    const body = await c.req.json();
+    const query = body.query;
+
+    if (!query) {
+      return c.json({ success: false, error: 'Query is required' }, 400);
+    }
+
+    // 2. Ejecutar la herramienta core intacta
+    const toolResult = await wikimediaTool.execute({ query });
+
+    // 3. Retornar el resultado plano. CX lo procesará y lo sumará a su redacción.
+    return c.json(toolResult);
+
+  } catch (error) {
+    console.error('[CX Tool Error] Wikimedia:', error);
+    return c.json({ success: false, error: 'Error interno en la búsqueda' }, 500);
+  }
+});
+
 
 // -- Google Photos Picker API -- CORS-safe, credenciales en server -----------
 import {
