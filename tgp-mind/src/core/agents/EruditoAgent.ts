@@ -60,24 +60,6 @@ export class EruditoAgent extends BaseAgent {
     // ── Selección de modelo ───────────────────────────────────────────────────
     this.modelName = usePro ? MODEL_PRO : MODEL_FLASH;
 
-    // ── Detección temprana: sugerir Pro sin ejecutarlo ────────────────────────
-    // Si el usuario NO eligió Pro explícitamente pero el tema sugiere que lo necesita,
-    // devolvemos una sugerencia como respuesta de texto antes de generar.
-    if (!usePro && detectsProRequest(tema + ' ' + textoActual)) {
-      return {
-        status: 'COMPLETED',
-        content: [
-          `✍️ *Erudito detectó que este ensayo podría beneficiarse del motor Pro.*`,
-          ``,
-          `Estoy usando **Flash** (rápido y analítico) por defecto.`,
-          `Si querés la versión Premium completa con mayor profundidad analítica, respondé:`,
-          ``,
-          `> **"usá Pro"** — para activar *gemini-3.1-pro-preview* en este ensayo.`,
-          `> **"adelante"** o **"continúa"** — para generar ahora con Flash.`,
-        ].join('\n'),
-      };
-    }
-
     // ── Construcción de mensajes ──────────────────────────────────────────────
     let systemInstruction = '';
     let userMessage = '';

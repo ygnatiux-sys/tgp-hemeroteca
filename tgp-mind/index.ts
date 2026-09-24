@@ -56,6 +56,7 @@ import {
 } from './src/servicios/publicacion.js';
 import { Octokit } from '@octokit/rest';
 import vision from '@google-cloud/vision';
+import { SessionsClient } from '@google-cloud/dialogflow-cx';
 import crypto from 'node:crypto';
 import 'dotenv/config';
 // Ã¢â€â‚¬Ã¢â€â‚¬ Configuración Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
@@ -65,13 +66,17 @@ const TELEGRAM_BOT_NAME  = (process.env.TELEGRAM_BOT_NAME || 'Analista_IMG_bot')
 // GEMINI_API_KEY importada desde ./src/ia/gemini.js
 const TGP_MIND_API_KEY   = (process.env.TGP_MIND_API_KEY || '').replace(/['"]/g, '').trim();
 const XAVIER_CHAT_ID     = 7886507052;
-const DIALOGFLOW_PROJECT  = process.env.DIALOGFLOW_PROJECT  || '';
-const DIALOGFLOW_LOCATION = process.env.DIALOGFLOW_LOCATION || 'us-central1';
-const DIALOGFLOW_AGENT_ID = process.env.DIALOGFLOW_AGENT_ID || '';
+const DIALOGFLOW_PROJECT_ID = process.env.DIALOGFLOW_PROJECT_ID || process.env.DIALOGFLOW_PROJECT || 'tgp-mind';
+const DIALOGFLOW_LOCATION   = process.env.DIALOGFLOW_LOCATION || 'us-central1';
+const DIALOGFLOW_AGENT_ID   = process.env.DIALOGFLOW_AGENT_ID || '7cf1a08f-1b45-48f4-be5f-155eb3ee2848';
+export const dialogflowClient = new SessionsClient({
+  apiEndpoint: `${DIALOGFLOW_LOCATION}-dialogflow.googleapis.com`,
+});
 const TELEGRAM_API        = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
 const TELEGRAM_SOCIAL_TOKEN     = (process.env.REDES_TOKEN || process.env.TELEGRAM_SOCIAL_TOKEN || '').replace(/['"]/g, '').trim();
 const TELEGRAM_TGP_CLOUD_TOKEN  = (process.env.ASSISTANT_TOKEN || process.env.TELEGRAM_TGP_CLOUD_TOKEN || '').replace(/['"]/g, '').trim();
 const TELEGRAM_DEV_TOKEN = (process.env.TELEGRAM_DEV_BOT_TOKEN || process.env.LIMINAL_TOKEN || '').replace(/['"]/g, '').trim(); // TELEGRAM_DEV_BOT_TOKEN=activo verificado (200 OK)
+const TELEGRAM_PREMIUM_TOKEN = (process.env.TELEGRAM_BOT_TOKEN_PREMIUM || '').replace(/['"]/g, '').trim();
 const ZERNIO_API_KEY        = process.env.ZERNIO_API_KEY || '';
 const ZERNIO_FB_ID          = process.env.ZERNIO_FB_ID || '';
 const ZERNIO_TIKTOK_ID      = process.env.ZERNIO_TIKTOK_ID || '';
@@ -204,6 +209,11 @@ if (TELEGRAM_TGP_CLOUD_TOKEN) {
 if (TELEGRAM_DEV_TOKEN) {
   app.post(`/bot${TELEGRAM_DEV_TOKEN}`, handleWebhookRoute('liminal', TELEGRAM_DEV_TOKEN));
 }
+
+if (TELEGRAM_PREMIUM_TOKEN) {
+  app.post(`/bot${TELEGRAM_PREMIUM_TOKEN}`, handleWebhookRoute('liminal', TELEGRAM_PREMIUM_TOKEN));
+}
+app.post('/webhook/telegram-premium', handleWebhookRoute('liminal', TELEGRAM_PREMIUM_TOKEN));
 
 // ── Dialogflow CX Custom Tool: Wikimedia Commons ─────────────────────────────
 app.post('/cx-tool-wikimedia', async (c) => {

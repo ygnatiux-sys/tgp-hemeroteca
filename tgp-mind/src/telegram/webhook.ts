@@ -17,11 +17,21 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { procesarFotoTelegramAR2 } from '../storage/r2.js';
-import { appendTurn, clearChatHistory, getConversationHistory, getHITLState, setHITLState, clearHITLState } from '../storage/d1.js';
+import {
+  appendTurn,
+  clearChatHistory,
+  getConversationHistory,
+  getHITLState,
+  setHITLState,
+  clearHITLState,
+  registrarResguardoD1,
+  generarYGuardarAudioTTS,
+} from '../storage/d1.js';
 import { processTelegramMessage, BotIdentity } from '../ia/agent.js';
 import { EruditoAgent } from '../core/agents/EruditoAgent.js';
 import { wikimediaTool } from '../core/tools/wikimediaTool.js';
 import { nanoBananaTool } from '../core/tools/nanoBananaTool.js';
+import { generarMarkdoc, publicarEntradaKeystaticGitHub } from '../servicios/publicacion.js';
 import {
   esFichaVisual,
   TECLADO_CONFIRMACION,
@@ -401,30 +411,130 @@ export async function handleTelegramWebhook(
     // pasamos textParaAgente='' para que agent.ts no duplique el guardado.
     const textParaAgente = fotoGuardadaEnD1 ? '' : userTextForAgent;
 
-    // ── MODO HITL PARA ERUDITO SDK (TEST LIMINAL — 100% CONVERSACIONAL) ──
+    // ── FLUJO CONTINUO Y ZERO FRICCIÓN (ERUDITO AGENT) ────────────────────────
     if (botIdentity === 'liminal') {
       const erudito = new EruditoAgent(process.env.GEMINI_API_KEY || '');
-      const cleanUserText = textParaAgente.trim();
-      const lowerText = cleanUserText.toLowerCase();
 
-      // 1. Revisar si hay un estado HITL pendiente en Cloudflare D1
-      const hitlState: any = await getHITLState(chatId, botIdentity);
+      // 1. Extraer prompt del usuario y foto permanente en R2 (si se envió)
+      let userPrompt = text;
+      let attachedPhotoUrl: string | null = null;
+      if (hasPhotos && imageContextPrefix) {
+        const match = imageContextPrefix.match(/https:\/\/[^\s\]]+/);
+        if (match) attachedPhotoUrl = match[0];
+      }
 
-      const isApproval = /^(adelante|ok|proceed|proceder|dale|s[ií]|hazlo|hacelo|contin[uú]a|avanza|ejecutar|confirmo|metele)/i.test(lowerText);
-      const wantsPro = lowerText.includes('usá pro') || lowerText.includes('usa pro') || lowerText.includes('modo pro') || (lowerText === 'pro') || Boolean(hitlState?.wantsPro);
+      if (!userPrompt && attachedPhotoUrl) {
+        userPrompt = 'Analiza esta imagen y redacta un ensayo erudito magistral sobre su contexto histórico, arqueológico o simbólico.';
+      }
 
-      let response: any;
+      const lowerText = userPrompt.toLowerCase().trim();
 
-      if (hitlState?.pendingToolCall && isApproval) {
-        // Aprobación confirmada por el usuario
-        const pending = hitlState.pendingToolCall;
-        const toolName = pending.name;
-        const toolArgs = pending.args || {};
-        const originalPrompt = hitlState.originalPrompt || cleanUserText;
-        const useProModel = wantsPro || Boolean(hitlState.wantsPro);
+      // 2. Comandos de Post-Producción y Utilidades (Keystatic GitOps y Audio TTS)
+      if (lowerText.startsWith('/publicar')) {
+        const history = await getConversationHistory(chatId, 6, botIdentity);
+        const lastModelTurn = [...history].reverse().find(t => t.role === 'model');
+        const essayContent = lastModelTurn?.parts?.map((p: any) => p.text).join('\n') || '';
 
-        await clearHITLState(chatId, botIdentity);
-        await sendTelegramMessage(chatId, botToken, `⚡ *[HITL]* Aprobado. Generando recursos y redactando ensayo...`);
+        if (!essayContent) {
+          await sendTelegramMessage(chatId, botToken, '⚠️ No encontré un ensayo reciente en la memoria para publicar. Generá uno primero.');
+          return;
+        }
+
+        await sendTelegramMessage(chatId, botToken, '⏳ Publicando ensayo en GitHub Keystatic...');
+        try {
+          const ghToken = process.env.GITHUB_TOKEN_HEMEROTECA || process.env.GITHUB_TOKEN || '';
+          const ghRepo  = process.env.GITHUB_REPO_HEMEROTECA || 'ygnatiux-sys/tgp-hemeroteca';
+          const tituloMatch = essayContent.match(/^#+\s*(.+)$/m);
+          const titulo = tituloMatch ? tituloMatch[1].replace(/[*_#]/g, '').trim() : 'Ensayo Erudito TGP';
+          const { slug, contenidoMdoc } = generarMarkdoc({
+            titulo,
+            secciones: [{ parrafo: essayContent }],
+          });
+
+          const commitSha = await publicarEntradaKeystaticGitHub({
+            coleccion: 'ensayos-cinematicos',
+            slug,
+            indexJson: { title: titulo, generadorTexto: JSON.stringify({ text: contenidoMdoc }) },
+            contentMdoc: contenidoMdoc,
+            token: ghToken,
+            repoFull: ghRepo,
+            mensajeCommit: `docs(hemeroteca): publicar ensayo "${titulo}" vía Erudito Telegram`,
+          });
+
+          await sendTelegramMessage(
+            chatId,
+            botToken,
+            `✅ *¡Publicado con éxito en TGP Hemeroteca!*\n\n📦 **Commit GitHub:** \`${commitSha.slice(0, 7)}\`\n🌐 **Ruta:** \`src/content/ensayos-cinematicos/${slug}\``
+          );
+        } catch (pubErr: any) {
+          console.error('[Publicar Error]:', pubErr);
+          await sendTelegramMessage(chatId, botToken, `⚠️ Error en la publicación: ${pubErr?.message || pubErr}`);
+        }
+        return;
+      }
+
+      if (lowerText.startsWith('/audio')) {
+        const history = await getConversationHistory(chatId, 6, botIdentity);
+        const lastModelTurn = [...history].reverse().find(t => t.role === 'model');
+        const essayContent = lastModelTurn?.parts?.map((p: any) => p.text).join('\n') || '';
+
+        if (!essayContent) {
+          await sendTelegramMessage(chatId, botToken, '⚠️ No hay un ensayo reciente para generar audio.');
+          return;
+        }
+
+        await sendTelegramMessage(chatId, botToken, '🎙️ Sintetizando audio documental con voz neuronal...');
+        try {
+          const audioUrl = await generarYGuardarAudioTTS(`tgp-${chatId}-${Date.now()}`, essayContent);
+          if (audioUrl) {
+            await sendTelegramMessage(chatId, botToken, `🎧 *Audio documental disponible:*\n🔗 ${audioUrl}`);
+          } else {
+            await sendTelegramMessage(chatId, botToken, '⚠️ No se pudo sintetizar el audio en este momento.');
+          }
+        } catch (audioErr: any) {
+          console.error('[Audio Error]:', audioErr);
+          await sendTelegramMessage(chatId, botToken, `⚠️ Error generando audio: ${audioErr?.message || audioErr}`);
+        }
+        return;
+      }
+
+      // 3. Mapeo Estricto de Perfiles de Ejecución (Zero Fricción)
+      const isProBreve   = /^\/pro_breve\b/i.test(userPrompt);
+      const isProMedio   = /^\/pro_medio\b/i.test(userPrompt);
+      const isProPremium = /^\/pro_premium\b/i.test(userPrompt);
+      const isProGeneric = /^\/pro\b/i.test(userPrompt);
+
+      const wantsPro = isProBreve || isProMedio || isProPremium || isProGeneric ||
+                       /modo pro|us[aá] pro/i.test(userPrompt);
+
+      const cleanPrompt = userPrompt
+        .replace(/^\/(pro_breve|pro_medio|pro_premium|pro)\s*/i, '')
+        .trim();
+
+      // Guardar el turno del usuario en D1
+      await appendTurn(chatId, 'user', [{ text: userPrompt }], botIdentity);
+      const baseHistory = await getConversationHistory(chatId, 10, botIdentity);
+
+      // Si viene con foto adjunta desde Telegram (Escudo R2), inyectarla directo
+      let initialPrompt = cleanPrompt;
+      if (attachedPhotoUrl) {
+        initialPrompt = [
+          `El usuario ha enviado una imagen propia (alojada permanentemente en R2): ${attachedPhotoUrl}`,
+          `NO busques imágenes ni llames a herramientas de generación de portada. Usa esta imagen como referencia visual central.`,
+          `Redacta el ensayo erudito magistral sobre: "${cleanPrompt || 'esta imagen'}"`,
+        ].join('\n');
+      }
+
+      // Ejecutar Erudito Agent
+      let response = await erudito.generateEssay('', initialPrompt, 'divulgativo', baseHistory, wantsPro);
+
+      // 4. Bucle Flujo Continuo: Si el modelo pide una herramienta visual, ejecutarla de inmediato
+      if (response.status === 'REQUIRES_ACTION') {
+        const tc = response.toolCall;
+        const toolName = tc?.name;
+        const toolArgs = tc?.args || {};
+
+        console.log(`[Flujo Continuo] Auto-ejecutando herramienta ${toolName}:`, toolArgs);
 
         let toolResult: any;
         let generatedPhotoUrl: string | null = null;
@@ -444,76 +554,54 @@ export async function handleTelegramWebhook(
             toolResult = { error: `Herramienta ${toolName} no reconocida.` };
           }
         } catch (toolErr: any) {
+          console.error(`[Flujo Continuo Tool Error]:`, toolErr);
           toolResult = { error: toolErr.message };
         }
 
-        // Si se generó o encontró foto con URL permanente, enviarla al chat
+        // Si se obtuvo imagen (Wikimedia o Nano Banana), enviar foto de inmediato al chat
         if (generatedPhotoUrl && !generatedPhotoUrl.startsWith('data:')) {
-          await sendTelegramPhoto(chatId, botToken, generatedPhotoUrl, `🎨 *Portada generada:* "${toolArgs?.title || originalPrompt}"`);
+          const photoCaption = toolName === 'search_wikimedia_photo'
+            ? `🏛️ *Fotografía Histórica (Wikimedia Commons)*\n📌 *${toolArgs?.query || cleanPrompt}*`
+            : `🎨 *Portada Cinematográfica TGP*\n🎬 *"${toolArgs?.title || cleanPrompt}"*`;
+          await sendTelegramPhoto(chatId, botToken, generatedPhotoUrl, photoCaption);
         }
 
-        // Redactar el ensayo con Erudito incorporando la portada ya generada y aprobada
-        const baseHistory = await getConversationHistory(chatId, 12, botIdentity);
+        // Redactar de inmediato el ensayo completo incorporando la imagen obtenida
         const essayPrompt = [
-          `Se ha completado y aprobado la portada visual para este ensayo:`,
-          `- Título de portada: "${toolArgs?.title || originalPrompt}"`,
+          `Se ha completado el recurso visual para este ensayo:`,
+          `- Referencia: "${toolArgs?.title || toolArgs?.query || cleanPrompt}"`,
           toolArgs?.concept ? `- Concepto visual: "${toolArgs.concept}"` : '',
           generatedPhotoUrl ? `- URL de imagen: ${generatedPhotoUrl}` : '',
-          `\nLa portada ya fue generada y enviada al lector. NO vuelvas a llamar a herramientas de imagen.`,
-          `Redacta el ensayo magistral completo sobre "${originalPrompt}".`,
+          `\nLa imagen ya fue generada y enviada al lector. NO vuelvas a llamar a herramientas de imagen.`,
+          `Redacta el ensayo magistral completo sobre "${cleanPrompt}".`,
           `Cumple con todos los estándares: formato Markdown impecable para TGP Hemeroteca, fuentes de autoridad, estructura divulgativo-erudita y profundidad analítica.`
         ].filter(Boolean).join('\n');
 
         response = await erudito.generateEssay(
-          toolArgs?.title || originalPrompt,
+          toolArgs?.title || cleanPrompt,
           essayPrompt,
           'divulgativo',
           baseHistory,
-          useProModel
+          wantsPro
         );
-
-      } else if (hitlState?.pendingToolCall && !isApproval) {
-        // El usuario respondió una corrección conceptual o cambió de opinión
-        await clearHITLState(chatId, botIdentity);
-        await appendTurn(chatId, 'user', [{ text: cleanUserText }], botIdentity);
-        const updatedHistory = await getConversationHistory(chatId, 12, botIdentity);
-        response = await erudito.generateEssay('', cleanUserText, 'divulgativo', updatedHistory, wantsPro);
-
-      } else {
-        // Flujo inicial normal
-        await appendTurn(chatId, 'user', [{ text: cleanUserText }], botIdentity);
-        const updatedHistory = await getConversationHistory(chatId, 12, botIdentity);
-        response = await erudito.generateEssay('', cleanUserText, 'divulgativo', updatedHistory, wantsPro);
       }
 
+      // 5. Entrega del ensayo terminado + Resguardo Documental en D1
       if (response.status === 'COMPLETED') {
         const textToSend = response.content || '';
-        // 100% Conversacional: CERO teclados inline
         await sendTelegramMessage(chatId, botToken, textToSend);
         await appendTurn(chatId, 'model', [{ text: textToSend }], botIdentity);
 
-      } else if (response.status === 'REQUIRES_ACTION') {
-        const tc = response.toolCall;
-        let promptText = '';
-        if (tc?.name === 'search_wikimedia_photo') {
-          promptText = `🔧 *[HITL — Aprobación Requerida]*\n\nErudito propone buscar una fotografía histórica en Wikimedia Commons:\n👉 *"${tc.args?.query || 'consulta'}"*\n\n¿Procedemos? Respondé *"adelante"* o *"ok"* para ejecutar, o indicame si querés ajustar la búsqueda.`;
-        } else if (tc?.name === 'generate_nano_banana_cover') {
-          promptText = `🎨 *[HITL — Aprobación Requerida]*\n\nErudito propone generar una portada cinematográfica:\n🎬 **Título:** "${tc.args?.title || 'Sin título'}"\n📌 **Concepto:** ${tc.args?.concept || 'Arte conceptual'}\n\n¿Procedemos? Respondé *"adelante"* o *"ok"* para generar la imagen, o indicame si querés corregir algún detalle del concepto visual.`;
-        } else {
-          promptText = `🔧 *[HITL — Aprobación Requerida]*\n\nErudito propone ejecutar la herramienta: *${tc?.name}*.\n\n¿Procedemos? Respondé *"adelante"* o *"ok"*.`;
-        }
-
-        // Persistir en Cloudflare D1 hitl_sessions para que sobreviva llamadas HTTP
-        await setHITLState(chatId, {
-          step: 'awaiting_tool_approval',
-          pendingToolCall: tc,
-          originalPrompt: cleanUserText,
-          wantsPro,
-        } as any, botIdentity);
-
-        await sendTelegramMessage(chatId, botToken, promptText);
-        await appendTurn(chatId, 'model', [{ text: promptText }], botIdentity);
-
+        // Registro atómico de resguardo documental en Cloudflare D1
+        await registrarResguardoD1({
+          origen: `telegram-${botIdentity}`,
+          destino: 'hemeroteca',
+          tema: cleanPrompt,
+          textoGenerado: textToSend,
+          metadatos: { prompt: cleanPrompt, wantsPro },
+          imagenR2Url: attachedPhotoUrl || undefined,
+          chatId: chatId,
+        });
       } else if (response.status === 'ERROR') {
         await sendTelegramMessage(chatId, botToken, `⚠️ Error en Erudito: ${response.error || 'Desconocido'}`);
       }
