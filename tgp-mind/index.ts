@@ -70,7 +70,7 @@ const DIALOGFLOW_AGENT_ID = process.env.DIALOGFLOW_AGENT_ID || '';
 const TELEGRAM_API        = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
 const TELEGRAM_SOCIAL_TOKEN     = (process.env.REDES_TOKEN || process.env.TELEGRAM_SOCIAL_TOKEN || '').replace(/['"]/g, '').trim();
 const TELEGRAM_TGP_CLOUD_TOKEN  = (process.env.ASSISTANT_TOKEN || process.env.TELEGRAM_TGP_CLOUD_TOKEN || '').replace(/['"]/g, '').trim();
-const TELEGRAM_DEV_TOKEN = (process.env.LIMINAL_TOKEN || process.env.TELEGRAM_DEV_BOT_TOKEN || '').replace(/['"]/g, '').trim(); // LIMINAL_TOKEN=nuevo (post-roll), TELEGRAM_DEV_BOT_TOKEN=viejo (fallback)
+const TELEGRAM_DEV_TOKEN = (process.env.TELEGRAM_DEV_BOT_TOKEN || process.env.LIMINAL_TOKEN || '').replace(/['"]/g, '').trim(); // TELEGRAM_DEV_BOT_TOKEN=activo verificado (200 OK)
 const ZERNIO_API_KEY        = process.env.ZERNIO_API_KEY || '';
 const ZERNIO_FB_ID          = process.env.ZERNIO_FB_ID || '';
 const ZERNIO_TIKTOK_ID      = process.env.ZERNIO_TIKTOK_ID || '';

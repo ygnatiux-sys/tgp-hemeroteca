@@ -4,7 +4,7 @@ import type { AgentResponse, TgpTool, AgentStatus } from './types.js';
 export abstract class BaseAgent {
   protected ai: GoogleGenAI;
   protected tools: TgpTool[] = [];
-  protected modelName: string = 'gemini-2.5-flash';  // Default: Flash para tests seguros. Pro es opt-in.
+  protected modelName: string = 'gemini-3.8-flash';  // Default: Flash rápido y analítico
   protected temperature: number = 0.7;
 
   constructor(apiKey: string) {

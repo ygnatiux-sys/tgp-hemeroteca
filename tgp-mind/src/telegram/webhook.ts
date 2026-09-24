@@ -20,6 +20,8 @@ import { procesarFotoTelegramAR2 } from '../storage/r2.js';
 import { appendTurn, clearChatHistory, getConversationHistory } from '../storage/d1.js';
 import { processTelegramMessage, BotIdentity } from '../ia/agent.js';
 import { EruditoAgent } from '../core/agents/EruditoAgent.js';
+import { wikimediaTool } from '../core/tools/wikimediaTool.js';
+import { nanoBananaTool } from '../core/tools/nanoBananaTool.js';
 import {
   esFichaVisual,
   TECLADO_CONFIRMACION,
@@ -210,28 +212,6 @@ export async function handleTelegramWebhook(
 
     // Tratar callback_data como texto semántico → Gemini
     try {
-      // ── MODO HITL PARA ERUDITO SDK (TEST LIMINAL) ──
-      if (botIdentity === 'liminal' && (data === 'erudito_pro' || data === 'erudito_flash')) {
-        const usePro = data === 'erudito_pro';
-        await editMessageReplyMarkup(botToken, chatId, messageId!, [
-          [{ text: usePro ? '💎 Generando con Pro...' : '⚡ Generando con Flash...', callback_data: 'disabled' }]
-        ]);
-        
-        const erudito = new EruditoAgent(process.env.GEMINI_API_KEY || '');
-        const history = await getConversationHistory(chatId, 12, botIdentity);
-        
-        // El Agent usa history para entender el contexto. Pasamos tema=""
-        const response = await erudito.generateEssay('', '', 'divulgativo', history, usePro);
-        
-        if (response.status === 'COMPLETED') {
-           const keyboard = esFichaVisual(response.content || '') ? TECLADO_CONFIRMACION : undefined;
-           await sendTelegramMessage(chatId, botToken, response.content || '', keyboard);
-           await appendTurn(chatId, 'model', [{ text: response.content || '' }], botIdentity);
-        } else if (response.status === 'REQUIRES_ACTION') {
-           await sendTelegramMessage(chatId, botToken, `🔧 [HITL] Erudito solicitó Tool: ${response.toolCall?.name}`);
-        }
-        return;
-      }
 
       const responseText = await processTelegramMessage(chatId, data, botIdentity);
       if (responseText) {
@@ -350,41 +330,79 @@ export async function handleTelegramWebhook(
     // pasamos textParaAgente='' para que agent.ts no duplique el guardado.
     const textParaAgente = fotoGuardadaEnD1 ? '' : userTextForAgent;
 
-    // ── MODO HITL PARA ERUDITO SDK (TEST LIMINAL) ──
+    // ── MODO HITL PARA ERUDITO SDK (TEST LIMINAL — 100% CONVERSACIONAL) ──
     if (botIdentity === 'liminal') {
       const erudito = new EruditoAgent(process.env.GEMINI_API_KEY || '');
-      
-      // En EruditoAgent, la función execute() apendea el userText. 
-      // Por eso pasamos history. NO lo guardamos en D1 todavía para no duplicarlo,
-      // o bien lo guardamos y le pasamos history SIN el último turno.
-      // Para mayor simplicidad y mantener la base de datos limpia, Erudito maneja
-      // la charla y nosotros lo guardamos.
-      
-      await appendTurn(chatId, 'user', [{ text: textParaAgente }], botIdentity);
+      const cleanUserText = textParaAgente.trim();
+      const lowerText = cleanUserText.toLowerCase();
+
       const history = await getConversationHistory(chatId, 12, botIdentity);
-      
-      // En Telegram, el "tema" es implícito por el historial, así que mandamos ''
-      const response = await erudito.generateEssay('', '', 'divulgativo', history, false);
+
+      // Detectar si el último turno de modelo contenía una Tool pendiente de aprobación
+      const lastModelTurn = [...history].reverse().find(t => t.role === 'model');
+      const pendingToolCall = lastModelTurn?.parts?.find(p => (p as any).functionCall)?.functionCall;
+
+      const isApproval = /^(adelante|ok|proceed|proceder|dale|s[ií]|hazlo|hacelo|contin[uú]a|avanza|ejecutar|confirmo|metele)/i.test(lowerText);
+      const wantsPro = lowerText.includes('usá pro') || lowerText.includes('usa pro') || lowerText.includes('modo pro') || (lowerText === 'pro');
+
+      let response: any;
+
+      if (pendingToolCall && isApproval) {
+        const toolName = pendingToolCall.name;
+        const toolArgs = pendingToolCall.args || {};
+        await sendTelegramMessage(chatId, botToken, `⚡ *[HITL]* Aprobado. Ejecutando ${toolName}...`);
+
+        let toolResult: any;
+        try {
+          if (toolName === 'search_wikimedia_photo') {
+            toolResult = await wikimediaTool.execute(toolArgs);
+          } else if (toolName === 'generate_nano_banana_cover') {
+            toolResult = await nanoBananaTool.execute(toolArgs);
+          } else {
+            toolResult = { error: `Herramienta ${toolName} no reconocida.` };
+          }
+        } catch (toolErr: any) {
+          toolResult = { error: toolErr.message };
+        }
+
+        await appendTurn(chatId, 'user', [{ text: cleanUserText }], botIdentity);
+        response = await erudito.resumeAfterApproval(toolName, toolResult, history, wantsPro);
+
+      } else {
+        await appendTurn(chatId, 'user', [{ text: cleanUserText }], botIdentity);
+        const updatedHistory = await getConversationHistory(chatId, 12, botIdentity);
+        response = await erudito.generateEssay('', cleanUserText, 'divulgativo', updatedHistory, wantsPro);
+      }
 
       if (response.status === 'COMPLETED') {
-         let customKeyboard = esFichaVisual(response.content || '') ? TECLADO_CONFIRMACION : undefined;
-         
-         // Inyectar teclado para sugerencia de Pro
-         if (response.content?.includes('sí, usá Pro')) {
-           customKeyboard = [
-             [{ text: '💎 Sí, usar Pro', callback_data: 'erudito_pro' }],
-             [{ text: '⚡ Generar ahora con Flash', callback_data: 'erudito_flash' }]
-           ];
-         }
-         
-         await sendTelegramMessage(chatId, botToken, response.content || '', customKeyboard);
-         await appendTurn(chatId, 'model', [{ text: response.content || '' }], botIdentity);
+        const textToSend = response.content || '';
+        // 100% Conversacional: CERO teclados inline
+        await sendTelegramMessage(chatId, botToken, textToSend);
+        await appendTurn(chatId, 'model', [{ text: textToSend }], botIdentity);
+
       } else if (response.status === 'REQUIRES_ACTION') {
-         // Lógica HITL
-         await sendTelegramMessage(chatId, botToken, `🔧 [HITL] Erudito requiere ejecutar: ${response.toolCall?.name}`);
+        const tc = response.toolCall;
+        let promptText = '';
+        if (tc?.name === 'search_wikimedia_photo') {
+          promptText = `🔧 *[HITL — Aprobación Requerida]*\n\nErudito propone buscar una fotografía histórica en Wikimedia Commons:\n👉 *"${tc.args?.query || 'consulta'}"*\n\n¿Procedemos? Respondé *"adelante"* o *"ok"* para ejecutar, o indicame si querés ajustar la búsqueda.`;
+        } else if (tc?.name === 'generate_nano_banana_cover') {
+          promptText = `🎨 *[HITL — Aprobación Requerida]*\n\nErudito propone generar una portada cinematográfica:\n🎬 **Título:** "${tc.args?.title || 'Sin título'}"\n📌 **Concepto:** ${tc.args?.concept || 'Arte conceptual'}\n\n¿Procedemos? Respondé *"adelante"* o *"ok"* para generar la imagen, o indicame si querés corregir algún detalle del concepto visual.`;
+        } else {
+          promptText = `🔧 *[HITL — Aprobación Requerida]*\n\nErudito propone ejecutar la herramienta: *${tc?.name}*.\n\n¿Procedemos? Respondé *"adelante"* o *"ok"*.`;
+        }
+
+        await sendTelegramMessage(chatId, botToken, promptText);
+        await appendTurn(chatId, 'model', [
+          { text: promptText },
+          { functionCall: { name: tc.name, args: tc.args } } as any
+        ], botIdentity);
+
+      } else if (response.status === 'ERROR') {
+        await sendTelegramMessage(chatId, botToken, `⚠️ Error en Erudito: ${response.error || 'Desconocido'}`);
       }
       return;
     }
+
 
     const responseText = await processTelegramMessage(
       chatId,

@@ -9,11 +9,11 @@ import type { AgentResponse } from './types.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODELOS DISPONIBLES
-//   Flash  → gemini-2.5-flash   (default, seguro para tests)
-//   Pro    → gemini-2.5-pro     (opt-in, para redacciones Premium confirmadas)
+//   Flash  → gemini-3.8-flash       (default, rápido y analítico)
+//   Pro    → gemini-3.1-pro-preview (opt-in, para redacciones Premium confirmadas)
 // ─────────────────────────────────────────────────────────────────────────────
-const MODEL_FLASH = 'gemini-2.5-flash';
-const MODEL_PRO   = 'gemini-2.5-pro';
+const MODEL_FLASH = 'gemini-3.8-flash';
+const MODEL_PRO   = 'gemini-3.1-pro-preview';
 
 // Palabras clave que indican que el usuario PODRÍA querer calidad Pro.
 // El agente los detecta y SUGIERE —no ejecuta— el cambio.
@@ -47,7 +47,7 @@ export class EruditoAgent extends BaseAgent {
    * @param textoActual  - Borrador existente (para modo académico)
    * @param modo         - 'divulgativo' | 'academico'
    * @param history      - Historial de conversación (GeminiTurn[])
-   * @param usePro       - Si true, usa gemini-2.5-pro. Solo cuando el usuario lo confirmó.
+   * @param usePro       - Si true, usa gemini-3.1-pro-preview. Solo cuando el usuario lo confirmó.
    */
   public async generateEssay(
     tema: string,
@@ -69,11 +69,11 @@ export class EruditoAgent extends BaseAgent {
         content: [
           `✍️ *Erudito detectó que este ensayo podría beneficiarse del motor Pro.*`,
           ``,
-          `Estoy usando **Flash** (rápido y económico) por defecto.`,
+          `Estoy usando **Flash** (rápido y analítico) por defecto.`,
           `Si querés la versión Premium completa con mayor profundidad analítica, respondé:`,
           ``,
-          `> **"sí, usá Pro"** — para activar *gemini-2.5-pro* en este ensayo.`,
-          `> **"continúa"** — para generar ahora con Flash.`,
+          `> **"usá Pro"** — para activar *gemini-3.1-pro-preview* en este ensayo.`,
+          `> **"adelante"** o **"continúa"** — para generar ahora con Flash.`,
         ].join('\n'),
       };
     }
@@ -102,7 +102,7 @@ export class EruditoAgent extends BaseAgent {
         `una búsqueda en Wikimedia o generar una portada fotográfica si añadirá valor visual.`,
         `Aplica todas las reglas de estructura, tono divulgativo-erudito y formato Markdown`,
         `definidas en tu identidad. El ensayo debe tener entre 900 y 2.000 palabras.`,
-        usePro ? `\n[Motor: gemini-2.5-pro — Calidad Premium activada por el usuario.]` : '',
+        usePro ? `\n[Motor: gemini-3.1-pro-preview — Calidad Premium activada por el usuario.]` : '',
       ].filter(Boolean).join('\n');
     }
 
