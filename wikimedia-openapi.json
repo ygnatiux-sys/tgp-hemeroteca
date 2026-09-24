@@ -35,25 +35,25 @@
         },
         "responses": {
           "200": {
-            "description": "Resultados estructurados de la búsqueda",
+            "description": "Resultados de la búsqueda",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "success": { "type": "boolean" },
-                    "originalQuery": { "type": "string" },
-                    "results": {
+                    "images": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
                           "title": { "type": "string" },
                           "url": { "type": "string" },
+                          "license": { "type": "string" },
                           "author": { "type": "string" }
                         }
                       }
-                    }
+                    },
+                    "message": { "type": "string" }
                   }
                 }
               }

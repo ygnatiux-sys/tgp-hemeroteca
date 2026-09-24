@@ -211,6 +211,7 @@ app.post('/cx-tool-wikimedia', async (c) => {
     // 1. Recibir el payload exacto definido por el schema OpenAPI
     const body = await c.req.json();
     const query = body.query;
+    console.log('[CX-Wikimedia] Query recibida:', query);
 
     if (!query) {
       return c.json({ success: false, error: 'Query is required' }, 400);
@@ -218,13 +219,17 @@ app.post('/cx-tool-wikimedia', async (c) => {
 
     // 2. Ejecutar la herramienta core intacta
     const toolResult = await wikimediaTool.execute({ query });
+    console.log('[CX-Wikimedia] Resultado:', JSON.stringify(toolResult));
 
-    // 3. Retornar el resultado plano. CX lo procesará y lo sumará a su redacción.
-    return c.json(toolResult);
+    // 3. Retornar el resultado estructurado para Dialogflow CX
+    return c.json({
+      images: toolResult.results || [],
+      message: toolResult.success ? 'Imágenes encontradas' : 'Sin resultados'
+    });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('[CX Tool Error] Wikimedia:', error);
-    return c.json({ success: false, error: 'Error interno en la búsqueda' }, 500);
+    return c.json({ success: false, error: error?.message || 'Error interno en la búsqueda' }, 500);
   }
 });
 

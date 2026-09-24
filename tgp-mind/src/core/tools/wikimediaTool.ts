@@ -20,29 +20,28 @@ export const wikimediaTool: TgpTool = {
 
     const env = process.env as any;
     const apiKey = env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error('Falta GEMINI_API_KEY para Flash Archivist.');
 
-    // 1. Flash Archivist Router: Traducir query natural a query de Wikimedia
-    const ai = new GoogleGenAI({ apiKey });
-    const prompt = `Eres un experto archivista de Wikimedia Commons.
+    // 1. Flash Archivist Router: Traducir query natural a query de Wikimedia (opcional)
+    let advancedQuery = rawQuery;
+    if (apiKey) {
+      try {
+        const ai = new GoogleGenAI({ apiKey });
+        const prompt = `Eres un experto archivista de Wikimedia Commons.
 El usuario busca una imagen sobre: "${rawQuery}".
 Tu trabajo es construir la 'query' perfecta de búsqueda para la API de Wikimedia.
 Usa sintaxis avanzada como "incategory:" o exclusiones "-incategory:" si el tema es propenso a arrojar basura (ej. para sitios arqueológicos excluye mapas o diagramas).
 Responde ÚNICAMENTE con el string de búsqueda. Ejemplo: "Visočica hill" incategory:"Visočica (hill in Visoko)" -incategory:"Diagrams"`;
 
-    let advancedQuery = rawQuery;
-    try {
-      const flashRes = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      });
-      if (flashRes.text) {
-        advancedQuery = flashRes.text.trim();
-        // Limpiar comillas iniciales y finales si el modelo las pone
-        advancedQuery = advancedQuery.replace(/^["']|["']$/g, '');
+        const flashRes = await ai.models.generateContent({
+          model: 'gemini-3.8-flash',
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        });
+        if (flashRes.text) {
+          advancedQuery = flashRes.text.trim().replace(/^["']|["']$/g, '');
+        }
+      } catch (e) {
+        console.warn('[WikimediaTool] Flash falló, usando fallback crudo.', e);
       }
-    } catch (e) {
-      console.warn('[WikimediaTool] Flash falló, usando fallback crudo.', e);
     }
 
     // 2. Ejecutar la búsqueda en Commons
