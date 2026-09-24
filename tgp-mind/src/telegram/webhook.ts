@@ -452,21 +452,23 @@ export async function handleTelegramWebhook(
           await sendTelegramPhoto(chatId, botToken, generatedPhotoUrl, `🎨 *Portada generada:* "${toolArgs?.title || originalPrompt}"`);
         }
 
-        // Reanudar con Erudito:
-        // Reconstruimos el historial con el turno del modelo que invocó la tool para que Gemini SDK no arroje error
+        // Redactar el ensayo con Erudito incorporando la portada ya generada y aprobada
         const baseHistory = await getConversationHistory(chatId, 12, botIdentity);
-        const reconstructedHistory = [
-          ...baseHistory,
-          {
-            role: 'model',
-            parts: [{ functionCall: { name: toolName, args: toolArgs } }]
-          }
-        ];
+        const essayPrompt = [
+          `Se ha completado y aprobado la portada visual para este ensayo:`,
+          `- Título de portada: "${toolArgs?.title || originalPrompt}"`,
+          toolArgs?.concept ? `- Concepto visual: "${toolArgs.concept}"` : '',
+          generatedPhotoUrl ? `- URL de imagen: ${generatedPhotoUrl}` : '',
+          `\nLa portada ya fue generada y enviada al lector. NO vuelvas a llamar a herramientas de imagen.`,
+          `Redacta el ensayo magistral completo sobre "${originalPrompt}".`,
+          `Cumple con todos los estándares: formato Markdown impecable para TGP Hemeroteca, fuentes de autoridad, estructura divulgativo-erudita y profundidad analítica.`
+        ].filter(Boolean).join('\n');
 
-        response = await erudito.resumeAfterApproval(
-          toolName,
-          toolResult,
-          reconstructedHistory,
+        response = await erudito.generateEssay(
+          toolArgs?.title || originalPrompt,
+          essayPrompt,
+          'divulgativo',
+          baseHistory,
           useProModel
         );
 
