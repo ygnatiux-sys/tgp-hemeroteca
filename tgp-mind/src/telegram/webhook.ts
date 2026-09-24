@@ -574,6 +574,7 @@ export async function handleTelegramWebhook(
       }
 
       // Ejecutar Erudito Agent
+      let generatedPhotoUrl: string | null = null;
       let response = await erudito.generateEssay('', initialPrompt, 'divulgativo', baseHistory, wantsPro);
 
       // 4. Bucle Flujo Continuo: Si el modelo pide una herramienta visual, ejecutarla de inmediato
@@ -585,7 +586,6 @@ export async function handleTelegramWebhook(
         console.log(`[Flujo Continuo] Auto-ejecutando herramienta ${toolName}:`, toolArgs);
 
         let toolResult: any;
-        let generatedPhotoUrl: string | null = null;
 
         try {
           if (toolName === 'search_wikimedia_photo') {
