@@ -451,21 +451,55 @@ export async function handleTelegramWebhook(
             secciones: [{ parrafo: essayContent }],
           });
 
+          // Detectar imagen existente en el texto o enlaces
+          const imgMatch = essayContent.match(/https:\/\/storage\.thegreatpuzzleproject\.com\/[^\s\)\"]+/i) ||
+                           essayContent.match(/https:\/\/upload\.wikimedia\.org\/[^\s\)\"]+/i);
+          const coverUrl = imgMatch ? imgMatch[0] : '';
+
           const commitSha = await publicarEntradaKeystaticGitHub({
             coleccion: 'ensayos-cinematicos',
             slug,
-            indexJson: { title: titulo, generadorTexto: JSON.stringify({ text: contenidoMdoc }) },
+            indexJson: {
+              title: titulo,
+              coverImage: coverUrl,
+              generadorTexto: JSON.stringify({ text: contenidoMdoc, image: coverUrl }),
+            },
             contentMdoc: contenidoMdoc,
             token: ghToken,
             repoFull: ghRepo,
             mensajeCommit: `docs(hemeroteca): publicar ensayo "${titulo}" vía Erudito Telegram`,
           });
 
-          await sendTelegramMessage(
-            chatId,
-            botToken,
-            `✅ *¡Publicado con éxito en TGP Hemeroteca!*\n\n📦 **Commit GitHub:** \`${commitSha.slice(0, 7)}\`\n🌐 **Ruta:** \`src/content/ensayos-cinematicos/${slug}\``
-          );
+          const commitUrl = `https://github.com/${ghRepo}/commit/${commitSha}`;
+          const hemerotecaUrl = `https://thegreatpuzzleproject.com/ensayos-cinematicos/${slug}`;
+
+          const msgPublicado = [
+            `✅ *¡Publicado con éxito en TGP Hemeroteca!*`,
+            ``,
+            `🏛️ **Hemeroteca Web:** [Abrir Ensayo en Hemeroteca](${hemerotecaUrl})`,
+            `📦 **Commit GitHub:** [Ver Commit ${commitSha.slice(0, 7)} en GitHub](${commitUrl})`,
+            coverUrl ? `🖼️ **Storage R2:** [Ver Portada en Storage R2](${coverUrl})` : '',
+            `📁 **Ruta del Archivo:** \`src/content/ensayos-cinematicos/${slug}\``,
+          ].filter(Boolean).join('\n');
+
+          await sendTelegramMessage(chatId, botToken, msgPublicado);
+
+          // Registro atómico de resguardo con traza completa en Cloudflare D1
+          await registrarResguardoD1({
+            origen: `telegram-${botIdentity}-publicacion`,
+            destino: 'hemeroteca',
+            tema: titulo,
+            textoGenerado: essayContent,
+            metadatos: {
+              slug,
+              commitSha,
+              commitUrl,
+              hemerotecaUrl,
+              coverUrl,
+            },
+            imagenR2Url: coverUrl || undefined,
+            chatId: chatId,
+          });
         } catch (pubErr: any) {
           console.error('[Publicar Error]:', pubErr);
           await sendTelegramMessage(chatId, botToken, `⚠️ Error en la publicación: ${pubErr?.message || pubErr}`);
@@ -485,9 +519,23 @@ export async function handleTelegramWebhook(
 
         await sendTelegramMessage(chatId, botToken, '🎙️ Sintetizando audio documental con voz neuronal...');
         try {
-          const audioUrl = await generarYGuardarAudioTTS(`tgp-${chatId}-${Date.now()}`, essayContent);
+          const audioId = `tgp-${chatId}-${Date.now()}`;
+          const audioUrl = await generarYGuardarAudioTTS(audioId, essayContent);
           if (audioUrl) {
-            await sendTelegramMessage(chatId, botToken, `🎧 *Audio documental disponible:*\n🔗 ${audioUrl}`);
+            await sendTelegramMessage(
+              chatId,
+              botToken,
+              `🎧 *Audio Documental Generado con Éxito*\n\n🔊 **Storage R2:** [Escuchar / Descargar Audio](${audioUrl})\n📁 **Key:** \`audios/${audioId}.mp3\``
+            );
+
+            await registrarResguardoD1({
+              origen: `telegram-${botIdentity}-audio`,
+              destino: 'datalake',
+              tema: 'Audio TTS Documental',
+              textoGenerado: essayContent.slice(0, 500),
+              metadatos: { audioUrl, audioId },
+              chatId: chatId,
+            });
           } else {
             await sendTelegramMessage(chatId, botToken, '⚠️ No se pudo sintetizar el audio en este momento.');
           }
@@ -588,7 +636,17 @@ export async function handleTelegramWebhook(
 
       // 5. Entrega del ensayo terminado + Resguardo Documental en D1
       if (response.status === 'COMPLETED') {
-        const textToSend = response.content || '';
+        let textToSend = response.content || '';
+        const finalImageUrl = attachedPhotoUrl || generatedPhotoUrl;
+
+        // Traza permanente y visible al pie del ensayo
+        const trazaFooter: string[] = ['\n\n---'];
+        if (finalImageUrl) {
+          trazaFooter.push(`🖼️ **Storage R2:** [Ver Imagen Original en Storage R2](${finalImageUrl})`);
+        }
+        trazaFooter.push(`🏛️ **Hemeroteca:** Envía \`/publicar\` para comitear este ensayo a [TGP Hemeroteca](https://thegreatpuzzleproject.com)`);
+        textToSend += trazaFooter.join('\n');
+
         await sendTelegramMessage(chatId, botToken, textToSend);
         await appendTurn(chatId, 'model', [{ text: textToSend }], botIdentity);
 
@@ -598,8 +656,13 @@ export async function handleTelegramWebhook(
           destino: 'hemeroteca',
           tema: cleanPrompt,
           textoGenerado: textToSend,
-          metadatos: { prompt: cleanPrompt, wantsPro },
-          imagenR2Url: attachedPhotoUrl || undefined,
+          metadatos: {
+            prompt: cleanPrompt,
+            wantsPro,
+            imagenR2Url: finalImageUrl || null,
+            storageUrl: finalImageUrl || null,
+          },
+          imagenR2Url: finalImageUrl || undefined,
           chatId: chatId,
         });
       } else if (response.status === 'ERROR') {
