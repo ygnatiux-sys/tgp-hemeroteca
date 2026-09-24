@@ -139,7 +139,7 @@ export function crearModeloEnsayo(
     required: ['titulo', 'secciones'],
   };
   return googleAI.getGenerativeModel({
-    model: modelName,
+    model: modelToUse,
     generationConfig: { responseMimeType: 'application/json', responseSchema: esquema },
   });
 }

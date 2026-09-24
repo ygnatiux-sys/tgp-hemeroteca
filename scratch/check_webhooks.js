@@ -1,4 +1,7 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import path from 'path';
+
+dotenv.config({ path: path.resolve('tgp-mind/.env') });
 
 async function checkWebhook(botName, token) {
   if (!token) {
@@ -15,10 +18,12 @@ async function checkWebhook(botName, token) {
 }
 
 async function main() {
-  console.log("=== Telegram Webhook Status ===");
+  console.log("=== Telegram Webhook Status (from tgp-mind/.env) ===");
   await checkWebhook("Omni Bot (Analista)", process.env.TELEGRAM_TOKEN);
   await checkWebhook("Social Bot", process.env.TELEGRAM_SOCIAL_TOKEN);
   await checkWebhook("Assistant Bot (Xavier)", process.env.TELEGRAM_TGP_CLOUD_TOKEN);
+  await checkWebhook("Liminal Bot", process.env.LIMINAL_TOKEN);
 }
 
 main();
+

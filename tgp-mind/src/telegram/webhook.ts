@@ -242,6 +242,13 @@ export async function handleTelegramWebhook(
         }
         const keyboard = esFichaVisual(responseText) ? TECLADO_CONFIRMACION : undefined;
         await sendTelegramMessage(chatId, botToken, responseText, keyboard);
+      } else {
+        if (data === 'ok' && messageId) {
+          await editMessageReplyMarkup(botToken, chatId, messageId, [
+            [{ text: '⚠️ Sin respuesta', callback_data: 'disabled' }],
+          ]);
+        }
+        await sendTelegramMessage(chatId, botToken, '⚠️ No se obtuvo respuesta del sistema. Por favor intentá nuevamente con /nuevo.');
       }
     } catch (err: any) {
       const errMsg = err?.message || String(err);
@@ -253,7 +260,7 @@ export async function handleTelegramWebhook(
           [{ text: '⚠️ Error en la generación', callback_data: 'disabled' }],
         ]);
       }
-      await sendTelegramMessage(chatId, botToken, '⚠️ Hubo un error. Intenta de nuevo.');
+      await sendTelegramMessage(chatId, botToken, '⚠️ Hubo un error al procesar la confirmación. Por favor intentá de nuevo.');
     }
     return;
   }

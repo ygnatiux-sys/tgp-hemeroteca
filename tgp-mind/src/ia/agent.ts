@@ -246,7 +246,7 @@ export async function processTelegramMessage(
   // ── Paso 3: Llamar a Gemini ────────────────────────────────────────────────
   const toolsForBot = TOOLS_BY_BOT[botIdentity];
   const response = await genai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-3.8-flash',
     contents: safeContents as any,
     config: {
       systemInstruction: SYSTEM_PROMPTS[botIdentity],
@@ -259,7 +259,11 @@ export async function processTelegramMessage(
   // ── Paso 4a: Respuesta de texto ────────────────────────────────────────────────────
   const functionCalls = response.functionCalls;
   if (!functionCalls || functionCalls.length === 0) {
-    const text = (response.text || '').trim();
+    let text = (response.text || '').trim();
+    if (!text) {
+      console.warn(`[Agent:${botIdentity}] Respuesta vacía de Gemini sin functionCall.`);
+      text = '⚠️ No se pudo procesar la respuesta. Por favor, reenvía tu mensaje o escribe /menu.';
+    }
     await appendModelText(chatId, text, botIdentity);
     return text;
   }
@@ -280,22 +284,21 @@ export async function processTelegramMessage(
   // Guardar el functionResponse (con aislamiento de bot)
   await appendFunctionResponse(chatId, toolName, toolResult, botIdentity);
 
-  // Llamada adicional a Gemini para la respuesta textual final (con historial aislado)
-  const historyConResult: GeminiTurn[] = await getConversationHistory(chatId, 12, botIdentity);
-  console.log(`[Agent:${botIdentity}] Post-Tool history:`, JSON.stringify(historyConResult, null, 2));
-  
-  const finalResponse = await genai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: historyConResult as any,
-    config: {
-      systemInstruction: SYSTEM_PROMPTS[botIdentity],
-      temperature: 0.2,
-      maxOutputTokens: 4096,
-      // Sin tools en la llamada de cierre: solo queremos texto de confirmación.
-    },
-  });
+  // Devolver el resultado de la herramienta directamente sin una segunda llamada
+  // redundante a Gemini que puede fallar por falta de thought_signature o timeouts.
+  let finalText: string;
+  if (toolResult?.result) {
+    const rawResult = String(toolResult.result);
+    finalText = rawResult.startsWith('✅')
+      ? rawResult
+      : `✅ Publicado con éxito.\n\n${rawResult}`;
+  } else if (toolResult?.error) {
+    finalText = `⚠️ Error al ejecutar ${toolName}: ${toolResult.error}`;
+  } else {
+    finalText = `✅ ${toolName} ejecutado correctamente.`;
+  }
 
-  const finalText = (finalResponse.text || `✅ ${toolName} ejecutado correctamente.`).trim();
   await appendModelText(chatId, finalText, botIdentity);
   return finalText;
 }
+

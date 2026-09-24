@@ -172,15 +172,9 @@ function handleWebhookRoute(botType: 'redes' | 'omni' | 'assistant' | 'liminal',
   return async (c: any) => {
     try {
       const update = await c.req.json();
-      const task = handleTelegramWebhook(update, botType, token).catch((err: any) => {
-        console.error(`[Background Webhook Error - ${botType}]:`, err);
-      });
-      // Soporte para Cloudflare Workers / Serverless execution context si existe
-      if (c.executionCtx && typeof c.executionCtx.waitUntil === 'function') {
-        c.executionCtx.waitUntil(task);
-      }
-    } catch (parseErr: any) {
-      console.error(`[Webhook Parse Error - ${botType}]:`, parseErr?.message);
+      await handleTelegramWebhook(update, botType, token);
+    } catch (err: any) {
+      console.error(`[Webhook Error - ${botType}]:`, err?.message || err);
     }
     return c.text('OK');
   };

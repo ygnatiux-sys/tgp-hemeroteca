@@ -1,3 +1,23 @@
+# REGLA MANDATORIA: TRANSPARENCIA, PLANIFICACI脫N Y C脫DIGO HEREDADO
+
+Antes de realizar CUALQUIER cambio o ejecuci贸n en el repositorio, el agente DEBE cumplir obligatoriamente con este protocolo:
+
+1. **Explicaci贸n Previa en Modo Humano Simple:**  
+   NUNCA aplicar cambios sin antes explicar claramente, en lenguaje simple y sin jerga oscura, qu茅 se va a hacer.
+
+2. **Plan Detallado en el Visor:**  
+   Siempre presentar el plan detallado y estructurado en el visor de artefactos (`implementation_plan.md`) para revisi贸n antes de actuar.
+
+3. **Protecci贸n Estricta de C贸digo Heredado (Legacy):**  
+   PROHIBIDO tocar, modificar o eliminar c贸digo heredado sin avisar previamente y de manera comprensible. Si algo ya funciona, se respeta. Cero limpiezas silenciosas.
+
+4. **Contrato Expl铆cito: "驴Qu茅 Saco y Qu茅 Pongo?":**  
+   En cada propuesta de cambio, se debe listar expl铆citamente:
+   - **Qu茅 se saca / elimina:** funci贸n, archivo o bloque espec铆fico, y por qu茅.
+   - **Qu茅 se pone / agrega:** funci贸n o l贸gica nueva, y qu茅 beneficio concreto aporta.
+   Especialmente cr铆tico en funciones de **IA (Gemini / modelos / tokens)**, **Cloud Run (despliegues y env)**, **Telegram Webhooks**, **Svelte** y **Keystatic**.
+
+
 # PROTOCOLO DE EFICIENCIA COGNITIVA (AHORRO DE TOKENS)
 
 Antes de ejecutar cualquier tarea de generaci贸n o refactorizaci贸n de c贸digo, el agente DEBE cumplir estrictamente los siguientes pasos:
@@ -15,5 +35,5 @@ Antes de ejecutar cualquier tarea de generaci贸n o refactorizaci贸n de c贸digo, 
    - Incluir diagn贸sticos en vivo (ej. `getWebhookInfo` de Telegram) y separar entornos local vs. producci贸n.
 
 
-# PROTECCI覰 DE TOKENS EN DESPLIEGUES Y .ENV
-NUNCA modifiques, elimines, renombres ni sobreescribas las variables de entorno de los tokens de Telegram (OMNI_TOKEN, ASSISTANT_TOKEN, REDES_TOKEN) en los archivos .env, .env.example, o scripts de despliegue sin la autorizaci髇 EXPL虲ITA del usuario. Si vas a generar o sugerir la creaci髇 de un nuevo .env, DEBES asegurarte de incluir las variables de entorno de autenticaci髇 ya existentes para no romper la conexi髇 con las APIs de Telegram en producci髇 (Cloud Run).
+# PROTECCION DE TOKENS EN DESPLIEGUES Y .ENV
+NUNCA modifiques, elimines, renombres ni sobreescribas las variables de entorno de los tokens de Telegram (OMNI_TOKEN, ASSISTANT_TOKEN, REDES_TOKEN) en los archivos .env, .env.example, o scripts de despliegue sin la autorizaci贸n EXPLICITA del usuario. Si vas a generar o sugerir la creaci贸n de un nuevo .env, DEBES asegurarte de incluir las variables de entorno de autenticaci贸n ya existentes para no romper la conexi贸n con las APIs de Telegram en producci贸n (Cloud Run).
