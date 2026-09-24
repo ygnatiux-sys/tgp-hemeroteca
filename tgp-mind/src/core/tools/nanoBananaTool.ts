@@ -2,6 +2,7 @@ import { GoogleGenAI, Type } from '@google/genai';
 import type { TgpTool } from '../agents/types.js';
 import { resolveIntelligentDirection, buildDirectorBrief, buildFinalImagePrompt, generateImageWithGemini } from '../../lib/arte-tgp/index.js';
 import type { IntelligentDirectorInput } from '../../lib/arte-tgp/types.js';
+import { estandarizarYSubirImagenAR2 } from '../../storage/r2.js';
 
 export const nanoBananaTool: TgpTool = {
   name: 'generate_nano_banana_cover',
@@ -79,9 +80,21 @@ export const nanoBananaTool: TgpTool = {
         return { success: false, error: imageResult.error };
       }
 
+      let finalImageUrl = imageResult.image;
+      try {
+        if (imageResult.image?.startsWith('data:image/')) {
+          const base64Data = imageResult.image.split(',')[1];
+          const buf = Buffer.from(base64Data, 'base64');
+          const slug = args.title ? args.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : undefined;
+          finalImageUrl = await estandarizarYSubirImagenAR2(buf, 'portadas', slug);
+        }
+      } catch (uploadErr: any) {
+        console.warn('[NanoBananaTool] No se pudo subir imagen a R2, usando fallback original:', uploadErr?.message);
+      }
+
       return {
         success: true,
-        imageUrl: imageResult.image,
+        imageUrl: finalImageUrl,
         imagePrompt: finalPrompt,
         brief: brief.fullTextBrief
       };

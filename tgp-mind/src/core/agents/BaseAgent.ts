@@ -82,26 +82,65 @@ export abstract class BaseAgent {
 
   /**
    * Continúa la ejecución luego de que el humano (HITL) aprobó y resolvió un Tool.
+   * Fusiona functionResponse y userMessage en un único turno de usuario válido para el SDK.
    */
   public async resume(toolName: string, toolResult: any, userMessage: string, systemInstruction: string, history: any[]): Promise<AgentResponse> {
-    // Agregamos la respuesta de la función al historial
-    const updatedHistory = [
-      ...history,
-      {
-        role: 'user', // En el SDK de Gemini, la respuesta de la función suele ir como 'user' part o en un formato específico.
-        parts: [
-          {
-            functionResponse: {
-              name: toolName,
-              response: { result: toolResult }
-            }
-          }
-        ]
-      }
-    ];
+    try {
+      const contents = [
+        ...history,
+        {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: toolName,
+                response: { result: toolResult }
+              }
+            } as any,
+            ...(userMessage ? [{ text: userMessage }] : [])
+          ]
+        }
+      ];
 
-    // Volvemos a ejecutar con el historial actualizado
-    return this.execute(userMessage, systemInstruction, updatedHistory);
+      const config: any = {
+        temperature: this.temperature,
+        systemInstruction,
+      };
+
+      const functionDeclarations = this.getFunctionDeclarations();
+      if (functionDeclarations.length > 0) {
+        config.tools = [{ functionDeclarations }];
+      }
+
+      const response = await this.ai.models.generateContent({
+        model: this.modelName,
+        contents,
+        config
+      });
+
+      const functionCall = response.functionCalls?.[0];
+      if (functionCall) {
+        return {
+          status: 'REQUIRES_ACTION',
+          toolCall: {
+            name: functionCall.name ?? '',
+            args: (functionCall.args ?? {}) as Record<string, any>,
+          }
+        };
+      }
+
+      const content = response.text?.trim() || '';
+      return {
+        status: 'COMPLETED',
+        content
+      };
+    } catch (err: any) {
+      console.error(`[BaseAgent.resume] Error:`, err);
+      return {
+        status: 'ERROR',
+        error: err.message
+      };
+    }
   }
 }
 
