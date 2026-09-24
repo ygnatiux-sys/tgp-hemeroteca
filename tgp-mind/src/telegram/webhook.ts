@@ -430,7 +430,7 @@ export async function handleTelegramWebhook(
       const lowerText = userPrompt.toLowerCase().trim();
 
       // 2. Comandos de Post-Producción y Utilidades (Keystatic GitOps y Audio TTS)
-      if (lowerText.startsWith('/publicar')) {
+      if (lowerText.startsWith('/publicar') || lowerText.startsWith('/publica')) {
         const history = await getConversationHistory(chatId, 6, botIdentity);
         const lastModelTurn = [...history].reverse().find(t => t.role === 'model');
         const essayContent = lastModelTurn?.parts?.map((p: any) => p.text).join('\n') || '';
@@ -508,7 +508,7 @@ export async function handleTelegramWebhook(
                        /modo pro|us[aá] pro/i.test(userPrompt);
 
       const cleanPrompt = userPrompt
-        .replace(/^\/(pro_breve|pro_medio|pro_premium|pro)\s*/i, '')
+        .replace(/^\/(pro_breve|pro_medio|pro_premium|pro|flash)\s*/i, '')
         .trim();
 
       // Guardar el turno del usuario en D1
