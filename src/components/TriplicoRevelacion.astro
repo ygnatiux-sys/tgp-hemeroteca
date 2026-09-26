@@ -61,15 +61,29 @@ const progressId = `triptico-progress-${instanceId}`;
 
 const hero = heroPost ?? posts[0] ?? null;
 const slicedPosts = posts.slice(0, 3);
+
+// Helper para partición armónica de headline (evita desbordes y cortes de letras)
+let headlinePart1 = headline;
+let headlinePart2 = '';
+
+if (headline.includes('.')) {
+  const parts = headline.split('.');
+  headlinePart1 = parts[0];
+  headlinePart2 = parts.slice(1).join('.').trim();
+} else if (headline.includes('&')) {
+  const parts = headline.split('&');
+  headlinePart1 = parts[0].trim();
+  headlinePart2 = `& ${parts[1].trim()}`;
+}
 ---
 
 <section
   id={`triptico-revelacion-${instanceId}`}
-  class="triptico-root w-full max-w-360 mx-auto px-4 md:px-8 lg:px-12 py-16 md:py-24"
+  class="triptico-root w-full max-w-[1720px] 2xl:max-w-[1840px] mx-auto px-2 sm:px-4 md:px-6 py-10 md:py-16"
   aria-label="Tríptico de Revelación — Colecciones en Rotación"
 >
   <!-- Encabezado editorial -->
-  <header class="mb-8 flex flex-col gap-1.5">
+  <header class="mb-8 flex flex-col gap-1.5 px-1 sm:px-2">
     <span class="font-mono text-[10px] uppercase tracking-[0.5em] text-rust-orange font-bold opacity-70">
       {label}
     </span>
@@ -81,7 +95,7 @@ const slicedPosts = posts.slice(0, 3);
   <!-- CONTENEDOR DE LOS TRES ACTOS -->
   <div
     id={stageId}
-    class="relative w-full overflow-hidden rounded-2xl md:rounded-3xl border border-white/5 shadow-2xl min-h-[82vh] md:min-h-180 lg:min-h-205 bg-black"
+    class="relative w-full overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 shadow-2xl min-h-[82vh] md:min-h-180 lg:min-h-205 bg-black"
   >
 
     <!-- ═══════════════════════════════ -->
@@ -89,14 +103,16 @@ const slicedPosts = posts.slice(0, 3);
     <!-- ═══════════════════════════════ -->
     <div
       id={acto1Id}
-      class="triptico-acto absolute inset-0 grid grid-cols-1 sm:grid-cols-3"
+      class={actOneMode === 'grid'
+        ? "triptico-acto absolute inset-0 p-3 sm:p-4 md:p-5 lg:p-6 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-5 bg-black"
+        : "triptico-acto absolute inset-0"}
       style="visibility: visible; opacity: 1;"
     >
       {slicedPosts.map((post, i) => (
         <a
           href={post.href}
           class={actOneMode === 'grid' 
-            ? "group relative overflow-hidden bg-[#0a0a0b] flex flex-col justify-end border-r border-white/5 last:border-r-0 transition-all duration-500"
+            ? "group relative overflow-hidden rounded-xl md:rounded-2xl border border-white/10 bg-[#0a0a0b] flex flex-col justify-end transition-all duration-500 hover:border-rust-orange/50 hover:shadow-[0_0_30px_rgba(217,119,6,0.18)]"
             : "triptico-seq-card relative group overflow-hidden bg-black flex flex-col justify-end"}
           style={actOneMode === 'grid' ? `transition-delay:${i * 60}ms` : 'will-change: transform, opacity;'}
         >
@@ -110,9 +126,9 @@ const slicedPosts = posts.slice(0, 3);
             />
             <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/50 to-black/10"></div>
           </div>
-          <div class="relative z-10 p-5 md:p-6 flex flex-col gap-2">
+          <div class="relative z-10 p-5 md:p-6 lg:p-7 flex flex-col gap-2">
             {post.badge && (
-              <span class="font-mono text-[8px] uppercase tracking-[0.4em] text-rust-orange font-bold opacity-70">
+              <span class="font-mono text-[8px] uppercase tracking-[0.4em] text-rust-orange font-bold opacity-75">
                 {post.badge}
               </span>
             )}
@@ -120,11 +136,11 @@ const slicedPosts = posts.slice(0, 3);
               {post.title}
             </h3>
             {post.excerpt && (
-              <p class="font-sans text-[11px] text-white/45 leading-relaxed line-clamp-2 hidden md:block">
+              <p class="font-sans text-[11px] text-white/50 leading-relaxed line-clamp-2 hidden md:block">
                 {post.excerpt}
               </p>
             )}
-            <span class={`font-mono uppercase text-white/25 group-hover:text-rust-orange/60 transition-colors mt-1 ${actOneMode === 'grid' ? 'text-[9px] tracking-[0.3em]' : 'text-[11px] tracking-[0.4em] drop-shadow-md'}`}>
+            <span class={`font-mono uppercase text-white/30 group-hover:text-rust-orange/80 transition-colors mt-1 ${actOneMode === 'grid' ? 'text-[9px] tracking-[0.3em]' : 'text-[11px] tracking-[0.4em] drop-shadow-md'}`}>
               Explorar Dossier →
             </span>
           </div>
@@ -133,7 +149,7 @@ const slicedPosts = posts.slice(0, 3);
           )}
         </a>
       ))}
-      <div class="absolute top-4 right-5 z-30 font-mono text-[8px] uppercase tracking-[0.4em] text-white/20">
+      <div class="absolute top-4 right-5 z-30 font-mono text-[8px] uppercase tracking-[0.4em] text-white/20 pointer-events-none">
         Acto I — Novedades
       </div>
     </div>
@@ -198,7 +214,7 @@ const slicedPosts = posts.slice(0, 3);
       <!-- Ruido sutil de fondo -->
       <div class="absolute inset-0 opacity-[0.018]" style="background-image:url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC42NSIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbikiIG9wYWNpdHk9IjEiLz48L3N2Zz4=);"></div>
 
-      <div class="relative z-10 flex flex-col items-center gap-8 md:gap-10 text-center px-8 max-w-4xl">
+      <div class="relative z-10 flex flex-col items-center gap-6 md:gap-8 text-center px-4 sm:px-8 max-w-5xl 2xl:max-w-6xl w-full">
         <!-- Eyebrow ornamental -->
         <div class="triptico-a3-anim flex items-center gap-4 opacity-0">
           <div class="w-12 h-px bg-rust-orange/30"></div>
@@ -206,18 +222,25 @@ const slicedPosts = posts.slice(0, 3);
           <div class="w-12 h-px bg-rust-orange/30"></div>
         </div>
 
-        <!-- Headline -->
-        <h3 class="triptico-a3-anim font-cinzel font-black text-white text-5xl md:text-7xl lg:text-[6rem] xl:text-[8rem] leading-[0.85] tracking-tight drop-shadow-[0_0_40px_rgba(255,255,255,0.15)] opacity-0">
-          {headline.split('.')[0]}<br />
-          <span class="gradient-steel-titanium drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">{headline.split('.').slice(1).join('.')}</span>
+        <!-- Headline fluido que NUNCA desborda -->
+        <h3 class="triptico-a3-anim font-cinzel font-black text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[4.2rem] 2xl:text-[4.8rem] leading-[1.04] tracking-normal sm:tracking-tight drop-shadow-[0_0_40px_rgba(255,255,255,0.15)] opacity-0 px-2 sm:px-4 break-words">
+          <span>{headlinePart1}</span>
+          {headlinePart2 && (
+            <>
+              <br class="hidden sm:inline" />
+              <span class="gradient-steel-titanium drop-shadow-[0_0_20px_rgba(255,255,255,0.1)] inline-block mt-1 sm:mt-0">
+                {headlinePart2}
+              </span>
+            </>
+          )}
         </h3>
 
-        <p class="triptico-a3-anim font-serif italic text-white/40 text-xl md:text-2xl leading-relaxed max-w-2xl mx-auto opacity-0">
+        <p class="triptico-a3-anim font-serif italic text-white/40 text-lg md:text-xl lg:text-2xl leading-relaxed max-w-2xl mx-auto opacity-0">
           Ensayos cinemáticos, arqueosemiótica, arquetipos y dirección de arte.<br />
           <span class="text-white/20">Un archivo vivo de pensamiento visual.</span>
         </p>
 
-        <div class="triptico-a3-anim flex items-center justify-center mt-4 opacity-0">
+        <div class="triptico-a3-anim flex items-center justify-center mt-2 opacity-0">
           <a
             href={ctaHref}
             class="group/cta inline-flex items-center gap-4 px-10 py-5 bg-black/40 backdrop-blur-md border border-white/10 font-mono font-bold text-[14px] tracking-[0.3em] uppercase text-white/80 rounded-full transition-all duration-500 hover:border-rust-orange/60 hover:bg-rust-orange/10 hover:text-white hover:shadow-[0_0_40px_rgba(217,119,6,0.25)] active:scale-95"
