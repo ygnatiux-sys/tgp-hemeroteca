@@ -298,6 +298,10 @@ export default config({
         title: fields.slug({ name: { label: 'Título' } }),
         generadorTexto: geminiCinematicField as any,
         agenteErudito: agenteEruditoField,
+        generador: fields.text({ 
+          label: 'Motor / Versión de Agente', 
+          description: 'Identificador del motor o agente de IA que originó este ensayo cinemático.' 
+        }),
 
         atmosfera: fields.conditional(
           fields.select({

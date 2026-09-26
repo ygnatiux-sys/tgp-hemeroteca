@@ -1,4 +1,6 @@
 {
-  "titulo": "El Buda: anatomía del deseo y la disolución del yo",
-  "secciones": 3
+  "title": "El Buda: anatomía del deseo y la disolución del yo",
+  "atmosfera": {
+    "discriminant": "obsidiana"
+  }
 }

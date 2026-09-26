@@ -1,6 +1,8 @@
 {
-  "titulo": "Espartaco y la rebelión de los gladiadores: Anatomía de la insurgencia ontológica",
-  "secciones": 3,
   "generador": "TGP Mind Agent v2",
-  "fecha": "2026-09-22"
+  "title": "Espartaco y la rebelión de los gladiadores: Anatomía de la insurgencia ontológica",
+  "date": "2026-09-22",
+  "atmosfera": {
+    "discriminant": "obsidiana"
+  }
 }

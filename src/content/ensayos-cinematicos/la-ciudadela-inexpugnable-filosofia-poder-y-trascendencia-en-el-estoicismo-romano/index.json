@@ -1,6 +1,8 @@
 {
-  "titulo": "La Ciudadela Inexpugnable: Filosofía, Poder y Trascendencia en el Estoicismo Romano",
-  "secciones": 3,
   "generador": "TGP Mind Agent v2",
-  "fecha": "2026-09-22"
+  "title": "La Ciudadela Inexpugnable: Filosofía, Poder y Trascendencia en el Estoicismo Romano",
+  "date": "2026-09-22",
+  "atmosfera": {
+    "discriminant": "obsidiana"
+  }
 }

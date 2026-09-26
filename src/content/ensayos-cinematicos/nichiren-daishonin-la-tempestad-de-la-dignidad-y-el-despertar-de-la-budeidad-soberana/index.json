@@ -1,6 +1,8 @@
 {
-  "titulo": "Nichiren Daishonin: La Tempestad de la Dignidad y el Despertar de la Budeidad Soberana",
-  "secciones": 3,
   "generador": "TGP Mind Agent v2",
-  "fecha": "2026-09-22"
+  "title": "Nichiren Daishonin: La Tempestad de la Dignidad y el Despertar de la Budeidad Soberana",
+  "date": "2026-09-22",
+  "atmosfera": {
+    "discriminant": "obsidiana"
+  }
 }

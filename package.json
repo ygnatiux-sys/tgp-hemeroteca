@@ -29,6 +29,7 @@
     "analisis": "node scripts/analisis-distribucion.mjs",
     "sanear": "node scripts/sanear-hemeroteca.mjs",
     "sanear:preview": "node scripts/sanear-hemeroteca.mjs --dry-run",
+    "sanear:keystatic": "node scripts/sanear-esquemas-keystatic.mjs",
     "wikimedia": "node scripts/asignar-wikimedia.mjs",
     "wikimedia:preview": "node scripts/asignar-wikimedia.mjs --dry-run",
     "audit:orphans": "node scripts/audit-orphans.mjs",

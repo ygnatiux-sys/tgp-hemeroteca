@@ -1,6 +1,8 @@
 {
-  "titulo": "La Catedral de la Razón: Arqueosemiótica y Vigencia de la Escolástica",
-  "secciones": 3,
   "generador": "TGP Mind Agent v2",
-  "fecha": "2026-09-22"
+  "title": "La Catedral de la Razón: Arqueosemiótica y Vigencia de la Escolástica",
+  "date": "2026-09-22",
+  "atmosfera": {
+    "discriminant": "obsidiana"
+  }
 }
