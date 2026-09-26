@@ -1,5 +1,5 @@
 import { component, fields } from '@keystatic/core';
-import { MotorArteTGP } from './MotorArteTGP';
+import { MotorArteTGP } from '../modules/tgp-agents/MotorArteTGP';
 
 export const componentBlocks = {
   nanoBananaImageBlock: component({

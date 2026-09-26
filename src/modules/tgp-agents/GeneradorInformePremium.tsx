@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { setNativeValue, injectIntoKeystaticDocumentEditor } from '../lib/keystaticDomHacks';
+import { setNativeValue, injectIntoKeystaticDocumentEditor } from '../../lib/keystaticDomHacks';
 
 export function GeneradorInformePremium({ value, onChange }: any) {
   const [loading, setLoading] = useState(false);
