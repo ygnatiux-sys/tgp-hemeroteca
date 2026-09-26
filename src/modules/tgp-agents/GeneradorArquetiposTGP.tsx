@@ -4,8 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 // Keystatic usa inputs controlados por React. El simple `element.value = x`
 // no dispara el estado interno de React. Este helper usa el setter nativo
 // del prototipo para forzar que React detecte el cambio.
-import { setNativeValue } from '../lib/keystaticDomHacks';
-import { getTgpBackup, saveTgpBackup, clearTgpBackup } from '../hooks/useTgpBackup';
+import { setNativeValue } from '../../lib/keystaticDomHacks';
+import { getTgpBackup, saveTgpBackup, clearTgpBackup } from '../../hooks/useTgpBackup';
 
 export function GeneradorArquetiposTGP({ value, onChange }: any) {
   const [titulo, setTitulo] = useState('');

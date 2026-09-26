@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-import { setNativeValue, injectIntoKeystaticDocumentEditor, lockKeystaticSave as lockKeystatiSave } from '../lib/keystaticDomHacks';
-import { getTgpBackup, saveTgpBackup, clearTgpBackup } from '../hooks/useTgpBackup';
+import { setNativeValue, injectIntoKeystaticDocumentEditor, lockKeystaticSave as lockKeystatiSave } from '../../lib/keystaticDomHacks';
+import { getTgpBackup, saveTgpBackup, clearTgpBackup } from '../../hooks/useTgpBackup';
 
 export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
   const [lugar, setLugar] = useState('');

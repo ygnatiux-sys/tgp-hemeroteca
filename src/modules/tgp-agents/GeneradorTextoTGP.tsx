@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { setNativeValue, injectIntoKeystaticDocumentEditor } from '../lib/keystaticDomHacks';
-import { getTgpBackup, saveTgpBackup } from '../hooks/useTgpBackup';
+import { setNativeValue, injectIntoKeystaticDocumentEditor } from '../../lib/keystaticDomHacks';
+import { getTgpBackup, saveTgpBackup } from '../../hooks/useTgpBackup';
 
 export function GeneradorTextoTGP({ value, onChange }: any) {
   const [titulo, setTitulo] = useState('');

@@ -3,5 +3,5 @@ export {
   GeneradorCinematicosTGP,
   GeneradorCinematicosTGP as GeminiCinematicStudio,
   geminiCinematicField,
-} from '../components/GeneradorCinematicosTGP';
-export type { GeminiCinematicProps } from '../components/GeneradorCinematicosTGP';
+} from '../modules/tgp-agents/GeneradorCinematicosTGP';
+export type { GeminiCinematicProps } from '../modules/tgp-agents/GeneradorCinematicosTGP';

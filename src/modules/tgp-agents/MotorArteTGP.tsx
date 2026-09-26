@@ -24,7 +24,7 @@ import {
   MATERIALITIES,
   IMPERFECTION_LEVELS,
   NEGATIVE_CONSTRAINTS,
-} from '../lib/arte-tgp/catalog';
+} from '../../lib/arte-tgp/catalog';
 import type {
   IntelligentDirectorInput,
   ManualLabInput,
@@ -34,7 +34,7 @@ import type {
   Materiality,
   NegativeConstraint,
   SceneCondition,
-} from '../lib/arte-tgp/types';
+} from '../../lib/arte-tgp/types';
 
 export function MotorArteTGP({ value, onChange, initialTitulo = '', initialEstilo = 'editorial' }: any) {
   // Pestaña activa

@@ -4,8 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 // Keystatic usa inputs controlados por React. El simple `element.value = x`
 // no dispara el estado interno de React. Este helper usa el setter nativo
 // del prototipo para forzar que React detecte el cambio y valide el slug.
-import { setNativeValue, injectIntoKeystaticDocumentEditor as injectIntoKSDocumentEditor } from '../lib/keystaticDomHacks';
-import { getTgpBackup, saveTgpBackup } from '../hooks/useTgpBackup';
+import { setNativeValue, injectIntoKeystaticDocumentEditor as injectIntoKSDocumentEditor } from '../../lib/keystaticDomHacks';
+import { getTgpBackup, saveTgpBackup } from '../../hooks/useTgpBackup';
 
 export interface GeminiCinematicProps {
   value: string;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { searchWikimediaCommons, clearWikimediaCache, type WikimediaImageItem } from '../lib/wikimedia/client';
-import { exportMetadataPdfDossier, downloadBatchImages } from '../lib/wikimedia/exporter';
+import { searchWikimediaCommons, clearWikimediaCache, type WikimediaImageItem } from '../../lib/wikimedia/client';
+import { exportMetadataPdfDossier, downloadBatchImages } from '../../lib/wikimedia/exporter';
 
 export function BuscadorWikimediaTGP({ value, onChange }: any) {
   const [query, setQuery] = useState('');

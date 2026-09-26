@@ -17,7 +17,7 @@ import React, { useState, useRef, useEffect } from 'react';
  *   - Desbloquea el botón Save nativo de Keystatic
  */
 
-import { injectIntoKeystaticDocumentEditor as injectIntoKSDocumentEditor, lockKeystaticSave as lockKSSave } from '../lib/keystaticDomHacks';
+import { injectIntoKeystaticDocumentEditor as injectIntoKSDocumentEditor, lockKeystaticSave as lockKSSave } from '../../lib/keystaticDomHacks';
 
 export function AgenteEruditoTGP({ value, onChange }: any) {
   const [modo, setModo] = useState<'divulgativo' | 'academico'>('divulgativo');

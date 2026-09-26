@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PRESETS_ARTE, type EditorialPreset, type LineaEditorialKey } from '../config/presetsArte';
+import { PRESETS_ARTE, type EditorialPreset, type LineaEditorialKey } from '../../config/presetsArte';
 
 export interface ProbadorArteData {
   conceptoBase: string;
