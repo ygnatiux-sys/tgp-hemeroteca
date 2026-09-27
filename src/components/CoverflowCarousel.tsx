@@ -32,8 +32,13 @@ export default function CoverflowCarousel({
   }
 
   const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState<boolean>(true);
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
+
+  const stopAutoPlay = useCallback(() => {
+    setIsAutoPlaying(false);
+  }, []);
 
   // Inicializar en el medio si hay al menos 3 posts
   useEffect(() => {
@@ -44,26 +49,44 @@ export default function CoverflowCarousel({
     }
   }, [posts.length]);
 
+  // Rotación automática por defecto cada 4.5 segundos
+  useEffect(() => {
+    if (!isAutoPlaying || posts.length <= 1) return;
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev < posts.length - 1 ? prev + 1 : 0));
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, posts.length]);
+
   const handlePrev = useCallback(() => {
+    stopAutoPlay();
     setActiveIndex((prev) => (prev > 0 ? prev - 1 : posts.length - 1));
-  }, [posts.length]);
+  }, [posts.length, stopAutoPlay]);
 
   const handleNext = useCallback(() => {
+    stopAutoPlay();
     setActiveIndex((prev) => (prev < posts.length - 1 ? prev + 1 : 0));
-  }, [posts.length]);
+  }, [posts.length, stopAutoPlay]);
 
   // Manejo de teclado
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') handlePrev();
-      if (e.key === 'ArrowRight') handleNext();
+      if (e.key === 'ArrowLeft') {
+        stopAutoPlay();
+        handlePrev();
+      }
+      if (e.key === 'ArrowRight') {
+        stopAutoPlay();
+        handleNext();
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handlePrev, handleNext]);
+  }, [handlePrev, handleNext, stopAutoPlay]);
 
   // Soporte Touch / Swipe en móviles
   const onTouchStart = (e: React.TouchEvent) => {
+    stopAutoPlay();
     touchStartX.current = e.targetTouches[0].clientX;
   };
 
@@ -182,6 +205,7 @@ export default function CoverflowCarousel({
               <div
                 key={post.id || idx}
                 onClick={() => {
+                  stopAutoPlay();
                   if (!isActive) setActiveIndex(idx);
                 }}
                 className={`absolute w-70 sm:w-85 md:w-100 lg:w-110 aspect-2/3 rounded-2xl md:rounded-3xl overflow-hidden border-0 transition-all duration-500 ease-out ${positionClasses} ${visualClasses}`}
@@ -293,7 +317,10 @@ export default function CoverflowCarousel({
         {posts.map((_, idx) => (
           <button
             key={idx}
-            onClick={() => setActiveIndex(idx)}
+            onClick={() => {
+              stopAutoPlay();
+              setActiveIndex(idx);
+            }}
             aria-label={`Ir a publicación ${idx + 1}`}
             className={`transition-all duration-300 rounded-full cursor-pointer ${
               idx === activeIndex

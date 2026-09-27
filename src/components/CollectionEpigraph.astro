@@ -2,75 +2,117 @@
 /**
  * CollectionEpigraph.astro
  *
- * Franja de epigrafe cinematografico entre colecciones en la pagina /colecciones/.
- * Version compacta de CinematicExcerptRest: misma tipografia Gloock y degradados,
- * sin canvas de polvo, con fundido inferior cinematico para la transicion a la siguiente card.
+ * Cartel presentador cinemático entre colecciones en /colecciones/.
+ * Secuencia cinemática GSAP de 4 fases:
+ *  1. Fase Izquierda: Muestra la 1ra mitad lógica de la frase en el lado izquierdo.
+ *  2. Fase Derecha: Tras un fade suave, muestra la 2da mitad lógica en el lado derecho.
+ *  3. Fase Pantalla Completa: Muestra el nombre de la colección a toda pantalla con tipografía Gloock metalizada.
+ *  4. Fase Push GSAP: Impulso/desplazamiento suave cinemático que te empuja al frame de la siguiente colección.
  *
  * Sintaxis del prop `text`:
  *   **palabra**   → blanco brillante (glow)
  *   [[letra]]     → dorado TGP (acento)
- *   texto normal  → gradiente metalico Gloock (#E3DDD3 / papiro suave)
+ *   texto normal  → gradiente metálico Gloock (#E3DDD3 / papiro suave)
  */
 
 interface Props {
   text: string;
+  collectionLabel?: string;
+  nextTargetId?: string;
   id?: string;
 }
 
 const {
   text,
+  collectionLabel,
+  nextTargetId,
   id = "epigraph-" + Math.random().toString(36).substring(2, 9),
 } = Astro.props;
 
-// ─── Tokenizador identico al de CinematicExcerptRest ─────────────────────────
-const rawWords = text.trim().split(/\s+/);
-let currentMode: 'normal' | 'glow' | 'accent' = 'normal';
-
-const wordsData = rawWords.map((rawWord, wordIdx) => {
-  let word = rawWord;
-  let type: 'normal' | 'glow' | 'accent' = currentMode;
-
-  if (word.startsWith('**')) {
-    currentMode = 'glow';
-    type = 'glow';
-    word = word.slice(2);
-  } else if (word.startsWith('[[')) {
-    currentMode = 'accent';
-    type = 'accent';
-    word = word.slice(2);
+// ─── División lógica de la frase en 2 partes (Part 1 Izquierda, Part 2 Derecha) ───
+function splitPhrase(rawText: string) {
+  const clean = rawText.trim();
+  
+  // Si contiene puntuación fuerte como punto y espacio
+  const sentences = clean.split(/(?<=\.)\s+/);
+  if (sentences.length >= 2) {
+    return {
+      part1: sentences[0],
+      part2: sentences.slice(1).join(' ')
+    };
   }
 
-  let endsGlow = false;
-  let endsAccent = false;
-
-  if (word.endsWith('**')) {
-    endsGlow = true;
-    word = word.slice(0, -2);
-  } else if (word.includes('**')) {
-    word = word.replace(/\*\*/g, '');
-    endsGlow = true;
+  // Si contiene punto y coma
+  if (clean.includes('; ')) {
+    const parts = clean.split('; ');
+    return { part1: parts[0] + ';', part2: parts.slice(1).join('; ') };
   }
 
-  if (word.endsWith(']]') || word.includes(']].') || word.includes(']],') || word.includes(']]:') || word.includes(']];')) {
-    endsAccent = true;
-    word = word.replace(/\]\]/g, '');
-  } else if (word.includes(']]')) {
-    word = word.replace(/\]\]/g, '');
-    endsAccent = true;
-  }
-
-  const cleanWord = word.replace(/\[\[/g, '').replace(/\]\]/g, '').replace(/\*\*/g, '');
-
-  if (endsGlow || endsAccent) {
-    currentMode = 'normal';
-  }
-
+  // Partición por palabras balanceadas
+  const words = clean.split(/\s+/);
+  const mid = Math.ceil(words.length / 2);
   return {
-    word: cleanWord,
-    type,
-    index: wordIdx
+    part1: words.slice(0, mid).join(' '),
+    part2: words.slice(mid).join(' ')
   };
-});
+}
+
+const { part1, part2 } = splitPhrase(text);
+
+// ─── Tokenizador de formato ──────────────────────────────────────────────────
+function parseFormattedWords(str: string) {
+  const rawWords = str.trim().split(/\s+/);
+  let currentMode: 'normal' | 'glow' | 'accent' = 'normal';
+
+  return rawWords.map((rawWord, wordIdx) => {
+    let word = rawWord;
+    let type: 'normal' | 'glow' | 'accent' = currentMode;
+
+    if (word.startsWith('**')) {
+      currentMode = 'glow';
+      type = 'glow';
+      word = word.slice(2);
+    } else if (word.startsWith('[[')) {
+      currentMode = 'accent';
+      type = 'accent';
+      word = word.slice(2);
+    }
+
+    let endsGlow = false;
+    let endsAccent = false;
+
+    if (word.endsWith('**')) {
+      endsGlow = true;
+      word = word.slice(0, -2);
+    } else if (word.includes('**')) {
+      word = word.replace(/\*\*/g, '');
+      endsGlow = true;
+    }
+
+    if (word.endsWith(']]') || word.includes(']].') || word.includes(']],') || word.includes(']]:') || word.includes(']];')) {
+      endsAccent = true;
+      word = word.replace(/\]\]/g, '');
+    } else if (word.includes(']]')) {
+      word = word.replace(/\]\]/g, '');
+      endsAccent = true;
+    }
+
+    const cleanWord = word.replace(/\[\[/g, '').replace(/\]\]/g, '').replace(/\*\*/g, '');
+
+    if (endsGlow || endsAccent) {
+      currentMode = 'normal';
+    }
+
+    return {
+      word: cleanWord,
+      type,
+      index: wordIdx
+    };
+  });
+}
+
+const part1Words = parseFormattedWords(part1);
+const part2Words = parseFormattedWords(part2);
 ---
 
 <style>
@@ -79,19 +121,20 @@ const wordsData = rawWords.map((rawWord, wordIdx) => {
 
 <section
   id={id}
-  class="col-epigraph relative w-full overflow-hidden select-none py-28 sm:py-36 md:py-48 lg:py-56 flex flex-col justify-center items-center"
+  class="col-epigraph relative w-full overflow-hidden select-none min-h-[85vh] py-24 sm:py-32 md:py-44 flex flex-col justify-center items-center bg-black/90 my-12"
+  data-next-target={nextTargetId}
 >
-  {/* Mascara superior: difumina el borde desde arriba */}
+  {/* Máscara superior */}
   <div class="absolute inset-x-0 top-0 h-36 sm:h-48 bg-linear-to-b from-(--bg-main,#121413) to-transparent pointer-events-none z-10" />
 
-  {/* Mascara inferior cinematica: difumina hacia la siguiente card */}
+  {/* Máscara inferior cinemática */}
   <div class="absolute inset-x-0 bottom-0 h-48 sm:h-64 bg-linear-to-t from-(--bg-main,#121413) to-transparent pointer-events-none z-10" />
 
-  {/* Contenedor central de lectura */}
-  <div class="relative z-20 max-w-[40ch] mx-auto px-4 sm:px-6 md:px-8 text-center">
-    <p class="epigraph-headline glow-metallic-gloock" id={`${id}-headline`}>
+  {/* ── FASE 1: PARTE IZQUIERDA DEL FRAME ── */}
+  <div class="ep-part-left absolute inset-y-0 left-0 w-full md:w-[65%] lg:w-[55%] flex items-center justify-start px-6 sm:px-12 md:px-16 lg:px-24 z-20 pointer-events-none opacity-0">
+    <p class="epigraph-headline text-left glow-metallic-gloock">
       {
-        wordsData.map((wd, idx) => (
+        part1Words.map((wd) => (
           <span class="epigraph-word-wrapper">
             <span
               class:list={[
@@ -99,7 +142,6 @@ const wordsData = rawWords.map((rawWord, wordIdx) => {
                 wd.type === "glow" ? "word-glow" : "",
                 wd.type === "accent" ? "word-accent" : "word-normal",
               ]}
-              style={`transition-delay: ${idx * 65}ms;`}
             >
               {wd.word}
             </span>
@@ -109,20 +151,50 @@ const wordsData = rawWords.map((rawWord, wordIdx) => {
       }
     </p>
   </div>
+
+  {/* ── FASE 2: PARTE DERECHA DEL FRAME ── */}
+  <div class="ep-part-right absolute inset-y-0 right-0 w-full md:w-[65%] lg:w-[55%] flex items-center justify-end px-6 sm:px-12 md:px-16 lg:px-24 z-20 pointer-events-none opacity-0">
+    <p class="epigraph-headline text-right glow-metallic-gloock">
+      {
+        part2Words.map((wd) => (
+          <span class="epigraph-word-wrapper">
+            <span
+              class:list={[
+                "epigraph-word",
+                wd.type === "glow" ? "word-glow" : "",
+                wd.type === "accent" ? "word-accent" : "word-normal",
+              ]}
+            >
+              {wd.word}
+            </span>
+            <span class="epigraph-space" aria-hidden="true">&nbsp;</span>
+          </span>
+        ))
+      }
+    </p>
+  </div>
+
+  {/* ── FASE 3: TRANSICIÓN DE EMPALME A LA SIGUIENTE COLECCIÓN ── */}
+  {collectionLabel && (
+    <div class="ep-part-full absolute inset-0 w-full h-full flex flex-col items-center justify-center p-6 z-30 pointer-events-none opacity-0">
+      <span class="font-mono text-xs sm:text-sm uppercase tracking-[0.5em] text-rust-orange font-bold mb-4 opacity-90 drop-shadow-md">
+        TAMBIÉN PUEDES EXPLORAR MÁS EN
+      </span>
+      <h2 class="ep-collection-title font-serif font-black text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight text-center gradient-general-h1 glow-metallic-gloock max-w-[20ch] leading-none">
+        {collectionLabel}
+      </h2>
+    </div>
+  )}
 </section>
 
 <style>
-  /* ── Tipografia Gloock BOLD / BLACK — entre cards de colecciones ── */
+  /* ── Tipografía Gloock BOLD / BLACK ── */
   .epigraph-headline {
     font-family: 'Gloock', serif;
-    font-size: clamp(1.85rem, 3.8vw, 3.35rem);
+    font-size: clamp(2rem, 4.2vw, 3.8rem);
     font-weight: 800;
-    line-height: 1.22;
+    line-height: 1.25;
     letter-spacing: -0.02em;
-    max-width: 38ch;
-    margin-left: auto;
-    margin-right: auto;
-    text-wrap: balance;
     padding: 0;
   }
 
@@ -135,23 +207,9 @@ const wordsData = rawWords.map((rawWord, wordIdx) => {
     display: inline-block;
   }
 
-  /* ── Aparicion cinematica: Fade + Scale Out (1.20 -> 1.0) + De-blur optico ── */
   .epigraph-word {
     display: inline-block;
-    opacity: 0;
-    filter: blur(18px);
-    transform: translateY(22px) scale(1.20);
     will-change: opacity, filter, transform;
-    transition:
-      opacity 1.3s cubic-bezier(0.16, 1, 0.3, 1),
-      filter 1.3s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .col-epigraph.is-revealed .epigraph-word {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateY(0) scale(1);
   }
 
   /* ── Degradados Gloock BOLD / BLACK de alto impacto ── */
@@ -190,38 +248,128 @@ const wordsData = rawWords.map((rawWord, wordIdx) => {
   .glow-metallic-gloock {
     filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 22px rgba(227, 221, 211, 0.2));
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    .epigraph-word {
-      opacity: 1 !important;
-      filter: none !important;
-      transform: none !important;
-      transition: none !important;
-    }
-  }
 </style>
 
 <script>
-  const setupEpigraph = (section: HTMLElement) => {
-    if (section.dataset.epInit === 'true') return;
-    section.dataset.epInit = 'true';
+  import gsap from 'gsap';
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          section.classList.add('is-revealed');
-        } else {
-          section.classList.remove('is-revealed');
+  function initEpigraphs() {
+    document.querySelectorAll<HTMLElement>('.col-epigraph').forEach(section => {
+      if (section.dataset.epInit === 'true') return;
+      section.dataset.epInit = 'true';
+
+      const partLeft = section.querySelector<HTMLElement>('.ep-part-left');
+      const partRight = section.querySelector<HTMLElement>('.ep-part-right');
+      const partFull = section.querySelector<HTMLElement>('.ep-part-full');
+      const nextTargetId = section.dataset.nextTarget;
+
+      let hasPlayed = false;
+
+      const playSequence = () => {
+        if (hasPlayed) return;
+        hasPlayed = true;
+
+        let userScrolledDuringInvitation = false;
+        const onInvitationScroll = () => {
+          userScrolledDuringInvitation = true;
+        };
+
+        const tl = gsap.timeline({
+          onComplete: () => {
+            window.removeEventListener('wheel', onInvitationScroll);
+            window.removeEventListener('touchmove', onInvitationScroll);
+          }
+        });
+
+        // ── FASE 1: Parte Izquierda ──
+        if (partLeft) {
+          const wordsLeft = partLeft.querySelectorAll('.epigraph-word');
+          tl.to(partLeft, { opacity: 1, duration: 0.1 });
+          tl.fromTo(wordsLeft, 
+            { opacity: 0, y: 22, filter: 'blur(12px)', scale: 1.15 },
+            { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, duration: 0.9, stagger: 0.08, ease: 'power2.out' }
+          );
+          tl.to({}, { duration: 2.0 }); // Pausa de lectura
+          tl.to(wordsLeft, { opacity: 0, y: -16, filter: 'blur(8px)', duration: 0.6, ease: 'power2.in' });
+          tl.to(partLeft, { opacity: 0, duration: 0.1 });
         }
-      });
-    }, { threshold: 0.15 });
 
-    observer.observe(section);
-  };
+        // ── FASE 2: Parte Derecha ──
+        if (partRight) {
+          const wordsRight = partRight.querySelectorAll('.epigraph-word');
+          tl.to(partRight, { opacity: 1, duration: 0.1 });
+          tl.fromTo(wordsRight, 
+            { opacity: 0, y: 22, filter: 'blur(12px)', scale: 1.15 },
+            { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, duration: 0.9, stagger: 0.08, ease: 'power2.out' }
+          );
+          tl.to({}, { duration: 2.4 }); // Pausa de lectura
+          tl.to(wordsRight, { opacity: 0, y: -16, filter: 'blur(8px)', duration: 0.6, ease: 'power2.in' });
+          tl.to(partRight, { opacity: 0, duration: 0.1 });
+        }
 
-  const initEpigraphs = () => {
-    document.querySelectorAll<HTMLElement>('.col-epigraph').forEach(setupEpigraph);
-  };
+        // ── FASE 3: Transición 'TAMBIÉN PUEDES EXPLORAR MÁS EN' + Nombre ──
+        if (partFull) {
+          tl.add(() => {
+            // Escuchar si el usuario scrollea manualmente SOLO durante la invitación
+            window.addEventListener('wheel', onInvitationScroll, { passive: true });
+            window.addEventListener('touchmove', onInvitationScroll, { passive: true });
+          });
+
+          tl.to(partFull, { opacity: 1, duration: 0.3 });
+          tl.fromTo(partFull.children, 
+            { opacity: 0, scale: 0.9, filter: 'blur(16px)' },
+            { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 1.0, stagger: 0.15, ease: 'power3.out' }
+          );
+          tl.to({}, { duration: 2.4 }); // Pausa para contemplar la invitación
+          tl.to(partFull, { opacity: 0, scale: 1.05, filter: 'blur(10px)', duration: 0.8, ease: 'power2.inOut' });
+        }
+
+        // ── FASE 4: Impulso (Push GSAP) Activo hacia la Siguiente Colección ──
+        if (nextTargetId) {
+          tl.to({}, { duration: 0.1 });
+          tl.add(() => {
+            window.removeEventListener('wheel', onInvitationScroll);
+            window.removeEventListener('touchmove', onInvitationScroll);
+
+            // 1. Abortar si la pestaña no está activa
+            if (document.hidden) return;
+
+            // 2. Abortar si el usuario scrolleó manualmente durante la invitación
+            if (userScrolledDuringInvitation) return;
+
+            // 3. Validar si la sección del epígrafe sigue en el campo visual del usuario
+            const rect = section.getBoundingClientRect();
+            const isStillVisible = rect.bottom > 100 && rect.top < window.innerHeight - 50;
+            if (!isStillVisible) return;
+
+            // 4. Debounce de seguridad (evita bucles si el usuario reingresa rápidamente)
+            const lastPushTime = Number(section.dataset.lastPush || 0);
+            const now = Date.now();
+            if (now - lastPushTime < 12000) return;
+            section.dataset.lastPush = String(now);
+
+            // 5. Ejecución garantizada y fluida del Push hacia el target
+            const targetEl = document.getElementById(nextTargetId);
+            if (targetEl) {
+              const yOffset = -32;
+              const yTarget = targetEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+              window.scrollTo({ top: yTarget, behavior: 'smooth' });
+            }
+          });
+        }
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            playSequence();
+          }
+        });
+      }, { threshold: 0.35 });
+
+      observer.observe(section);
+    });
+  }
 
   document.addEventListener('astro:page-load', initEpigraphs);
   if (document.readyState === 'complete' || document.readyState === 'interactive') {

@@ -235,13 +235,17 @@ const epigraphMap: Record<string, string> = {
             headline="Sitios Geohistóricos & Arqueohistóricos"
             ctaHref="/colecciones/arqueosemiotica/"
             ctaLabel="Explorar Cartografía"
+            nextTargetId="epigraph-geohistoricos"
           />
         )}
       </section>
 
-      {/* ─── EPIGRAFE CINEMATICO: entre Sitios Geohistóricos y las Colecciones Temáticas ─── */}
+      {/* ─── EPÍGRAFE CINEMÁTICO: entre Sitios Geohistóricos y las Colecciones Temáticas ─── */}
       <CollectionEpigraph
+        id="epigraph-geohistoricos"
         text="[[Coordenadas]] del pasado. El espacio como **texto cifrado,** la piedra como memoria viva de lo que fuimos."
+        collectionLabel={collections[0]?.label || "Sitios Geohistóricos & Arqueohistoria"}
+        nextTargetId={`triptico-stage-col-${collections[0]?.key}`}
       />
 
       {/* ═══════════════════════════════════════════════════════════════════
@@ -251,12 +255,19 @@ const epigraphMap: Record<string, string> = {
         {collections.slice(0, 3).map((col, index) => {
           const epigraphText = epigraphMap[col.key] || `**${col.label}:** una [[colección]] de registros del pensamiento humano en expansión.`;
           const colPosts = toTriplicoPosts(col);
+          const stageTargetId = `triptico-stage-col-${col.key}`;
+          const nextTarget = index < collections.slice(0, 3).length - 1 ? `epigraph-${collections[index + 1]?.key}` : 'sec-col-vertical';
 
           return (
-            <div class="flex flex-col w-full gap-8 md:gap-12">
+            <div id={`sec-col-${index}`} class="flex flex-col w-full gap-8 md:gap-12">
               {/* Epígrafe cinemático previo (excepto en la primera colección) */}
               {index > 0 && (
-                <CollectionEpigraph text={epigraphText} />
+                <CollectionEpigraph 
+                  id={`epigraph-${col.key}`}
+                  text={epigraphText} 
+                  collectionLabel={col.label}
+                  nextTargetId={stageTargetId}
+                />
               )}
 
               {colPosts.length > 0 && (
@@ -267,6 +278,7 @@ const epigraphMap: Record<string, string> = {
                   headline={`${col.label}. En Profundidad.`}
                   ctaHref={`/colecciones/${col.key}/`}
                   ctaLabel={`Explorar ${col.label}`}
+                  nextTargetId={nextTarget}
                 />
               )}
             </div>
@@ -276,7 +288,9 @@ const epigraphMap: Record<string, string> = {
 
       {/* ─── RESTO DE COLECCIONES: VERTICAL STACK CON CHEVRON CTA ─── */}
       {collections.length > 3 && (
-        <VerticalCollectionsStack collections={collections.slice(3)} />
+        <div id="sec-col-vertical" class="w-full">
+          <VerticalCollectionsStack collections={collections.slice(3)} />
+        </div>
       )}
     </div>
 

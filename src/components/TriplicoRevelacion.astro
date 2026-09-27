@@ -2,15 +2,13 @@
 /**
  * TriplicoRevelacion.astro
  * ─────────────────────────────────────────────────────────────────────────────
- * Tríptico de Revelación — Cinematic Reveal Loop
+ * Tríptico de Revelación — Secuencia Cinemática de Colecciones
  *
- * Tres actos superpuestos con crossfade GSAP (autoAlpha):
- *   Acto I  (Novedades)   → Grid de 3 tarjetas de posts recientes
- *   Acto II (Profundidad) → Bento Card a pantalla completa con imagen hero
- *   Acto III (Umbral)     → CTA minimalista "Explorar colecciones"
- *
- * Dimensiones: w-full, h = 62vh (equivalente a ~3 tarjetas individuales)
- * Ubicación en About: antes del footer, después de MubiBlockCinematic.
+ * Secuencia Narrativa:
+ *   1. Portada Cabecera (Hero)  → Imagen principal límpida de la colección.
+ *   2. Spotlight Individual     → Foto FIJA límpida (sin recortar). La FRASE se desplaza sobre la foto.
+ *   3. Grilla Final 3-Cards    → Vista heredada con las 3 tarjetas en grilla.
+ *   4. Retorno a Cabecera       → Tras un breve descanso en 3-cards, vuelve a la Portada Hero.
  */
 
 export interface TriplicoPost {
@@ -22,21 +20,14 @@ export interface TriplicoPost {
 }
 
 interface Props {
-  posts: TriplicoPost[];       // Acto I — últimos posts (idealmente 3)
-  heroPost?: TriplicoPost;     // Acto II — colección destacada (imagen grande)
-  /** ID único para permitir múltiples instancias en la misma página sin colisión de DOM */
+  posts: TriplicoPost[];       // Tres posts principales de la colección
+  heroPost?: TriplicoPost;     // Imagen hero/cabeza de la colección
   instanceId?: string;
-  /** Etiqueta editorial (eyebrow) */
   label?: string;
-  /** Titular principal del encabezado */
   headline?: string;
-  /** Texto del CTA secundario en Acto III */
   ctaHref?: string;
   ctaLabel?: string;
-  ctaSecondaryHref?: string;
-  ctaSecondaryLabel?: string;
-  /** Modo de presentación del Acto I: grilla simultánea (por defecto) o secuencia centrada ("guest") */
-  actOneMode?: 'grid' | 'sequence';
+  nextTargetId?: string;
 }
 
 const {
@@ -47,22 +38,14 @@ const {
   headline = 'Lo Reciente. Lo Profundo. El Umbral.',
   ctaHref = '/colecciones/',
   ctaLabel = 'Ver Todas las Colecciones',
-  ctaSecondaryHref = '/archivo/',
-  ctaSecondaryLabel = 'Archivo Completo',
-  actOneMode = 'grid',
+  nextTargetId,
 } = Astro.props;
 
-const stageId    = `triptico-stage-${instanceId}`;
-const acto1Id    = `triptico-acto1-${instanceId}`;
-const acto2Id    = `triptico-acto2-${instanceId}`;
-const acto3Id    = `triptico-acto3-${instanceId}`;
-const dotsId     = `triptico-dots-${instanceId}`;
-const progressId = `triptico-progress-${instanceId}`;
-
+const stageId   = `triptico-stage-${instanceId}`;
 const hero = heroPost ?? posts[0] ?? null;
 const slicedPosts = posts.slice(0, 3);
 
-// Helper para partición armónica de headline (evita desbordes y cortes de letras)
+// Helper para partición armónica de headline
 let headlinePart1 = headline;
 let headlinePart2 = '';
 
@@ -79,8 +62,9 @@ if (headline.includes('.')) {
 
 <section
   id={`triptico-revelacion-${instanceId}`}
-  class="triptico-root w-full max-w-430 2xl:max-w-460 mx-auto px-2 sm:px-4 md:px-6 py-10 md:py-16"
+  class="triptico-root w-full max-w-430 2xl:max-w-460 mx-auto px-2 sm:px-4 md:px-6 py-10 md:py-16 select-none"
   aria-label="Tríptico de Revelación — Colecciones en Rotación"
+  data-next-target={nextTargetId}
 >
   <!-- Encabezado editorial -->
   <header class="mb-8 flex flex-col gap-1.5 px-1 sm:px-2">
@@ -92,29 +76,176 @@ if (headline.includes('.')) {
     </h2>
   </header>
 
-  <!-- CONTENEDOR DE LOS TRES ACTOS -->
+  <!-- CONTENEDOR DE LA SECUENCIA NARRATIVA -->
   <div
     id={stageId}
     class="relative w-full overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 shadow-2xl min-h-[82vh] md:min-h-180 lg:min-h-205 bg-black"
   >
 
-    <!-- ═══════════════════════════════ -->
-    <!-- ACTO I — Novedades (Grid 3 o Seq)-->
-    <!-- ═══════════════════════════════ -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- ETAPA INTERLUDIO: NOMBRE DE LA COLECCIÓN EN H1 GRADIENT DESTACADO   -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
     <div
-      id={acto1Id}
-      class={actOneMode === 'grid'
-        ? "triptico-acto absolute inset-0 p-3 sm:p-4 md:p-5 lg:p-6 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-5 bg-black"
-        : "triptico-acto absolute inset-0"}
-      style="visibility: visible; opacity: 1;"
+      class="triptico-layer-title-interlude absolute inset-0 flex flex-col items-center justify-center bg-[#070809] z-40 isolate pointer-events-none"
+      style="visibility: visible; opacity: 1; backface-visibility: hidden;"
+    >
+      <div class="interlude-title-box text-center px-6 max-w-4xl flex flex-col items-center gap-3">
+        <span class="font-mono text-[10px] md:text-xs uppercase tracking-[0.6em] text-rust-orange font-bold drop-shadow-md">
+          COLECCIÓN TGP
+        </span>
+        <h1 class="font-cinzel font-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl gradient-steel-titanium tracking-tight leading-[0.95] drop-shadow-2xl text-balance">
+          {headlinePart1 || headline}
+        </h1>
+        {headlinePart2 && (
+          <p class="font-serif italic text-white/60 text-base md:text-xl font-light mt-1">
+            {headlinePart2}
+          </p>
+        )}
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- ETAPA 1: PORTADA CABEZA DE LA COLECCIÓN (HERO LÍMPIDA)              -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <div
+      class="triptico-layer-hero absolute inset-0 opacity-0 z-10 isolate pointer-events-none"
+      style="visibility: hidden; backface-visibility: hidden;"
+    >
+      {hero ? (
+        <a href={hero.href} class="group relative w-full h-full flex items-end overflow-hidden">
+          <div class="absolute inset-0 z-0">
+            <img
+              src={hero.img}
+              alt={hero.title}
+              loading="lazy"
+              decoding="async"
+              class="hero-bg-img w-full h-full object-cover brightness-95"
+            />
+            {/* Scrim Mínimo Granular solo para legibilidad inferior */}
+            <div class="absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-black/85 via-black/30 to-transparent pointer-events-none"></div>
+          </div>
+          <div class="hero-content-box relative z-10 p-8 md:p-12 lg:p-16 max-w-3xl flex flex-col gap-4">
+            <span class="font-mono text-[9px] uppercase tracking-[0.5em] text-rust-orange font-bold drop-shadow-md">
+              PORTADA DE LA COLECCIÓN
+            </span>
+            <h3 class="font-cinzel font-black text-white text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-[0.95] tracking-tight drop-shadow-2xl">
+              {hero.title}
+            </h3>
+            {hero.excerpt && (
+              <p class="font-serif italic text-white/80 text-base md:text-lg leading-relaxed max-w-xl drop-shadow-md">
+                {hero.excerpt}
+              </p>
+            )}
+            <span class="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.4em] text-white/50 group-hover:text-rust-orange transition-colors mt-2">
+              <span class="w-8 h-px bg-rust-orange/40 group-hover:bg-rust-orange transition-colors"></span>
+              Explorar Dossier Principal →
+            </span>
+          </div>
+        </a>
+      ) : null}
+      <div class="absolute top-4 right-5 z-30 font-mono text-[8px] uppercase tracking-[0.4em] text-white/40 pointer-events-none drop-shadow-md">
+        Etapa I — Portada
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- ETAPA 2: SPOTLIGHT INDIVIDUAL — RESTRUCTURACIÓN PURA VERTICAL STACK -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <div 
+      class="triptico-layer-spotlight absolute inset-0 opacity-0 pointer-events-none z-20 isolate"
+      style="visibility: hidden; backface-visibility: hidden;"
+    >
+      {slicedPosts.map((post, idx) => {
+        const isRightAligned = idx % 2 === 1; // Alterna posición de la frase
+        
+        // Sanitización UTF-8 para prevenir glitches de caracteres
+        const cleanedTitle = (post.title || '')
+          .replace(/J\uFFFDpiter|J\?piter|J\uFFFD\uFFFDpiter/g, 'Júpiter')
+          .replace(/Astrolog\uFFFD\uFFFD|Astrolog\?a|Astrolog\uFFFD/g, 'Astrología')
+          .replace(/\uFFFD/g, '');
+
+        const cleanedExcerpt = (post.excerpt || '')
+          .replace(/J\uFFFDpiter|J\?piter|J\uFFFD\uFFFDpiter/g, 'Júpiter')
+          .replace(/Astrolog\uFFFD\uFFFD|Astrolog\?a|Astrolog\uFFFD/g, 'Astrología')
+          .replace(/\uFFFD/g, '');
+
+        // Detección inteligente de arte (retratos, estatuas, bustos) idéntica a VerticalCollectionsStack
+        const isPortraitArt = /mercurio|homero|saturno|wiki|busto|estatua|retrato|filosofia|hegel|jup|júpiter|dios|apolo/i.test(post.img) || /busto|estatua|retrato|escultura/i.test(cleanedTitle);
+        const fitClass = isPortraitArt ? 'object-contain! bg-[#08090a]' : 'object-cover';
+
+        return (
+          <div
+            class="spotlight-card absolute inset-0 opacity-0 pointer-events-none overflow-hidden isolate"
+            style="visibility: hidden; backface-visibility: hidden;"
+            data-index={idx}
+          >
+            {/* Contenedor de Foto Cinemática Límpida (Full-Bleed) */}
+            <div class="spotlight-img-wrap absolute inset-0 w-full h-full overflow-hidden bg-[#0a0b0b]">
+              <img
+                src={post.img}
+                alt={cleanedTitle}
+                class={`spotlight-img absolute inset-0 w-full h-full pointer-events-none brightness-95 contrast-[1.02] z-0 ${fitClass}`}
+                style="object-position: 50% 50%;"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+
+            {/* Capa Cinemática Pura (Idéntica a VerticalCollectionsStack) */}
+            <div class="spotlight-cinematic-layer absolute inset-0 z-20 flex">
+              <div class:list={["hidden md:block w-[40%] h-full", isRightAligned ? "order-1" : "order-2"]}></div>
+              <div 
+                class:list={[
+                  "w-full md:w-[60%] h-full flex flex-col justify-center p-8 md:p-14 lg:p-20 z-20 transition-all duration-1000",
+                  isRightAligned 
+                    ? "order-2 bg-linear-to-l from-black/95 via-black/80 to-transparent" 
+                    : "order-1 bg-linear-to-r from-black/95 via-black/80 to-transparent"
+                ]}
+              >
+                <div class="spotlight-text-content flex flex-col gap-3 max-w-2xl">
+                  <span class="font-mono text-[9px] uppercase tracking-[0.5em] text-rust-orange font-bold drop-shadow-md block">
+                    {post.badge || `Dossier ${idx + 1} de ${slicedPosts.length}`}
+                  </span>
+                  <h3 class="font-cinzel font-extrabold text-2xl md:text-4xl lg:text-5xl text-white leading-tight drop-shadow-2xl">
+                    {cleanedTitle}
+                  </h3>
+                  {cleanedExcerpt && (
+                    <p 
+                      class="spotlight-phrase font-serif text-2xl md:text-3xl lg:text-4xl text-[#E3DDD3]/90 leading-tight drop-shadow-2xl text-balance mt-2 max-w-[35ch]"
+                      data-phrase={cleanedExcerpt}
+                    >
+                      "{cleanedExcerpt}"
+                    </p>
+                  )}
+                  <a
+                    href={post.href}
+                    class="inline-flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.35em] text-rust-orange hover:text-white transition-colors mt-6 font-bold"
+                  >
+                    <span>Ver Investigación →</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+      <div class="absolute top-4 right-5 z-30 font-mono text-[8px] uppercase tracking-[0.4em] text-white/40 pointer-events-none drop-shadow-md">
+        Etapa II — En Profundidad
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- ETAPA 3: PANTALLA FINAL CON LAS 3 CARDS JUNTAS (HEREDADO)            -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <div
+      class="triptico-layer-grid absolute inset-0 p-3 sm:p-4 md:p-5 lg:p-6 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-5 bg-black opacity-0 pointer-events-none z-30 isolate"
+      style="visibility: hidden; backface-visibility: hidden;"
     >
       {slicedPosts.map((post, i) => (
         <a
           href={post.href}
-          class={actOneMode === 'grid' 
-            ? "group relative overflow-hidden rounded-xl md:rounded-2xl border border-white/10 bg-[#0a0a0b] flex flex-col justify-end transition-all duration-500 hover:border-rust-orange/50 hover:shadow-[0_0_30px_rgba(217,119,6,0.18)]"
-            : "triptico-seq-card relative group overflow-hidden bg-black flex flex-col justify-end"}
-          style={actOneMode === 'grid' ? `transition-delay:${i * 60}ms` : 'will-change: transform, opacity;'}
+          class="group relative overflow-hidden rounded-xl md:rounded-2xl border border-white/10 bg-[#0a0a0b] flex flex-col justify-end transition-all duration-500 hover:border-rust-orange/50 hover:shadow-[0_0_30px_rgba(217,119,6,0.18)]"
+          style={`transition-delay:${i * 60}ms`}
         >
           <div class="absolute inset-0 z-0">
             <img
@@ -140,467 +271,283 @@ if (headline.includes('.')) {
                 {post.excerpt}
               </p>
             )}
-            <span class={`font-mono uppercase text-white/30 group-hover:text-rust-orange/80 transition-colors mt-1 ${actOneMode === 'grid' ? 'text-[9px] tracking-[0.3em]' : 'text-[11px] tracking-[0.4em] drop-shadow-md'}`}>
+            <span class="font-mono uppercase text-white/30 group-hover:text-rust-orange/80 transition-colors mt-1 text-[9px] tracking-[0.3em]">
               Explorar Dossier →
             </span>
           </div>
-          {actOneMode === 'grid' && (
-            <div class="absolute left-0 top-0 h-full w-0.5 bg-rust-orange scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-bottom z-20"></div>
-          )}
+          <div class="absolute left-0 top-0 h-full w-0.5 bg-rust-orange scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-bottom z-20"></div>
         </a>
       ))}
-      <div class="absolute top-4 right-5 z-30 font-mono text-[8px] uppercase tracking-[0.4em] text-white/20 pointer-events-none">
-        Acto I — Novedades
+      <div class="absolute top-4 right-5 z-30 font-mono text-[8px] uppercase tracking-[0.4em] text-white/40 pointer-events-none drop-shadow-md">
+        Etapa III — Tríptico Completo
       </div>
-    </div>
-
-    <!-- ═══════════════════════════════════ -->
-    <!-- ACTO II — Bento Colección Hero     -->
-    <!-- ═══════════════════════════════════ -->
-    <div
-      id={acto2Id}
-      class="triptico-acto absolute inset-0"
-      style="visibility: hidden; opacity: 0;"
-    >
-      {hero ? (
-        <a href={hero.href} class="group relative w-full h-full flex items-end overflow-hidden">
-          <div class="absolute inset-0 z-0">
-            <img
-              src={hero.img}
-              alt={hero.title}
-              loading="lazy"
-              decoding="async"
-              class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-            />
-            <div class="absolute inset-0 bg-linear-to-b from-black/30 via-transparent to-black/95"></div>
-            <div class="absolute inset-0 bg-linear-to-r from-black/70 via-transparent to-black/40"></div>
-          </div>
-          <div class="relative z-10 p-8 md:p-12 lg:p-16 max-w-3xl flex flex-col gap-4">
-            <span class="font-mono text-[9px] uppercase tracking-[0.5em] text-rust-orange font-bold">
-              Colección Destacada
-            </span>
-            <h3 class="font-cinzel font-black text-white text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-[0.95] tracking-tight drop-shadow-2xl">
-              {hero.title}
-            </h3>
-            {hero.excerpt && (
-              <p class="font-serif italic text-white/55 text-base md:text-lg leading-relaxed max-w-xl">
-                {hero.excerpt}
-              </p>
-            )}
-            <span class="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.4em] text-white/30 group-hover:text-rust-orange transition-colors mt-2">
-              <span class="w-8 h-px bg-rust-orange/40 group-hover:bg-rust-orange transition-colors"></span>
-              Explorar colección completa →
-            </span>
-          </div>
-        </a>
-      ) : (
-        <div class="w-full h-full flex items-center justify-center bg-[#0a0a0b]">
-          <span class="font-mono text-white/20 text-sm">Sin datos de colección destacada</span>
-        </div>
-      )}
-      <div class="absolute top-4 right-5 z-30 font-mono text-[8px] uppercase tracking-[0.4em] text-white/20">
-        Acto II — Profundidad
-      </div>
-    </div>
-
-    <!-- ═══════════════════════════════ -->
-    <!-- ACTO III — Umbral CTA          -->
-    <!-- ═══════════════════════════════ -->
-    <div
-      id={acto3Id}
-      class="triptico-acto absolute inset-0 flex flex-col items-center justify-center gap-8 bg-[#060607]"
-      style="visibility: hidden; opacity: 0;"
-    >
-      <!-- Ruido sutil de fondo -->
-      <div class="absolute inset-0 opacity-[0.018]" style="background-image:url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC42NSIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbikiIG9wYWNpdHk9IjEiLz48L3N2Zz4=);"></div>
-
-      <div class="relative z-10 flex flex-col items-center gap-6 md:gap-8 text-center px-4 sm:px-8 max-w-5xl 2xl:max-w-6xl w-full">
-        <!-- Eyebrow ornamental -->
-        <div class="triptico-a3-anim flex items-center gap-4 opacity-0">
-          <div class="w-12 h-px bg-rust-orange/30"></div>
-          <span class="font-mono text-[10px] uppercase tracking-[0.6em] text-rust-orange/80 font-bold">El Umbral</span>
-          <div class="w-12 h-px bg-rust-orange/30"></div>
-        </div>
-
-        <!-- Headline fluido que NUNCA desborda -->
-        <h3 class="triptico-a3-anim font-cinzel font-black text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[4.2rem] 2xl:text-[4.8rem] leading-[1.04] tracking-normal sm:tracking-tight drop-shadow-[0_0_40px_rgba(255,255,255,0.15)] opacity-0 px-2 sm:px-4 wrap-break-word">
-          <span>{headlinePart1}</span>
-          {headlinePart2 && (
-            <>
-              <br class="hidden sm:inline" />
-              <span class="gradient-steel-titanium drop-shadow-[0_0_20px_rgba(255,255,255,0.1)] inline-block mt-1 sm:mt-0">
-                {headlinePart2}
-              </span>
-            </>
-          )}
-        </h3>
-
-        <p class="triptico-a3-anim font-serif italic text-white/40 text-lg md:text-xl lg:text-2xl leading-relaxed max-w-2xl mx-auto opacity-0">
-          Ensayos cinemáticos, arqueosemiótica, arquetipos y dirección de arte.<br />
-          <span class="text-white/20">Un archivo vivo de pensamiento visual.</span>
-        </p>
-
-        <div class="triptico-a3-anim flex items-center justify-center mt-2 opacity-0">
-          <a
-            href={ctaHref}
-            class="group/cta inline-flex items-center gap-4 px-10 py-5 bg-black/40 backdrop-blur-md border border-white/10 font-mono font-bold text-[14px] tracking-[0.3em] uppercase text-white/80 rounded-full transition-all duration-500 hover:border-rust-orange/60 hover:bg-rust-orange/10 hover:text-white hover:shadow-[0_0_40px_rgba(217,119,6,0.25)] active:scale-95"
-          >
-            <span>{ctaLabel}</span>
-            <span class="opacity-70 group-hover/cta:translate-x-1.5 transition-transform duration-300">▸</span>
-          </a>
-        </div>
-      </div>
-
-      <div class="absolute top-4 right-5 z-30 font-mono text-[8px] uppercase tracking-[0.4em] text-white/15">
-        Acto III — Umbral
-      </div>
-    </div>
-
-    <!-- Dots de navegación -->
-    <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2.5" id={dotsId} role="tablist">
-      {[1, 2, 3].map((n) => (
-        <button
-          type="button"
-          class={`triptico-dot rounded-full transition-all duration-500 cursor-pointer border-none outline-none shrink-0 ${n === 1 ? 'bg-rust-orange w-5 h-1.5' : 'bg-white/20 hover:bg-white/40 w-1.5 h-1.5'}`}
-          data-acto={n}
-          aria-label={`Acto ${n}`}
-          aria-selected={n === 1 ? 'true' : 'false'}
-        />
-      ))}
-    </div>
-
-    <!-- Barra de progreso (oculta a petición, conservada para lógica de JS) -->
-    <div class="absolute bottom-0 left-0 z-40 h-0.5 w-full opacity-0 pointer-events-none" aria-hidden="true">
-      <div id={progressId} class="h-full w-0"></div>
     </div>
 
   </div>
 </section>
 
-<script define:vars={{ stageId, acto1Id, acto2Id, acto3Id, dotsId, progressId, actOneMode }}>
-  const initTriptico = () => {
-    const stage = document.getElementById(stageId);
-    if (!stage || stage.__triptico_init) return;
-    stage.__triptico_init = true;
+<script>
+  import gsap from 'gsap';
 
-    const acto1 = document.getElementById(acto1Id);
-    const acto2 = document.getElementById(acto2Id);
-    const acto3 = document.getElementById(acto3Id);
-    const progressBar = document.getElementById(progressId);
-    const dots = Array.from(document.querySelectorAll(`#${dotsId} .triptico-dot`));
+  function parsePhrase(text: string) {
+    return text
+      .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-black">$1</strong>')
+      .replace(/\[\[([^\]]+)\]\]/g, '<span class="text-rust-orange italic">$1</span>');
+  }
 
-    if (!acto1 || !acto2 || !acto3) return;
+  function initTripticoNarrative() {
+    document.querySelectorAll<HTMLElement>('.triptico-root').forEach(root => {
+      if (root.dataset.tnInit === 'true') return;
+      root.dataset.tnInit = 'true';
 
-    const STAY = 6;
-    const FADE = 1.2;
-    // Secuencia Guest Star — tiempos para el ojo humano
-    const SEQ_ENTER   = 1.2;    // fade-in
-    const SEQ_HOLD    = 3.5;    // tiempo en reposo
-    const SEQ_SWAY    = 4.0;    // duración total del balanceo
-    const SEQ_EXIT    = 1.0;    // fade-out
-    const SEQ_GAP     = 0.6;    // negro entre cards
-    const SWAY_PX     = 5;      // píxeles de balanceo lateral individual
-    const SWAY_HALF   = 0.9;    // duración de cada medio-balanceo
-    const PER_CARD    = SEQ_ENTER + Math.max(SEQ_HOLD, SEQ_SWAY) + SEQ_EXIT + SEQ_GAP;
-    // Finale group — las 3 aparecen juntas solapadas
-    const FIN_ENTER   = 1.0;
-    const FIN_HOLD    = 2.2;
-    const FIN_EXIT    = 1.0;
-    const FIN_SWAY    = 3;      // píxeles del balanceo grupal
-    const FIN_SWAY_D  = 0.45;   // duración de cada medio-balanceo grupal
-    const FIN_OVERLAP = 55;     // px que las cards late/right se corren al centro
-    const FIN_TOTAL   = FIN_ENTER + FIN_HOLD + FIN_EXIT;
+      const titleInterludeLayer = root.querySelector<HTMLElement>('.triptico-layer-title-interlude');
+      const interludeTitleBox = root.querySelector<HTMLElement>('.interlude-title-box');
+      const heroLayer = root.querySelector<HTMLElement>('.triptico-layer-hero');
+      const spotlightLayer = root.querySelector<HTMLElement>('.triptico-layer-spotlight');
+      const gridLayer = root.querySelector<HTMLElement>('.triptico-layer-grid');
+      const spotlightCards = Array.from(root.querySelectorAll<HTMLElement>('.spotlight-card'));
+      const nextTargetId = root.dataset.nextTarget;
 
-    // Config por card: qué scale y qué x-drift en su momento estelar
-    // orden de aparición: Centro(1) → Derecha(2) → Izquierda(0)
-    const SEQ_CONFIG = [
-      { cardIndex: 1, xDrift:   0,  scale: 1.12 }, // Centro — no se mueve
-      { cardIndex: 2, xDrift: -48,  scale: 1.18 }, // Derecha — se corre hacia el centro
-      { cardIndex: 0, xDrift:  48,  scale: 1.18 }, // Izquierda — se corre hacia el centro
-    ];
-    
-    const actos = [acto1, acto2, acto3];
-    let currentActo = 0;
-    let loopTimeout = null;
-    let progressRaf = null;
-    let paused = false;
-    let progressStart = 0;
-    let timeRemaining = 0;
-    let act1Timeline = null;
-    
-    const getDurationForAct = (idx) => {
-      if (idx === 0 && actOneMode === 'sequence') {
-        const cardsCount = document.querySelectorAll(`#${acto1Id} .triptico-seq-card`).length;
-        return (PER_CARD * cardsCount + FIN_TOTAL) * 1000;
-      }
-      return (STAY + FADE) * 1000;
-    };
+      if (!heroLayer || !spotlightLayer || !gridLayer) return;
 
-    const loadGSAP = () => {
-      return new Promise((resolve) => {
-        if (window.gsap) { resolve(window.gsap); return; }
-        const s = document.createElement('script');
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
-        s.onload = () => resolve(window.gsap);
-        document.head.appendChild(s);
-      });
-    };
+      let isRunning = false;
 
-    const updateDots = (idx) => {
-      dots.forEach((dot, i) => {
-        const active = i === idx;
-        dot.setAttribute('aria-selected', String(active));
-        if (active) {
-          dot.classList.add('bg-rust-orange', 'w-5');
-          dot.classList.remove('bg-white/20', 'w-1.5');
+      const playSequence = () => {
+        if (isRunning) return;
+        isRunning = true;
+
+        let userInteracted = false;
+        const onUserInteraction = () => {
+          userInteracted = true;
+        };
+        window.addEventListener('wheel', onUserInteraction, { passive: true });
+        window.addEventListener('touchmove', onUserInteraction, { passive: true });
+
+        const triggerSoftPush = () => {
+          isRunning = false;
+          window.removeEventListener('wheel', onUserInteraction);
+          window.removeEventListener('touchmove', onUserInteraction);
+
+          if (!nextTargetId) return;
+
+          setTimeout(() => {
+            // 1. Abortar si la pestaña no está activa
+            if (document.hidden) return;
+
+            // 2. Abortar si el usuario scrolleó o interactuó manualmente
+            if (userInteracted) return;
+
+            // 3. Validar si la sección del tríptico sigue visible en el viewport
+            const rect = root.getBoundingClientRect();
+            const isStillVisible = rect.bottom > 150 && rect.top < window.innerHeight - 100;
+            if (!isStillVisible) return;
+
+            // 4. Debounce de seguridad (15s) para evitar bucles repetitivos
+            const lastPushTime = Number(root.dataset.lastPush || 0);
+            const now = Date.now();
+            if (now - lastPushTime < 15000) return;
+            root.dataset.lastPush = String(now);
+
+            // 5. Soft push suave hacia el siguiente elemento target
+            const targetEl = document.getElementById(nextTargetId);
+            if (targetEl) {
+              const yOffset = -32;
+              const yTarget = targetEl.getBoundingClientRect().top + (window.scrollY || window.pageYOffset) + yOffset;
+              window.scrollTo({ top: yTarget, behavior: 'smooth' });
+            }
+          }, 3200); // 3.2s de contemplación en la cabecera estabilizada
+        };
+
+        const mainTl = gsap.timeline({
+          onComplete: () => {
+            // TRAS CONCLUIR LAS 3 CARDS Y UN BREVE DESCANSO:
+            // REAPARECE EL NOMBRE DE LA COLECCIÓN EN H1 GRADIENT Y LUEGO VUELVE A LA CABECERA
+            gsap.to(gridLayer, { 
+              autoAlpha: 0, 
+              pointerEvents: 'none', 
+              zIndex: 0,
+              duration: 1.0, 
+              delay: 4.5, 
+              ease: 'power2.inOut',
+              onComplete: () => {
+                if (titleInterludeLayer && interludeTitleBox) {
+                  gsap.set(titleInterludeLayer, { autoAlpha: 1, zIndex: 40 });
+                  gsap.fromTo(interludeTitleBox,
+                    { autoAlpha: 0, scale: 0.94, y: 15 },
+                    { autoAlpha: 1, scale: 1.04, y: 0, duration: 1.2, ease: 'power2.out' }
+                  );
+                  gsap.to(interludeTitleBox, {
+                    autoAlpha: 0,
+                    scale: 1.10,
+                    duration: 0.8,
+                    ease: 'power2.in',
+                    delay: 1.2,
+                    onComplete: () => {
+                      gsap.to(titleInterludeLayer, { autoAlpha: 0, zIndex: 0, duration: 0.4 });
+                      gsap.set(heroLayer, { zIndex: 30 });
+                      gsap.to(heroLayer, { 
+                        autoAlpha: 1, 
+                        pointerEvents: 'auto', 
+                        duration: 0.8,
+                        onComplete: () => {
+                          triggerSoftPush();
+                        }
+                      });
+                    }
+                  });
+                } else {
+                  gsap.set(heroLayer, { zIndex: 30 });
+                  gsap.to(heroLayer, { 
+                    autoAlpha: 1, 
+                    pointerEvents: 'auto', 
+                    duration: 1.0,
+                    onComplete: () => {
+                      triggerSoftPush();
+                    }
+                  });
+                }
+              }
+            });
+          }
+        });
+
+        // ── PASO 0: INTERLUDIO CINEMÁTICO NOMBRE DE LA COLECCIÓN (H1 GRADIENT) ──
+        if (titleInterludeLayer && interludeTitleBox) {
+          gsap.set(titleInterludeLayer, { autoAlpha: 1, zIndex: 40, pointerEvents: 'none' });
+          gsap.set(heroLayer, { autoAlpha: 0, zIndex: 10, pointerEvents: 'none' });
+          gsap.set(spotlightLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
+          gsap.set(gridLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
+
+          mainTl.fromTo(interludeTitleBox,
+            { autoAlpha: 0, scale: 0.94, y: 15 },
+            { autoAlpha: 1, scale: 1.02, y: 0, duration: 1.2, ease: 'power2.out' }
+          );
+          mainTl.to(interludeTitleBox,
+            { autoAlpha: 0, scale: 1.08, duration: 0.8, ease: 'power2.in' },
+            '+=0.6'
+          );
+          mainTl.to(titleInterludeLayer, { autoAlpha: 0, duration: 0.5, ease: 'power2.inOut' });
+          mainTl.set(titleInterludeLayer, { zIndex: 0 });
         } else {
-          dot.classList.remove('bg-rust-orange', 'w-5');
-          dot.classList.add('bg-white/20', 'w-1.5');
+          gsap.set(heroLayer, { autoAlpha: 1, zIndex: 30, pointerEvents: 'auto' });
+          gsap.set(spotlightLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
+          gsap.set(gridLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
         }
-      });
-    };
 
-    const animateProgress = () => {
-      if (!progressBar) return;
-      if (progressRaf) cancelAnimationFrame(progressRaf);
-      progressStart = performance.now();
-      const currentDuration = getDurationForAct(currentActo);
-      
-      const tick = (now) => {
-        if (paused) { progressRaf = requestAnimationFrame(tick); return; }
-        const elapsed = now - progressStart;
-        const pct = Math.min((elapsed / currentDuration) * 100, 100);
-        progressBar.style.width = `${pct}%`;
-        if (pct < 100) progressRaf = requestAnimationFrame(tick);
-      };
-      progressRaf = requestAnimationFrame(tick);
-    };
+        spotlightCards.forEach(card => gsap.set(card, { autoAlpha: 0, zIndex: 10, pointerEvents: 'none' }));
 
-    const crossfade = (gsap, nextIdx) => {
-      const currentDuration = getDurationForAct(nextIdx);
-      
-      // Fade out current act
-      gsap.to(actos[currentActo], { autoAlpha: 0, duration: FADE, ease: 'power2.inOut' });
-      
-      if (currentActo === 2) {
-        gsap.set(`#${acto3Id} .triptico-a3-anim`, { opacity: 0, y: 30, filter: "blur(12px)" });
-      }
+        // ── PASO A: PORTADA HERO (FOTO CABECERA FIJA Y LÍMPIDA) ──
+        const heroImg = heroLayer.querySelector('.hero-bg-img');
+        const heroContent = heroLayer.querySelector('.hero-content-box');
 
-      // Fade in next act
-      gsap.to(actos[nextIdx], { autoAlpha: 1, duration: FADE, ease: 'power2.inOut' });
+        if (heroImg && heroContent) {
+          mainTl.set(heroLayer, { zIndex: 30 });
+          mainTl.to(heroLayer, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.8, ease: 'power2.out' });
+          mainTl.fromTo(heroImg, 
+            { scale: 1 }, 
+            { scale: 1.04, duration: 3.8, ease: 'none' },
+            '<'
+          );
+          mainTl.fromTo(heroContent,
+            { autoAlpha: 0, y: 15 },
+            { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power2.out' },
+            '<0.2'
+          );
+          mainTl.to(heroLayer, { autoAlpha: 0, pointerEvents: 'none', duration: 0.7, ease: 'power2.inOut' }, '+=2.0');
+          mainTl.set(heroLayer, { zIndex: 10 });
+        }
 
-      // Animations inside the Acts
-      if (nextIdx === 2) {
-        gsap.fromTo(`#${acto3Id} .triptico-a3-anim`, 
-          { opacity: 0, y: 40, filter: "blur(16px)" },
-          { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.4, stagger: 0.15, ease: 'power3.out', delay: FADE * 0.4 }
+        // ── PASO B: PRESENTACIÓN INDIVIDUAL DE LAS 3 CARDS (ESTILO VERTICAL STACK) ──
+        if (spotlightCards.length > 0) {
+          mainTl.set(spotlightLayer, { zIndex: 35 });
+          mainTl.to(spotlightLayer, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.4 });
+
+          spotlightCards.forEach((card, idx) => {
+            const textContent = card.querySelector<HTMLElement>('.spotlight-text-content');
+            const phraseElem = card.querySelector<HTMLElement>('.spotlight-phrase');
+            const spotlightImg = card.querySelector<HTMLElement>('.spotlight-img');
+            const isRightAligned = idx % 2 === 1;
+            const cardStartTime = mainTl.duration();
+
+            // Activar tarjeta con z-index superior
+            mainTl.set(card, { zIndex: 25 }, cardStartTime);
+            mainTl.to(card, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.4 }, cardStartTime);
+
+            // PANEO CINEMÁTICO DE CÁMARA (20% 50% + Zoom 1.08 estilo Vertical Stack)
+            if (spotlightImg) {
+              const panTarget = isRightAligned ? '20% 50%' : '80% 50%';
+              mainTl.fromTo(spotlightImg,
+                { objectPosition: '50% 50%', scale: 1 },
+                { objectPosition: panTarget, scale: 1.08, duration: 3.6, ease: 'cubic-bezier(0.25, 1, 0.5, 1)' },
+                cardStartTime
+              );
+            }
+
+            // REVELADO EDITORIAL DE LA FRASE FORMATEADA
+            if (phraseElem) {
+              const phraseRaw = phraseElem.getAttribute('data-phrase') || phraseElem.innerText;
+              phraseElem.innerHTML = parsePhrase(phraseRaw);
+            }
+
+            if (textContent) {
+              const xStart = isRightAligned ? 40 : -40;
+              mainTl.fromTo(textContent,
+                { autoAlpha: 0, x: xStart, filter: 'blur(8px)' },
+                { autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' },
+                cardStartTime + 0.2
+              );
+            }
+
+            // Lectura contemplativa de la frase + salida suave y reducción de z-index
+            mainTl.to(card, { autoAlpha: 0, pointerEvents: 'none', zIndex: 20, duration: 0.6, ease: 'power2.in' }, cardStartTime + 3.4);
+          });
+
+          mainTl.to(spotlightLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none', duration: 0.4 });
+        }
+
+        // ── PASO C: PANTALLA FINAL CON LAS 3 CARDS JUNTAS (HEREDADO) ──
+        mainTl.set(gridLayer, { zIndex: 35 });
+        mainTl.to(gridLayer, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.8, ease: 'power2.out' });
+        const gridCards = gridLayer.querySelectorAll('a');
+        mainTl.fromTo(gridCards,
+          { autoAlpha: 0, y: 18, scale: 0.97 },
+          { autoAlpha: 1, y: 0, scale: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out' },
+          '-=0.4'
         );
-      } else if (nextIdx === 0 && actOneMode === 'sequence') {
-        const seqCards = Array.from(document.querySelectorAll(`#${acto1Id} .triptico-seq-card`));
-        if (act1Timeline) act1Timeline.kill();
-        gsap.set(seqCards, { autoAlpha: 0, x: 0, scale: 1, filter: 'blur(0px)', zIndex: 1 });
-        act1Timeline = gsap.timeline();
-        let cursor = 0;
+      };
 
-        // ── Actos individuales ──
-        SEQ_CONFIG.forEach(({ cardIndex, xDrift, scale: cardScale }) => {
-          const card = seqCards[cardIndex];
-          if (!card) { cursor += PER_CARD; return; }
-
-          // ① Entrada: fade-in + drift hacia centro + scale
-          act1Timeline.fromTo(card,
-            { autoAlpha: 0, scale: 0.88, filter: 'blur(12px)', y: 8, x: 0,      zIndex: 1  },
-            { autoAlpha: 1, scale: cardScale, filter: 'blur(0px)', y: 0, x: xDrift, zIndex: 10,
-              duration: SEQ_ENTER, ease: 'power2.out' },
-            cursor
-          );
-          // ② Balanceo (oscila alrededor del xDrift actual)
-          act1Timeline.to(card, {
-            x: xDrift + SWAY_PX, duration: SWAY_HALF, ease: 'sine.inOut',
-            yoyo: true, repeat: Math.round((SEQ_SWAY / SWAY_HALF) - 1),
-          }, cursor + SEQ_ENTER * 0.5);
-          // ③ Salida: scale-up y fade-out
-          act1Timeline.to(card,
-            { autoAlpha: 0, scale: cardScale + 0.1, filter: 'blur(8px)', x: xDrift, zIndex: 1,
-              duration: SEQ_EXIT, ease: 'power2.in' },
-            cursor + SEQ_ENTER + Math.max(SEQ_HOLD, SEQ_SWAY)
-          );
-          cursor += PER_CARD;
+      // IntersectionObserver para activar la secuencia al entrar al viewport o al interactuar
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            playSequence();
+          }
         });
+      }, { threshold: 0.3 });
 
-        // ── FINALE: las 3 juntas solapadas ──
-        const finStart = cursor;
-        const finaleConfig = [
-          { card: seqCards[0], x:  FIN_OVERLAP, z: 7,  scale: 1.03 }, // Izquierda — 3er puesto
-          { card: seqCards[1], x:  0,           z: 12, scale: 1.12 }, // Centro — 1er puesto (más grande)
-          { card: seqCards[2], x: -FIN_OVERLAP, z: 9,  scale: 1.06 }, // Derecha — 2do puesto
-        ];
-        finaleConfig.forEach(({ card, x, z, scale: finScale }) => {
-          if (!card) return;
-          // Aparecen simultáneamente con escala de podio
-          act1Timeline.fromTo(card,
-            { autoAlpha: 0, scale: 0.90, x: 0,  zIndex: z, filter: 'blur(6px)' },
-            { autoAlpha: 1, scale: finScale, x, zIndex: z, filter: 'blur(0px)',
-              duration: FIN_ENTER, ease: 'power2.out' },
-            finStart
-          );
-          // Balanceo grupal
-          act1Timeline.to(card, {
-            x: x + FIN_SWAY, duration: FIN_SWAY_D, ease: 'sine.inOut',
-            yoyo: true, repeat: Math.round((FIN_HOLD / FIN_SWAY_D) - 1),
-          }, finStart + FIN_ENTER);
-          // Salida sincronizada
-          act1Timeline.to(card,
-            { autoAlpha: 0, scale: finScale + 0.06, filter: 'blur(10px)', x,
-              duration: FIN_EXIT, ease: 'power2.in' },
-            finStart + FIN_ENTER + FIN_HOLD
-          );
-        });
-      }
+      observer.observe(root);
 
-      currentActo = nextIdx;
-      updateDots(currentActo);
-      animateProgress();
-      
-      timeRemaining = currentDuration;
-      scheduleNext(gsap, timeRemaining);
-    };
-
-    const scheduleNext = (gsap, durationMs) => {
-      if (loopTimeout) clearTimeout(loopTimeout);
-      loopTimeout = setTimeout(() => {
-        if (!paused) {
-          crossfade(gsap, (currentActo + 1) % 3);
+      // Re-activación al hacer hover o clic en el contenedor cuando retorna a la cabecera
+      root.addEventListener('mouseenter', () => {
+        const computedOpacity = window.getComputedStyle(heroLayer).opacity;
+        const computedVisibility = window.getComputedStyle(heroLayer).visibility;
+        if (!isRunning && (computedOpacity === '1' || computedVisibility === 'visible')) {
+          playSequence();
         }
-      }, durationMs);
-    };
-
-    // Hover pause
-    stage.addEventListener('mouseenter', () => { 
-      paused = true;
-      if (act1Timeline && currentActo === 0 && actOneMode === 'sequence') act1Timeline.pause();
-      if (loopTimeout) clearTimeout(loopTimeout);
-      
-      if (progressBar) {
-        const currentDuration = getDurationForAct(currentActo);
-        const elapsed = parseFloat(progressBar.style.width || '0') / 100 * currentDuration;
-        timeRemaining = currentDuration - elapsed;
-      }
-    });
-    
-    stage.addEventListener('mouseleave', () => {
-      paused = false;
-      if (act1Timeline && currentActo === 0 && actOneMode === 'sequence') act1Timeline.play();
-      
-      if (progressBar) {
-        const currentDuration = getDurationForAct(currentActo);
-        progressStart = performance.now() - (currentDuration - timeRemaining);
-      }
-      
-      loadGSAP().then((gsap) => scheduleNext(gsap, timeRemaining));
-    });
-
-    // Dots manuales
-    dots.forEach((dot, i) => {
-      dot.addEventListener('click', () => {
-        if (i === currentActo) return;
-        loadGSAP().then((gsap) => {
-          if (loopTimeout) clearTimeout(loopTimeout);
-          crossfade(gsap, i);
-          scheduleNext(gsap);
-        });
       });
     });
+  }
 
-    // Precargar imagen del Acto II
-    const heroImg = acto2.querySelector('img');
-    if (heroImg?.src) {
-      const link = document.createElement('link');
-      link.rel = 'preload';
-      link.as = 'image';
-      link.href = heroImg.src;
-      document.head.appendChild(link);
-    }
-
-    // Arranque
-    loadGSAP().then((gsap) => {
-      gsap.set(acto1, { autoAlpha: 1 });
-      gsap.set(acto2, { autoAlpha: 0 });
-      gsap.set(acto3, { autoAlpha: 0 });
-      
-      // Boot up sequence if in sequence mode
-      if (actOneMode === 'sequence') {
-        const seqCards = Array.from(document.querySelectorAll(`#${acto1Id} .triptico-seq-card`));
-        gsap.set(seqCards, { autoAlpha: 0, x: 0, scale: 1, zIndex: 1 });
-        act1Timeline = gsap.timeline();
-        let cursor = 0;
-
-        // ── Actos individuales ──
-        SEQ_CONFIG.forEach(({ cardIndex, xDrift, scale: cardScale }) => {
-          const card = seqCards[cardIndex];
-          if (!card) { cursor += PER_CARD; return; }
-
-          act1Timeline.fromTo(card,
-            { autoAlpha: 0, scale: 0.88, filter: 'blur(12px)', y: 8, x: 0,      zIndex: 1  },
-            { autoAlpha: 1, scale: cardScale, filter: 'blur(0px)', y: 0, x: xDrift, zIndex: 10,
-              duration: SEQ_ENTER, ease: 'power2.out' },
-            cursor
-          );
-          act1Timeline.to(card, {
-            x: xDrift + SWAY_PX, duration: SWAY_HALF, ease: 'sine.inOut',
-            yoyo: true, repeat: Math.round((SEQ_SWAY / SWAY_HALF) - 1),
-          }, cursor + SEQ_ENTER * 0.5);
-          act1Timeline.to(card,
-            { autoAlpha: 0, scale: cardScale + 0.1, filter: 'blur(8px)', x: xDrift, zIndex: 1,
-              duration: SEQ_EXIT, ease: 'power2.in' },
-            cursor + SEQ_ENTER + Math.max(SEQ_HOLD, SEQ_SWAY)
-          );
-          cursor += PER_CARD;
-        });
-
-        // ── FINALE: las 3 juntas solapadas ──
-        const finStart = cursor;
-        const finaleConfig = [
-          { card: seqCards[0], x:  FIN_OVERLAP, z: 7,  scale: 1.03 }, // Izquierda — 3er puesto
-          { card: seqCards[1], x:  0,           z: 12, scale: 1.12 }, // Centro — 1er puesto
-          { card: seqCards[2], x: -FIN_OVERLAP, z: 9,  scale: 1.06 }, // Derecha — 2do puesto
-        ];
-        finaleConfig.forEach(({ card, x, z, scale: finScale }) => {
-          if (!card) return;
-          act1Timeline.fromTo(card,
-            { autoAlpha: 0, scale: 0.90, x: 0,  zIndex: z, filter: 'blur(6px)' },
-            { autoAlpha: 1, scale: finScale, x, zIndex: z, filter: 'blur(0px)',
-              duration: FIN_ENTER, ease: 'power2.out' },
-            finStart
-          );
-          act1Timeline.to(card, {
-            x: x + FIN_SWAY, duration: FIN_SWAY_D, ease: 'sine.inOut',
-            yoyo: true, repeat: Math.round((FIN_HOLD / FIN_SWAY_D) - 1),
-          }, finStart + FIN_ENTER);
-          act1Timeline.to(card,
-            { autoAlpha: 0, scale: finScale + 0.06, filter: 'blur(10px)', x,
-              duration: FIN_EXIT, ease: 'power2.in' },
-            finStart + FIN_ENTER + FIN_HOLD
-          );
-        });
-      }
-      
-      updateDots(0);
-      animateProgress();
-      timeRemaining = getDurationForAct(0);
-      scheduleNext(gsap, timeRemaining);
-    });
-  };
-
-  document.addEventListener('DOMContentLoaded', initTriptico);
-  document.addEventListener('astro:page-load', initTriptico);
+  document.addEventListener('astro:page-load', initTripticoNarrative);
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initTripticoNarrative();
+  } else {
+    document.addEventListener('DOMContentLoaded', initTripticoNarrative);
+  }
 </script>
 
 <style>
-  .triptico-acto { will-change: opacity, visibility; }
-  .triptico-dot:focus-visible {
-    outline: 2px solid rgba(239,235,227,0.5);
-    outline-offset: 3px;
-    border-radius: 999px;
-  }
+  .triptico-root { will-change: opacity; }
 </style>
+
+
