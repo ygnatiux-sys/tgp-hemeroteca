@@ -171,13 +171,18 @@ const epigraphMap: Record<string, string> = {
 
       const itemsCount = track.children.length;
       let currentIndex = 0;
-      let sequenceTimeouts: number[] = [];
+      let sequenceTimeouts: ReturnType<typeof setTimeout>[] = [];
 
       // Función para parsear la frase (bold y links visuales)
       function parsePhrase(text: string) {
         return text
           .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-black">$1</strong>')
           .replace(/\[\[([^\]]+)\]\]/g, '<span class="text-rust-orange italic">$1</span>');
+      }
+
+      let isAutoPushActive = true;
+      function stopAutoPush() {
+        isAutoPushActive = false;
       }
 
       function clearCinematic() {
@@ -240,6 +245,19 @@ const epigraphMap: Record<string, string> = {
               cinematicLayer.style.visibility = 'hidden';
               textContainer.innerHTML = '';
             }, 1000);
+
+            // 3. Auto-push a la siguiente colección tras estabilizarse la cabecera (3.2s)
+            sequenceTimeouts.push(setTimeout(() => {
+              if (!isAutoPushActive) return;
+              if (document.hidden) return;
+
+              const rect = root.getBoundingClientRect();
+              const isVisible = rect.bottom > 100 && rect.top < window.innerHeight - 50;
+              if (!isVisible) return;
+
+              currentIndex = (currentIndex + 1) % itemsCount;
+              updateSlider(true);
+            }, 3200));
             
           }, 5500)); // Tiempo contemplativo de lectura cinemática
 
@@ -281,25 +299,34 @@ const epigraphMap: Record<string, string> = {
           activeCard.classList.add('active-card');
           if (triggerCinematic) {
             playCinematicFor(activeCard);
+          } else {
+            clearCinematic();
           }
         }
       }
 
       nextBtn.addEventListener('click', (e) => {
         e.preventDefault();
+        stopAutoPush();
         if (currentIndex < itemsCount - 1) {
           currentIndex++;
-          updateSlider();
+          updateSlider(true);
         }
       });
 
       prevBtn.addEventListener('click', (e) => {
         e.preventDefault();
+        stopAutoPush();
         if (currentIndex > 0) {
           currentIndex--;
-          updateSlider();
+          updateSlider(true);
         }
       });
+
+      // Desactivar avance automático al interactuar con el slider
+      track.addEventListener('click', () => stopAutoPush());
+      root.addEventListener('wheel', () => stopAutoPush(), { passive: true });
+      root.addEventListener('touchmove', () => stopAutoPush(), { passive: true });
 
       // Inicializar (con cinemática en la primera carta si el usuario se detiene a verla)
       // Para evitar reproducirlo solo cargando la página, podríamos usar IntersectionObserver
