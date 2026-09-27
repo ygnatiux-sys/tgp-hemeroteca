@@ -392,6 +392,42 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
             ctaLabel="Acceder al Registro Completo"
             variant="archive"
           />
+
+          {/* Pie de Dossier Editorial — Idéntico a modelo Archivo General (§5.4) */}
+          <div class="flex flex-col w-full items-center text-center pt-8 sm:pt-12 md:pt-16">
+            {/* Excerpt con estilo Cartelera de Cine */}
+            {umbralHeroPost.excerpt && (
+              <p class="font-['Proza_Libre'] text-lg sm:text-xl md:text-2xl text-[#EFEBE3]/95 leading-relaxed tracking-[0.01em] max-w-4xl text-center mb-8 sm:mb-12 mx-auto drop-shadow-lg px-4">
+                {umbralHeroPost.excerpt}
+              </p>
+            )}
+
+            {/* Tags de Categorías y Metadatos en color default — separación limpia */}
+            <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 font-['Proza_Libre'] text-xs sm:text-sm uppercase tracking-[0.25em] text-white/50 w-full pt-6 sm:pt-8 border-t border-white/10 mx-auto max-w-xl px-4">
+              <span class="ch-tag">ENSAYOS CINEMÁTICOS</span>
+              <span class="font-bold opacity-40 ch-tag">•</span>
+              <span class="ch-tag">HISTORIA DEL LIBRO</span>
+              <span class="font-bold opacity-40 ch-tag">•</span>
+              <span class="ch-tag">FILOSOFÍA DE LA TÉCNICA</span>
+              <span class="font-bold opacity-40 ch-tag">•</span>
+              <span class="ch-tag text-white/40">2026</span>
+            </div>
+
+            {/* Botón CTA Grande Centrado "VER REGISTRO" con amplio aire y shimmer */}
+            <div class="flex justify-center mt-12 sm:mt-16 md:mt-20 mb-6 sm:mb-10">
+              <a
+                href={umbralHeroPost.href}
+                class="group relative inline-flex items-center justify-center gap-6 px-18 sm:px-26 py-7 sm:py-9 rounded-full bg-transparent border border-[#E3DDD3]/25 text-[#EFEBE3] font-metadata font-bold text-base sm:text-lg md:text-xl uppercase tracking-[0.35em] backdrop-blur-md shadow-[0_0_30px_-5px_rgba(255,255,255,0.05)] hover:bg-[#EFEBE3]/10 hover:border-[#EFEBE3]/50 hover:shadow-[0_0_40px_-5px_rgba(227,221,211,0.2)] hover:scale-[1.02] active:scale-95 transition-all duration-500 overflow-hidden no-underline"
+              >
+                {/* Brillo interno cinemático */}
+                <div class="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none" />
+                <span class="relative z-10">VER REGISTRO</span>
+                <span class="relative z-10 text-base sm:text-lg transition-transform duration-500 group-hover:translate-x-2">
+                  &#9656;
+                </span>
+              </a>
+            </div>
+          </div>
         </section>
       )}
 
@@ -638,6 +674,15 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
 </script>
 
 <style>
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-120%);
+    }
+    100% {
+      transform: translateX(120%);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .reveal-item { transition: none !important; opacity: 1 !important; transform: none !important; }
   }
