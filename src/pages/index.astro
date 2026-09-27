@@ -193,16 +193,54 @@ const heroSlides   = publishable.slice(0, HERO_COUNT).map((e, index) => {
 // Posts disponibles después del Hero (nunca vacío si hay contenido)
 const remaining    = publishable.slice(HERO_COUNT);
 
-const leadStory    = remaining[0]           ?? null;
-const secondaryA   = remaining[1]           ?? null;
-const secondaryB   = remaining[2]           ?? null;
+// ─── DOSSIERES DESTACADOS: TRÍPTICO EDITORIAL DE "EL UMBRAL DE LO IRREVOCABLE" ───
+const umbralPostEntry = publishableCinematicos.find(c => c.slug.includes('umbral-de-lo-irrevocable')) || publishableCinematicos[0];
 
-// Slugs ya destacados en Hero y Bloque 2 (Lead y Secundarios)
+const umbralHeroPost: TriplicoPost | undefined = umbralPostEntry ? {
+  title: umbralPostEntry.entry.title || 'El umbral de lo irrevocable: Fenomenología del confirmar y publicar',
+  excerpt: umbralPostEntry.entry.dek || umbralPostEntry.entry.excerpt || '',
+  img: resolveEssayImage(umbralPostEntry.entry, umbralPostEntry.slug),
+  href: `/ensayos-cinematicos/${umbralPostEntry.slug}`,
+  badge: 'Ensayos Cinemáticos · Edición Principal',
+} : undefined;
+
+// Selección curada de 3 ensayos afines inéditos (códices, imprenta, biblioteca y archivo del saber)
+const afinesSlugs = [
+  'la-catedral-de-la-razon-arqueosemiotica-y-vigencia-de-la-escolastica',
+  'la-hemeroteca-del-porvenir-el-oraculo-de-delfos-y-el-archivo-de-las-voces-perdidas',
+  'borges-y-su-obra-el-laberinto-del-infinito',
+  'borges-y-el-porvenir-el-laberinto-de-los-futuros-bifurcados',
+  'la-ciudadela-interior-anatomia-cinematica-del-estoicismo-romano',
+  'tacito-y-la-dramaturgia-del-poder-anatomia-de-la-sombra-imperial',
+];
+
+const afinesCandidates = publishableCinematicos.filter(c => 
+  c.slug !== umbralPostEntry?.slug && 
+  !c.slug.includes('kheper') &&
+  (afinesSlugs.includes(c.slug) || /catedral|hemeroteca|borges|escolastica|oraculo|ciudadela|tacito|tucidides/i.test(c.entry.title || ''))
+);
+
+const fallbackCandidates = publishableCinematicos.filter(c => 
+  c.slug !== umbralPostEntry?.slug && 
+  !c.slug.includes('kheper') &&
+  !afinesCandidates.some(a => a.slug === c.slug)
+);
+
+const dossierInnerCinematics = [...afinesCandidates, ...fallbackCandidates].slice(0, 3);
+
+const dossierTriplicoPosts: TriplicoPost[] = dossierInnerCinematics.map((c, idx) => ({
+  title: c.entry.title || 'Dossier Cinemático',
+  excerpt: c.entry.dek || c.entry.excerpt || '',
+  img: resolveEssayImage(c.entry, c.slug),
+  href: `/ensayos-cinematicos/${c.slug}`,
+  badge: formatCategory(c.entry.category) || `Dossier ${idx + 1}`,
+}));
+
+// Slugs ya destacados en Hero y Bloque 2 (para no repetir en Ensayos Recientes ni Del Archivo)
 const topFeaturedSlugs = new Set([
   heroSlug,
-  leadStory?.slug,
-  secondaryA?.slug,
-  secondaryB?.slug,
+  umbralPostEntry?.slug,
+  ...dossierInnerCinematics.map(c => c.slug),
 ].filter(Boolean));
 
 // Completar "Ensayos Recientes" con ensayos cinemáticos y de archivo (12 para carrusel fluido 4+2)
@@ -232,9 +270,6 @@ const collections = Array.from(categoryGroups.entries())
   .sort((a, b) => b.count - a.count);
 
 // ─── CARGA DE IMÁGENES EDITORIAL ──────────────────────────────────────────────
-const leadImage  = resolveEssayImage(leadStory?.entry, leadStory?.slug);
-const secAImage  = resolveEssayImage(secondaryA?.entry, secondaryA?.slug);
-const secBImage  = resolveEssayImage(secondaryB?.entry, secondaryB?.slug);
 
 const resolvedRecent = recentEssays.map(e => ({
   ...e,
@@ -245,6 +280,22 @@ const resolvedArchiveRows = archiveRows.map(e => ({
   ...e,
   img: resolveEssayImage(e.entry, e.slug),
 }));
+
+// Mapeo limpio para Tríptico de Revelación en "Del Archivo"
+const archiveTriplicoPosts: TriplicoPost[] = resolvedArchiveRows.map((e, idx) => ({
+  title: e.entry.title || 'Investigación del Archivo',
+  excerpt: e.entry.dek || e.entry.excerpt || '',
+  img: e.img || '',
+  href: (e as any).isCinematicGSAP ? `/ensayos-cinematicos/${e.slug}` : `/hemeroteca/${e.slug}`,
+  badge: formatCategory(e.entry.category) || `Registro ${idx + 1}`,
+}));
+
+// Portada designada con Kheper como protagonista de cabecera y reposo final
+const kheperCandidate = archiveTriplicoPosts.find(p => /kheper|escarabajo/i.test(p.title));
+const archiveHeroPost = kheperCandidate || (archiveTriplicoPosts.length > 0 ? archiveTriplicoPosts[0] : undefined);
+const archiveInnerPosts = archiveHeroPost 
+  ? archiveTriplicoPosts.filter(p => p.title !== archiveHeroPost.title).slice(0, 3)
+  : archiveTriplicoPosts.slice(0, 3);
 
 // ─── POSTS PARA SPOTLIGHT HERO CON MEDIA TRAY (ESTILO NAT GEO / DISNEY+) ───
 const spotlightPosts = publishableCinematicos.map(item => ({
@@ -327,73 +378,22 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
     <div class="container-editorial max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-32 md:gap-48 lg:gap-60 pt-20 md:pt-32 pb-28 md:pb-44">
 
       {/* ═══════════════════════════════════════════════════════════════════
-          BLOQUE 2: DOSSIERES DESTACADOS — MODELO EDITORIAL ARCHIVO GENERAL
+          BLOQUE 2: DOSSIERES DESTACADOS — TRÍPTICO PANORÁMICO DE REVELACIÓN
       ═══════════════════════════════════════════════════════════════════ */}
-      <section class="flex flex-col gap-32 md:gap-40 lg:gap-56 reveal-item">
-
-        {/* ENCABEZADO EDITORIAL */}
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-4 border-b border-white/8">
-          <div>
-            <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Archivo Editorial</span>
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-cinzel font-extrabold tracking-tight" style="background-image: linear-gradient(180deg, #CBD5E1 0%, #334155 100%); -webkit-background-clip: text; background-clip: text; color: transparent;">
-              Dossieres Destacados
-            </h2>
-          </div>
-          <a href="/archivo/" class="font-metadata text-[10px] uppercase tracking-[0.3em] text-white/40 hover:text-rust-orange transition-colors shrink-0 pb-1">
-            Ver todo el Archivo →
-          </a>
-        </div>
-
-        {/* DOSSIER PRINCIPAL — HERO FULL BLEED (ESTILO ARCHIVO GENERAL) */}
-        {leadStory && (
-          <div class="w-full">
-            <CinematicArchiveCard
-              slug={leadStory.slug}
-              entry={leadStory.entry}
-              img={leadImage}
-              variant="hero"
-              enableCinemagraph={true}
-              isEager={true}
-              hideExteriorTitle={true}
-              centerCtaBelow={true}
-              ctaLabel="VER REGISTRO"
-            />
-          </div>
-        )}
-
-        {/* DOSSIER 2 DESTACADO — SECUNDARIO A */}
-        {secondaryA && (
-          <div class="w-full">
-            <CinematicArchiveCard
-              slug={secondaryA.slug}
-              entry={secondaryA.entry}
-              img={secAImage}
-              variant="hero"
-              enableCinemagraph={true}
-              hideExteriorTitle={true}
-              centerCtaBelow={true}
-              ctaLabel="VER REGISTRO"
-            />
-          </div>
-        )}
-
-        {/* DOSSIER 3 DESTACADO — SECUNDARIO B */}
-        {secondaryB && (
-          <div class="w-full">
-            <CinematicArchiveCard
-              slug={secondaryB.slug}
-              entry={secondaryB.entry}
-              img={secBImage}
-              variant="hero"
-              enableCinemagraph={true}
-              hideExteriorTitle={true}
-              centerCtaBelow={true}
-              ctaLabel="VER REGISTRO"
-            />
-          </div>
-        )}
-
-      </section>
+      {umbralHeroPost && dossierTriplicoPosts.length > 0 && (
+        <section class="w-screen relative left-1/2 -translate-x-1/2 max-w-430 2xl:max-w-460 px-3 sm:px-6 md:px-8 lg:px-10 flex flex-col gap-6 reveal-item">
+          <TriplicoRevelacion
+            instanceId="dossieres-destacados-home"
+            posts={dossierTriplicoPosts}
+            heroPost={umbralHeroPost}
+            label="Dossieres Cinemáticos · Ensayos Eruditos"
+            headline="El Umbral de lo Irrevocable. Fenomenología del Publicar."
+            ctaHref={umbralHeroPost.href}
+            ctaLabel="Acceder al Registro Completo"
+            variant="archive"
+          />
+        </section>
+      )}
 
 
       {/* ═══════════════════════════════════════════════════════════════════
@@ -437,42 +437,22 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
 
 
       {/* ═══════════════════════════════════════════════════════════════════
-          BLOQUE 5: ZONA ARCHIVOS (HEROS FULL BLEED APILADOS COMO ARCHIVO GENERAL)
-          Mapeo: publishable[10..19] con formato cinemático idéntico a Por Año
+          BLOQUE 5: ZONA ARCHIVOS (TRÍPTICO DE REVELACIÓN DEL ARCHIVO GENERAL)
       ═══════════════════════════════════════════════════════════════════ */}
-      {resolvedArchiveRows.length > 0 && (
-        <section class="flex flex-col gap-10 md:gap-14">
-          <div class="reveal-item flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4">
-            <div>
-              <span class="font-metadata text-[10px] uppercase tracking-[0.4em] text-rust-orange block mb-1">Hemeroteca</span>
-              <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-cinzel font-extrabold tracking-tight drop-shadow-md" style="background-image: linear-gradient(180deg, #CBD5E1 0%, #334155 100%); -webkit-background-clip: text; background-clip: text; color: transparent;">
-                Del Archivo
-              </h2>
-            </div>
-            <a href="/archivo/" class="font-metadata text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-rust-orange transition-colors shrink-0">
-              Ver archivo completo ({publishable.length}) →
-            </a>
-          </div>
+      {archiveTriplicoPosts.length > 0 && (
+        <section id="sec-del-archivo" class="w-screen relative left-1/2 -translate-x-1/2 max-w-430 2xl:max-w-460 px-3 sm:px-6 md:px-8 lg:px-10 flex flex-col gap-6">
+          <TriplicoRevelacion
+            instanceId="del-archivo-home"
+            posts={archiveInnerPosts}
+            heroPost={archiveHeroPost}
+            label="Hemeroteca"
+            headline="Del Archivo. Fondo Documental."
+            ctaHref="/archivo/"
+            ctaLabel="Ver Archivo Completo"
+            variant="archive"
+          />
 
-          {/* Secuencias Cinematográficas: Heros Full Bleed */}
-          <div class="flex flex-col gap-32 md:gap-40 lg:gap-56">
-            {resolvedArchiveRows.map((row) => (
-              <div class="w-full">
-                <CinematicArchiveCard
-                  slug={row.slug}
-                  entry={row.entry}
-                  img={row.img}
-                  variant="hero"
-                  enableCinemagraph={true}
-                  hideExteriorTitle={true}
-                  centerCtaBelow={true}
-                  ctaLabel="VER REGISTRO"
-                />
-              </div>
-            ))}
-          </div>
-
-          <div class="text-center pt-8">
+          <div class="text-center pt-2">
             <a
               href="/archivo/"
               class="group relative inline-flex items-center gap-3.5 font-metadata text-[10.5px] uppercase tracking-[0.35em] px-10 py-4.5 rounded-full bg-[#151718]/90 backdrop-blur-sm border border-white/10 hover:bg-rust-orange/10 hover:border-rust-orange/50 text-[#E0E0E0]/70 hover:text-rust-orange transition-all duration-500 active:scale-95"

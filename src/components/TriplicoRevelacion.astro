@@ -28,6 +28,7 @@ interface Props {
   ctaHref?: string;
   ctaLabel?: string;
   nextTargetId?: string;
+  variant?: 'collection' | 'archive';
 }
 
 const {
@@ -39,11 +40,62 @@ const {
   ctaHref = '/colecciones/',
   ctaLabel = 'Ver Todas las Colecciones',
   nextTargetId,
+  variant = 'collection',
 } = Astro.props;
 
+const isArchive = variant === 'archive';
 const stageId   = `triptico-stage-${instanceId}`;
 const hero = heroPost ?? posts[0] ?? null;
 const slicedPosts = posts.slice(0, 3);
+
+// Helper para formateo editorial heredado de frases (CinematicArchiveCard)
+function parseHeroPhrase(text?: string) {
+  if (!text) return "";
+  const clean = text.replace(/^[#*`>\s]+/, "").trim();
+
+  if (clean.includes("[[") || clean.includes("**")) {
+    return clean
+      .replace(
+        /\*\*([^*]+)\*\*/g,
+        '<strong class="text-white font-bold md:font-black">$1</strong>',
+      )
+      .replace(
+        /\[\[([^\]]+)\]\]/g,
+        '<span class="italic text-amber-200/90 font-serif drop-shadow-[0_0_12px_rgba(245,158,11,0.5)]">$1</span>',
+      )
+      .replace(
+        /(^|[^*])\*([^*]+)\*([^*]|$)/g,
+        '$1<span class="italic text-white/95 font-serif">$2</span>$3',
+      );
+  }
+
+  // Estilizado suave para excerpts planos: resalta las primeras dos palabras con serif ámbar
+  const words = clean.split(" ");
+  if (words.length > 3) {
+    const firstTwo = words.slice(0, 2).join(" ");
+    const rest = words.slice(2).join(" ");
+    return `<span class="italic text-amber-200/90 font-serif">${firstTwo}</span> ${rest}`;
+  }
+
+  return clean;
+}
+
+// Detección inteligente de arte para la imagen de cabecera / hero
+const isHeroPortraitArt = hero ? (
+  /gutenberg|imprenta|prensa|escarabajo|scarab|aguara|hegel|homero|saturno|busto|estatua|retrato|filosofia|moctezuma|gengis|tatu|rostro|portrait|escultura|venus|urano|arquetipo|personaje|fauna|animal|tero|perdiz|tapir|vaca|hunza|kheper|grabado|woodcut/i.test(`${hero.title || ''} ${hero.img || ''}`)
+) : false;
+const heroFitClass = (isArchive && isHeroPortraitArt) ? 'object-contain! bg-[#08090a]' : 'object-cover';
+
+// Sanitización UTF-8 del Hero
+const cleanedHeroTitle = hero ? (hero.title || '')
+  .replace(/J\uFFFDpiter|J\?piter|J\uFFFD\uFFFDpiter/g, 'Júpiter')
+  .replace(/Astrolog\uFFFD\uFFFD|Astrolog\?a|Astrolog\uFFFD/g, 'Astrología')
+  .replace(/\uFFFD/g, '') : '';
+
+const cleanedHeroExcerpt = hero ? (hero.excerpt || '')
+  .replace(/J\uFFFDpiter|J\?piter|J\uFFFD\uFFFDpiter/g, 'Júpiter')
+  .replace(/Astrolog\uFFFD\uFFFD|Astrolog\?a|Astrolog\uFFFD/g, 'Astrología')
+  .replace(/\uFFFD/g, '') : '';
 
 // Helper para partición armónica de headline
 let headlinePart1 = headline;
@@ -65,6 +117,7 @@ if (headline.includes('.')) {
   class="triptico-root w-full max-w-430 2xl:max-w-460 mx-auto px-2 sm:px-4 md:px-6 py-10 md:py-16 select-none"
   aria-label="Tríptico de Revelación — Colecciones en Rotación"
   data-next-target={nextTargetId}
+  data-variant={variant}
 >
   <!-- Encabezado editorial -->
   <header class="mb-8 flex flex-col gap-1.5 px-1 sm:px-2">
@@ -91,9 +144,12 @@ if (headline.includes('.')) {
     >
       <div class="interlude-title-box text-center px-6 max-w-4xl flex flex-col items-center gap-3">
         <span class="font-mono text-[10px] md:text-xs uppercase tracking-[0.6em] text-rust-orange font-bold drop-shadow-md">
-          COLECCIÓN TGP
+          {isArchive ? 'HEMEROTECA' : 'COLECCIÓN TGP'}
         </span>
-        <h1 class="font-cinzel font-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl gradient-steel-titanium tracking-tight leading-[0.95] drop-shadow-2xl text-balance">
+        <h1 class:list={[
+          "font-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl gradient-steel-titanium tracking-tight leading-[0.95] drop-shadow-2xl text-balance",
+          isArchive ? "font-gloock" : "font-cinzel"
+        ]}>
           {headlinePart1 || headline}
         </h1>
         {headlinePart2 && (
@@ -108,40 +164,89 @@ if (headline.includes('.')) {
     <!-- ETAPA 1: PORTADA CABEZA DE LA COLECCIÓN (HERO LÍMPIDA)              -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <div
-      class="triptico-layer-hero absolute inset-0 opacity-0 z-10 isolate pointer-events-none"
+      class="triptico-layer-hero absolute inset-0 opacity-0 z-10 isolate pointer-events-none overflow-hidden"
       style="visibility: hidden; backface-visibility: hidden;"
     >
       {hero ? (
-        <a href={hero.href} class="group relative w-full h-full flex items-end overflow-hidden">
-          <div class="absolute inset-0 z-0">
+        <div class="relative w-full h-full overflow-hidden">
+          {/* Contenedor de Foto Cinemática Límpida (Full-Bleed) con paneo */}
+          <div class="hero-img-wrap absolute inset-0 w-full h-full overflow-hidden bg-[#0a0b0b]">
             <img
               src={hero.img}
-              alt={hero.title}
+              alt={cleanedHeroTitle}
               loading="lazy"
               decoding="async"
-              class="hero-bg-img w-full h-full object-cover brightness-95"
+              class={`hero-bg-img absolute inset-0 w-full h-full pointer-events-none brightness-95 contrast-[1.02] z-0 ${heroFitClass}`}
+              style="object-position: 50% 50%;"
             />
-            {/* Scrim Mínimo Granular solo para legibilidad inferior */}
-            <div class="absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-black/85 via-black/30 to-transparent pointer-events-none"></div>
           </div>
-          <div class="hero-content-box relative z-10 p-8 md:p-12 lg:p-16 max-w-3xl flex flex-col gap-4">
-            <span class="font-mono text-[9px] uppercase tracking-[0.5em] text-rust-orange font-bold drop-shadow-md">
-              PORTADA DE LA COLECCIÓN
-            </span>
-            <h3 class="font-cinzel font-black text-white text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-[0.95] tracking-tight drop-shadow-2xl">
-              {hero.title}
-            </h3>
-            {hero.excerpt && (
-              <p class="font-serif italic text-white/80 text-base md:text-lg leading-relaxed max-w-xl drop-shadow-md">
-                {hero.excerpt}
-              </p>
-            )}
-            <span class="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.4em] text-white/50 group-hover:text-rust-orange transition-colors mt-2">
-              <span class="w-8 h-px bg-rust-orange/40 group-hover:bg-rust-orange transition-colors"></span>
-              Explorar Dossier Principal →
-            </span>
+
+          {/* SUB-STAGE 1: MODO CINEMÁTICO DE PRESENTACIÓN H1 (FLANCO OPUESTO AL PANEO / CERO COLISIÓN) */}
+          <div 
+            class="hero-title-stage absolute inset-0 z-30 flex opacity-0 pointer-events-none"
+            style="visibility: hidden; backface-visibility: hidden;"
+          >
+            {/* Zona despejada 50% a la derecha para que el arte/sujeto se vea 100% libre */}
+            <div class="hidden md:block w-1/2 h-full shrink-0 order-2"></div>
+            {/* Zona 50% a la izquierda para el H1 límpido */}
+            <div class="w-full md:w-1/2 h-full flex items-center justify-start p-8 md:p-14 lg:pl-20 lg:pr-6 order-1">
+              <div class="hero-title-box flex flex-col items-start gap-4 md:gap-5 text-left max-w-[38ch]">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-px bg-rust-orange/50"></div>
+                  <span class="font-mono text-[9px] uppercase tracking-[0.55em] text-rust-orange font-bold drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                    {hero.badge || (isArchive ? 'ARCHIVO DE INVESTIGACIÓN' : 'PORTADA DE LA COLECCIÓN')}
+                  </span>
+                  <div class="w-8 h-px bg-rust-orange/50"></div>
+                </div>
+
+                <h1 class="font-gloock font-extrabold gradient-steel-titanium text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[4.2rem] leading-[0.98] tracking-tight drop-shadow-[0_6px_35px_rgba(0,0,0,0.95)] text-balance">
+                  {cleanedHeroTitle}
+                </h1>
+              </div>
+            </div>
           </div>
-        </a>
+
+          {/* SUB-STAGE 2: CAPA CINEMÁTICA — FRASE SOBERANA (IDÉNTICO A CARDS INTERIORES) */}
+          <div 
+            class="hero-cinematic-layer absolute inset-0 z-20 flex opacity-0 pointer-events-none"
+            style="visibility: hidden; backface-visibility: hidden;"
+          >
+            {/* Zona despejada 50% para contemplar el paisaje/arte */}
+            <div class="hidden md:block w-1/2 h-full shrink-0 order-2"></div>
+            {/* Zona 50% degradada con la frase como protagonista */}
+            <div class="w-full md:w-1/2 h-full flex items-center justify-start p-8 md:p-14 lg:pl-20 lg:pr-6 order-1 bg-linear-to-r from-black/95 via-black/80 to-transparent">
+              <div class="hero-text-content flex flex-col items-start gap-4 max-w-[38ch]">
+                {/* Eyebrow */}
+                <span class="font-mono text-[9px] uppercase tracking-[0.55em] text-rust-orange font-bold drop-shadow-md block">
+                  {hero.badge || (isArchive ? 'ARCHIVO DE INVESTIGACIÓN' : 'PORTADA DE LA COLECCIÓN')}
+                </span>
+
+                {/* LA FRASE SOBERANA */}
+                <p 
+                  class="hero-phrase font-serif text-2xl md:text-3xl lg:text-[2.85rem] text-[#E3DDD3]/95 leading-[1.2] drop-shadow-2xl text-balance"
+                  data-phrase={cleanedHeroExcerpt || cleanedHeroTitle}
+                >
+                  <span set:html={parseHeroPhrase(cleanedHeroExcerpt || cleanedHeroTitle)} />
+                </p>
+
+                {/* Anclaje sutil del título */}
+                {cleanedHeroExcerpt && (
+                  <p class="font-gloock italic text-base text-white/55 leading-snug line-clamp-2 mt-1">
+                    {cleanedHeroTitle}
+                  </p>
+                )}
+
+                {/* CTA */}
+                <a
+                  href={hero.href}
+                  class="inline-flex items-center gap-2 font-mono text-[9.5px] uppercase tracking-[0.4em] text-rust-orange hover:text-white transition-colors mt-3 font-bold"
+                >
+                  <span>{isArchive ? 'Acceder al Registro Completo →' : 'Ver Investigación →'}</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       ) : null}
       <div class="absolute top-4 right-5 z-30 font-mono text-[8px] uppercase tracking-[0.4em] text-white/40 pointer-events-none drop-shadow-md">
         Etapa I — Portada
@@ -169,8 +274,8 @@ if (headline.includes('.')) {
           .replace(/Astrolog\uFFFD\uFFFD|Astrolog\?a|Astrolog\uFFFD/g, 'Astrología')
           .replace(/\uFFFD/g, '');
 
-        // Detección inteligente de arte (retratos, estatuas, bustos) idéntica a VerticalCollectionsStack
-        const isPortraitArt = /mercurio|homero|saturno|wiki|busto|estatua|retrato|filosofia|hegel|jup|júpiter|dios|apolo/i.test(post.img) || /busto|estatua|retrato|escultura/i.test(cleanedTitle);
+        // Detección inteligente de arte (retratos, estatuas, bustos, grabados)
+        const isPortraitArt = /mercurio|homero|saturno|wiki|busto|estatua|retrato|filosofia|hegel|jup|júpiter|dios|apolo|kheper|escarabajo|scarab|gutenberg|imprenta|prensa|grabado|woodcut/i.test(post.img) || /busto|estatua|retrato|escultura|escarabajo|kheper/i.test(cleanedTitle);
         const fitClass = isPortraitArt ? 'object-contain! bg-[#08090a]' : 'object-cover';
 
         return (
@@ -191,35 +296,77 @@ if (headline.includes('.')) {
               />
             </div>
 
-            {/* Capa Cinemática Pura (Idéntica a VerticalCollectionsStack) */}
-            <div class="spotlight-cinematic-layer absolute inset-0 z-20 flex">
-              <div class:list={["hidden md:block w-[40%] h-full", isRightAligned ? "order-1" : "order-2"]}></div>
+            {/* SUB-STAGE 1: MODO CINEMÁTICO DE PRESENTACIÓN H1 (FLANCO OPUESTO AL PANEO / CERO COLISIÓN) */}
+            <div 
+              class="spotlight-title-stage absolute inset-0 z-30 flex opacity-0 pointer-events-none"
+              style="visibility: hidden; backface-visibility: hidden;"
+            >
+              {/* Zona despejada 50% para el arte enfocado */}
+              <div class:list={["hidden md:block w-1/2 h-full shrink-0", isRightAligned ? "order-1" : "order-2"]}></div>
+              {/* Zona 50% lateral para el H1 límpido en el flanco opuesto */}
               <div 
                 class:list={[
-                  "w-full md:w-[60%] h-full flex flex-col justify-center p-8 md:p-14 lg:p-20 z-20 transition-all duration-1000",
-                  isRightAligned 
-                    ? "order-2 bg-linear-to-l from-black/95 via-black/80 to-transparent" 
-                    : "order-1 bg-linear-to-r from-black/95 via-black/80 to-transparent"
+                  "w-full md:w-1/2 h-full flex items-center p-8 md:p-14 lg:p-20",
+                  isRightAligned ? "order-2 justify-end lg:pr-20 lg:pl-6" : "order-1 justify-start lg:pl-20 lg:pr-6"
                 ]}
               >
-                <div class="spotlight-text-content flex flex-col gap-3 max-w-2xl">
-                  <span class="font-mono text-[9px] uppercase tracking-[0.5em] text-rust-orange font-bold drop-shadow-md block">
+                <div class="spotlight-title-box flex flex-col items-start gap-4 md:gap-5 text-left max-w-[38ch]">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-px bg-rust-orange/50"></div>
+                    <span class="font-mono text-[9px] uppercase tracking-[0.55em] text-rust-orange font-bold drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                      {post.badge || `Dossier ${idx + 1} de ${slicedPosts.length}`}
+                    </span>
+                    <div class="w-8 h-px bg-rust-orange/50"></div>
+                  </div>
+
+                  <h1 class="font-gloock font-extrabold gradient-steel-titanium text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[4.2rem] leading-[0.98] tracking-tight drop-shadow-[0_6px_35px_rgba(0,0,0,0.95)] text-balance">
+                    {cleanedTitle}
+                  </h1>
+                </div>
+              </div>
+            </div>
+
+            {/* Capa Cinemática — Frase Soberana (blueprint: VerticalCollectionsStack) */}
+            <div 
+              class="spotlight-cinematic-layer absolute inset-0 z-20 flex opacity-0 pointer-events-none"
+              style="visibility: hidden; backface-visibility: hidden;"
+            >
+              {/* Zona despejada 50% para que se vea el artefacto / paisaje */}
+              <div class:list={["hidden md:block w-1/2 h-full shrink-0", isRightAligned ? "order-1" : "order-2"]}></div>
+              {/* Zona 50% degradada con la frase como protagonista */}
+              <div 
+                class:list={[
+                  "w-full md:w-1/2 h-full flex items-center p-8 md:p-14 lg:p-20 transition-all duration-1000",
+                  isRightAligned 
+                    ? "order-2 justify-end lg:pr-20 lg:pl-6 bg-linear-to-l from-black/95 via-black/80 to-transparent" 
+                    : "order-1 justify-start lg:pl-20 lg:pr-6 bg-linear-to-r from-black/95 via-black/80 to-transparent"
+                ]}
+              >
+                <div class="spotlight-text-content flex flex-col items-start gap-4 max-w-[38ch]">
+                  {/* Eyebrow: badge o categoría — pequeño y sutil */}
+                  <span class="font-mono text-[9px] uppercase tracking-[0.55em] text-rust-orange font-bold drop-shadow-md block">
                     {post.badge || `Dossier ${idx + 1} de ${slicedPosts.length}`}
                   </span>
-                  <h3 class="font-cinzel font-extrabold text-2xl md:text-4xl lg:text-5xl text-white leading-tight drop-shadow-2xl">
-                    {cleanedTitle}
-                  </h3>
+
+                  {/* LA FRASE — protagónica y soberana, sin H3 que la aplaste */}
+                  <p 
+                    class="spotlight-phrase font-serif text-2xl md:text-3xl lg:text-[2.85rem] text-[#E3DDD3]/95 leading-[1.2] drop-shadow-2xl text-balance"
+                    data-phrase={cleanedExcerpt || cleanedTitle}
+                  >
+                    <span set:html={parseHeroPhrase(cleanedExcerpt || cleanedTitle)} />
+                  </p>
+
+                  {/* Anclaje sutil: título como pie secundario — nunca compite con la frase */}
                   {cleanedExcerpt && (
-                    <p 
-                      class="spotlight-phrase font-serif text-2xl md:text-3xl lg:text-4xl text-[#E3DDD3]/90 leading-tight drop-shadow-2xl text-balance mt-2 max-w-[35ch]"
-                      data-phrase={cleanedExcerpt}
-                    >
-                      "{cleanedExcerpt}"
+                    <p class="font-gloock italic text-base text-white/55 leading-snug line-clamp-2 mt-1">
+                      {cleanedTitle}
                     </p>
                   )}
+
+                  {/* CTA en mono rust */}
                   <a
                     href={post.href}
-                    class="inline-flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.35em] text-rust-orange hover:text-white transition-colors mt-6 font-bold"
+                    class="inline-flex items-center gap-2 font-mono text-[9.5px] uppercase tracking-[0.4em] text-rust-orange hover:text-white transition-colors mt-3 font-bold"
                   >
                     <span>Ver Investigación →</span>
                   </a>
@@ -241,43 +388,64 @@ if (headline.includes('.')) {
       class="triptico-layer-grid absolute inset-0 p-3 sm:p-4 md:p-5 lg:p-6 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-5 bg-black opacity-0 pointer-events-none z-30 isolate"
       style="visibility: hidden; backface-visibility: hidden;"
     >
-      {slicedPosts.map((post, i) => (
-        <a
-          href={post.href}
-          class="group relative overflow-hidden rounded-xl md:rounded-2xl border border-white/10 bg-[#0a0a0b] flex flex-col justify-end transition-all duration-500 hover:border-rust-orange/50 hover:shadow-[0_0_30px_rgba(217,119,6,0.18)]"
-          style={`transition-delay:${i * 60}ms`}
-        >
-          <div class="absolute inset-0 z-0">
-            <img
-              src={post.img}
-              alt={post.title}
-              loading="lazy"
-              decoding="async"
-              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/50 to-black/10"></div>
-          </div>
-          <div class="relative z-10 p-5 md:p-6 lg:p-7 flex flex-col gap-2">
-            {post.badge && (
-              <span class="font-mono text-[8px] uppercase tracking-[0.4em] text-rust-orange font-bold opacity-75">
-                {post.badge}
+      {slicedPosts.map((post, i) => {
+        // Detección inteligente de artefacto para encuadre limpio en la grilla final
+        const gridIsArtifact = /mercurio|homero|saturno|wiki|busto|estatua|retrato|filosofia|hegel|jup|júpiter|dios|apolo|kheper|escarabajo|scarab|gutenberg|imprenta|prensa|grabado|woodcut/i.test(post.img || '') || /busto|estatua|retrato|escultura|escarabajo|kheper/i.test(post.title || '');
+        const gridFitClass = gridIsArtifact ? 'object-contain! bg-[#08090a]' : 'object-cover';
+        // Excerpt formateado para las tarjetas (primeras 2 palabras en ámbar si no hay marcas)
+        const gridExcerptRaw = (post.excerpt || '').replace(/\uFFFD/g, '').trim();
+        return (
+          <a
+            href={post.href}
+            class="group relative overflow-hidden rounded-xl md:rounded-2xl border border-white/10 bg-[#09090a] flex flex-col justify-end transition-all duration-500 hover:border-rust-orange/50 hover:shadow-[0_0_30px_rgba(217,119,6,0.18)]"
+            style={`transition-delay:${i * 60}ms`}
+          >
+            {/* Imagen con encuadre inteligente */}
+            <div class="absolute inset-0 z-0">
+              <img
+                src={post.img}
+                alt={post.title}
+                loading="lazy"
+                decoding="async"
+                class={`w-full h-full ${gridFitClass} transition-transform duration-700 group-hover:scale-[1.03]`}
+              />
+              {/* Scrim inferior sutil para contraste de texto sin apagar la imagen */}
+              <div class="absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-black/90 via-black/40 to-transparent pointer-events-none"></div>
+            </div>
+
+            {/* Contenido textual heredado de CinematicArchiveCard */}
+            <div class="relative z-10 p-5 md:p-6 flex flex-col gap-1.5">
+              {/* Eyebrow: badge / categoría en mono rust-orange */}
+              {post.badge && (
+                <span class="font-mono text-[8px] uppercase tracking-[0.45em] text-rust-orange font-bold opacity-85 mb-0.5">
+                  {post.badge}
+                </span>
+              )}
+
+              {/* Título con font-gloock + gradient-steel-titanium — identidad heredada del Home */}
+              <h3 class="font-gloock font-bold gradient-steel-titanium text-base sm:text-lg md:text-xl leading-snug line-clamp-2 drop-shadow-md">
+                {post.title}
+              </h3>
+
+              {/* Excerpt serifado con parseHeroPhrase (ámbar cursiva en arranque) */}
+              {gridExcerptRaw && (
+                <p class="grid-card-phrase font-serif text-[11.5px] sm:text-xs text-white/75 leading-relaxed line-clamp-2 hidden md:block mt-0.5"
+                   data-grid-phrase={gridExcerptRaw}>
+                  <span class="grid-card-phrase-inner" />
+                </p>
+              )}
+
+              {/* CTA heredado — rust-orange mono */}
+              <span class="font-mono uppercase text-rust-orange/60 group-hover:text-rust-orange transition-colors mt-2 text-[8.5px] tracking-[0.35em] font-bold">
+                VER REGISTRO →
               </span>
-            )}
-            <h3 class="font-cinzel font-bold text-white text-sm md:text-base lg:text-lg leading-snug line-clamp-3 group-hover:text-rust-orange transition-colors duration-300">
-              {post.title}
-            </h3>
-            {post.excerpt && (
-              <p class="font-sans text-[11px] text-white/50 leading-relaxed line-clamp-2 hidden md:block">
-                {post.excerpt}
-              </p>
-            )}
-            <span class="font-mono uppercase text-white/30 group-hover:text-rust-orange/80 transition-colors mt-1 text-[9px] tracking-[0.3em]">
-              Explorar Dossier →
-            </span>
-          </div>
-          <div class="absolute left-0 top-0 h-full w-0.5 bg-rust-orange scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-bottom z-20"></div>
-        </a>
-      ))}
+            </div>
+
+            {/* Borde lateral animado al hover */}
+            <div class="absolute left-0 top-0 h-full w-0.5 bg-rust-orange scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-bottom z-20"></div>
+          </a>
+        );
+      })}
       <div class="absolute top-4 right-5 z-30 font-mono text-[8px] uppercase tracking-[0.4em] text-white/40 pointer-events-none drop-shadow-md">
         Etapa III — Tríptico Completo
       </div>
@@ -290,9 +458,24 @@ if (headline.includes('.')) {
   import gsap from 'gsap';
 
   function parsePhrase(text: string) {
-    return text
-      .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-black">$1</strong>')
-      .replace(/\[\[([^\]]+)\]\]/g, '<span class="text-rust-orange italic">$1</span>');
+    if (!text) return "";
+    const clean = text.replace(/^[#*`>\s]+/, "").trim();
+
+    if (clean.includes("[[") || clean.includes("**")) {
+      return clean
+        .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-bold md:font-black">$1</strong>')
+        .replace(/\[\[([^\]]+)\]\]/g, '<span class="italic text-amber-200/90 font-serif drop-shadow-[0_0_12px_rgba(245,158,11,0.5)]">$1</span>')
+        .replace(/(^|[^*])\*([^*]+)\*([^*]|$)/g, '$1<span class="italic text-white/95 font-serif">$2</span>$3');
+    }
+
+    const words = clean.split(" ");
+    if (words.length > 3) {
+      const firstTwo = words.slice(0, 2).join(" ");
+      const rest = words.slice(2).join(" ");
+      return `<span class="italic text-amber-200/90 font-serif">${firstTwo}</span> ${rest}`;
+    }
+
+    return clean;
   }
 
   function initTripticoNarrative() {
@@ -307,8 +490,17 @@ if (headline.includes('.')) {
       const gridLayer = root.querySelector<HTMLElement>('.triptico-layer-grid');
       const spotlightCards = Array.from(root.querySelectorAll<HTMLElement>('.spotlight-card'));
       const nextTargetId = root.dataset.nextTarget;
+      const isArchiveVariant = root.dataset.variant === 'archive';
 
       if (!heroLayer || !spotlightLayer || !gridLayer) return;
+
+      // ── HIDRATACIÓN DE EXCERPTS DE LA GRILLA FINAL (ámbar cursiva en arranque) ──
+      root.querySelectorAll<HTMLElement>('.grid-card-phrase').forEach(phraseEl => {
+        const raw = phraseEl.getAttribute('data-grid-phrase') || '';
+        const inner = phraseEl.querySelector<HTMLElement>('.grid-card-phrase-inner');
+        if (inner && raw) inner.innerHTML = parsePhrase(raw);
+      });
+
 
       let isRunning = false;
 
@@ -360,6 +552,10 @@ if (headline.includes('.')) {
 
         const mainTl = gsap.timeline({
           onComplete: () => {
+            if (isArchiveVariant) {
+              isRunning = false;
+              return;
+            }
             // TRAS CONCLUIR LAS 3 CARDS Y UN BREVE DESCANSO:
             // REAPARECE EL NOMBRE DE LA COLECCIÓN EN H1 GRADIENT Y LUEGO VUELVE A LA CABECERA
             gsap.to(gridLayer, { 
@@ -436,25 +632,69 @@ if (headline.includes('.')) {
 
         spotlightCards.forEach(card => gsap.set(card, { autoAlpha: 0, zIndex: 10, pointerEvents: 'none' }));
 
-        // ── PASO A: PORTADA HERO (FOTO CABECERA FIJA Y LÍMPIDA) ──
-        const heroImg = heroLayer.querySelector('.hero-bg-img');
-        const heroContent = heroLayer.querySelector('.hero-content-box');
+        // ── PASO A: PORTADA HERO (IDÉNTICO A CARDS INTERIORES) ──
+        const heroImg = heroLayer.querySelector<HTMLElement>('.hero-bg-img');
+        const heroTitleStage = heroLayer.querySelector<HTMLElement>('.hero-title-stage');
+        const heroTitleBox = heroLayer.querySelector<HTMLElement>('.hero-title-box');
+        const heroCinematicLayer = heroLayer.querySelector<HTMLElement>('.hero-cinematic-layer');
+        const heroTextContent = heroLayer.querySelector<HTMLElement>('.hero-text-content');
+        const heroPhraseElem = heroLayer.querySelector<HTMLElement>('.hero-phrase');
 
-        if (heroImg && heroContent) {
+        if (heroImg) {
+          const heroStartTime = mainTl.duration();
           mainTl.set(heroLayer, { zIndex: 30 });
-          mainTl.to(heroLayer, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.8, ease: 'power2.out' });
+          mainTl.to(heroLayer, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.4 }, heroStartTime);
+
+          // Paneo cinemático de cámara
           mainTl.fromTo(heroImg, 
-            { scale: 1 }, 
-            { scale: 1.04, duration: 3.8, ease: 'none' },
-            '<'
+            { objectPosition: '50% 50%', scale: 1 }, 
+            { objectPosition: '80% 50%', scale: 1.08, duration: 5.6, ease: 'cubic-bezier(0.25, 1, 0.5, 1)' },
+            heroStartTime
           );
-          mainTl.fromTo(heroContent,
-            { autoAlpha: 0, y: 15 },
-            { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power2.out' },
-            '<0.2'
-          );
-          mainTl.to(heroLayer, { autoAlpha: 0, pointerEvents: 'none', duration: 0.7, ease: 'power2.inOut' }, '+=2.0');
-          mainTl.set(heroLayer, { zIndex: 10 });
+
+          // ── SUB-STAGE 1: MODO CINEMÁTICO DE PRESENTACIÓN H1 ──
+          if (heroTitleStage && heroTitleBox) {
+            mainTl.set(heroTitleStage, { zIndex: 30, autoAlpha: 1 }, heroStartTime);
+            mainTl.fromTo(heroTitleBox,
+              { autoAlpha: 0, x: -30, filter: 'blur(6px)' },
+              { autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' },
+              heroStartTime + 0.1
+            );
+            mainTl.to(heroTitleBox,
+              { autoAlpha: 0, x: -15, duration: 0.5, ease: 'power2.in' },
+              heroStartTime + 1.9
+            );
+            mainTl.to(heroTitleStage,
+              { autoAlpha: 0, duration: 0.4, ease: 'power2.inOut' },
+              heroStartTime + 2.1
+            );
+            mainTl.set(heroTitleStage, { zIndex: 0 }, heroStartTime + 2.5);
+          }
+
+          // ── SUB-STAGE 2: ESCENA PRESERVADA (FRASE SOBERANA + PAISAJE DESPEJADO) ──
+          if (heroPhraseElem) {
+            const raw = heroPhraseElem.getAttribute('data-phrase') || heroPhraseElem.innerText;
+            heroPhraseElem.innerHTML = parsePhrase(raw);
+          }
+
+          if (heroCinematicLayer) {
+            mainTl.fromTo(heroCinematicLayer,
+              { autoAlpha: 0 },
+              { autoAlpha: 1, duration: 0.8, ease: 'power2.out' },
+              heroStartTime + 2.3
+            );
+          }
+
+          if (heroTextContent) {
+            mainTl.fromTo(heroTextContent,
+              { autoAlpha: 0, x: -40, filter: 'blur(8px)' },
+              { autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' },
+              heroStartTime + 2.3
+            );
+          }
+
+          // Salida suave hacia Etapa 2
+          mainTl.to(heroLayer, { autoAlpha: 0, pointerEvents: 'none', zIndex: 10, duration: 0.6, ease: 'power2.in' }, heroStartTime + 5.5);
         }
 
         // ── PASO B: PRESENTACIÓN INDIVIDUAL DE LAS 3 CARDS (ESTILO VERTICAL STACK) ──
@@ -463,6 +703,9 @@ if (headline.includes('.')) {
           mainTl.to(spotlightLayer, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.4 });
 
           spotlightCards.forEach((card, idx) => {
+            const titleStage = card.querySelector<HTMLElement>('.spotlight-title-stage');
+            const titleBox = card.querySelector<HTMLElement>('.spotlight-title-box');
+            const cinematicLayer = card.querySelector<HTMLElement>('.spotlight-cinematic-layer');
             const textContent = card.querySelector<HTMLElement>('.spotlight-text-content');
             const phraseElem = card.querySelector<HTMLElement>('.spotlight-phrase');
             const spotlightImg = card.querySelector<HTMLElement>('.spotlight-img');
@@ -478,15 +721,43 @@ if (headline.includes('.')) {
               const panTarget = isRightAligned ? '20% 50%' : '80% 50%';
               mainTl.fromTo(spotlightImg,
                 { objectPosition: '50% 50%', scale: 1 },
-                { objectPosition: panTarget, scale: 1.08, duration: 3.6, ease: 'cubic-bezier(0.25, 1, 0.5, 1)' },
+                { objectPosition: panTarget, scale: 1.08, duration: 5.6, ease: 'cubic-bezier(0.25, 1, 0.5, 1)' },
                 cardStartTime
               );
             }
 
-            // REVELADO EDITORIAL DE LA FRASE FORMATEADA
+            // ── SUB-STAGE 1: MODO CINEMÁTICO DE PRESENTACIÓN H1 (GRADIENTE TITANIUM EXTRA BOLD) ──
+            if (titleStage && titleBox) {
+              const titleXStart = isRightAligned ? 30 : -30;
+              mainTl.set(titleStage, { zIndex: 30, autoAlpha: 1 }, cardStartTime);
+              mainTl.fromTo(titleBox,
+                { autoAlpha: 0, x: titleXStart, filter: 'blur(6px)' },
+                { autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' },
+                cardStartTime + 0.1
+              );
+              mainTl.to(titleBox,
+                { autoAlpha: 0, x: titleXStart / 2, duration: 0.5, ease: 'power2.in' },
+                cardStartTime + 1.9
+              );
+              mainTl.to(titleStage,
+                { autoAlpha: 0, duration: 0.4, ease: 'power2.inOut' },
+                cardStartTime + 2.1
+              );
+              mainTl.set(titleStage, { zIndex: 0 }, cardStartTime + 2.5);
+            }
+
+            // ── SUB-STAGE 2: ESCENA PRESERVADA INTACTA (FRASE SOBERANA + ARTEFACTO) ──
             if (phraseElem) {
               const phraseRaw = phraseElem.getAttribute('data-phrase') || phraseElem.innerText;
               phraseElem.innerHTML = parsePhrase(phraseRaw);
+            }
+
+            if (cinematicLayer) {
+              mainTl.fromTo(cinematicLayer,
+                { autoAlpha: 0 },
+                { autoAlpha: 1, duration: 0.8, ease: 'power2.out' },
+                cardStartTime + 2.3
+              );
             }
 
             if (textContent) {
@@ -494,26 +765,57 @@ if (headline.includes('.')) {
               mainTl.fromTo(textContent,
                 { autoAlpha: 0, x: xStart, filter: 'blur(8px)' },
                 { autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' },
-                cardStartTime + 0.2
+                cardStartTime + 2.3
               );
             }
 
             // Lectura contemplativa de la frase + salida suave y reducción de z-index
-            mainTl.to(card, { autoAlpha: 0, pointerEvents: 'none', zIndex: 20, duration: 0.6, ease: 'power2.in' }, cardStartTime + 3.4);
+            mainTl.to(card, { autoAlpha: 0, pointerEvents: 'none', zIndex: 20, duration: 0.6, ease: 'power2.in' }, cardStartTime + 5.5);
           });
 
           mainTl.to(spotlightLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none', duration: 0.4 });
         }
 
-        // ── PASO C: PANTALLA FINAL CON LAS 3 CARDS JUNTAS (HEREDADO) ──
-        mainTl.set(gridLayer, { zIndex: 35 });
-        mainTl.to(gridLayer, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.8, ease: 'power2.out' });
-        const gridCards = gridLayer.querySelectorAll('a');
-        mainTl.fromTo(gridCards,
-          { autoAlpha: 0, y: 18, scale: 0.97 },
-          { autoAlpha: 1, y: 0, scale: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out' },
-          '-=0.4'
-        );
+        // ── FINAL DE LA SECUENCIA ──
+        if (isArchiveVariant) {
+          // CORRECCIÓN: DE LA PRESENTACIÓN AL FINAL, PASAMOS DIRECTO A KHEPER COMO PORTADA COVER Y SU H1 EXTRABOLD
+          if (heroImg && heroTitleStage && heroTitleBox) {
+            mainTl.set(heroLayer, { zIndex: 40 });
+            mainTl.to(heroLayer, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.8, ease: 'power2.out' });
+
+            mainTl.fromTo(heroImg,
+              { scale: 1.04 },
+              { scale: 1.0, duration: 2.0, ease: 'power2.out' },
+              '<'
+            );
+
+            if (heroCinematicLayer) {
+              mainTl.set(heroCinematicLayer, { autoAlpha: 0 });
+            }
+
+            mainTl.set(heroTitleStage, { zIndex: 35 });
+            mainTl.fromTo(heroTitleStage,
+              { autoAlpha: 0, scale: 0.96 },
+              { autoAlpha: 1, scale: 1.0, duration: 1.0, ease: 'power2.out' },
+              '<0.2'
+            );
+            mainTl.fromTo(heroTitleBox,
+              { autoAlpha: 0, x: -30, filter: 'blur(6px)' },
+              { autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' },
+              '<'
+            );
+          }
+        } else {
+          // ── PASO C: PANTALLA FINAL CON LAS 3 CARDS JUNTAS (HEREDADO EN COLECCIONES) ──
+          mainTl.set(gridLayer, { zIndex: 35 });
+          mainTl.to(gridLayer, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.8, ease: 'power2.out' });
+          const gridCards = gridLayer.querySelectorAll('a');
+          mainTl.fromTo(gridCards,
+            { autoAlpha: 0, y: 18, scale: 0.97 },
+            { autoAlpha: 1, y: 0, scale: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out' },
+            '-=0.4'
+          );
+        }
       };
 
       // IntersectionObserver para activar la secuencia al entrar al viewport o al interactuar
