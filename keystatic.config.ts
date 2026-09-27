@@ -385,5 +385,32 @@ export default config({
         }),
       },
     }),
+
+    // Colección ligera para notas manuales
+    simpleNota: collection({
+      label: '📝 Simple Nota',
+      slugField: 'title',
+      path: 'src/content/notas/*',
+      format: { contentField: 'content' },
+      schema: {
+        title: fields.slug({ name: { label: 'Título' } }),
+        
+        // Campo de imagen (guardado en public/images/notas)
+        image: fields.image({
+          label: 'Imagen de Portada',
+          directory: 'public/images/notas',
+          publicPath: '/images/notas',
+        }),
+
+        // Fecha por defecto: Toma el día de hoy automáticamente al crear el post
+        date: fields.date({
+          label: 'Fecha de Publicación',
+          defaultValue: { kind: 'today' }, 
+        }),
+
+        // El editor para escribir el cuerpo del post
+        content: fields.mdx({ label: 'Contenido de la Nota' }),
+      },
+    }),
   },
 });

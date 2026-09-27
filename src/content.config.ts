@@ -165,6 +165,18 @@ const ensayosCinematicosContent = defineCollection({
   }),
 });
 
+const notas = defineCollection({
+  loader: glob({ 
+    pattern: "**/*.{md,mdx}", 
+    base: "src/content/notas" 
+  }),
+  schema: z.object({
+    title: z.string().optional().catch("Sin Título"),
+    image: z.string().optional().nullable().catch(null),
+    date: z.coerce.date().optional().nullable().catch(null),
+  }),
+});
+
 export const collections = {
   ensayos,
   ensayosContent,
@@ -175,4 +187,5 @@ export const collections = {
   arquetiposGlobalesContent,
   ensayosCinematicos,
   ensayosCinematicosContent,
+  notas,
 };
