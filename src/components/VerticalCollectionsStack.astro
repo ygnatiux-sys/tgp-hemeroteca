@@ -41,8 +41,8 @@ const epigraphMap: Record<string, string> = {
   <div class="relative w-full aspect-video max-h-[90vh] flex justify-center items-center overflow-hidden rounded-2xl md:rounded-3xl border border-white/5 shadow-2xl bg-theme-dark">
     
     {/* Máscaras suaves superior e inferior para legibilidad de botones */}
-    <div class="absolute top-0 left-0 right-0 h-24 bg-linear-to-b from-black/50 via-black/20 to-transparent z-40 pointer-events-none"></div>
-    <div class="absolute bottom-0 left-0 right-0 h-24 bg-linear-to-t from-black/50 via-black/20 to-transparent z-40 pointer-events-none"></div>
+    <div class="absolute top-0 left-0 right-0 h-20 bg-linear-to-b from-black/25 to-transparent z-40 pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-20 bg-linear-to-t from-black/25 to-transparent z-40 pointer-events-none"></div>
 
     {/* Controles (Z-index 50) */}
     <button 
@@ -72,6 +72,7 @@ const epigraphMap: Record<string, string> = {
         const imgUrl = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '')) || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop';
         const linkUrl = col.link || `/colecciones/${col.key}/`;
         const epigraphText = epigraphMap[col.key] || `La memoria de la humanidad resguardada en ${col.label}.`;
+        const isRightAligned = idx % 2 === 1;
 
         const isPortraitArt = /mercurio|homero|saturno|wiki|busto|estatua|retrato|filosofia|hegel/i.test(imgUrl) || /filosofia|hegel/i.test(col.key);
         const fitClass = isPortraitArt ? 'object-contain! bg-[#08090a]' : 'object-cover';
@@ -94,9 +95,9 @@ const epigraphMap: Record<string, string> = {
               />
             </div>
 
-            {/* UI Normal (Título, Hero style) */}
+            {/* UI Normal (Título, Hero style limpio con scrim granular inferior) */}
             <div class="normal-ui absolute inset-0 transition-opacity duration-1000 ease-in-out">
-              <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 via-40% to-transparent pointer-events-none z-10" />
+              <div class="absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-black/85 via-black/30 to-transparent pointer-events-none z-10" />
               <div class="relative z-20 p-8 md:p-14 lg:p-18 flex flex-col justify-end h-full pointer-events-auto select-text cursor-text">
                 <span class="font-mono text-xs sm:text-sm uppercase tracking-[0.35em] text-rust-orange font-bold mb-2 block">
                   Colección TGP
@@ -115,25 +116,26 @@ const epigraphMap: Record<string, string> = {
               </div>
             </div>
 
-            {/* UI Cinemática (Frase con Scrim granular fino) */}
+            {/* UI Cinemática (Frase limpia estilo Tríptico, sin backdrop-blur pesado) */}
             <div 
               class="cinematic-layer absolute inset-0 opacity-0 pointer-events-none transition-all duration-1000 ease-in-out z-20 flex"
               style="visibility: hidden; backface-visibility: hidden;"
             >
-              <div class="hidden md:block w-[40%] h-full"></div> {/* Zona limpia transparente para la imagen */}
-              <div class="w-full md:w-[60%] h-full bg-linear-to-r from-black/60 md:from-transparent via-black/75 to-black/90 backdrop-blur-xs flex items-center justify-center p-8 md:p-12 lg:p-20">
+              <div class:list={["hidden md:block w-[40%] h-full", isRightAligned ? "order-1" : "order-2"]}></div>
+              <div 
+                class:list={[
+                  "w-full md:w-[60%] h-full flex items-center justify-center p-8 md:p-14 lg:p-20 transition-all duration-1000",
+                  isRightAligned 
+                    ? "order-2 bg-linear-to-l from-black/95 via-black/80 to-transparent" 
+                    : "order-1 bg-linear-to-r from-black/95 via-black/80 to-transparent"
+                ]}
+              >
                 <p 
-                  class="cinematic-text font-serif text-3xl md:text-5xl lg:text-[3.5rem] text-[#E3DDD3]/90 leading-tight drop-shadow-2xl text-center text-balance max-w-[90%] md:max-w-[35ch] lg:max-w-[40ch]"
+                  class="cinematic-text font-serif text-2xl md:text-4xl lg:text-[3rem] text-[#E3DDD3]/95 leading-tight drop-shadow-2xl text-center text-balance max-w-[90%] md:max-w-[35ch] lg:max-w-[40ch]"
                   data-phrase={epigraphText}
                 ></p>
               </div>
             </div>
-
-            {/* Máscara global Fade to Black */}
-            <div 
-              class="fade-mask absolute inset-0 bg-black opacity-0 pointer-events-none z-30 transition-all duration-700 ease-in-out"
-              style="visibility: hidden; backface-visibility: hidden;"
-            ></div>
           </a>
         );
       })}
@@ -190,9 +192,10 @@ const epigraphMap: Record<string, string> = {
         const ui = card.querySelector<HTMLElement>('.normal-ui');
         const cinematicLayer = card.querySelector<HTMLElement>('.cinematic-layer');
         const textContainer = card.querySelector<HTMLElement>('.cinematic-text');
-        const fadeMask = card.querySelector<HTMLElement>('.fade-mask');
+        const cardIndex = Number(card.dataset.index || 0);
+        const isRightAligned = cardIndex % 2 === 1;
 
-        if (!img || !ui || !cinematicLayer || !textContainer || !fadeMask) return;
+        if (!img || !ui || !cinematicLayer || !textContainer) return;
 
         // Estado Inicial
         img.style.objectPosition = '50% 50%';
@@ -201,52 +204,44 @@ const epigraphMap: Record<string, string> = {
         ui.style.visibility = 'visible';
         cinematicLayer.style.opacity = '0';
         cinematicLayer.style.visibility = 'hidden';
-        fadeMask.style.opacity = '0';
-        fadeMask.style.visibility = 'hidden';
         textContainer.innerHTML = '';
 
         const phraseRaw = textContainer.getAttribute('data-phrase') || '';
         const phraseHTML = parsePhrase(phraseRaw);
 
-        // 1. Esperar 1 segundo tras aparecer
+        // 1. Esperar 1.2 segundos tras aparecer
         sequenceTimeouts.push(setTimeout(() => {
           
-          // Fase 1: Shift image & show dark zone
-          img.style.objectPosition = '20% 50%'; // Mover imagen más a la izquierda
+          // Fase 1: Shift image & show cinematic zone sin tapar el sujeto
+          img.style.objectPosition = isRightAligned ? '20% 50%' : '80% 50%';
           img.style.transform = 'scale(1.08)';  // Zoom cinemático
-          ui.style.opacity = '0';               // Ocultar UI normal
-          ui.style.visibility = 'hidden';
+          ui.style.opacity = '0';               // Desvanecer UI normal
+          setTimeout(() => {
+            ui.style.visibility = 'hidden';
+          }, 800);
+
           cinematicLayer.style.visibility = 'visible';
-          cinematicLayer.style.opacity = '1';   // Mostrar capa cinemática
+          cinematicLayer.style.opacity = '1';   // Mostrar capa cinemática limpiamente
           
           // Inyectamos el HTML parseado envuelto en un span animado
           textContainer.innerHTML = `<span class="inline-block type-char">${phraseHTML}</span>`;
 
-          // 2. Esperar a que se lea (6 segundos para dar tiempo)
+          // 2. Esperar a que se lea contemplativamente (5.5s)
           sequenceTimeouts.push(setTimeout(() => {
             
-            // Fase 2: Fade to black global
-            fadeMask.style.visibility = 'visible';
-            fadeMask.style.opacity = '1';
+            // Fase 2: Crossfade suave directo de vuelta a la UI normal (SIN FADE TO BLACK ABRUPTO)
+            cinematicLayer.style.opacity = '0';
+            ui.style.visibility = 'visible';
+            ui.style.opacity = '1';
+            img.style.objectPosition = '50% 50%';
+            img.style.transform = 'scale(1)';
 
-            // 3. Resetear bajo el negro y volver al centro
-            sequenceTimeouts.push(setTimeout(() => {
-              img.style.objectPosition = '50% 50%';
-              img.style.transform = 'scale(1)';
-              ui.style.visibility = 'visible';
-              ui.style.opacity = '1';
-              cinematicLayer.style.opacity = '0';
+            setTimeout(() => {
               cinematicLayer.style.visibility = 'hidden';
               textContainer.innerHTML = '';
-              
-              // Quitar el negro
-              fadeMask.style.opacity = '0';
-              setTimeout(() => {
-                fadeMask.style.visibility = 'hidden';
-              }, 700);
-            }, 1000)); // tiempo del fade to black
+            }, 1000);
             
-          }, 6000)); // Tiempo largo de lectura cinemática
+          }, 5500)); // Tiempo contemplativo de lectura cinemática
 
         }, 1200));
       }
@@ -262,14 +257,9 @@ const epigraphMap: Record<string, string> = {
         // Limpiar animaciones de otras cards
         const allCards = Array.from(track.children) as HTMLElement[];
         allCards.forEach(c => {
-          const fade = c.querySelector<HTMLElement>('.fade-mask');
           const ui = c.querySelector<HTMLElement>('.normal-ui');
           const cin = c.querySelector<HTMLElement>('.cinematic-layer');
           const img = c.querySelector<HTMLElement>('.card-image');
-          if (fade) {
-            fade.style.opacity = '0';
-            fade.style.visibility = 'hidden';
-          }
           if (ui) {
             ui.style.opacity = '1';
             ui.style.visibility = 'visible';
