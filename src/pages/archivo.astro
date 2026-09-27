@@ -7,6 +7,7 @@ import CinematicExcerptRest from '../components/CinematicExcerptRest.astro';
 import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
 import CoverflowCarousel, { type CoverflowPost } from '../components/CoverflowCarousel';
 import CollectionRestTray from '../components/CollectionRestTray.astro';
+import TriplicoRevelacion, { type TriplicoPost } from '../components/TriplicoRevelacion.astro';
 import RowNetflixClasico from '../components/RowNetflixClasico.astro';
 import SpotlightMediaTray, { type TrayCollectionItem } from '../components/SpotlightMediaTray.astro';
 import Marquee from '../components/Marquee.astro';
@@ -367,16 +368,55 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                   </div>
                 )}
 
-                {/* 2. Resto de la Colección: Tray Mode Horizontal de 3 Cards con amplio padding y separación */}
-                {restEssays.length > 0 && (
-                  <div class="w-full pt-20 sm:pt-28 md:pt-36 pb-12 sm:pb-20 flex flex-col items-center">
-                    <CollectionRestTray
-                      essays={restEssays}
-                      categoryKey={group.catKey}
-                      categoryLabel={group.catLabel}
-                    />
-                  </div>
-                )}
+                {/* 2. Resto de la Colección: Tríptico de Revelación en Modo Archivo (Gloock + Ancho Panorámico) */}
+                {restEssays.length > 0 && (() => {
+                  const pool = restEssays.length >= 3 
+                    ? restEssays 
+                    : [...restEssays, coverEssay, ...restEssays].slice(0, 3);
+                  
+                  const triplicoCategoryPosts: TriplicoPost[] = pool.slice(0, 3).map((essay, idx) => ({
+                    title: essay.entry.title || 'Dossier del Archivo',
+                    excerpt: (essay.entry as any).dek || essay.entry.excerpt || '',
+                    img: essay.img || resolveEssayImage(essay.entry, essay.slug),
+                    href: (essay as any).isCinematicGSAP ? `/ensayos-cinematicos/${essay.slug}/` : `/hemeroteca/${essay.slug}/`,
+                    badge: `${group.catLabel} · Expediente ${idx + 1}`,
+                  }));
+
+                  const heroEssayCandidate = restEssays.length > 3 ? restEssays[3] : (restEssays[0] || coverEssay);
+                  const triplicoCategoryHero: TriplicoPost = {
+                    title: heroEssayCandidate.entry.title || group.catLabel,
+                    excerpt: (heroEssayCandidate.entry as any).dek || heroEssayCandidate.entry.excerpt || '',
+                    img: heroEssayCandidate.img || resolveEssayImage(heroEssayCandidate.entry, heroEssayCandidate.slug),
+                    href: (heroEssayCandidate as any).isCinematicGSAP ? `/ensayos-cinematicos/${heroEssayCandidate.slug}/` : `/hemeroteca/${heroEssayCandidate.slug}/`,
+                    badge: `${group.catLabel} · Registro Principal`,
+                  };
+
+                  return (
+                    <div class="w-full pt-16 sm:pt-24 md:pt-28 pb-12 sm:pb-20 flex flex-col items-center">
+                      {/* CollectionRestTray preservado en codebase y deshabilitado temporalmente en Archivo */}
+                      {/*
+                      <CollectionRestTray
+                        essays={restEssays}
+                        categoryKey={group.catKey}
+                        categoryLabel={group.catLabel}
+                      />
+                      */}
+                      <div class="w-full">
+                        <TriplicoRevelacion
+                          posts={triplicoCategoryPosts}
+                          heroPost={triplicoCategoryHero}
+                          instanceId={`archivo-${group.catKey}`}
+                          variant="archive"
+                          hideHeader={true}
+                          label={`COLECCIÓN ${group.catLabel.toUpperCase()}`}
+                          headline={group.catLabel}
+                          ctaHref={`/colecciones/${group.catKey}/`}
+                          ctaLabel={`Explorar Colección Completa (${group.essays.length})`}
+                        />
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             );
           })}

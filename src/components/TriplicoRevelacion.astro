@@ -29,6 +29,7 @@ interface Props {
   ctaLabel?: string;
   nextTargetId?: string;
   variant?: 'collection' | 'archive';
+  hideHeader?: boolean;
 }
 
 const {
@@ -41,6 +42,7 @@ const {
   ctaLabel = 'Ver Todas las Colecciones',
   nextTargetId,
   variant = 'collection',
+  hideHeader = false,
 } = Astro.props;
 
 const isArchive = variant === 'archive';
@@ -114,25 +116,34 @@ if (headline.includes('.')) {
 
 <section
   id={`triptico-revelacion-${instanceId}`}
-  class="triptico-root w-full max-w-430 2xl:max-w-460 mx-auto px-2 sm:px-4 md:px-6 py-10 md:py-16 select-none"
+  class:list={[
+    "triptico-root w-full select-none",
+    isArchive ? "max-w-none px-0" : "max-w-430 2xl:max-w-460 mx-auto px-2 sm:px-4 md:px-6",
+    hideHeader ? "py-2 sm:py-4 md:py-6" : "py-10 md:py-16"
+  ]}
   aria-label="Tríptico de Revelación — Colecciones en Rotación"
   data-next-target={nextTargetId}
   data-variant={variant}
 >
-  <!-- Encabezado editorial -->
-  <header class="mb-8 flex flex-col gap-1.5 px-1 sm:px-2">
-    <span class="font-mono text-[10px] uppercase tracking-[0.5em] text-rust-orange font-bold opacity-70">
-      {label}
-    </span>
-    <h2 class="font-cinzel font-extrabold text-3xl md:text-4xl lg:text-5xl gradient-steel-titanium tracking-tight leading-[0.95]">
-      {headline}
-    </h2>
-  </header>
+  <!-- Encabezado editorial (opcional) -->
+  {!hideHeader && (
+    <header class="mb-8 flex flex-col gap-1.5 px-1 sm:px-2">
+      <span class="font-mono text-[10px] uppercase tracking-[0.5em] text-rust-orange font-bold opacity-70">
+        {label}
+      </span>
+      <h2 class="font-cinzel font-extrabold text-3xl md:text-4xl lg:text-5xl gradient-steel-titanium tracking-tight leading-[0.95]">
+        {headline}
+      </h2>
+    </header>
+  )}
 
   <!-- CONTENEDOR DE LA SECUENCIA NARRATIVA -->
   <div
     id={stageId}
-    class="relative w-full overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 shadow-2xl min-h-[82vh] md:min-h-180 lg:min-h-205 bg-black"
+    class:list={[
+      "relative w-full overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 shadow-2xl bg-black",
+      isArchive ? "aspect-16/10 sm:aspect-video min-h-135 md:min-h-165" : "min-h-[82vh] md:min-h-180 lg:min-h-205"
+    ]}
   >
 
     <!-- ═══════════════════════════════════════════════════════════════════ -->
