@@ -45,5 +45,7 @@ scratch/
 *.db
 panlingua.sql
 panlingua_chunks/
+panlingua_batches/
 dump.sql
+test_*.sql
 
