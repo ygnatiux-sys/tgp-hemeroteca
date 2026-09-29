@@ -15,3 +15,9 @@ id = "5792b625de48422e875b04c7948546b6"
 
 [observability]
 enabled = true
+
+[[d1_databases]]
+binding = "tgp_panlingua"
+database_name = "tgp-panlingua"
+database_id = "a4c11340-cec3-4273-b6d0-5691a100f09a"
+
