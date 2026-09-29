@@ -1,4 +1,4 @@
-﻿// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 // TGP MIND — Tool: query_panlingua
 // Permite a Gemini Flash consultar la base de datos lingüística Panlingua (D1)
 // via Cloudflare REST API (no Worker binding — compatible con Cloud Run).
@@ -117,30 +117,42 @@ export async function ejecutarQueryPanlingua(args: PanlingualArgs): Promise<stri
   const { intent, language, concept, macroarea, limit = 8 } = args;
   const safeLimit = Math.min(Math.max(1, limit), 25);
 
+  // Normalización tolerante de alias de intent (inglés / español)
+  let normalizedIntent: string = intent;
+  if (['stats', 'contar', 'count', 'contar_entradas'].includes(intent)) normalizedIntent = 'contar_entradas';
+  else if (['by_language', 'buscar_idioma', 'idioma', 'language'].includes(intent)) normalizedIntent = 'buscar_idioma';
+  else if (['search_word', 'buscar_palabra', 'buscar_concepto', 'semantic_search', 'concept'].includes(intent)) normalizedIntent = 'buscar_concepto';
+  else if (['compare_languages', 'comparar', 'comparar_conceptos'].includes(intent)) normalizedIntent = 'comparar_conceptos';
+  else if (['list_languages', 'listar', 'listar_idiomas'].includes(intent)) normalizedIntent = 'listar_idiomas';
+  else if (['buscar_macroarea', 'macroarea'].includes(intent)) normalizedIntent = 'buscar_macroarea';
+
+  const targetConcept = concept || (args as any).term || (args as any).word || (args as any).concepto;
+  const targetLanguage = language || (args as any).lang || (args as any).idioma;
+
   try {
     let rows: any[] = [];
 
-    if (intent === 'buscar_concepto' || intent === 'comparar_conceptos') {
+    if (normalizedIntent === 'buscar_concepto' || normalizedIntent === 'comparar_conceptos') {
       rows = await runD1Query(
         `SELECT "Language","Macroarea","Concept","Tribal_Word" FROM "lexico_periferico" WHERE "Concept" LIKE ? ORDER BY "Macroarea","Language" LIMIT ?`,
-        [`%${concept || ''}%`, safeLimit]
+        [`%${targetConcept || ''}%`, safeLimit]
       );
-    } else if (intent === 'buscar_idioma') {
+    } else if (normalizedIntent === 'buscar_idioma') {
       rows = await runD1Query(
         `SELECT "Concept","Tribal_Word","Macroarea" FROM "lexico_periferico" WHERE "Language" LIKE ? LIMIT ?`,
-        [`%${language || ''}%`, safeLimit]
+        [`%${targetLanguage || ''}%`, safeLimit]
       );
-    } else if (intent === 'listar_idiomas') {
+    } else if (normalizedIntent === 'listar_idiomas') {
       const hasArea = macroarea && macroarea.trim() !== '';
       rows = hasArea
         ? await runD1Query(`SELECT DISTINCT "Language","Macroarea" FROM "lexico_periferico" WHERE "Macroarea" = ? ORDER BY "Language" LIMIT ?`, [macroarea!, safeLimit])
         : await runD1Query(`SELECT DISTINCT "Language","Macroarea" FROM "lexico_periferico" ORDER BY "Language" LIMIT ?`, [safeLimit]);
-    } else if (intent === 'contar_entradas') {
-      const hasLang = language && language.trim() !== '';
+    } else if (normalizedIntent === 'contar_entradas') {
+      const hasLang = targetLanguage && targetLanguage.trim() !== '';
       rows = hasLang
-        ? await runD1Query(`SELECT COUNT(*) FROM "lexico_periferico" WHERE "Language" LIKE ?`, [`%${language}%`])
+        ? await runD1Query(`SELECT COUNT(*) FROM "lexico_periferico" WHERE "Language" LIKE ?`, [`%${targetLanguage}%`])
         : await runD1Query(`SELECT COUNT(*) FROM "lexico_periferico"`);
-    } else if (intent === 'buscar_macroarea') {
+    } else if (normalizedIntent === 'buscar_macroarea') {
       rows = await runD1Query(
         `SELECT DISTINCT "Language","Macroarea" FROM "lexico_periferico" WHERE "Macroarea" LIKE ? ORDER BY "Language" LIMIT ?`,
         [`%${macroarea || ''}%`, safeLimit]
@@ -149,7 +161,7 @@ export async function ejecutarQueryPanlingua(args: PanlingualArgs): Promise<stri
       return `⚠️ Tipo de consulta no reconocida: ${intent}`;
     }
 
-    return formatResults(rows, intent, concept, language);
+    return formatResults(rows, normalizedIntent, targetConcept, targetLanguage);
 
   } catch (err: any) {
     console.error('[Panlingua Tool] Error:', err?.message || err);

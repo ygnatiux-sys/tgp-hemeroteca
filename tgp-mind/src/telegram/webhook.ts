@@ -411,8 +411,14 @@ export async function handleTelegramWebhook(
     // pasamos textParaAgente='' para que agent.ts no duplique el guardado.
     const textParaAgente = fotoGuardadaEnD1 ? '' : userTextForAgent;
 
-    // ── FLUJO CONTINUO Y ZERO FRICCIÓN (ERUDITO AGENT) ────────────────────────
-    if (botIdentity === 'liminal') {
+    // ── FLUJO CONTINUO (ERUDITO AGENT PARA ENSAYOS / MULTIMEDIA) ──────────────
+    // Liminal deriva a EruditoAgent solo si se solicita explícitamente un ensayo (/ensayo, /pro, fotos, /publicar, /audio).
+    // Para preguntas y respuestas, Panlingua o chat interactivo, fluye a processTelegramMessage.
+    const isEnsayoExplicit = /^\/(ensayo|pro_breve|pro_medio|pro_premium|pro|flash)\b/i.test(text || '') ||
+                             /modo pro|us[aá] pro|redacta un ensayo/i.test(text || '');
+    const isPostProd = /^\/(publicar|publica|audio)\b/i.test(text || '');
+
+    if (botIdentity === 'liminal' && (hasPhotos || isEnsayoExplicit || isPostProd)) {
       const erudito = new EruditoAgent(process.env.GEMINI_API_KEY || '');
 
       // 1. Extraer prompt del usuario y foto permanente en R2 (si se envió)
