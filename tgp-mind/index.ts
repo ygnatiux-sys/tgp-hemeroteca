@@ -242,7 +242,27 @@ app.post('/cx-tool-wikimedia', async (c) => {
     return c.json({ success: false, error: error?.message || 'Error interno en la búsqueda' }, 500);
   }
 });
+// ── Dialogflow CX Custom Tool: Panlingua D1 ───────────────────────────────────
+app.post('/cx-tool-panlingua', async (c) => {
+  try {
+    const body = await c.req.json();
+    const { intent, language, concept, macroarea, limit } = body;
+    console.log('[CX-Panlingua] Query recibida:', JSON.stringify({ intent, language, concept, macroarea }));
 
+    if (!intent) {
+      return c.json({ success: false, error: '"intent" is required' }, 400);
+    }
+
+    const { ejecutarQueryPanlingua } = await import('./src/ia/tools/tool-panlingua.js');
+    const result = await ejecutarQueryPanlingua({ intent, language, concept, macroarea, limit });
+
+    return c.json({ success: true, result });
+
+  } catch (error: any) {
+    console.error('[CX Tool Error] Panlingua:', error);
+    return c.json({ success: false, error: error?.message || 'Error interno Panlingua' }, 500);
+  }
+});
 
 // -- Google Photos Picker API -- CORS-safe, credenciales en server -----------
 import {

@@ -30,6 +30,7 @@ import { TOOL_GENERAR_ENSAYO, ejecutarGenerarEnsayo } from './tools/tool-generar
 import { TOOL_PUBLISH_SOCIAL, ejecutarPublishSocial } from './tools/tool-publish-social.js';
 import { TOOL_CINEMATIC, ejecutarCinematicPipeline } from './tools/tool-cinematic.js';
 import { TOOL_NEO4J, ejecutarNeo4jExtraction } from './tools/tool-neo4j.js';
+import { TOOL_QUERY_PANLINGUA, ejecutarQueryPanlingua } from './tools/tool-panlingua.js';
 
 // ── Tool: request_human_action (Fase 3 — Esqueleto listo) ────────────────────
 // Usada cuando el bot necesita que el usuario realice una acción externa
@@ -121,7 +122,10 @@ Especialidad: Investigación, análisis de grafos y redacción de ensayos histó
 Especialidad: Generalista TGP. Puedes publicar en todos los destinos disponibles.`,
 
   liminal: `${BASE_SYSTEM_PROMPT}
-Especialidad: Conversacional filosófico y generación de contenido cinemático.`,
+Especialidad: Exploradora lingüística y filosofía del lenguaje via Panlingua.
+Tienes acceso a la base de datos Panlingua con vocabulario de más de 314 idiomas del mundo.
+Cuando el usuario pregunte sobre idiomas, palabras, conceptos en distintas lenguas, familias lingüísticas o comparativas de vocabulario, usa SIEMPRE la tool query_panlingua para obtener datos reales antes de responder.
+No inventes vocabulario: consultá la base primero, luego elaborá la respuesta con tu análisis filosófico y lingüístico.`,
 };
 
 // ── Asignación dinámica de Tools por identidad ───────────────────────────────
@@ -129,7 +133,7 @@ const TOOLS_BY_BOT: Record<BotIdentity, object[]> = {
   redes:     [TOOL_PUBLISH_SOCIAL, TOOL_REQUEST_HUMAN_ACTION],
   assistant: [TOOL_GENERAR_ENSAYO, TOOL_NEO4J, TOOL_REQUEST_HUMAN_ACTION],
   omni:      [TOOL_GENERAR_ENSAYO, TOOL_PUBLISH_SOCIAL, TOOL_CINEMATIC, TOOL_NEO4J, TOOL_REQUEST_HUMAN_ACTION],
-  liminal:   [TOOL_GENERAR_ENSAYO, TOOL_CINEMATIC, TOOL_REQUEST_HUMAN_ACTION],
+  liminal:   [TOOL_QUERY_PANLINGUA, TOOL_GENERAR_ENSAYO, TOOL_CINEMATIC, TOOL_REQUEST_HUMAN_ACTION],
 };
 
 export type BotIdentity = 'redes' | 'assistant' | 'omni' | 'liminal';
@@ -171,6 +175,15 @@ async function ejecutarTool(
     } else if (name === 'extract_neo4j_entities') {
       result = await ejecutarNeo4jExtraction({
         texto: String(args.texto || ''),
+        chatId,
+      });
+    } else if (name === 'query_panlingua') {
+      result = await ejecutarQueryPanlingua({
+        intent: args.intent,
+        language: args.language,
+        concept: args.concept,
+        macroarea: args.macroarea,
+        limit: args.limit,
         chatId,
       });
     } else if (name === 'request_human_action') {

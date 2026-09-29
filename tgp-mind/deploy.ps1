@@ -1,5 +1,12 @@
 $ErrorActionPreference = "Stop"
 
+if (-not (Get-Command gcloud -ErrorAction SilentlyContinue)) {
+    $sdkBin = "$env:LOCALAPPDATA\Google\Cloud SDK\google-cloud-sdk\bin"
+    if (Test-Path "$sdkBin\gcloud.cmd") {
+        $env:PATH = "$sdkBin;$env:PATH"
+    }
+}
+
 $PROJECT_ID = "tgp-mind"
 $REGION = "us-central1"
 $SERVICE_NAME = "tgp-mind"
