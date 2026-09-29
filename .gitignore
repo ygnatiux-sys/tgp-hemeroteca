@@ -38,3 +38,12 @@ tgp-scraper/node_modules/
 # Local utility scripts (pueden contener secretos hardcodeados)
 *.bat
 scratch/
+
+# Bases de datos locales y dumps SQL (datos privados, no van al repo)
+*.sqlite
+*.sqlite3
+*.db
+panlingua.sql
+panlingua_chunks/
+dump.sql
+
