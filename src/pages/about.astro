@@ -12,6 +12,7 @@ import CinematicExcerptRest from '../components/CinematicExcerptRest.astro';
 import MazoCartasGSAP from '../components/MazoCartasGSAP.astro';
 import { type MubiCinematicItem } from '../components/MubiBlockCinematic.astro';
 import TriplicoRevelacion, { type TriplicoPost } from '../components/TriplicoRevelacion.astro';
+import ToboganPosts from '../components/ToboganPosts.astro';
 import { sanitizeImageUrl, getPublishableEssays, resolveEssayImage, isValidImageSrc } from '../lib/content-filter';
 
 // Portada Hero Cinemática (Monjes Novicios Leyendo en el Templo - Wikimedia Commons)
@@ -30,6 +31,17 @@ const mazoCartas = publishable
   }))
   .filter(c => typeof c.src === 'string' && c.src.length > 4)
   .slice(0, 5);
+
+// ── 10 posts para el Tobogán Diagonal al pie de About ──
+const toboganPosts = publishable
+  .map(e => ({
+    title: (e.entry.title || e.slug) as string,
+    src: resolveEssayImage(e.entry, e.slug) as string,
+    href: `/hemeroteca/${e.slug}/`,
+    category: (e.entry.category || e.entry.coleccion || "Hemeroteca") as string,
+  }))
+  .filter(c => typeof c.src === 'string' && c.src.length > 4)
+  .slice(0, 11);
 
 // ── Ensayos Cinemáticos para el Showcase por Bloques MUBI (de a 3 tarjetas) ──
 const allCinematicosRaw = await getCollection('ensayosCinematicos').catch(() => []);
@@ -427,6 +439,20 @@ const triplicoHero: TriplicoPost | undefined = mubiCinematicItems.slice(3).find(
       headline="Experiencias Visuales. En Tres Actos."
       ctaHref="/ensayos-cinematicos/"
       ctaLabel="Explorar Archivo Cinemático"
+    />
+  )}
+
+  {/* ══════════════════════════════════════════════════════════════════
+      TOBOGÁN DE POSTS: Cascada Diagonal Scroll-Driven al pie de About
+  ══════════════════════════════════════════════════════════════════ */}
+  {toboganPosts.length > 0 && (
+    <ToboganPosts
+      posts={toboganPosts}
+      titulo="Hemeroteca en Movimiento"
+      subtitulo="Más de 50 ensayos cartografiados"
+      descripcion="Cada investigación publicada es una pieza de un rompecabezas mayor. Un archivo vivo donde el conocimiento se recuerda y se experimenta en una caída continua."
+      cta={{ label: "Explorar Hemeroteca", href: "/archivo/" }}
+      badge="Acervo Visual"
     />
   )}
 
