@@ -20,6 +20,7 @@ interface Props {
   ctaPrimary?: { label: string; href: string };
   ctaSecondary?: { label: string; href: string };
   letraChica?: string[];
+  isH1?: boolean;
 }
 
 const {
@@ -32,6 +33,7 @@ const {
     "El archivo crece con cada ensayo publicado.",
     "Acceso abierto, sin registro. Se aplican Términos.",
   ],
+  isH1 = false,
 } = Astro.props;
 
 const grid = tiles.slice(0, 12);
@@ -42,7 +44,11 @@ const grid = tiles.slice(0, 12);
     <div class="hs-glow" aria-hidden="true"></div>
 
     <div class="hs-copy">
-      <h2 class="hs-title">{titulo}</h2>
+      {isH1 ? (
+        <h1 class="hs-title">{titulo}</h1>
+      ) : (
+        <h2 class="hs-title">{titulo}</h2>
+      )}
       <p class="hs-sub">{bajada}</p>
 
       <div class="hs-actions">

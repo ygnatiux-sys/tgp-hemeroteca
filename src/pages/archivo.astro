@@ -11,6 +11,7 @@ import TriplicoRevelacion, { type TriplicoPost } from '../components/TriplicoRev
 import RowNetflixClasico from '../components/RowNetflixClasico.astro';
 import SpotlightMediaTray, { type TrayCollectionItem } from '../components/SpotlightMediaTray.astro';
 import Marquee from '../components/Marquee.astro';
+import HeroSpotifyColecciones from '../components/HeroSpotifyColecciones.astro';
 import {
   getPublishableEssays,
   formatCategory,
@@ -72,6 +73,16 @@ const resolvedEssays = publishable.map(e => ({
   ...e,
   img: resolveEssayImage(e.entry, e.slug),
 }));
+
+// ─── 12 PORTADAS PARA EL HERO PRINCIPAL ESTILO SPOTIFY ────────────────────────
+const archiveHeroTiles = resolvedEssays
+  .filter(e => e.img)
+  .slice(0, 12)
+  .map(e => ({
+    src: sanitizeImageUrl(typeof e.img === 'object' && (e.img as any)?.src ? (e.img as any).src : (typeof e.img === 'string' ? e.img : '')),
+    alt: e.entry.title || e.slug,
+    href: (e as any).isCinematicGSAP ? `/ensayos-cinematicos/${e.slug}/` : `/hemeroteca/${e.slug}/`,
+  }));
 
 // Agrupamiento por categorías para barras editoriales estilo suizo
 const essaysByCategory = categories.map(cat => {
@@ -206,31 +217,21 @@ function createPremierSequences(essays: typeof resolvedEssays) {
   description="Archivo general y catálogo cronológico de investigaciones, dossiers y ensayos de The Great Puzzle Project."
   image={archiveCoverUrl}
 >
-  {/* ── HERO PRINCIPAL CINEMÁTICO (H1) CON MASK BLACK AL PIE ── */}
-  <div class="relative w-full">
-    <Marquee
-      title="ARCHIVO GENERAL"
-      subtitle="Registros documentales e investigaciones cartografiadas"
-      imageUrl={archiveCoverUrl}
-      vibeClass="vibe-travel-senses"
-      isH1={true}
-      fontClass="font-gloock font-black gradient-general-h1 glow-metallic-gloock"
-      heightClass="h-[100vh]"
-      marginClass="mt-0 mb-0"
-      roundedClass="rounded-none"
-      showSocialInTitle={true}
-      maskBottom={true}
-      fullWidth={true}
-      disableParallax={true}
-    />
-  </div>
-
-  {/* ── RESPIRO VISUAL / EXCERPT DOBLE SCROLL POLVO DORADO & TYPEMAGIC EN BG-MAIN ── */}
-  <CinematicExcerptRest 
-    text="El repositorio del [[tiempo transcurrido]]. **Huellas epistémicas** clasificadas y resguardadas, listas para el escrutinio del alma humana."
+  {/* ── HERO PRINCIPAL ESTILO SPOTIFY (H1) A FULL BLEED ── */}
+  <HeroSpotifyColecciones
+    isH1={true}
+    tiles={archiveHeroTiles}
+    titulo={`Explorá sin límites. Más de ${publishable.length} investigaciones del archivo TGP.`}
+    bajada="Registros documentales, arqueosemiótica y memoria histórica en un solo catálogo. Leé cuando quieras."
+    ctaPrimary={{ label: "Explorar catálogo", href: "#archive-view-container" }}
+    ctaSecondary={{ label: "Ver colecciones", href: "/colecciones/" }}
+    letraChica={[
+      "El archivo crece con cada investigación publicada.",
+      "Acceso libre y abierto. Sin registro ni suscripción requerida.",
+    ]}
   />
 
-  <div class="min-h-screen pb-32 pt-12">
+  <div id="archive-view-container" class="min-h-screen pb-32 pt-12">
     <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16">
       {/* ══════════════════════════════════════════════════════════════════
           SISTEMA DE SOLAPAS PRINCIPALES (TABS MINIMALISTAS)
@@ -516,6 +517,28 @@ function createPremierSequences(essays: typeof resolvedEssays) {
           </section>
         </div>
       )}
+    </div>
+
+    {/* ── INTERLUDIO HERO MONUMENTAL: MARQUEE CLÁSICO (TORRE DE BABEL) & RESPIRO EDITORIAL ── */}
+    <div class="relative w-full mt-24 mb-12">
+      <Marquee
+        title="ARCHIVO GENERAL"
+        subtitle="Registros documentales e investigaciones cartografiadas"
+        imageUrl={archiveCoverUrl}
+        vibeClass="vibe-travel-senses"
+        isH1={false}
+        fontClass="font-gloock font-black gradient-general-h1 glow-metallic-gloock"
+        heightClass="h-[75vh]"
+        marginClass="mt-0 mb-0"
+        roundedClass="rounded-none"
+        showSocialInTitle={true}
+        maskBottom={true}
+        fullWidth={true}
+        disableParallax={true}
+      />
+      <CinematicExcerptRest 
+        text="El repositorio del [[tiempo transcurrido]]. **Huellas epistémicas** clasificadas y resguardadas, listas para el escrutinio del alma humana."
+      />
     </div>
 
     {/* ── SECCIÓN FINAL: MODE TRAY / COVERFLOW CAROUSEL 3D DE COLECCIONES (FULL WIDTH / EDGE-TO-EDGE) ── */}
