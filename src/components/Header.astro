@@ -17,78 +17,65 @@ const { transparentUntilScroll = false } = Astro.props;
   class="fixed top-0 w-full z-50 bg-transparent border-b border-transparent"
   data-transparent-until-scroll={transparentUntilScroll ? "true" : "false"}
 >
-  {/* Barra principal: altura mínima 56px mobile, 60px desktop → WCV */}
-  <div class="w-full px-4 md:px-6 lg:px-8 xl:px-12 flex items-center justify-between relative" style="min-height:56px; height:56px;">
+  {/* Barra principal comercial (estilo Netflix/HBO): 64px mobile, 76px desktop → WCV */}
+  <div class="w-full h-16 lg:h-19 px-4 md:px-6 lg:px-8 xl:px-12 flex items-center justify-between relative">
 
     {/* ── IZQUIERDA: Marca ── */}
     <div class="flex items-center shrink-0 z-10">
       <div class="flex items-center gap-2 md:gap-2.5">
         {/* Logo marca 3 líneas */}
         <a href="https://ediciones.thegreatpuzzleproject.com" class="group/brand flex flex-col text-left justify-center select-none" title="Ir a Ediciones de The Great Puzzle Project">
-          <span class="font-['Gloock'] font-black text-xs md:text-[13px] lg:text-[14px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-1">
+          <span class="font-['Gloock'] font-black text-[13px] md:text-[15px] lg:text-[17px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-1">
             THE GREAT
           </span>
           <div class="flex items-center gap-1.5 my-0.5">
-            <div class="brand-element w-4.5 h-4.5 md:w-5 md:h-5 rounded-full border-0 bg-current/5 flex items-center justify-center transition-all duration-300 shrink-0 relative overflow-hidden shadow-md">
+            <div class="brand-element w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 rounded-full border-0 bg-current/5 flex items-center justify-center transition-all duration-300 shrink-0 relative overflow-hidden shadow-md">
               <img 
                 src="/images/favicon.TGP.webp" 
                 alt="The Great Puzzle Project Logo" 
                 class="scale-[1.05] animate-soft-pulse group-hover/brand:scale-[1.10] transition-transform duration-500 img-nativa"
               />
             </div>
-            <span class="font-['Gloock'] font-black text-xs md:text-[13px] lg:text-[14px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-2">
+            <span class="font-['Gloock'] font-black text-[13px] md:text-[15px] lg:text-[17px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-2">
               PUZZLE
             </span>
           </div>
-          <span class="font-['Gloock'] font-black text-xs md:text-[13px] lg:text-[14px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-3">
+          <span class="font-['Gloock'] font-black text-[13px] md:text-[15px] lg:text-[17px] tracking-wide uppercase leading-none transition-colors gradient-steel-line-3">
             PROJECT
           </span>
         </a>
         
         {/* Separador vertical */}
-        <div class="w-px h-8 md:h-9 bg-white/15 mx-0.5 rounded-full"></div>
+        <div class="w-px h-9 md:h-11 bg-white/15 mx-0.5 rounded-full"></div>
 
         {/* HEMEROTECA — badge */}
-        <a href="/" class="brand-hemeroteca header-subtitle-hemeroteca font-['Gloock'] font-black text-[13px] md:text-[14px] lg:text-[15px] tracking-widest uppercase px-1.5 py-0.5 rounded-md transition-all duration-500 border border-transparent leading-none gradient-steel-line-3" title="Volver al Inicio de la Hemeroteca">
+        <a href="/" class="brand-hemeroteca header-subtitle-hemeroteca font-['Gloock'] font-black text-[14px] md:text-[16px] lg:text-[18px] tracking-widest uppercase px-1.5 py-0.5 rounded-md transition-all duration-500 border border-transparent leading-none gradient-steel-line-3" title="Volver al Inicio de la Hemeroteca">
           HEMEROTECA
         </a>
       </div>
     </div>
 
-    {/* ── CENTRO: Nav desktop (solo xl+) ── */}
-    <nav class="toolbar-element hidden xl:flex absolute left-1/2 -translate-x-1/2 items-center gap-5 2xl:gap-6 shrink-0 font-metadata text-[15px] xl:text-base tracking-[-0.01em] whitespace-nowrap z-0 transition-all duration-500">
+    {/* ── CENTRO: Nav desktop visible (a partir de lg / laptops y desktop) ── */}
+    <nav class="toolbar-element hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-4 xl:gap-6 shrink-0 font-metadata text-[15px] xl:text-[16.5px] tracking-[-0.01em] whitespace-nowrap z-0 transition-all duration-500">
 
       <a href="/" class="header-nav-link transition-colors py-1">Inicio</a>
       <a href="/colecciones/" class="header-nav-link transition-colors py-1">Colecciones</a>
       <a href="/archivo/" class="header-nav-link transition-colors py-1">Archivo</a>
       <a href="/about/" class="header-nav-link transition-colors py-1">About</a>
-
-      {/* Divisor */}
-      <span class="w-px h-3.5 bg-white/15 rounded-full"></span>
-
-      <a
-        href="https://ediciones.thegreatpuzzleproject.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="header-nav-link transition-colors flex items-center gap-1.5 py-1"
-        title="Editorial TGP — Archivo Editorial"
-      >
-        Editorial
-        <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
-      </a>
     </nav>
 
     {/* ── DERECHA: Acciones ── */}
     {/* Touch targets mínimo 44×44px (WCV) */}
     <div class="flex items-center gap-1 md:gap-1.5 ml-auto z-10">
-      <ThemeToggle />
+      {/* Tema día/noche: en desktop acá; en < lg vive dentro del hamburguesa */}
+      <div class="hidden lg:block"><ThemeToggle /></div>
       <BuscadorModal client:load />
 
-      {/* Botón Hamburguesa — visible en < xl */}
+      {/* Botón Hamburguesa — visible solo en móviles y tablets (< lg) */}
       <button
         id="nav-mobile-btn"
         type="button"
-        class="xl:hidden w-11 h-11 min-w-11 min-h-11 rounded-lg border border-white/12 bg-white/4 hover:bg-white/10 active:scale-95 text-[#EFEBE3] flex flex-col items-center justify-center gap-1.25 transition-all duration-300 cursor-pointer"
+        class="lg:hidden w-11 h-11 min-w-11 min-h-11 rounded-lg border border-white/12 bg-white/4 hover:bg-white/10 active:scale-95 text-[#EFEBE3] flex flex-col items-center justify-center gap-1.25 transition-all duration-300 cursor-pointer"
         aria-label="Alternar menú de navegación"
         aria-expanded="false"
         aria-controls="nav-drawer"
@@ -109,7 +96,7 @@ const { transparentUntilScroll = false } = Astro.props;
 {/* Backdrop */}
 <div
   id="nav-backdrop"
-  class="fixed inset-0 z-9980 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-400 xl:hidden"
+  class="fixed inset-0 z-9980 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-400 lg:hidden"
   aria-hidden="true"
 ></div>
 
@@ -119,7 +106,7 @@ const { transparentUntilScroll = false } = Astro.props;
   role="dialog"
   aria-modal="true"
   aria-label="Navegación principal"
-  class="fixed top-0 right-0 h-full w-[min(88vw,340px)] z-9990 xl:hidden
+  class="fixed top-0 right-0 h-full w-[min(88vw,340px)] z-9990 lg:hidden
          bg-[#0e1110]/97 backdrop-blur-2xl border-l border-white/8
          flex flex-col
          translate-x-full transition-transform duration-400 ease-in-out
@@ -163,18 +150,25 @@ const { transparentUntilScroll = false } = Astro.props;
     </a>
   </nav>
 
+  {/* ── Tema día / noche (delega en #theme-toggle-btn, sin duplicar lógica) ── */}
+  <div class="px-6 pb-2">
+    <button
+      id="drawer-theme-toggle"
+      type="button"
+      class="w-full flex items-center justify-between py-3 text-[15px] font-['Gloock'] text-[#EFEBE3]/70 hover:text-[#EFEBE3] border-b border-white/5 transition-all duration-300 cursor-pointer"
+      aria-label="Alternar modo día / noche"
+    >
+      <span>Modo día / noche</span>
+      <span class="relative w-5 h-5" aria-hidden="true">
+        <svg class="drawer-icon-sun absolute inset-0 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="drawer-icon-moon absolute inset-0 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </span>
+    </button>
+  </div>
+
   {/* ── Nav secundaria ── */}
   <div class="px-6 pt-2 pb-4">
     <p class="font-metadata text-[11px] uppercase tracking-[0.4em] text-white/25 mb-3">Plataformas</p>
-    <a
-      href="https://ediciones.thegreatpuzzleproject.com"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="drawer-nav-link group flex items-center justify-between py-3 text-[15px] font-['Gloock'] text-[#EFEBE3]/50 hover:text-[#EFEBE3]/90 border-b border-white/5 transition-all duration-300"
-    >
-      <span>Editorial TGP</span>
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40 group-hover:opacity-80 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
-    </a>
     <a
       href="https://thegreatpuzzleproject.substack.com"
       target="_blank"
@@ -209,41 +203,33 @@ const { transparentUntilScroll = false } = Astro.props;
     const header = document.getElementById('site-header');
     if (!header) return;
 
-    // ── Active links ──
-    const currentPath = window.location.pathname;
-    const allNavLinks = header.querySelectorAll('.header-nav-link');
-    
-    allNavLinks.forEach(link => {
+    // ── Active links (header + drawer) — normalización unificada ──
+    const normalizePath = (p) => (p.endsWith('/') && p !== '/' ? p.slice(0, -1) : p);
+    const currentPath = normalizePath(window.location.pathname);
+    const isActivePath = (href) => {
+      const nHref = normalizePath(href);
+      return nHref === '/' ? currentPath === '/' : currentPath.startsWith(nHref);
+    };
+
+    header.querySelectorAll('.header-nav-link').forEach(link => {
       const href = link.getAttribute('href');
-      if (href && !href.startsWith('http')) {
-        const normalizedPath = currentPath.endsWith('/') && currentPath !== '/' ? currentPath.slice(0, -1) : currentPath;
-        const normalizedHref = href.endsWith('/') && href !== '/' ? href.slice(0, -1) : href;
-        const isActive = normalizedHref === '/' ? normalizedPath === '/' : normalizedPath.startsWith(normalizedHref);
-        if (isActive) {
-          link.classList.add('active');
-          link.setAttribute('data-active', 'true');
-        } else {
-          link.classList.remove('active');
-          link.removeAttribute('data-active');
-        }
+      if (!href || href.startsWith('http')) return;
+      if (isActivePath(href)) {
+        link.classList.add('active');
+        link.setAttribute('data-active', 'true');
+      } else {
+        link.classList.remove('active');
+        link.removeAttribute('data-active');
       }
     });
 
-    // ── Drawer links active ──
-    const drawerLinks = document.querySelectorAll('.drawer-nav-link');
-    drawerLinks.forEach(link => {
+    document.querySelectorAll('.drawer-nav-link').forEach(link => {
       const href = link.getAttribute('href');
-      if (href && !href.startsWith('http')) {
-        const normalizedPath = currentPath.endsWith('/') && currentPath !== '/' ? currentPath.slice(0, -1) : currentPath;
-        const normalizedHref = href.endsWith('/') && href !== '/' ? href.slice(0, -1) : href;
-        const isActive = normalizedHref === '/' ? normalizedPath === '/' : normalizedPath.startsWith(normalizedHref);
-        if (isActive) {
-          const indicator = link.querySelector('.drawer-nav-indicator');
-          if (indicator) {
-            indicator.style.opacity = '1';
-          }
-          link.style.color = '#EFEBE3';
-        }
+      if (!href || href.startsWith('http')) return;
+      if (isActivePath(href)) {
+        const indicator = link.querySelector('.drawer-nav-indicator');
+        if (indicator) indicator.style.opacity = '1';
+        link.style.color = '#EFEBE3';
       }
     });
 
@@ -338,7 +324,9 @@ const { transparentUntilScroll = false } = Astro.props;
     const closeBtn  = document.getElementById('nav-drawer-close');
     const drawerNavLinks = document.querySelectorAll('.drawer-nav-link');
 
-    if (mobileBtn && drawer && backdrop) {
+    // Guard: setupHeader corre más de una vez (DOMContentLoaded + astro:page-load); bindear una sola vez
+    if (mobileBtn && drawer && backdrop && mobileBtn.dataset.bound !== 'true') {
+      mobileBtn.dataset.bound = 'true';
       let isDrawerOpen = false;
 
       const openDrawer = () => {
@@ -380,9 +368,23 @@ const { transparentUntilScroll = false } = Astro.props;
         });
       });
 
-      document.addEventListener('keydown', (e) => {
+      // Un solo listener de teclado vigente (evita acumulación entre inicializaciones)
+      if (window.tgpHeaderState.keyHandler) {
+        document.removeEventListener('keydown', window.tgpHeaderState.keyHandler);
+      }
+      const keyHandler = (e) => {
         if (e.key === 'Escape' && isDrawerOpen) closeDrawer();
-      });
+      };
+      document.addEventListener('keydown', keyHandler);
+      window.tgpHeaderState.keyHandler = keyHandler;
+
+      // Tema día/noche: delega en el toggle existente (sin duplicar su lógica)
+      const drawerTheme = document.getElementById('drawer-theme-toggle');
+      if (drawerTheme) {
+        drawerTheme.addEventListener('click', () => {
+          document.getElementById('theme-toggle-btn')?.click();
+        });
+      }
     }
 
     scrollHandler();
@@ -397,16 +399,17 @@ const { transparentUntilScroll = false } = Astro.props;
 </script>
 
 <style>
-  /* ── Estado base del navbar: transición fluida ── */
+  /* ── Estado base del navbar: Scrim superior permanente de alta visibilidad (estilo Netflix) ── */
   #site-header {
-    background-color: transparent;
+    background: linear-gradient(180deg, rgba(7, 7, 9, 0.90) 0%, rgba(7, 7, 9, 0.55) 55%, transparent 100%);
     border-bottom: 1px solid transparent;
     box-shadow: none;
     opacity: 1;
     transform: translateY(0);
     transition:
       transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-      background-color 0.3s ease,
+      background 0.35s ease,
+      background-color 0.35s ease,
       border-color 0.3s ease,
       backdrop-filter 0.3s ease,
       box-shadow 0.3s ease;
@@ -414,11 +417,11 @@ const { transparentUntilScroll = false } = Astro.props;
 
   /* ── Con scroll: sticky glassmorphism al navegar o scroll up ── */
   #site-header.is-scrolled {
-    background-color: rgba(14, 17, 16, 0.88);
+    background: rgba(14, 17, 16, 0.92) !important;
     border-bottom-color: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.6);
   }
 
   /* ── Scroll descendente: ocultar suavemente para lectura inmersiva ── */
@@ -450,6 +453,11 @@ const { transparentUntilScroll = false } = Astro.props;
   #nav-drawer:focus {
     outline: none;
   }
+
+  /* ── Drawer: icono de tema según modo (sol en oscuro, luna en claro) ── */
+  .drawer-icon-moon { display: none; }
+  :global([data-theme='light']) .drawer-icon-sun { display: none; }
+  :global([data-theme='light']) .drawer-icon-moon { display: block; }
 
   /* ── Nav activa en desktop ──
      (El estado .active / [data-active] se complementa en global.css) */
@@ -499,8 +507,8 @@ const { transparentUntilScroll = false } = Astro.props;
     animation: soft-pulse 3.5s ease-in-out infinite;
   }
 
-  /* ── Ocultar nav desktop en < xl ── */
-  @media (max-width: 1279px) {
+  /* ── Ocultar nav desktop en < lg (móviles y tablets) ── */
+  @media (max-width: 1023px) {
     nav.toolbar-element {
       display: none !important;
     }

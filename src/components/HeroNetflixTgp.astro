@@ -128,12 +128,12 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
 ---
 
 <section
-  class={`relative w-full min-h-[82vh] md:min-h-[86vh] lg:min-h-[90vh] flex flex-col justify-between overflow-hidden bg-[#070709] text-white select-none isolation-auto ${className}`}
+  class={`relative w-full min-h-screen md:min-h-[100svh] flex flex-col justify-between overflow-hidden bg-[#070709] text-white select-none isolation-auto ${className}`}
   aria-label={titulo}
   style={`--tgp-accent: ${accentColor};`}
 >
   {/* ═══════════════════════════════════════════════════════════════════════
-      FONDO: MATRIZ DE PORTADAS TILTED (-13.5°) EN PENUMBRA EDITORIAL
+      FONDO: MATRIZ DE PORTADAS TILTED (-13.5°) VISIBLES Y LUMINOSAS
   ═══════════════════════════════════════════════════════════════════════ */}
   <div class="absolute inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true">
     <div class="netflix-grid-stage">
@@ -174,59 +174,28 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
       </div>
     </div>
 
-    {/* Viñetas cinematográficas de alto contraste */}
+    {/* Resplandor cálido superior izquierdo (coherente con HeroSpotifyColecciones) */}
     <div
-      class={`absolute inset-0 pointer-events-none ${
-        align === "left"
-          ? "bg-[radial-gradient(ellipse_at_25%_75%,rgba(7,7,9,0.98)_0%,rgba(7,7,9,0.92)_40%,rgba(7,7,9,0.55)_70%,rgba(7,7,9,0.15)_100%)]"
-          : "bg-[radial-gradient(circle_at_center,rgba(7,7,9,0.85)_0%,rgba(7,7,9,0.95)_60%,rgba(7,7,9,0.98)_100%)]"
-      }`}
+      class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_65%_75%_at_0%_0%,rgba(224,122,95,0.45)_0%,rgba(224,122,95,0.15)_40%,transparent_72%)]"
     />
 
-    {/* Gradiente superior */}
-    <div class="absolute inset-x-0 top-0 h-36 bg-linear-to-b from-black/90 via-black/50 to-transparent pointer-events-none" />
+    {/* Degradado lateral de protección de texto: oscuro a la izquierda, completamente transparente a la derecha */}
+    <div
+      class="absolute inset-0 pointer-events-none bg-linear-to-r from-[#070709]/95 via-[#070709]/75 via-45% to-transparent to-75%"
+    />
 
-    {/* Gradiente inferior: fusión fluida hacia el catálogo */}
-    <div class="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-[#070709] via-[#070709]/80 to-transparent pointer-events-none" />
+    {/* Gradiente superior sutil para navbar */}
+    <div class="absolute inset-x-0 top-0 h-28 bg-linear-to-b from-black/70 to-transparent pointer-events-none" />
 
-    {/* Tinte atmosférico obsidiana */}
-    <div class="absolute inset-0 bg-[#070709]/30 mix-blend-multiply pointer-events-none" />
+    {/* Gradiente inferior suave (permite luz hacia abajo para el UX) */}
+    <div class="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-[#070709]/70 to-transparent pointer-events-none" />
   </div>
-
-  {/* ═══════════════════════════════════════════════════════════════════════
-      BARRA SUPERIOR: THE GREAT PUZZLE PROJECT CON IGNICIÓN NEÓN
-  ═══════════════════════════════════════════════════════════════════════ */}
-  <header class="relative z-20 w-full px-6 sm:px-10 md:px-14 lg:px-16 pt-6 sm:pt-8 md:pt-10 flex items-center justify-between">
-    {/* Logotipo Brand con 'PROJECT' destacado e ignición de luz */}
-    <a
-      href={brandHref}
-      class="group inline-flex items-center gap-2 sm:gap-3 no-underline focus:outline-none"
-      aria-label="The Great Puzzle Project"
-    >
-      <span class="brand-title font-['Cinzel'] font-black text-2xl sm:text-3xl md:text-4xl tracking-[0.2em] text-[#E50914] drop-shadow-[0_0_25px_rgba(229,9,20,0.7)] group-hover:drop-shadow-[0_0_35px_rgba(229,9,20,0.95)] transition-all duration-300">
-        {brandText}
-      </span>
-      <span class="font-['Outfit'] font-black text-[10px] sm:text-xs tracking-[0.35em] text-[#ff4d58] uppercase px-2 sm:px-2.5 py-0.5 rounded-full bg-[#E50914]/20 border border-[#E50914]/50 shadow-[0_0_15px_rgba(229,9,20,0.5)] animate-pulse">
-        PROJECT
-      </span>
-    </a>
-
-    {/* Botón de acción rápida superior derecho */}
-    <div class="flex items-center gap-4">
-      <a
-        href={secondaryCtaHref}
-        class="inline-flex items-center justify-center px-5 sm:px-6 py-2 sm:py-2.5 rounded-full bg-white text-black font-['Outfit'] font-bold text-xs sm:text-sm tracking-wide shadow-md hover:bg-stone-200 hover:scale-[1.03] active:scale-95 transition-all duration-300 no-underline cursor-pointer"
-      >
-        {secondaryCtaText}
-      </a>
-    </div>
-  </header>
 
   {/* ═══════════════════════════════════════════════════════════════════════
       CONTENIDO HERO: H1 GLOOCK IMPACT CON TEXT HIGHLIGHT ANIMATION
   ═══════════════════════════════════════════════════════════════════════ */}
   <div
-    class={`relative z-20 w-full px-6 sm:px-10 md:px-14 lg:px-16 pb-14 sm:pb-18 md:pb-22 lg:pb-26 my-auto flex flex-col ${
+    class={`relative z-20 w-full px-6 sm:px-10 md:px-14 lg:px-16 pt-32 sm:pt-36 md:pt-40 lg:pt-44 pb-16 sm:pb-20 my-auto flex flex-col ${
       align === "left"
         ? "items-start text-left max-w-3xl"
         : "items-center text-center max-w-4xl mx-auto"
@@ -264,22 +233,31 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
       {bajada}
     </p>
 
-    {/* Botón Principal CTA estilo Netflix Pill con Chevron */}
-    <div class="mt-8 sm:mt-10 flex items-center gap-4">
+    {/* Acciones principales estilo Pill con coherencia original */}
+    <div class="mt-7 sm:mt-8 flex flex-wrap items-center gap-3.5 sm:gap-4">
       <a
         href={ctaHref}
-        class="group relative inline-flex items-center justify-center gap-3 px-8 sm:px-10 py-3.5 sm:py-4 md:py-4.5 rounded-md sm:rounded-lg bg-[#E50914] text-white font-['Outfit'] font-bold text-base sm:text-lg md:text-xl tracking-wide shadow-[0_0_35px_rgba(229,9,20,0.5)] hover:bg-[#b80710] hover:shadow-[0_0_55px_rgba(229,9,20,0.85)] hover:scale-[1.03] active:scale-95 transition-all duration-300 no-underline cursor-pointer"
+        class="group relative inline-flex items-center justify-center gap-2.5 px-8 sm:px-9 py-3.5 sm:py-4 rounded-full bg-[#E50914] text-white font-['Outfit'] font-bold text-base sm:text-lg tracking-wide shadow-[0_0_30px_rgba(229,9,20,0.45)] hover:bg-[#ff1e27] hover:scale-[1.03] active:scale-95 transition-all duration-300 no-underline cursor-pointer"
       >
         <span>{ctaText}</span>
-        <span class="text-xl sm:text-2xl font-light leading-none transition-transform duration-300 group-hover:translate-x-1.5">
+        <span class="text-xl font-light leading-none transition-transform duration-300 group-hover:translate-x-1.5">
           &#8250;
         </span>
       </a>
+
+      {secondaryCtaText && (
+        <a
+          href={secondaryCtaHref}
+          class="inline-flex items-center justify-center px-7 sm:px-8 py-3.5 sm:py-4 rounded-full bg-black/40 hover:bg-black/60 text-white font-['Outfit'] font-bold text-base sm:text-lg tracking-wide border border-white/40 hover:border-white hover:scale-[1.03] active:scale-95 backdrop-blur-md transition-all duration-300 no-underline cursor-pointer shadow-md"
+        >
+          {secondaryCtaText}
+        </a>
+      )}
     </div>
   </div>
 
   {/* Indicador de scroll sutil hacia el catálogo */}
-  <div class="relative z-20 pb-4 flex justify-center w-full pointer-events-none opacity-60">
+  <div class="relative z-20 pb-6 sm:pb-8 flex justify-center w-full pointer-events-none opacity-60">
     <span class="font-['Outfit'] text-[11px] uppercase tracking-[0.3em] text-white/50 flex items-center gap-2 animate-bounce">
       <span>Deslizar para ver el catálogo</span>
       <span>↓</span>
@@ -288,7 +266,7 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
 </section>
 
 <style>
-  /* ── MATRIZ DE PÓSTERES INCLINADA A -13.5° ── */
+  /* ── MATRIZ DE PÓSTERES INCLINADA A -13.5° (LUMINOSA Y VISIBLE) ── */
   .netflix-grid-stage {
     position: absolute;
     top: 50%;
@@ -299,7 +277,7 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
     gap: 1.25rem;
     transform: translate(-46%, -50%) rotate(-13.5deg) scale(1.15);
     transform-origin: center center;
-    filter: brightness(0.68) contrast(1.12) saturate(0.85);
+    filter: brightness(1.02) contrast(1.05) saturate(1.0);
   }
 
   @media (min-width: 1024px) {
@@ -329,11 +307,19 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
     flex-shrink: 0;
     width: clamp(140px, 15vw, 220px);
     aspect-ratio: 2 / 3;
-    border-radius: 0.65rem;
+    border-radius: 0.85rem;
     overflow: hidden;
     background-color: #121413;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+
+  .netflix-card:hover {
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 18px 36px -4px rgba(0, 0, 0, 0.7);
+    border-color: rgba(255, 255, 255, 0.25);
+    z-index: 10;
   }
 
   .netflix-card img {

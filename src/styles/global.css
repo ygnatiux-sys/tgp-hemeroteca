@@ -172,7 +172,7 @@ html, body {
 }
 
 .gradient-steel-line-2 {
-  background: linear-gradient(180deg, #CBD5E1 0%, #718096 100%);
+  background: linear-gradient(180deg, #FFFFFF 0%, #CBD5E1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -180,7 +180,7 @@ html, body {
 }
 
 .gradient-steel-line-3 {
-  background: linear-gradient(180deg, #718096 0%, #334155 100%);
+  background: linear-gradient(180deg, #E2E8F0 0%, #94A3B8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
