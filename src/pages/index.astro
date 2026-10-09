@@ -17,6 +17,7 @@ import SpotlightHero from '../components/SpotlightHero.astro';
 import CinematicGrid from '../components/CinematicGrid.astro';
 import MubiBlockCinematic, { type MubiCinematicItem } from '../components/MubiBlockCinematic.astro';
 import TriplicoRevelacion, { type TriplicoPost } from '../components/TriplicoRevelacion.astro';
+import ScrollNarrative from '../components/ScrollNarrative.astro';
 import {
   type EssayEntry,
   getPublishableEssays,
@@ -449,6 +450,12 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
         </section>
       )}
 
+      {/* ═══════════════════════════════════════════════════════════════════
+          INTERLUDIO EDITORIAL: STICKY SCROLL NARRATIVE (MEGALITOS)
+      ═══════════════════════════════════════════════════════════════════ */}
+      <div class="w-screen relative left-1/2 -translate-x-1/2 -my-12 sm:-my-16 md:-my-24 overflow-x-hidden">
+        <ScrollNarrative />
+      </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
           BLOQUE 4: COLECCIONES — BlockCarousel por bloques de 3 (MUBI style)

@@ -1,0 +1,255 @@
+---
+/**
+ * ScrollNarrative.astro
+ * Sticky Scroll Narrative de 3 pasos a pantalla completa.
+ * Estilo editorial de alta gama (National Geographic / Apple / The Great Puzzle).
+ */
+
+interface Step {
+  id: string;
+  badge?: string;
+  image: string;
+  alt: string;
+  text: string;
+  ctaText?: string;
+  ctaHref?: string;
+}
+
+interface Props {
+  steps?: Step[];
+  className?: string;
+}
+
+const defaultSteps: Step[] = [
+  {
+    id: "step-1",
+    badge: "CAPÍTULO I · MESOAMÉRICA",
+    image: "/images/megalitos/olmeca.jpg",
+    alt: "Cabeza Olmeca colosal sobre fondo oscuro",
+    text: "Un mismo lenguaje, continentes separados por océanos.",
+  },
+  {
+    id: "step-2",
+    badge: "CAPÍTULO II · RAPA NUI",
+    image: "/images/megalitos/moai.jpg",
+    alt: "Moái monolítico recortado contra el océano",
+    text: "La misma obsesión monolítica.",
+  },
+  {
+    id: "step-3",
+    badge: "CAPÍTULO III · ANATOLIA",
+    image: "/images/megalitos/gobekli-tepe.jpg",
+    alt: "Pilar megalítico grabado en Göbekli Tepe",
+    text: "El rompecabezas original.",
+    ctaText: "Explorar el Dossier Megalítico",
+    ctaHref: "/colecciones/arqueosemiotica/",
+  },
+];
+
+const { steps = defaultSteps, className = "" } = Astro.props;
+---
+
+<section
+  id="scroll-narrative-container"
+  class={`relative w-full h-[300vh] bg-black ${className}`}
+  data-scroll-narrative
+>
+  {/* Contenedor Sticky a Pantalla Completa */}
+  <div class="sticky top-0 h-screen w-full overflow-hidden bg-black select-none">
+    
+    {/* Capas narrativas superpuestas */}
+    {steps.map((step, index) => (
+      <div
+        class={`narrative-layer absolute inset-0 w-full h-full flex flex-col items-center justify-center transition-opacity duration-400 ease-out will-change-[opacity] ${index === 0 ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        data-step-index={index}
+      >
+        {/* Imagen de fondo con escala dinámica y aceleración GPU */}
+        <img
+          src={step.image}
+          alt={step.alt}
+          loading={index === 0 ? "eager" : "lazy"}
+          decoding="async"
+          class="narrative-img absolute inset-0 w-full h-full object-cover object-center filter brightness-95 will-change-transform transition-transform duration-500 ease-out origin-center"
+        />
+
+        {/* Overlay editorial: Oscurecimiento 60% + viñeta cinematográfica */}
+        <div class="absolute inset-0 bg-black/60 pointer-events-none" />
+        <div class="absolute inset-0 bg-radial-[circle_at_center,transparent_30%,rgba(0,0,0,0.85)_100%] pointer-events-none" />
+
+        {/* Contenido textual centrado con elevación cinética */}
+        <div class={`narrative-content relative z-10 max-w-4xl mx-auto px-6 sm:px-10 text-center flex flex-col items-center gap-6 transition-all duration-500 ease-out will-change-[transform,opacity] ${index === 0 ? "translate-y-0 opacity-100 scale-100" : "translate-y-8 opacity-0 scale-95"}`}>
+          {step.badge && (
+            <span class="inline-block font-metadata text-[10px] sm:text-xs tracking-[0.35em] uppercase text-stone-400/90 font-medium py-1 px-3.5 rounded-full border border-stone-400/20 bg-stone-900/40 backdrop-blur-md">
+              {step.badge}
+            </span>
+          )}
+
+          <h2 class="font-serif text-stone-200 text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.12] tracking-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] max-w-3xl">
+            {step.text}
+          </h2>
+
+          {step.ctaText && (
+            <div class="pt-4 sm:pt-6">
+              <a
+                href={step.ctaHref || "#"}
+                class="group relative inline-flex items-center gap-4 px-8 sm:px-12 py-4 sm:py-5 rounded-full bg-stone-100 text-stone-950 font-metadata text-xs sm:text-sm font-bold uppercase tracking-[0.25em] shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:bg-white hover:scale-[1.03] active:scale-95 transition-all duration-300 pointer-events-auto cursor-pointer"
+              >
+                <span>{step.ctaText}</span>
+                <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+    ))}
+
+    {/* Indicador de progreso de lectura editorial (estilo Apple / NatGeo) */}
+    <aside
+      aria-label="Progreso narrativo"
+      class="absolute bottom-8 sm:bottom-12 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4 px-5 py-2.5 rounded-full bg-black/50 backdrop-blur-md border border-white/10"
+    >
+      {steps.map((_, idx) => (
+        <div class="flex items-center gap-2">
+          <span
+            class={`narrative-dot-label font-mono text-[10px] tracking-widest transition-colors duration-300 ${idx === 0 ? "text-stone-200 font-bold" : "text-stone-500"}`}
+            data-dot-label={idx}
+          >
+            0{idx + 1}
+          </span>
+          <div
+            class="narrative-bar w-8 sm:w-12 h-1 rounded-full bg-white/20 overflow-hidden"
+          >
+            <div
+              class="narrative-bar-fill h-full bg-stone-200 transition-[width] duration-150 ease-out"
+              data-dot-fill={idx}
+              style={idx === 0 ? "width: 100%;" : "width: 0%;"}
+            />
+          </div>
+        </div>
+      ))}
+    </aside>
+
+  </div>
+</section>
+
+<script>
+  function setupScrollNarrative() {
+    const container = document.getElementById("scroll-narrative-container");
+    if (!container) return;
+
+    const layers = container.querySelectorAll<HTMLElement>(".narrative-layer");
+    const dotLabels = container.querySelectorAll<HTMLElement>("[data-dot-label]");
+    const dotFills = container.querySelectorAll<HTMLElement>("[data-dot-fill]");
+    const totalSteps = layers.length;
+    if (totalSteps === 0) return;
+
+    let ticking = false;
+    let lastActiveIndex = -1;
+
+    function update() {
+      ticking = false;
+      const rect = container.getBoundingClientRect();
+      const scrollableDistance = rect.height - window.innerHeight;
+
+      if (scrollableDistance <= 0) return;
+
+      // Progreso normalizado entre 0 y 1 a lo largo de los 300vh
+      const rawProgress = -rect.top / scrollableDistance;
+      const progress = Math.min(Math.max(rawProgress, 0), 1);
+
+      // Determinación de paso según requisitos:
+      // 0.00 - 0.33: Paso 1
+      // 0.33 - 0.66: Paso 2
+      // 0.66 - 1.00: Paso 3
+      let activeIndex = 0;
+      if (progress < 0.333) {
+        activeIndex = 0;
+      } else if (progress < 0.666) {
+        activeIndex = 1;
+      } else {
+        activeIndex = 2;
+      }
+
+      // Progreso local continuo dentro del paso activo (0 a 1)
+      const stepStart = activeIndex * (1 / totalSteps);
+      const stepEnd = (activeIndex + 1) * (1 / totalSteps);
+      const localProgress = Math.min(Math.max((progress - stepStart) / (stepEnd - stepStart), 0), 1);
+
+      // Transición viva entre capas: Escala Ken Burns e elevación de texto
+      layers.forEach((layer, idx) => {
+        const img = layer.querySelector<HTMLElement>(".narrative-img");
+        const content = layer.querySelector<HTMLElement>(".narrative-content");
+
+        if (idx === activeIndex) {
+          layer.classList.remove("opacity-0", "pointer-events-none");
+          layer.classList.add("opacity-100", "pointer-events-auto");
+
+          if (content) {
+            content.classList.remove("translate-y-8", "-translate-y-8", "opacity-0", "scale-95");
+            content.classList.add("translate-y-0", "opacity-100", "scale-100");
+          }
+
+          if (img) {
+            // Micro-zoom dinámico asistido por hardware (1.0 a 1.07)
+            const scale = 1.0 + localProgress * 0.07;
+            img.style.transform = `scale(${scale.toFixed(4)})`;
+          }
+        } else {
+          layer.classList.remove("opacity-100", "pointer-events-auto");
+          layer.classList.add("opacity-0", "pointer-events-none");
+
+          if (content) {
+            content.classList.remove("translate-y-0", "opacity-100", "scale-100");
+            content.classList.add(idx < activeIndex ? "-translate-y-8" : "translate-y-8", "opacity-0", "scale-95");
+          }
+
+          if (img) {
+            img.style.transform = idx < activeIndex ? "scale(1.07)" : "scale(1.0)";
+          }
+        }
+      });
+
+      // Actualizar indicadores numéricos y barras de progreso fluidas
+      dotLabels.forEach((label, idx) => {
+        if (idx === activeIndex) {
+          label.classList.remove("text-stone-500");
+          label.classList.add("text-stone-200", "font-bold");
+        } else {
+          label.classList.remove("text-stone-200", "font-bold");
+          label.classList.add("text-stone-500");
+        }
+      });
+
+      dotFills.forEach((fill, idx) => {
+        if (idx < activeIndex) {
+          fill.style.width = "100%";
+        } else if (idx === activeIndex) {
+          fill.style.width = `${(localProgress * 100).toFixed(1)}%`;
+        } else {
+          fill.style.width = "0%";
+        }
+      });
+    }
+
+    function onScroll() {
+      if (!ticking) {
+        requestAnimationFrame(update);
+        ticking = true;
+      }
+    }
+
+    // Inicialización inmediata
+    update();
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+  }
+
+  // Soporte para carga inicial y navegación View Transitions
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupScrollNarrative);
+  } else {
+    setupScrollNarrative();
+  }
+  document.addEventListener("astro:page-load", setupScrollNarrative);
+</script>
