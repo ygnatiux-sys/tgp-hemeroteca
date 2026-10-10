@@ -3,14 +3,17 @@
  * src/components/AlternativeScrollNarrative.astro
  * ─────────────────────────────────────────────────────────────────────────────
  * NUEVA COLECCIÓN: 'ALTERNATIVE' (Historia Profunda / Archivo No Oficial)
- * Sticky Scroll Narrative a pantalla completa (full bleed).
+ * Sticky Scroll Narrative a pantalla completa (full bleed) — 4 CAPÍTULOS
  *
- * Integra en una secuencia fluida los 3 efectos cinemáticos de laboratorio:
- * 1. DERINKUYU: Paralaje de Abismo (Profundidad Z con Clash Display y paleta Cinabrio/Carbón).
- * 2. DIQUÍS: Fractura lateral izquierda con desintegración en niebla (Fraunces).
- * 3. OLMECAS: Fractura tectónica geológica centrada con fisura de basalto/oro.
+ * 1. DERINKUYU: Paralaje de Abismo (Profundidad Z con Clash Display).
+ * 2. BARABAR: Resonancia Sónica y Refracción Espejo (The Sonic Reflection con Syne 900).
+ * 3. DIQUÍS: Fractura lateral izquierda con desintegración en niebla (Fraunces).
+ * 4. OLMECAS: Fractura tectónica geológica centrada con fisura de basalto/oro y CTA.
+ *
+ * Glassmorfismo refinado al 5% de opacidad de fondo en elementos flotantes y franjas.
  */
 import imgDerinkuyu from "../assets/alternativa/derinkuyu.jpg";
+import imgBarabar from "../assets/alternativa/barabar.jpg";
 import imgDiquis from "../assets/alternativa/esfera-diquis.jpg";
 import imgOlmeca from "../assets/alternativa/olmeca.jpg";
 
@@ -31,19 +34,19 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
 />
 <link
   rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,900,0,0&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,900,0,0&family=Syne:wght@800;900&display=swap"
 />
 
 <section
   id="alt-narrative-container"
-  class={`relative w-full h-[300vh] bg-[#0a0a0a] text-white select-none ${className}`}
+  class={`relative w-full h-[400vh] bg-[#0a0a0a] text-white select-none ${className}`}
   data-autoplay={autoplayDuration}
   aria-label="Colección Alternative"
 >
   <!-- Contenedor Sticky a Pantalla Completa (Full Bleed) -->
   <div class="sticky top-0 h-screen w-full overflow-hidden bg-[#0a0a0a]">
     
-    <!-- HEADER EDITORIAL DE LA COLECCIÓN (Superpuesto en la parte superior) -->
+    <!-- HEADER EDITORIAL DE LA COLECCIÓN (Glassmorfismo al 5%) -->
     <header class="absolute top-5 sm:top-7 inset-x-0 z-30 flex items-center justify-between px-5 sm:px-10 pointer-events-none">
       <div class="flex items-center gap-2.5">
         <span class="w-2 h-2 rounded-full bg-[#E69A46] shadow-[0_0_10px_#E69A46] animate-pulse"></span>
@@ -52,11 +55,11 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
         </span>
       </div>
 
-      <!-- Indicadores de paso interactivos -->
-      <nav class="flex items-center gap-2 pointer-events-auto" aria-label="Navegación de colección">
+      <!-- Indicadores de paso interactivos con glassmorfismo al 5% -->
+      <nav class="flex items-center gap-1.5 sm:gap-2 pointer-events-auto" aria-label="Navegación de colección">
         <button
           type="button"
-          class="alt-step-btn px-2.5 sm:px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-black/40 backdrop-blur-md text-stone-400 hover:text-white is-active"
+          class="alt-step-btn px-2.5 sm:px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-white/5 backdrop-blur-md text-stone-400 hover:text-white is-active"
           data-step="0"
           title="Derinkuyu"
         >
@@ -64,19 +67,27 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
         </button>
         <button
           type="button"
-          class="alt-step-btn px-2.5 sm:px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-black/40 backdrop-blur-md text-stone-400 hover:text-white"
+          class="alt-step-btn px-2.5 sm:px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-white/5 backdrop-blur-md text-stone-400 hover:text-white"
           data-step="1"
-          title="Diquís"
+          title="Barabar"
         >
-          II · Diquís
+          II · Barabar
         </button>
         <button
           type="button"
-          class="alt-step-btn px-2.5 sm:px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-black/40 backdrop-blur-md text-stone-400 hover:text-white"
+          class="alt-step-btn px-2.5 sm:px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-white/5 backdrop-blur-md text-stone-400 hover:text-white"
           data-step="2"
+          title="Diquís"
+        >
+          III · Diquís
+        </button>
+        <button
+          type="button"
+          class="alt-step-btn px-2.5 sm:px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-white/5 backdrop-blur-md text-stone-400 hover:text-white"
+          data-step="3"
           title="Olmecas"
         >
-          III · Olmecas
+          IV · Olmecas
         </button>
       </nav>
     </header>
@@ -98,16 +109,14 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
         />
       </div>
 
-      <!-- Iluminación: Viñeta Carbón + Resplandor Cálido de Antorcha -->
       <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_50%_50%,rgba(10,10,10,0.2)_0%,rgba(10,10,10,0.65)_60%,rgba(10,10,10,0.96)_95%)]"></div>
       <div class="absolute inset-0 pointer-events-none mix-blend-screen bg-[radial-gradient(circle_at_66%_72%,rgba(217,99,63,0.24)_0%,rgba(184,58,36,0.12)_28%,transparent_60%)]"></div>
       <div class="alt-grain absolute inset-0 pointer-events-none"></div>
       <div class="alt-ash absolute inset-0 pointer-events-none z-10" aria-hidden="true"></div>
 
-      <!-- Cámara 3D -->
       <div class="alt-3d-viewport absolute inset-0 flex items-center justify-center pointer-events-none z-20 px-4">
         <div class="alt-derinkuyu-chamber relative flex flex-col items-center justify-center text-center max-w-7xl">
-          <span class="alt-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#E69A46] py-0.5 px-3 rounded-full border border-[#E69A46]/30 bg-black/60 backdrop-blur-md opacity-0">
+          <span class="alt-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#E69A46] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0">
             Anatolia Subterránea · Refugio Primordial
           </span>
           <h2 class="alt-derin-h1 text-[clamp(3.8rem,15vw,15rem)] font-bold leading-[0.86] tracking-[-0.035em] uppercase whitespace-nowrap text-transparent opacity-0">
@@ -121,11 +130,59 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
     </div>
 
     <!-- ══════════════════════════════════════════════════════════════════════
-         PASO 1: DIQUÍS — FRACTURA LATERAL & DESINTEGRACIÓN
+         PASO 1: BARABAR — RESONANCIA SÓNICA & REFRACCIÓN ESPEJO
     ══════════════════════════════════════════════════════════════════════ -->
     <div
       class="alt-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none"
       data-layer-index="1"
+    >
+      <div class="alt-bg-wrap absolute inset-0 overflow-hidden">
+        <img
+          src={imgBarabar.src}
+          alt="Bóveda de granito pulido espejo de las Cuevas de Barabar"
+          class="alt-img absolute inset-0 w-full h-full object-cover object-[center_55%] brightness-[0.85] contrast-[1.22] will-change-transform"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+
+      <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_50%_50%,rgba(6,7,8,0.15)_0%,rgba(6,7,8,0.6)_65%,rgba(6,7,8,0.95)_98%)]"></div>
+      <div class="absolute inset-0 pointer-events-none mix-blend-screen bg-[radial-gradient(circle_at_43%_72%,rgba(243,156,18,0.3)_0%,rgba(211,84,0,0.14)_22%,transparent_55%)]"></div>
+      <div class="alt-grain absolute inset-0 pointer-events-none"></div>
+
+      <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none px-4">
+        <div class="alt-barabar-chamber relative flex flex-col items-center text-center max-w-7xl">
+          <span class="alt-badge inline-flex items-center gap-2 mb-4 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#e5e5e5] py-1 px-3.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#f39c12] shadow-[0_0_8px_#f39c12]"></span>
+            Cámara Subterránea de Bihar · Acústica de Granito
+          </span>
+
+          <div class="alt-barabar-stack relative inline-block">
+            <span class="alt-barabar-echo alt-echo-1 absolute inset-0 text-transparent font-black uppercase text-[clamp(3.6rem,15vw,14rem)] leading-[0.86] tracking-[-0.01em] opacity-0" aria-hidden="true">Barabar</span>
+            <span class="alt-barabar-echo alt-echo-2 absolute inset-0 text-transparent font-black uppercase text-[clamp(3.6rem,15vw,14rem)] leading-[0.86] tracking-[-0.01em] opacity-0" aria-hidden="true">Barabar</span>
+            <span class="alt-barabar-echo alt-echo-3 absolute inset-0 text-transparent font-black uppercase text-[clamp(3.6rem,15vw,14rem)] leading-[0.86] tracking-[-0.01em] opacity-0" aria-hidden="true">Barabar</span>
+            <span class="alt-barabar-echo alt-echo-4 absolute inset-0 text-transparent font-black uppercase text-[clamp(3.6rem,15vw,14rem)] leading-[0.86] tracking-[-0.01em] opacity-0" aria-hidden="true">Barabar</span>
+
+            <h2 class="alt-barabar-solid relative m-0 font-black uppercase whitespace-nowrap text-[clamp(3.6rem,15vw,14rem)] leading-[0.86] tracking-[-0.01em] text-transparent opacity-0 overflow-hidden">
+              Barabar
+              <span class="alt-barabar-glint absolute inset-0 pointer-events-none" aria-hidden="true"></span>
+            </h2>
+          </div>
+
+          <p class="alt-barabar-sub mt-6 font-sans text-[clamp(0.85rem,2.2vw,1.35rem)] tracking-[0.24em] uppercase text-transparent opacity-0">
+            <span class="inline-block w-6 h-[1.5px] bg-[#f39c12] mr-2 align-middle"></span>
+            El reflejo imposible de una tecnología perdida
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         PASO 2: DIQUÍS — FRACTURA LATERAL & DESINTEGRACIÓN
+    ══════════════════════════════════════════════════════════════════════ -->
+    <div
+      class="alt-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none"
+      data-layer-index="2"
     >
       <div class="alt-bg-wrap absolute inset-0 overflow-hidden">
         <img
@@ -140,10 +197,9 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
       <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_70%_50%,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.72)_75%),linear-gradient(90deg,rgba(0,0,0,0.85)_0%,rgba(0,0,0,0.4)_50%,rgba(0,0,0,0.7)_100%)]"></div>
       <div class="alt-grain absolute inset-0 pointer-events-none"></div>
 
-      <!-- Escenario lateral izquierdo -->
       <div class="absolute inset-0 flex items-center justify-start z-20 pointer-events-none pl-6 sm:pl-14 md:pl-20 pr-6">
         <div class="alt-diquis-slot relative flex flex-col items-start text-left max-w-5xl">
-          <span class="alt-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#FF4D55] py-0.5 px-3 rounded-full border border-[#FF4D55]/30 bg-black/60 backdrop-blur-md opacity-0">
+          <span class="alt-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#FF4D55] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0">
             Costa Rica · Geometría Esférica Sagrada
           </span>
 
@@ -163,11 +219,11 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
     </div>
 
     <!-- ══════════════════════════════════════════════════════════════════════
-         PASO 2: OLMECAS — FRACTURA TECTÓNICA CENTRAL & CTA
+         PASO 3: OLMECAS — FRACTURA TECTÓNICA CENTRAL & CTA
     ══════════════════════════════════════════════════════════════════════ -->
     <div
       class="alt-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none"
-      data-layer-index="2"
+      data-layer-index="3"
     >
       <div class="alt-bg-wrap absolute inset-0 overflow-hidden">
         <img
@@ -182,10 +238,9 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
       <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.6)_75%,rgba(0,0,0,0.94)_100%)]"></div>
       <div class="alt-grain absolute inset-0 pointer-events-none"></div>
 
-      <!-- Escenario centrado -->
       <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none px-4">
         <div class="alt-olmeca-slot relative flex flex-col items-center text-center max-w-6xl">
-          <span class="alt-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#F0C284] py-0.5 px-3 rounded-full border border-[#F0C284]/30 bg-black/60 backdrop-blur-md opacity-0">
+          <span class="alt-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#F0C284] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0">
             Mesoamérica · Escultura Colosal de Basalto
           </span>
 
@@ -201,7 +256,6 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
             </p>
           </div>
 
-          <!-- CTA de acceso a la colección -->
           <div class="alt-cta-wrap mt-8 opacity-0 pointer-events-auto">
             <a
               href="/colecciones/arqueosemiotica/"
@@ -215,7 +269,7 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
       </div>
     </div>
 
-    <!-- Indicador de Scroll en la base -->
+    <!-- Indicador de Scroll -->
     <div class="absolute bottom-5 inset-x-0 z-30 flex flex-col items-center pointer-events-none">
       <span class="font-mono text-[8.5px] tracking-[0.3em] uppercase text-stone-400 opacity-70">
         Desliza para explorar el archivo
@@ -245,6 +299,45 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
     transform-style: preserve-3d;
   }
 
+  /* BARABAR */
+  .alt-barabar-solid,
+  .alt-barabar-echo {
+    font-family: 'Syne', sans-serif;
+  }
+
+  .alt-barabar-solid {
+    background: linear-gradient(180deg, #ffffff 0%, #e8edf1 26%, #b0b7bd 62%, #6e777f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.98)) drop-shadow(0 0 45px rgba(229, 229, 229, 0.28));
+  }
+
+  .alt-echo-1 { -webkit-text-stroke: 1.5px rgba(243, 156, 18, 0.55); }
+  .alt-echo-2 { -webkit-text-stroke: 1.5px rgba(229, 229, 229, 0.7); }
+  .alt-echo-3 { -webkit-text-stroke: 1.5px rgba(176, 183, 189, 0.6); }
+  .alt-echo-4 { -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.4); }
+
+  .alt-barabar-glint {
+    background: linear-gradient(
+      110deg,
+      transparent 18%,
+      rgba(255, 255, 255, 0.95) 45%,
+      rgba(243, 156, 18, 0.8) 50%,
+      rgba(255, 255, 255, 0.95) 55%,
+      transparent 82%
+    );
+    transform: translateX(-160%) skewX(-24deg);
+    mix-blend-mode: color-dodge;
+  }
+
+  .alt-barabar-sub {
+    background: linear-gradient(180deg, #fde3a7 0%, #f39c12 55%, #d35400 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 25px rgba(243, 156, 18, 0.45));
+  }
+
+  /* DIQUÍS */
   .alt-diquis-h1 {
     font-family: 'Fraunces', serif;
     font-variation-settings: 'opsz' 9, 'SOFT' 0, 'WONK' 0;
@@ -257,6 +350,7 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
     filter: drop-shadow(0 14px 38px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 35px rgba(229, 9, 20, 0.4));
   }
 
+  /* OLMECAS */
   .alt-olmeca-h1 {
     font-family: 'Fraunces', serif;
     font-variation-settings: 'opsz' 9, 'SOFT' 0, 'WONK' 0;
@@ -284,9 +378,14 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
     );
   }
 
+  /* FRANJA GLASSMÓRFICA AL 5% DE FONDO (Elimina la franja opaca) */
   .alt-band {
-    background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.98) 50%, rgba(0,0,0,0.55) 100%);
-    box-shadow: inset 0 0 40px rgba(0,0,0,1);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
   }
 
   /* Grano analógico A24 */
@@ -339,9 +438,9 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
     let currentIndex = 0;
     let autoTimer: any = null;
     let isVisible = false;
-    let stepTimelines: Array<gsap.core.Timeline | null> = [null, null, null];
+    let stepTimelines: Array<gsap.core.Timeline | null> = [null, null, null, null];
 
-    // Generar partículas de ceniza para Derinkuyu
+    // Partículas de ceniza para Derinkuyu
     const ashContainer = container.querySelector<HTMLElement>(".alt-ash");
     if (ashContainer) {
       ashContainer.innerHTML = "";
@@ -372,13 +471,12 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
 
     // DISPARADORES CINEMÁTICOS PARTICULARES POR PASO
     function playStepAnimation(stepIndex: number) {
-      // Matar timeline previa de este paso si existe
       stepTimelines[stepIndex]?.kill();
       const tl = gsap.timeline();
       stepTimelines[stepIndex] = tl;
 
       if (stepIndex === 0) {
-        // ── PASO 0: DERINKUYU (Paralaje de Abismo Z) ──
+        // ── PASO 0: DERINKUYU (Paralaje Z) ──
         const layer = layers[0];
         const h1 = layer.querySelector<HTMLElement>(".alt-derin-h1");
         const sub = layer.querySelector<HTMLElement>(".alt-derin-sub");
@@ -395,16 +493,58 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
           .to(h1, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, "-=0.4")
           .to({}, { duration: 0.7 })
           .addLabel("drop")
-          // Título cae al abismo tridimensional
           .to(h1, { scale: 0.46, z: -480, y: 30, opacity: 0.14, filter: "blur(9px)", duration: 2.6, ease: "power3.inOut" }, "drop")
-          // Avance sutil de cámara
           .to(img, { scale: 1.07, duration: 3.0, ease: "power2.out" }, "drop")
-          // Subtítulo emerge a la superficie
           .to(sub, { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.8, ease: "power2.out" }, "drop+=0.8");
 
       } else if (stepIndex === 1) {
-        // ── PASO 1: DIQUÍS (Fractura Lateral con Desintegración) ──
+        // ── PASO 1: BARABAR (Resonancia Sónica y Glint de Espejo) ──
         const layer = layers[1];
+        const badge = layer.querySelector<HTMLElement>(".alt-badge");
+        const solid = layer.querySelector<HTMLElement>(".alt-barabar-solid");
+        const glint = layer.querySelector<HTMLElement>(".alt-barabar-glint");
+        const sub = layer.querySelector<HTMLElement>(".alt-barabar-sub");
+        const echoes = layer.querySelectorAll<HTMLElement>(".alt-barabar-echo");
+        if (!badge || !solid || !glint || !sub || echoes.length === 0) return;
+
+        gsap.set(badge, { opacity: 0, y: -15 });
+        gsap.set(solid, { opacity: 0, scale: 0.98 });
+        gsap.set(glint, { xPercent: -180 });
+        gsap.set(sub, { opacity: 0, y: 35, filter: "blur(14px)" });
+        echoes.forEach((echo) => {
+          gsap.set(echo, { opacity: 0, scale: 1, x: 0, y: 0 });
+        });
+
+        tl.to(badge, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" });
+        tl.addLabel("resonance");
+
+        echoes.forEach((echo, idx) => {
+          const spread = (idx + 1) * 16;
+          tl.fromTo(
+            echo,
+            { opacity: 0, scale: 1 + (idx + 1) * 0.04, x: (idx % 2 === 0 ? -1 : 1) * spread },
+            { opacity: 0.85 - idx * 0.15, duration: 0.45, ease: "power2.out" },
+            "resonance"
+          ).to(
+            echo,
+            { x: (idx % 2 === 0 ? 1 : -1) * (spread * 0.7), duration: 0.08, repeat: 6, yoyo: true, ease: "sine.inOut" },
+            "resonance+=0.2"
+          );
+        });
+
+        tl.addLabel("collapse", "resonance+=0.8");
+
+        echoes.forEach((echo) => {
+          tl.to(echo, { x: 0, scale: 1, opacity: 0, duration: 0.5, ease: "power3.in" }, "collapse");
+        });
+
+        tl.to(solid, { opacity: 1, scale: 1, duration: 0.75, ease: "power3.out" }, "collapse+=0.15")
+          .to(glint, { xPercent: 180, duration: 1.1, ease: "power2.inOut" }, "collapse+=0.75")
+          .to(sub, { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.5, ease: "power3.out" }, "collapse+=0.95");
+
+      } else if (stepIndex === 2) {
+        // ── PASO 2: DIQUÍS (Fractura Lateral con Desintegración) ──
+        const layer = layers[2];
         const tectonic = layer.querySelector<HTMLElement>(".alt-diquis-tectonic");
         const h1 = layer.querySelector<HTMLElement>(".alt-diquis-h1");
         const top = layer.querySelector<HTMLElement>(".alt-top");
@@ -430,21 +570,18 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
         tl.to(badge, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" })
           .to(h1, { opacity: 1, scale: 1, duration: 1.1, ease: "power2.out" }, "-=0.4")
           .to({}, { duration: 0.6 })
-          // Temblor previo
           .fromTo(tectonic, { x: -2.5 }, { x: 2.5, duration: 0.04, repeat: 10, yoyo: true, ease: "none" })
           .set(tectonic, { x: 0 })
           .addLabel("fracture")
-          // Falla geológica lateral
           .to(top, { x: -shift, y: -gap / 2, duration: 1.4, ease: "power4.inOut" }, "fracture")
           .to(bot, { x: shift, y: gap / 2, duration: 1.4, ease: "power4.inOut" }, "fracture")
           .to(band, { scaleY: 1, duration: 1.4, ease: "power4.inOut" }, "fracture")
           .to(sub, { opacity: 1, filter: "blur(0px)", duration: 1.4, ease: "power2.out" }, "fracture+=0.7")
-          // Desintegración progresiva en fade out
           .to([top, bot, band], { opacity: 0, filter: "blur(18px)", scale: 1.05, duration: 2.0, ease: "power2.out" }, "fracture+=1.3");
 
-      } else if (stepIndex === 2) {
-        // ── PASO 2: OLMECAS (Fractura Tectónica Central + CTA) ──
-        const layer = layers[2];
+      } else if (stepIndex === 3) {
+        // ── PASO 3: OLMECAS (Fractura Tectónica Central + CTA) ──
+        const layer = layers[3];
         const tectonic = layer.querySelector<HTMLElement>(".alt-olmeca-tectonic");
         const h1 = layer.querySelector<HTMLElement>(".alt-olmeca-h1");
         const top = layer.querySelector<HTMLElement>(".alt-top");
@@ -472,7 +609,6 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
         tl.to(badge, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" })
           .to(h1, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, "-=0.4")
           .to({}, { duration: 0.7 })
-          // Temblor
           .fromTo(tectonic, { x: -3 }, { x: 3, duration: 0.04, repeat: 12, yoyo: true, ease: "none" })
           .set(tectonic, { x: 0 })
           .addLabel("fracture")
@@ -484,7 +620,6 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
       }
     }
 
-    // Transición cinemática entre capas
     function goToStep(targetIndex: number) {
       if (targetIndex < 0 || targetIndex >= totalSteps) return;
       if (targetIndex === currentIndex && layers[targetIndex].classList.contains("opacity-100")) return;
@@ -492,7 +627,6 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
       const prevIndex = currentIndex;
       currentIndex = targetIndex;
 
-      // Actualizar botones de navegación
       stepBtns.forEach((btn, idx) => {
         if (idx === currentIndex) {
           btn.classList.add("is-active");
@@ -504,7 +638,6 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
       const prevLayer = layers[prevIndex];
       const nextLayer = layers[targetIndex];
 
-      // Desvanecer capa anterior
       if (prevLayer && prevLayer !== nextLayer) {
         stepTimelines[prevIndex]?.kill();
         gsap.to(prevLayer, {
@@ -518,7 +651,6 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
         });
       }
 
-      // Entrar nueva capa
       if (nextLayer) {
         nextLayer.classList.remove("pointer-events-none");
         nextLayer.classList.add("pointer-events-auto");
@@ -534,7 +666,6 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
       }
     }
 
-    // Temporizador Autoplay
     function startAutoTimer() {
       stopAutoTimer();
       autoTimer = setInterval(() => {
@@ -556,7 +687,6 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
       startAutoTimer();
     }
 
-    // Click en botones de paso
     stepBtns.forEach((btn) => {
       btn.addEventListener("click", () => {
         const step = parseInt(btn.dataset.step || "0", 10);
@@ -565,7 +695,6 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
       });
     });
 
-    // Control de Scroll sincronizado en el contenedor 300vh
     let ticking = false;
     function onScroll() {
       if (!ticking) {
@@ -591,14 +720,12 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
       }
     }
 
-    // IntersectionObserver para pausar autoplay si no está visible
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           isVisible = entry.isIntersecting;
           if (isVisible) {
             startAutoTimer();
-            // Disparar animación inicial si recién entra
             playStepAnimation(currentIndex);
           } else {
             stopAutoTimer();

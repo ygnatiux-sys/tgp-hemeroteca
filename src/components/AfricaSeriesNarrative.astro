@@ -1,0 +1,387 @@
+---
+/**
+ * src/components/AfricaSeriesNarrative.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * SERIE DESTACADA: 'MISTERIOS DEL ÁFRICA'
+ *
+ * 1. Intro Monumental: Título masivo en Rojo Diquís (#FF4D55 -> #E50914) con
+ *    estética dramática, que da paso de inmediato a la secuencia de investigación.
+ * 2. Capítulo I: "La Cicatriz del Agua" (Erosión pluvial en el recinto de la Esfinge de Giza).
+ * 3. Arquitectura extensible para incorporar los próximos episodios del continente africano.
+ */
+import imgEsfinge from "../assets/alternativa/esfinge-erosion.jpg";
+
+interface Props {
+  className?: string;
+  autoplayDuration?: number;
+}
+
+const { className = "", autoplayDuration = 6500 } = Astro.props;
+
+// 14 estratos verticales para la cascada pluvial de Giza
+const sliceCount = 14;
+const slices = Array.from({ length: sliceCount }, (_, i) => {
+  const start = (i / sliceCount) * 100;
+  const end = ((i + 1) / sliceCount) * 100 + 0.15;
+  return {
+    index: i,
+    clip: `polygon(${start}% 0%, ${end}% 0%, ${end}% 100%, ${start}% 100%)`,
+  };
+});
+---
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Cinzel:wght@800;900&family=Fraunces:opsz,wght,SOFT,WONK@9..144,900,0,1&display=swap"
+/>
+
+<section
+  id="africa-series-container"
+  class={`relative w-full h-[250vh] bg-[#141210] text-white select-none ${className}`}
+  data-autoplay={autoplayDuration}
+  aria-label="Serie Destacada: Misterios del África"
+>
+  <!-- Contenedor Sticky a Pantalla Completa (Full Bleed) -->
+  <div class="sticky top-0 h-screen w-full overflow-hidden bg-[#141210]">
+
+    <!-- HEADER EDITORIAL DE LA SERIE (Glassmorfismo al 5%) -->
+    <header class="absolute top-5 sm:top-7 inset-x-0 z-30 flex items-center justify-between px-5 sm:px-10 pointer-events-none">
+      <div class="flex items-center gap-2.5">
+        <span class="w-2 h-2 rounded-full bg-[#E50914] shadow-[0_0_10px_#E50914] animate-pulse"></span>
+        <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.35em] uppercase text-[#FF4D55] font-bold">
+          Serie Destacada · Misterios del África
+        </span>
+      </div>
+
+      <!-- Navegación de capítulos con glassmorfismo al 5% -->
+      <nav class="flex items-center gap-2 pointer-events-auto" aria-label="Capítulos de África">
+        <button
+          type="button"
+          class="afr-step-btn px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-white/5 backdrop-blur-md text-[#FF4D55] is-active"
+          data-step="0"
+          title="Giza"
+        >
+          I · La Cicatriz del Agua (Giza)
+        </button>
+      </nav>
+    </header>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         INTRO MONUMENTAL: 'MISTERIOS DEL ÁFRICA' EN ROJO DIQUÍS
+    ══════════════════════════════════════════════════════════════════════ -->
+    <div
+      class="afr-intro-overlay absolute inset-0 z-25 flex items-center justify-center pointer-events-none px-4 bg-[#141210]/90 backdrop-blur-sm transition-opacity duration-700"
+    >
+      <div class="afr-intro-box flex flex-col items-center text-center max-w-6xl">
+        <span class="afr-intro-badge inline-block mb-3 font-mono text-[9.5px] sm:text-[10.5px] tracking-[0.4em] uppercase text-[#FF4D55] py-1 px-4 rounded-full border border-[#FF4D55]/30 bg-black/60 backdrop-blur-md">
+          Investigación Epistémica Especial
+        </span>
+        <h2 class="afr-intro-title font-serif font-black uppercase text-[clamp(2.8rem,11vw,11.5rem)] leading-[0.88] tracking-[-0.02em] text-transparent">
+          Misterios del África
+        </h2>
+        <p class="afr-intro-sub mt-4 font-mono text-[10px] sm:text-[11.5px] tracking-[0.3em] uppercase text-stone-400">
+          Iniciando registro arqueológico · Egipto ancestral
+        </p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         CAPÍTULO I: LA CICATRIZ DEL AGUA (GIZA, EGIPTO) — EROSIÓN PLUVIAL
+    ══════════════════════════════════════════════════════════════════════ -->
+    <div
+      class="afr-layer absolute inset-0 w-full h-full opacity-100 pointer-events-auto"
+      data-layer-index="0"
+    >
+      <div class="afr-bg-wrap absolute inset-0 overflow-hidden">
+        <img
+          src={imgEsfinge.src}
+          alt="Recinto de la Esfinge de Giza con fisuras verticales de erosión pluvial"
+          class="afr-img absolute inset-0 w-full h-full object-cover object-[center_48%] brightness-[0.88] contrast-[1.18] saturate-[1.05] will-change-transform"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+
+      <!-- Iluminación: Sombra de piedra mineral (#141210) + Resplandor Solar Rasante -->
+      <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_50%_50%,rgba(20,18,16,0.15)_0%,rgba(20,18,16,0.65)_60%,rgba(20,18,16,0.96)_96%)]"></div>
+      <div class="absolute inset-0 pointer-events-none mix-blend-screen bg-[radial-gradient(circle_at_18%_28%,rgba(240,220,184,0.28)_0%,rgba(212,184,134,0.14)_28%,transparent_62%)]"></div>
+      <div class="afr-grain absolute inset-0 pointer-events-none"></div>
+      <div class="afr-dust absolute inset-0 pointer-events-none z-10" aria-hidden="true"></div>
+
+      <!-- Escenario Tipográfico Pluvial -->
+      <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none px-4">
+        <div class="afr-pluvial-chamber relative flex flex-col items-center text-center max-w-7xl">
+          <span class="afr-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#d4b886] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0">
+            Giza · Recinto de la Esfinge · Edad de Hielo
+          </span>
+
+          <div class="afr-cascade-wrap relative inline-block">
+            <h3 class="afr-master font-serif font-black uppercase whitespace-nowrap text-[clamp(2.8rem,10.5vw,10rem)] leading-[0.92] tracking-[0.04em] text-transparent opacity-0 select-none">
+              La Cicatriz del Agua
+            </h3>
+
+            <div class="afr-slices-box absolute inset-0 pointer-events-none" aria-hidden="true">
+              {
+                slices.map((slice) => (
+                  <span
+                    class="afr-slice absolute inset-0 font-serif font-black uppercase whitespace-nowrap text-[clamp(2.8rem,10.5vw,10rem)] leading-[0.92] tracking-[0.04em] text-transparent will-change-transform"
+                    style={`clip-path: ${slice.clip};`}
+                  >
+                    La Cicatriz del Agua
+                  </span>
+                ))
+              }
+            </div>
+          </div>
+
+          <p class="afr-sub mt-6 font-serif text-[clamp(0.85rem,2vw,1.35rem)] font-medium tracking-[0.22em] uppercase text-[#ead5b3] opacity-0">
+            <span class="text-[#d4b886] mr-1.5">—</span> La geología que reescribe la cronología humana
+          </p>
+
+          <div class="afr-cta-wrap mt-8 opacity-0 pointer-events-auto">
+            <a
+              href="/colecciones/arqueosemiotica/"
+              class="group relative inline-flex items-center gap-3 px-7 sm:px-9 py-3 rounded-full font-mono text-[10.5px] uppercase tracking-[0.28em] font-bold text-[#141210] bg-linear-to-r from-[#d4b886] via-[#ead5b3] to-[#d4b886] shadow-[0_0_30px_rgba(212,184,134,0.3)] hover:brightness-110 active:scale-95 transition-all duration-300"
+            >
+              <span>Explorar Dossier de Egipto</span>
+              <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indicador de Scroll en la base -->
+    <div class="absolute bottom-5 inset-x-0 z-30 flex flex-col items-center pointer-events-none">
+      <span class="font-mono text-[8.5px] tracking-[0.3em] uppercase text-stone-400 opacity-70">
+        Serie Documental · Desliza para descender
+      </span>
+      <div class="w-px h-5 mt-1.5 bg-linear-to-b from-stone-400 to-transparent animate-pulse"></div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  /* Tipografía y Gradiente ROJO DIQUÍS */
+  .afr-intro-title {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'opsz' 9, 'SOFT' 0, 'WONK' 0;
+    background: linear-gradient(180deg, #ff4d55 0%, #e50914 42%, #9b0b11 78%, #4a0508 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.98)) drop-shadow(0 0 50px rgba(229, 9, 20, 0.5));
+  }
+
+  /* Tipografía Ocre Atardecer para Giza */
+  .afr-master,
+  .afr-slice {
+    font-family: 'Cinzel', serif;
+    background: linear-gradient(
+      180deg,
+      #f7ebd6 0%,
+      #e8d1a7 30%,
+      #d4b886 65%,
+      #8e7040 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 18px 45px rgba(0, 0, 0, 0.98)) drop-shadow(0 0 40px rgba(212, 184, 134, 0.32));
+  }
+
+  .afr-sub {
+    text-shadow: 0 4px 22px rgba(0, 0, 0, 0.95), 0 0 25px rgba(212, 184, 134, 0.35);
+  }
+
+  /* Grano analógico A24 */
+  .afr-grain {
+    opacity: 0.18;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    animation: afr-grain-anim 0.8s steps(5) infinite;
+  }
+
+  @keyframes afr-grain-anim {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-2%, 1%); }
+    50% { transform: translate(1%, -2%); }
+    75% { transform: translate(-1%, 2%); }
+    100% { transform: translate(0, 0); }
+  }
+
+  .afr-dust :global(span) {
+    position: absolute;
+    border-radius: 50%;
+    background: #d4b886;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+
+  function setupAfricaSeries() {
+    const container = document.getElementById("africa-series-container");
+    if (!container || container.dataset.ready === "true") return;
+    container.dataset.ready = "true";
+
+    const introOverlay = container.querySelector<HTMLElement>(".afr-intro-overlay");
+    const introTitle = container.querySelector<HTMLElement>(".afr-intro-title");
+    const introBadge = container.querySelector<HTMLElement>(".afr-intro-badge");
+    const introSub = container.querySelector<HTMLElement>(".afr-intro-sub");
+
+    const badge = container.querySelector<HTMLElement>(".afr-badge");
+    const cascadeWrap = container.querySelector<HTMLElement>(".afr-cascade-wrap");
+    const slices = container.querySelectorAll<HTMLElement>(".afr-slice");
+    const sub = container.querySelector<HTMLElement>(".afr-sub");
+    const cta = container.querySelector<HTMLElement>(".afr-cta-wrap");
+    const dustLayer = container.querySelector<HTMLElement>(".afr-dust");
+
+    if (!introOverlay || !introTitle || !badge || !cascadeWrap || slices.length === 0 || !sub || !dustLayer) return;
+
+    let tl: gsap.core.Timeline | null = null;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Generar partículas de polvo de caliza
+    const spawnLimestoneDust = () => {
+      dustLayer.innerHTML = "";
+      const count = 28;
+      const rect = cascadeWrap.getBoundingClientRect();
+      const contRect = container.getBoundingClientRect();
+      const originX = rect.left - contRect.left;
+      const originY = rect.top - contRect.top + rect.height * 0.5;
+
+      for (let i = 0; i < count; i++) {
+        const dot = document.createElement("span");
+        const s = 1.2 + Math.random() * 2.8;
+        dot.style.width = `${s}px`;
+        dot.style.height = `${s}px`;
+        dot.style.left = `${originX + Math.random() * rect.width}px`;
+        dot.style.top = `${originY}px`;
+        dot.style.opacity = "0";
+        dustLayer.appendChild(dot);
+
+        gsap.fromTo(
+          dot,
+          { opacity: 0, y: 0, scale: 0.6 },
+          {
+            opacity: 0.35 + Math.random() * 0.55,
+            y: (Math.random() - 0.5) * 80 + 30,
+            x: (Math.random() - 0.5) * 70,
+            scale: 1.4,
+            duration: 1.8 + Math.random() * 1.5,
+            ease: "power2.out",
+            onComplete: () => {
+              gsap.to(dot, { opacity: 0, duration: 0.8, onComplete: () => dot.remove() });
+            },
+          }
+        );
+      }
+    };
+
+    const reset = () => {
+      tl?.kill();
+      tl = null;
+      dustLayer.innerHTML = "";
+
+      gsap.set(introOverlay, { opacity: 1, pointerEvents: "auto" });
+      gsap.set(introTitle, { opacity: 0, scale: 1.08 });
+      gsap.set([introBadge, introSub], { opacity: 0, y: -12 });
+
+      gsap.set(badge, { opacity: 0, y: -16 });
+      gsap.set(sub, { opacity: 0, y: 35, filter: "blur(14px)" });
+      if (cta) gsap.set(cta, { opacity: 0, y: 20 });
+      gsap.set(cascadeWrap, { y: 0, filter: "none" });
+
+      slices.forEach((slice) => {
+        gsap.set(slice, { yPercent: -140, opacity: 0, scaleY: 1.25 });
+      });
+    };
+
+    const playSeries = () => {
+      reset();
+
+      if (reduceMotion) {
+        gsap.set(introOverlay, { opacity: 0, pointerEvents: "none" });
+        gsap.set([badge, sub], { opacity: 1, y: 0, filter: "none" });
+        if (cta) gsap.set(cta, { opacity: 1, y: 0 });
+        slices.forEach((s) => gsap.set(s, { yPercent: 0, opacity: 1, scaleY: 1 }));
+        return;
+      }
+
+      const mainTl = gsap.timeline();
+      tl = mainTl;
+
+      // FASE 1: APERTURA MONUMENTAL EN ROJO DIQUÍS
+      mainTl.to([introBadge, introSub], { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" })
+        .to(introTitle, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, "-=0.3")
+        .to({}, { duration: 1.2 }) // Contemplación del rojo monumental
+        // Salida fluida de la intro hacia la secuencia de investigación
+        .to([introTitle, introBadge, introSub], { opacity: 0, scale: 0.95, duration: 0.75, ease: "power2.in" })
+        .to(introOverlay, { opacity: 0, duration: 0.8, ease: "power2.inOut", onComplete: () => {
+          introOverlay.style.pointerEvents = "none";
+        }}, "-=0.2");
+
+      // FASE 2: ENTRADA DEL CAPÍTULO I (GIZA — EROSIÓN PLUVIAL)
+      mainTl.to(badge, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, "-=0.2");
+      mainTl.addLabel("flood");
+
+      slices.forEach((slice, idx) => {
+        const randomDelay = (idx % 3) * 0.08 + Math.sin(idx * 0.8) * 0.12 + 0.1;
+        const duration = 1.1 + (idx % 4) * 0.08;
+
+        mainTl.to(
+          slice,
+          {
+            yPercent: 0,
+            opacity: 1,
+            scaleY: 1,
+            duration: duration,
+            ease: "power4.in",
+          },
+          `flood+=${randomDelay}`
+        );
+      });
+
+      // FASE 3: IMPACTO Y POLVO DE CALIZA
+      mainTl.addLabel("impact", "flood+=1.35");
+      mainTl.add(() => spawnLimestoneDust(), "impact");
+
+      mainTl.fromTo(
+        cascadeWrap,
+        { y: -3, filter: "blur(3.5px)" },
+        { y: 3, filter: "blur(1.5px)", duration: 0.05, repeat: 5, yoyo: true, ease: "none" },
+        "impact"
+      ).to(cascadeWrap, { y: 0, filter: "blur(0px)", duration: 0.4, ease: "power2.out" });
+
+      // FASE 4: REVELACIÓN EN LA SOMBRA Y CTA
+      mainTl.to(sub, { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.6, ease: "power3.out" }, "impact+=0.5");
+      if (cta) {
+        mainTl.to(cta, { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, "impact+=1.0");
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            playSeries();
+          } else {
+            reset();
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    observer.observe(container);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupAfricaSeries);
+  } else {
+    setupAfricaSeries();
+  }
+  document.addEventListener("astro:page-load", setupAfricaSeries);
+</script>

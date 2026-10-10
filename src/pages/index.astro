@@ -18,6 +18,7 @@ import CinematicGrid from '../components/CinematicGrid.astro';
 import MubiBlockCinematic, { type MubiCinematicItem } from '../components/MubiBlockCinematic.astro';
 import TriplicoRevelacion, { type TriplicoPost } from '../components/TriplicoRevelacion.astro';
 import AlternativeScrollNarrative from '../components/AlternativeScrollNarrative.astro';
+import AfricaSeriesNarrative from '../components/AfricaSeriesNarrative.astro';
 import ScrollNarrative from '../components/ScrollNarrative.astro';
 import HeroNetflixTgp from '../components/HeroNetflixTgp.astro';
 import {
@@ -473,6 +474,13 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
       ═══════════════════════════════════════════════════════════════════ */}
       <div class="w-screen relative left-1/2 -translate-x-1/2 my-12 sm:my-16 md:my-24 overflow-x-hidden">
         <AlternativeScrollNarrative />
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          NUEVA SERIE DESTACADA: 'MISTERIOS DEL ÁFRICA'
+      ═══════════════════════════════════════════════════════════════════ */}
+      <div class="w-screen relative left-1/2 -translate-x-1/2 my-12 sm:my-16 md:my-24 overflow-x-hidden">
+        <AfricaSeriesNarrative />
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
