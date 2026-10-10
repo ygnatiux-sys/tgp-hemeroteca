@@ -1,0 +1,621 @@
+---
+/**
+ * src/components/AlternativeScrollNarrative.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * NUEVA COLECCIÓN: 'ALTERNATIVE' (Historia Profunda / Archivo No Oficial)
+ * Sticky Scroll Narrative a pantalla completa (full bleed).
+ *
+ * Integra en una secuencia fluida los 3 efectos cinemáticos de laboratorio:
+ * 1. DERINKUYU: Paralaje de Abismo (Profundidad Z con Clash Display y paleta Cinabrio/Carbón).
+ * 2. DIQUÍS: Fractura lateral izquierda con desintegración en niebla (Fraunces).
+ * 3. OLMECAS: Fractura tectónica geológica centrada con fisura de basalto/oro.
+ */
+import imgDerinkuyu from "../assets/alternativa/derinkuyu.jpg";
+import imgDiquis from "../assets/alternativa/esfera-diquis.jpg";
+import imgOlmeca from "../assets/alternativa/olmeca.jpg";
+
+interface Props {
+  className?: string;
+  autoplayDuration?: number; // ms por diapositiva
+}
+
+const { className = "", autoplayDuration = 6000 } = Astro.props;
+---
+
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap"
+/>
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,900,0,0&display=swap"
+/>
+
+<section
+  id="alt-narrative-container"
+  class={`relative w-full h-[300vh] bg-[#0a0a0a] text-white select-none ${className}`}
+  data-autoplay={autoplayDuration}
+  aria-label="Colección Alternative"
+>
+  <!-- Contenedor Sticky a Pantalla Completa (Full Bleed) -->
+  <div class="sticky top-0 h-screen w-full overflow-hidden bg-[#0a0a0a]">
+    
+    <!-- HEADER EDITORIAL DE LA COLECCIÓN (Superpuesto en la parte superior) -->
+    <header class="absolute top-5 sm:top-7 inset-x-0 z-30 flex items-center justify-between px-5 sm:px-10 pointer-events-none">
+      <div class="flex items-center gap-2.5">
+        <span class="w-2 h-2 rounded-full bg-[#E69A46] shadow-[0_0_10px_#E69A46] animate-pulse"></span>
+        <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.35em] uppercase text-[#E69A46] font-bold">
+          Colección · Alternative
+        </span>
+      </div>
+
+      <!-- Indicadores de paso interactivos -->
+      <nav class="flex items-center gap-2 pointer-events-auto" aria-label="Navegación de colección">
+        <button
+          type="button"
+          class="alt-step-btn px-2.5 sm:px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-black/40 backdrop-blur-md text-stone-400 hover:text-white is-active"
+          data-step="0"
+          title="Derinkuyu"
+        >
+          I · Derinkuyu
+        </button>
+        <button
+          type="button"
+          class="alt-step-btn px-2.5 sm:px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-black/40 backdrop-blur-md text-stone-400 hover:text-white"
+          data-step="1"
+          title="Diquís"
+        >
+          II · Diquís
+        </button>
+        <button
+          type="button"
+          class="alt-step-btn px-2.5 sm:px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-black/40 backdrop-blur-md text-stone-400 hover:text-white"
+          data-step="2"
+          title="Olmecas"
+        >
+          III · Olmecas
+        </button>
+      </nav>
+    </header>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         PASO 0: DERINKUYU — PARALAJE DE ABISMO (Profundidad Z)
+    ══════════════════════════════════════════════════════════════════════ -->
+    <div
+      class="alt-layer absolute inset-0 w-full h-full opacity-100 pointer-events-auto"
+      data-layer-index="0"
+    >
+      <div class="alt-bg-wrap absolute inset-0 overflow-hidden">
+        <img
+          src={imgDerinkuyu.src}
+          alt="Túnel y rueda de molino de Derinkuyu"
+          class="alt-img absolute inset-0 w-full h-full object-cover brightness-[0.82] contrast-[1.2] will-change-transform"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+
+      <!-- Iluminación: Viñeta Carbón + Resplandor Cálido de Antorcha -->
+      <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_50%_50%,rgba(10,10,10,0.2)_0%,rgba(10,10,10,0.65)_60%,rgba(10,10,10,0.96)_95%)]"></div>
+      <div class="absolute inset-0 pointer-events-none mix-blend-screen bg-[radial-gradient(circle_at_66%_72%,rgba(217,99,63,0.24)_0%,rgba(184,58,36,0.12)_28%,transparent_60%)]"></div>
+      <div class="alt-grain absolute inset-0 pointer-events-none"></div>
+      <div class="alt-ash absolute inset-0 pointer-events-none z-10" aria-hidden="true"></div>
+
+      <!-- Cámara 3D -->
+      <div class="alt-3d-viewport absolute inset-0 flex items-center justify-center pointer-events-none z-20 px-4">
+        <div class="alt-derinkuyu-chamber relative flex flex-col items-center justify-center text-center max-w-7xl">
+          <span class="alt-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#E69A46] py-0.5 px-3 rounded-full border border-[#E69A46]/30 bg-black/60 backdrop-blur-md opacity-0">
+            Anatolia Subterránea · Refugio Primordial
+          </span>
+          <h2 class="alt-derin-h1 text-[clamp(3.8rem,15vw,15rem)] font-bold leading-[0.86] tracking-[-0.035em] uppercase whitespace-nowrap text-transparent opacity-0">
+            Derinkuyu
+          </h2>
+          <p class="alt-derin-sub absolute top-1/2 -translate-y-1/2 font-sans text-[clamp(0.85rem,2.2vw,1.45rem)] tracking-[0.28em] uppercase text-[#f7ebe1] opacity-0">
+            <span class="text-[#E69A46] mr-1.5">—</span> El último refugio de la humanidad
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         PASO 1: DIQUÍS — FRACTURA LATERAL & DESINTEGRACIÓN
+    ══════════════════════════════════════════════════════════════════════ -->
+    <div
+      class="alt-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none"
+      data-layer-index="1"
+    >
+      <div class="alt-bg-wrap absolute inset-0 overflow-hidden">
+        <img
+          src={imgDiquis.src}
+          alt="Esfera colosal de piedra en la selva de Diquís"
+          class="alt-img absolute inset-0 w-full h-full object-cover object-right sm:object-center brightness-[0.76] contrast-[1.18] saturate-[0.85] will-change-transform"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+
+      <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_70%_50%,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.72)_75%),linear-gradient(90deg,rgba(0,0,0,0.85)_0%,rgba(0,0,0,0.4)_50%,rgba(0,0,0,0.7)_100%)]"></div>
+      <div class="alt-grain absolute inset-0 pointer-events-none"></div>
+
+      <!-- Escenario lateral izquierdo -->
+      <div class="absolute inset-0 flex items-center justify-start z-20 pointer-events-none pl-6 sm:pl-14 md:pl-20 pr-6">
+        <div class="alt-diquis-slot relative flex flex-col items-start text-left max-w-5xl">
+          <span class="alt-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#FF4D55] py-0.5 px-3 rounded-full border border-[#FF4D55]/30 bg-black/60 backdrop-blur-md opacity-0">
+            Costa Rica · Geometría Esférica Sagrada
+          </span>
+
+          <div class="alt-diquis-tectonic relative inline-block">
+            <h2 class="alt-diquis-h1 relative m-0 font-serif font-black uppercase whitespace-nowrap text-[clamp(3.8rem,15vw,14rem)] leading-[0.88] tracking-[-0.02em] opacity-0">
+              <span class="alt-sizer block opacity-0" aria-hidden="true">Diquís</span>
+              <span class="alt-band absolute inset-x-0 top-1/2 h-0 -translate-y-1/2 pointer-events-none" aria-hidden="true"></span>
+              <span class="alt-half alt-top absolute inset-0 block text-transparent" aria-hidden="true">Diquís</span>
+              <span class="alt-half alt-bot absolute inset-0 block text-transparent" aria-hidden="true">Diquís</span>
+            </h2>
+            <p class="alt-diquis-sub absolute left-1 top-1/2 -translate-y-1/2 m-0 font-sans text-[clamp(0.8rem,1.8vw,1.3rem)] tracking-[0.28em] uppercase text-[#F5D0D2] opacity-0">
+              El enigma lítico de la selva
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         PASO 2: OLMECAS — FRACTURA TECTÓNICA CENTRAL & CTA
+    ══════════════════════════════════════════════════════════════════════ -->
+    <div
+      class="alt-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none"
+      data-layer-index="2"
+    >
+      <div class="alt-bg-wrap absolute inset-0 overflow-hidden">
+        <img
+          src={imgOlmeca.src}
+          alt="Cabeza colosal Olmeca"
+          class="alt-img absolute inset-0 w-full h-full object-cover brightness-[0.78] contrast-[1.16] saturate-[0.72] will-change-transform"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+
+      <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.6)_75%,rgba(0,0,0,0.94)_100%)]"></div>
+      <div class="alt-grain absolute inset-0 pointer-events-none"></div>
+
+      <!-- Escenario centrado -->
+      <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none px-4">
+        <div class="alt-olmeca-slot relative flex flex-col items-center text-center max-w-6xl">
+          <span class="alt-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#F0C284] py-0.5 px-3 rounded-full border border-[#F0C284]/30 bg-black/60 backdrop-blur-md opacity-0">
+            Mesoamérica · Escultura Colosal de Basalto
+          </span>
+
+          <div class="alt-olmeca-tectonic relative inline-block">
+            <h2 class="alt-olmeca-h1 relative m-0 font-serif font-black uppercase whitespace-nowrap text-[clamp(4rem,16vw,15.5rem)] leading-[0.88] tracking-[-0.01em] opacity-0">
+              <span class="alt-sizer block opacity-0" aria-hidden="true">Olmecas</span>
+              <span class="alt-band absolute inset-x-0 top-1/2 h-0 -translate-y-1/2 pointer-events-none" aria-hidden="true"></span>
+              <span class="alt-half alt-top absolute inset-0 block text-transparent" aria-hidden="true">Olmecas</span>
+              <span class="alt-half alt-bot absolute inset-0 block text-transparent" aria-hidden="true">Olmecas</span>
+            </h2>
+            <p class="alt-olmeca-sub absolute inset-x-0 top-1/2 -translate-y-1/2 m-0 font-sans text-[clamp(0.8rem,1.8vw,1.3rem)] tracking-[0.28em] uppercase text-[#EDE3CF] opacity-0">
+              El misterio del basalto
+            </p>
+          </div>
+
+          <!-- CTA de acceso a la colección -->
+          <div class="alt-cta-wrap mt-8 opacity-0 pointer-events-auto">
+            <a
+              href="/colecciones/arqueosemiotica/"
+              class="group relative inline-flex items-center gap-3 px-7 sm:px-9 py-3 rounded-full font-mono text-[10.5px] uppercase tracking-[0.28em] font-bold text-stone-900 bg-linear-to-r from-[#F0C284] via-[#E6B070] to-[#C98B4D] shadow-[0_0_30px_rgba(240,194,132,0.3)] hover:brightness-110 active:scale-95 transition-all duration-300"
+            >
+              <span>Explorar Colección Alternative</span>
+              <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indicador de Scroll en la base -->
+    <div class="absolute bottom-5 inset-x-0 z-30 flex flex-col items-center pointer-events-none">
+      <span class="font-mono text-[8.5px] tracking-[0.3em] uppercase text-stone-400 opacity-70">
+        Desliza para explorar el archivo
+      </span>
+      <div class="w-px h-5 mt-1.5 bg-linear-to-b from-stone-400 to-transparent animate-pulse"></div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  /* Tipografías y texturas */
+  .alt-derin-h1 {
+    font-family: 'Clash Display', 'Inter', system-ui, sans-serif;
+    background: linear-gradient(180deg, #f2825c 0%, #d45632 32%, #9e2a18 70%, #4a0d06 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.98)) drop-shadow(0 0 45px rgba(184, 58, 36, 0.38));
+  }
+
+  .alt-3d-viewport {
+    perspective: 1100px;
+    perspective-origin: 50% 48%;
+  }
+
+  .alt-derinkuyu-chamber {
+    transform-style: preserve-3d;
+  }
+
+  .alt-diquis-h1 {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'opsz' 9, 'SOFT' 0, 'WONK' 0;
+  }
+
+  .alt-diquis-tectonic .alt-half {
+    background: linear-gradient(180deg, #ff4d55 0%, #e50914 42%, #9b0b11 78%, #4a0508 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 14px 38px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 35px rgba(229, 9, 20, 0.4));
+  }
+
+  .alt-olmeca-h1 {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'opsz' 9, 'SOFT' 0, 'WONK' 0;
+  }
+
+  .alt-olmeca-tectonic .alt-half {
+    background: linear-gradient(180deg, #f0c284 0%, #c98b4d 48%, #8a5328 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 14px 38px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 32px rgba(201, 139, 77, 0.38));
+  }
+
+  /* Cortes dentados de falla tectónica */
+  .alt-top {
+    clip-path: polygon(
+      0 0, 100% 0, 100% 50%, 93% 52.5%, 84% 48.5%, 73% 53%, 61% 49%,
+      50% 52%, 38% 48%, 27% 53%, 15% 49.5%, 6% 52%, 0 50%
+    );
+  }
+
+  .alt-bot {
+    clip-path: polygon(
+      0 50%, 6% 52%, 15% 49.5%, 27% 53%, 38% 48%, 50% 52%, 61% 49%,
+      73% 53%, 84% 48.5%, 93% 52.5%, 100% 50%, 100% 100%, 0 100%
+    );
+  }
+
+  .alt-band {
+    background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.98) 50%, rgba(0,0,0,0.55) 100%);
+    box-shadow: inset 0 0 40px rgba(0,0,0,1);
+  }
+
+  /* Grano analógico A24 */
+  .alt-grain {
+    opacity: 0.2;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    animation: alt-grain-anim 0.8s steps(5) infinite;
+  }
+
+  @keyframes alt-grain-anim {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-2%, 1%); }
+    50% { transform: translate(1%, -2%); }
+    75% { transform: translate(-1%, 2%); }
+    100% { transform: translate(0, 0); }
+  }
+
+  .alt-step-btn.is-active {
+    border-color: #e69a46;
+    background: rgba(230, 154, 70, 0.2);
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .alt-ash :global(span) {
+    position: absolute;
+    border-radius: 50%;
+    background: #e69a46;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+
+  function setupAlternativeNarrative() {
+    const container = document.getElementById("alt-narrative-container");
+    if (!container || container.dataset.ready === "true") return;
+    container.dataset.ready = "true";
+
+    const layers = container.querySelectorAll<HTMLElement>(".alt-layer");
+    const stepBtns = container.querySelectorAll<HTMLElement>(".alt-step-btn");
+    const totalSteps = layers.length;
+    if (totalSteps === 0) return;
+
+    const autoDurationAttr = container.getAttribute("data-autoplay");
+    const autoplayDuration = autoDurationAttr ? parseInt(autoDurationAttr, 10) : 6000;
+
+    let currentIndex = 0;
+    let autoTimer: any = null;
+    let isVisible = false;
+    let stepTimelines: Array<gsap.core.Timeline | null> = [null, null, null];
+
+    // Generar partículas de ceniza para Derinkuyu
+    const ashContainer = container.querySelector<HTMLElement>(".alt-ash");
+    if (ashContainer) {
+      ashContainer.innerHTML = "";
+      const count = 28;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      for (let i = 0; i < count; i++) {
+        const dot = document.createElement("span");
+        const s = 1.2 + Math.random() * 2.6;
+        dot.style.width = `${s}px`;
+        dot.style.height = `${s}px`;
+        dot.style.left = `${Math.random() * w}px`;
+        dot.style.top = `${h * 0.4 + Math.random() * h * 0.5}px`;
+        dot.style.opacity = "0";
+        ashContainer.appendChild(dot);
+        gsap.to(dot, {
+          opacity: 0.15 + Math.random() * 0.5,
+          y: -(30 + Math.random() * 100),
+          x: (Math.random() - 0.5) * 50,
+          duration: 3 + Math.random() * 3,
+          ease: "sine.inOut",
+          repeat: -1,
+          yoyo: true,
+          delay: Math.random() * 2,
+        });
+      }
+    }
+
+    // DISPARADORES CINEMÁTICOS PARTICULARES POR PASO
+    function playStepAnimation(stepIndex: number) {
+      // Matar timeline previa de este paso si existe
+      stepTimelines[stepIndex]?.kill();
+      const tl = gsap.timeline();
+      stepTimelines[stepIndex] = tl;
+
+      if (stepIndex === 0) {
+        // ── PASO 0: DERINKUYU (Paralaje de Abismo Z) ──
+        const layer = layers[0];
+        const h1 = layer.querySelector<HTMLElement>(".alt-derin-h1");
+        const sub = layer.querySelector<HTMLElement>(".alt-derin-sub");
+        const badge = layer.querySelector<HTMLElement>(".alt-badge");
+        const img = layer.querySelector<HTMLElement>(".alt-img");
+        if (!h1 || !sub || !badge || !img) return;
+
+        gsap.set(h1, { opacity: 0, scale: 1.06, z: 0, y: 0, filter: "blur(0px)" });
+        gsap.set(sub, { opacity: 0, y: 35, filter: "blur(12px)" });
+        gsap.set(badge, { opacity: 0, y: -15 });
+        gsap.set(img, { scale: 1 });
+
+        tl.to(badge, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" })
+          .to(h1, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, "-=0.4")
+          .to({}, { duration: 0.7 })
+          .addLabel("drop")
+          // Título cae al abismo tridimensional
+          .to(h1, { scale: 0.46, z: -480, y: 30, opacity: 0.14, filter: "blur(9px)", duration: 2.6, ease: "power3.inOut" }, "drop")
+          // Avance sutil de cámara
+          .to(img, { scale: 1.07, duration: 3.0, ease: "power2.out" }, "drop")
+          // Subtítulo emerge a la superficie
+          .to(sub, { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.8, ease: "power2.out" }, "drop+=0.8");
+
+      } else if (stepIndex === 1) {
+        // ── PASO 1: DIQUÍS (Fractura Lateral con Desintegración) ──
+        const layer = layers[1];
+        const tectonic = layer.querySelector<HTMLElement>(".alt-diquis-tectonic");
+        const h1 = layer.querySelector<HTMLElement>(".alt-diquis-h1");
+        const top = layer.querySelector<HTMLElement>(".alt-top");
+        const bot = layer.querySelector<HTMLElement>(".alt-bot");
+        const band = layer.querySelector<HTMLElement>(".alt-band");
+        const sub = layer.querySelector<HTMLElement>(".alt-diquis-sub");
+        const badge = layer.querySelector<HTMLElement>(".alt-badge");
+        if (!tectonic || !h1 || !top || !bot || !band || !sub || !badge) return;
+
+        const w = h1.offsetWidth;
+        const h = h1.offsetHeight;
+        const gap = Math.max(h * 0.36, 42);
+        const shift = Math.max(12, w * 0.025);
+        band.style.height = `${gap}px`;
+
+        gsap.set(tectonic, { x: 0 });
+        gsap.set([top, bot], { x: 0, y: 0, opacity: 1, filter: "none", scale: 1 });
+        gsap.set(band, { scaleY: 0, opacity: 1, filter: "none" });
+        gsap.set(sub, { opacity: 0, filter: "blur(12px)", y: 0 });
+        gsap.set(h1, { opacity: 0, scale: 1.04 });
+        gsap.set(badge, { opacity: 0, y: -15 });
+
+        tl.to(badge, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" })
+          .to(h1, { opacity: 1, scale: 1, duration: 1.1, ease: "power2.out" }, "-=0.4")
+          .to({}, { duration: 0.6 })
+          // Temblor previo
+          .fromTo(tectonic, { x: -2.5 }, { x: 2.5, duration: 0.04, repeat: 10, yoyo: true, ease: "none" })
+          .set(tectonic, { x: 0 })
+          .addLabel("fracture")
+          // Falla geológica lateral
+          .to(top, { x: -shift, y: -gap / 2, duration: 1.4, ease: "power4.inOut" }, "fracture")
+          .to(bot, { x: shift, y: gap / 2, duration: 1.4, ease: "power4.inOut" }, "fracture")
+          .to(band, { scaleY: 1, duration: 1.4, ease: "power4.inOut" }, "fracture")
+          .to(sub, { opacity: 1, filter: "blur(0px)", duration: 1.4, ease: "power2.out" }, "fracture+=0.7")
+          // Desintegración progresiva en fade out
+          .to([top, bot, band], { opacity: 0, filter: "blur(18px)", scale: 1.05, duration: 2.0, ease: "power2.out" }, "fracture+=1.3");
+
+      } else if (stepIndex === 2) {
+        // ── PASO 2: OLMECAS (Fractura Tectónica Central + CTA) ──
+        const layer = layers[2];
+        const tectonic = layer.querySelector<HTMLElement>(".alt-olmeca-tectonic");
+        const h1 = layer.querySelector<HTMLElement>(".alt-olmeca-h1");
+        const top = layer.querySelector<HTMLElement>(".alt-top");
+        const bot = layer.querySelector<HTMLElement>(".alt-bot");
+        const band = layer.querySelector<HTMLElement>(".alt-band");
+        const sub = layer.querySelector<HTMLElement>(".alt-olmeca-sub");
+        const badge = layer.querySelector<HTMLElement>(".alt-badge");
+        const cta = layer.querySelector<HTMLElement>(".alt-cta-wrap");
+        if (!tectonic || !h1 || !top || !bot || !band || !sub || !badge || !cta) return;
+
+        const w = h1.offsetWidth;
+        const h = h1.offsetHeight;
+        const gap = Math.max(h * 0.42, 52);
+        const shift = Math.max(16, w * 0.032);
+        band.style.height = `${gap}px`;
+
+        gsap.set(tectonic, { x: 0 });
+        gsap.set([top, bot], { x: 0, y: 0, opacity: 1 });
+        gsap.set(band, { scaleY: 0 });
+        gsap.set(sub, { opacity: 0, filter: "blur(12px)", y: 0 });
+        gsap.set(h1, { opacity: 0, scale: 1.06 });
+        gsap.set(badge, { opacity: 0, y: -15 });
+        gsap.set(cta, { opacity: 0, y: 20 });
+
+        tl.to(badge, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" })
+          .to(h1, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, "-=0.4")
+          .to({}, { duration: 0.7 })
+          // Temblor
+          .fromTo(tectonic, { x: -3 }, { x: 3, duration: 0.04, repeat: 12, yoyo: true, ease: "none" })
+          .set(tectonic, { x: 0 })
+          .addLabel("fracture")
+          .to(top, { x: -shift, y: -gap / 2, duration: 1.5, ease: "power4.inOut" }, "fracture")
+          .to(bot, { x: shift, y: gap / 2, duration: 1.5, ease: "power4.inOut" }, "fracture")
+          .to(band, { scaleY: 1, duration: 1.5, ease: "power4.inOut" }, "fracture")
+          .to(sub, { opacity: 1, filter: "blur(0px)", duration: 1.5, ease: "power2.out" }, "fracture+=0.8")
+          .to(cta, { opacity: 1, y: 0, duration: 1.1, ease: "power3.out" }, "fracture+=1.2");
+      }
+    }
+
+    // Transición cinemática entre capas
+    function goToStep(targetIndex: number) {
+      if (targetIndex < 0 || targetIndex >= totalSteps) return;
+      if (targetIndex === currentIndex && layers[targetIndex].classList.contains("opacity-100")) return;
+
+      const prevIndex = currentIndex;
+      currentIndex = targetIndex;
+
+      // Actualizar botones de navegación
+      stepBtns.forEach((btn, idx) => {
+        if (idx === currentIndex) {
+          btn.classList.add("is-active");
+        } else {
+          btn.classList.remove("is-active");
+        }
+      });
+
+      const prevLayer = layers[prevIndex];
+      const nextLayer = layers[targetIndex];
+
+      // Desvanecer capa anterior
+      if (prevLayer && prevLayer !== nextLayer) {
+        stepTimelines[prevIndex]?.kill();
+        gsap.to(prevLayer, {
+          opacity: 0,
+          duration: 0.65,
+          ease: "power2.inOut",
+          onComplete: () => {
+            prevLayer.classList.remove("pointer-events-auto");
+            prevLayer.classList.add("pointer-events-none");
+          },
+        });
+      }
+
+      // Entrar nueva capa
+      if (nextLayer) {
+        nextLayer.classList.remove("pointer-events-none");
+        nextLayer.classList.add("pointer-events-auto");
+
+        gsap.to(nextLayer, {
+          opacity: 1,
+          duration: 0.7,
+          ease: "power2.out",
+          onStart: () => {
+            playStepAnimation(targetIndex);
+          },
+        });
+      }
+    }
+
+    // Temporizador Autoplay
+    function startAutoTimer() {
+      stopAutoTimer();
+      autoTimer = setInterval(() => {
+        if (isVisible) {
+          const next = (currentIndex + 1) % totalSteps;
+          goToStep(next);
+        }
+      }, autoplayDuration);
+    }
+
+    function stopAutoTimer() {
+      if (autoTimer) {
+        clearInterval(autoTimer);
+        autoTimer = null;
+      }
+    }
+
+    function resetAutoTimer() {
+      startAutoTimer();
+    }
+
+    // Click en botones de paso
+    stepBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const step = parseInt(btn.dataset.step || "0", 10);
+        goToStep(step);
+        resetAutoTimer();
+      });
+    });
+
+    // Control de Scroll sincronizado en el contenedor 300vh
+    let ticking = false;
+    function onScroll() {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          ticking = false;
+          if (!container) return;
+          const rect = container.getBoundingClientRect();
+          const scrollableDistance = rect.height - window.innerHeight;
+          if (scrollableDistance <= 0) return;
+
+          if (rect.top <= 0 && rect.bottom >= window.innerHeight) {
+            const rawProgress = -rect.top / scrollableDistance;
+            const progress = Math.min(Math.max(rawProgress, 0), 1);
+            const slice = 1 / totalSteps;
+            const target = Math.min(Math.floor(progress / slice), totalSteps - 1);
+            if (target !== currentIndex) {
+              goToStep(target);
+              resetAutoTimer();
+            }
+          }
+        });
+        ticking = true;
+      }
+    }
+
+    // IntersectionObserver para pausar autoplay si no está visible
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisible = entry.isIntersecting;
+          if (isVisible) {
+            startAutoTimer();
+            // Disparar animación inicial si recién entra
+            playStepAnimation(currentIndex);
+          } else {
+            stopAutoTimer();
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(container);
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupAlternativeNarrative);
+  } else {
+    setupAlternativeNarrative();
+  }
+  document.addEventListener("astro:page-load", setupAlternativeNarrative);
+</script>

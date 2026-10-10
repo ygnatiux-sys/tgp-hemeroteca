@@ -1,0 +1,27 @@
+---
+import Layout from "../layouts/Layout.astro";
+import AbyssHero from "../components/AbyssHero.astro";
+import img from "../assets/alternativa/derinkuyu.jpg";
+
+export const prerender = true;
+---
+
+<Layout
+  title="Laboratorio: Paralaje de Abismo (Profundidad Z) — DERINKUYU | TGP"
+  description="Efecto de caída en profundidad tridimensional hacia el túnel de Derinkuyu con Clash Display y paleta Cinabrio/Carbón."
+  headerTransparentUntilScroll={true}
+  footerVariant="minimal"
+  bodyClass="bg-[#0a0a0a]"
+>
+  <AbyssHero
+    image={img}
+    imageScale={1.03}
+    imageFilter="contrast(1.22) brightness(0.82)"
+    imagePosition="center"
+    word="Derinkuyu"
+    subtitle="El último refugio de la humanidad"
+    speed={1}
+    showHud={true}
+    hudLabel="Profundidad Z · Derinkuyu"
+  />
+</Layout>

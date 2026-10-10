@@ -1,0 +1,24 @@
+---
+import Layout from "../layouts/Layout.astro";
+import BarabarHero from "../components/BarabarHero.astro";
+import img from "../assets/alternativa/barabar.jpg";
+
+export const prerender = true;
+---
+
+<Layout
+  title="Laboratorio: Resonancia y Refracción Espejo — BARABAR | TGP"
+  description="Prueba cinemática de las Cuevas de Barabar con eco acústico GSAP, glint de espejo y paleta Mercurio / Ámbar Ígneo."
+  headerTransparentUntilScroll={true}
+  footerVariant="minimal"
+  bodyClass="bg-[#060708]"
+>
+  <BarabarHero
+    image={img}
+    word="BARABAR"
+    subtitle="El reflejo imposible de una tecnología perdida"
+    speed={1}
+    showHud={true}
+    hudLabel="Resonancia & Espejo · Barabar"
+  />
+</Layout>

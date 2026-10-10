@@ -17,6 +17,7 @@ import SpotlightHero from '../components/SpotlightHero.astro';
 import CinematicGrid from '../components/CinematicGrid.astro';
 import MubiBlockCinematic, { type MubiCinematicItem } from '../components/MubiBlockCinematic.astro';
 import TriplicoRevelacion, { type TriplicoPost } from '../components/TriplicoRevelacion.astro';
+import AlternativeScrollNarrative from '../components/AlternativeScrollNarrative.astro';
 import ScrollNarrative from '../components/ScrollNarrative.astro';
 import HeroNetflixTgp from '../components/HeroNetflixTgp.astro';
 import {
@@ -466,6 +467,13 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
           />
         </section>
       )}
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          NUEVA COLECCIÓN: 'ALTERNATIVE' (HISTORIA PROFUNDA / ARCHIVO NO OFICIAL)
+      ═══════════════════════════════════════════════════════════════════ */}
+      <div class="w-screen relative left-1/2 -translate-x-1/2 my-12 sm:my-16 md:my-24 overflow-x-hidden">
+        <AlternativeScrollNarrative />
+      </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
           INTERLUDIO EDITORIAL: STICKY SCROLL NARRATIVE (MEGALITOS)

@@ -1,0 +1,648 @@
+---
+/**
+ * src/components/BarabarHero.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * LAS CUEVAS DE BARABAR — "Resonancia y Refracción Espejo" (The Sonic Reflection)
+ *
+ * 1. Paleta: Gris Mercurio / Plata Pulida (#E5E5E5) + Ámbar Ígneo (#F39C12 / #D35400).
+ * 2. Tipografía: Syne Extra Bold / 900 (estilo PP Monument Extended, ultra-ancha).
+ * 3. Animación GSAP:
+ *    - Entrada: Eco acústico (4 ondas de contorno vibran en resonancia y colapsan).
+ *    - Acabado: Destello y barrido de luz de espejo (glint metálico diagonal).
+ *    - H2/H3: Surge desde la penumbra con motion blur, iluminado por la lámpara de aceite.
+ */
+interface Props {
+  image: ImageMetadata;
+  word?: string;
+  subtitle?: string;
+  speed?: number;
+  showHud?: boolean;
+  hudLabel?: string;
+}
+
+const {
+  image,
+  word = "BARABAR",
+  subtitle = "El reflejo imposible de una tecnología perdida",
+  speed = 1,
+  showHud = true,
+  hudLabel = "Resonancia & Espejo · Barabar",
+} = Astro.props;
+---
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Syne:wght@800;900&display=swap"
+/>
+
+<section class="barabar-stage" aria-label={word}>
+  <!-- Fondo cinemático de la cueva de granito -->
+  <div class="barabar-bg-wrap">
+    <img
+      src={image.src}
+      alt="Bóveda de granito pulido espejo de las Cuevas de Barabar"
+      class="barabar-img"
+      loading="eager"
+      decoding="async"
+    />
+  </div>
+
+  <!-- Iluminación: viñeta de granito oscuro + fuego de la lámpara de aceite -->
+  <div class="barabar-vignette"></div>
+  <div class="barabar-lamp-glow"></div>
+  <div class="barabar-grain"></div>
+
+  <!-- Escenario Tipográfico -->
+  <div class="barabar-slot">
+    <div class="barabar-chamber">
+      
+      <!-- Badge de Cámara Sonora -->
+      <span class="barabar-badge">
+        <span class="barabar-badge-dot"></span>
+        Cámara Subterránea de Bihar · Acústica de Granito
+      </span>
+
+      <!-- Bloque Tipográfico con Capas de Eco Acústico -->
+      <div class="barabar-text-stack">
+        <!-- 4 Capas de Contorno Translúcido (Ondas de Eco) -->
+        <span class="barabar-echo echo-1" aria-hidden="true">{word}</span>
+        <span class="barabar-echo echo-2" aria-hidden="true">{word}</span>
+        <span class="barabar-echo echo-3" aria-hidden="true">{word}</span>
+        <span class="barabar-echo echo-4" aria-hidden="true">{word}</span>
+
+        <!-- Palabra Sólida Central en Mercurio Pulido -->
+        <h1 class="barabar-solid" aria-label={word}>
+          {word}
+          <!-- Destello de Espejo (Glint) -->
+          <span class="barabar-glint" aria-hidden="true"></span>
+        </h1>
+      </div>
+
+      <!-- H2: Emerge con motion blur iluminado por el fuego de la lámpara -->
+      <h2 class="barabar-sub">
+        <span class="barabar-sub-line"></span>
+        {subtitle}
+      </h2>
+    </div>
+  </div>
+
+  {
+    showHud ? (
+      <div class="barabar-hud">
+        <div class="barabar-hud-head">
+          <span class="barabar-hud-dot" />
+          <span>{hudLabel}</span>
+        </div>
+        <button type="button" id="barabar-replay" class="barabar-hud-btn">
+          Resonar Cámara (Espacio)
+        </button>
+        <div class="barabar-hud-speeds">
+          <button type="button" class="barabar-speed" data-speed="1.5">Rápido</button>
+          <button type="button" class="barabar-speed is-active" data-speed="1">Resonante</button>
+          <button type="button" class="barabar-speed" data-speed="0.6">Profundo</button>
+        </div>
+      </div>
+    ) : (
+      <button type="button" id="barabar-replay" class="barabar-replay" aria-label="Repetir resonancia">
+        ↻
+      </button>
+    )
+  }
+</section>
+
+<noscript>
+  <style>
+    .barabar-solid,
+    .barabar-sub,
+    .barabar-badge {
+      opacity: 1 !important;
+      transform: none !important;
+      filter: none !important;
+    }
+    .barabar-echo {
+      display: none !important;
+    }
+  </style>
+</noscript>
+
+<style>
+  .barabar-stage {
+    position: relative;
+    width: 100%;
+    height: 100svh;
+    min-height: 580px;
+    overflow: hidden;
+    background: #060708;
+    color: #fff;
+    user-select: none;
+  }
+
+  .barabar-bg-wrap {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .barabar-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 55%;
+    filter: brightness(0.85) contrast(1.22);
+    will-change: transform;
+    animation: barabar-creep 30s ease-in-out infinite alternate;
+  }
+
+  @keyframes barabar-creep {
+    from { transform: scale(1.02); }
+    to { transform: scale(1.08); }
+  }
+
+  /* Viñeta de Granito Profundo */
+  .barabar-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at 50% 50%,
+      rgba(6, 7, 8, 0.15) 0%,
+      rgba(6, 7, 8, 0.6) 65%,
+      rgba(6, 7, 8, 0.95) 98%
+    );
+    pointer-events: none;
+  }
+
+  /* Halo cálido de la lámpara de aceite en el suelo */
+  .barabar-lamp-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at 43% 72%,
+      rgba(243, 156, 18, 0.3) 0%,
+      rgba(211, 84, 0, 0.14) 22%,
+      transparent 55%
+    );
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  /* Grano analógico A24 */
+  .barabar-grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.2;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    pointer-events: none;
+    animation: barabar-grain-anim 0.8s steps(5) infinite;
+  }
+
+  @keyframes barabar-grain-anim {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-2%, 1%); }
+    50% { transform: translate(1%, -2%); }
+    75% { transform: translate(-1%, 2%); }
+    100% { transform: translate(0, 0); }
+  }
+
+  .barabar-slot {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+    padding: 2rem 4vw;
+  }
+
+  .barabar-chamber {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 1400px;
+    width: 100%;
+  }
+
+  .barabar-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: clamp(0.6rem, 1vw, 0.72rem);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #e5e5e5;
+    padding: 0.35rem 1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(229, 229, 229, 0.2);
+    background: rgba(6, 7, 8, 0.65);
+    backdrop-filter: blur(10px);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+  }
+
+  .barabar-badge-dot {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: #f39c12;
+    box-shadow: 0 0 10px #f39c12;
+  }
+
+  .barabar-text-stack {
+    position: relative;
+    display: inline-block;
+  }
+
+  /* TIPOGRAFÍA BRUTALISTA ULTRA-ANCHA (Syne 900 estilo PP Monument Extended) */
+  .barabar-solid,
+  .barabar-echo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 900;
+    font-size: clamp(3.6rem, 15.5vw, 15rem);
+    line-height: 0.86;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin: 0;
+    padding: 0.05em 0.08em;
+  }
+
+  /* Capas de Contorno (Eco Acústico) */
+  .barabar-echo {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    color: transparent;
+    -webkit-text-stroke: 1.6px rgba(229, 229, 229, 0.55);
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform, opacity, filter;
+  }
+
+  .echo-1 { -webkit-text-stroke-color: rgba(243, 156, 18, 0.5); }
+  .echo-2 { -webkit-text-stroke-color: rgba(229, 229, 229, 0.7); }
+  .echo-3 { -webkit-text-stroke-color: rgba(176, 183, 189, 0.6); }
+  .echo-4 { -webkit-text-stroke-color: rgba(255, 255, 255, 0.4); }
+
+  /* Palabra Sólida Central (Gris Mercurio / Plata Pulida) */
+  .barabar-solid {
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #e8edf1 26%,
+      #b0b7bd 62%,
+      #6e777f 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    opacity: 0;
+    filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.98))
+      drop-shadow(0 0 45px rgba(229, 229, 229, 0.28));
+    overflow: hidden;
+    will-change: transform, opacity;
+  }
+
+  /* Destello de Espejo Diagonal (Glint) */
+  .barabar-glint {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: linear-gradient(
+      110deg,
+      transparent 18%,
+      rgba(255, 255, 255, 0.95) 45%,
+      rgba(243, 156, 18, 0.8) 50%,
+      rgba(255, 255, 255, 0.95) 55%,
+      transparent 82%
+    );
+    transform: translateX(-160%) skewX(-24deg);
+    mix-blend-mode: color-dodge;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  /* SUBTÍTULO: Ámbar Ígneo con Fuego y Resplandor */
+  .barabar-sub {
+    margin: 1.6rem 0 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: clamp(0.85rem, 2.2vw, 1.4rem);
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    background: linear-gradient(
+      180deg,
+      #fde3a7 0%,
+      #f39c12 55%,
+      #d35400 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    opacity: 0;
+    filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.95))
+      drop-shadow(0 0 25px rgba(243, 156, 18, 0.45));
+    will-change: transform, opacity, filter;
+  }
+
+  .barabar-sub-line {
+    width: 2rem;
+    height: 1.5px;
+    background: linear-gradient(90deg, #f39c12, transparent);
+  }
+
+  /* HUD */
+  .barabar-hud {
+    position: absolute;
+    top: 5.5rem;
+    right: 1.5rem;
+    z-index: 30;
+    width: 16rem;
+    padding: 0.95rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-radius: 1rem;
+    background: rgba(6, 7, 8, 0.88);
+    border: 1px solid rgba(229, 229, 229, 0.18);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(16px);
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .barabar-hud-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #e5e5e5;
+    font-weight: 700;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .barabar-hud-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: #e5e5e5;
+    box-shadow: 0 0 8px #e5e5e5;
+  }
+
+  .barabar-hud-btn {
+    padding: 0.75rem;
+    border-radius: 0.7rem;
+    border: 0;
+    cursor: pointer;
+    background: linear-gradient(90deg, #b0b7bd, #e5e5e5);
+    color: #060708;
+    font-weight: 700;
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+
+  .barabar-hud-btn:hover {
+    filter: brightness(1.1);
+  }
+
+  .barabar-hud-btn:active {
+    transform: scale(0.96);
+  }
+
+  .barabar-hud-speeds {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: 0.6rem;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .barabar-speed {
+    padding: 0.4rem 0;
+    border: 0;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    background: transparent;
+    color: #a0a6ac;
+    font-size: 0.62rem;
+  }
+
+  .barabar-speed.is-active {
+    background: #e5e5e5;
+    color: #060708;
+    font-weight: 700;
+  }
+
+  .barabar-replay {
+    position: absolute;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 20;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(6, 7, 8, 0.6);
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 1.1rem;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
+  }
+
+  .barabar-replay:hover {
+    color: #fff;
+    border-color: #e5e5e5;
+    transform: rotate(-90deg);
+  }
+</style>
+
+<script>
+  import gsap from "gsap";
+
+  const setupBarabar = () => {
+    const stage = document.querySelector<HTMLElement>(".barabar-stage");
+    if (!stage || stage.dataset.ready === "true") return;
+    stage.dataset.ready = "true";
+
+    const badge = stage.querySelector<HTMLElement>(".barabar-badge");
+    const solid = stage.querySelector<HTMLElement>(".barabar-solid");
+    const glint = stage.querySelector<HTMLElement>(".barabar-glint");
+    const sub = stage.querySelector<HTMLElement>(".barabar-sub");
+    const echoes = stage.querySelectorAll<HTMLElement>(".barabar-echo");
+    const replayBtn = document.getElementById("barabar-replay");
+    const speedBtns = document.querySelectorAll<HTMLElement>(".barabar-speed");
+
+    if (!solid || !glint || !sub || echoes.length === 0) return;
+
+    let speed = 1;
+    let tl: gsap.core.Timeline | null = null;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const reset = () => {
+      tl?.kill();
+      tl = null;
+
+      gsap.set(badge, { opacity: 0, y: -18 });
+      gsap.set(solid, { opacity: 0, scale: 0.98, filter: "blur(0px)" });
+      gsap.set(glint, { xPercent: -180 });
+      gsap.set(sub, { opacity: 0, y: 35, filter: "blur(14px)" });
+
+      echoes.forEach((echo) => {
+        gsap.set(echo, { opacity: 0, scale: 1, x: 0, y: 0, filter: "blur(0px)" });
+      });
+    };
+
+    const play = async () => {
+      if (document.fonts?.ready) await document.fonts.ready;
+      reset();
+
+      if (reduceMotion) {
+        gsap.set([badge, solid, sub], { opacity: 1, y: 0, filter: "none", scale: 1 });
+        return;
+      }
+
+      tl = gsap.timeline();
+
+      // FASE 0: Badge sutil de contexto
+      tl.to(badge, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" });
+
+      // FASE 1: ECO ACÚSTICO — Las 4 ondas de contorno vibran en resonancia desfasada
+      tl.addLabel("resonance");
+
+      echoes.forEach((echo, idx) => {
+        const spread = (idx + 1) * 16;
+        tl.fromTo(
+          echo,
+          {
+            opacity: 0,
+            scale: 1 + (idx + 1) * 0.04,
+            x: (idx % 2 === 0 ? -1 : 1) * spread,
+          },
+          {
+            opacity: 0.85 - idx * 0.15,
+            duration: 0.45,
+            ease: "power2.out",
+          },
+          "resonance"
+        )
+        // Vibración armónica desfasada (simulando resonancia acústica pura)
+        .to(
+          echo,
+          {
+            x: (idx % 2 === 0 ? 1 : -1) * (spread * 0.7),
+            duration: 0.08,
+            repeat: 7,
+            yoyo: true,
+            ease: "sine.inOut",
+          },
+          "resonance+=0.2"
+        );
+      });
+
+      // FASE 2: IMPLOSIÓN ACÚSTICA & CONSOLIDACIÓN EN MERCURIO SÓLIDO
+      tl.addLabel("collapse", "resonance+=0.85");
+
+      // Las ondas de eco colapsan hacia el centro y se desvanecen
+      echoes.forEach((echo) => {
+        tl.to(
+          echo,
+          {
+            x: 0,
+            scale: 1,
+            opacity: 0,
+            duration: 0.55,
+            ease: "power3.in",
+          },
+          "collapse"
+        );
+      });
+
+      // La palabra sólida se materializa masiva
+      tl.to(
+        solid,
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.75,
+          ease: "power3.out",
+        },
+        "collapse+=0.2"
+      );
+
+      // FASE 3: BRILLO DE ESPEJO (GLINT DIAGONAL)
+      // Un barrido reflectante cruza el granito pulido
+      tl.to(
+        glint,
+        {
+          xPercent: 180,
+          duration: 1.1,
+          ease: "power2.inOut",
+        },
+        "collapse+=0.8"
+      );
+
+      // FASE 4: SURGIMIENTO DESDE LA PENUMBRA (ÁMBAR ÍGNEO / LÁMPARA DE ACEITE)
+      tl.to(
+        sub,
+        {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 1.6,
+          ease: "power3.out",
+        },
+        "collapse+=1.0"
+      );
+
+      tl.timeScale(speed);
+    };
+
+    reset();
+    setTimeout(play, 450);
+
+    replayBtn?.addEventListener("click", play);
+
+    speedBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        speedBtns.forEach((b) => b.classList.remove("is-active"));
+        btn.classList.add("is-active");
+        speed = parseFloat(btn.dataset.speed || "1");
+        play();
+      });
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && (e.target as HTMLElement)?.tagName !== "INPUT") {
+        e.preventDefault();
+        play();
+      }
+    });
+  };
+
+  document.addEventListener("astro:page-load", setupBarabar);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupBarabar);
+  } else {
+    setupBarabar();
+  }
+</script>
