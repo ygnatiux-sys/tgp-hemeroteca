@@ -105,43 +105,50 @@ export function BuscadorModal() {
             if (!isOpen) setQuery('');
           }}
           title="Buscar (Ctrl + K)"
-          className="header-action-btn flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-xl transition-all duration-300 cursor-pointer z-10 relative"
+          className="header-action-btn flex items-center justify-center w-11 h-11 md:w-12 md:h-12 min-w-11 min-h-11 rounded-xl transition-all duration-300 cursor-pointer z-10 relative"
         >
-          <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="w-5.5 h-5.5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
         </button>
 
-        {/* Línea de búsqueda (se expande unas 3 palabras) */}
+        {/* Línea de búsqueda (se expande con presencia cinematográfica y letra gruesa) */}
         <input
           ref={inputRef}
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Buscar ensayo..."
-          className={`transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] bg-transparent border-b border-black/20 dark:border-white/20 outline-none text-[13px] font-metadata tracking-widest uppercase placeholder:text-black/30 dark:placeholder:text-white/30 text-current ${
-            isOpen ? 'w-36 md:w-44 opacity-100 ml-1 px-1' : 'w-0 opacity-0 px-0 border-transparent'
+          placeholder="Buscar temas o ensayos..."
+          className={`transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] bg-transparent border-b-2 border-black/40 dark:border-white/40 outline-none text-[14px] md:text-[16px] font-sans font-bold tracking-wider uppercase placeholder:text-black/40 dark:placeholder:text-white/40 text-current ${
+            isOpen ? 'w-48 md:w-72 opacity-100 ml-2 px-1' : 'w-0 opacity-0 px-0 border-transparent'
           }`}
           style={{ visibility: isOpen ? 'visible' : 'hidden' }}
         />
 
-        {/* Resultados Nudos (flotantes sin caja fuerte) */}
+        {/* Resultados con cuerpo visual sólido y tipografía engrosada */}
         {isOpen && query.trim() !== '' && (
-          <div className="absolute top-12 md:top-14 right-0 w-80 md:w-112.5 flex flex-col gap-1 z-50">
+          <div className="absolute top-12 md:top-14 right-0 w-84 md:w-115 flex flex-col gap-1.5 z-50 p-2 sm:p-2.5 rounded-2xl bg-[#0a0b0d]/95 dark:bg-[#0a0b0d]/95 backdrop-blur-2xl border border-white/15 shadow-[0_20px_60px_rgba(0,0,0,0.95)]">
             {isLoading ? (
-              <div className="text-[10px] font-metadata tracking-widest uppercase text-current opacity-50 px-2">Buscando...</div>
+              <div className="text-xs font-metadata font-bold tracking-widest uppercase text-current opacity-70 px-3 py-2">Buscando...</div>
             ) : filtered.length === 0 ? (
-              <div className="text-[10px] font-metadata tracking-widest uppercase text-current opacity-50 px-2">No encontrado</div>
+              <div className="text-xs font-metadata font-bold tracking-widest uppercase text-current opacity-70 px-3 py-2">No encontrado</div>
             ) : (
               filtered.slice(0, 6).map((item) => (
                 <a
                   key={item.id || item.slug}
                   href={`/hemeroteca/${item.slug}/`}
                   onClick={() => setIsOpen(false)}
-                  className="font-metadata font-light text-[11px] uppercase tracking-[0.2em] text-current opacity-70 hover:opacity-100 hover:text-rust-orange dark:hover:text-rust-orange hover:drop-shadow-[0_0_8px_rgba(239,235,227,0.06)] px-2 py-1.5 transition-all duration-300 select-none block"
+                  className="group/item flex flex-col gap-0.5 px-3.5 py-2.5 rounded-xl bg-white/4 hover:bg-white/12 dark:bg-white/5 dark:hover:bg-white/15 border border-white/10 hover:border-white/25 transition-all duration-200 select-none"
                 >
-                  {item.title}
+                  {item.category && (
+                    <span className="font-metadata font-bold text-[9.5px] uppercase tracking-[0.25em] text-rust-orange">
+                      {item.category}
+                    </span>
+                  )}
+                  <span className="font-sans font-bold text-[13.5px] sm:text-[14.5px] uppercase tracking-wide text-white group-hover/item:text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)] leading-snug">
+                    {item.title}
+                  </span>
                 </a>
               ))
             )}
@@ -155,43 +162,41 @@ export function BuscadorModal() {
           type="button"
           onClick={() => setNavState(prev => ((prev + 1) % 3) as 0 | 1 | 2)}
           title="Menú"
-          className={`header-action-btn flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-xl transition-all duration-300 cursor-pointer ${
+          className={`header-action-btn flex items-center justify-center w-11 h-11 md:w-12 md:h-12 min-w-11 min-h-11 rounded-xl transition-all duration-300 cursor-pointer ${
             isNavExpanded ? 'is-expanded text-[#EFEBE3]! drop-shadow-[0_0_5px_rgba(239,235,227,0.25)]' : ''
           }`}
         >
-          <svg className="w-5.5 h-4.5" viewBox="0 0 18 14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+          <svg className="w-5.5 h-4.5 md:w-6 md:h-5" viewBox="0 0 18 14" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round">
             <line x1="0" y1="2" x2="18" y2="2" />
             <line x1="0" y1="7" x2="18" y2="7" />
             <line x1="0" y1="12" x2="18" y2="12" />
           </svg>
         </button>
 
-        {/* Menú Desplegable Minimalista */}
+        {/* Menú Desplegable con cuerpo editorial unificado */}
         <div 
-          className={`absolute top-12 md:top-14 right-0 w-56 md:w-64 bg-transparent transition-all duration-300 origin-top-right z-50 flex flex-col gap-1.5 ${
-            isNavExpanded ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible'
+          className={`absolute top-12 md:top-14 right-0 w-64 md:w-72 p-2 sm:p-2.5 rounded-2xl bg-[#0a0b0d]/95 dark:bg-[#0a0b0d]/95 backdrop-blur-2xl border border-white/15 shadow-[0_20px_60px_rgba(0,0,0,0.95)] transition-all duration-300 origin-top-right z-50 flex flex-col gap-1 ${
+            isNavExpanded ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible pointer-events-none'
           }`}
         >
-          <div className="flex flex-col items-end gap-1.5 pt-2">
-            {[
-              { label: 'Inicio', href: '/' },
-              { label: 'Colecciones', href: '/colecciones' },
-              { label: 'Archivo', href: '/archivo' },
-              { label: 'About', href: '/about' },
-              { label: 'Editorial ↗', href: 'https://ediciones.thegreatpuzzleproject.com', external: true },
-            ].map(link => (
-              <a
-                key={link.href}
-                href={link.href}
-                target={link.external ? '_blank' : undefined}
-                rel={link.external ? 'noopener noreferrer' : undefined}
-                onClick={() => setNavState(0)}
-                className="font-metadata text-[13px] md:text-sm uppercase tracking-[-0.015em] text-current opacity-70 hover:opacity-100 hover:text-[#EFEBE3] hover:drop-shadow-[0_0_6px_rgba(255,255,255,0.2)] transition-all"
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
+          {[
+            { label: 'Inicio', href: '/' },
+            { label: 'Colecciones', href: '/colecciones' },
+            { label: 'Archivo', href: '/archivo' },
+            { label: 'About', href: '/about' },
+            { label: 'Editorial ↗', href: 'https://ediciones.thegreatpuzzleproject.com', external: true },
+          ].map(link => (
+            <a
+              key={link.href}
+              href={link.href}
+              target={link.external ? '_blank' : undefined}
+              rel={link.external ? 'noopener noreferrer' : undefined}
+              onClick={() => setNavState(0)}
+              className="px-4 py-2.5 rounded-xl bg-white/4 hover:bg-white/12 dark:bg-white/5 dark:hover:bg-white/15 border border-white/10 hover:border-white/25 font-sans font-bold text-[13.5px] sm:text-[14.5px] uppercase tracking-wider text-white hover:text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)] transition-all duration-200 select-none block text-left"
+            >
+              {link.label}
+            </a>
+          ))}
         </div>
       </div>
     </div>

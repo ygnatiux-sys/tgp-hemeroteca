@@ -232,7 +232,7 @@ header .header-btn-codice {
 /* ─── MODO CLARO (PAPIRO) ─── */
 [data-theme='light'] header {
   background-color: rgba(245, 244, 240, 0.96) !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-bottom: none !important;
 }
 
 [data-theme='light'] header .header-brand-title,

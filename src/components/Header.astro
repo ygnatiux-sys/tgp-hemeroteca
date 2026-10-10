@@ -14,7 +14,7 @@ const { transparentUntilScroll = false } = Astro.props;
 
 <header
   id="site-header"
-  class="fixed top-0 w-full z-50 bg-transparent border-b border-transparent"
+  class="fixed top-0 w-full z-50 bg-transparent border-0"
   data-transparent-until-scroll={transparentUntilScroll ? "true" : "false"}
 >
   {/* Barra principal comercial (estilo Netflix/HBO): 64px mobile, 76px desktop → WCV */}
@@ -56,12 +56,12 @@ const { transparentUntilScroll = false } = Astro.props;
     </div>
 
     {/* ── CENTRO: Nav desktop visible (a partir de lg / laptops y desktop) ── */}
-    <nav class="toolbar-element hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-4 xl:gap-6 shrink-0 font-metadata text-[15px] xl:text-[16.5px] tracking-[-0.01em] whitespace-nowrap z-0 transition-all duration-500">
+    <nav class="toolbar-element hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-5 xl:gap-7 shrink-0 font-metadata text-[15px] xl:text-[16px] tracking-wide font-medium whitespace-nowrap z-0 transition-all duration-500">
 
-      <a href="/" class="header-nav-link transition-colors py-1">Inicio</a>
-      <a href="/colecciones/" class="header-nav-link transition-colors py-1">Colecciones</a>
-      <a href="/archivo/" class="header-nav-link transition-colors py-1">Archivo</a>
-      <a href="/about/" class="header-nav-link transition-colors py-1">About</a>
+      <a href="/" class="header-nav-link transition-colors px-2 py-1.5">Inicio</a>
+      <a href="/colecciones/" class="header-nav-link transition-colors px-2 py-1.5">Colecciones</a>
+      <a href="/archivo/" class="header-nav-link transition-colors px-2 py-1.5">Archivo</a>
+      <a href="/about/" class="header-nav-link transition-colors px-2 py-1.5">About</a>
     </nav>
 
     {/* ── DERECHA: Acciones ── */}
@@ -75,14 +75,14 @@ const { transparentUntilScroll = false } = Astro.props;
       <button
         id="nav-mobile-btn"
         type="button"
-        class="lg:hidden w-11 h-11 min-w-11 min-h-11 rounded-lg border border-white/12 bg-white/4 hover:bg-white/10 active:scale-95 text-[#EFEBE3] flex flex-col items-center justify-center gap-1.25 transition-all duration-300 cursor-pointer"
+        class="lg:hidden w-11 h-11 md:w-12 md:h-12 min-w-11 min-h-11 rounded-xl border border-white/12 bg-white/4 hover:bg-white/10 active:scale-95 text-[#EFEBE3] flex flex-col items-center justify-center gap-1.25 transition-all duration-300 cursor-pointer"
         aria-label="Alternar menú de navegación"
         aria-expanded="false"
         aria-controls="nav-drawer"
       >
-        <span class="hamburger-line block w-4.5 h-[1.5px] bg-current rounded-full transition-all duration-300 origin-center"></span>
-        <span class="hamburger-line block w-4.5 h-[1.5px] bg-current rounded-full transition-all duration-300 origin-center"></span>
-        <span class="hamburger-line block w-3 h-[1.5px] bg-current rounded-full transition-all duration-300 origin-center self-start ml-0.75"></span>
+        <span class="hamburger-line block w-5 md:w-5.5 h-[2.2px] bg-current rounded-full transition-all duration-300 origin-center"></span>
+        <span class="hamburger-line block w-5 md:w-5.5 h-[2.2px] bg-current rounded-full transition-all duration-300 origin-center"></span>
+        <span class="hamburger-line block w-3.5 md:w-4 h-[2.2px] bg-current rounded-full transition-all duration-300 origin-center self-start ml-0.75"></span>
       </button>
     </div>
   </div>
@@ -402,7 +402,8 @@ const { transparentUntilScroll = false } = Astro.props;
   /* ── Estado base del navbar: Scrim superior permanente de alta visibilidad (estilo Netflix) ── */
   #site-header {
     background: linear-gradient(180deg, rgba(7, 7, 9, 0.90) 0%, rgba(7, 7, 9, 0.55) 55%, transparent 100%);
-    border-bottom: 1px solid transparent;
+    border-bottom: none !important;
+    border-color: transparent !important;
     box-shadow: none;
     opacity: 1;
     transform: translateY(0);
@@ -410,7 +411,6 @@ const { transparentUntilScroll = false } = Astro.props;
       transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
       background 0.35s ease,
       background-color 0.35s ease,
-      border-color 0.3s ease,
       backdrop-filter 0.3s ease,
       box-shadow 0.3s ease;
   }
@@ -418,7 +418,8 @@ const { transparentUntilScroll = false } = Astro.props;
   /* ── Con scroll: sticky glassmorphism al navegar o scroll up ── */
   #site-header.is-scrolled {
     background: rgba(14, 17, 16, 0.92) !important;
-    border-bottom-color: rgba(255, 255, 255, 0.08);
+    border-bottom: none !important;
+    border-color: transparent !important;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.6);
@@ -470,7 +471,8 @@ const { transparentUntilScroll = false } = Astro.props;
   }
   [data-theme='light'] #site-header.is-scrolled {
     background-color: rgba(245, 244, 240, 0.94) !important;
-    border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+    border-bottom: none !important;
+    border-color: transparent !important;
     box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08) !important;
   }
   [data-theme='light'] #site-header .header-action-btn svg {
