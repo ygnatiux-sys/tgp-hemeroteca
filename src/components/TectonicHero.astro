@@ -26,7 +26,8 @@ interface Props {
   subColor?: string;
   size?: string;
   tracking?: string;
-  align?: "center" | "top-left" | "bottom-left" | "bottom-center";
+  align?: "center" | "left" | "top-left" | "bottom-left" | "bottom-center";
+  disintegrate?: boolean;
   speed?: number;
   showHud?: boolean;
   hudLabel?: string;
@@ -66,7 +67,11 @@ const {
   <div class="tec-grain"></div>
 
   <div class={`tec-slot tec-align-${align}`}>
-    <TectonicTitle {...titleProps} speed={speed} />
+    <TectonicTitle
+      {...titleProps}
+      align={align === "left" || align === "top-left" || align === "bottom-left" ? "left" : "center"}
+      speed={speed}
+    />
   </div>
 
   {
@@ -169,6 +174,7 @@ const {
   }
 
   .tec-align-center { align-items: center; justify-content: center; }
+  .tec-align-left { align-items: center; justify-content: flex-start; padding-left: 6vw; }
   .tec-align-top-left { align-items: flex-start; justify-content: flex-start; padding-top: 17vh; }
   .tec-align-bottom-left { align-items: flex-end; justify-content: flex-start; padding-bottom: 14vh; }
   .tec-align-bottom-center { align-items: flex-end; justify-content: center; padding-bottom: 11vh; }

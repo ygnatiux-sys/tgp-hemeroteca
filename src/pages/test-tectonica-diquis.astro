@@ -1,0 +1,38 @@
+---
+import Layout from "../layouts/Layout.astro";
+import TectonicHero from "../components/TectonicHero.astro";
+import img from "../assets/alternativa/esfera-diquis.jpg";
+
+export const prerender = true;
+---
+
+<Layout
+  title="Laboratorio: Fractura Tectónica Rojo Netflix — DIQUÍS | TGP"
+  description="Prueba de la animación Fractura Tectónica con Fraunces Rojo Netflix granulado, alineada a la izquierda y desintegración en fade out."
+  headerTransparentUntilScroll={true}
+  footerVariant="minimal"
+  bodyClass="bg-black"
+>
+  <TectonicHero
+    image={img}
+    imageFilter="brightness(0.78) contrast(1.18) saturate(0.85)"
+    imagePosition="center right"
+    overlay="radial-gradient(ellipse at 70% 50%, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 75%), linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.7) 100%)"
+    word="Diquís"
+    subtitle="El enigma lítico de la selva"
+    fontHref="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,900,0,0&display=swap"
+    fontFamily="'Fraunces', serif"
+    fontWeight={900}
+    fontVariation="'opsz' 9, 'SOFT' 0, 'WONK' 0"
+    gradient="linear-gradient(180deg, #FF4D55 0%, #E50914 42%, #9B0B11 78%, #4A0508 100%)"
+    glow="rgba(229, 9, 20, 0.45)"
+    accent="#FF2A35"
+    subColor="#F5D0D2"
+    size="clamp(4rem, 16vw, 15rem)"
+    tracking="-0.02em"
+    align="left"
+    disintegrate={true}
+    showHud={true}
+    hudLabel="Fractura Rojo Netflix · Diquís"
+  />
+</Layout>

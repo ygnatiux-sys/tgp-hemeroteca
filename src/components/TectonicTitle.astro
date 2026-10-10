@@ -199,6 +199,29 @@ const cssVars = [
     text-shadow: 0 2px 18px rgba(0, 0, 0, 0.9);
   }
 
+  .tec-align-left {
+    text-align: left;
+  }
+  .tec-align-left .tec-h1 {
+    text-align: left;
+  }
+  .tec-align-left .tec-sub {
+    text-align: left;
+    left: 1%;
+    right: auto;
+  }
+  .tec-align-right {
+    text-align: right;
+  }
+  .tec-align-right .tec-h1 {
+    text-align: right;
+  }
+  .tec-align-right .tec-sub {
+    text-align: right;
+    right: 1%;
+    left: auto;
+  }
+
   .tec-dust {
     position: absolute;
     inset: 0;
@@ -233,6 +256,7 @@ const cssVars = [
       if (!h1 || !top || !bot || !band || !sub || !dust) return;
 
       let speed = parseFloat(root.dataset.speed || "1");
+      const shouldDisintegrate = root.dataset.disintegrate === "true";
       let tl: gsap.core.Timeline | null = null;
       const reduceMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
@@ -252,8 +276,8 @@ const cssVars = [
         tl = null;
         dust.innerHTML = "";
         gsap.set(root, { x: 0 });
-        gsap.set([top, bot], { x: 0, y: 0 });
-        gsap.set(band, { yPercent: -50, scaleY: 0, transformOrigin: "50% 50%" });
+        gsap.set([top, bot], { x: 0, y: 0, opacity: 1, filter: "none", scale: 1 });
+        gsap.set(band, { yPercent: -50, scaleY: 0, opacity: 1, filter: "none", transformOrigin: "50% 50%" });
         gsap.set(sub, { yPercent: -50, opacity: 0, filter: "blur(12px)" });
         gsap.set(h1, { opacity: 0, scale: 1.06 });
       };
@@ -326,6 +350,21 @@ const cssVars = [
             { opacity: 1, filter: "blur(0px)", duration: 1.6, ease: "power2.out" },
             "fracture+=0.9",
           );
+
+        // 6. Si tiene desintegración activada: fade out y disolución en el vacío
+        if (shouldDisintegrate) {
+          tl.to(
+            [top, bot, band],
+            {
+              opacity: 0,
+              filter: "blur(18px)",
+              scale: 1.04,
+              duration: 2.2,
+              ease: "power2.out",
+            },
+            "fracture+=1.4",
+          );
+        }
 
         tl.timeScale(speed);
       };
