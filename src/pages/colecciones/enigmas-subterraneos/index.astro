@@ -3,14 +3,10 @@
  * src/pages/colecciones/enigmas-subterraneos/index.astro
  * ─────────────────────────────────────────────────────────────────────────────
  * PÁGINA OFICIAL DE COLECCIÓN: ENIGMAS SUBTERRÁNEOS
- *
- * Hereda Layout.astro, diseño cinemático de Arquetipos Globales, CSS del proyecto
- * y la experiencia inmersiva de Derinkuyu y las Cuevas de Barabar.
  */
 export const prerender = true;
 import Layout from '../../../layouts/Layout.astro';
 import AlternativeScrollNarrative from '../../../components/AlternativeScrollNarrative.astro';
-import Marquee from '../../../components/Marquee.astro';
 import BackSlideButton from '../../../components/BackSlideButton.astro';
 ---
 
@@ -18,7 +14,7 @@ import BackSlideButton from '../../../components/BackSlideButton.astro';
   <main class="w-full bg-[#050907] text-[#d0e6dc] min-h-screen">
     
     <div class="fixed top-5 left-6 z-40">
-      <BackSlideButton href="/colecciones/" label="Colecciones" />
+      <BackSlideButton fallbackUrl="/colecciones/" />
     </div>
 
     <!-- EXPERIENCIA CINEMÁTICA PRINCIPAL SUBTERRÁNEA -->
@@ -26,9 +22,11 @@ import BackSlideButton from '../../../components/BackSlideButton.astro';
       <AlternativeScrollNarrative />
     </section>
 
-    <!-- MARQUEE EDITORIAL -->
-    <div class="py-6 bg-[#020504] border-y border-[#34d399]/20">
-      <Marquee text="ENIGMAS SUBTERRÁNEOS · CIUDAD SUBTERRÁNEA DE DERINKUYU · CUEVAS ACÚSTICAS DE BARABAR · CUEVAS DE LONGYOU · LÍFITO ANCESTRAL ·" speed={45} />
+    <!-- BANNER EDITORIAL DE CINTA -->
+    <div class="py-4 bg-[#020504] border-y border-[#34d399]/20 overflow-hidden">
+      <div class="whitespace-nowrap font-mono text-xs uppercase tracking-[0.3em] text-[#34d399] text-center animate-pulse">
+        ENIGMAS SUBTERRÁNEOS · CIUDAD SUBTERRÁNEA DE DERINKUYU · CUEVAS ACÚSTICAS DE BARABAR · LÍFITO ANCESTRAL
+      </div>
     </div>
 
     <!-- SECCIÓN DOSSIER Y RUTA DE HIJOS DE LA COLECCIÓN -->

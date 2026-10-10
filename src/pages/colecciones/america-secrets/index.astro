@@ -3,14 +3,10 @@
  * src/pages/colecciones/america-secrets/index.astro
  * ─────────────────────────────────────────────────────────────────────────────
  * PÁGINA OFICIAL DE COLECCIÓN: AMÉRICA SECRETS
- *
- * Apertura cinemática con Fraunces Impact, imán verde musgo y secuencia
- * de investigación (Olmecas, Moais, Göbekli Tepe, Diquís y Pumapunku).
  */
 export const prerender = true;
 import Layout from '../../../layouts/Layout.astro';
 import ScrollNarrative from '../../../components/ScrollNarrative.astro';
-import Marquee from '../../../components/Marquee.astro';
 import BackSlideButton from '../../../components/BackSlideButton.astro';
 ---
 
@@ -18,7 +14,7 @@ import BackSlideButton from '../../../components/BackSlideButton.astro';
   <main class="w-full bg-[#0b0f0d] text-[#e2e8f0] min-h-screen">
     
     <div class="fixed top-5 left-6 z-40">
-      <BackSlideButton href="/colecciones/" label="Colecciones" />
+      <BackSlideButton fallbackUrl="/colecciones/" />
     </div>
 
     <!-- EXPERIENCIA CINEMÁTICA PRINCIPAL DE AMERICA SECRETS -->
@@ -26,9 +22,11 @@ import BackSlideButton from '../../../components/BackSlideButton.astro';
       <ScrollNarrative />
     </section>
 
-    <!-- MARQUEE EDITORIAL -->
-    <div class="py-6 bg-[#050806] border-y border-[#34d399]/20">
-      <Marquee text="AMERICA SECRETS · CABEZAS COLOSALES OLMECAS · MOAIS DE RAPA NUI · GÖBEKLI TEPE · ESFERAS DEL DIQUÍS · PUMAPUNKU ·" speed={45} />
+    <!-- BANNER EDITORIAL DE CINTA -->
+    <div class="py-4 bg-[#050806] border-y border-[#34d399]/20 overflow-hidden">
+      <div class="whitespace-nowrap font-mono text-xs uppercase tracking-[0.3em] text-[#34d399] text-center animate-pulse">
+        AMERICA SECRETS · CABEZAS COLOSALES OLMECAS · MOAIS DE RAPA NUI · GÖBEKLI TEPE · ESFERAS DEL DIQUÍS · PUMAPUNKU
+      </div>
     </div>
 
     <!-- GRID DE CAPÍTULOS HIJOS -->
