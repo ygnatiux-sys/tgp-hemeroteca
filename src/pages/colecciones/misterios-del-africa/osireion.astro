@@ -1,0 +1,53 @@
+---
+/**
+ * src/pages/colecciones/misterios-del-africa/osireion.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * DOSSIER HIJO: EL OSIREION DE ABIDOS (EGIPTO)
+ */
+export const prerender = true;
+import Layout from '../../../layouts/Layout.astro';
+import BackSlideButton from '../../../components/BackSlideButton.astro';
+import OsireionHero from '../../../components/OsireionHero.astro';
+---
+
+<Layout title="El Osireion de Abidos · Misterios del África">
+  <main class="w-full bg-[#0a0f0d] text-[#dcbba8] min-h-screen">
+    
+    <div class="fixed top-5 left-6 z-40">
+      <BackSlideButton href="/colecciones/misterios-del-africa/" label="Misterios del África" />
+    </div>
+
+    <!-- HERO INDIVIDUAL HIJO CON EFECTO NIVEL FREÁTICO -->
+    <section class="w-full">
+      <OsireionHero />
+    </section>
+
+    <!-- DOSSIER TÉCNICO -->
+    <section class="max-w-4xl mx-auto px-6 py-20 font-serif leading-relaxed text-stone-200">
+      <div class="border-l-2 border-[#8b5a45] pl-6 py-2 mb-10">
+        <p class="font-mono text-xs uppercase tracking-widest text-[#8b5a45]">Expediente Megalítico #02</p>
+        <h2 class="text-3xl font-bold text-[#dcbba8] uppercase mt-1">Granito Pálido y Nivel Freático</h2>
+      </div>
+
+      <p class="text-lg text-stone-300 mb-6">
+        Construido a una cota de 18 metros por debajo del nivel del templo de Seti I, el Osireion es un recinto insular rodeado por un estanque central alimentado por napas subterráneas. Sus pilares monolíticos de granito rojo, desaturados por la tiniebla y el agua estancada, carecen totalmente de inscripciones jeroglíficas originales.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 my-12 font-mono text-xs uppercase">
+        <div class="p-6 rounded-xl bg-[#0e1713] border border-[#8b5a45]/30">
+          <span class="text-[#8b5a45]">Masa Monolítica</span>
+          <p class="text-[#dcbba8] text-base font-bold mt-2">100 Toneladas / Pilar</p>
+        </div>
+        <div class="p-6 rounded-xl bg-[#0e1713] border border-[#8b5a45]/30">
+          <span class="text-[#8b5a45]">Estilo Arquitectónico</span>
+          <p class="text-[#dcbba8] text-base font-bold mt-2">Anepigráfico Brutalista</p>
+        </div>
+        <div class="p-6 rounded-xl bg-[#0e1713] border border-[#8b5a45]/30">
+          <span class="text-[#8b5a45]">Inmersión</span>
+          <p class="text-[#dcbba8] text-base font-bold mt-2">Agua Subterránea</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</Layout>

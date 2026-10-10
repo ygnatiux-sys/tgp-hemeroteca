@@ -1,0 +1,53 @@
+---
+/**
+ * src/pages/colecciones/america-secrets/olmeca.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * DOSSIER HIJO: CABEZAS COLOSALES OLMECAS
+ */
+export const prerender = true;
+import Layout from '../../../layouts/Layout.astro';
+import BackSlideButton from '../../../components/BackSlideButton.astro';
+import imgOlmeca from '../../../assets/alternativa/olmeca-head.jpg';
+---
+
+<Layout title="Cabezas Colosales Olmecas · América Secrets">
+  <main class="w-full bg-[#0b0f0d] text-[#e2e8f0] min-h-screen">
+    
+    <div class="fixed top-5 left-6 z-40">
+      <BackSlideButton href="/colecciones/america-secrets/" label="América Secrets" />
+    </div>
+
+    <section class="relative w-full h-[80vh] overflow-hidden flex items-center justify-center">
+      <img
+        src={imgOlmeca.src}
+        alt="Cabeza Colosal Olmeca tallada en basalto"
+        class="absolute inset-0 w-full h-full object-cover object-center filter brightness-105 contrast-105"
+      />
+      <div class="absolute inset-0 bg-linear-to-t from-[#0b0f0d] via-[#0b0f0d]/40 to-[#0b0f0d]/80"></div>
+      
+      <div class="relative z-10 text-center max-w-4xl px-6">
+        <span class="font-mono text-xs tracking-[0.35em] uppercase text-[#34d399] py-1 px-4 rounded-full border border-[#34d399]/30 bg-black/60 backdrop-blur-md">
+          Mesoamérica · San Lorenzo & La Venta
+        </span>
+        <h1 class="font-serif font-black uppercase text-4xl sm:text-7xl text-white mt-4 tracking-tight">
+          Cabezas Olmecas
+        </h1>
+        <p class="font-mono text-xs sm:text-sm tracking-widest text-emerald-200/80 uppercase mt-4">
+          Monolitos de basalto colosal esculpidos sin metal conocido
+        </p>
+      </div>
+    </section>
+
+    <section class="max-w-4xl mx-auto px-6 py-16 font-serif leading-relaxed text-stone-200">
+      <div class="border-l-2 border-[#34d399] pl-6 py-2 mb-10">
+        <p class="font-mono text-xs uppercase tracking-widest text-[#34d399]">Expediente Lítico #01</p>
+        <h2 class="text-2xl font-bold text-white uppercase mt-1">Escultura Colosal en Basalto</h2>
+      </div>
+
+      <p class="text-lg text-stone-300 mb-6">
+        Las 17 cabezas colosales olmecas conocidas fueron talladas en bloques individuales de basalto provenientes de la Sierra de los Tuxtlas. Su transporte abarcó más de 80 kilómetros atravesando pantanos y ríos mesoamericanos.
+      </p>
+    </section>
+
+  </main>
+</Layout>

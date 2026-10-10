@@ -1,0 +1,66 @@
+---
+/**
+ * src/pages/colecciones/misterios-del-africa/giza.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * DOSSIER HIJO: LA CICATRIZ DEL AGUA (GIZA, EGIPTO)
+ */
+export const prerender = true;
+import Layout from '../../../layouts/Layout.astro';
+import BackSlideButton from '../../../components/BackSlideButton.astro';
+import imgEsfinge from '../../../assets/alternativa/esfinge-erosion.jpg';
+---
+
+<Layout title="La Cicatriz del Agua (Giza) · Misterios del África">
+  <main class="w-full bg-[#141210] text-[#ead5b3] min-h-screen">
+    
+    <div class="fixed top-5 left-6 z-40">
+      <BackSlideButton href="/colecciones/misterios-del-africa/" label="Misterios del África" />
+    </div>
+
+    <!-- HERO INDIVIDUAL HIJO -->
+    <section class="relative w-full h-[80vh] overflow-hidden flex items-center justify-center">
+      <img
+        src={imgEsfinge.src}
+        alt="Erosión pluvial en el recinto de la Esfinge de Giza"
+        class="absolute inset-0 w-full h-full object-cover object-[18%_30%] filter brightness-105 contrast-105"
+      />
+      <div class="absolute inset-0 bg-linear-to-t from-[#141210] via-[#141210]/40 to-[#141210]/80"></div>
+      
+      <div class="relative z-10 text-center max-w-4xl px-6">
+        <span class="font-mono text-xs tracking-[0.35em] uppercase text-[#d4b886] py-1 px-4 rounded-full border border-white/10 bg-black/60 backdrop-blur-md">
+          Egipto · Recinto de la Esfinge · Edad de Hielo
+        </span>
+        <h1 class="font-serif font-black uppercase text-4xl sm:text-7xl text-white mt-4 tracking-tight">
+          La Cicatriz del Agua
+        </h1>
+        <p class="font-mono text-xs sm:text-sm tracking-widest text-[#ead5b3]/80 uppercase mt-4">
+          La geología que reescribe la cronología humana
+        </p>
+      </div>
+    </section>
+
+    <!-- DOSSIER DE INVESTIGACIÓN -->
+    <section class="max-w-4xl mx-auto px-6 py-16 font-serif leading-relaxed text-stone-200">
+      <div class="border-l-2 border-[#d4b886] pl-6 py-2 mb-10">
+        <p class="font-mono text-xs uppercase tracking-widest text-[#d4b886]">Evidencia Geológica #01</p>
+        <h2 class="text-2xl font-bold text-white uppercase mt-1">Fisuras de Erosión Hidráulica Vertical</h2>
+      </div>
+
+      <p class="text-lg text-stone-300 mb-6">
+        El recinto que rodea a la Esfinge de Giza presenta profundos canales verticales redondeados tallados en la roca madre de caliza. A diferencia de la erosión eólica (por viento y arena), que produce estrías horizontales, estos perfiles ondulados solo se forman por abundante escurrimiento pluvial masivo durante milenios.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 my-12 font-mono text-xs uppercase">
+        <div class="p-6 rounded-xl bg-white/5 border border-white/10">
+          <span class="text-[#d4b886]">Patrón Climático</span>
+          <p class="text-white text-base font-bold mt-2">Precipitación Neolítica Pluvial</p>
+        </div>
+        <div class="p-6 rounded-xl bg-white/5 border border-white/10">
+          <span class="text-[#d4b886]">Crono-Estrato</span>
+          <p class="text-white text-base font-bold mt-2">Pre-Desecación del Sáhara (>7,000 a.C.)</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</Layout>

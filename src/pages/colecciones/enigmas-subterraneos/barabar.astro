@@ -1,0 +1,53 @@
+---
+/**
+ * src/pages/colecciones/enigmas-subterraneos/barabar.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * DOSSIER HIJO: CUEVAS DE BARABAR (INDIA)
+ */
+export const prerender = true;
+import Layout from '../../../layouts/Layout.astro';
+import BackSlideButton from '../../../components/BackSlideButton.astro';
+import imgBarabar from '../../../assets/alternativa/barabar-caves.jpg';
+---
+
+<Layout title="Cuevas de Barabar · Enigmas Subterráneos">
+  <main class="w-full bg-[#050907] text-[#d0e6dc] min-h-screen">
+    
+    <div class="fixed top-5 left-6 z-40">
+      <BackSlideButton href="/colecciones/enigmas-subterraneos/" label="Enigmas Subterráneos" />
+    </div>
+
+    <section class="relative w-full h-[80vh] overflow-hidden flex items-center justify-center">
+      <img
+        src={imgBarabar.src}
+        alt="Cuevas de Barabar con pulido especular en granito"
+        class="absolute inset-0 w-full h-full object-cover object-center filter brightness-105 contrast-105"
+      />
+      <div class="absolute inset-0 bg-linear-to-t from-[#050907] via-[#050907]/40 to-[#050907]/80"></div>
+      
+      <div class="relative z-10 text-center max-w-4xl px-6">
+        <span class="font-mono text-xs tracking-[0.35em] uppercase text-[#34d399] py-1 px-4 rounded-full border border-[#34d399]/30 bg-black/60 backdrop-blur-md">
+          Bihar · India · Siglo III a.C.
+        </span>
+        <h1 class="font-serif font-black uppercase text-4xl sm:text-7xl text-white mt-4 tracking-tight">
+          Cuevas de Barabar
+        </h1>
+        <p class="font-mono text-xs sm:text-sm tracking-widest text-emerald-200/80 uppercase mt-4">
+          Pulido especular de espejo e ingeniería de resonancia geométrica
+        </p>
+      </div>
+    </section>
+
+    <section class="max-w-4xl mx-auto px-6 py-16 font-serif leading-relaxed text-stone-200">
+      <div class="border-l-2 border-[#34d399] pl-6 py-2 mb-10">
+        <p class="font-mono text-xs uppercase tracking-widest text-[#34d399]">Expediente Hipogeo #02</p>
+        <h2 class="text-2xl font-bold text-white uppercase mt-1">Acústica de Resonancia Sagrada</h2>
+      </div>
+
+      <p class="text-lg text-stone-300 mb-6">
+        Las cámaras de Barabar (como Lomas Rishi y Karan Chaupar) fueron excavadas directamente en monolitos de granito con un acabado interior tan pulido que genera reflexiones ópticas y acústicas continuas.
+      </p>
+    </section>
+
+  </main>
+</Layout>

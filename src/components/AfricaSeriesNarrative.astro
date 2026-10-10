@@ -10,6 +10,7 @@
  * 3. Arquitectura extensible para incorporar los próximos episodios del continente africano.
  */
 import imgEsfinge from "../assets/alternativa/esfinge-erosion.jpg";
+import imgOsireion from "../assets/alternativa/osireion.jpg";
 
 interface Props {
   className?: string;
@@ -32,14 +33,19 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://api.fontshare.com" />
 <link
   rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Cinzel:wght@800;900&family=Fraunces:opsz,wght,SOFT,WONK@9..144,900,0,1&display=swap"
 />
+<link
+  href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,900&display=swap"
+  rel="stylesheet"
+/>
 
 <section
   id="africa-series-container"
-  class={`relative w-full h-[250vh] bg-[#141210] text-white select-none ${className}`}
+  class={`relative w-full h-[380vh] bg-[#141210] text-white select-none ${className}`}
   data-autoplay={autoplayDuration}
   aria-label="Serie Destacada: Misterios del África"
 >
@@ -59,11 +65,19 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
       <nav class="flex items-center gap-2 pointer-events-auto" aria-label="Capítulos de África">
         <button
           type="button"
-          class="afr-step-btn px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-white/5 backdrop-blur-md text-[#FF4D55] is-active"
+          class="afr-step-btn px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border bg-white/5 backdrop-blur-md text-[#FF4D55] border-[#FF4D55]/40 is-active cursor-pointer"
           data-step="0"
           title="Giza"
         >
           I · La Cicatriz del Agua (Giza)
+        </button>
+        <button
+          type="button"
+          class="afr-step-btn px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-white/5 backdrop-blur-md text-stone-400 hover:text-[#dcbba8] cursor-pointer"
+          data-step="1"
+          title="El Osireion"
+        >
+          II · El Osireion (Abidos)
         </button>
       </nav>
     </header>
@@ -153,6 +167,83 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
       </div>
     </div>
 
+    <!-- ══════════════════════════════════════════════════════════════════════
+         CAPÍTULO II: EL OSIREION (ABIDOS, EGIPTO) — NIVEL FREÁTICO Y BRUTALISMO
+    ══════════════════════════════════════════════════════════════════════ -->
+    <div
+      class="afr-layer-osireion absolute inset-0 w-full h-full opacity-0 pointer-events-none transition-opacity duration-700 bg-[#0a0f0d]"
+      data-layer-index="1"
+    >
+      <div class="afr-osi-bg-wrap absolute inset-0 overflow-hidden">
+        <img
+          src={imgOsireion.src}
+          alt="Pilares de granito del Osireion de Abidos sumergidos en agua subterránea"
+          class="afr-osi-img absolute inset-0 w-full h-full object-cover object-[50%_45%] filter brightness-112 contrast-108 saturate-105 will-change-transform"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+
+      <!-- Scrims perimetrales ligeros (máxima nitidez y brillo fotográfico) -->
+      <div class="absolute inset-x-0 top-0 h-28 bg-linear-to-b from-[#0a0f0d]/75 to-transparent pointer-events-none"></div>
+      <div class="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-[#0a0f0d]/90 via-[#0a0f0d]/35 to-transparent pointer-events-none"></div>
+      <div class="absolute inset-0 pointer-events-none mix-blend-screen bg-[radial-gradient(circle_at_50%_45%,rgba(220,187,168,0.12)_0%,transparent_60%)]"></div>
+
+      <!-- Escenario Tipográfico del Osireion -->
+      <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none px-4">
+        <div class="afr-osi-chamber relative flex flex-col items-center text-center max-w-6xl w-full">
+          
+          <span class="afr-osi-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.4em] uppercase text-[#8b5a45] py-1 px-4 rounded-full border border-[#8b5a45]/40 bg-[#0a0f0d]/75 backdrop-blur-md opacity-0">
+            Abidos · Estanque Sagrado de Osiris · Cota -18.4m
+          </span>
+
+          <!-- Título Brutalista con descenso por máscara clip-path -->
+          <div class="afr-osi-title-wrap relative w-full flex items-center justify-center overflow-hidden py-2">
+            <h3
+              class="afr-osi-ghost font-black uppercase text-[clamp(2.4rem,8.2vw,8.5rem)] leading-[0.88] tracking-[-0.01em] text-[#dcbba8]/10 select-none pointer-events-none"
+              style="font-family: 'Cabinet Grotesk', sans-serif;"
+              aria-hidden="true"
+            >
+              EL OSIREION
+            </h3>
+
+            <h3
+              class="afr-osi-main absolute inset-0 flex items-center justify-center font-black uppercase text-[clamp(2.4rem,8.2vw,8.5rem)] leading-[0.88] tracking-[-0.01em] select-none"
+              style="font-family: 'Cabinet Grotesk', sans-serif;"
+            >
+              <span class="afr-osi-stone relative inline-block">
+                EL OSIREION
+              </span>
+            </h3>
+
+            <!-- Línea de tensión superficial del agua que desciende -->
+            <div class="afr-osi-water-line absolute inset-x-0 h-[1.5px] bg-linear-to-r from-transparent via-[#8b5a45] to-transparent pointer-events-none opacity-0 shadow-[0_0_15px_#8b5a45]"></div>
+          </div>
+
+          <!-- Ecos en la Caverna (H2 / H3) -->
+          <div class="afr-osi-sub-wrap mt-5 flex flex-col items-center">
+            <h4 class="afr-osi-sub font-black text-[clamp(0.95rem,2.2vw,1.55rem)] tracking-[0.24em] uppercase text-[#dcbba8]/90 opacity-0">
+              La cronología sumergida de <span class="text-[#8b5a45] font-extrabold underline decoration-[#8b5a45]/50 underline-offset-4">Abidos</span>
+            </h4>
+            <p class="afr-osi-desc mt-2.5 max-w-xl font-mono text-[9.5px] sm:text-[11px] tracking-[0.22em] uppercase text-[#dcbba8]/60 opacity-0">
+              Bloques megalíticos de 100 toneladas · Arquitectura anepigráfica desnuda
+            </p>
+          </div>
+
+          <div class="afr-osi-cta-wrap mt-8 opacity-0 pointer-events-auto">
+            <a
+              href="/colecciones/arqueosemiotica/"
+              class="group relative inline-flex items-center gap-3 px-8 sm:px-10 py-3.5 rounded-full font-mono text-[10.5px] uppercase tracking-[0.3em] font-bold text-[#0a0f0d] bg-[#dcbba8] shadow-[0_0_35px_rgba(220,187,168,0.3)] hover:bg-white hover:shadow-[0_0_45px_rgba(220,187,168,0.5)] active:scale-95 transition-all duration-300"
+            >
+              <span>Examinar El Osireion</span>
+              <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
     <!-- Indicador de Scroll en la base -->
     <div class="absolute bottom-5 inset-x-0 z-30 flex flex-col items-center pointer-events-none">
       <span class="font-mono text-[8.5px] tracking-[0.3em] uppercase text-stone-400 opacity-70">
@@ -195,6 +286,25 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
     text-shadow: 0 4px 22px rgba(0, 0, 0, 0.95), 0 0 25px rgba(212, 184, 134, 0.35);
   }
 
+  /* Tipografía Granito Pálido y Abismo para Osireion */
+  .afr-osi-stone {
+    color: #dcbba8;
+    background: linear-gradient(
+      180deg,
+      #f2dfd5 0%,
+      #dcbba8 45%,
+      #c49f8a 85%,
+      #8b5a45 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 35px rgba(139, 90, 69, 0.25));
+  }
+
+  .afr-osi-sub {
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.95), 0 0 25px rgba(139, 90, 69, 0.35);
+  }
+
   /* Grano analógico A24 */
   .afr-grain {
     opacity: 0.18;
@@ -232,20 +342,59 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
     const introBadge = container.querySelector<HTMLElement>(".afr-intro-badge");
     const introSub = container.querySelector<HTMLElement>(".afr-intro-sub");
 
-    const badge = container.querySelector<HTMLElement>(".afr-badge");
+    // Capa I: Giza
+    const layer0 = container.querySelector<HTMLElement>('.afr-layer[data-layer-index="0"]');
+    const badge0 = container.querySelector<HTMLElement>(".afr-badge");
     const cascadeWrap = container.querySelector<HTMLElement>(".afr-cascade-wrap");
     const slices = container.querySelectorAll<HTMLElement>(".afr-slice");
-    const sub = container.querySelector<HTMLElement>(".afr-sub");
-    const cta = container.querySelector<HTMLElement>(".afr-cta-wrap");
+    const sub0 = container.querySelector<HTMLElement>(".afr-sub");
+    const cta0 = container.querySelector<HTMLElement>(".afr-cta-wrap");
     const dustLayer = container.querySelector<HTMLElement>(".afr-dust");
 
-    if (!introOverlay || !introTitle || !badge || !cascadeWrap || slices.length === 0 || !sub || !dustLayer) return;
+    // Capa II: El Osireion
+    const layer1 = container.querySelector<HTMLElement>('.afr-layer-osireion[data-layer-index="1"]');
+    const badge1 = container.querySelector<HTMLElement>(".afr-osi-badge");
+    const titleMain1 = container.querySelector<HTMLElement>(".afr-osi-main");
+    const waterLine1 = container.querySelector<HTMLElement>(".afr-osi-water-line");
+    const sub1 = container.querySelector<HTMLElement>(".afr-osi-sub");
+    const desc1 = container.querySelector<HTMLElement>(".afr-osi-desc");
+    const cta1 = container.querySelector<HTMLElement>(".afr-osi-cta-wrap");
+    const img1 = container.querySelector<HTMLElement>(".afr-osi-img");
 
-    let tl: gsap.core.Timeline | null = null;
+    const stepBtns = container.querySelectorAll<HTMLButtonElement>(".afr-step-btn");
+
+    if (!introOverlay || !introTitle || !layer0 || !layer1) return;
+
+    let tl0: gsap.core.Timeline | null = null;
+    let tl1: gsap.core.Timeline | null = null;
+    let currentChapter = 0;
+    let autoplayTimer: ReturnType<typeof setTimeout> | null = null;
+    const autoplayDuration = parseInt(container.dataset.autoplay || "6500", 10);
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // Generar partículas de polvo de caliza
+    const stopAutoplay = () => {
+      if (autoplayTimer) {
+        clearTimeout(autoplayTimer);
+        autoplayTimer = null;
+      }
+    };
+
+    const scheduleNextChapter = () => {
+      stopAutoplay();
+      if (reduceMotion) return;
+      autoplayTimer = setTimeout(() => {
+        const nextChapter = (currentChapter + 1) % 2;
+        if (nextChapter === 0) {
+          playGiza();
+        } else {
+          playOsireion();
+        }
+      }, autoplayDuration);
+    };
+
+    // Generar partículas de caliza para Giza
     const spawnLimestoneDust = () => {
+      if (!dustLayer || !cascadeWrap) return;
       dustLayer.innerHTML = "";
       const count = 28;
       const rect = cascadeWrap.getBoundingClientRect();
@@ -281,95 +430,245 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
       }
     };
 
-    const reset = () => {
-      tl?.kill();
-      tl = null;
-      dustLayer.innerHTML = "";
+    // Actualizar botones de navegación
+    const updateNav = (step: number) => {
+      stepBtns.forEach((btn) => {
+        const s = parseInt(btn.dataset.step || "0", 10);
+        if (s === step) {
+          btn.classList.add("is-active");
+          if (step === 0) {
+            btn.className = "afr-step-btn px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-[#FF4D55]/50 bg-[#FF4D55]/15 backdrop-blur-md text-[#FF4D55] is-active cursor-pointer";
+          } else {
+            btn.className = "afr-step-btn px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-[#8b5a45]/60 bg-[#8b5a45]/20 backdrop-blur-md text-[#dcbba8] is-active cursor-pointer";
+          }
+        } else {
+          btn.classList.remove("is-active");
+          btn.className = "afr-step-btn px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-white/5 backdrop-blur-md text-stone-400 hover:text-white cursor-pointer";
+        }
+      });
+    };
 
-      gsap.set(introOverlay, { opacity: 1, pointerEvents: "auto" });
-      gsap.set(introTitle, { opacity: 0, scale: 1.08 });
-      gsap.set([introBadge, introSub], { opacity: 0, y: -12 });
-
-      gsap.set(badge, { opacity: 0, y: -16 });
-      gsap.set(sub, { opacity: 0, y: 35, filter: "blur(14px)" });
-      if (cta) gsap.set(cta, { opacity: 0, y: 20 });
-      gsap.set(cascadeWrap, { y: 0, filter: "none" });
-
+    // Reset Giza
+    const resetGiza = () => {
+      tl0?.kill();
+      tl0 = null;
+      if (dustLayer) dustLayer.innerHTML = "";
+      if (badge0) gsap.set(badge0, { opacity: 0, y: -16 });
+      if (sub0) gsap.set(sub0, { opacity: 0, y: 35, filter: "blur(14px)" });
+      if (cta0) gsap.set(cta0, { opacity: 0, y: 20 });
+      if (cascadeWrap) gsap.set(cascadeWrap, { y: 0, filter: "none" });
       slices.forEach((slice) => {
         gsap.set(slice, { yPercent: -140, opacity: 0, scaleY: 1.25 });
       });
     };
 
-    const playSeries = () => {
-      reset();
+    // Reset Osireion
+    const resetOsireion = () => {
+      tl1?.kill();
+      tl1 = null;
+      if (badge1) gsap.set(badge1, { opacity: 0, y: -16 });
+      if (titleMain1) {
+        gsap.set(titleMain1, { clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)", opacity: 1 });
+      }
+      if (waterLine1) gsap.set(waterLine1, { top: "0%", opacity: 0 });
+      if (sub1) gsap.set(sub1, { opacity: 0.2, y: 40, filter: "blur(10px)" });
+      if (desc1) gsap.set(desc1, { opacity: 0, y: 20 });
+      if (cta1) gsap.set(cta1, { opacity: 0, y: 20 });
+      if (img1) gsap.set(img1, { scale: 1.05 });
+    };
+
+    // Reproducir Capítulo I: Giza
+    const playGiza = () => {
+      resetGiza();
+      updateNav(0);
+      currentChapter = 0;
+
+      gsap.to(layer0, { opacity: 1, duration: 0.6, pointerEvents: "auto" });
+      gsap.to(layer1, { opacity: 0, duration: 0.6, pointerEvents: "none" });
 
       if (reduceMotion) {
-        gsap.set(introOverlay, { opacity: 0, pointerEvents: "none" });
-        gsap.set([badge, sub], { opacity: 1, y: 0, filter: "none" });
-        if (cta) gsap.set(cta, { opacity: 1, y: 0 });
+        if (badge0 && sub0) gsap.set([badge0, sub0], { opacity: 1, y: 0, filter: "none" });
+        if (cta0) gsap.set(cta0, { opacity: 1, y: 0 });
         slices.forEach((s) => gsap.set(s, { yPercent: 0, opacity: 1, scaleY: 1 }));
+        scheduleNextChapter();
         return;
       }
 
-      const mainTl = gsap.timeline();
-      tl = mainTl;
+      const mainTl = gsap.timeline({
+        onComplete: () => {
+          scheduleNextChapter();
+        },
+      });
+      tl0 = mainTl;
 
-      // FASE 1: APERTURA MONUMENTAL EN ROJO DIQUÍS
-      mainTl.to([introBadge, introSub], { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" })
-        .to(introTitle, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, "-=0.3")
-        .to({}, { duration: 1.2 }) // Contemplación del rojo monumental
-        // Salida fluida de la intro hacia la secuencia de investigación
-        .to([introTitle, introBadge, introSub], { opacity: 0, scale: 0.95, duration: 0.75, ease: "power2.in" })
-        .to(introOverlay, { opacity: 0, duration: 0.8, ease: "power2.inOut", onComplete: () => {
-          introOverlay.style.pointerEvents = "none";
-        }}, "-=0.2");
-
-      // FASE 2: ENTRADA DEL CAPÍTULO I (GIZA — EROSIÓN PLUVIAL)
-      mainTl.to(badge, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, "-=0.2");
+      if (badge0) mainTl.to(badge0, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" });
       mainTl.addLabel("flood");
 
       slices.forEach((slice, idx) => {
         const randomDelay = (idx % 3) * 0.08 + Math.sin(idx * 0.8) * 0.12 + 0.1;
         const duration = 1.1 + (idx % 4) * 0.08;
-
         mainTl.to(
           slice,
-          {
-            yPercent: 0,
-            opacity: 1,
-            scaleY: 1,
-            duration: duration,
-            ease: "power4.in",
-          },
+          { yPercent: 0, opacity: 1, scaleY: 1, duration: duration, ease: "power4.in" },
           `flood+=${randomDelay}`
         );
       });
 
-      // FASE 3: IMPACTO Y POLVO DE CALIZA
       mainTl.addLabel("impact", "flood+=1.35");
       mainTl.add(() => spawnLimestoneDust(), "impact");
 
-      mainTl.fromTo(
-        cascadeWrap,
-        { y: -3, filter: "blur(3.5px)" },
-        { y: 3, filter: "blur(1.5px)", duration: 0.05, repeat: 5, yoyo: true, ease: "none" },
-        "impact"
-      ).to(cascadeWrap, { y: 0, filter: "blur(0px)", duration: 0.4, ease: "power2.out" });
-
-      // FASE 4: REVELACIÓN EN LA SOMBRA Y CTA
-      mainTl.to(sub, { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.6, ease: "power3.out" }, "impact+=0.5");
-      if (cta) {
-        mainTl.to(cta, { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, "impact+=1.0");
+      if (cascadeWrap) {
+        mainTl.fromTo(
+          cascadeWrap,
+          { y: -3, filter: "blur(3.5px)" },
+          { y: 3, filter: "blur(1.5px)", duration: 0.05, repeat: 5, yoyo: true, ease: "none" },
+          "impact"
+        ).to(cascadeWrap, { y: 0, filter: "blur(0px)", duration: 0.4, ease: "power2.out" });
       }
+
+      if (sub0) mainTl.to(sub0, { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.6, ease: "power3.out" }, "impact+=0.5");
+      if (cta0) mainTl.to(cta0, { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, "impact+=1.0");
     };
+
+    // Reproducir Capítulo II: El Osireion (Nivel Freático)
+    const playOsireion = () => {
+      resetOsireion();
+      updateNav(1);
+      currentChapter = 1;
+
+      gsap.to(layer1, { opacity: 1, duration: 0.7, pointerEvents: "auto" });
+      gsap.to(layer0, { opacity: 0, duration: 0.7, pointerEvents: "none" });
+
+      if (reduceMotion) {
+        if (badge1 && desc1) gsap.set([badge1, desc1], { opacity: 1, y: 0 });
+        if (titleMain1) gsap.set(titleMain1, { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" });
+        if (sub1) gsap.set(sub1, { opacity: 1, y: 0, filter: "none" });
+        if (cta1) gsap.set(cta1, { opacity: 1, y: 0 });
+        scheduleNextChapter();
+        return;
+      }
+
+      const osiTl = gsap.timeline({
+        defaults: { ease: "power3.out" },
+        onComplete: () => {
+          scheduleNextChapter();
+        },
+      });
+      tl1 = osiTl;
+
+      if (img1) osiTl.to(img1, { scale: 1.0, duration: 4.0, ease: "power1.out" }, 0);
+      if (badge1) osiTl.to(badge1, { opacity: 1, y: 0, duration: 0.7 }, 0.2);
+      if (waterLine1) osiTl.to(waterLine1, { opacity: 0.85, duration: 0.3 }, 0.4);
+
+      // Descenso del agua por clip-path
+      if (waterLine1) {
+        osiTl.to(waterLine1, { top: "100%", duration: 2.2, ease: "power2.inOut" }, 0.5);
+      }
+      if (titleMain1) {
+        osiTl.to(
+          titleMain1,
+          {
+            clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+            duration: 2.2,
+            ease: "power2.inOut",
+            onComplete: () => {
+              if (waterLine1) gsap.to(waterLine1, { opacity: 0, duration: 0.4 });
+            },
+          },
+          0.5
+        );
+      }
+
+      // Ecos en la caverna (H2/H3 subiendo de 20% a 100%)
+      if (sub1) {
+        osiTl.fromTo(
+          sub1,
+          { opacity: 0.2, y: 40, filter: "blur(10px)" },
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.7, ease: "power3.out" },
+          1.5
+        );
+      }
+      if (desc1) osiTl.to(desc1, { opacity: 0.85, y: 0, duration: 1.1 }, 2.0);
+      if (cta1) osiTl.to(cta1, { opacity: 1, y: 0, duration: 0.9 }, 2.4);
+    };
+
+    // Secuencia inicial con la apertura monumental de África
+    const startSeriesFlow = () => {
+      resetGiza();
+      resetOsireion();
+      stopAutoplay();
+
+      gsap.set(introOverlay, { opacity: 1, pointerEvents: "auto" });
+      gsap.set(introTitle, { opacity: 0, scale: 1.08 });
+      gsap.set([introBadge, introSub], { opacity: 0, y: -12 });
+
+      if (reduceMotion) {
+        gsap.set(introOverlay, { opacity: 0, pointerEvents: "none" });
+        playGiza();
+        return;
+      }
+
+      const introTl = gsap.timeline();
+      introTl.to([introBadge, introSub], { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" })
+        .to(introTitle, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, "-=0.3")
+        .to({}, { duration: 1.2 })
+        .to([introTitle, introBadge, introSub], { opacity: 0, scale: 0.95, duration: 0.75, ease: "power2.in" })
+        .to(introOverlay, { opacity: 0, duration: 0.8, ease: "power2.inOut", onComplete: () => {
+          introOverlay.style.pointerEvents = "none";
+          playGiza();
+        }}, "-=0.2");
+    };
+
+    // Navegación por botones
+    stepBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        stopAutoplay();
+        const step = parseInt(btn.dataset.step || "0", 10);
+        if (step === 0 && currentChapter !== 0) {
+          playGiza();
+        } else if (step === 1 && currentChapter !== 1) {
+          playOsireion();
+        }
+      });
+    });
+
+    // Control por Scroll
+    let scrollTicking = false;
+    const handleScroll = () => {
+      if (scrollTicking) return;
+      scrollTicking = true;
+      requestAnimationFrame(() => {
+        const rect = container.getBoundingClientRect();
+        const winH = window.innerHeight;
+        const totalScrollable = rect.height - winH;
+        if (totalScrollable > 0) {
+          const currentScroll = -rect.top;
+          const progress = Math.max(0, Math.min(1, currentScroll / totalScrollable));
+
+          // Entre 0 y 0.5 -> Capítulo I (Giza); entre 0.5 y 1.0 -> Capítulo II (Osireion)
+          if (progress > 0.52 && currentChapter === 0) {
+            stopAutoplay();
+            playOsireion();
+          } else if (progress < 0.45 && currentChapter === 1 && rect.top < 50) {
+            stopAutoplay();
+            playGiza();
+          }
+        }
+        scrollTicking = false;
+      });
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            playSeries();
+            startSeriesFlow();
           } else {
-            reset();
+            stopAutoplay();
+            resetGiza();
+            resetOsireion();
           }
         });
       },

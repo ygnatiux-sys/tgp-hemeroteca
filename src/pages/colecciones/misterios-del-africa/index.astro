@@ -1,0 +1,88 @@
+---
+/**
+ * src/pages/colecciones/misterios-del-africa/index.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * PÁGINA OFICIAL DE COLECCIÓN: MISTERIOS DEL ÁFRICA
+ *
+ * Hereda Layout.astro, diseño cinemático de Arquetipos Globales, CSS del proyecto
+ * y la experiencia inmersiva de África (Giza & El Osireion).
+ */
+export const prerender = true;
+import Layout from '../../../layouts/Layout.astro';
+import AfricaSeriesNarrative from '../../../components/AfricaSeriesNarrative.astro';
+import Marquee from '../../../components/Marquee.astro';
+import BackSlideButton from '../../../components/BackSlideButton.astro';
+---
+
+<Layout title="Misterios del África · Colección Arqueosemiótica">
+  <main class="w-full bg-[#141210] text-[#ead5b3] min-h-screen">
+    
+    <!-- BARRA SUPERIOR DE NAVEGACIÓN Y BOTÓN VOLVER -->
+    <div class="fixed top-5 left-6 z-40">
+      <BackSlideButton href="/colecciones/" label="Colecciones" />
+    </div>
+
+    <!-- EXPERIENCIA CINEMÁTICA PRINCIPAL DE ÁFRICA -->
+    <section class="w-full">
+      <AfricaSeriesNarrative />
+    </section>
+
+    <!-- MARQUEE EDITORIAL HERO -->
+    <div class="py-6 bg-[#0a0806] border-y border-white/10">
+      <Marquee text="EGIPTO ANCESTRAL · RECINTO DE LA ESFINGE · EL OSIREION DE ABIDOS · INVESTIGACIÓN PLUVIAL ·" speed={45} />
+    </div>
+
+    <!-- SECCIÓN DOSSIER Y RUTA DE HIJOS DE LA COLECCIÓN -->
+    <section class="max-w-7xl mx-auto px-6 py-20">
+      <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 border-b border-white/10 pb-6">
+        <div>
+          <span class="font-mono text-xs uppercase tracking-[0.3em] text-[#FF4D55]">Capítulos & Dossiers Indivuduales</span>
+          <h2 class="font-serif text-3xl sm:text-5xl font-black uppercase tracking-tight text-white mt-2">
+            Explora los Hitos del África
+          </h2>
+        </div>
+        <p class="font-mono text-xs uppercase tracking-widest text-stone-400 mt-4 md:mt-0 max-w-md">
+          Selecciona cada expediente para analizar las evidencias geológicas y la arquitectura monumental.
+        </p>
+      </div>
+
+      <!-- GRID DE CAPÍTULOS HIJOS -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- HIJO 1: GIZA -->
+        <a href="/colecciones/misterios-del-africa/giza/" class="group relative block rounded-2xl overflow-hidden border border-white/10 bg-[#1a1714] p-8 hover:border-[#FF4D55]/50 transition-all duration-300 shadow-2xl">
+          <div class="flex items-center justify-between mb-6">
+            <span class="font-mono text-[10px] uppercase tracking-widest text-[#FF4D55] py-1 px-3 rounded-full border border-[#FF4D55]/30 bg-[#FF4D55]/10">
+              Capítulo I
+            </span>
+            <span class="font-mono text-xs text-stone-400 group-hover:translate-x-1 transition-transform">Explorar Dossier →</span>
+          </div>
+          <h3 class="font-serif text-2xl sm:text-3xl font-bold uppercase text-white group-hover:text-[#FF4D55] transition-colors">
+            La Cicatriz del Agua (Giza)
+          </h3>
+          <p class="font-sans text-sm text-stone-300 mt-3 leading-relaxed">
+            Erosión pluvial en el recinto de la Esfinge. La evidencia geológica de precipitación masiva previa a la desecación del Sáhara.
+          </p>
+        </a>
+
+        <!-- HIJO 2: OSIREION -->
+        <a href="/colecciones/misterios-del-africa/osireion/" class="group relative block rounded-2xl overflow-hidden border border-white/10 bg-[#1a1714] p-8 hover:border-[#dcbba8]/50 transition-all duration-300 shadow-2xl">
+          <div class="flex items-center justify-between mb-6">
+            <span class="font-mono text-[10px] uppercase tracking-widest text-[#8b5a45] py-1 px-4 rounded-full border border-[#8b5a45]/40 bg-[#8b5a45]/20 text-[#dcbba8]">
+              Capítulo II
+            </span>
+            <span class="font-mono text-xs text-stone-400 group-hover:translate-x-1 transition-transform">Explorar Dossier →</span>
+          </div>
+          <h3 class="font-serif text-2xl sm:text-3xl font-bold uppercase text-white group-hover:text-[#dcbba8] transition-colors">
+            El Osireion de Abidos
+          </h3>
+          <p class="font-sans text-sm text-stone-300 mt-3 leading-relaxed">
+            Sumergido bajo el nivel freático. Pilares de 100 toneladas de granito pálido con arquitectura anepigráfica desnuda.
+          </p>
+        </a>
+
+      </div>
+    </section>
+
+  </main>
+</Layout>

@@ -1,0 +1,87 @@
+---
+/**
+ * src/pages/colecciones/enigmas-subterraneos/index.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * PÁGINA OFICIAL DE COLECCIÓN: ENIGMAS SUBTERRÁNEOS
+ *
+ * Hereda Layout.astro, diseño cinemático de Arquetipos Globales, CSS del proyecto
+ * y la experiencia inmersiva de Derinkuyu y las Cuevas de Barabar.
+ */
+export const prerender = true;
+import Layout from '../../../layouts/Layout.astro';
+import AlternativeScrollNarrative from '../../../components/AlternativeScrollNarrative.astro';
+import Marquee from '../../../components/Marquee.astro';
+import BackSlideButton from '../../../components/BackSlideButton.astro';
+---
+
+<Layout title="Enigmas Subterráneos · Colección Arqueosemiótica">
+  <main class="w-full bg-[#050907] text-[#d0e6dc] min-h-screen">
+    
+    <div class="fixed top-5 left-6 z-40">
+      <BackSlideButton href="/colecciones/" label="Colecciones" />
+    </div>
+
+    <!-- EXPERIENCIA CINEMÁTICA PRINCIPAL SUBTERRÁNEA -->
+    <section class="w-full">
+      <AlternativeScrollNarrative />
+    </section>
+
+    <!-- MARQUEE EDITORIAL -->
+    <div class="py-6 bg-[#020504] border-y border-[#34d399]/20">
+      <Marquee text="ENIGMAS SUBTERRÁNEOS · CIUDAD SUBTERRÁNEA DE DERINKUYU · CUEVAS ACÚSTICAS DE BARABAR · CUEVAS DE LONGYOU · LÍFITO ANCESTRAL ·" speed={45} />
+    </div>
+
+    <!-- SECCIÓN DOSSIER Y RUTA DE HIJOS DE LA COLECCIÓN -->
+    <section class="max-w-7xl mx-auto px-6 py-20">
+      <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 border-b border-white/10 pb-6">
+        <div>
+          <span class="font-mono text-xs uppercase tracking-[0.3em] text-[#34d399]">Abismos & Espacios Hipogeos</span>
+          <h2 class="font-serif text-3xl sm:text-5xl font-black uppercase tracking-tight text-white mt-2">
+            Expedientes de Arquitectura Subterránea
+          </h2>
+        </div>
+        <p class="font-mono text-xs uppercase tracking-widest text-stone-400 mt-4 md:mt-0 max-w-md">
+          Estructuras excavadas directamente en la roca virgen para refugio o resonancia acústica extrema.
+        </p>
+      </div>
+
+      <!-- GRID DE CAPÍTULOS HIJOS -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- DERINKUYU -->
+        <a href="/colecciones/enigmas-subterraneos/derinkuyu/" class="group relative block rounded-2xl overflow-hidden border border-white/10 bg-[#09120e] p-8 hover:border-[#34d399]/50 transition-all duration-300 shadow-2xl">
+          <div class="flex items-center justify-between mb-6">
+            <span class="font-mono text-[10px] uppercase tracking-widest text-[#34d399] py-1 px-3 rounded-full border border-[#34d399]/30 bg-[#34d399]/10">
+              Expediente Hipogeo I
+            </span>
+            <span class="font-mono text-xs text-stone-400 group-hover:translate-x-1 transition-transform">Explorar Dossier →</span>
+          </div>
+          <h3 class="font-serif text-2xl sm:text-3xl font-bold uppercase text-white group-hover:text-[#34d399] transition-colors">
+            Derinkuyu (Capadocia)
+          </h3>
+          <p class="font-sans text-sm text-stone-300 mt-3 leading-relaxed">
+            La megaciudad subterránea de 18 niveles descendentes en toba volcánica, diseñada para albergar a 20,000 personas en aislamiento hermético.
+          </p>
+        </a>
+
+        <!-- BARABAR -->
+        <a href="/colecciones/enigmas-subterraneos/barabar/" class="group relative block rounded-2xl overflow-hidden border border-white/10 bg-[#09120e] p-8 hover:border-[#34d399]/50 transition-all duration-300 shadow-2xl">
+          <div class="flex items-center justify-between mb-6">
+            <span class="font-mono text-[10px] uppercase tracking-widest text-[#34d399] py-1 px-3 rounded-full border border-[#34d399]/30 bg-[#34d399]/10">
+              Expediente Hipogeo II
+            </span>
+            <span class="font-mono text-xs text-stone-400 group-hover:translate-x-1 transition-transform">Explorar Dossier →</span>
+          </div>
+          <h3 class="font-serif text-2xl sm:text-3xl font-bold uppercase text-white group-hover:text-[#34d399] transition-colors">
+            Cuevas de Barabar (India)
+          </h3>
+          <p class="font-sans text-sm text-stone-300 mt-3 leading-relaxed">
+            Cámaras de granito con pulido especular perfecto e ingenieria acústica de resonancia geométrica sagrada.
+          </p>
+        </a>
+
+      </div>
+    </section>
+
+  </main>
+</Layout>

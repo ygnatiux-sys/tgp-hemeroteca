@@ -1,0 +1,360 @@
+---
+/**
+ * src/components/OsireionHero.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * HERO CINEMÁTICO: 'EL OSIREION' (ABIDOS, EGIPTO)
+ *
+ * 1. Paleta 'Granito y Abismo':
+ *    - Texto Principal: Granito Pálido / Polvo de Cuarzo (#dcbba8).
+ *    - Fondo/Sombras: Agua Estancada (#0a0f0d - negro con carga verde/cian muy oscura).
+ *    - Acento (H2/H3): Arcilla del Nilo (#8b5a45 - terracota oxidado).
+ * 2. Tipografía: Cabinet Grotesk (Black, peso 900) - brutalismo megalítico, sin adornos.
+ * 3. Animación GSAP: 'Nivel Freático' (Inmersión Inversa):
+ *    - Descenso del agua por máscara CSS clip-path de arriba hacia abajo.
+ *    - Refracción / ondulación acuática y blur direccional que se aclara a piedra sólida y seca.
+ *    - Ecos cavernosos en H2/H3 flotando desde la base con opacidad de 20% a 100%.
+ */
+import imgOsireion from "../assets/alternativa/osireion.jpg";
+
+interface Props {
+  className?: string;
+  autoPlay?: boolean;
+}
+
+const { className = "", autoPlay = true } = Astro.props;
+---
+
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link
+  href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,900&display=swap"
+  rel="stylesheet"
+/>
+
+<div
+  class={`osireion-hero-root relative w-full h-screen overflow-hidden bg-[#0a0f0d] text-[#dcbba8] select-none ${className}`}
+  data-autoplay={autoPlay ? "true" : "false"}
+>
+  <!-- FILTRO SVG DE DISPERSIÓN ACUÁTICA / ONDULACIÓN FREÁTICA -->
+  <svg class="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
+    <defs>
+      <filter id="osireion-water-ripple" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence
+          id="osireion-turb"
+          type="fractalNoise"
+          baseFrequency="0.015 0.04"
+          numOctaves="3"
+          result="noise"
+        />
+        <feDisplacementMap
+          id="osireion-disp"
+          in="SourceGraphic"
+          in2="noise"
+          scale="16"
+          xChannelSelector="R"
+          yChannelSelector="G"
+        />
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- CAPA DE FONDO: FOTOGRAFÍA MONUMENTAL DEL OSIREION -->
+  <div class="osireion-bg-wrap absolute inset-0 overflow-hidden">
+    <img
+      src={imgOsireion.src}
+      alt="Pilares monolíticos de granito del Osireion de Abidos sumergidos bajo el agua subterránea"
+      class="osireion-img absolute inset-0 w-full h-full object-cover object-[50%_45%] filter brightness-112 contrast-108 saturate-105 will-change-transform"
+      loading="eager"
+      decoding="async"
+    />
+  </div>
+
+  <!-- SCRIMS PERIMETRALES LIGEROS (MÁXIMA NITIDEZ Y BRILLO DE LA FOTOGRAFÍA) -->
+  <div class="absolute inset-x-0 top-0 h-28 bg-linear-to-b from-[#0a0f0d]/75 to-transparent pointer-events-none"></div>
+  <div class="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-[#0a0f0d]/90 via-[#0a0f0d]/35 to-transparent pointer-events-none"></div>
+  <div class="absolute inset-0 pointer-events-none mix-blend-screen bg-[radial-gradient(circle_at_50%_45%,rgba(220,187,168,0.12)_0%,transparent_60%)]"></div>
+
+  <!-- HUD SUPERIOR EDITORIAL -->
+  <div class="absolute top-6 inset-x-0 z-30 flex items-center justify-between px-6 sm:px-12 pointer-events-none">
+    <div class="flex items-center gap-3">
+      <span class="w-2 h-2 rounded-full bg-[#8b5a45] shadow-[0_0_12px_#8b5a45] animate-pulse"></span>
+      <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.38em] uppercase text-[#dcbba8]/80 font-bold">
+        Egipto Pre-Dinástico · Nivel Freático Activo
+      </span>
+    </div>
+
+    <div class="hidden sm:flex items-center gap-2 font-mono text-[9px] tracking-[0.25em] uppercase text-[#8b5a45] bg-[#0a0f0d]/80 px-3 py-1 rounded-full border border-[#8b5a45]/30 backdrop-blur-md">
+      <span>Cota Subterránea: -18.40m</span>
+    </div>
+  </div>
+
+  <!-- CÁMARA TIPOGRÁFICA PRINCIPAL -->
+  <div class="absolute inset-0 z-20 flex items-center justify-center px-4 sm:px-6 pointer-events-none">
+    <div class="osireion-chamber relative flex flex-col items-center text-center max-w-6xl w-full">
+      
+      <!-- BADGE MONOLÍTICO -->
+      <span class="osireion-badge inline-block mb-3 sm:mb-4 font-mono text-[9.5px] sm:text-[11px] tracking-[0.42em] uppercase text-[#8b5a45] py-1 px-4 rounded-full border border-[#8b5a45]/40 bg-[#0a0f0d]/75 backdrop-blur-md opacity-0">
+        Abidos · Estanque Sagrado de Osiris
+      </span>
+
+      <!-- CONTENEDOR DEL TÍTULO BRUTALISTA CON MÁSCARA DE DESCENSO FREÁTICO -->
+      <div class="osireion-title-wrapper relative w-full flex items-center justify-center overflow-hidden py-2">
+        
+        <!-- TEXTO SOMBRA (Silueta en el agua estancada) -->
+        <h1
+          class="osireion-title-ghost font-black uppercase text-[clamp(2.5rem,8.6vw,9rem)] leading-[0.88] tracking-[-0.01em] text-[#dcbba8]/10 select-none pointer-events-none"
+          style="font-family: 'Cabinet Grotesk', sans-serif;"
+          aria-hidden="true"
+        >
+          EL OSIREION
+        </h1>
+
+        <!-- TEXTO PRINCIPAL: REVELADO DE ARRIBA A ABAJO POR MÁSCARA -->
+        <h1
+          class="osireion-title-main absolute inset-0 flex items-center justify-center font-black uppercase text-[clamp(2.5rem,8.6vw,9rem)] leading-[0.88] tracking-[-0.01em] select-none"
+          style="font-family: 'Cabinet Grotesk', sans-serif;"
+        >
+          <span class="osireion-title-stone relative inline-block">
+            EL OSIREION
+          </span>
+        </h1>
+
+        <!-- LÍNEA LÁSER DE TENSIÓN DE SUPERFICIE DEL AGUA -->
+        <div class="osireion-water-line absolute inset-x-0 h-[1.5px] bg-linear-to-r from-transparent via-[#8b5a45] to-transparent pointer-events-none opacity-0 shadow-[0_0_15px_#8b5a45]"></div>
+      </div>
+
+      <!-- H2 / H3: ECOS EN LA CAVERNA (FLOTANDO DESDE LA BASE) -->
+      <div class="osireion-sub-wrap mt-5 sm:mt-7 flex flex-col items-center">
+        <h2 class="osireion-sub font-black text-[clamp(0.95rem,2.2vw,1.6rem)] tracking-[0.24em] uppercase text-[#dcbba8]/90 opacity-0">
+          La cronología sumergida de <span class="text-[#8b5a45] font-extrabold underline decoration-[#8b5a45]/50 underline-offset-4">Abidos</span>
+        </h2>
+        <p class="osireion-desc mt-2.5 max-w-xl font-mono text-[10px] sm:text-[11.5px] tracking-[0.22em] uppercase text-[#dcbba8]/60 opacity-0">
+          Bloques megalíticos de 100 toneladas · Arquitectura anepigráfica desnuda
+        </p>
+      </div>
+
+      <!-- BOTÓN CTA EDITORIAL -->
+      <div class="osireion-cta mt-8 sm:mt-10 opacity-0 pointer-events-auto">
+        <a
+          href="/colecciones/arqueosemiotica/"
+          class="group relative inline-flex items-center gap-3 px-8 sm:px-10 py-3.5 rounded-full font-mono text-[10.5px] uppercase tracking-[0.3em] font-bold text-[#0a0f0d] bg-[#dcbba8] shadow-[0_0_35px_rgba(220,187,168,0.3)] hover:bg-white hover:shadow-[0_0_45px_rgba(220,187,168,0.5)] active:scale-95 transition-all duration-300"
+        >
+          <span>Examinar El Osireion</span>
+          <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INDICADOR DE AGUA Y PROFUNDIDAD EN EL PIE -->
+  <div class="absolute bottom-6 inset-x-0 z-30 flex flex-col items-center pointer-events-none">
+    <div class="flex items-center gap-2 font-mono text-[8.5px] tracking-[0.32em] uppercase text-[#dcbba8]/50">
+      <span>Nivel Freático Despejado</span>
+      <span class="text-[#8b5a45]">•</span>
+      <span>Piedra Monolítica Expuesta</span>
+    </div>
+    <div class="w-px h-6 mt-2 bg-linear-to-b from-[#8b5a45] to-transparent animate-pulse"></div>
+  </div>
+</div>
+
+<style>
+  /* Tipografía y Color Granito Pálido / Polvo de Cuarzo (#dcbba8) */
+  .osireion-title-stone {
+    color: #dcbba8;
+    background: linear-gradient(
+      180deg,
+      #f2dfd5 0%,
+      #dcbba8 45%,
+      #c49f8a 85%,
+      #8b5a45 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 35px rgba(139, 90, 69, 0.25));
+  }
+
+  .osireion-sub {
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.95), 0 0 25px rgba(139, 90, 69, 0.35);
+  }
+
+  /* Estado de refracción bajo el agua */
+  .is-underwater {
+    filter: url(#osireion-water-ripple) blur(3px);
+  }
+
+  /* Estado completamente seco y sólido */
+  .is-dry-stone {
+    filter: none !important;
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+
+  export function initOsireionHero(rootSelector = ".osireion-hero-root") {
+    const root = document.querySelector<HTMLElement>(rootSelector);
+    if (!root) return;
+
+    const badge = root.querySelector<HTMLElement>(".osireion-badge");
+    const titleMain = root.querySelector<HTMLElement>(".osireion-title-main");
+    const titleStone = root.querySelector<HTMLElement>(".osireion-title-stone");
+    const waterLine = root.querySelector<HTMLElement>(".osireion-water-line");
+    const sub = root.querySelector<HTMLElement>(".osireion-sub");
+    const desc = root.querySelector<HTMLElement>(".osireion-desc");
+    const cta = root.querySelector<HTMLElement>(".osireion-cta");
+    const img = root.querySelector<HTMLElement>(".osireion-img");
+    const turb = document.getElementById("osireion-turb");
+    const disp = document.getElementById("osireion-disp");
+
+    if (!badge || !titleMain || !titleStone || !waterLine || !sub || !desc) return;
+
+    let tl: gsap.core.Timeline | null = null;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Reset de estado inicial
+    const reset = () => {
+      tl?.kill();
+      tl = null;
+
+      gsap.set(badge, { opacity: 0, y: -16 });
+      gsap.set(titleMain, {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)",
+        opacity: 1,
+      });
+      titleStone.classList.add("is-underwater");
+      titleStone.classList.remove("is-dry-stone");
+
+      gsap.set(waterLine, { top: "0%", opacity: 0 });
+      gsap.set(sub, { opacity: 0.2, y: 45, filter: "blur(12px)" });
+      gsap.set(desc, { opacity: 0, y: 25 });
+      if (cta) gsap.set(cta, { opacity: 0, y: 20 });
+      if (img) gsap.set(img, { scale: 1.06, y: 0 });
+    };
+
+    const play = () => {
+      reset();
+
+      if (reduceMotion) {
+        gsap.set([badge, desc], { opacity: 1, y: 0 });
+        gsap.set(titleMain, { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" });
+        titleStone.classList.remove("is-underwater");
+        titleStone.classList.add("is-dry-stone");
+        gsap.set(sub, { opacity: 1, y: 0, filter: "none" });
+        if (cta) gsap.set(cta, { opacity: 1, y: 0 });
+        return;
+      }
+
+      const mainTl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      tl = mainTl;
+
+      // 1. Sutil acercamiento monumental de la cámara
+      if (img) {
+        mainTl.to(img, { scale: 1.0, duration: 4.5, ease: "power1.out" }, 0);
+      }
+
+      // 2. Aparición del badge
+      mainTl.to(badge, { opacity: 1, y: 0, duration: 0.8 }, 0.2);
+
+      // 3. Activación de la línea de superficie del agua
+      mainTl.to(waterLine, { opacity: 0.85, duration: 0.3 }, 0.4);
+
+      // 4. DESCENSO DEL AGUA (Revelación por máscara de arriba hacia abajo)
+      // Simula que el agua baja, revelando la roca megalítica desnuda
+      mainTl.to(
+        waterLine,
+        {
+          top: "100%",
+          duration: 2.2,
+          ease: "power2.inOut",
+        },
+        0.5
+      );
+
+      mainTl.to(
+        titleMain,
+        {
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+          duration: 2.2,
+          ease: "power2.inOut",
+          onUpdate: function () {
+            // Animación suave de turbulencia acuática durante el retroceso del agua
+            if (disp && turb) {
+              const prog = this.progress();
+              const scaleVal = (1 - prog) * 16;
+              disp.setAttribute("scale", scaleVal.toFixed(1));
+            }
+          },
+          onComplete: () => {
+            // El agua terminó de bajar: el texto se vuelve nítido, seco y brutalmente sólido
+            titleStone.classList.remove("is-underwater");
+            titleStone.classList.add("is-dry-stone");
+            gsap.to(waterLine, { opacity: 0, duration: 0.4 });
+          },
+        },
+        0.5
+      );
+
+      // 5. ECOS EN LA CAVERNA (H2 y H3 flotando desde la base como burbujas o ecos)
+      // Opacidad inicial 20% -> 100%, elevándose desde el fondo
+      mainTl.fromTo(
+        sub,
+        { opacity: 0.2, y: 45, filter: "blur(12px)" },
+        {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 1.8,
+          ease: "power3.out",
+        },
+        1.6
+      );
+
+      mainTl.to(
+        desc,
+        {
+          opacity: 0.85,
+          y: 0,
+          duration: 1.2,
+        },
+        2.2
+      );
+
+      // 6. Botón CTA
+      if (cta) {
+        mainTl.to(
+          cta,
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.9,
+          },
+          2.6
+        );
+      }
+    };
+
+    // Auto-arranque al entrar en viewport
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            play();
+          } else {
+            reset();
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(root);
+  }
+
+  // Inicializar en carga
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => initOsireionHero());
+  } else {
+    initOsireionHero();
+  }
+  document.addEventListener("astro:page-load", () => initOsireionHero());
+</script>

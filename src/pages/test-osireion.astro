@@ -1,0 +1,66 @@
+---
+/**
+ * src/pages/test-osireion.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * LABORATORIO DE PRUEBA: 'EL OSIREION' (ABIDOS, EGIPTO)
+ *
+ * Página de verificación aislada a pantalla completa para evaluar:
+ * 1. Paleta de Color: Granito Pálido (#dcbba8), Agua Estancada (#0a0f0d), Arcilla (#8b5a45).
+ * 2. Tipografía: Cabinet Grotesk (Black / 900).
+ * 3. Animación GSAP de Descenso de Nivel Freático y Ecos en la Caverna.
+ */
+import OsireionHero from "../components/OsireionHero.astro";
+---
+
+<!doctype html>
+<html lang="es" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Laboratorio · El Osireion de Abidos</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="bg-[#0a0f0d] text-[#dcbba8] overflow-x-hidden min-h-screen">
+    
+    <!-- BARRA SUPERIOR DE CONTROL INTERACTIVO DEL LABORATORIO -->
+    <div class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-[#0a0f0d]/90 border border-[#8b5a45]/40 px-5 py-2.5 rounded-full shadow-[0_10px_35px_rgba(0,0,0,0.8)] backdrop-blur-md">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#8b5a45] shadow-[0_0_8px_#8b5a45] animate-pulse"></span>
+        <span class="font-mono text-[11px] font-bold uppercase tracking-widest text-[#dcbba8]">
+          Osireion Lab
+        </span>
+      </div>
+
+      <div class="h-4 w-px bg-white/20"></div>
+
+      <button
+        id="btn-replay"
+        type="button"
+        class="cursor-pointer font-mono text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-[#8b5a45]/30 text-[#dcbba8] hover:bg-[#8b5a45] hover:text-white transition-all duration-200"
+      >
+        ↺ Reiniciar Nivel Freático
+      </button>
+
+      <a
+        href="/"
+        class="font-mono text-[10px] tracking-widest uppercase text-[#dcbba8]/60 hover:text-[#dcbba8] transition-colors"
+      >
+        Inicio
+      </a>
+    </div>
+
+    <!-- HERO PRINCIPAL DEL OSIREION -->
+    <OsireionHero />
+
+    <script>
+      import { initOsireionHero } from "../components/OsireionHero.astro";
+
+      const btnReplay = document.getElementById("btn-replay");
+      if (btnReplay) {
+        btnReplay.addEventListener("click", () => {
+          initOsireionHero(".osireion-hero-root");
+        });
+      }
+    </script>
+  </body>
+</html>

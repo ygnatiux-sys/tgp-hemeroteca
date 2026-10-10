@@ -1,0 +1,53 @@
+---
+/**
+ * src/pages/colecciones/enigmas-subterraneos/derinkuyu.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * DOSSIER HIJO: CIUDAD SUBTERRÁNEA DE DERINKUYU
+ */
+export const prerender = true;
+import Layout from '../../../layouts/Layout.astro';
+import BackSlideButton from '../../../components/BackSlideButton.astro';
+import imgDerinkuyu from '../../../assets/alternativa/derinkuyu-abismo.jpg';
+---
+
+<Layout title="Derinkuyu · Enigmas Subterráneos">
+  <main class="w-full bg-[#050907] text-[#d0e6dc] min-h-screen">
+    
+    <div class="fixed top-5 left-6 z-40">
+      <BackSlideButton href="/colecciones/enigmas-subterraneos/" label="Enigmas Subterráneos" />
+    </div>
+
+    <section class="relative w-full h-[80vh] overflow-hidden flex items-center justify-center">
+      <img
+        src={imgDerinkuyu.src}
+        alt="Galerías subterráneas de Derinkuyu en Capadocia"
+        class="absolute inset-0 w-full h-full object-cover object-center filter brightness-105 contrast-105"
+      />
+      <div class="absolute inset-0 bg-linear-to-t from-[#050907] via-[#050907]/40 to-[#050907]/80"></div>
+      
+      <div class="relative z-10 text-center max-w-4xl px-6">
+        <span class="font-mono text-xs tracking-[0.35em] uppercase text-[#34d399] py-1 px-4 rounded-full border border-[#34d399]/30 bg-black/60 backdrop-blur-md">
+          Capadocia · Turquía · Profundidad: -85m
+        </span>
+        <h1 class="font-serif font-black uppercase text-4xl sm:text-7xl text-white mt-4 tracking-tight">
+          Derinkuyu
+        </h1>
+        <p class="font-mono text-xs sm:text-sm tracking-widest text-emerald-200/80 uppercase mt-4">
+          La megaciudad subterránea de 18 niveles en toba volcánica
+        </p>
+      </div>
+    </section>
+
+    <section class="max-w-4xl mx-auto px-6 py-16 font-serif leading-relaxed text-stone-200">
+      <div class="border-l-2 border-[#34d399] pl-6 py-2 mb-10">
+        <p class="font-mono text-xs uppercase tracking-widest text-[#34d399]">Expediente Hipogeo #01</p>
+        <h2 class="text-2xl font-bold text-white uppercase mt-1">Pozos de Ventilación & Puertas de Piedra Circular</h2>
+      </div>
+
+      <p class="text-lg text-stone-300 mb-6">
+        Derinkuyu contaba con pozos de aireación de más de 55 metros de profundidad que suministraban aire fresco a miles de personas aisladas del exterior.
+      </p>
+    </section>
+
+  </main>
+</Layout>
