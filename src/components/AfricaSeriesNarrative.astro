@@ -98,15 +98,15 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
         <img
           src={imgEsfinge.src}
           alt="Recinto de la Esfinge de Giza con fisuras verticales de erosión pluvial"
-          class="afr-img absolute inset-0 w-full h-full object-cover object-[center_48%] brightness-[0.88] contrast-[1.18] saturate-[1.05] will-change-transform"
+          class="afr-img absolute inset-0 w-full h-full object-cover object-[18%_30%] filter brightness-105 contrast-105 will-change-transform"
           loading="eager"
           decoding="async"
         />
       </div>
 
-      <!-- Iluminación: Sombra de piedra mineral (#141210) + Resplandor Solar Rasante -->
-      <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_50%_50%,rgba(20,18,16,0.15)_0%,rgba(20,18,16,0.65)_60%,rgba(20,18,16,0.96)_96%)]"></div>
-      <div class="absolute inset-0 pointer-events-none mix-blend-screen bg-[radial-gradient(circle_at_18%_28%,rgba(240,220,184,0.28)_0%,rgba(212,184,134,0.14)_28%,transparent_62%)]"></div>
+      <!-- Scrim sutil ceñido al pie y resplandor solar rasante (máxima nitidez fotográfica) -->
+      <div class="absolute inset-x-0 bottom-0 h-32 sm:h-40 md:h-48 bg-linear-to-t from-[#141210]/90 via-[#141210]/35 to-transparent pointer-events-none"></div>
+      <div class="absolute inset-0 pointer-events-none mix-blend-screen bg-[radial-gradient(circle_at_18%_28%,rgba(240,220,184,0.22)_0%,rgba(212,184,134,0.1)_28%,transparent_60%)]"></div>
       <div class="afr-grain absolute inset-0 pointer-events-none"></div>
       <div class="afr-dust absolute inset-0 pointer-events-none z-10" aria-hidden="true"></div>
 
@@ -118,7 +118,7 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
           </span>
 
           <div class="afr-cascade-wrap relative inline-block">
-            <h3 class="afr-master font-serif font-black uppercase whitespace-nowrap text-[clamp(2.8rem,10.5vw,10rem)] leading-[0.92] tracking-[0.04em] text-transparent opacity-0 select-none">
+            <h3 class="afr-master font-serif font-black uppercase whitespace-nowrap text-[clamp(1.5rem,4.4vw,4.5rem)] leading-[0.94] tracking-[0.03em] text-transparent opacity-0 select-none">
               La Cicatriz del Agua
             </h3>
 
@@ -126,7 +126,7 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
               {
                 slices.map((slice) => (
                   <span
-                    class="afr-slice absolute inset-0 font-serif font-black uppercase whitespace-nowrap text-[clamp(2.8rem,10.5vw,10rem)] leading-[0.92] tracking-[0.04em] text-transparent will-change-transform"
+                    class="afr-slice absolute inset-0 font-serif font-black uppercase whitespace-nowrap text-[clamp(1.5rem,4.4vw,4.5rem)] leading-[0.94] tracking-[0.03em] text-transparent will-change-transform"
                     style={`clip-path: ${slice.clip};`}
                   >
                     La Cicatriz del Agua

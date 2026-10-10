@@ -63,7 +63,32 @@ const { steps = defaultSteps, className = "", autoplayDuration = 3500 } = Astro.
 >
   {/* Contenedor Sticky a Pantalla Completa */}
   <div class="sticky top-0 h-screen w-full overflow-hidden bg-black select-none">
-    
+
+    {/* ══════════════════════════════════════════════════════════════════════
+         PANTALLA PREVIA CINEMÁTICA: 'AMERICA SECRETS' (ESTILO APERTURA DE PELÍCULA)
+    ══════════════════════════════════════════════════════════════════════ */}
+    <div
+      class="narrative-intro-overlay absolute inset-0 z-35 flex items-center justify-center pointer-events-auto px-4 bg-[#0c0e0b]/92 backdrop-blur-md"
+    >
+      {/* Fondo difuminado parcial verde musgo levemente fosfóreo */}
+      <div class="america-moss-aura absolute inset-0 pointer-events-none" aria-hidden="true"></div>
+
+      <div class="narrative-intro-box relative z-10 flex flex-col items-center text-center max-w-6xl">
+        <span class="narrative-intro-badge inline-block mb-3 sm:mb-4 font-mono text-[9.5px] sm:text-[11px] tracking-[0.4em] uppercase text-[#BDEBB8] py-1 px-4 rounded-full border border-[#72D468]/35 bg-[#142013]/70 backdrop-blur-md shadow-[0_0_20px_rgba(114,212,104,0.2)] opacity-0">
+          Colección Destacada · Archivo Monolítico
+        </span>
+
+        <h1 class="narrative-intro-title font-fraunces font-black uppercase text-[clamp(1.8rem,5.2vw,5.4rem)] leading-[0.9] tracking-[-0.01em] select-none opacity-0">
+          <span class="america-destacado">AMÉRICA</span>
+          <span class="secrets-lithic block sm:inline sm:ml-4">SECRETS</span>
+        </h1>
+
+        <p class="narrative-intro-sub mt-4 sm:mt-6 font-mono text-[10px] sm:text-[12px] tracking-[0.32em] uppercase text-[#D2C3B0] max-w-2xl opacity-0">
+          La misma obsesión monolítica · Tres continentes separados por océanos
+        </p>
+      </div>
+    </div>
+
     {/* Capas narrativas superpuestas */}
     {steps.map((step, index) => (
       <div
@@ -124,12 +149,60 @@ const { steps = defaultSteps, className = "", autoplayDuration = 3500 } = Astro.
     const totalSteps = layers.length;
     if (totalSteps === 0) return;
 
+    const introOverlay = container.querySelector<HTMLElement>(".narrative-intro-overlay");
+    const introTitle = container.querySelector<HTMLElement>(".narrative-intro-title");
+    const introBadge = container.querySelector<HTMLElement>(".narrative-intro-badge");
+    const introSub = container.querySelector<HTMLElement>(".narrative-intro-sub");
+
     const autoDurationAttr = container.getAttribute("data-autoplay");
     const autoplayDuration = autoDurationAttr ? parseInt(autoDurationAttr, 10) : 3500;
 
     let currentIndex = 0;
     let autoTimer: any = null;
     let isVisible = false;
+    let introPlayed = false;
+    let introTl: gsap.core.Timeline | null = null;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Reproducción de la apertura cinematográfica 'AMERICA SECRETS'
+    function playIntro() {
+      if (!introOverlay || !introTitle || introPlayed) return;
+      introPlayed = true;
+
+      if (reduceMotion) {
+        introOverlay.style.opacity = "0";
+        introOverlay.classList.remove("pointer-events-auto");
+        introOverlay.classList.add("pointer-events-none");
+        startAutoTimer();
+        return;
+      }
+
+      introTl = gsap.timeline({
+        onComplete: () => {
+          gsap.to(introOverlay, {
+            opacity: 0,
+            duration: 0.85,
+            ease: "power2.inOut",
+            onComplete: () => {
+              introOverlay.classList.remove("pointer-events-auto");
+              introOverlay.classList.add("pointer-events-none");
+              startAutoTimer();
+            }
+          });
+        }
+      });
+
+      // Revelación cinemática con Fraunces Impact
+      introTl
+        .to([introBadge, introSub], { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" })
+        .fromTo(
+          introTitle,
+          { opacity: 0, scale: 1.08, filter: "blur(8px)" },
+          { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1.25, ease: "power3.out" },
+          "-=0.3"
+        )
+        .to({}, { duration: 1.4 }); // Contemplación del título de película
+    }
 
     // Transición cinemática orquestada con GSAP
     function goToStep(targetIndex: number) {
@@ -228,6 +301,21 @@ const { steps = defaultSteps, className = "", autoplayDuration = 3500 } = Astro.
           const scrollableDistance = rect.height - window.innerHeight;
           if (scrollableDistance <= 0) return;
 
+          // Si el usuario hace scroll directo, cerramos el intro overlay si seguía abierto
+          if (!introPlayed && introOverlay && rect.top <= 0) {
+            introPlayed = true;
+            introTl?.kill();
+            gsap.to(introOverlay, {
+              opacity: 0,
+              duration: 0.4,
+              ease: "power2.out",
+              onComplete: () => {
+                introOverlay.classList.remove("pointer-events-auto");
+                introOverlay.classList.add("pointer-events-none");
+              }
+            });
+          }
+
           // Solo si el usuario se encuentra dentro del contenedor de 300vh
           if (rect.top <= 0 && rect.bottom >= window.innerHeight) {
             const rawProgress = -rect.top / scrollableDistance;
@@ -244,13 +332,17 @@ const { steps = defaultSteps, className = "", autoplayDuration = 3500 } = Astro.
       }
     }
 
-    // Pausar autoplay cuando la sección no esté visible en la pantalla
+    // Pausar autoplay o detonar intro cuando la sección sea visible
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           isVisible = entry.isIntersecting;
           if (isVisible) {
-            startAutoTimer();
+            if (!introPlayed) {
+              playIntro();
+            } else {
+              startAutoTimer();
+            }
           } else {
             stopAutoTimer();
           }
@@ -271,3 +363,67 @@ const { steps = defaultSteps, className = "", autoplayDuration = 3500 } = Astro.
   }
   document.addEventListener("astro:page-load", setupScrollNarrative);
 </script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,900,0,1&display=swap"
+/>
+
+<style>
+  /* Tipografía FRAUNCES IMPACT para AMÉRICA SECRETS */
+  .narrative-intro-title {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'opsz' 144, 'SOFT' 0, 'WONK' 1;
+  }
+
+  /* AMÉRICA: Título de película monumental lítico en terracota y ocre ardiente */
+  .america-destacado {
+    background: linear-gradient(
+      180deg,
+      #fce2c2 0%,
+      #f09b62 25%,
+      #c55228 58%,
+      #782710 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0 4px 0 #4a1508)
+      drop-shadow(0 14px 35px rgba(0, 0, 0, 0.98))
+      drop-shadow(0 0 55px rgba(197, 82, 40, 0.45));
+  }
+
+  /* SECRETS: Caliza ocre tallada */
+  .secrets-lithic {
+    background: linear-gradient(
+      180deg,
+      #f7eedf 0%,
+      #dfc394 32%,
+      #b89257 65%,
+      #6c512a 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0 4px 0 #312310)
+      drop-shadow(0 14px 35px rgba(0, 0, 0, 0.98))
+      drop-shadow(0 0 40px rgba(217, 185, 134, 0.3));
+  }
+
+  /* Fondo difuminado parcial verde musgo levemente fosfóreo */
+  .america-moss-aura {
+    background: radial-gradient(
+      ellipse at 50% 50%,
+      rgba(114, 212, 104, 0.24) 0%,
+      rgba(52, 110, 46, 0.38) 32%,
+      rgba(18, 38, 16, 0.6) 65%,
+      transparent 85%
+    );
+    filter: blur(55px);
+    mix-blend-mode: screen;
+  }
+</style>
