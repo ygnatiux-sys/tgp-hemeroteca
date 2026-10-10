@@ -1,0 +1,624 @@
+---
+/**
+ * src/components/PumapunkuHero.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * PUMAPUNKU — "MECANIZADO ANCESTRAL" (Andesita Quirúrgica / Corte CNC)
+ *
+ * 1. Paleta de Color:
+ *    - Texto Principal: Gris Titanio (#c2c5cc)
+ *    - Fondo/Sombras: Negro Basalto (#050607)
+ *    - Acento / Láser: Cian Industrial / Óxido de Cobre (#457b77 / #608f8c / láser #4ef2d2)
+ * 2. Tipografía:
+ *    - Panchang (Extrabold 800/900) brutalista de máquina CNC + Chivo Mono para telemetría.
+ * 3. Animación GSAP:
+ *    - Corte de Precisión (Clip-path lineal a velocidad constante con hilo láser cian de 1px).
+ *    - Encastre Perfecto (Asentamiento con golpe seco ease: power4.inOut).
+ *    - Telemetría Tabular: Despliegue de datos con parpadeo digital topográfico.
+ */
+import imgPumapunku from "../assets/alternativa/pumapunku.jpg";
+
+interface Props {
+  image?: ImageMetadata;
+  word?: string;
+  subtitle?: string;
+  speed?: number;
+  showHud?: boolean;
+  hudLabel?: string;
+}
+
+const {
+  image = imgPumapunku,
+  word = "MECANIZADO ANCESTRAL",
+  subtitle = "La anomalía de la andesita en el altiplano boliviano",
+  speed = 0.6,
+  showHud = true,
+  hudLabel = "Corte CNC · Pumapunku",
+} = Astro.props;
+---
+
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link
+  href="https://api.fontshare.com/v2/css?f[]=panchang@700,800,900&display=swap"
+  rel="stylesheet"
+/>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@400;600;700&family=Space+Grotesk:wght@600;700&display=swap"
+  rel="stylesheet"
+/>
+
+<section class="pumapunku-stage" aria-label={word} data-speed={speed}>
+  {/* Fondo de alta definición del bloque H de andesita */}
+  <div class="pumapunku-bg-wrap">
+    <img
+      src={image.src}
+      alt="Bloque H de andesita con cortes de precisión milimétrica en Pumapunku"
+      class="pumapunku-img"
+      loading="eager"
+      decoding="async"
+    />
+  </div>
+
+  {/* Grilla técnica sutil de ingeniería / AutoCAD */}
+  <div class="pumapunku-grid-overlay" aria-hidden="true"></div>
+
+  {/* Scrim ceñido al pie y viñeta sutil de negro basalto */}
+  <div class="pumapunku-vignette"></div>
+
+  {/* Escenario de Telemetría y Tipografía CNC */}
+  <div class="pumapunku-slot">
+    <div class="pumapunku-chamber">
+
+      {/* Badge de Telemetría Topográfica */}
+      <div class="pumapunku-badge">
+        <span class="pumapunku-badge-dot"></span>
+        <span>TELEMETRÍA LÍTICA · PUMAPUNKU · ALTIPLANO 3800M</span>
+      </div>
+
+      {/* Contenedor del Corte CNC con Hilo Láser */}
+      <div class="pumapunku-cnc-wrap">
+        {/* Texto fantasma invisible para dimensiones */}
+        <h1 class="pumapunku-ghost" aria-label={word}>
+          {word}
+        </h1>
+
+        {/* Texto que se revela por corte de sierra de diamante */}
+        <div class="pumapunku-revealed-layer" aria-hidden="true">
+          <span class="pumapunku-solid-text">{word}</span>
+        </div>
+
+        {/* Hilo Láser de 1px en Cian Industrial con destello de corte */}
+        <div class="pumapunku-laser-beam" aria-hidden="true">
+          <span class="pumapunku-laser-spark"></span>
+        </div>
+      </div>
+
+      {/* Subtítulo: Telemetría Tabular Secuencial */}
+      <div class="pumapunku-telemetry-box">
+        <span class="pumapunku-telemetry-prefix">[ESCÁNEO TOPOGRÁFICO: 90.0°]</span>
+        <h2 class="pumapunku-sub">
+          {subtitle}
+        </h2>
+      </div>
+
+      {/* Métricas de Ingeniería Andesítica */}
+      <div class="pumapunku-metrics" aria-hidden="true">
+        <div class="pumapunku-metric-item">
+          <span class="pumapunku-metric-label">MATERIAL</span>
+          <span class="pumapunku-metric-val">Andesita Gris Volcánica</span>
+        </div>
+        <div class="pumapunku-metric-item">
+          <span class="pumapunku-metric-label">DUREZA MOHS</span>
+          <span class="pumapunku-metric-val">6.0 — 6.5</span>
+        </div>
+        <div class="pumapunku-metric-item">
+          <span class="pumapunku-metric-label">TOLERANCIA DE ÁNGULO</span>
+          <span class="pumapunku-metric-val">± 0.05 mm / 90° Int.</span>
+        </div>
+        <div class="pumapunku-metric-item">
+          <span class="pumapunku-metric-label">ENCASTRE</span>
+          <span class="pumapunku-metric-val">Hermético al Vacío</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {
+    showHud ? (
+      <div class="pumapunku-hud">
+        <div class="pumapunku-hud-head">
+          <span class="pumapunku-hud-dot" />
+          <span>{hudLabel}</span>
+        </div>
+        <button type="button" id="pumapunku-replay" class="pumapunku-hud-btn">
+          Ejecutar Corte CNC (Espacio)
+        </button>
+        <div class="pumapunku-hud-speeds">
+          <button type="button" class="pumapunku-speed" data-speed="1.5">Láser Rápido</button>
+          <button type="button" class="pumapunku-speed" data-speed="1">Precisión</button>
+          <button type="button" class="pumapunku-speed is-active" data-speed="0.6">Milimétrico</button>
+        </div>
+      </div>
+    ) : null
+  }
+</section>
+
+<style>
+  .pumapunku-stage {
+    position: relative;
+    width: 100%;
+    height: 100svh;
+    min-height: 600px;
+    overflow: hidden;
+    background: #050607; /* Negro Basalto */
+    color: #c2c5cc;      /* Gris Titanio */
+    user-select: none;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+  }
+
+  .pumapunku-bg-wrap {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .pumapunku-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 46%;
+    filter: brightness(1.05) contrast(1.08);
+    will-change: transform;
+    animation: pumapunku-pan 36s ease-in-out infinite alternate;
+  }
+
+  @keyframes pumapunku-pan {
+    from { transform: scale(1.01) translate(0, 0); }
+    to { transform: scale(1.06) translate(-1%, -1%); }
+  }
+
+  /* Grilla técnica sutil de corte y medición */
+  .pumapunku-grid-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-size: 60px 60px;
+    background-image: 
+      linear-gradient(to right, rgba(69, 123, 119, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(69, 123, 119, 0.04) 1px, transparent 1px);
+  }
+
+  /* Scrim ceñido y viñeta sutil de Negro Basalto */
+  .pumapunku-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at 50% 50%,
+      transparent 35%,
+      rgba(5, 6, 7, 0.5) 70%,
+      rgba(5, 6, 7, 0.92) 100%
+    ),
+    linear-gradient(to top, rgba(5, 6, 7, 0.95) 0%, rgba(5, 6, 7, 0.25) 30%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .pumapunku-slot {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+    padding: 2rem 4vw;
+  }
+
+  .pumapunku-chamber {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 1400px;
+    width: 100%;
+  }
+
+  /* Badge de telemetría */
+  .pumapunku-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: 'Chivo Mono', monospace;
+    font-size: clamp(0.58rem, 0.9vw, 0.7rem);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #4ef2d2;
+    padding: 0.35rem 1.1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(78, 242, 210, 0.3);
+    background: rgba(5, 6, 7, 0.7);
+    backdrop-filter: blur(12px);
+    margin-bottom: 1.8rem;
+    opacity: 0;
+  }
+
+  .pumapunku-badge-dot {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: #4ef2d2;
+    box-shadow: 0 0 8px #4ef2d2;
+    animation: pulse-dot 1.8s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  /* CONTENEDOR DEL CORTE CNC */
+  .pumapunku-cnc-wrap {
+    position: relative;
+    display: inline-block;
+    overflow: visible;
+  }
+
+  /* Tipografía Panchang Brutalista CNC */
+  .pumapunku-ghost,
+  .pumapunku-solid-text {
+    font-family: 'Panchang', 'Space Grotesk', system-ui, sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.4rem, 4.4vw, 4.5rem);
+    line-height: 0.94;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin: 0;
+    padding: 0.05em 0.1em;
+  }
+
+  .pumapunku-ghost {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  /* Capa sólida de Gris Titanio cortada con clip-path */
+  .pumapunku-revealed-layer {
+    position: absolute;
+    inset: 0;
+    clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
+    will-change: clip-path, transform;
+  }
+
+  .pumapunku-solid-text {
+    display: block;
+    color: #c2c5cc; /* Gris Titanio */
+    background: linear-gradient(
+      180deg,
+      #f0f2f5 0%,
+      #d4d7de 30%,
+      #b0b4bd 65%,
+      #6c707a 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.98))
+            drop-shadow(0 0 25px rgba(69, 123, 119, 0.25));
+  }
+
+  /* Hilo Láser Cian de 1px */
+  .pumapunku-laser-beam {
+    position: absolute;
+    top: -10%;
+    bottom: -10%;
+    left: 0;
+    width: 1.5px;
+    background: #4ef2d2;
+    box-shadow: 
+      0 0 6px #4ef2d2,
+      0 0 14px #4ef2d2,
+      0 0 28px rgba(78, 242, 210, 0.6);
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  .pumapunku-laser-spark {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    transform: translate(-50%, 50%);
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 12px #4ef2d2, 0 0 24px #4ef2d2;
+  }
+
+  /* Telemetría Tabular Subtítulo */
+  .pumapunku-telemetry-box {
+    margin-top: 1.8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    opacity: 0;
+  }
+
+  .pumapunku-telemetry-prefix {
+    font-family: 'Chivo Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    color: #457b77; /* Cian Industrial */
+    text-transform: uppercase;
+  }
+
+  .pumapunku-sub {
+    margin: 0;
+    font-family: 'Chivo Mono', monospace;
+    font-size: clamp(0.78rem, 1.4vw, 1.15rem);
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #9ba1ad;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.95);
+  }
+
+  /* Panel inferior de métricas de precisión */
+  .pumapunku-metrics {
+    margin-top: 2.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.8rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    padding: 0.6rem 1.4rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(69, 123, 119, 0.2);
+    background: rgba(5, 6, 7, 0.6);
+    backdrop-filter: blur(8px);
+  }
+
+  .pumapunku-metric-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+  }
+
+  .pumapunku-metric-label {
+    font-family: 'Chivo Mono', monospace;
+    font-size: 0.52rem;
+    letter-spacing: 0.24em;
+    color: #457b77;
+    text-transform: uppercase;
+  }
+
+  .pumapunku-metric-val {
+    font-family: 'Chivo Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #c2c5cc;
+    letter-spacing: 0.08em;
+  }
+
+  /* HUD */
+  .pumapunku-hud {
+    position: absolute;
+    top: 5.5rem;
+    right: 1.5rem;
+    z-index: 30;
+    width: 16rem;
+    padding: 0.95rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-radius: 0.8rem;
+    background: rgba(5, 6, 7, 0.9);
+    border: 1px solid rgba(78, 242, 210, 0.24);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(16px);
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+  }
+
+  .pumapunku-hud-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: #4ef2d2;
+    font-weight: 700;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .pumapunku-hud-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: #4ef2d2;
+    box-shadow: 0 0 8px #4ef2d2;
+  }
+
+  .pumapunku-hud-btn {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 0;
+    cursor: pointer;
+    background: linear-gradient(90deg, #457b77, #4ef2d2);
+    color: #050607;
+    font-weight: 700;
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+
+  .pumapunku-hud-btn:hover {
+    filter: brightness(1.15);
+  }
+
+  .pumapunku-hud-btn:active {
+    transform: scale(0.97);
+  }
+
+  .pumapunku-hud-speeds {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: 0.4rem;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .pumapunku-speed {
+    padding: 0.4rem 0;
+    border: 0;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    background: transparent;
+    color: #8c929e;
+    font-size: 0.58rem;
+    font-family: 'Chivo Mono', monospace;
+  }
+
+  .pumapunku-speed.is-active {
+    background: #4ef2d2;
+    color: #050607;
+    font-weight: 700;
+  }
+</style>
+
+<script>
+  import gsap from "gsap";
+
+  const setupPumapunku = () => {
+    const stage = document.querySelector<HTMLElement>(".pumapunku-stage");
+    if (!stage || stage.dataset.ready === "true") return;
+    stage.dataset.ready = "true";
+
+    const badge = stage.querySelector<HTMLElement>(".pumapunku-badge");
+    const revealedLayer = stage.querySelector<HTMLElement>(".pumapunku-revealed-layer");
+    const laserBeam = stage.querySelector<HTMLElement>(".pumapunku-laser-beam");
+    const telemetryBox = stage.querySelector<HTMLElement>(".pumapunku-telemetry-box");
+    const subText = stage.querySelector<HTMLElement>(".pumapunku-sub");
+    const metrics = stage.querySelector<HTMLElement>(".pumapunku-metrics");
+    const replayBtn = document.getElementById("pumapunku-replay");
+    const speedBtns = document.querySelectorAll<HTMLElement>(".pumapunku-speed");
+
+    if (!badge || !revealedLayer || !laserBeam || !telemetryBox || !subText || !metrics) return;
+
+    let speed = parseFloat(stage.dataset.speed || "0.6");
+    let tl: gsap.core.Timeline | null = null;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const reset = () => {
+      tl?.kill();
+      tl = null;
+
+      gsap.set(badge, { opacity: 0, y: -12 });
+      gsap.set(revealedLayer, {
+        clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)",
+        x: 0,
+      });
+      gsap.set(laserBeam, { left: "0%", opacity: 0 });
+      gsap.set(telemetryBox, { opacity: 0 });
+      gsap.set(metrics, { opacity: 0, y: 15 });
+    };
+
+    const play = () => {
+      reset();
+
+      if (reduceMotion) {
+        gsap.set([badge, telemetryBox, metrics], { opacity: 1, y: 0 });
+        gsap.set(revealedLayer, { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" });
+        return;
+      }
+
+      tl = gsap.timeline();
+
+      // FASE 0: Calibración y Badge Topográfico
+      tl.to(badge, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" });
+
+      // FASE 1: BARRIDO LÁSER CNC (Velocidad matemática constante)
+      tl.addLabel("laserCut");
+      tl.set(laserBeam, { opacity: 1 }, "laserCut");
+
+      // Progreso del corte de 0 a 100%
+      const cutProgress = { val: 0 };
+      tl.to(
+        cutProgress,
+        {
+          val: 100,
+          duration: 1.6,
+          ease: "none", // Velocidad lineal exacta de fresadora
+          onUpdate: () => {
+            const p = cutProgress.val;
+            revealedLayer.style.clipPath = `polygon(0% 0%, ${p}% 0%, ${p}% 100%, 0% 100%)`;
+            laserBeam.style.left = `${p}%`;
+          },
+        },
+        "laserCut"
+      );
+
+      // FASE 2: EL ENCASTRE PERFECTO (Golpe seco sin rebote al terminar el corte)
+      tl.addLabel("lock", ">");
+      tl.to(laserBeam, { opacity: 0, duration: 0.15 }, "lock");
+
+      // Micro-asentamiento seco (dos bloques encastrando al vacío)
+      tl.fromTo(
+        revealedLayer,
+        { x: -2 },
+        { x: 0, duration: 0.12, ease: "power4.inOut" },
+        "lock"
+      );
+
+      // FASE 3: TELEMETRÍA TABULAR DIGITAL (Parpadeo de datos topográficos)
+      tl.addLabel("telemetry", "lock+=0.2");
+      tl.to(telemetryBox, { opacity: 1, duration: 0.1 }, "telemetry");
+
+      // Simulación de escaneo parpadeando 3 veces antes de fijar datos
+      tl.to(subText, { opacity: 0.2, duration: 0.05, repeat: 3, yoyo: true }, "telemetry");
+
+      // FASE 4: Métricas de Tolerancia de Corte
+      tl.to(metrics, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, "telemetry+=0.25");
+
+      tl.timeScale(speed);
+    };
+
+    reset();
+    setTimeout(play, 350);
+
+    replayBtn?.addEventListener("click", play);
+
+    speedBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        speedBtns.forEach((b) => b.classList.remove("is-active"));
+        btn.classList.add("is-active");
+        speed = parseFloat(btn.dataset.speed || "1");
+        play();
+      });
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && (e.target as HTMLElement)?.tagName !== "INPUT") {
+        e.preventDefault();
+        play();
+      }
+    });
+  };
+
+  document.addEventListener("astro:page-load", setupPumapunku);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupPumapunku);
+  } else {
+    setupPumapunku();
+  }
+</script>

@@ -1,0 +1,24 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PumapunkuHero from "../components/PumapunkuHero.astro";
+import img from "../assets/alternativa/pumapunku.jpg";
+
+export const prerender = true;
+---
+
+<Layout
+  title="Laboratorio: Mecanizado Ancestral (Pumapunku) — ANDESITA QUIRÚRGICA | TGP"
+  description="Prueba cinemática de alta tecnología lítica en Pumapunku: corte CNC con hilo láser cian, encastre seco y telemetría de ingeniería andesítica."
+  headerTransparentUntilScroll={true}
+  footerVariant="minimal"
+  bodyClass="bg-[#050607]"
+>
+  <PumapunkuHero
+    image={img}
+    word="MECANIZADO ANCESTRAL"
+    subtitle="La anomalía de la andesita en el altiplano boliviano"
+    speed={0.6}
+    showHud={true}
+    hudLabel="Corte CNC · Pumapunku"
+  />
+</Layout>

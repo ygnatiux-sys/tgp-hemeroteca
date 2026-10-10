@@ -46,9 +46,17 @@ const defaultSteps: Step[] = [
     image: "/images/megalitos/gobekli-tepe.jpg",
     alt: "Pilar megalítico grabado en Göbekli Tepe",
     text: "El rompecabezas original.",
-    ctaText: "Explorar el Dossier Megalítico",
-    ctaHref: "/colecciones/arqueosemiotica/",
     imagePosition: "center 28%",
+  },
+  {
+    id: "step-4",
+    badge: "CAPÍTULO IV · PUMAPUNKU · ANDESITA QUIRÚRGICA",
+    image: "/images/megalitos/pumapunku.jpg",
+    alt: "Bloque H de andesita con corte de precisión geométrica en Pumapunku",
+    text: "La anomalía de la andesita en el altiplano boliviano",
+    ctaText: "Ver Estudio: Mecanizado Ancestral",
+    ctaHref: "/test-pumapunku",
+    imagePosition: "center 46%",
   },
 ];
 
@@ -57,7 +65,7 @@ const { steps = defaultSteps, className = "", autoplayDuration = 3500 } = Astro.
 
 <section
   id="scroll-narrative-container"
-  class={`relative w-full h-[300vh] bg-black ${className}`}
+  class={`relative w-full h-[400vh] bg-black ${className}`}
   data-scroll-narrative
   data-autoplay={autoplayDuration}
 >
@@ -116,9 +124,29 @@ const { steps = defaultSteps, className = "", autoplayDuration = 3500 } = Astro.
             </span>
           )}
 
-          <h2 class="font-serif text-stone-100 text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-tight tracking-tight drop-shadow-[0_2px_16px_rgba(0,0,0,0.95)] max-w-4xl lg:max-w-5xl text-balance">
-            {step.text}
-          </h2>
+          {index === 3 ? (
+            /* PASO 4: PUMAPUNKU — CORTE CNC LÁSER MILIMÉTRICO */
+            <div class="pumapunku-cnc-step relative flex flex-col items-center my-1">
+              <div class="relative inline-block overflow-visible">
+                <span class="pumapunku-step-ghost font-mono uppercase text-transparent text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-tight font-black select-none">
+                  MECANIZADO ANCESTRAL
+                </span>
+                <div class="pumapunku-step-cut absolute inset-0 overflow-hidden" style="clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);">
+                  <span class="font-mono uppercase text-[#c2c5cc] text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-tight font-black tracking-wider drop-shadow-[0_2px_14px_rgba(0,0,0,0.9)]">
+                    MECANIZADO ANCESTRAL
+                  </span>
+                </div>
+                <div class="pumapunku-step-laser absolute top-0 bottom-0 left-0 w-[1.5px] bg-[#4ef2d2] shadow-[0_0_10px_#4ef2d2,0_0_20px_#4ef2d2] opacity-0 pointer-events-none"></div>
+              </div>
+              <p class="font-mono text-[10px] sm:text-[11.5px] tracking-[0.25em] uppercase text-[#457b77] mt-1.5 font-bold">
+                [PRECISIÓN MILIMÉTRICA: 90.0°] · {step.text}
+              </p>
+            </div>
+          ) : (
+            <h2 class="font-serif text-stone-100 text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-tight tracking-tight drop-shadow-[0_2px_16px_rgba(0,0,0,0.95)] max-w-4xl lg:max-w-5xl text-balance">
+              {step.text}
+            </h2>
+          )}
 
           {step.ctaText && (
             <div class="pt-1">
@@ -264,6 +292,29 @@ const { steps = defaultSteps, className = "", autoplayDuration = 3500 } = Astro.
             { y: 22, opacity: 0 }, 
             { y: 0, opacity: 1, duration: 0.6, ease: "power3.out", delay: 0.08 }
           );
+        }
+
+        // Si es Pumapunku (Paso 4 / index 3): disparar corte láser milimétrico
+        if (targetIndex === 3) {
+          const cutEl = nextLayer.querySelector<HTMLElement>(".pumapunku-step-cut");
+          const laserEl = nextLayer.querySelector<HTMLElement>(".pumapunku-step-laser");
+          if (cutEl && laserEl) {
+            gsap.set(cutEl, { clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)" });
+            gsap.set(laserEl, { left: "0%", opacity: 1 });
+            const progress = { val: 0 };
+            gsap.to(progress, {
+              val: 100,
+              duration: 2.2, // Modo milimétrico pausado
+              ease: "none",
+              onUpdate: () => {
+                cutEl.style.clipPath = `polygon(0% 0%, ${progress.val}% 0%, ${progress.val}% 100%, 0% 100%)`;
+                laserEl.style.left = `${progress.val}%`;
+              },
+              onComplete: () => {
+                gsap.to(laserEl, { opacity: 0, duration: 0.2 });
+              }
+            });
+          }
         }
       }
     }
