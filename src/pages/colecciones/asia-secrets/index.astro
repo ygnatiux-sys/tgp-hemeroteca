@@ -1,0 +1,86 @@
+---
+/**
+ * src/pages/colecciones/asia-secrets/index.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * PÁGINA OFICIAL DE COLECCIÓN: ASIA SECRETS
+ */
+export const prerender = true;
+
+import Layout from '../../../layouts/Layout.astro';
+import AsiaSecretsNarrative from '../../../components/AsiaSecretsNarrative.astro';
+import BackSlideButton from '../../../components/BackSlideButton.astro';
+---
+
+<Layout title="Asia Secrets · Colección Arqueosemiótica | TGP">
+  <main class="w-full bg-[#060a08] text-[#e0e3e1] min-h-screen">
+    
+    <div class="fixed top-5 left-6 z-40">
+      <BackSlideButton fallbackUrl="/colecciones/" />
+    </div>
+
+    <!-- EXPERIENCIA CINEMÁTICA PRINCIPAL DE ASIA SECRETS -->
+    <section class="w-full">
+      <AsiaSecretsNarrative />
+    </section>
+
+    <!-- BANNER EDITORIAL DE CINTA -->
+    <div class="py-4 bg-[#030504] border-y border-[#a95a3f]/25 overflow-hidden">
+      <div class="whitespace-nowrap font-mono text-xs uppercase tracking-[0.3em] text-[#a95a3f] text-center animate-pulse">
+        ASIA SECRETS · GUNUNG PADANG (JAVA) · NAN MADOL (MICRONESIA) · CUEVAS DE BARABAR (BIHAR) · YONAGUNI (JAPÓN)
+      </div>
+    </div>
+
+    <!-- GRID DE CAPÍTULOS HIJOS -->
+    <section class="max-w-7xl mx-auto px-6 py-20">
+      <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 border-b border-white/10 pb-6">
+        <div>
+          <span class="font-mono text-xs uppercase tracking-[0.3em] text-[#a95a3f]">Episodios & Expedientes Megalíticos</span>
+          <h2 class="font-serif text-3xl sm:text-5xl font-black uppercase tracking-tight text-white mt-2">
+            Hitos Líticos de Asia & Oceanía
+          </h2>
+        </div>
+        <p class="font-mono text-xs uppercase tracking-widest text-[#e0e3e1]/60 mt-4 md:mt-0 max-w-md">
+          Georradar subterráneo, arquitectura ciclópea en basalto columnar y cámaras de resonancia acústica.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- GUNUNG PADANG -->
+        <a href="/test-gunung-padang" class="group block rounded-2xl border border-white/10 bg-[#0d1410] p-7 hover:border-[#a95a3f]/60 transition-all duration-300 shadow-xl">
+          <span class="font-mono text-[10px] uppercase text-[#a95a3f]">Episodio I · Java</span>
+          <h3 class="font-serif text-2xl font-bold uppercase text-white group-hover:text-[#e0e3e1] transition-colors mt-2">
+            Gunung Padang
+          </h3>
+          <p class="font-sans text-xs text-stone-300 mt-2">
+            La colina escalonada de basalto columnar con anomalías detectadas por georradar bajo el estrato del Holoceno.
+          </p>
+        </a>
+
+        <!-- NAN MADOL -->
+        <a href="/test-nan-madol" class="group block rounded-2xl border border-white/10 bg-[#0d1410] p-7 hover:border-[#a95a3f]/60 transition-all duration-300 shadow-xl">
+          <span class="font-mono text-[10px] uppercase text-[#a95a3f]">Episodio II · Micronesia</span>
+          <h3 class="font-serif text-2xl font-bold uppercase text-white group-hover:text-[#e0e3e1] transition-colors mt-2">
+            Nan Madol
+          </h3>
+          <p class="font-sans text-xs text-stone-300 mt-2">
+            La ciudad flotante de 250 millones de toneladas de prismas de basalto ensamblados sobre un arrecife de coral.
+          </p>
+        </a>
+
+        <!-- BARABAR -->
+        <a href="/test-barabar-eco" class="group block rounded-2xl border border-white/10 bg-[#0d1410] p-7 hover:border-[#a95a3f]/60 transition-all duration-300 shadow-xl">
+          <span class="font-mono text-[10px] uppercase text-[#a95a3f]">Episodio III · India</span>
+          <h3 class="font-serif text-2xl font-bold uppercase text-white group-hover:text-[#e0e3e1] transition-colors mt-2">
+            Cuevas de Barabar
+          </h3>
+          <p class="font-sans text-xs text-stone-300 mt-2">
+            Bóvedas monolíticas de granito pulido con acabado de espejo y acústica de resonancia hipnótica.
+          </p>
+        </a>
+
+      </div>
+    </section>
+
+  </main>
+</Layout>

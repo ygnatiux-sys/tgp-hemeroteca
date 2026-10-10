@@ -1,0 +1,387 @@
+---
+/**
+ * src/components/StratigraphicTitle.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * EXCAVACIÓN ESTRATIGRÁFICA (Tectonic Shift — 5 Estratos Geológicos)
+ * Gunung Padang · The Great Puzzle Project
+ *
+ * 1. La palabra gigante se divide en 5 estratos horizontales con clip-path dentado.
+ * 2. Desplazamiento tectónico en oposición: estratos impares entran desde la izquierda
+ *    y pares desde la derecha a velocidad pesada.
+ * 3. Al colisionar en el centro, impacto monolítico con camera-shake (1-2px).
+ * 4. Barrido de Georradar (GPR Scanline) vertical de arriba a abajo (mix-blend-mode: overlay).
+ * 5. El subtítulo H2 (Núcleo Ferroso #a95a3f) emerge desde la base del título con mask-image.
+ */
+interface Props {
+  word?: string;
+  subtitle?: string;
+  fontHref?: string;
+  fontFamily?: string;
+  fontWeight?: string | number;
+  textColor?: string;
+  accentColor?: string;
+  speed?: number;
+  autoplay?: boolean;
+  delay?: number;
+  align?: "center" | "left" | "right";
+  size?: string;
+}
+
+const {
+  word = "GUNUNG PADANG",
+  subtitle = "La pirámide que fractura el Holoceno",
+  fontHref = "https://api.fontshare.com/v2/css?f[]=clash-grotesk@700&display=swap",
+  fontFamily = "'Clash Grotesk', system-ui, -apple-system, sans-serif",
+  fontWeight = 700,
+  textColor = "#e0e3e1", // Niebla de Java / Ceniza Pálida
+  accentColor = "#a95a3f", // Núcleo Ferroso
+  speed = 1,
+  autoplay = true,
+  delay = 0.5,
+  align = "center",
+  size = "clamp(3.4rem, 11vw, 12.5rem)",
+} = Astro.props;
+
+// 5 Estratos geológicos: polígonos continuos que encastran exactamente
+const strataClips = [
+  // Estrato 1: 0% a ~21%
+  "polygon(0 0, 100% 0, 100% 21%, 91% 22.5%, 82% 19.5%, 71% 22%, 58% 19%, 43% 22%, 30% 19.5%, 16% 22%, 0 20%)",
+  // Estrato 2: ~20% a ~41%
+  "polygon(0 20%, 16% 22%, 30% 19.5%, 43% 22%, 58% 19%, 71% 22%, 82% 19.5%, 91% 22.5%, 100% 21%, 100% 41%, 92% 42.5%, 80% 39%, 67% 42.5%, 52% 39%, 36% 42.5%, 21% 39.5%, 0 41%)",
+  // Estrato 3: ~41% a ~62%
+  "polygon(0 41%, 21% 39.5%, 36% 42.5%, 52% 39%, 67% 42.5%, 80% 39%, 92% 42.5%, 100% 41%, 100% 62%, 88% 63.5%, 76% 60%, 62% 63.5%, 48% 60%, 33% 63.5%, 17% 60.5%, 0 62%)",
+  // Estrato 4: ~62% a ~82%
+  "polygon(0 62%, 17% 60.5%, 33% 63.5%, 48% 60%, 62% 63.5%, 76% 60%, 88% 63.5%, 100% 62%, 100% 82%, 93% 83.5%, 81% 80.5%, 69% 83%, 55% 80.5%, 41% 83%, 26% 80.5%, 12% 83%, 0 81%)",
+  // Estrato 5: ~81% a 100%
+  "polygon(0 81%, 12% 83%, 26% 80.5%, 41% 83%, 55% 80.5%, 69% 83%, 81% 80.5%, 93% 83.5%, 100% 82%, 100% 100%, 0 100%)",
+];
+---
+
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link rel="stylesheet" href={fontHref} />
+
+<div
+  class={`strata-root strata-align-${align}`}
+  style={`--strata-font:${fontFamily}; --strata-weight:${fontWeight}; --strata-color:${textColor}; --strata-accent:${accentColor}; --strata-size:${size};`}
+  data-speed={speed}
+  data-autoplay={autoplay ? "true" : "false"}
+  data-delay={delay}
+>
+  <div class="strata-shake-box">
+    <!-- H1 real semántico para SEO/Accesibilidad -->
+    <h1 class="strata-h1" aria-label={word}>
+      <!-- Sizer invisible para reservar espacio exacto -->
+      <span class="strata-sizer" aria-hidden="true">{word}</span>
+
+      <!-- 5 Estratos visuales -->
+      {strataClips.map((clip, i) => (
+        <span
+          class={`strata-slice strata-slice-${i + 1}`}
+          aria-hidden="true"
+          style={`clip-path: ${clip};`}
+          data-slice={i + 1}
+        >
+          {word}
+        </span>
+      ))}
+
+      <!-- Haz de Escáner Georradar (GPR) -->
+      <span class="strata-gpr-scan" aria-hidden="true"></span>
+    </h1>
+
+    <!-- Contenedor del Subtítulo que emerge de la base con máscara -->
+    <div class="strata-sub-wrapper">
+      <h2 class="strata-sub">{subtitle}</h2>
+    </div>
+  </div>
+</div>
+
+<noscript>
+  <style>
+    .strata-slice,
+    .strata-sub {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  </style>
+</noscript>
+
+<style>
+  .strata-root {
+    position: relative;
+    display: inline-block;
+    width: max-content;
+    max-width: 96vw;
+    user-select: none;
+  }
+
+  .strata-shake-box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    will-change: transform;
+  }
+
+  .strata-h1 {
+    position: relative;
+    margin: 0;
+    font-family: var(--strata-font);
+    font-weight: var(--strata-weight);
+    font-size: var(--strata-size);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-align: center;
+    filter: drop-shadow(0 18px 45px rgba(6, 10, 8, 0.95))
+      drop-shadow(0 0 25px rgba(224, 227, 225, 0.12));
+  }
+
+  .strata-sizer {
+    display: block;
+    visibility: hidden;
+    padding: 0.05em 0.04em;
+  }
+
+  .strata-slice {
+    position: absolute;
+    inset: 0;
+    display: block;
+    padding: 0.05em 0.04em;
+    color: var(--strata-color);
+    background: linear-gradient(
+      180deg,
+      #ffffff 0%,
+      var(--strata-color) 45%,
+      #b8c0bb 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    will-change: transform, opacity;
+    z-index: 2;
+  }
+
+  /* Haz de luz de penetración georradar (GPR) */
+  .strata-gpr-scan {
+    position: absolute;
+    inset: -15% -10%;
+    z-index: 4;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(224, 227, 225, 0.05) 30%,
+      rgba(255, 255, 255, 0.45) 48%,
+      rgba(169, 90, 63, 0.6) 52%,
+      rgba(224, 227, 225, 0.08) 70%,
+      transparent 100%
+    );
+    mix-blend-mode: overlay;
+    opacity: 0;
+    transform: translateY(-120%);
+    will-change: transform, opacity;
+  }
+
+  /* Contenedor del Subtítulo emergente con máscara */
+  .strata-sub-wrapper {
+    position: relative;
+    width: 100%;
+    margin-top: 1rem;
+    overflow: hidden;
+    padding-top: 0.2rem;
+    padding-bottom: 0.4rem;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 22%,
+      black 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 22%,
+      black 100%
+    );
+  }
+
+  .strata-sub {
+    margin: 0;
+    font-family: var(--strata-font);
+    font-weight: 500;
+    font-size: clamp(0.78rem, calc(var(--strata-size) * 0.12), 1.55rem);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    line-height: 1.4;
+    text-align: center;
+    color: var(--strata-accent);
+    text-shadow: 0 4px 20px rgba(6, 10, 8, 0.95);
+    opacity: 0;
+    transform: translateY(120%);
+    will-change: transform, opacity;
+  }
+
+  /* Alineaciones opcionales */
+  .strata-align-left .strata-shake-box {
+    align-items: flex-start;
+  }
+  .strata-align-left .strata-h1,
+  .strata-align-left .strata-sub {
+    text-align: left;
+  }
+</style>
+
+<script>
+  import gsap from "gsap";
+
+  const initStratigraphicTitles = () => {
+    const components = document.querySelectorAll<HTMLElement>(".strata-root");
+
+    components.forEach((root) => {
+      if (root.dataset.initialized === "true") return;
+      root.dataset.initialized = "true";
+
+      const shakeBox = root.querySelector<HTMLElement>(".strata-shake-box");
+      const slices = root.querySelectorAll<HTMLElement>(".strata-slice");
+      const scan = root.querySelector<HTMLElement>(".strata-gpr-scan");
+      const sub = root.querySelector<HTMLElement>(".strata-sub");
+
+      if (!shakeBox || slices.length === 0 || !scan || !sub) return;
+
+      let speed = parseFloat(root.dataset.speed || "1");
+      let tl: gsap.core.Timeline | null = null;
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      const reset = () => {
+        tl?.kill();
+        tl = null;
+        gsap.set(shakeBox, { x: 0, y: 0 });
+        slices.forEach((slice, idx) => {
+          // Estratos impares (0, 2, 4) se preparan a la izquierda (-130%)
+          // Estratos pares (1, 3) se preparan a la derecha (+130%)
+          const direction = idx % 2 === 0 ? -130 : 130;
+          gsap.set(slice, {
+            xPercent: direction,
+            opacity: 0,
+            scale: 1.02,
+          });
+        });
+        gsap.set(scan, { yPercent: -130, opacity: 0 });
+        gsap.set(sub, { yPercent: 120, opacity: 0 });
+      };
+
+      const play = async () => {
+        if (document.fonts?.ready) await document.fonts.ready;
+        reset();
+
+        if (reduceMotion) {
+          slices.forEach((slice) =>
+            gsap.set(slice, { xPercent: 0, opacity: 1, scale: 1 }),
+          );
+          gsap.set(sub, { yPercent: 0, opacity: 1 });
+          return;
+        }
+
+        tl = gsap.timeline({
+          defaults: { ease: "power3.inOut" },
+        });
+
+        // 1. Desplazamiento tectónico en oposición: los 5 estratos entran lentos y pesados
+        tl.to(
+          slices,
+          {
+            xPercent: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 2.4,
+            stagger: 0.08,
+            ease: "power4.out",
+          },
+          0.2,
+        );
+
+        // 2. Colisión e impacto monolítico en el centro (Camera Shake de 2px)
+        tl.to(
+          shakeBox,
+          {
+            x: -2.5,
+            y: 1.5,
+            duration: 0.045,
+            repeat: 7,
+            yoyo: true,
+            ease: "none",
+          },
+          1.85,
+        );
+        tl.set(shakeBox, { x: 0, y: 0 }, 2.2);
+
+        // 3. Escáner Georradar (GPR Scanline) barre verticalmente la palabra
+        tl.to(
+          scan,
+          {
+            opacity: 0.9,
+            duration: 0.2,
+            ease: "power1.in",
+          },
+          2.3,
+        );
+        tl.to(
+          scan,
+          {
+            yPercent: 140,
+            duration: 1.4,
+            ease: "power2.inOut",
+          },
+          2.3,
+        );
+        tl.to(
+          scan,
+          {
+            opacity: 0,
+            duration: 0.3,
+            ease: "power1.out",
+          },
+          3.4,
+        );
+
+        // 4. Subtítulo emerge de la base con máscara, como desenterrado
+        tl.to(
+          sub,
+          {
+            yPercent: 0,
+            opacity: 1,
+            duration: 1.8,
+            ease: "power3.out",
+          },
+          2.6,
+        );
+
+        tl.timeScale(speed);
+      };
+
+      // Disparadores de repetición externa
+      window.addEventListener("strata:replay", (e) => {
+        const detail = (e as CustomEvent).detail;
+        if (detail?.speed) speed = detail.speed;
+        play();
+      });
+      window.addEventListener("strata:reset", reset);
+
+      reset();
+      if (root.dataset.autoplay !== "false") {
+        const delay = parseFloat(root.dataset.delay || "0.5") * 1000;
+        setTimeout(play, delay);
+      }
+    });
+  };
+
+  document.addEventListener("astro:page-load", initStratigraphicTitles);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initStratigraphicTitles);
+  } else {
+    initStratigraphicTitles();
+  }
+</script>

@@ -1,0 +1,32 @@
+---
+/**
+ * src/pages/test-gunung-padang.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Laboratorio de prueba interactivo: GUNUNG PADANG
+ * - Excavación Estratigráfica en 5 capas
+ * - Paleta Magma Seco y Niebla
+ * - Alternador de fuentes: Clash Grotesk (Bold 700) vs Unbounded (Black 900)
+ * - Brillo original de la imagen preservado (sin oscurecedores)
+ */
+export const prerender = true;
+
+import Layout from "../layouts/Layout.astro";
+import BackSlideButton from "../components/BackSlideButton.astro";
+import GunungPadangHero from "../components/GunungPadangHero.astro";
+---
+
+<Layout
+  title="Gunung Padang · Excavación Estratigráfica | TGP Laboratorio"
+  description="Laboratorio interactivo de Gunung Padang con animación GSAP de 5 estratos tectónicos, escáner georradar y Clash Grotesk Bold."
+  headerTransparentUntilScroll={true}
+  footerVariant="minimal"
+  bodyClass="bg-[#060a08]"
+>
+  <div class="fixed top-5 left-6 z-40">
+    <BackSlideButton fallbackUrl="/#asia-secrets" />
+  </div>
+
+  <main class="w-full">
+    <GunungPadangHero showHud={true} align="center" />
+  </main>
+</Layout>

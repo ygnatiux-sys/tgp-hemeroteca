@@ -1,0 +1,151 @@
+---
+/**
+ * src/components/GunungPadangHero.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Hero cinematográfico de Gunung Padang:
+ * - Brillo natural preservado (sin oscurecedores asfixiantes).
+ * - Excavación Estratigráfica en 5 capas con StratigraphicTitle.
+ * - Paleta Magma Seco y Niebla:
+ *   #e0e3e1 (Niebla de Java / Ceniza Pálida)
+ *   #060a08 (Verde Obsidiana)
+ *   #a95a3f (Núcleo Ferroso)
+ */
+import StratigraphicTitle from "./StratigraphicTitle.astro";
+import imgGunung from "../assets/alternativa/gunung-padang.jpg";
+
+interface Props {
+  showHud?: boolean;
+  align?: "center" | "left";
+  speed?: number;
+  fontChoice?: "clash" | "unbounded";
+}
+
+const {
+  showHud = true,
+  align = "center",
+  speed = 1,
+  fontChoice = "clash",
+} = Astro.props;
+
+const fontConfig = {
+  clash: {
+    href: "https://api.fontshare.com/v2/css?f[]=clash-grotesk@700&display=swap",
+    family: "'Clash Grotesk', system-ui, -apple-system, sans-serif",
+    weight: 700,
+  },
+  unbounded: {
+    href: "https://fonts.googleapis.com/css2?family=Unbounded:wght@800;900&display=swap",
+    family: "'Unbounded', sans-serif",
+    weight: 900,
+  },
+}[fontChoice];
+---
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link rel="stylesheet" href={fontConfig.href} />
+
+<section class="gp-stage relative w-full h-svh min-h-145 overflow-hidden bg-[#060a08] select-none" aria-label="Gunung Padang">
+  <!-- Fondo cinemático: IMAGEN CON BRILLO ORIGINAL PRESERVADO -->
+  <div class="gp-bg absolute inset-0 overflow-hidden">
+    <img
+      src={imgGunung.src}
+      alt="Columnas de basalto hexagonales en la jungla de Gunung Padang"
+      class="gp-img absolute inset-0 w-full h-full object-cover object-[center_35%] filter brightness-105 contrast-102 will-change-transform"
+      loading="eager"
+      decoding="async"
+    />
+  </div>
+
+  <!-- Sutil degradado únicamente en los bordes para lectura sin oscurecer el centro -->
+  <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(6,10,8,0.35)_80%,rgba(6,10,8,0.85)_100%)]"></div>
+  <div class="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-[#060a08] via-[#060a08]/40 to-transparent pointer-events-none"></div>
+
+  <!-- Título Estratigráfico Central -->
+  <div class={`gp-slot absolute inset-0 flex flex-col justify-center px-4 md:px-8 z-20 pointer-events-none ${align === "left" ? "items-start max-w-7xl mx-auto" : "items-center text-center"}`}>
+    <div class="pointer-events-auto">
+      <StratigraphicTitle
+        word="GUNUNG PADANG"
+        subtitle="La pirámide que fractura el Holoceno"
+        fontHref={fontConfig.href}
+        fontFamily={fontConfig.family}
+        fontWeight={fontConfig.weight}
+        textColor="#e0e3e1"
+        accentColor="#a95a3f"
+        speed={speed}
+        align={align}
+      />
+    </div>
+  </div>
+
+  <!-- HUD Interactivo de Control para Test y Presentación -->
+  {showHud && (
+    <div class="gp-hud absolute bottom-6 right-6 z-30 flex flex-wrap items-center gap-2.5 p-2 rounded-2xl bg-[#060a08]/85 border border-[#e0e3e1]/15 backdrop-blur-md shadow-2xl">
+      <div class="flex items-center gap-2 px-3 py-1 font-mono text-[10px] tracking-[0.25em] uppercase text-[#e0e3e1]/70">
+        <span class="w-2 h-2 rounded-full bg-[#a95a3f] shadow-[0_0_8px_#a95a3f] animate-pulse"></span>
+        <span>Georradar GPR · 5 Estratos</span>
+      </div>
+      
+      <button
+        type="button"
+        id="gp-replay-btn"
+        class="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-[#a95a3f] text-[#e0e3e1] hover:text-white font-mono text-[10.5px] uppercase tracking-wider transition-all duration-300 active:scale-95 cursor-pointer"
+      >
+        Repetir Estratos (Espacio)
+      </button>
+
+      <div class="flex items-center gap-1 border-l border-white/10 pl-2">
+        <button type="button" class="gp-speed-btn px-2.5 py-1 rounded-lg text-[10px] font-mono text-white/60 hover:text-white transition-colors" data-speed="1.6">Rápido</button>
+        <button type="button" class="gp-speed-btn is-active px-2.5 py-1 rounded-lg text-[10px] font-mono bg-white/15 text-white font-bold" data-speed="1">Místico</button>
+        <button type="button" class="gp-speed-btn px-2.5 py-1 rounded-lg text-[10px] font-mono text-white/60 hover:text-white transition-colors" data-speed="0.6">Lento</button>
+      </div>
+    </div>
+  )}
+</section>
+
+<style>
+  .gp-img {
+    animation: gp-drift 32s ease-in-out infinite alternate;
+  }
+  @keyframes gp-drift {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.045); }
+  }
+</style>
+
+<script>
+  const setupGpHud = () => {
+    const replayBtn = document.getElementById("gp-replay-btn");
+    const speedBtns = document.querySelectorAll(".gp-speed-btn");
+
+    replayBtn?.addEventListener("click", () => {
+      window.dispatchEvent(new CustomEvent("strata:replay"));
+    });
+
+    speedBtns.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const target = e.currentTarget as HTMLElement;
+        const sp = parseFloat(target.dataset.speed || "1");
+        speedBtns.forEach((b) => b.classList.remove("is-active", "bg-white/15", "font-bold"));
+        target.classList.add("is-active", "bg-white/15", "font-bold");
+        window.dispatchEvent(new CustomEvent("strata:replay", { detail: { speed: sp } }));
+      });
+    });
+
+    // Atajo barra espaciadora
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && e.target === document.body) {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent("strata:replay"));
+      }
+    });
+  };
+
+  document.addEventListener("astro:page-load", setupGpHud);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupGpHud);
+  } else {
+    setupGpHud();
+  }
+</script>
