@@ -125,20 +125,24 @@ const { steps = defaultSteps, className = "", autoplayDuration = 3500 } = Astro.
           )}
 
           {index === 3 ? (
-            /* PASO 4: PUMAPUNKU — CORTE CNC LÁSER MILIMÉTRICO */
+            /* PASO 4: PUMAPUNKU — CORTE CNC LÁSER MILIMÉTRICO (PUMA PUNKU + MECANIZADO ANCESTRAL) */
             <div class="pumapunku-cnc-step relative flex flex-col items-center my-1">
               <div class="relative inline-block overflow-visible">
-                <span class="pumapunku-step-ghost font-mono uppercase text-transparent text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-tight font-black select-none">
-                  MECANIZADO ANCESTRAL
-                </span>
-                <div class="pumapunku-step-cut absolute inset-0 overflow-hidden" style="clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);">
-                  <span class="font-mono uppercase text-[#c2c5cc] text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-tight font-black tracking-wider drop-shadow-[0_2px_14px_rgba(0,0,0,0.9)]">
+                <div class="pumapunku-step-ghost font-mono uppercase text-transparent leading-none font-black select-none text-center">
+                  <span class="block text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-wide">PUMA PUNKU</span>
+                  <span class="block text-xs sm:text-sm md:text-base font-bold tracking-[0.22em] mt-1">MECANIZADO ANCESTRAL</span>
+                </div>
+                <div class="pumapunku-step-cut absolute inset-0 overflow-hidden text-center flex flex-col items-center justify-center" style="clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);">
+                  <span class="block font-mono uppercase text-[#c2c5cc] text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-wide drop-shadow-[0_2px_14px_rgba(0,0,0,0.95)]">
+                    PUMA PUNKU
+                  </span>
+                  <span class="block font-mono uppercase text-[#4ef2d2] text-xs sm:text-sm md:text-base font-bold tracking-[0.22em] mt-1 drop-shadow-[0_0_12px_rgba(78,242,210,0.6)]">
                     MECANIZADO ANCESTRAL
                   </span>
                 </div>
                 <div class="pumapunku-step-laser absolute top-0 bottom-0 left-0 w-[1.5px] bg-[#4ef2d2] shadow-[0_0_10px_#4ef2d2,0_0_20px_#4ef2d2] opacity-0 pointer-events-none"></div>
               </div>
-              <p class="font-mono text-[10px] sm:text-[11.5px] tracking-[0.25em] uppercase text-[#457b77] mt-1.5 font-bold">
+              <p class="font-mono text-[9.5px] sm:text-[11px] tracking-[0.22em] uppercase text-[#608f8c] mt-2 font-bold">
                 [PRECISIÓN MILIMÉTRICA: 90.0°] · {step.text}
               </p>
             </div>

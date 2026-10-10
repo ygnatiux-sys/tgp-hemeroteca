@@ -19,7 +19,8 @@ import imgPumapunku from "../assets/alternativa/pumapunku.jpg";
 
 interface Props {
   image?: ImageMetadata;
-  word?: string;
+  title?: string;
+  subtitleWord?: string;
   subtitle?: string;
   speed?: number;
   showHud?: boolean;
@@ -28,7 +29,8 @@ interface Props {
 
 const {
   image = imgPumapunku,
-  word = "MECANIZADO ANCESTRAL",
+  title = "PUMA PUNKU",
+  subtitleWord = "MECANIZADO ANCESTRAL",
   subtitle = "La anomalía de la andesita en el altiplano boliviano",
   speed = 0.6,
   showHud = true,
@@ -79,13 +81,15 @@ const {
       {/* Contenedor del Corte CNC con Hilo Láser */}
       <div class="pumapunku-cnc-wrap">
         {/* Texto fantasma invisible para dimensiones */}
-        <h1 class="pumapunku-ghost" aria-label={word}>
-          {word}
-        </h1>
+        <div class="pumapunku-ghost" aria-hidden="true">
+          <h1 class="pumapunku-ghost-main">{title}</h1>
+          <span class="pumapunku-ghost-sub">{subtitleWord}</span>
+        </div>
 
         {/* Texto que se revela por corte de sierra de diamante */}
         <div class="pumapunku-revealed-layer" aria-hidden="true">
-          <span class="pumapunku-solid-text">{word}</span>
+          <span class="pumapunku-solid-main">{title}</span>
+          <span class="pumapunku-solid-sub">{subtitleWord}</span>
         </div>
 
         {/* Hilo Láser de 1px en Cian Industrial con destello de corte */}
@@ -268,16 +272,12 @@ const {
 
   /* Tipografía Panchang Brutalista CNC */
   .pumapunku-ghost,
-  .pumapunku-solid-text {
-    font-family: 'Panchang', 'Space Grotesk', system-ui, sans-serif;
-    font-weight: 900;
-    font-size: clamp(1.4rem, 4.4vw, 4.5rem);
-    line-height: 0.94;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    margin: 0;
-    padding: 0.05em 0.1em;
+  .pumapunku-revealed-layer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
   }
 
   .pumapunku-ghost {
@@ -285,20 +285,25 @@ const {
     visibility: hidden;
   }
 
-  /* Capa sólida de Gris Titanio cortada con clip-path */
-  .pumapunku-revealed-layer {
-    position: absolute;
-    inset: 0;
-    clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
-    will-change: clip-path, transform;
+  .pumapunku-ghost-main,
+  .pumapunku-solid-main {
+    font-family: 'Panchang', 'Space Grotesk', system-ui, sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.8rem, 5.2vw, 5.2rem);
+    line-height: 0.94;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin: 0;
+    padding: 0.04em 0.1em;
   }
 
-  .pumapunku-solid-text {
+  .pumapunku-solid-main {
     display: block;
     color: #c2c5cc; /* Gris Titanio */
     background: linear-gradient(
       180deg,
-      #f0f2f5 0%,
+      #f2f4f7 0%,
       #d4d7de 30%,
       #b0b4bd 65%,
       #6c707a 100%
@@ -308,6 +313,24 @@ const {
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.98))
             drop-shadow(0 0 25px rgba(69, 123, 119, 0.25));
+  }
+
+  .pumapunku-ghost-sub,
+  .pumapunku-solid-sub {
+    font-family: 'Panchang', 'Chivo Mono', monospace;
+    font-weight: 800;
+    font-size: clamp(0.85rem, 2.2vw, 2rem);
+    line-height: 1;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin: 0;
+  }
+
+  .pumapunku-solid-sub {
+    display: block;
+    color: #4ef2d2; /* Cian Industrial con brillo láser */
+    text-shadow: 0 0 12px rgba(78, 242, 210, 0.65), 0 0 24px rgba(69, 123, 119, 0.4);
   }
 
   /* Hilo Láser Cian de 1px */
