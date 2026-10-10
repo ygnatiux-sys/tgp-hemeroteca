@@ -24,7 +24,7 @@ const {
   image,
   word = "LA CICATRIZ DEL AGUA",
   subtitle = "La geología que reescribe la cronología humana",
-  speed = 1,
+  speed = 0.6,
   showHud = true,
   hudLabel = "Erosión Pluvial · Giza",
 } = Astro.props;
@@ -48,7 +48,7 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
   href="https://fonts.googleapis.com/css2?family=Cinzel:wght@800;900&family=Fraunces:opsz,wght,SOFT,WONK@9..144,900,0,1&display=swap"
 />
 
-<section class="pluvial-stage" aria-label={word}>
+<section class="pluvial-stage" aria-label={word} data-initial-speed={speed}>
   <!-- Fondo cinemático de la roca erosionada por agua al atardecer -->
   <div class="pluvial-bg-wrap">
     <img
@@ -119,8 +119,8 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
         </button>
         <div class="pluvial-hud-speeds">
           <button type="button" class="pluvial-speed" data-speed="1.5">Rápido</button>
-          <button type="button" class="pluvial-speed is-active" data-speed="1">Torrencial</button>
-          <button type="button" class="pluvial-speed" data-speed="0.6">Lento</button>
+          <button type="button" class="pluvial-speed" data-speed="1">Torrencial</button>
+          <button type="button" class="pluvial-speed is-active" data-speed="0.6">Lento</button>
         </div>
       </div>
     ) : (
@@ -170,7 +170,7 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 48%;
+    object-position: 18% 30%;
     filter: brightness(0.88) contrast(1.18) saturate(1.05);
     will-change: transform;
     animation: pluvial-drift 32s ease-in-out infinite alternate;
@@ -298,9 +298,10 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
   .pluvial-slice {
     font-family: 'Cinzel', serif;
     font-weight: 900;
-    font-size: clamp(2.8rem, 10.5vw, 10rem);
-    line-height: 0.92;
+    font-size: clamp(1.75rem, 5.2vw, 5.4rem);
+    line-height: 0.96;
     letter-spacing: 0.04em;
+    word-spacing: 0.22em;
     text-transform: uppercase;
     white-space: nowrap;
     margin: 0;
@@ -333,6 +334,8 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
   .pluvial-slice {
     position: absolute;
     inset: 0;
+    opacity: 0;
+    transform: translateY(-140%);
     will-change: transform, opacity;
   }
 
@@ -484,7 +487,7 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
 
     if (!badge || !cascadeWrap || slices.length === 0 || !sub || !dustLayer) return;
 
-    let speed = 1;
+    let speed = parseFloat(stage.dataset.initialSpeed || "0.6");
     let tl: gsap.core.Timeline | null = null;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -538,7 +541,7 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
         gsap.set(slice, {
           yPercent: -140,
           opacity: 0,
-          scaleY: 1.25, // estiramiento inicial emulando hilo de agua torrencial
+          scaleY: 1, // caída limpia sin solapamientos entre franjas
         });
       });
     };
