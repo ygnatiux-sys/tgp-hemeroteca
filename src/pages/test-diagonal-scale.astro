@@ -1,0 +1,462 @@
+---
+import Layout from '../layouts/Layout.astro';
+import caveImg from '../assets/georreferencias/cueva-de-altamira/coverImage.jpg';
+import cosmosImg from '../assets/ensayos/del-cosmos-a-la-luna/coverImage.png';
+
+export const prerender = true;
+---
+
+<Layout
+  title="Laboratorio: Diagonal Canvas Scale (De la Cueva al Cosmos) | TGP"
+  description="Efecto de apertura de ojo ontológico y escalado diagonal desde la caverna paleolítica hacia el cosmos con GSAP Core."
+  hideHeader={false}
+  headerTransparentUntilScroll={true}
+  footerVariant="minimal"
+>
+  <main class="relative w-full h-screen min-h-screen overflow-hidden bg-[#050507] text-white select-none">
+
+    <!-- CONTENEDOR PRINCIPAL DEL ESCENARIO -->
+    <div id="eye-stage" class="relative w-full h-full overflow-hidden will-change-transform">
+
+      <!-- CAPA 0: LA CAVERNA (Estado Previo — Confinación Paleolítica) -->
+      <div id="cave-layer" class="absolute inset-0 z-10 overflow-hidden bg-black flex items-center justify-center">
+        <!-- Imagen de textura rupestre de Altamira (2.13 MB) -->
+        <img
+          id="cave-bg-img"
+          src={caveImg.src}
+          alt="Cueva Paleolítica de Altamira"
+          class="absolute inset-0 w-full h-full object-cover object-center opacity-40 filter brightness-50 contrast-125 scale-105 will-change-transform"
+          loading="eager"
+          decoding="async"
+        />
+
+        <!-- Gradiente de claustrofobia y viñeta de caverna -->
+        <div class="absolute inset-0 bg-radial from-transparent via-black/80 to-black pointer-events-none"></div>
+
+        <!-- Foco central: El destello primordial antes de la apertura -->
+        <div id="eye-slit-core" class="relative z-20 flex flex-col items-center justify-center text-center px-6 pointer-events-none">
+          <div class="w-20 h-20 rounded-full border border-[#d4af37]/30 flex items-center justify-center shadow-[0_0_50px_rgba(212,175,55,0.4)] backdrop-blur-xs mb-4">
+            <span class="font-serif text-3xl text-[#d4af37] animate-pulse">👁</span>
+          </div>
+          <span class="font-metadata text-[10px] uppercase tracking-[0.5em] text-[#d4af37]/80">
+            Apertura Ontológica
+          </span>
+          <h2 class="font-cinzel text-2xl md:text-4xl text-stone-200 mt-2 tracking-wider">
+            De la Cueva al Cosmos
+          </h2>
+          <p class="font-sans text-xs md:text-sm text-stone-400 font-light max-w-md mt-2 leading-relaxed">
+            El origen del simbolismo: el ojo de la conciencia despierta en la penumbra mineral y estalla hacia la inmensidad estelar.
+          </p>
+        </div>
+      </div>
+
+      <!-- CAPA 1: EL COSMOS (Estado Revelado — Inmensidad del Pensamiento Humano) -->
+      <div
+        id="cosmos-layer"
+        class="absolute inset-0 z-20 overflow-hidden will-change-[clip-path]"
+        style="clip-path: url(#eye-scale-clip); -webkit-clip-path: url(#eye-scale-clip);"
+      >
+        <!-- Imagen Full-Bleed 100vh del Cosmos (7.99 MB) -->
+        <img
+          id="cosmos-bg-img"
+          src={cosmosImg.src}
+          alt="De la Cueva al Cosmos - Visión Cosmológica"
+          class="absolute inset-0 w-full h-full object-cover object-center will-change-transform scale-110"
+          loading="eager"
+          decoding="async"
+        />
+
+        <!-- Gradientes editoriales de ambientación -->
+        <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-black/40 pointer-events-none"></div>
+        <div class="absolute inset-0 bg-linear-to-r from-black/85 via-transparent to-black/35 pointer-events-none"></div>
+
+        <!-- Tipografía editorial del post revelado -->
+        <div id="cosmos-content-text" class="absolute bottom-16 md:bottom-24 left-6 md:left-16 max-w-2xl z-30 flex flex-col gap-3">
+          <span class="inline-flex items-center gap-2 font-metadata text-[10px] md:text-xs uppercase tracking-[0.45em] text-[#d4af37]">
+            <span class="w-2 h-px bg-[#d4af37]"></span>
+            Arqueosemiótica · Génesis del Símbolo
+          </span>
+          <h1 class="font-cinzel text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-white via-[#f3ede2] to-[#c5b392] drop-shadow-[0_10px_30px_rgba(0,0,0,0.95)]">
+            De la Cueva al Cosmos
+          </h1>
+          <p class="font-serif italic text-base md:text-xl text-stone-300/90 leading-relaxed max-w-xl drop-shadow-md">
+            "Cuando el primer ser humano proyectó el pigmento ocre sobre la roca, no pintó una bestia: inauguró el puente semiótico entre la caverna y las constelaciones."
+          </p>
+          <div class="flex items-center gap-4 mt-2">
+            <a
+              href="/hemeroteca/cueva-de-altamira/"
+              class="px-5 py-2.5 rounded-full bg-white/10 hover:bg-[#d4af37] text-white hover:text-black font-sans text-xs uppercase tracking-[0.2em] font-semibold backdrop-blur-md border border-white/20 hover:border-[#d4af37] transition-all duration-300 shadow-lg"
+            >
+              Explorar Archivo Rupestre
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAPA 2: MOTOR SVG DE ESCALADO DIAGONAL Y APERTURA DE OJO -->
+      <svg
+        id="eye-svg-engine"
+        class="absolute inset-0 w-full h-full pointer-events-none z-30 overflow-visible"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <!-- CLIP-PATH DINÁMICO: Iris diagonal anamórfico que se abre desde el centro -->
+          <clipPath id="eye-scale-clip" clipPathUnits="userSpaceOnUse">
+            <path id="eye-scale-path" d="" />
+          </clipPath>
+
+          <!-- Filtro de Resplandor del Filo del Ojo -->
+          <filter id="eye-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur1" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur2" />
+            <feMerge>
+              <feMergeNode in="blur2" />
+              <feMergeNode in="blur1" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- AURA Y FILO DE EXPANSIÓN DEL IRIS DIAGONAL -->
+        <path
+          id="eye-border-aura"
+          d=""
+          fill="none"
+          stroke="#d4af37"
+          stroke-width="8"
+          filter="url(#eye-glow)"
+          opacity="0"
+        />
+        <path
+          id="eye-border-core"
+          d=""
+          fill="none"
+          stroke="#ffffff"
+          stroke-width="2.5"
+          filter="url(#eye-glow)"
+          opacity="0"
+        />
+      </svg>
+
+    </div>
+
+    <!-- HUD DE CONTROL INTERACTIVO -->
+    <div class="fixed top-20 right-6 z-50 flex flex-col gap-2 max-w-xs">
+      <div class="bg-black/85 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col gap-3.5">
+        <div class="flex items-center justify-between border-b border-white/10 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#d4af37] animate-pulse"></span>
+            <span class="font-metadata text-[10px] uppercase tracking-[0.2em] text-[#d4af37] font-bold">
+              Diagonal Scale Lab
+            </span>
+          </div>
+          <span id="eye-status-badge" class="font-metadata text-[9px] uppercase tracking-wider text-stone-400 bg-white/5 px-2 py-0.5 rounded">
+            Listo
+          </span>
+        </div>
+
+        <!-- Botón Principal Disparador -->
+        <button
+          id="btn-trigger-scale"
+          type="button"
+          class="w-full py-3 px-4 rounded-xl bg-linear-to-r from-[#d4af37] to-[#e6ca65] hover:from-[#e6ca65] hover:to-white text-black font-sans font-bold text-xs uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:shadow-[0_0_30px_rgba(212,175,55,0.7)] transition-all duration-200 transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+          Abrir Ojo al Cosmos (Espacio)
+        </button>
+
+        <!-- Selector de Geometría de Apertura -->
+        <div class="flex flex-col gap-1.5">
+          <label class="font-metadata text-[9px] uppercase tracking-[0.15em] text-stone-400">
+            Forma de Apertura:
+          </label>
+          <div class="grid grid-cols-2 gap-1 bg-white/5 p-1 rounded-lg text-[10px] font-sans">
+            <button type="button" class="shape-btn active py-1.5 rounded text-center transition-all bg-[#d4af37] text-black font-bold" data-shape="eye">
+              Ojo Anamórfico
+            </button>
+            <button type="button" class="shape-btn py-1.5 rounded text-center transition-all text-stone-300 hover:text-white" data-shape="diamond">
+              Rombo Diagonal
+            </button>
+          </div>
+        </div>
+
+        <!-- Selector de Velocidad -->
+        <div class="flex flex-col gap-1.5">
+          <label class="font-metadata text-[9px] uppercase tracking-[0.15em] text-stone-400">
+            Velocidad:
+          </label>
+          <div class="grid grid-cols-3 gap-1 bg-white/5 p-1 rounded-lg text-[10px] font-sans">
+            <button type="button" class="speed-btn py-1.5 rounded text-center transition-all text-stone-300 hover:text-white" data-speed="0.55">
+              Agresivo 0.55s
+            </button>
+            <button type="button" class="speed-btn py-1.5 rounded text-center transition-all text-stone-300 hover:text-white" data-speed="0.95">
+              Cinemático 0.95s
+            </button>
+            <button type="button" class="speed-btn active py-1.5 rounded text-center transition-all bg-[#d4af37] text-black font-bold" data-speed="1.8">
+              Místico 1.8s
+            </button>
+          </div>
+        </div>
+
+        <!-- Acciones secundarias -->
+        <div class="flex items-center gap-2 pt-1 border-t border-white/10">
+          <button
+            id="btn-reset-eye"
+            type="button"
+            class="flex-1 py-1.5 text-[10px] uppercase tracking-wider text-stone-400 hover:text-white bg-white/5 hover:bg-white/10 rounded transition-all cursor-pointer"
+          >
+            Cerrar Ojo
+          </button>
+          <a
+            href="/hemeroteca/cueva-de-altamira/"
+            class="flex-1 py-1.5 text-[10px] uppercase tracking-wider text-center text-[#d4af37] hover:text-white bg-[#d4af37]/10 hover:bg-[#d4af37]/20 rounded transition-all"
+          >
+            Post Altamira ↗
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import gsap from 'gsap';
+
+  function initDiagonalCanvasScale() {
+    const stage = document.getElementById('eye-stage');
+    const clipPathEl = document.getElementById('eye-scale-path');
+    const auraEl = document.getElementById('eye-border-aura');
+    const coreEl = document.getElementById('eye-border-core');
+    const slitCore = document.getElementById('eye-slit-core');
+    const caveImg = document.getElementById('cave-bg-img');
+    const cosmosImg = document.getElementById('cosmos-bg-img');
+    const contentText = document.getElementById('cosmos-content-text');
+    const btnTrigger = document.getElementById('btn-trigger-scale');
+    const btnReset = document.getElementById('btn-reset-eye');
+    const badge = document.getElementById('eye-status-badge');
+    const speedButtons = document.querySelectorAll('.speed-btn');
+    const shapeButtons = document.querySelectorAll('.shape-btn');
+
+    if (!clipPathEl || !auraEl || !coreEl || !btnTrigger) return;
+
+    let currentDuration = 1.8;
+    let currentShape: 'eye' | 'diamond' = 'eye';
+    let isExpanding = false;
+
+    // Selector de forma
+    shapeButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        shapeButtons.forEach(b => {
+          b.classList.remove('bg-[#d4af37]', 'text-black', 'font-bold', 'active');
+          b.classList.add('text-stone-300');
+        });
+        btn.classList.add('bg-[#d4af37]', 'text-black', 'font-bold', 'active');
+        btn.classList.remove('text-stone-300');
+        currentShape = (btn.getAttribute('data-shape') || 'eye') as 'eye' | 'diamond';
+      });
+    });
+
+    // Selector de velocidad
+    speedButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        speedButtons.forEach(b => {
+          b.classList.remove('bg-[#d4af37]', 'text-black', 'font-bold', 'active');
+          b.classList.add('text-stone-300');
+        });
+        btn.classList.add('bg-[#d4af37]', 'text-black', 'font-bold', 'active');
+        btn.classList.remove('text-stone-300');
+        currentDuration = parseFloat(btn.getAttribute('data-speed') || '0.55');
+      });
+    });
+
+    // CÁLCULO GEOMÉTRICO ANAMÓRFICO DE APERTURA DE OJO / ESCALADO EN DIAGONAL
+    function updateEyeScaleGeometry(progress: number) {
+      if (!clipPathEl || !auraEl || !coreEl) return;
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+      const cx = W / 2;
+      const cy = H / 2;
+      const maxRadius = Math.sqrt(W * W + H * H) * 0.75;
+
+      if (progress <= 0) {
+        clipPathEl.setAttribute('d', `M ${cx} ${cy} Z`);
+        auraEl.setAttribute('opacity', '0');
+        coreEl.setAttribute('opacity', '0');
+        return;
+      }
+
+      if (progress >= 1) {
+        clipPathEl.setAttribute('d', `M 0 0 L ${W} 0 L ${W} ${H} L 0 ${H} Z`);
+        auraEl.setAttribute('opacity', '0');
+        coreEl.setAttribute('opacity', '0');
+        return;
+      }
+
+      const r = progress * maxRadius;
+
+      let dPath = '';
+      if (currentShape === 'eye') {
+        // FORMA OJO ANAMÓRFICO: Se estira en la diagonal (rotado ~35deg)
+        const rx = r * 1.35;
+        const ry = r * 0.75;
+        const angleRad = -0.62; // ~-35 grados en diagonal
+
+        // 4 vértices del ojo rotado
+        const cos = Math.cos(angleRad);
+        const sin = Math.sin(angleRad);
+
+        // Vértices principales:
+        const p1x = cx + (-rx) * cos - 0 * sin;
+        const p1y = cy + (-rx) * sin + 0 * cos;
+
+        const p2x = cx + rx * cos - 0 * sin;
+        const p2y = cy + rx * sin + 0 * cos;
+
+        // Puntos de control superior e inferior del ojo:
+        const topCtrlX = cx + 0 * cos - (-ry * 1.4) * sin;
+        const topCtrlY = cy + 0 * sin + (-ry * 1.4) * cos;
+
+        const botCtrlX = cx + 0 * cos - (ry * 1.4) * sin;
+        const botCtrlY = cy + 0 * sin + (ry * 1.4) * cos;
+
+        dPath = `M ${Math.round(p1x)} ${Math.round(p1y)} Q ${Math.round(topCtrlX)} ${Math.round(topCtrlY)} ${Math.round(p2x)} ${Math.round(p2y)} Q ${Math.round(botCtrlX)} ${Math.round(botCtrlY)} ${Math.round(p1x)} ${Math.round(p1y)} Z`;
+      } else {
+        // FORMA ROMBOIDE DIAGONAL
+        const rx = r * 1.25;
+        const ry = r * 1.1;
+
+        const pTopX = cx;
+        const pTopY = cy - ry;
+        const pRightX = cx + rx;
+        const pRightY = cy;
+        const pBotX = cx;
+        const pBotY = cy + ry;
+        const pLeftX = cx - rx;
+        const pLeftY = cy;
+
+        dPath = `M ${Math.round(pTopX)} ${Math.round(pTopY)} L ${Math.round(pRightX)} ${Math.round(pRightY)} L ${Math.round(pBotX)} ${Math.round(pBotY)} L ${Math.round(pLeftX)} ${Math.round(pLeftY)} Z`;
+      }
+
+      clipPathEl.setAttribute('d', dPath);
+      auraEl.setAttribute('d', dPath);
+      coreEl.setAttribute('d', dPath);
+
+      // El resplandor es máximo en el clímax de apertura y se disuelve al envolver la pantalla
+      const edgeOpacity = progress < 0.85 ? Math.min(progress * 2.5, 1) : Math.max(0, (1 - progress) * 6.5);
+      auraEl.setAttribute('opacity', `${edgeOpacity * 0.9}`);
+      coreEl.setAttribute('opacity', `${edgeOpacity}`);
+    }
+
+    // Reseteo
+    function resetToCave() {
+      gsap.killTweensOf([stage, caveImg, cosmosImg, contentText, slitCore]);
+      updateEyeScaleGeometry(0);
+      if (slitCore) gsap.set(slitCore, { opacity: 1, scale: 1 });
+      if (caveImg) gsap.set(caveImg, { scale: 1.05, opacity: 0.4 });
+      if (cosmosImg) gsap.set(cosmosImg, { scale: 1.15 });
+      if (contentText) gsap.set(contentText, { opacity: 0, y: 25 });
+      if (stage) gsap.set(stage, { x: 0, y: 0 });
+      if (badge) badge.textContent = 'Listo';
+      isExpanding = false;
+    }
+
+    // Disparo del efecto Diagonal Canvas Scale
+    function executeDiagonalScale() {
+      if (isExpanding) return;
+      isExpanding = true;
+      if (badge) badge.textContent = '¡Apertura!';
+
+      updateEyeScaleGeometry(0);
+      if (slitCore) gsap.to(slitCore, { opacity: 0, scale: 1.5, duration: 0.25, ease: 'power2.in' });
+      if (caveImg) gsap.to(caveImg, { scale: 1.25, opacity: 0.1, duration: currentDuration * 1.5, ease: 'power2.out' });
+      if (cosmosImg) gsap.set(cosmosImg, { scale: 1.18 });
+      if (contentText) gsap.set(contentText, { opacity: 0, y: 30 });
+
+      const scaleTracker = { val: 0 };
+      const tl = gsap.timeline({
+        onComplete: () => {
+          updateEyeScaleGeometry(1);
+          if (badge) badge.textContent = 'Cosmos Revelado';
+          isExpanding = false;
+        }
+      });
+
+      // 1. ESCALADO DIAGONAL AGRESIVO DEL OJO CON GSAP EXPO.OUT
+      tl.to(scaleTracker, {
+        val: 1,
+        duration: currentDuration,
+        ease: 'expo.out',
+        onUpdate: () => {
+          updateEyeScaleGeometry(scaleTracker.val);
+        }
+      }, 0);
+
+      // 2. MICRO-SACUDÓN DE IMPACTO AL LLEGAR A LOS BORDES
+      if (stage) {
+        tl.to(stage, {
+          scale: 1.015,
+          duration: 0.08,
+          ease: 'power4.inOut'
+        }, currentDuration * 0.5)
+        .to(stage, {
+          scale: 1.0,
+          duration: 0.25,
+          ease: 'elastic.out(1, 0.5)'
+        });
+      }
+
+      // 3. ASENTAMIENTO DE LA IMAGEN DEL COSMOS
+      if (cosmosImg) {
+        tl.to(cosmosImg, {
+          scale: 1.0,
+          duration: currentDuration * 2.2,
+          ease: 'power3.out'
+        }, 0);
+      }
+
+      // 4. APARICIÓN DE LA TIPOGRAFÍA Y CITAS
+      if (contentText) {
+        tl.to(contentText, {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          ease: 'power2.out'
+        }, currentDuration * 0.45);
+      }
+    }
+
+    btnTrigger.addEventListener('click', () => {
+      if (badge && badge.textContent === 'Cosmos Revelado') {
+        resetToCave();
+        requestAnimationFrame(() => executeDiagonalScale());
+      } else {
+        executeDiagonalScale();
+      }
+    });
+
+    if (btnReset) btnReset.addEventListener('click', resetToCave);
+
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && (e.target as HTMLElement)?.tagName !== 'INPUT') {
+        e.preventDefault();
+        btnTrigger.click();
+      }
+    };
+    window.addEventListener('keydown', handleKeydown);
+
+    // Apertura inicial automática
+    setTimeout(() => {
+      executeDiagonalScale();
+    }, 550);
+  }
+
+  document.addEventListener('astro:page-load', initDiagonalCanvasScale);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDiagonalCanvasScale);
+  } else {
+    initDiagonalCanvasScale();
+  }
+</script>

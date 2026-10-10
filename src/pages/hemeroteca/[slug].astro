@@ -382,6 +382,7 @@ const heroTitleClass = `text-[clamp(2.25rem,5vw,4.5rem)] font-cinzel font-extrab
     eyebrow={doc.category || "Archivo clasificado"}
     subtitle={doc.volantaHook || (doc.excerpt ? `"${doc.excerpt}"` : undefined)}
     titleClass={heroTitleClass}
+    enableBladeWipe={slug === 'ulyses-y-las-sirenas'}
   >
     <div slot="meta" class="flex flex-col items-center justify-center gap-2.5 w-full">
       <div

@@ -15,6 +15,7 @@ interface Props {
   eyebrow?: string;
   subtitle?: string;
   titleClass?: string;
+  enableBladeWipe?: boolean;
 }
 
 const {
@@ -25,16 +26,22 @@ const {
   eyebrow,
   subtitle,
   titleClass = "font-cinzel text-5xl md:text-7xl lg:text-8xl font-extrabold leading-tight tracking-tight bg-linear-to-r from-white via-[#E2E8F0] to-[#94A3B8] bg-clip-text text-transparent drop-shadow-[0_15px_50px_rgba(0,0,0,0.95)]",
+  enableBladeWipe = false,
 } = Astro.props;
 
 const safeImageUrl = sanitizeImageUrl(image);
 ---
 
 <header
-  class="interior-hero relative w-full h-svh min-h-screen flex flex-col justify-end overflow-hidden bg-theme-dark text-white"
+  class="interior-hero relative w-full h-svh min-h-screen flex flex-col justify-end overflow-hidden bg-theme-dark text-white select-none md:select-auto"
+  data-blade-wipe={enableBladeWipe ? "true" : "false"}
 >
   {/* 1. Canvas Visual: Imagen Absoluta + Fade to Black */}
-  <div class="absolute inset-0 z-0 overflow-hidden bg-black">
+  <div
+    id="interior-hero-canvas"
+    class="absolute inset-0 z-0 overflow-hidden bg-black will-change-[clip-path]"
+    style={enableBladeWipe ? "clip-path: url(#interior-blade-clip); -webkit-clip-path: url(#interior-blade-clip);" : undefined}
+  >
     {
       safeImageUrl ? (
         <Image
@@ -66,6 +73,53 @@ const safeImageUrl = sanitizeImageUrl(image);
     >
     </div>
   </div>
+
+  {/* Motor SVG geométrico para The Blade Wipe sincronizado */}
+  {enableBladeWipe && (
+    <svg
+      id="interior-blade-svg"
+      class="absolute inset-0 w-full h-full pointer-events-none z-30 overflow-visible"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <clipPath id="interior-blade-clip" clipPathUnits="userSpaceOnUse">
+          <polygon id="interior-blade-poly" points="0 0, 0 0, 0 0" />
+        </clipPath>
+        <filter id="interior-ray-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur1" />
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur2" />
+          <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="blur3" />
+          <feMerge>
+            <feMergeNode in="blur3" />
+            <feMergeNode in="blur2" />
+            <feMergeNode in="blur1" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <line
+        id="interior-ray-aura"
+        x1="0" y1="0" x2="0" y2="0"
+        stroke="#d4af37"
+        stroke-width="9"
+        stroke-linecap="round"
+        filter="url(#interior-ray-glow)"
+        opacity="0"
+      />
+      <line
+        id="interior-ray-core"
+        x1="0" y1="0" x2="0" y2="0"
+        stroke="#ffffff"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        filter="url(#interior-ray-glow)"
+        opacity="0"
+      />
+      <circle id="interior-spark-a" cx="0" cy="0" r="5" fill="#ffffff" filter="url(#interior-ray-glow)" opacity="0" />
+      <circle id="interior-spark-b" cx="0" cy="0" r="5" fill="#ffffff" filter="url(#interior-ray-glow)" opacity="0" />
+    </svg>
+  )}
 
   {/* 2. Escenario Tipográfico (Centrado dinámico sobre la imagen) */}
   <div
@@ -168,6 +222,11 @@ const safeImageUrl = sanitizeImageUrl(image);
     // Desbloquear en scroll
     window.addEventListener("scroll", unlockNavigation, { passive: true, once: true });
 
+    const isBladeWipe = hero.getAttribute("data-blade-wipe") === "true";
+    const canvas = hero.querySelector("#interior-hero-canvas") as HTMLElement;
+    const cutterWrap = hero.querySelector(".blade-cutter-wrap") as HTMLElement;
+    const slashLine = hero.querySelector(".blade-slash-line") as HTMLElement;
+
     // Zoom out majestuoso de la imagen de fondo
     if (image) {
       gsap.fromTo(
@@ -183,6 +242,106 @@ const safeImageUrl = sanitizeImageUrl(image);
         unlockNavigation();
       }
     });
+
+    // CORTE DIAGONAL ANIME: THE BLADE WIPE SINCRONIZADO
+    if (isBladeWipe) {
+      const updateInteriorBlade = (progress: number) => {
+        const poly = hero.querySelector("#interior-blade-poly");
+        const rayAura = hero.querySelector("#interior-ray-aura");
+        const rayCore = hero.querySelector("#interior-ray-core");
+        const sparkA = hero.querySelector("#interior-spark-a");
+        const sparkB = hero.querySelector("#interior-spark-b");
+        if (!poly || !rayAura || !rayCore) return;
+
+        const W = window.innerWidth;
+        const H = window.innerHeight;
+        const Lsq = W * W + H * H;
+
+        if (progress <= 0) {
+          poly.setAttribute("points", `0 ${H}, 0 ${H}, 0 ${H}`);
+          rayAura.setAttribute("opacity", "0");
+          rayCore.setAttribute("opacity", "0");
+          if (sparkA) sparkA.setAttribute("opacity", "0");
+          if (sparkB) sparkB.setAttribute("opacity", "0");
+          return;
+        }
+
+        if (progress >= 1) {
+          poly.setAttribute("points", `0 0, ${W} 0, ${W} ${H}, 0 ${H}`);
+          rayAura.setAttribute("opacity", "0");
+          rayCore.setAttribute("opacity", "0");
+          if (sparkA) sparkA.setAttribute("opacity", "0");
+          if (sparkB) sparkB.setAttribute("opacity", "0");
+          return;
+        }
+
+        const yL = H - progress * (Lsq / H);
+        const xB = progress * (Lsq / W);
+        const xT = W - (1 - progress) * (Lsq / W);
+        const yR = (1 - progress) * (Lsq / H);
+
+        const intersections: { x: number; y: number }[] = [];
+        if (yL >= 0 && yL <= H) intersections.push({ x: 0, y: yL });
+        if (xB >= 0 && xB <= W) intersections.push({ x: xB, y: H });
+        if (xT >= 0 && xT <= W) intersections.push({ x: xT, y: 0 });
+        if (yR >= 0 && yR <= H) intersections.push({ x: W, y: yR });
+
+        if (intersections.length >= 2) {
+          const p1 = intersections[0];
+          const p2 = intersections[1];
+
+          rayAura.setAttribute("x1", `${p1.x}`);
+          rayAura.setAttribute("y1", `${p1.y}`);
+          rayAura.setAttribute("x2", `${p2.x}`);
+          rayAura.setAttribute("y2", `${p2.y}`);
+          rayAura.setAttribute("opacity", "0.9");
+
+          rayCore.setAttribute("x1", `${p1.x}`);
+          rayCore.setAttribute("y1", `${p1.y}`);
+          rayCore.setAttribute("x2", `${p2.x}`);
+          rayCore.setAttribute("y2", `${p2.y}`);
+          rayCore.setAttribute("opacity", "1");
+
+          if (sparkA) {
+            sparkA.setAttribute("cx", `${p1.x}`);
+            sparkA.setAttribute("cy", `${p1.y}`);
+            sparkA.setAttribute("opacity", "1");
+          }
+          if (sparkB) {
+            sparkB.setAttribute("cx", `${p2.x}`);
+            sparkB.setAttribute("cy", `${p2.y}`);
+            sparkB.setAttribute("opacity", "1");
+          }
+
+          const pts: { x: number; y: number }[] = [{ x: 0, y: H }];
+          if (yL < 0) pts.push({ x: 0, y: 0 });
+          if (xT >= 0 && xT <= W) pts.push({ x: xT, y: 0 });
+          if (yR >= 0 && yR <= H) pts.push({ x: W, y: yR });
+          if (xB > W) pts.push({ x: W, y: H });
+          if (xB >= 0 && xB <= W) pts.push({ x: xB, y: H });
+          if (yL >= 0 && yL <= H) pts.push({ x: 0, y: yL });
+
+          poly.setAttribute("points", pts.map(pt => `${Math.round(pt.x)} ${Math.round(pt.y)}`).join(", "));
+        }
+      };
+
+      updateInteriorBlade(0);
+      const progressTracker = { val: 0 };
+
+      tl.to(progressTracker, {
+        val: 1,
+        duration: 1.5,
+        ease: "power3.out",
+        onUpdate: () => {
+          updateInteriorBlade(progressTracker.val);
+        }
+      }, 0.1);
+
+      // Micro-impacto Camera Shake sutil durante el paso del filo
+      tl.to(hero, { x: 3, y: -2, duration: 0.05, ease: "power4.inOut" }, 0.3)
+        .to(hero, { x: -2, y: 1.5, duration: 0.05, ease: "power4.inOut" })
+        .to(hero, { x: 0, y: 0, duration: 0.08, ease: "power2.out" });
+    }
 
     // RITMO 1: Colección / Categoría entra apagada y suave (opacity: 0.55), luego FADE OUT
     if (h2) {

@@ -1,0 +1,503 @@
+---
+import Layout from '../layouts/Layout.astro';
+import coverImg from '../assets/ensayos/ulyses-y-las-sirenas/coverImage.jpeg';
+
+export const prerender = true;
+---
+
+<Layout
+  title="Laboratorio: The Blade Wipe (Barrido de Navaja Sincronizado) | TGP"
+  description="Prueba del efecto cinematográfico The Blade Wipe con GSAP: El rayo revela la imagen en tiempo real a medida que la atraviesa en diagonal."
+  hideHeader={false}
+  headerTransparentUntilScroll={true}
+  footerVariant="minimal"
+>
+  <main class="relative w-full h-screen min-h-screen overflow-hidden bg-[#070709] text-white select-none">
+
+    <!-- CONTENEDOR PRINCIPAL DEL ESCENARIO (Con Camera-Shake reactivo) -->
+    <div id="blade-stage" class="relative w-full h-full overflow-hidden will-change-transform">
+
+      <!-- CAPA 0: ESTADO PREVIO (Atmósfera oscura de espera con monograma) -->
+      <div id="blade-layer-before" class="absolute inset-0 flex flex-col items-center justify-center bg-[#070709] z-10 pointer-events-none">
+        <div class="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.15)_0%,transparent_70%)]"></div>
+        <div class="text-center px-6 max-w-xl flex flex-col items-center gap-4">
+          <div class="w-16 h-16 rounded-full border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] font-serif text-2xl shadow-[0_0_25px_rgba(212,175,55,0.2)]">
+            Ψ
+          </div>
+          <span class="font-metadata text-xs uppercase tracking-[0.4em] text-[#d4af37]/70">
+            Sincronización Óptica Anime · GSAP Core
+          </span>
+          <h2 class="font-serif text-3xl md:text-5xl font-light text-stone-200 tracking-wide">
+            The Blade Wipe
+          </h2>
+          <p class="font-sans text-sm text-stone-400 font-light leading-relaxed">
+            El rayo de navaja ahora corta y <strong class="text-[#d4af37] font-medium">desvela la imagen nítida en tiempo real exactamente a su paso</strong> sin desfasajes.
+          </p>
+        </div>
+      </div>
+
+      <!-- CAPA 1: ESTADO REVELADO (Hero Ultra-Nítido de Ulises y las Sirenas 100vh) recortado por SVG -->
+      <div
+        id="blade-layer-after"
+        class="absolute inset-0 z-20 overflow-hidden will-change-[clip-path]"
+        style="clip-path: url(#blade-wipe-clip); -webkit-clip-path: url(#blade-wipe-clip);"
+      >
+        <!-- Imagen Full-Bleed 100vh ultra nítida (1.02 MB) -->
+        <img
+          id="blade-hero-img"
+          src={coverImg.src}
+          alt="Ulyses y las Sirenas - Hero Nítido"
+          class="absolute inset-0 w-full h-full object-cover object-center will-change-transform scale-100"
+          loading="eager"
+          decoding="async"
+        />
+
+        <!-- Gradientes cinemáticos de ambientación TGP -->
+        <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/35 to-black/30 pointer-events-none"></div>
+        <div class="absolute inset-0 bg-linear-to-r from-black/80 via-transparent to-black/40 pointer-events-none"></div>
+
+        <!-- Tipografía editorial del post revelado -->
+        <div id="blade-content-text" class="absolute bottom-16 md:bottom-24 left-6 md:left-16 max-w-2xl z-30 flex flex-col gap-3">
+          <span class="inline-flex items-center gap-2 font-metadata text-[10px] md:text-xs uppercase tracking-[0.45em] text-[#d4af37]">
+            <span class="w-2 h-px bg-[#d4af37]"></span>
+            Historia de la Cultura · Ensayo Erudito
+          </span>
+          <h1 class="font-cinzel text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-white via-[#f3ede2] to-[#c5b392] drop-shadow-[0_10px_30px_rgba(0,0,0,0.95)]">
+            Ulyses y las Sirenas
+          </h1>
+          <p class="font-serif italic text-base md:text-xl text-stone-300/90 leading-relaxed max-w-xl drop-shadow-md">
+            "El canto de las sirenas no es una invitación al placer, sino una emboscada del conocimiento absoluto."
+          </p>
+          <div class="flex items-center gap-4 mt-2">
+            <a
+              href="/hemeroteca/ulyses-y-las-sirenas/"
+              class="px-5 py-2.5 rounded-full bg-white/10 hover:bg-[#d4af37] text-white hover:text-black font-sans text-xs uppercase tracking-[0.2em] font-semibold backdrop-blur-md border border-white/20 hover:border-[#d4af37] transition-all duration-300 shadow-lg"
+            >
+              Ver Ensayo Completo
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAPA 2: MOTOR SVG MATEMÁTICO — CLIP-PATH + RAYO LUMINOSO INTEGRADO -->
+      <svg
+        id="blade-svg-engine"
+        class="absolute inset-0 w-full h-full pointer-events-none z-30 overflow-visible"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <!-- CLIP-PATH DINÁMICO: Sus puntos son exactamente la frontera del rayo -->
+          <clipPath id="blade-wipe-clip" clipPathUnits="userSpaceOnUse">
+            <polygon id="blade-wipe-poly" points="0 0, 0 0, 0 0" />
+          </clipPath>
+
+          <!-- Filtro de Resplandor Especular del Rayo -->
+          <filter id="ray-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur1" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur2" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="blur3" />
+            <feMerge>
+              <feMergeNode in="blur3" />
+              <feMergeNode in="blur2" />
+              <feMergeNode in="blur1" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- AURA DORADA EXTERNA DEL RAYO -->
+        <line
+          id="ray-aura"
+          x1="0" y1="0" x2="0" y2="0"
+          stroke="#d4af37"
+          stroke-width="9"
+          stroke-linecap="round"
+          filter="url(#ray-glow)"
+          opacity="0"
+        />
+
+        <!-- NÚCLEO BLANCO ULTRA-BRILLANTE DEL FILO -->
+        <line
+          id="ray-core"
+          x1="0" y1="0" x2="0" y2="0"
+          stroke="#ffffff"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          filter="url(#ray-glow)"
+          opacity="0"
+        />
+
+        <!-- CHISPAS / VÉRTICES DE CONTACTO -->
+        <circle id="spark-a" cx="0" cy="0" r="5" fill="#ffffff" filter="url(#ray-glow)" opacity="0" />
+        <circle id="spark-b" cx="0" cy="0" r="5" fill="#ffffff" filter="url(#ray-glow)" opacity="0" />
+      </svg>
+
+    </div>
+
+    <!-- HUD DE CONTROL INTERACTIVO -->
+    <div class="fixed top-20 right-6 z-50 flex flex-col gap-2 max-w-xs">
+      <div class="bg-black/85 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col gap-3.5">
+        <div class="flex items-center justify-between border-b border-white/10 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#d4af37] animate-pulse"></span>
+            <span class="font-metadata text-[10px] uppercase tracking-[0.2em] text-[#d4af37] font-bold">
+              Blade Wipe Sincronizado
+            </span>
+          </div>
+          <span id="blade-status-badge" class="font-metadata text-[9px] uppercase tracking-wider text-stone-400 bg-white/5 px-2 py-0.5 rounded">
+            Listo
+          </span>
+        </div>
+
+        <!-- Botón Principal Disparador -->
+        <button
+          id="btn-trigger-slash"
+          type="button"
+          class="w-full py-3 px-4 rounded-xl bg-linear-to-r from-[#d4af37] to-[#e6ca65] hover:from-[#e6ca65] hover:to-white text-black font-sans font-bold text-xs uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:shadow-[0_0_30px_rgba(212,175,55,0.7)] transition-all duration-200 transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          Ejecutar Corte (Espacio)
+        </button>
+
+        <!-- Selector de Modo de Corte -->
+        <div class="flex flex-col gap-1.5">
+          <label class="font-metadata text-[9px] uppercase tracking-[0.15em] text-stone-400">
+            Estilo del Rayo:
+          </label>
+          <div class="grid grid-cols-2 gap-1 bg-white/5 p-1 rounded-lg text-[10px] font-sans">
+            <button type="button" class="mode-btn active py-1.5 rounded text-center transition-all bg-[#d4af37] text-black font-bold" data-mode="blade">
+              Barrido de Filo
+            </button>
+            <button type="button" class="mode-btn py-1.5 rounded text-center transition-all text-stone-300 hover:text-white" data-mode="tracer">
+              Rayo Trazador
+            </button>
+          </div>
+        </div>
+
+        <!-- Selector de Velocidad -->
+        <div class="flex flex-col gap-1.5">
+          <label class="font-metadata text-[9px] uppercase tracking-[0.15em] text-stone-400">
+            Velocidad:
+          </label>
+          <div class="grid grid-cols-3 gap-1 bg-white/5 p-1 rounded-lg text-[10px] font-sans">
+            <button type="button" class="speed-btn py-1.5 rounded text-center transition-all text-stone-300 hover:text-white" data-speed="0.45">
+              Blitz 0.45s
+            </button>
+            <button type="button" class="speed-btn py-1.5 rounded text-center transition-all text-stone-300 hover:text-white" data-speed="0.75">
+              Medio 0.75s
+            </button>
+            <button type="button" class="speed-btn active py-1.5 rounded text-center transition-all bg-[#d4af37] text-black font-bold" data-speed="1.5">
+              Slow 1.5s
+            </button>
+          </div>
+        </div>
+
+        <!-- Opciones de Impacto -->
+        <div class="flex items-center justify-between text-[11px] text-stone-300 pt-1 border-t border-white/5">
+          <label for="check-shake" class="cursor-pointer select-none">Camera Shake (Anime):</label>
+          <input type="checkbox" id="check-shake" checked class="accent-[#d4af37] w-4 h-4 cursor-pointer" />
+        </div>
+
+        <!-- Acciones secundarias -->
+        <div class="flex items-center gap-2 pt-1 border-t border-white/10">
+          <button
+            id="btn-reset"
+            type="button"
+            class="flex-1 py-1.5 text-[10px] uppercase tracking-wider text-stone-400 hover:text-white bg-white/5 hover:bg-white/10 rounded transition-all cursor-pointer"
+          >
+            Reiniciar
+          </button>
+          <a
+            href="/hemeroteca/ulyses-y-las-sirenas/"
+            class="flex-1 py-1.5 text-[10px] uppercase tracking-wider text-center text-[#d4af37] hover:text-white bg-[#d4af37]/10 hover:bg-[#d4af37]/20 rounded transition-all"
+          >
+            Ver en Post ↗
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import gsap from 'gsap';
+
+  function initSynchronizedBladeWipe() {
+    const stage = document.getElementById('blade-stage');
+    const poly = document.getElementById('blade-wipe-poly');
+    const rayAura = document.getElementById('ray-aura');
+    const rayCore = document.getElementById('ray-core');
+    const sparkA = document.getElementById('spark-a');
+    const sparkB = document.getElementById('spark-b');
+    const heroImg = document.getElementById('blade-hero-img');
+    const contentText = document.getElementById('blade-content-text');
+    const btnTrigger = document.getElementById('btn-trigger-slash');
+    const btnReset = document.getElementById('btn-reset');
+    const badge = document.getElementById('blade-status-badge');
+    const checkShake = document.getElementById('check-shake') as HTMLInputElement | null;
+    const speedButtons = document.querySelectorAll('.speed-btn');
+    const modeButtons = document.querySelectorAll('.mode-btn');
+
+    if (!poly || !rayAura || !rayCore || !btnTrigger) return;
+
+    let currentDuration = 1.5;
+    let currentMode: 'blade' | 'tracer' = 'blade';
+    let isCutting = false;
+
+    // Selector de modo
+    modeButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        modeButtons.forEach(b => {
+          b.classList.remove('bg-[#d4af37]', 'text-black', 'font-bold', 'active');
+          b.classList.add('text-stone-300');
+        });
+        btn.classList.add('bg-[#d4af37]', 'text-black', 'font-bold', 'active');
+        btn.classList.remove('text-stone-300');
+        currentMode = (btn.getAttribute('data-mode') || 'blade') as 'blade' | 'tracer';
+      });
+    });
+
+    // Selector de velocidad
+    speedButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        speedButtons.forEach(b => {
+          b.classList.remove('bg-[#d4af37]', 'text-black', 'font-bold', 'active');
+          b.classList.add('text-stone-300');
+        });
+        btn.classList.add('bg-[#d4af37]', 'text-black', 'font-bold', 'active');
+        btn.classList.remove('text-stone-300');
+        currentDuration = parseFloat(btn.getAttribute('data-speed') || '0.45');
+      });
+    });
+
+    // CÁLCULO GEOMÉTRICO EXACTO DEL CORTE EN TIEMPO REAL
+    function updateBladeGeometry(progress: number) {
+      if (!poly || !rayAura || !rayCore) return;
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+      const Lsq = W * W + H * H;
+
+      if (progress <= 0) {
+        poly.setAttribute('points', `0 ${H}, 0 ${H}, 0 ${H}`);
+        rayAura.setAttribute('opacity', '0');
+        rayCore.setAttribute('opacity', '0');
+        if (sparkA) sparkA.setAttribute('opacity', '0');
+        if (sparkB) sparkB.setAttribute('opacity', '0');
+        return;
+      }
+
+      if (progress >= 1) {
+        poly.setAttribute('points', `0 0, ${W} 0, ${W} ${H}, 0 ${H}`);
+        rayAura.setAttribute('opacity', '0');
+        rayCore.setAttribute('opacity', '0');
+        if (sparkA) sparkA.setAttribute('opacity', '0');
+        if (sparkB) sparkB.setAttribute('opacity', '0');
+        return;
+      }
+
+      if (currentMode === 'blade') {
+        // MODO BARRIDO: El rayo perpendicular barre de (0, H) a (W, 0)
+        // Coordenadas de intersección de la línea de la navaja con los 4 bordes:
+        // Left (x = 0):
+        const yL = H - progress * (Lsq / H);
+        // Bottom (y = H):
+        const xB = progress * (Lsq / W);
+        // Top (y = 0):
+        const xT = W - (1 - progress) * (Lsq / W);
+        // Right (x = W):
+        const yR = (1 - progress) * (Lsq / H);
+
+        const intersections: { x: number; y: number }[] = [];
+        if (yL >= 0 && yL <= H) intersections.push({ x: 0, y: yL });
+        if (xB >= 0 && xB <= W) intersections.push({ x: xB, y: H });
+        if (xT >= 0 && xT <= W) intersections.push({ x: xT, y: 0 });
+        if (yR >= 0 && yR <= H) intersections.push({ x: W, y: yR });
+
+        if (intersections.length >= 2) {
+          const p1 = intersections[0];
+          const p2 = intersections[1];
+
+          // 1. DIBUJAR EL RAYO EXACTAMENTE ENTRE LOS PUNTOS DE INTERSECCIÓN
+          rayAura.setAttribute('x1', `${p1.x}`);
+          rayAura.setAttribute('y1', `${p1.y}`);
+          rayAura.setAttribute('x2', `${p2.x}`);
+          rayAura.setAttribute('y2', `${p2.y}`);
+          rayAura.setAttribute('opacity', '0.9');
+
+          rayCore.setAttribute('x1', `${p1.x}`);
+          rayCore.setAttribute('y1', `${p1.y}`);
+          rayCore.setAttribute('x2', `${p2.x}`);
+          rayCore.setAttribute('y2', `${p2.y}`);
+          rayCore.setAttribute('opacity', '1');
+
+          if (sparkA) {
+            sparkA.setAttribute('cx', `${p1.x}`);
+            sparkA.setAttribute('cy', `${p1.y}`);
+            sparkA.setAttribute('opacity', '1');
+          }
+          if (sparkB) {
+            sparkB.setAttribute('cx', `${p2.x}`);
+            sparkB.setAttribute('cy', `${p2.y}`);
+            sparkB.setAttribute('opacity', '1');
+          }
+
+          // 2. CONSTRUIR EL POLÍGONO DE LA IMAGEN DETRÁS DEL FILO
+          // El polígono siempre contiene la esquina inferior-izquierda (0, H)
+          const pts: { x: number; y: number }[] = [{ x: 0, y: H }];
+
+          // Si el corte ya pasó la esquina superior-izquierda (0, 0):
+          if (yL < 0) pts.push({ x: 0, y: 0 });
+
+          // Puntos del filo:
+          if (xT >= 0 && xT <= W) pts.push({ x: xT, y: 0 });
+          if (yR >= 0 && yR <= H) pts.push({ x: W, y: yR });
+
+          // Si el corte ya pasó la esquina inferior-derecha (W, H):
+          if (xB > W) pts.push({ x: W, y: H });
+          if (xB >= 0 && xB <= W) pts.push({ x: xB, y: H });
+          if (yL >= 0 && yL <= H) pts.push({ x: 0, y: yL });
+
+          const polyPointsStr = pts.map(pt => `${Math.round(pt.x)} ${Math.round(pt.y)}`).join(', ');
+          poly.setAttribute('points', polyPointsStr);
+        }
+      } else {
+        // MODO TRAZADOR: Un rayo sale de (0, H) hacia (W, 0) y va abriendo la imagen
+        const curX = progress * W;
+        const curY = H - progress * H;
+
+        // El rayo viaja desde (0, H) hasta (curX, curY)
+        rayAura.setAttribute('x1', '0');
+        rayAura.setAttribute('y1', `${H}`);
+        rayAura.setAttribute('x2', `${curX}`);
+        rayAura.setAttribute('y2', `${curY}`);
+        rayAura.setAttribute('opacity', '0.9');
+
+        rayCore.setAttribute('x1', '0');
+        rayCore.setAttribute('y1', `${H}`);
+        rayCore.setAttribute('x2', `${curX}`);
+        rayCore.setAttribute('y2', `${curY}`);
+        rayCore.setAttribute('opacity', '1');
+
+        if (sparkA) {
+          sparkA.setAttribute('cx', `${curX}`);
+          sparkA.setAttribute('cy', `${curY}`);
+          sparkA.setAttribute('opacity', '1');
+        }
+
+        // El área revelada se expande con el avance de la punta:
+        poly.setAttribute('points', `0 ${H}, ${Math.round(curX)} ${Math.round(curY)}, 0 ${Math.round(curY)}, 0 ${H}`);
+      }
+    }
+
+    // Reseteo
+    function resetToBefore() {
+      gsap.killTweensOf([stage, heroImg, contentText]);
+      updateBladeGeometry(0);
+      gsap.set(heroImg, { scale: 1.05 });
+      gsap.set(contentText, { opacity: 0, y: 20 });
+      gsap.set(stage, { x: 0, y: 0 });
+      if (badge) badge.textContent = 'Listo';
+      isCutting = false;
+    }
+
+    // Ejecución Sincronizada de The Blade Wipe
+    function executeBladeSlash() {
+      if (isCutting) return;
+      isCutting = true;
+      if (badge) badge.textContent = '¡Rayo Cortando!';
+
+      updateBladeGeometry(0);
+      gsap.set(heroImg, { scale: 1.05 });
+      gsap.set(contentText, { opacity: 0, y: 25 });
+
+      const progressTracker = { val: 0 };
+      const tl = gsap.timeline({
+        onComplete: () => {
+          updateBladeGeometry(1);
+          if (badge) badge.textContent = 'Revelado';
+          isCutting = false;
+        }
+      });
+
+      // 1. EL AVANCE DEL RAYO: De 0 a 1 con aceleración anime de impacto
+      tl.to(progressTracker, {
+        val: 1,
+        duration: currentDuration,
+        ease: 'power4.out',
+        onUpdate: () => {
+          updateBladeGeometry(progressTracker.val);
+        }
+      }, 0);
+
+      // 2. MICRO-IMPACTO HÁPTICO VISUAL (Camera Shake sincronizado con el corte)
+      if (checkShake && checkShake.checked && stage) {
+        tl.to(stage, {
+          x: 4,
+          y: -3,
+          duration: 0.04,
+          ease: 'power4.inOut'
+        }, 0.04)
+        .to(stage, {
+          x: -3,
+          y: 2,
+          duration: 0.04,
+          ease: 'power4.inOut'
+        })
+        .to(stage, {
+          x: 0,
+          y: 0,
+          duration: 0.06,
+          ease: 'power2.out'
+        });
+      }
+
+      // 3. ASENTAMIENTO CINEMÁTICO DE LA IMAGEN
+      tl.to(heroImg, {
+        scale: 1,
+        duration: currentDuration * 2.2,
+        ease: 'power3.out'
+      }, 0);
+
+      // 4. DESPLIEGUE DEL TEXTO TRAS EL PASO DEL RAYO
+      tl.to(contentText, {
+        opacity: 1,
+        y: 0,
+        duration: 0.45,
+        ease: 'power2.out'
+      }, currentDuration * 0.4);
+    }
+
+    btnTrigger.addEventListener('click', () => {
+      if (badge && badge.textContent === 'Revelado') {
+        resetToBefore();
+        requestAnimationFrame(() => executeBladeSlash());
+      } else {
+        executeBladeSlash();
+      }
+    });
+
+    if (btnReset) btnReset.addEventListener('click', resetToBefore);
+
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && (e.target as HTMLElement)?.tagName !== 'INPUT') {
+        e.preventDefault();
+        btnTrigger.click();
+      }
+    };
+    window.addEventListener('keydown', handleKeydown);
+
+    // Ejecución inicial automática suave
+    setTimeout(() => {
+      executeBladeSlash();
+    }, 500);
+  }
+
+  document.addEventListener('astro:page-load', initSynchronizedBladeWipe);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSynchronizedBladeWipe);
+  } else {
+    initSynchronizedBladeWipe();
+  }
+</script>

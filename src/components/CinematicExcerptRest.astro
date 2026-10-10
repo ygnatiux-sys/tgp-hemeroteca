@@ -220,6 +220,9 @@ const wordsData = rawWords.map((rawWord, wordIdx) => {
       speedY: number;
       angle: number;
       angleSpeed: number;
+      osc: number;
+      flickPhase: number;
+      flickSpeed: number;
     }> = [];
     private animationFrameId: number | null = null;
     private isRunning: boolean = false;
@@ -234,28 +237,31 @@ const wordsData = rawWords.map((rawWord, wordIdx) => {
     private resize() {
       const rect = this.canvas.parentElement?.getBoundingClientRect();
       this.canvas.width = rect?.width ?? window.innerWidth;
-      this.canvas.height = rect?.height ?? 220;
+      this.canvas.height = rect?.height ?? window.innerHeight;
+    }
+
+    private spawnMote(fromLeft = false) {
+      const w = this.canvas.width;
+      const h = this.canvas.height;
+      return {
+        x: fromLeft ? -10 : Math.random() * w,
+        y: Math.random() * h,
+        radius: 0.8 + Math.random() * 2.4,
+        opacity: 0.12 + Math.random() * 0.50,
+        speedX: 0.20 + Math.random() * 0.55,
+        speedY: (Math.random() - 0.5) * 0.13,
+        angle: Math.random() * Math.PI * 2,
+        angleSpeed: 0.004 + Math.random() * 0.015,
+        osc: 0.06 + Math.random() * 0.11,
+        flickPhase: Math.random() * Math.PI * 2,
+        flickSpeed: 0.010 + Math.random() * 0.028,
+      };
     }
 
     public start() {
       if (this.isRunning) return;
       this.isRunning = true;
-      this.motes = [];
-      const count = 18;
-
-      for (let i = 0; i < count; i++) {
-        this.motes.push({
-          x: Math.random() * this.canvas.width,
-          y: Math.random() * this.canvas.height,
-          radius: 0.6 + Math.random() * 1.5,
-          opacity: 0.05 + Math.random() * 0.18,
-          speedX: 0.15 + Math.random() * 0.35,
-          speedY: (Math.random() - 0.5) * 0.1,
-          angle: Math.random() * Math.PI * 2,
-          angleSpeed: 0.005 + Math.random() * 0.01
-        });
-      }
-
+      this.motes = Array.from({ length: 55 }, () => this.spawnMote());
       this.loop();
     }
 
@@ -274,20 +280,24 @@ const wordsData = rawWords.map((rawWord, wordIdx) => {
 
       this.motes.forEach(m => {
         m.x += m.speedX;
-        m.y += m.speedY + Math.sin(m.angle) * 0.08;
+        m.y += m.speedY + Math.sin(m.angle) * m.osc;
         m.angle += m.angleSpeed;
+        m.flickPhase += m.flickSpeed;
 
-        if (m.x > this.canvas.width + 10) {
-          m.x = -10;
-          m.y = Math.random() * this.canvas.height;
+        if (m.x > this.canvas.width + 14) {
+          Object.assign(m, this.spawnMote(true));
         }
 
+        const flick = 1 + 0.16 * Math.sin(m.flickPhase);
+        const finalOp = Math.min(1, m.opacity * flick);
+        const grad = this.ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.radius * 2.6);
+        grad.addColorStop(0, `rgba(201, 168, 108, ${finalOp})`);
+        grad.addColorStop(0.4, `rgba(223, 202, 157, ${(finalOp * 0.6).toFixed(3)})`);
+        grad.addColorStop(1, 'rgba(201, 168, 108, 0)');
+
         this.ctx.beginPath();
-        const grad = this.ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.radius * 2);
-        grad.addColorStop(0, `rgba(239, 235, 227, ${m.opacity})`);
-        grad.addColorStop(1, 'rgba(239, 235, 227, 0)');
         this.ctx.fillStyle = grad;
-        this.ctx.arc(m.x, m.y, m.radius * 2, 0, Math.PI * 2);
+        this.ctx.arc(m.x, m.y, m.radius * 2.6, 0, Math.PI * 2);
         this.ctx.fill();
       });
 

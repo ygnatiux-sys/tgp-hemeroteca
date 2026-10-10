@@ -1,0 +1,136 @@
+---
+/**
+ * src/components/BladeWipe.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * THE BLADE WIPE (El Barrido de Navaja) — GSAP Core
+ * 
+ * Efecto cinematográfico de transición de pantalla:
+ * Una franja diagonal muy delgada (2px) con núcleo hiperbóreo y aura dorada TGP
+ * cruza la pantalla de abajo a la izquierda hacia arriba a la derecha.
+ * Justo detrás del filo, el nuevo contenido/imagen se va desvelando limpiamente.
+ */
+interface Props {
+  id?: string;
+  duration?: number;
+  angle?: number;
+  showShake?: boolean;
+  autoPlay?: boolean;
+  delay?: number;
+}
+
+const {
+  id = "blade-wipe-root",
+  duration = 0.4,
+  angle = 42,
+  showShake = true,
+  autoPlay = true,
+  delay = 0.4,
+} = Astro.props;
+---
+
+<div
+  id={id}
+  class="blade-wipe-container relative w-full h-full overflow-hidden select-none"
+  data-duration={duration}
+  data-angle={angle}
+  data-shake={showShake ? "true" : "false"}
+  data-autoplay={autoPlay ? "true" : "false"}
+  data-delay={delay}
+>
+  <!-- CAPA DE CONTENIDO REVELADO (Afectada por la máscara diagonal) -->
+  <div
+    class="blade-revealed-layer absolute inset-0 z-10 overflow-hidden will-change-[mask-image,-webkit-mask-image]"
+    style={`--blade-p: 0%; mask-image: linear-gradient(${angle}deg, #000 0%, #000 calc(var(--blade-p) * 1%), transparent calc(var(--blade-p) * 1% + 0.2%)); -webkit-mask-image: linear-gradient(${angle}deg, #000 0%, #000 calc(var(--blade-p) * 1%), transparent calc(var(--blade-p) * 1% + 0.2%));`}
+  >
+    <slot />
+  </div>
+
+  <!-- FILO DE LA NAVAJA (Línea ultradelgada con destello y aura dorada) -->
+  <div
+    class="blade-cutter-wrap absolute inset-0 pointer-events-none z-30 overflow-hidden opacity-0 will-change-transform"
+  >
+    <div
+      class="blade-slash-line absolute w-[260vmax] h-0.5 -left-[80vmax] top-1/2 -translate-y-1/2 will-change-transform"
+      style={`
+        transform: rotate(-${90 - angle}deg);
+        background: linear-gradient(90deg, rgba(212,175,55,0) 0%, rgba(212,175,55,0.7) 20%, #ffffff 50%, rgba(212,175,55,0.7) 80%, rgba(212,175,55,0) 100%);
+        box-shadow: 0 0 10px #ffffff, 0 0 25px #d4af37, 0 0 50px rgba(212,175,55,0.8), 0 0 80px rgba(255,255,255,0.4);
+      `}
+    >
+      <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-4 bg-white/80 blur-[2px] rounded-full"></div>
+      <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-52 h-8 bg-[#d4af37]/60 blur-[6px] rounded-full"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import gsap from 'gsap';
+
+  export function setupBladeWipes() {
+    const containers = document.querySelectorAll<HTMLElement>('.blade-wipe-container');
+
+    containers.forEach((container) => {
+      if (container.dataset.initialized === 'true') return;
+      container.dataset.initialized = 'true';
+
+      const revealedLayer = container.querySelector<HTMLElement>('.blade-revealed-layer');
+      const cutterWrap = container.querySelector<HTMLElement>('.blade-cutter-wrap');
+      const slashLine = container.querySelector<HTMLElement>('.blade-slash-line');
+
+      if (!revealedLayer || !cutterWrap || !slashLine) return;
+
+      const duration = parseFloat(container.dataset.duration || '0.4');
+      const autoPlay = container.dataset.autoplay === 'true';
+      const delay = parseFloat(container.dataset.delay || '0.4');
+      const shouldShake = container.dataset.shake === 'true';
+
+      const triggerSlash = (customDuration = duration) => {
+        revealedLayer.style.setProperty('--blade-p', '0%');
+        gsap.set(cutterWrap, { opacity: 1 });
+
+        const tl = gsap.timeline({
+          onComplete: () => {
+            revealedLayer.style.setProperty('--blade-p', '125%');
+            gsap.to(cutterWrap, { opacity: 0, duration: 0.15 });
+          }
+        });
+
+        const maskObj = { p: 0 };
+        tl.to(maskObj, {
+          p: 125,
+          duration: customDuration,
+          ease: 'expo.out',
+          onUpdate: () => {
+            revealedLayer.style.setProperty('--blade-p', `${maskObj.p}%`);
+          }
+        }, 0);
+
+        tl.fromTo(slashLine,
+          { x: '-45vw', y: '45vh', opacity: 0.8 },
+          { x: '45vw', y: '-45vh', opacity: 1, duration: customDuration, ease: 'expo.out' },
+          0
+        );
+
+        if (shouldShake) {
+          tl.to(container, { x: 4, y: -3, duration: 0.04, ease: 'power4.inOut' }, 0.04)
+            .to(container, { x: -3, y: 2, duration: 0.04, ease: 'power4.inOut' })
+            .to(container, { x: 0, y: 0, duration: 0.06, ease: 'power2.out' });
+        }
+      };
+
+      // Exponer método en el elemento DOM para control externo
+      (container as any).triggerBladeWipe = triggerSlash;
+
+      if (autoPlay) {
+        setTimeout(() => triggerSlash(), delay * 1000);
+      }
+    });
+  }
+
+  document.addEventListener('astro:page-load', setupBladeWipes);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupBladeWipes);
+  } else {
+    setupBladeWipes();
+  }
+</script>
