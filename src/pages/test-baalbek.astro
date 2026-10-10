@@ -1,0 +1,38 @@
+---
+import Layout from "../layouts/Layout.astro";
+import TectonicHero from "../components/TectonicHero.astro";
+import img from "../assets/alternativa/baalbek.jpg";
+
+export const prerender = true;
+---
+
+<!--
+  BAALBEK — Fraunces Black (9pt): serifas macizas = sillares romanos de 800 toneladas.
+  Paleta A24: ámbar de linterna → terracota, sobre cielo de tormenta con grano 35mm.
+-->
+<Layout
+  title="BAALBEK — El templo de las piedras imposibles | TGP"
+  description="Baalbek: megalitos romanos al borde de la noche. Pieza de historia profunda con Fractura Tectónica."
+  headerTransparentUntilScroll={true}
+  footerVariant="minimal"
+  bodyClass="bg-black"
+>
+  <TectonicHero
+    image={img}
+    imageFilter="saturate(0.75) contrast(1.1) sepia(0.2) brightness(0.9)"
+    overlay="linear-gradient(120deg, rgba(5,5,6,0.82) 0%, rgba(5,5,6,0.4) 42%, rgba(5,5,6,0) 70%), linear-gradient(0deg, rgba(0,0,0,0.5), rgba(0,0,0,0) 40%)"
+    word="Baalbek"
+    subtitle="El templo de las piedras imposibles"
+    fontHref="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,900,0,0&display=swap"
+    fontFamily="'Fraunces', serif"
+    fontWeight={900}
+    fontVariation="'opsz' 9, 'SOFT' 0, 'WONK' 0"
+    gradient="linear-gradient(180deg, #F6C873 0%, #E0A24A 42%, #B4532A 100%)"
+    glow="rgba(224,162,74,0.42)"
+    accent="#E0A24A"
+    subColor="#EDE3CF"
+    size="clamp(3.2rem, 9.5vw, 10rem)"
+    tracking="-0.012em"
+    align="top-left"
+  />
+</Layout>

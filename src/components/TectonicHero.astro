@@ -1,0 +1,273 @@
+---
+/**
+ * src/components/TectonicHero.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Escenario compartido de las piezas "historia profunda":
+ * imagen full-bleed + viñeta Mubi + grano de película A24 + título con
+ * Fractura Tectónica (TectonicTitle). Cada pieza solo pasa configuración.
+ */
+import TectonicTitle from "./TectonicTitle.astro";
+
+interface Props {
+  image: ImageMetadata;
+  imageScale?: number;
+  imageFilter?: string;
+  imagePosition?: string;
+  overlay?: string;
+  word: string;
+  subtitle: string;
+  fontHref: string;
+  fontFamily: string;
+  fontWeight?: string | number;
+  fontVariation?: string;
+  gradient: string;
+  glow?: string;
+  accent?: string;
+  subColor?: string;
+  size?: string;
+  tracking?: string;
+  align?: "center" | "top-left" | "bottom-left" | "bottom-center";
+  speed?: number;
+  showHud?: boolean;
+  hudLabel?: string;
+}
+
+const {
+  image,
+  imageScale = 1,
+  imageFilter = "none",
+  imagePosition = "center",
+  overlay = "linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.6))",
+  align = "center",
+  speed = 1,
+  showHud = false,
+  hudLabel = "Fractura Tectónica",
+  fontHref,
+  ...titleProps
+} = Astro.props;
+---
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="stylesheet" href={fontHref} />
+
+<section class="tec-stage" aria-label={titleProps.word}>
+  <div class="tec-bg">
+    <img
+      class="tec-img"
+      src={image.src}
+      alt=""
+      style={`--s:${imageScale};object-position:${imagePosition};filter:${imageFilter};`}
+      loading="eager"
+      decoding="async"
+    />
+  </div>
+  <div class="tec-overlay" style={`background:${overlay}`}></div>
+  <div class="tec-vignette"></div>
+  <div class="tec-grain"></div>
+
+  <div class={`tec-slot tec-align-${align}`}>
+    <TectonicTitle {...titleProps} speed={speed} />
+  </div>
+
+  {
+    showHud ? (
+      <div class="tec-hud">
+        <div class="tec-hud-head">
+          <span class="tec-hud-dot" />
+          <span>{hudLabel}</span>
+        </div>
+        <button type="button" id="tec-replay" class="tec-hud-btn">
+          Repetir fractura (Espacio)
+        </button>
+        <div class="tec-hud-speeds">
+          <button type="button" class="tec-speed" data-speed="1.7">Rápido</button>
+          <button type="button" class="tec-speed is-active" data-speed="1">Místico</button>
+          <button type="button" class="tec-speed" data-speed="0.6">Lento</button>
+        </div>
+      </div>
+    ) : (
+      <button type="button" id="tec-replay" class="tec-replay" aria-label="Repetir animación">
+        ↻
+      </button>
+    )
+  }
+</section>
+
+<style>
+  .tec-stage {
+    position: relative;
+    width: 100%;
+    height: 100svh;
+    min-height: 560px;
+    overflow: hidden;
+    background: #000;
+    color: #fff;
+  }
+
+  .tec-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .tec-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(var(--s));
+    animation: tec-drift 28s ease-in-out infinite alternate;
+  }
+
+  @keyframes tec-drift {
+    from { transform: scale(var(--s)); }
+    to { transform: scale(calc(var(--s) * 1.05)); }
+  }
+
+  .tec-overlay,
+  .tec-vignette,
+  .tec-grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .tec-vignette {
+    background: radial-gradient(
+      ellipse at center,
+      transparent 35%,
+      rgba(0, 0, 0, 0.55) 78%,
+      rgba(0, 0, 0, 0.9) 100%
+    );
+  }
+
+  /* Grano analógico de película (A24) */
+  .tec-grain {
+    opacity: 0.17;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    animation: tec-grain 0.9s steps(6) infinite;
+  }
+
+  @keyframes tec-grain {
+    0% { transform: translate(0, 0); }
+    20% { transform: translate(-2%, 1%); }
+    40% { transform: translate(1%, -2%); }
+    60% { transform: translate(-1%, 2%); }
+    80% { transform: translate(2%, -1%); }
+    100% { transform: translate(0, 0); }
+  }
+
+  .tec-slot {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    z-index: 5;
+    padding: 2rem 5vw;
+    pointer-events: none;
+  }
+
+  .tec-align-center { align-items: center; justify-content: center; }
+  .tec-align-top-left { align-items: flex-start; justify-content: flex-start; padding-top: 17vh; }
+  .tec-align-bottom-left { align-items: flex-end; justify-content: flex-start; padding-bottom: 14vh; }
+  .tec-align-bottom-center { align-items: flex-end; justify-content: center; padding-bottom: 11vh; }
+
+  /* Botón mínimo de repetición (piezas finales) */
+  .tec-replay {
+    position: absolute;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 20;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(0, 0, 0, 0.45);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
+  }
+  .tec-replay:hover { color: #fff; border-color: rgba(255, 255, 255, 0.5); transform: rotate(-90deg); }
+
+  /* HUD del laboratorio */
+  .tec-hud {
+    position: absolute;
+    top: 5.5rem;
+    right: 1.5rem;
+    z-index: 20;
+    width: 15.5rem;
+    padding: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    border-radius: 1rem;
+    background: rgba(0, 0, 0, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(14px);
+    font-family: "Inter", system-ui, sans-serif;
+  }
+  .tec-hud-head {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: #d4af37; font-weight: 700;
+    padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .tec-hud-dot { width: 0.45rem; height: 0.45rem; border-radius: 50%; background: #d4af37; }
+  .tec-hud-btn {
+    padding: 0.7rem; border-radius: 0.7rem; border: 0; cursor: pointer;
+    background: linear-gradient(90deg, #d4af37, #e6ca65); color: #000;
+    font-weight: 700; font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase;
+    transition: transform 0.15s ease;
+  }
+  .tec-hud-btn:active { transform: scale(0.96); }
+  .tec-hud-speeds {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.25rem;
+    padding: 0.25rem; border-radius: 0.6rem; background: rgba(255, 255, 255, 0.06);
+  }
+  .tec-speed {
+    padding: 0.4rem 0; border: 0; border-radius: 0.4rem; cursor: pointer;
+    background: transparent; color: #cfcfcf; font-size: 0.62rem;
+  }
+  .tec-speed.is-active { background: #d4af37; color: #000; font-weight: 700; }
+</style>
+
+<script>
+  const setupTectonicHud = () => {
+    const replayBtn = document.getElementById("tec-replay");
+    if (!replayBtn || replayBtn.dataset.ready === "true") return;
+    replayBtn.dataset.ready = "true";
+
+    let speed = 1;
+    const speedBtns = document.querySelectorAll<HTMLElement>(".tec-speed");
+
+    const replay = () =>
+      window.dispatchEvent(new CustomEvent("tectonic:replay", { detail: { speed } }));
+
+    replayBtn.addEventListener("click", replay);
+
+    speedBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        speedBtns.forEach((b) => b.classList.remove("is-active"));
+        btn.classList.add("is-active");
+        speed = parseFloat(btn.dataset.speed || "1");
+      });
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && (e.target as HTMLElement)?.tagName !== "INPUT") {
+        e.preventDefault();
+        replay();
+      }
+    });
+  };
+
+  document.addEventListener("astro:page-load", setupTectonicHud);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupTectonicHud);
+  } else {
+    setupTectonicHud();
+  }
+</script>

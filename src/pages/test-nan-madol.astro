@@ -1,0 +1,40 @@
+---
+import Layout from "../layouts/Layout.astro";
+import TectonicHero from "../components/TectonicHero.astro";
+import img from "../assets/alternativa/nan-madol.jpg";
+
+export const prerender = true;
+---
+
+<!--
+  NAN MADOL — pensada para Ogg Bold (licencia paga de Sharp Type, no incluida).
+  SUSTITUTO GRATUITO ACTIVO: Bodoni Moda Black. Cuando exista el .woff2 de Ogg,
+  cambiar SOLO `fontHref` y `fontFamily` abajo.
+  Imagen con letterbox negro: imageScale 1.32 recorta las barras.
+-->
+<Layout
+  title="NAN MADOL — La ciudad de basalto sobre el agua | TGP"
+  description="Nan Madol, Micronesia: muros de basalto sobre el mar. Pieza de historia profunda con Fractura Tectónica."
+  headerTransparentUntilScroll={true}
+  footerVariant="minimal"
+  bodyClass="bg-black"
+>
+  <TectonicHero
+    image={img}
+    imageScale={1.32}
+    imageFilter="saturate(0.82) contrast(1.12) brightness(0.62)"
+    overlay="linear-gradient(180deg, rgba(3,10,10,0.6) 0%, rgba(3,10,10,0.32) 50%, rgba(3,10,10,0.72) 100%)"
+    word="Nan Madol"
+    subtitle="La ciudad de basalto sobre el agua"
+    fontHref="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,900&display=swap"
+    fontFamily="'Bodoni Moda', serif"
+    fontWeight={900}
+    gradient="linear-gradient(180deg, #A6F3D8 0%, #4FC3A1 52%, #1F7A68 100%)"
+    glow="rgba(79,195,161,0.5)"
+    accent="#6FD1B5"
+    subColor="#CFE3DC"
+    size="clamp(3rem, 10.5vw, 11rem)"
+    tracking="0.005em"
+    align="center"
+  />
+</Layout>

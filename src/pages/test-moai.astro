@@ -1,0 +1,38 @@
+---
+import Layout from "../layouts/Layout.astro";
+import TectonicHero from "../components/TectonicHero.astro";
+import img from "../assets/alternativa/moai.jpg";
+
+export const prerender = true;
+---
+
+<!--
+  MOAI — Clash Display Bold: brutalismo seco, sin adorno. Mubi + espacio negativo:
+  un solo objeto aislado, color reducido a su mínima expresión, acento único de óxido.
+-->
+<Layout
+  title="MOAI — Silencio de piedra | TGP"
+  description="Moai de Rapa Nui aislado en el vacío. Pieza de historia profunda con Fractura Tectónica."
+  headerTransparentUntilScroll={true}
+  footerVariant="minimal"
+  bodyClass="bg-black"
+>
+  <TectonicHero
+    image={img}
+    imageScale={1.05}
+    imageFilter="grayscale(0.88) contrast(1.2) brightness(0.6)"
+    overlay="radial-gradient(ellipse at 50% 40%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 55%, rgba(0,0,0,0.85) 100%), linear-gradient(0deg, rgba(0,0,0,0.78), rgba(0,0,0,0) 55%)"
+    word="Moai"
+    subtitle="Rapa Nui · Silencio de piedra"
+    fontHref="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap"
+    fontFamily="'Clash Display', 'Inter', sans-serif"
+    fontWeight={700}
+    gradient="linear-gradient(180deg, #F6F1E4 0%, #E3DCCB 55%, #B9B09B 100%)"
+    glow="rgba(255,255,255,0.14)"
+    accent="#D9633F"
+    subColor="#D9633F"
+    size="clamp(4.5rem, 20vw, 20rem)"
+    tracking="-0.025em"
+    align="bottom-center"
+  />
+</Layout>

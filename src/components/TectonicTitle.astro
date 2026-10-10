@@ -1,0 +1,354 @@
+---
+/**
+ * src/components/TectonicTitle.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * LA FRACTURA TECTÓNICA (Split Text Horizontal) — GSAP Core
+ *
+ * 1. La palabra gigante aparece sólida.
+ * 2. Tiembla y se parte por la mitad (corte horizontal dentado, como una falla).
+ *    La mitad superior se desplaza a la izquierda, la inferior a la derecha, y se
+ *    separan en vertical abriendo una fisura oscura.
+ * 3. Desde esa fisura emerge el H2 con un fade-in suave (blur → nítido).
+ *
+ * Accesibilidad: el <h1> real lleva aria-label; las copias visuales son aria-hidden.
+ * Eventos externos: window.dispatchEvent(new CustomEvent('tectonic:replay', { detail: { speed } }))
+ */
+interface Props {
+  word: string;
+  subtitle: string;
+  fontFamily: string;
+  fontWeight?: string | number;
+  fontVariation?: string;
+  gradient: string;
+  glow?: string;
+  accent?: string;
+  subColor?: string;
+  subFont?: string;
+  size?: string;
+  tracking?: string;
+  align?: "center" | "left" | "right";
+  disintegrate?: boolean;
+  speed?: number;
+  autoplay?: boolean;
+  delay?: number;
+}
+
+const {
+  word,
+  subtitle,
+  fontFamily,
+  fontWeight = 900,
+  fontVariation = "normal",
+  gradient,
+  glow = "rgba(255,255,255,0.15)",
+  accent = "#ffffff",
+  subColor = "#EDE3CF",
+  subFont = "'Inter', system-ui, sans-serif",
+  size = "clamp(4rem, 15vw, 15rem)",
+  tracking = "-0.01em",
+  align = "center",
+  disintegrate = false,
+  speed = 1,
+  autoplay = true,
+  delay = 0.6,
+} = Astro.props;
+
+const cssVars = [
+  `--tec-font:${fontFamily}`,
+  `--tec-weight:${fontWeight}`,
+  `--tec-var:${fontVariation}`,
+  `--tec-gradient:${gradient}`,
+  `--tec-glow:${glow}`,
+  `--tec-accent:${accent}`,
+  `--tec-sub:${subColor}`,
+  `--tec-subfont:${subFont}`,
+  `--tec-size:${size}`,
+  `--tec-track:${tracking}`,
+].join(";");
+---
+
+<div
+  class={`tectonic tec-align-${align}`}
+  style={cssVars}
+  data-align={align}
+  data-disintegrate={disintegrate ? "true" : "false"}
+  data-speed={speed}
+  data-autoplay={autoplay ? "true" : "false"}
+  data-delay={delay}
+>
+  <h1 class="tec-h1" aria-label={word}>
+    <span class="tec-sizer" aria-hidden="true">{word}</span>
+    <span class="tec-band" aria-hidden="true"></span>
+    <span class="tec-half tec-top" aria-hidden="true">{word}</span>
+    <span class="tec-half tec-bot" aria-hidden="true">{word}</span>
+  </h1>
+  <h2 class="tec-sub">{subtitle}</h2>
+  <div class="tec-dust" aria-hidden="true"></div>
+</div>
+
+<noscript>
+  <style>
+    .tec-h1,
+    .tec-sub {
+      opacity: 1 !important;
+    }
+  </style>
+</noscript>
+
+<style>
+  .tectonic {
+    position: relative;
+    display: inline-block;
+    width: max-content;
+    max-width: 96vw;
+  }
+
+  .tec-h1 {
+    position: relative;
+    margin: 0;
+    font-family: var(--tec-font);
+    font-weight: var(--tec-weight);
+    font-variation-settings: var(--tec-var);
+    font-size: var(--tec-size);
+    line-height: 0.88;
+    letter-spacing: var(--tec-track);
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-align: center;
+    opacity: 0;
+    filter: drop-shadow(0 14px 38px rgba(0, 0, 0, 0.85))
+      drop-shadow(0 0 30px var(--tec-glow));
+  }
+
+  .tec-sizer,
+  .tec-half {
+    display: block;
+    padding: 0.08em 0.05em;
+    box-sizing: border-box;
+  }
+
+  .tec-sizer {
+    visibility: hidden;
+  }
+
+  .tec-half {
+    position: absolute;
+    inset: 0;
+    background: var(--tec-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    z-index: 2;
+    will-change: transform;
+  }
+
+  /* Corte horizontal DENTADO: la falla no es una línea recta */
+  .tec-top {
+    clip-path: polygon(
+      0 0, 100% 0, 100% 50%, 93% 52.5%, 84% 48.5%, 73% 53%, 61% 49%,
+      50% 52%, 38% 48%, 27% 53%, 15% 49.5%, 6% 52%, 0 50%
+    );
+  }
+
+  .tec-bot {
+    clip-path: polygon(
+      0 50%, 6% 52%, 15% 49.5%, 27% 53%, 38% 48%, 50% 52%, 61% 49%,
+      73% 53%, 84% 48.5%, 93% 52.5%, 100% 50%, 100% 100%, 0 100%
+    );
+  }
+
+  /* La fisura oscura entre ambas mitades */
+  .tec-band {
+    position: absolute;
+    left: -1%;
+    right: -1%;
+    top: 50%;
+    height: 0;
+    z-index: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.95) 22%,
+      rgba(0, 0, 0, 0.98) 78%,
+      rgba(0, 0, 0, 0.55) 100%
+    );
+    box-shadow:
+      inset 0 0 44px rgba(0, 0, 0, 1),
+      0 0 34px -6px var(--tec-glow);
+    pointer-events: none;
+  }
+
+  .tec-sub {
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    top: 50%;
+    z-index: 3;
+    margin: 0;
+    text-align: center;
+    font-family: var(--tec-subfont);
+    font-weight: 500;
+    font-size: clamp(0.72rem, calc(var(--tec-size) * 0.1), 1.6rem);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    line-height: 1.5;
+    color: var(--tec-sub);
+    opacity: 0;
+    pointer-events: none;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.9);
+  }
+
+  .tec-dust {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .tec-dust :global(span) {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--tec-accent);
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  import gsap from "gsap";
+
+  const setupTectonic = () => {
+    const roots = document.querySelectorAll<HTMLElement>(".tectonic");
+
+    roots.forEach((root) => {
+      if (root.dataset.ready === "true") return;
+      root.dataset.ready = "true";
+
+      const h1 = root.querySelector<HTMLElement>(".tec-h1");
+      const top = root.querySelector<HTMLElement>(".tec-top");
+      const bot = root.querySelector<HTMLElement>(".tec-bot");
+      const band = root.querySelector<HTMLElement>(".tec-band");
+      const sub = root.querySelector<HTMLElement>(".tec-sub");
+      const dust = root.querySelector<HTMLElement>(".tec-dust");
+      if (!h1 || !top || !bot || !band || !sub || !dust) return;
+
+      let speed = parseFloat(root.dataset.speed || "1");
+      let tl: gsap.core.Timeline | null = null;
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      const measure = () => {
+        const w = h1.offsetWidth;
+        const h = h1.offsetHeight;
+        const gap = Math.max(h * 0.4, sub.offsetHeight + h * 0.24);
+        const shift = Math.max(14, w * 0.03);
+        band.style.height = `${gap}px`;
+        return { w, h, gap, shift };
+      };
+
+      const reset = () => {
+        tl?.kill();
+        tl = null;
+        dust.innerHTML = "";
+        gsap.set(root, { x: 0 });
+        gsap.set([top, bot], { x: 0, y: 0 });
+        gsap.set(band, { yPercent: -50, scaleY: 0, transformOrigin: "50% 50%" });
+        gsap.set(sub, { yPercent: -50, opacity: 0, filter: "blur(12px)" });
+        gsap.set(h1, { opacity: 0, scale: 1.06 });
+      };
+
+      const spawnDust = (w: number, h: number) => {
+        const count = 26;
+        for (let i = 0; i < count; i++) {
+          const p = document.createElement("span");
+          const s = 1 + Math.random() * 2.6;
+          p.style.width = `${s}px`;
+          p.style.height = `${s}px`;
+          p.style.left = `${Math.random() * w}px`;
+          p.style.top = `${h * 0.5}px`;
+          p.style.opacity = "0";
+          dust.appendChild(p);
+          gsap.fromTo(
+            p,
+            { opacity: 0, y: 0 },
+            {
+              opacity: 0.35 + Math.random() * 0.5,
+              y: 60 + Math.random() * 200,
+              x: (Math.random() - 0.5) * 50,
+              duration: 1.8 + Math.random() * 1.8,
+              ease: "power1.out",
+              delay: Math.random() * 0.5,
+              onComplete: () => {
+                gsap.to(p, { opacity: 0, duration: 0.8, onComplete: () => p.remove() });
+              },
+            },
+          );
+        }
+        void h;
+      };
+
+      const play = async () => {
+        if (document.fonts?.ready) await document.fonts.ready;
+        reset();
+        const { w, h, gap, shift } = measure();
+
+        if (reduceMotion) {
+          gsap.set(h1, { opacity: 1, scale: 1 });
+          gsap.set(top, { x: -shift, y: -gap / 2 });
+          gsap.set(bot, { x: shift, y: gap / 2 });
+          gsap.set(band, { scaleY: 1 });
+          gsap.set(sub, { opacity: 1, filter: "blur(0px)" });
+          return;
+        }
+
+        tl = gsap.timeline();
+        // 1. Aparece SÓLIDA
+        tl.to(h1, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" })
+          // 2. Contemplación
+          .to({}, { duration: 0.8 })
+          // 3. Temblor previo
+          .fromTo(
+            root,
+            { x: -3 },
+            { x: 3, duration: 0.04, repeat: 13, yoyo: true, ease: "none" },
+          )
+          .set(root, { x: 0 })
+          .addLabel("fracture")
+          .add(() => spawnDust(w, h), "fracture")
+          // 4. La falla: arriba a la izquierda, abajo a la derecha, y se abre la fisura
+          .to(top, { x: -shift, y: -gap / 2, duration: 1.6, ease: "power4.inOut" }, "fracture")
+          .to(bot, { x: shift, y: gap / 2, duration: 1.6, ease: "power4.inOut" }, "fracture")
+          .to(band, { scaleY: 1, duration: 1.6, ease: "power4.inOut" }, "fracture")
+          // 5. Del hueco oscuro emerge el H2
+          .to(
+            sub,
+            { opacity: 1, filter: "blur(0px)", duration: 1.6, ease: "power2.out" },
+            "fracture+=0.9",
+          );
+
+        tl.timeScale(speed);
+      };
+
+      window.addEventListener("tectonic:replay", (e) => {
+        const detail = (e as CustomEvent).detail;
+        if (detail?.speed) speed = detail.speed;
+        play();
+      });
+      window.addEventListener("tectonic:reset", reset);
+
+      reset();
+      if (root.dataset.autoplay !== "false") {
+        const delay = parseFloat(root.dataset.delay || "0.6") * 1000;
+        setTimeout(play, delay);
+      }
+    });
+  };
+
+  document.addEventListener("astro:page-load", setupTectonic);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupTectonic);
+  } else {
+    setupTectonic();
+  }
+</script>

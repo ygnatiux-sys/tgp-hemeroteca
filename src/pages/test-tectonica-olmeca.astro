@@ -1,0 +1,36 @@
+---
+import Layout from "../layouts/Layout.astro";
+import TectonicHero from "../components/TectonicHero.astro";
+import img from "../assets/alternativa/olmeca.jpg";
+
+export const prerender = true;
+---
+
+<Layout
+  title="Laboratorio: Fractura Tectónica — OLMECAS | TGP"
+  description="Prueba de la animación Fractura Tectónica con GSAP sobre la cabeza olmeca."
+  headerTransparentUntilScroll={true}
+  footerVariant="minimal"
+  bodyClass="bg-black"
+>
+  <TectonicHero
+    image={img}
+    imageFilter="brightness(0.82) contrast(1.12) saturate(0.7)"
+    overlay="radial-gradient(ellipse at 60% 45%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 70%), linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.55))"
+    word="Olmecas"
+    subtitle="El misterio del basalto"
+    fontHref="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,900,0,0&display=swap"
+    fontFamily="'Fraunces', serif"
+    fontWeight={900}
+    fontVariation="'opsz' 9, 'SOFT' 0, 'WONK' 0"
+    gradient="linear-gradient(180deg, #F0C284 0%, #C98B4D 48%, #8A5328 100%)"
+    glow="rgba(201,139,77,0.38)"
+    accent="#E6B070"
+    subColor="#EDE3CF"
+    size="clamp(4rem, 17vw, 17rem)"
+    tracking="-0.01em"
+    align="center"
+    showHud={true}
+    hudLabel="Fractura Tectónica · Olmecas"
+  />
+</Layout>
