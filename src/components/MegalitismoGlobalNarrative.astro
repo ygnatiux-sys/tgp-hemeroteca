@@ -1,0 +1,482 @@
+---
+/**
+ * src/components/MegalitismoGlobalNarrative.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * COLECCIÓN DESTACADA: 'MEGALITISMO GLOBAL'
+ * POST / ANOMALÍA Nº 10: Haʻamonga ʻa Maui (Tonga, Polinesia) — La Puerta de Tonga
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+interface Props {
+  className?: string;
+  autoplayDuration?: number;
+}
+
+const { className = "", autoplayDuration = 8000 } = Astro.props;
+---
+
+<!-- Importación de Google Fonts: Bodoni Moda (700/900 Italic) & Lato (300/400) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,700..900;1,6..96,700..900&family=Lato:ital,wght@0,300;0,400;0,700;1,300&family=Space+Mono:wght@400;700&display=swap"
+/>
+
+<section
+  id="megalitismo-global-container"
+  class={`relative w-full h-screen min-h-160 bg-[#050505] text-[#f7f5f8] select-none overflow-hidden ${className}`}
+  data-autoplay={autoplayDuration}
+  aria-label="Colección: Megalitismo Global — Haʻamonga ʻa Maui"
+>
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       ESCENA 1: APERTURA DE LA COLECCIÓN — MEGALITISMO GLOBAL (FUCSIA TO BLACK)
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <div
+    class="mega-layer-intro absolute inset-0 z-20 flex items-center justify-center overflow-hidden bg-[#050505] opacity-100 pointer-events-auto"
+    data-scene="intro"
+  >
+    <!-- Ambient Glow Fucsia / Magenta Profundo to Black -->
+    <div
+      class="mega-orb-1 absolute -top-[18%] -left-[12%] w-[80vw] h-[80vw] max-w-212.5 max-h-212.5 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,0,128,0.32)_0%,rgba(190,24,93,0.18)_35%,rgba(80,7,36,0.06)_60%,transparent_75%)] blur-3xl pointer-events-none will-change-transform"
+    ></div>
+    <div
+      class="mega-orb-2 absolute -bottom-[22%] -right-[15%] w-[75vw] h-[75vw] max-w-200 max-h-200 rounded-full bg-[radial-gradient(circle_at_center,rgba(225,29,72,0.24)_0%,rgba(136,19,55,0.12)_38%,transparent_70%)] blur-3xl pointer-events-none will-change-transform"
+    ></div>
+
+    <!-- Viñeta perimetral obsidiana para sellar bordes -->
+    <div
+      class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_36%,rgba(5,5,5,0.72)_72%,#050505_100%)] pointer-events-none"
+    ></div>
+    <div class="mega-grain absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay"></div>
+
+    <!-- Partículas a tono fucsia/magenta -->
+    <div class="mega-particles absolute inset-0 pointer-events-none z-10" aria-hidden="true"></div>
+
+    <!-- Onda expansiva de impacto fucsia -->
+    <div
+      class="mega-shockwave absolute w-32 h-32 rounded-full border-2 border-[#ff007f] pointer-events-none opacity-0 scale-50 z-15 shadow-[0_0_70px_#e11d48]"
+    ></div>
+
+    <!-- Escenario Tipográfico: MEGALITISMO (H1) + GLOBAL (H2) -->
+    <div class="relative z-20 flex flex-col items-center justify-center text-center px-4 max-w-6xl w-full">
+      <div class="mega-title-box relative flex flex-col items-center justify-center">
+        <!-- H1 Monumental: Bodoni Moda 900 en Fucsia Metálico Profundo -->
+        <h1
+          class="mega-title-h1 font-['Bodoni_Moda',serif] font-black uppercase text-[clamp(3.8rem,14vw,14.5rem)] leading-[0.84] tracking-[-0.03em] whitespace-nowrap text-transparent opacity-0 will-change-transform select-none"
+        >
+          MEGALITISMO
+        </h1>
+
+        <!-- H2 Destacado: GLOBAL en dos tiempos con resplandor prismático -->
+        <div class="mega-h2-wrap relative inline-block mt-3 sm:mt-5 overflow-visible">
+          <h2
+            class="mega-title-h2 font-['Bodoni_Moda',serif] italic font-bold uppercase text-[clamp(1.5rem,5.2vw,4.2rem)] tracking-[0.42em] text-[#ff2a85] drop-shadow-[0_0_35px_rgba(255,42,133,0.55)] m-0 opacity-0 will-change-transform"
+          >
+            GLOBAL
+          </h2>
+        </div>
+      </div>
+
+      <!-- Tagline Canónico -->
+      <p
+        class="mega-tagline mt-6 sm:mt-8 font-['Lato',sans-serif] font-light text-[11px] sm:text-[13px] tracking-[0.35em] uppercase text-[#e2d5de]/85 opacity-0 will-change-transform"
+      >
+        La arquitectura titánica que une a los océanos primordiales
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       ESCENA 2: ANOMALÍA Nº 10 — HAʻAMONGA ʻA MAUI (TONGA, POLINESIA)
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <div
+    class="mega-layer-post absolute inset-0 z-10 w-full h-full opacity-0 pointer-events-none bg-[#050505] overflow-hidden"
+    data-scene="post"
+  >
+    <!-- Fondo Fotográfico con Ken Burns 22s -->
+    <div class="mega-bg-wrap absolute inset-0 overflow-hidden">
+      <img
+        id="maui-bg-img"
+        src="/images/haamonga-a-maui.jpg"
+        alt="Trilito de coral Haʻamonga ʻa Maui en Tonga al atardecer"
+        class="mega-img absolute inset-0 w-full h-full object-cover object-[center_48%] filter brightness-[0.45] contrast-[1.25] saturate-[0.75] will-change-transform"
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+
+    <!-- Scrim oscuro sutil en la zona de textos para contraste absoluto -->
+    <div
+      class="absolute inset-0 pointer-events-none bg-linear-to-t from-black/85 via-black/30 to-transparent"
+    ></div>
+    <div
+      class="absolute inset-x-0 top-0 h-36 bg-linear-to-b from-black/75 to-transparent pointer-events-none"
+    ></div>
+    <div class="mega-grain absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay"></div>
+
+    <!-- FX Cinemático de Destello (Sun Flare): colocado en el vano donde rompe el sol -->
+    <div
+      class="mega-sun-flare absolute left-[56%] top-[57%] -translate-x-1/2 -translate-y-1/2 w-[65vw] h-[65vw] max-w-155 max-h-155 rounded-full pointer-events-none opacity-0 mix-blend-screen z-15 will-change-transform"
+      style="background: radial-gradient(circle at center, rgba(251, 191, 36, 0.95) 0%, rgba(245, 158, 11, 0.55) 24%, rgba(217, 119, 6, 0.22) 50%, transparent 72%);"
+    ></div>
+
+    <!-- UI Superior: Coordenadas Geográficas -->
+    <div class="absolute top-6 sm:top-8 inset-x-0 z-30 px-6 sm:px-12 pointer-events-none">
+      <div class="mega-coords-box flex items-center gap-3 opacity-0 will-change-transform">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#f59e0b] shadow-[0_0_10px_#f59e0b] animate-pulse"></span>
+        <span class="font-['Lato',sans-serif] font-normal text-[9.5px] sm:text-[11px] tracking-[0.28em] uppercase text-[#fef3c7]/90 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+          COORDENADAS: 21°08′12″S 175°02′52″O — TONGA, POLINESIA
+        </span>
+      </div>
+    </div>
+
+    <!-- Monumento (H1 / H2) — Esquina Inferior Izquierda -->
+    <div class="absolute bottom-8 sm:bottom-12 left-6 sm:left-12 z-20 pointer-events-none max-w-xl">
+      <div class="mega-monument-wrap flex flex-col items-start">
+        <span class="mega-num-badge font-['Space_Mono',monospace] text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-[#f59e0b] mb-1.5 opacity-0 will-change-transform drop-shadow-[0_2px_12px_rgba(0,0,0,0.95)]">
+          ANOMALÍA Nº 10 · LA RAREZA POLINESIA
+        </span>
+
+        <h1
+          class="mega-monument-h1 font-['Bodoni_Moda',serif] font-black uppercase text-[clamp(2.5rem,6.8vw,6.4rem)] leading-[0.88] tracking-[-0.02em] text-[#fff8ee] drop-shadow-[0_15px_35px_rgba(0,0,0,0.98)] opacity-0 will-change-transform"
+        >
+          HAʻAMONGA ʻA MAUI
+        </h1>
+
+        <h2
+          class="mega-monument-h2 font-['Bodoni_Moda',serif] italic font-bold uppercase text-[clamp(1.2rem,3.2vw,2.4rem)] tracking-[0.24em] text-[#fbbf24] mt-2 opacity-0 will-change-transform drop-shadow-[0_10px_25px_rgba(0,0,0,0.95)]"
+        >
+          LA PUERTA DE TONGA
+        </h2>
+      </div>
+    </div>
+
+    <!-- Abstracts Rotativos (T1, T2, T3) — Esquina Inferior Derecha -->
+    <div class="absolute bottom-8 sm:bottom-12 right-6 sm:right-12 z-25 pointer-events-none w-full max-w-md">
+      <div class="relative min-h-35 flex items-end justify-end text-right">
+        <!-- T1 (0.5s - 4.0s) -->
+        <p
+          class="mega-abstract-t1 absolute inset-x-0 bottom-0 font-['Lato',sans-serif] font-light text-[clamp(0.85rem,1.25vw,1.05rem)] leading-[1.65] tracking-[0.05em] text-[#fef9c3]/95 drop-shadow-[0_4px_18px_rgba(0,0,0,0.95)] opacity-0 will-change-transform"
+        >
+          “Un colosal trilito de piedra de coral de más de 30 toneladas, erigido en la absoluta soledad de la Polinesia. Un misterio estructural de escala megalítica que rompe con la cronología tradicional del Pacífico.”
+        </p>
+
+        <!-- T2 (4.0s - 7.5s) -->
+        <p
+          class="mega-abstract-t2 absolute inset-x-0 bottom-0 font-['Lato',sans-serif] font-light text-[clamp(0.85rem,1.25vw,1.05rem)] leading-[1.65] tracking-[0.05em] text-[#ffedd5]/95 drop-shadow-[0_4px_18px_rgba(0,0,0,0.95)] opacity-0 will-change-transform"
+        >
+          “La leyenda local atribuye su creación al dios Maui, quien habría cargado las gigantescas rocas desde la lejana isla de Wallis. Los bloques de coral están perfectamente ensamblados mediante encajes de muesca en el dintel.”
+        </p>
+
+        <!-- T3 (7.5s - 11.0s) -->
+        <p
+          class="mega-abstract-t3 absolute inset-x-0 bottom-0 font-['Lato',sans-serif] font-light text-[clamp(0.85rem,1.25vw,1.05rem)] leading-[1.65] tracking-[0.05em] text-[#fef9c3]/95 drop-shadow-[0_4px_18px_rgba(0,0,0,0.95)] opacity-0 will-change-transform"
+        >
+          “Investigaciones sugieren que el arco funcionaba como un sofisticado observatorio astronómico, alineado con precisión quirúrgica para marcar los solsticios de verano e invierno en el fin del mundo.”
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Gradiente Fucsia Profundo de Alta Costura para MEGALITISMO */
+  .mega-title-h1 {
+    font-family: 'Bodoni Moda', serif;
+    background: linear-gradient(180deg, #ffffff 0%, #ff66b2 26%, #ff007f 56%, #b00055 82%, #42001e 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 25px 60px rgba(0, 0, 0, 0.98)) drop-shadow(0 0 50px rgba(255, 0, 127, 0.5));
+  }
+
+  /* Textura de partículas orgánicas */
+  .mega-particles :global(span) {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+
+  function setupMegalitismoGlobal() {
+    const container = document.getElementById("megalitismo-global-container");
+    if (!container || container.dataset.ready === "true") return;
+    container.dataset.ready = "true";
+
+    // Capas
+    const layerIntro = container.querySelector<HTMLElement>('.mega-layer-intro[data-scene="intro"]');
+    const layerPost = container.querySelector<HTMLElement>('.mega-layer-post[data-scene="post"]');
+
+    // Escena 1: Intro
+    const titleH1 = container.querySelector<HTMLElement>(".mega-title-h1");
+    const titleH2 = container.querySelector<HTMLElement>(".mega-title-h2");
+    const tagline = container.querySelector<HTMLElement>(".mega-tagline");
+    const shockwave = container.querySelector<HTMLElement>(".mega-shockwave");
+    const particlesBox = container.querySelector<HTMLElement>(".mega-particles");
+    const orb1 = container.querySelector<HTMLElement>(".mega-orb-1");
+    const orb2 = container.querySelector<HTMLElement>(".mega-orb-2");
+
+    // Escena 2: Post
+    const bgImg = container.querySelector<HTMLElement>("#maui-bg-img");
+    const sunFlare = container.querySelector<HTMLElement>(".mega-sun-flare");
+    const coordsBox = container.querySelector<HTMLElement>(".mega-coords-box");
+    const numBadge = container.querySelector<HTMLElement>(".mega-num-badge");
+    const monumentH1 = container.querySelector<HTMLElement>(".mega-monument-h1");
+    const monumentH2 = container.querySelector<HTMLElement>(".mega-monument-h2");
+    const t1 = container.querySelector<HTMLElement>(".mega-abstract-t1");
+    const t2 = container.querySelector<HTMLElement>(".mega-abstract-t2");
+    const t3 = container.querySelector<HTMLElement>(".mega-abstract-t3");
+
+    if (!layerIntro || !layerPost) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Generador de partículas fucsia/magenta
+    const spawnFuchsiaParticles = (count: number = 32) => {
+      if (!particlesBox) return;
+      particlesBox.innerHTML = "";
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement("span");
+        const s = 1.4 + Math.random() * 3.2;
+        p.style.width = `${s}px`;
+        p.style.height = `${s}px`;
+        p.style.left = `${15 + Math.random() * 70}%`;
+        p.style.top = `${25 + Math.random() * 50}%`;
+        p.style.background = Math.random() > 0.4 ? "#ff007f" : (Math.random() > 0.5 ? "#ff66b2" : "#fda4af");
+        p.style.boxShadow = "0 0 14px rgba(255, 0, 127, 0.85)";
+        p.style.opacity = "0";
+        particlesBox.appendChild(p);
+
+        gsap.fromTo(
+          p,
+          { opacity: 0, scale: 0.2 },
+          {
+            opacity: 0.4 + Math.random() * 0.6,
+            x: (Math.random() - 0.5) * 160,
+            y: (Math.random() - 0.5) * 130 - 20,
+            scale: 1.4,
+            duration: 1.4 + Math.random() * 1.2,
+            ease: "power2.out",
+            onComplete: () => {
+              gsap.to(p, { opacity: 0, duration: 0.5, onComplete: () => p.remove() });
+            },
+          }
+        );
+      }
+    };
+
+    let masterTl: gsap.core.Timeline | null = null;
+    let kenBurnsTween: gsap.core.Tween | null = null;
+
+    // Ken Burns Effect: Escala de 1.0 a 1.05 en 22 segundos continuo y lineal
+    const startKenBurns = () => {
+      if (!bgImg || reduceMotion) return;
+      kenBurnsTween?.kill();
+      gsap.set(bgImg, { scale: 1.0 });
+      kenBurnsTween = gsap.to(bgImg, {
+        scale: 1.05,
+        duration: 22,
+        ease: "none",
+        repeat: -1,
+        yoyo: true,
+      });
+    };
+
+    // Construcción del Master Timeline Autónomo en Loop
+    const buildMasterTimeline = () => {
+      masterTl?.kill();
+
+      const tl = gsap.timeline({
+        repeat: -1,
+        repeatDelay: 0.6,
+      });
+      masterTl = tl;
+
+      // ─────────────────────────────────────────────────────────────
+      // FASE 1: APERTURA COLECCIÓN MEGALITISMO GLOBAL
+      // ─────────────────────────────────────────────────────────────
+      tl.addLabel("sceneIntro");
+
+      // Setup inicial de capas
+      tl.set(layerIntro, { opacity: 1, pointerEvents: "auto" });
+      tl.set(layerPost, { opacity: 0, pointerEvents: "none" });
+      tl.set([titleH1, titleH2, tagline], { opacity: 0 });
+      if (shockwave) tl.set(shockwave, { scale: 0.2, opacity: 0 });
+
+      // Respiración previa del resplandor
+      tl.fromTo(
+        [orb1, orb2],
+        { scale: 0.9, opacity: 0.6 },
+        { scale: 1.08, opacity: 1, duration: 0.9, ease: "power1.inOut" },
+        "sceneIntro"
+      );
+
+      // MOMENTO 1: Entrada monumental de MEGALITISMO (H1)
+      tl.addLabel("beat1", "sceneIntro+=0.2");
+      tl.add(() => spawnFuchsiaParticles(36), "beat1");
+
+      if (titleH1) {
+        tl.fromTo(
+          titleH1,
+          { opacity: 0, scale: 2.1, filter: "blur(22px)" },
+          { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.7, ease: "power4.out" },
+          "beat1"
+        );
+      }
+
+      if (shockwave) {
+        tl.fromTo(
+          shockwave,
+          { scale: 0.2, opacity: 1 },
+          { scale: 8.5, opacity: 0, duration: 1.05, ease: "power2.out" },
+          "beat1"
+        );
+      }
+
+      // MOMENTO 2: Revelación prismática de GLOBAL (H2)
+      tl.addLabel("beat2", "beat1+=0.35");
+      tl.add(() => spawnFuchsiaParticles(18), "beat2");
+
+      if (titleH2) {
+        tl.fromTo(
+          titleH2,
+          { opacity: 0, scale: 1.35, y: 16, filter: "blur(8px)" },
+          { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: 0.52, ease: "power3.out" },
+          "beat2"
+        );
+      }
+
+      // Tagline editorial
+      if (tagline) {
+        tl.to(tagline, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, "beat2+=0.25");
+      }
+
+      // Micro-reverberación
+      if (titleH1) {
+        tl.to(titleH1, { scale: 1.02, duration: 0.6, yoyo: true, repeat: 1, ease: "sine.inOut" }, "beat2+=0.5");
+      }
+
+      // Pausa de contemplación de la colección
+      tl.to({}, { duration: 2.4 });
+
+      // ─────────────────────────────────────────────────────────────
+      // FASE 2: TRANSICIÓN HACIA HAʻAMONGA ʻA MAUI (TONGA)
+      // ─────────────────────────────────────────────────────────────
+      tl.addLabel("transitionToPost");
+
+      tl.to(layerIntro, { opacity: 0, duration: 0.8, ease: "power2.inOut" }, "transitionToPost");
+      tl.to(layerPost, { opacity: 1, duration: 0.9, ease: "power2.out" }, "transitionToPost+=0.2");
+      tl.add(() => {
+        layerIntro.style.pointerEvents = "none";
+        layerPost.style.pointerEvents = "auto";
+        startKenBurns();
+      }, "transitionToPost+=0.3");
+
+      // ─────────────────────────────────────────────────────────────
+      // FASE 3: MONUMENTO Y SECUENCIA SOLAR (T1, T2, T3)
+      // ─────────────────────────────────────────────────────────────
+      tl.addLabel("postStart", "transitionToPost+=0.5");
+
+      // Entrada Stagger elegante de textos del monumento (y: 40, opacity: 0 -> 1)
+      const monumentItems = [coordsBox, numBadge, monumentH1, monumentH2].filter(Boolean);
+      tl.fromTo(
+        monumentItems,
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, duration: 1.0, stagger: 0.25, ease: "power3.out" },
+        "postStart"
+      );
+
+      // T1 (Aparece a los 0.5s tras el inicio del post)
+      if (t1) {
+        tl.fromTo(t1, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "postStart+=0.5");
+        tl.to(t1, { opacity: 0, y: -15, duration: 0.6, ease: "power2.in" }, "postStart+=3.8");
+      }
+
+      // T2 (Aparece alrededor de los 4.0s - coincide con el destello de sol en el dintel)
+      tl.addLabel("timeT2", "postStart+=4.0");
+
+      // FX Cinemático de Destello (Sun Flare): se intensifica e interactúa
+      if (sunFlare) {
+        tl.fromTo(
+          sunFlare,
+          { opacity: 0, scale: 0.85, x: -10 },
+          { opacity: 0.45, scale: 1.12, x: 12, duration: 1.4, ease: "power2.out" },
+          "timeT2"
+        );
+      }
+
+      if (t2) {
+        tl.fromTo(t2, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "timeT2");
+        tl.to(t2, { opacity: 0, y: -15, duration: 0.6, ease: "power2.in" }, "timeT2+=3.5");
+      }
+
+      // T3 (Aparece a los 7.5s - reemplaza a T2, el sun-flare se atenúa sutilmente)
+      tl.addLabel("timeT3", "postStart+=7.5");
+
+      if (sunFlare) {
+        tl.to(sunFlare, { opacity: 0.15, scale: 1.02, duration: 1.6, ease: "power2.inOut" }, "timeT3");
+      }
+
+      if (t3) {
+        tl.fromTo(t3, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "timeT3");
+        tl.to(t3, { opacity: 0, y: -15, duration: 0.6, ease: "power2.in" }, "timeT3+=3.5");
+      }
+
+      // Pausa final de contemplación antes de retornar al inicio de la colección
+      tl.to({}, { duration: 1.5 });
+
+      // Salida hacia la repetición
+      tl.to([monumentItems, sunFlare], { opacity: 0, duration: 0.8, ease: "power2.in" });
+    };
+
+    // ─────────────────────────────────────────────────────────────
+    // GANCHOS Y COMENTARIOS DE SCROLL / WHEEL (FUTURO OBSERVER)
+    // ─────────────────────────────────────────────────────────────
+    /*
+      TODO (Futuro ScrollObserver / Lenis / Wheel Integration):
+      - Si se enlaza a un pin/scrub de ScrollTrigger:
+        gsap.registerPlugin(ScrollTrigger);
+        ScrollTrigger.create({
+          trigger: container,
+          start: "top top",
+          end: "+=200%",
+          pin: true,
+          scrub: 1,
+          animation: masterTl
+        });
+      - Para Wheel Event granular:
+        window.addEventListener("wheel", (e) => { ... }, { passive: true });
+    */
+
+    // Iniciar con IntersectionObserver para pausar cuando no está en pantalla
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (!masterTl) {
+              buildMasterTimeline();
+            } else {
+              masterTl.play();
+              kenBurnsTween?.play();
+            }
+          } else {
+            masterTl?.pause();
+            kenBurnsTween?.pause();
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(container);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupMegalitismoGlobal);
+  } else {
+    setupMegalitismoGlobal();
+  }
+  document.addEventListener("astro:page-load", setupMegalitismoGlobal);
+</script>

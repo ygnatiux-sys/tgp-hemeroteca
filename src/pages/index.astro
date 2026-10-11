@@ -19,6 +19,7 @@ import MubiBlockCinematic, { type MubiCinematicItem } from '../components/MubiBl
 import TriplicoRevelacion, { type TriplicoPost } from '../components/TriplicoRevelacion.astro';
 import AlternativeScrollNarrative from '../components/AlternativeScrollNarrative.astro';
 import AfricaSeriesNarrative from '../components/AfricaSeriesNarrative.astro';
+import MegalitismoGlobalNarrative from '../components/MegalitismoGlobalNarrative.astro';
 import ScrollNarrative from '../components/ScrollNarrative.astro';
 import AsiaSecretsNarrative from '../components/AsiaSecretsNarrative.astro';
 import HeroNetflixTgp from '../components/HeroNetflixTgp.astro';
@@ -485,9 +486,16 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
+          NUEVA COLECCIÓN DESTACADA: 'MEGALITISMO GLOBAL' (HAʻAMONGA ʻA MAUI)
+      ═══════════════════════════════════════════════════════════════════ */}
+      <div class="w-screen relative left-1/2 -translate-x-1/2 my-12 sm:my-16 md:my-24 overflow-x-hidden">
+        <MegalitismoGlobalNarrative />
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════
           INTERLUDIO EDITORIAL: STICKY SCROLL NARRATIVE (MEGALITOS)
       ═══════════════════════════════════════════════════════════════════ */}
-      <div class="w-screen relative left-1/2 -translate-x-1/2 -my-12 sm:-my-16 md:-my-24 overflow-x-hidden">
+      <div class="w-screen relative left-1/2 -translate-x-1/2 my-12 sm:my-16 md:my-24 overflow-x-hidden">
         <ScrollNarrative />
       </div>
 
