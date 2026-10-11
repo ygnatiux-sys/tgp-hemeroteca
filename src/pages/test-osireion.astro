@@ -53,12 +53,10 @@ import OsireionHero from "../components/OsireionHero.astro";
     <OsireionHero />
 
     <script>
-      import { initOsireionHero } from "../components/OsireionHero.astro";
-
       const btnReplay = document.getElementById("btn-replay");
       if (btnReplay) {
         btnReplay.addEventListener("click", () => {
-          initOsireionHero(".osireion-hero-root");
+          window.dispatchEvent(new CustomEvent("osireion:replay"));
         });
       }
     </script>

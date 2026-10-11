@@ -347,6 +347,10 @@ const { className = "", autoPlay = true } = Astro.props;
       { threshold: 0.15 }
     );
 
+    window.addEventListener("osireion:replay", () => {
+      play();
+    });
+
     observer.observe(root);
   }
 
