@@ -101,17 +101,17 @@ body {
 }
 
 [data-theme='light'] .typemagyk-wrapper,
-[data-theme='light'] .typemagyk-wrapper :global(p) {
+[data-theme='light'] .typemagyk-wrapper p {
   color: var(--text-body) !important;
 }
 
-[data-theme='light'] .typemagyk-wrapper :global(h1),
-[data-theme='light'] .typemagyk-wrapper :global(h2),
-[data-theme='light'] .typemagyk-wrapper :global(h3) {
+[data-theme='light'] .typemagyk-wrapper h1,
+[data-theme='light'] .typemagyk-wrapper h2,
+[data-theme='light'] .typemagyk-wrapper h3 {
   color: var(--text-main) !important;
 }
 
-[data-theme='light'] .typemagyk-wrapper :global(blockquote) {
+[data-theme='light'] .typemagyk-wrapper blockquote {
   border-left-color: var(--accent-primary) !important;
   color: var(--accent-secondary) !important;
 }
