@@ -134,8 +134,9 @@ const strataClips = [
     text-transform: uppercase;
     white-space: nowrap;
     text-align: center;
-    filter: drop-shadow(0 18px 45px rgba(6, 10, 8, 0.95))
-      drop-shadow(0 0 25px rgba(224, 227, 225, 0.12));
+    filter: drop-shadow(0 20px 48px rgba(0, 0, 0, 0.98))
+      drop-shadow(0 0 35px rgba(126, 231, 166, 0.35))
+      drop-shadow(0 0 12px rgba(74, 222, 128, 0.22));
   }
 
   .strata-sizer {
@@ -149,21 +150,46 @@ const strataClips = [
     inset: 0;
     display: block;
     padding: 0.05em 0.04em;
-    color: var(--strata-color);
+    /* Gradiente natural fosfóreo: marfil/hueso antiguo mineralizado a fósforo verde-jade */
     background: linear-gradient(
       180deg,
-      #ffffff 0%,
-      var(--strata-color) 45%,
-      #b8c0bb 100%
+      #fefcf6 0%,
+      #f2ede0 22%,
+      #d4f7dc 46%,
+      #86efac 72%,
+      #3bb86a 90%,
+      #144226 100%
     );
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    color: transparent;
+    opacity: 0;
+    pointer-events: none;
     will-change: transform, opacity;
     z-index: 2;
   }
 
-  /* Haz de luz de penetración georradar (GPR) */
+  /* Micro-granulado lítico tipo óseo (caliza fosilizada / apatita porosa) */
+  .strata-slice::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.36;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='bone-strata'><feTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23bone-strata)'/></svg>");
+  }
+
+  /* Posicionamiento inicial en el vacío exterior antes de que GSAP tome el control */
+  .strata-slice:nth-child(odd) {
+    transform: translateX(-140%);
+  }
+  .strata-slice:nth-child(even) {
+    transform: translateX(140%);
+  }
+
+  /* Haz de luz de penetración georradar (GPR) con destello fosfóreo mineral */
   .strata-gpr-scan {
     position: absolute;
     inset: -15% -10%;
@@ -172,10 +198,10 @@ const strataClips = [
     background: linear-gradient(
       180deg,
       transparent 0%,
-      rgba(224, 227, 225, 0.05) 30%,
-      rgba(255, 255, 255, 0.45) 48%,
-      rgba(169, 90, 63, 0.6) 52%,
-      rgba(224, 227, 225, 0.08) 70%,
+      rgba(212, 247, 220, 0.08) 25%,
+      rgba(255, 255, 255, 0.5) 48%,
+      rgba(134, 239, 172, 0.75) 52%,
+      rgba(74, 222, 128, 0.25) 75%,
       transparent 100%
     );
     mix-blend-mode: overlay;
@@ -260,10 +286,9 @@ const strataClips = [
         tl = null;
         gsap.set(shakeBox, { x: 0, y: 0 });
         slices.forEach((slice, idx) => {
-          // Estratos impares (0, 2, 4) se preparan a la izquierda (-130%)
-          // Estratos pares (1, 3) se preparan a la derecha (+130%)
-          const direction = idx % 2 === 0 ? -130 : 130;
+          const direction = idx % 2 === 0 ? -140 : 140;
           gsap.set(slice, {
+            x: 0,
             xPercent: direction,
             opacity: 0,
             scale: 1.02,
@@ -279,7 +304,7 @@ const strataClips = [
 
         if (reduceMotion) {
           slices.forEach((slice) =>
-            gsap.set(slice, { xPercent: 0, opacity: 1, scale: 1 }),
+            gsap.set(slice, { x: 0, xPercent: 0, opacity: 1, scale: 1 }),
           );
           gsap.set(sub, { yPercent: 0, opacity: 1 });
           return;
@@ -289,21 +314,30 @@ const strataClips = [
           defaults: { ease: "power3.inOut" },
         });
 
-        // 1. Desplazamiento tectónico en oposición: los 5 estratos entran lentos y pesados
+        // 1. Nacimiento desde el vacío: se hacen visibles mientras viajan desde los extremos
+        tl.to(
+          slices,
+          {
+            opacity: 1,
+            duration: 1.1,
+            stagger: 0.08,
+            ease: "power2.in",
+          },
+          0.2,
+        );
         tl.to(
           slices,
           {
             xPercent: 0,
-            opacity: 1,
             scale: 1,
-            duration: 2.4,
+            duration: 2.1,
             stagger: 0.08,
             ease: "power4.out",
           },
           0.2,
         );
 
-        // 2. Colisión e impacto monolítico en el centro (Camera Shake de 2px)
+        // 2. Colisión e impacto monolítico en el centro (Camera Shake de 2.5px)
         tl.to(
           shakeBox,
           {
@@ -314,9 +348,9 @@ const strataClips = [
             yoyo: true,
             ease: "none",
           },
-          1.85,
+          1.95,
         );
-        tl.set(shakeBox, { x: 0, y: 0 }, 2.2);
+        tl.set(shakeBox, { x: 0, y: 0 }, 2.3);
 
         // 3. Escáner Georradar (GPR Scanline) barre verticalmente la palabra
         tl.to(
@@ -326,16 +360,16 @@ const strataClips = [
             duration: 0.2,
             ease: "power1.in",
           },
-          2.3,
+          2.35,
         );
         tl.to(
           scan,
           {
             yPercent: 140,
-            duration: 1.4,
+            duration: 1.3,
             ease: "power2.inOut",
           },
-          2.3,
+          2.35,
         );
         tl.to(
           scan,
@@ -353,7 +387,7 @@ const strataClips = [
           {
             yPercent: 0,
             opacity: 1,
-            duration: 1.8,
+            duration: 1.6,
             ease: "power3.out",
           },
           2.6,

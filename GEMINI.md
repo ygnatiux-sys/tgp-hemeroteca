@@ -37,3 +37,24 @@ Antes de ejecutar cualquier tarea de generación o refactorización de código, 
 
 # PROTECCION DE TOKENS EN DESPLIEGUES Y .ENV
 NUNCA modifiques, elimines, renombres ni sobreescribas las variables de entorno de los tokens de Telegram (OMNI_TOKEN, ASSISTANT_TOKEN, REDES_TOKEN) en los archivos .env, .env.example, o scripts de despliegue sin la autorización EXPLICITA del usuario. Si vas a generar o sugerir la creación de un nuevo .env, DEBES asegurarte de incluir las variables de entorno de autenticación ya existentes para no romper la conexión con las APIs de Telegram en producción (Cloud Run).
+
+
+# PROTOCOLO DE SELECCIÓN INTELIGENTE DE FX Y TIPOGRAFÍAS PARA NUEVOS POSTS
+
+Al iniciar o proponer un NUEVO POST, ENSAYO O DOSSIER CINEMÁTICO, el agente DEBE cumplir obligatoriamente con el siguiente protocolo de curaduría visual en lugar de repetir siempre el mismo efecto de forma mecánica:
+
+1. **Catálogo Completo de Efectos y Tipografías Disponibles:**
+   - **Excavación Estratigráfica (5 Estratos + GPR):** Desplazamiento horizontal de 5 capas en oposición + choque tectónico (2px) + escáner georradar. (*Tipografía: Clash Grotesk Bold 700 / Unbounded Black 900 / Syne ExtraBold 800*). Ideal para georradar, subsuelos, pirámides ocultas y basalto columnar.
+   - **Paralaje de Abismo (Profundidad Z):** Caída tridimensional en perspectiva Z hacia túneles o cámaras subterráneas. (*Tipografía: Clash Display Bold / Space Grotesk / Cabinet Grotesk*). Ideal para catacumbas, ciudades subterráneas y abismos.
+   - **La Fractura Tectónica (Split Horizontal):** Corte horizontal dentado por la mitad con temblor e inserción de fisura oscura. (*Tipografía: Bodoni Moda Black 900 / Ogg Bold / Cinzel Decorative*). Ideal para megalitos continentales e islas remotas.
+   - **Resonancia Sónica y Refracción Espejo:** Eco tipográfico en 4 capas desfasadas + destello de granito pulido (*glint*). (*Tipografía: Syne ExtraBold 800 / Archivo Black / Proza Libre*). Ideal para acústica sagrada, cámaras herméticas y granito espejo.
+   - **Erosión Pluvial (Cascada en 14 Estratos Verticales):** Fragmentación vertical desfasada simulando agua y desgaste milenario. (*Tipografía: Newsreader Display Italic / Fraunces / Bodoni Moda*). Ideal para erosión climática, recintos antiguos y esferas de piedra.
+   - **Mecanizado Ancestral (Corte Láser CNC):** Haz de luz de precisión con trazado geométrico y temblor microscópico. (*Tipografía: IBM Plex Mono / Space Mono / Unbounded Precision*). Ideal para andesita quirúrgica y encastres milimétricos.
+   - **Pre-Hero Dark Cinematográfico:** Titular monumental sobre pantalla oscura (*Verde Obsidiana* `#060a08` o *Carbón* `#0a0a0a`) con H1 en Fraunces + H2 pequeño al lado. (*Tipografía: Fraunces Black 900 + IBM Plex Mono*). Ideal para portadas de colecciones continentales y series episódicas.
+   - **Tríptico de Revelación (Dossier Editorial):** Composición 3-en-1 panorámica con hero card central y tarjetas secundarias. (*Tipografía: Fraunces Black 900 + Proza Libre*). Ideal para dossiers de investigación profunda y hemeroteca general.
+
+2. **Recomendación Obligatoria de las 3 Mejores Opciones:**
+   - El agente DEBE analizar la temática, clima y materialidad del nuevo post.
+   - DEBE presentar explícitamente **las 3 mejores combinaciones de [FX + Fuente + Paleta]**, explicando por qué encajan con la narrativa.
+   - La **Opción 1** se formulará siempre como *(Recomendada Principal)*.
+
