@@ -39,14 +39,14 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
 
 <section
   id="alt-narrative-container"
-  class={`relative w-full h-[400vh] bg-[#0a0a0a] text-white select-none ${className}`}
+  class={`relative w-full h-[500vh] bg-[#0a0a0a] text-white select-none ${className}`}
   data-autoplay={autoplayDuration}
   aria-label="Colección Alternative"
 >
   <!-- Contenedor Sticky a Pantalla Completa (Full Bleed) -->
   <div class="sticky top-0 h-screen w-full overflow-hidden bg-[#0a0a0a]">
     
-    <!-- HEADER EDITORIAL DE LA COLECCIÓN (Glassmorfismo al 5%) -->
+    <!-- HEADER EDITORIAL DE LA COLECCIÓN (Minimalista: Solo Nombre de Colección) -->
     <header class="absolute top-5 sm:top-7 inset-x-0 z-30 flex items-center justify-between px-5 sm:px-10 pointer-events-none">
       <div class="flex items-center gap-2.5">
         <span class="w-2 h-2 rounded-full bg-[#E69A46] shadow-[0_0_10px_#E69A46] animate-pulse"></span>
@@ -54,50 +54,51 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
           Colección · Alternative
         </span>
       </div>
-
-      <!-- Indicadores de paso interactivos con glassmorfismo al 5% -->
-      <nav class="flex items-center gap-1.5 sm:gap-2 pointer-events-auto" aria-label="Navegación de colección">
-        <button
-          type="button"
-          class="alt-step-btn px-2.5 sm:px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-white/5 backdrop-blur-md text-stone-400 hover:text-white is-active"
-          data-step="0"
-          title="Derinkuyu"
-        >
-          I · Derinkuyu
-        </button>
-        <button
-          type="button"
-          class="alt-step-btn px-2.5 sm:px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-white/5 backdrop-blur-md text-stone-400 hover:text-white"
-          data-step="1"
-          title="Barabar"
-        >
-          II · Barabar
-        </button>
-        <button
-          type="button"
-          class="alt-step-btn px-2.5 sm:px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-white/5 backdrop-blur-md text-stone-400 hover:text-white"
-          data-step="2"
-          title="Diquís"
-        >
-          III · Diquís
-        </button>
-        <button
-          type="button"
-          class="alt-step-btn px-2.5 sm:px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-white/5 backdrop-blur-md text-stone-400 hover:text-white"
-          data-step="3"
-          title="Olmecas"
-        >
-          IV · Olmecas
-        </button>
-      </nav>
     </header>
 
     <!-- ══════════════════════════════════════════════════════════════════════
-         PASO 0: DERINKUYU — PARALAJE DE ABISMO (Profundidad Z)
+         PASO 0: APERTURA COLECCIÓN ALTERNATIVE (AMBIENT GLOW ÁMBAR VOLCÁNICO)
     ══════════════════════════════════════════════════════════════════════ -->
     <div
-      class="alt-layer absolute inset-0 w-full h-full opacity-100 pointer-events-auto"
+      class="alt-layer alt-layer-intro absolute inset-0 w-full h-full opacity-100 pointer-events-auto z-20 flex items-center justify-center overflow-hidden bg-[#0a0a0a]"
       data-layer-index="0"
+    >
+      <!-- Resplandor ambiental cálido ámbar / magma -->
+      <div class="alt-ambient-orb-1 absolute -top-[15%] -right-[10%] w-[75vw] h-[75vw] max-w-225 max-h-225 rounded-full bg-[radial-gradient(circle_at_center,rgba(230,154,70,0.32)_0%,rgba(212,86,50,0.15)_35%,rgba(74,13,6,0.06)_60%,transparent_75%)] blur-3xl pointer-events-none"></div>
+      <div class="alt-ambient-orb-2 absolute -bottom-[20%] -left-[15%] w-[60vw] h-[60vw] max-w-175 max-h-175 rounded-full bg-[radial-gradient(circle_at_center,rgba(180,60,25,0.22)_0%,rgba(100,20,10,0.08)_40%,transparent_70%)] blur-3xl pointer-events-none"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_38%,rgba(10,10,10,0.75)_70%,#0a0a0a_100%)] pointer-events-none"></div>
+      <div class="alt-grain absolute inset-0 pointer-events-none opacity-20 mix-blend-overlay"></div>
+      <div class="alt-ash-intro absolute inset-0 pointer-events-none z-10" aria-hidden="true"></div>
+
+      <!-- Onda de choque ámbar sutil -->
+      <div class="alt-intro-shockwave absolute w-28 h-28 rounded-full border-2 border-[#E69A46] pointer-events-none opacity-0 scale-50 z-15 shadow-[0_0_60px_#d45632]"></div>
+
+      <!-- Escenario Central: ALTERNATIVE (H1) + COLECCIÓN (H2) -->
+      <div class="relative z-20 flex flex-col items-center justify-center text-center px-4 max-w-6xl w-full select-none">
+        <div class="alt-intro-box relative flex flex-col items-center justify-center">
+          <h1 class="alt-intro-title font-fraunces font-black uppercase text-[clamp(4.2rem,17vw,16.5rem)] leading-[0.84] tracking-[-0.035em] whitespace-nowrap text-transparent opacity-0 will-change-transform">
+            ALTERNATIVE
+          </h1>
+
+          <div class="alt-intro-h2-wrap relative inline-block mt-3 overflow-visible">
+            <h2 class="alt-intro-h2 font-mono font-bold uppercase text-[clamp(1.4rem,4.8vw,3.8rem)] tracking-[0.42em] text-[#E69A46] drop-shadow-[0_0_35px_rgba(230,154,70,0.55)] m-0 opacity-0 will-change-transform">
+              COLECCIÓN
+            </h2>
+          </div>
+        </div>
+
+        <p class="alt-intro-sub mt-6 font-mono text-[10px] sm:text-[12px] tracking-[0.35em] uppercase text-stone-300 opacity-0">
+          Historia profunda · El archivo no oficial
+        </p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         PASO 1: DERINKUYU — PARALAJE DE ABISMO (Profundidad Z)
+    ══════════════════════════════════════════════════════════════════════ -->
+    <div
+      class="alt-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none"
+      data-layer-index="1"
     >
       <div class="alt-bg-wrap absolute inset-0 overflow-hidden">
         <img
@@ -131,11 +132,11 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
     </div>
 
     <!-- ══════════════════════════════════════════════════════════════════════
-         PASO 1: BARABAR — RESONANCIA SÓNICA & REFRACCIÓN ESPEJO
+         PASO 2: BARABAR — RESONANCIA SÓNICA & REFRACCIÓN ESPEJO
     ══════════════════════════════════════════════════════════════════════ -->
     <div
       class="alt-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none"
-      data-layer-index="1"
+      data-layer-index="2"
     >
       <div class="alt-bg-wrap absolute inset-0 overflow-hidden">
         <img
@@ -180,11 +181,11 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
     </div>
 
     <!-- ══════════════════════════════════════════════════════════════════════
-         PASO 2: DIQUÍS — FRACTURA LATERAL & DESINTEGRACIÓN
+         PASO 3: DIQUÍS — FRACTURA LATERAL & DESINTEGRACIÓN
     ══════════════════════════════════════════════════════════════════════ -->
     <div
       class="alt-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none"
-      data-layer-index="2"
+      data-layer-index="3"
     >
       <div class="alt-bg-wrap absolute inset-0 overflow-hidden">
         <img
@@ -222,11 +223,11 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
     </div>
 
     <!-- ══════════════════════════════════════════════════════════════════════
-         PASO 3: OLMECAS — FRACTURA TECTÓNICA CENTRAL & CTA
+         PASO 4: OLMECAS — FRACTURA TECTÓNICA CENTRAL & CTA
     ══════════════════════════════════════════════════════════════════════ -->
     <div
       class="alt-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none"
-      data-layer-index="3"
+      data-layer-index="4"
     >
       <div class="alt-bg-wrap absolute inset-0 overflow-hidden">
         <img
@@ -285,6 +286,20 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
 </section>
 
 <style>
+  /* Apertura Colección Alternative */
+  .alt-intro-title {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'opsz' 9, 'SOFT' 0, 'WONK' 0;
+    background: linear-gradient(180deg, #fcead6 0%, #E69A46 32%, #d45632 65%, #6a1a0d 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 25px 60px rgba(0, 0, 0, 0.98)) drop-shadow(0 0 55px rgba(230, 154, 70, 0.45));
+  }
+
+  .alt-intro-h2 {
+    font-family: 'Space Mono', monospace;
+  }
+
   /* Tipografías y texturas */
   .alt-derin-h1 {
     font-family: 'Clash Display', 'Inter', system-ui, sans-serif;
@@ -432,7 +447,6 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
     container.dataset.ready = "true";
 
     const layers = container.querySelectorAll<HTMLElement>(".alt-layer");
-    const stepBtns = container.querySelectorAll<HTMLElement>(".alt-step-btn");
     const totalSteps = layers.length;
     if (totalSteps === 0) return;
 
@@ -442,7 +456,7 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
     let currentIndex = 0;
     let autoTimer: any = null;
     let isVisible = false;
-    let stepTimelines: Array<gsap.core.Timeline | null> = [null, null, null, null];
+    let stepTimelines: Array<gsap.core.Timeline | null> = [null, null, null, null, null];
 
     // Partículas de ceniza para Derinkuyu
     const ashContainer = container.querySelector<HTMLElement>(".alt-ash");
@@ -480,8 +494,45 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
       stepTimelines[stepIndex] = tl;
 
       if (stepIndex === 0) {
-        // ── PASO 0: DERINKUYU (Paralaje Z) ──
+        // ── PASO 0: APERTURA COLECCIÓN ALTERNATIVE ──
         const layer = layers[0];
+        const title = layer.querySelector<HTMLElement>(".alt-intro-title");
+        const h2 = layer.querySelector<HTMLElement>(".alt-intro-h2");
+        const sub = layer.querySelector<HTMLElement>(".alt-intro-sub");
+        const box = layer.querySelector<HTMLElement>(".alt-intro-box");
+        const shockwave = layer.querySelector<HTMLElement>(".alt-intro-shockwave");
+        const orb1 = layer.querySelector<HTMLElement>(".alt-ambient-orb-1");
+        const orb2 = layer.querySelector<HTMLElement>(".alt-ambient-orb-2");
+        if (!title || !h2 || !sub) return;
+
+        gsap.set([title, h2], { opacity: 0 });
+        gsap.set(sub, { opacity: 0, y: 18 });
+        if (shockwave) gsap.set(shockwave, { scale: 0.2, opacity: 0 });
+
+        tl.fromTo([orb1, orb2], { scale: 0.9, opacity: 0.5 }, { scale: 1.05, opacity: 1, duration: 0.8, ease: "power1.inOut" });
+
+        // Monumental ALTERNATIVE
+        tl.addLabel("beatAlternative");
+        tl.fromTo(title, { opacity: 0, scale: 2.1, filter: "blur(20px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.7, ease: "power4.out" }, "beatAlternative");
+
+        if (shockwave) {
+          tl.fromTo(shockwave, { scale: 0.2, opacity: 1 }, { scale: 7.5, opacity: 0, duration: 0.95, ease: "power2.out" }, "beatAlternative");
+        }
+        if (box) {
+          tl.fromTo(box, { x: -4, y: 3 }, { x: 3, y: -2, duration: 0.04, repeat: 4, yoyo: true, ease: "none" }, "beatAlternative").to(box, { x: 0, y: 0, duration: 0.1 });
+        }
+
+        // H2 Destacado: COLECCIÓN
+        tl.addLabel("beatH2", "beatAlternative+=0.3");
+        tl.fromTo(h2, { opacity: 0, scale: 1.35, y: 15, filter: "blur(8px)" }, { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: 0.5, ease: "power3.out" }, "beatH2");
+
+        // Tagline
+        tl.to(sub, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "beatH2+=0.25");
+        tl.to(title, { scale: 1.02, duration: 0.6, yoyo: true, repeat: 1, ease: "sine.inOut" }, "beatH2+=0.5");
+
+      } else if (stepIndex === 1) {
+        // ── PASO 1: DERINKUYU (Paralaje Z) ──
+        const layer = layers[1];
         const h1 = layer.querySelector<HTMLElement>(".alt-derin-h1");
         const sub = layer.querySelector<HTMLElement>(".alt-derin-sub");
         const badge = layer.querySelector<HTMLElement>(".alt-badge");
@@ -501,9 +552,9 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
           .to(img, { scale: 1.07, duration: 3.0, ease: "power2.out" }, "drop")
           .to(sub, { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.8, ease: "power2.out" }, "drop+=0.8");
 
-      } else if (stepIndex === 1) {
-        // ── PASO 1: BARABAR (Resonancia Sónica y Glint de Espejo) ──
-        const layer = layers[1];
+      } else if (stepIndex === 2) {
+        // ── PASO 2: BARABAR (Resonancia Sónica y Glint de Espejo) ──
+        const layer = layers[2];
         const badge = layer.querySelector<HTMLElement>(".alt-badge");
         const solid = layer.querySelector<HTMLElement>(".alt-barabar-solid");
         const glint = layer.querySelector<HTMLElement>(".alt-barabar-glint");
@@ -546,9 +597,9 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
           .to(glint, { xPercent: 180, duration: 1.1, ease: "power2.inOut" }, "collapse+=0.75")
           .to(sub, { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.5, ease: "power3.out" }, "collapse+=0.95");
 
-      } else if (stepIndex === 2) {
-        // ── PASO 2: DIQUÍS (Fractura Lateral con Desintegración) ──
-        const layer = layers[2];
+      } else if (stepIndex === 3) {
+        // ── PASO 3: DIQUÍS (Fractura Lateral con Desintegración) ──
+        const layer = layers[3];
         const tectonic = layer.querySelector<HTMLElement>(".alt-diquis-tectonic");
         const h1 = layer.querySelector<HTMLElement>(".alt-diquis-h1");
         const top = layer.querySelector<HTMLElement>(".alt-top");
@@ -583,9 +634,9 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
           .to(sub, { opacity: 1, filter: "blur(0px)", duration: 1.4, ease: "power2.out" }, "fracture+=0.7")
           .to([top, bot, band], { opacity: 0, filter: "blur(18px)", scale: 1.05, duration: 2.0, ease: "power2.out" }, "fracture+=1.3");
 
-      } else if (stepIndex === 3) {
-        // ── PASO 3: OLMECAS (Fractura Tectónica Central + CTA) ──
-        const layer = layers[3];
+      } else if (stepIndex === 4) {
+        // ── PASO 4: OLMECAS (Fractura Tectónica Central + CTA) ──
+        const layer = layers[4];
         const tectonic = layer.querySelector<HTMLElement>(".alt-olmeca-tectonic");
         const h1 = layer.querySelector<HTMLElement>(".alt-olmeca-h1");
         const top = layer.querySelector<HTMLElement>(".alt-top");
@@ -630,14 +681,6 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
 
       const prevIndex = currentIndex;
       currentIndex = targetIndex;
-
-      stepBtns.forEach((btn, idx) => {
-        if (idx === currentIndex) {
-          btn.classList.add("is-active");
-        } else {
-          btn.classList.remove("is-active");
-        }
-      });
 
       const prevLayer = layers[prevIndex];
       const nextLayer = layers[targetIndex];
@@ -691,13 +734,7 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
       startAutoTimer();
     }
 
-    stepBtns.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const step = parseInt(btn.dataset.step || "0", 10);
-        goToStep(step);
-        resetAutoTimer();
-      });
-    });
+
 
     let ticking = false;
     function onScroll() {

@@ -52,52 +52,48 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
   <!-- Contenedor Sticky a Pantalla Completa (Full Bleed) -->
   <div class="sticky top-0 h-screen w-full overflow-hidden bg-[#141210]">
 
-    <!-- HEADER EDITORIAL DE LA SERIE (Glassmorfismo al 5%) -->
-    <header class="absolute top-5 sm:top-7 inset-x-0 z-30 flex items-center justify-between px-5 sm:px-10 pointer-events-none">
-      <div class="flex items-center gap-2.5">
-        <span class="w-2 h-2 rounded-full bg-[#E50914] shadow-[0_0_10px_#E50914] animate-pulse"></span>
-        <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.35em] uppercase text-[#FF4D55] font-bold">
-          Serie Destacada · Misterios del África
-        </span>
-      </div>
-
-      <!-- Navegación de capítulos con glassmorfismo al 5% -->
-      <nav class="flex items-center gap-2 pointer-events-auto" aria-label="Capítulos de África">
-        <button
-          type="button"
-          class="afr-step-btn px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border bg-white/5 backdrop-blur-md text-[#FF4D55] border-[#FF4D55]/40 is-active cursor-pointer"
-          data-step="0"
-          title="Giza"
-        >
-          I · La Cicatriz del Agua (Giza)
-        </button>
-        <button
-          type="button"
-          class="afr-step-btn px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-white/5 backdrop-blur-md text-stone-400 hover:text-[#dcbba8] cursor-pointer"
-          data-step="1"
-          title="El Osireion"
-        >
-          II · El Osireion (Abidos)
-        </button>
-      </nav>
-    </header>
-
     <!-- ══════════════════════════════════════════════════════════════════════
-         INTRO MONUMENTAL: 'MISTERIOS DEL ÁFRICA' EN ROJO DIQUÍS
+         INTRO MONUMENTAL: 'MISTERIOS DEL ÁFRICA' — AMBIENT GLOW Y RITMO DE PERCUSIÓN
     ══════════════════════════════════════════════════════════════════════ -->
     <div
-      class="afr-intro-overlay absolute inset-0 z-25 flex items-center justify-center pointer-events-none px-4 bg-[#141210]/90 backdrop-blur-sm transition-opacity duration-700"
+      class="afr-intro-overlay absolute inset-0 z-25 flex items-center justify-center overflow-hidden bg-[#060404]"
     >
-      <div class="afr-intro-box flex flex-col items-center text-center max-w-6xl">
-        <span class="afr-intro-badge inline-block mb-3 font-mono text-[9.5px] sm:text-[10.5px] tracking-[0.4em] uppercase text-[#FF4D55] py-1 px-4 rounded-full border border-[#FF4D55]/30 bg-black/60 backdrop-blur-md">
-          Investigación Epistémica Especial
-        </span>
-        <h2 class="afr-intro-title font-serif font-black uppercase text-[clamp(2.8rem,11vw,11.5rem)] leading-[0.88] tracking-[-0.02em] text-transparent">
-          Misterios del África
-        </h2>
-        <p class="afr-intro-sub mt-4 font-mono text-[10px] sm:text-[11.5px] tracking-[0.3em] uppercase text-stone-400">
-          Iniciando registro arqueológico · Egipto ancestral
+      <!-- Ambient Glow: resplandores esféricos difuminados de rojo cinabrio mineral hacia black -->
+      <div class="afr-glow-orb-1 absolute -top-[18%] -left-[10%] w-[78vw] h-[78vw] max-w-225 max-h-225 rounded-full bg-[radial-gradient(circle_at_center,rgba(196,30,58,0.42)_0%,rgba(155,17,30,0.22)_35%,rgba(90,10,18,0.08)_60%,transparent_75%)] blur-3xl pointer-events-none will-change-transform"></div>
+      <div class="afr-glow-orb-2 absolute -bottom-[22%] -right-[12%] w-[68vw] h-[68vw] max-w-175 max-h-175 rounded-full bg-[radial-gradient(circle_at_center,rgba(229,9,20,0.32)_0%,rgba(139,0,0,0.14)_40%,transparent_70%)] blur-3xl pointer-events-none will-change-transform"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(6,4,4,0.7)_70%,#060404_100%)] pointer-events-none"></div>
+
+      <!-- Grano analógico y partículas de ceniza/cinabrio -->
+      <div class="afr-grain absolute inset-0 opacity-22 pointer-events-none mix-blend-overlay"></div>
+      <div class="afr-cinabrio-particles absolute inset-0 pointer-events-none z-10" aria-hidden="true"></div>
+
+      <!-- Anillo / Onda expansiva de impacto percusivo (Shockwave) -->
+      <div class="afr-drum-shockwave absolute w-28 h-28 rounded-full border-2 border-[#ff3b30] pointer-events-none opacity-0 scale-50 z-15 shadow-[0_0_60px_#c41e3a]"></div>
+      <div class="afr-drum-shockwave-2 absolute w-28 h-28 rounded-full border border-[#ff6b6b] pointer-events-none opacity-0 scale-50 z-15"></div>
+
+      <!-- Escenario Tipográfico Minimalista de la Colección -->
+      <div class="afr-drum-stage relative z-20 flex flex-col items-center justify-center text-center max-w-6xl w-full px-4 select-none">
+        
+        <!-- Nombre de la Colección: H1 ÁFRICA + H2 MISTERIOS Destacado -->
+        <div class="afr-percussion-box relative flex flex-col items-center justify-center">
+          <!-- H1 Monumental -->
+          <h1 class="afr-beat-africa font-serif font-black uppercase text-[clamp(4.8rem,18.5vw,18rem)] leading-[0.84] tracking-[-0.035em] whitespace-nowrap text-transparent opacity-0 will-change-transform">
+            ÁFRICA
+          </h1>
+
+          <!-- H2 Destacado de la Colección -->
+          <div class="afr-collection-wrap relative inline-block mt-3 overflow-visible">
+            <h2 class="afr-collection-h2 font-mono font-bold uppercase text-[clamp(1.4rem,4.8vw,3.8rem)] tracking-[0.42em] text-[#ff4d55] drop-shadow-[0_0_35px_rgba(255,77,85,0.55)] m-0 opacity-0 will-change-transform">
+              MISTERIOS
+            </h2>
+          </div>
+        </div>
+
+        <!-- Tagline Canónico -->
+        <p class="afr-intro-sub mt-6 font-mono text-[10px] sm:text-[12px] tracking-[0.35em] uppercase text-stone-300 opacity-0">
+          La geología sagrada del Nilo · El tiempo antes de los faraones
         </p>
+
       </div>
     </div>
 
@@ -124,23 +120,19 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
       <div class="afr-grain absolute inset-0 pointer-events-none"></div>
       <div class="afr-dust absolute inset-0 pointer-events-none z-10" aria-hidden="true"></div>
 
-      <!-- Escenario Tipográfico Pluvial -->
+      <!-- Escenario Tipográfico Pluvial Minimalista -->
       <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none px-4">
         <div class="afr-pluvial-chamber relative flex flex-col items-center text-center max-w-7xl">
-          <span class="afr-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#d4b886] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0">
-            Giza · Recinto de la Esfinge · Edad de Hielo
-          </span>
-
           <div class="afr-cascade-wrap relative inline-block">
-            <h3 class="afr-master font-serif font-black uppercase whitespace-nowrap text-[clamp(1.5rem,4.4vw,4.5rem)] leading-[0.94] tracking-[0.03em] text-transparent opacity-0 select-none">
+            <h2 class="afr-master font-serif font-black uppercase whitespace-nowrap text-[clamp(1.8rem,5.5vw,5.5rem)] leading-[0.92] tracking-[0.03em] text-transparent opacity-0 select-none">
               La Cicatriz del Agua
-            </h3>
+            </h2>
 
             <div class="afr-slices-box absolute inset-0 pointer-events-none" aria-hidden="true">
               {
                 slices.map((slice) => (
                   <span
-                    class="afr-slice absolute inset-0 font-serif font-black uppercase whitespace-nowrap text-[clamp(1.5rem,4.4vw,4.5rem)] leading-[0.94] tracking-[0.03em] text-transparent will-change-transform"
+                    class="afr-slice absolute inset-0 font-serif font-black uppercase whitespace-nowrap text-[clamp(1.8rem,5.5vw,5.5rem)] leading-[0.92] tracking-[0.03em] text-transparent will-change-transform"
                     style={`clip-path: ${slice.clip};`}
                   >
                     La Cicatriz del Agua
@@ -150,19 +142,10 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
             </div>
           </div>
 
-          <p class="afr-sub mt-6 font-serif text-[clamp(0.85rem,2vw,1.35rem)] font-medium tracking-[0.22em] uppercase text-[#ead5b3] opacity-0">
-            <span class="text-[#d4b886] mr-1.5">—</span> La geología que reescribe la cronología humana
+          <!-- Tagline Canónico -->
+          <p class="afr-sub mt-6 font-serif text-[clamp(0.9rem,1.8vw,1.4rem)] font-medium tracking-[0.25em] uppercase text-[#ead5b3] opacity-0">
+            <span class="text-[#d4b886] mr-2">—</span> La geología que reescribe la cronología humana
           </p>
-
-          <div class="afr-cta-wrap mt-8 opacity-0 pointer-events-auto">
-            <a
-              href="/colecciones/arqueosemiotica/"
-              class="group relative inline-flex items-center gap-3 px-7 sm:px-9 py-3 rounded-full font-mono text-[10.5px] uppercase tracking-[0.28em] font-bold text-[#141210] bg-linear-to-r from-[#d4b886] via-[#ead5b3] to-[#d4b886] shadow-[0_0_30px_rgba(212,184,134,0.3)] hover:brightness-110 active:scale-95 transition-all duration-300"
-            >
-              <span>Explorar Dossier de Egipto</span>
-              <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
-            </a>
-          </div>
         </div>
       </div>
     </div>
@@ -189,81 +172,58 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
       <div class="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-[#0a0f0d]/90 via-[#0a0f0d]/35 to-transparent pointer-events-none"></div>
       <div class="absolute inset-0 pointer-events-none mix-blend-screen bg-[radial-gradient(circle_at_50%_45%,rgba(220,187,168,0.12)_0%,transparent_60%)]"></div>
 
-      <!-- Escenario Tipográfico del Osireion -->
+      <!-- Escenario Tipográfico del Osireion Minimalista -->
       <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none px-4">
         <div class="afr-osi-chamber relative flex flex-col items-center text-center max-w-6xl w-full">
-          
-          <span class="afr-osi-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.4em] uppercase text-[#8b5a45] py-1 px-4 rounded-full border border-[#8b5a45]/40 bg-[#0a0f0d]/75 backdrop-blur-md opacity-0">
-            Abidos · Estanque Sagrado de Osiris · Cota -18.4m
-          </span>
-
           <!-- Título Brutalista con descenso por máscara clip-path -->
           <div class="afr-osi-title-wrap relative w-full flex items-center justify-center overflow-hidden py-2">
-            <h3
-              class="afr-osi-ghost font-black uppercase text-[clamp(2.4rem,8.2vw,8.5rem)] leading-[0.88] tracking-[-0.01em] text-[#dcbba8]/10 select-none pointer-events-none"
-              style="font-family: 'Cabinet Grotesk', sans-serif;"
-              aria-hidden="true"
-            >
-              EL OSIREION
-            </h3>
-
-            <h3
-              class="afr-osi-main absolute inset-0 flex items-center justify-center font-black uppercase text-[clamp(2.4rem,8.2vw,8.5rem)] leading-[0.88] tracking-[-0.01em] select-none"
+            <h2
+              class="afr-osi-main relative flex items-center justify-center font-black uppercase text-[clamp(2.5rem,8.5vw,9rem)] leading-[0.88] tracking-[-0.01em] select-none"
               style="font-family: 'Cabinet Grotesk', sans-serif;"
             >
               <span class="afr-osi-stone relative inline-block">
                 EL OSIREION
               </span>
-            </h3>
+            </h2>
 
             <!-- Línea de tensión superficial del agua que desciende -->
             <div class="afr-osi-water-line absolute inset-x-0 h-[1.5px] bg-linear-to-r from-transparent via-[#8b5a45] to-transparent pointer-events-none opacity-0 shadow-[0_0_15px_#8b5a45]"></div>
           </div>
 
-          <!-- Ecos en la Caverna (H2 / H3) -->
-          <div class="afr-osi-sub-wrap mt-5 flex flex-col items-center">
-            <h4 class="afr-osi-sub font-black text-[clamp(0.95rem,2.2vw,1.55rem)] tracking-[0.24em] uppercase text-[#dcbba8]/90 opacity-0">
+          <!-- Tagline Canónico -->
+          <div class="afr-osi-sub-wrap mt-6 flex flex-col items-center">
+            <p class="afr-osi-sub font-black text-[clamp(0.95rem,2.2vw,1.6rem)] tracking-[0.24em] uppercase text-[#dcbba8]/90 opacity-0">
               La cronología sumergida de <span class="text-[#8b5a45] font-extrabold underline decoration-[#8b5a45]/50 underline-offset-4">Abidos</span>
-            </h4>
-            <p class="afr-osi-desc mt-2.5 max-w-xl font-mono text-[9.5px] sm:text-[11px] tracking-[0.22em] uppercase text-[#dcbba8]/60 opacity-0">
-              Bloques megalíticos de 100 toneladas · Arquitectura anepigráfica desnuda
             </p>
           </div>
-
-          <div class="afr-osi-cta-wrap mt-8 opacity-0 pointer-events-auto">
-            <a
-              href="/colecciones/arqueosemiotica/"
-              class="group relative inline-flex items-center gap-3 px-8 sm:px-10 py-3.5 rounded-full font-mono text-[10.5px] uppercase tracking-[0.3em] font-bold text-[#0a0f0d] bg-[#dcbba8] shadow-[0_0_35px_rgba(220,187,168,0.3)] hover:bg-white hover:shadow-[0_0_45px_rgba(220,187,168,0.5)] active:scale-95 transition-all duration-300"
-            >
-              <span>Examinar El Osireion</span>
-              <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
-            </a>
-          </div>
-
         </div>
       </div>
     </div>
 
-    <!-- Indicador de Scroll en la base -->
-    <div class="absolute bottom-5 inset-x-0 z-30 flex flex-col items-center pointer-events-none">
-      <span class="font-mono text-[8.5px] tracking-[0.3em] uppercase text-stone-400 opacity-70">
-        Serie Documental · Desliza para descender
-      </span>
-      <div class="w-px h-5 mt-1.5 bg-linear-to-b from-stone-400 to-transparent animate-pulse"></div>
-    </div>
+
 
   </div>
 </section>
 
 <style>
-  /* Tipografía y Gradiente ROJO DIQUÍS */
-  .afr-intro-title {
+  /* Tipografía y Gradiente ROJO CINABRIO MINERAL (PERCUSIÓN ÁFRICA) */
+  .afr-beat-africa {
     font-family: 'Fraunces', serif;
     font-variation-settings: 'opsz' 9, 'SOFT' 0, 'WONK' 0;
-    background: linear-gradient(180deg, #ff4d55 0%, #e50914 42%, #9b0b11 78%, #4a0508 100%);
+    background: linear-gradient(180deg, #ff8080 0%, #ff2a38 30%, #c41e3a 58%, #800000 85%, #3d0306 100%);
     -webkit-background-clip: text;
     background-clip: text;
-    filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.98)) drop-shadow(0 0 50px rgba(229, 9, 20, 0.5));
+    filter: drop-shadow(0 25px 60px rgba(0, 0, 0, 0.98)) drop-shadow(0 0 65px rgba(229, 9, 20, 0.65));
+  }
+
+  .afr-collection-h2 {
+    font-family: 'Space Mono', monospace;
+  }
+
+  .afr-cinabrio-particles :global(span) {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
   }
 
   /* Tipografía Ocre Atardecer para Giza */
@@ -338,32 +298,64 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
     container.dataset.ready = "true";
 
     const introOverlay = container.querySelector<HTMLElement>(".afr-intro-overlay");
-    const introTitle = container.querySelector<HTMLElement>(".afr-intro-title");
-    const introBadge = container.querySelector<HTMLElement>(".afr-intro-badge");
+    const beatAfrica = container.querySelector<HTMLElement>(".afr-beat-africa");
+    const collectionH2 = container.querySelector<HTMLElement>(".afr-collection-h2");
     const introSub = container.querySelector<HTMLElement>(".afr-intro-sub");
+    const shockwave = container.querySelector<HTMLElement>(".afr-drum-shockwave");
+    const shockwave2 = container.querySelector<HTMLElement>(".afr-drum-shockwave-2");
+    const cinabrioParticles = container.querySelector<HTMLElement>(".afr-cinabrio-particles");
+    const orb1 = container.querySelector<HTMLElement>(".afr-glow-orb-1");
+    const orb2 = container.querySelector<HTMLElement>(".afr-glow-orb-2");
+    const percussionBox = container.querySelector<HTMLElement>(".afr-percussion-box");
 
     // Capa I: Giza
     const layer0 = container.querySelector<HTMLElement>('.afr-layer[data-layer-index="0"]');
-    const badge0 = container.querySelector<HTMLElement>(".afr-badge");
     const cascadeWrap = container.querySelector<HTMLElement>(".afr-cascade-wrap");
     const slices = container.querySelectorAll<HTMLElement>(".afr-slice");
     const sub0 = container.querySelector<HTMLElement>(".afr-sub");
-    const cta0 = container.querySelector<HTMLElement>(".afr-cta-wrap");
     const dustLayer = container.querySelector<HTMLElement>(".afr-dust");
 
     // Capa II: El Osireion
     const layer1 = container.querySelector<HTMLElement>('.afr-layer-osireion[data-layer-index="1"]');
-    const badge1 = container.querySelector<HTMLElement>(".afr-osi-badge");
     const titleMain1 = container.querySelector<HTMLElement>(".afr-osi-main");
     const waterLine1 = container.querySelector<HTMLElement>(".afr-osi-water-line");
     const sub1 = container.querySelector<HTMLElement>(".afr-osi-sub");
-    const desc1 = container.querySelector<HTMLElement>(".afr-osi-desc");
-    const cta1 = container.querySelector<HTMLElement>(".afr-osi-cta-wrap");
     const img1 = container.querySelector<HTMLElement>(".afr-osi-img");
 
-    const stepBtns = container.querySelectorAll<HTMLButtonElement>(".afr-step-btn");
+    if (!introOverlay || !beatAfrica || !layer0 || !layer1) return;
 
-    if (!introOverlay || !introTitle || !layer0 || !layer1) return;
+    // Generador de partículas de ceniza y pigmento cinabrio para los golpes de percusión
+    const spawnCinabrioDust = (intensity: number = 24) => {
+      if (!cinabrioParticles) return;
+      for (let i = 0; i < intensity; i++) {
+        const p = document.createElement("span");
+        const s = 1.6 + Math.random() * 3.4;
+        p.style.width = `${s}px`;
+        p.style.height = `${s}px`;
+        p.style.left = `${20 + Math.random() * 60}%`;
+        p.style.top = `${25 + Math.random() * 50}%`;
+        p.style.background = Math.random() > 0.4 ? "#ff3b30" : (Math.random() > 0.5 ? "#c41e3a" : "#ffd166");
+        p.style.boxShadow = "0 0 12px rgba(255, 59, 48, 0.85)";
+        p.style.opacity = "0";
+        cinabrioParticles.appendChild(p);
+
+        gsap.fromTo(
+          p,
+          { opacity: 0, scale: 0.3 },
+          {
+            opacity: 0.4 + Math.random() * 0.6,
+            x: (Math.random() - 0.5) * 160,
+            y: (Math.random() - 0.5) * 130 - 25,
+            scale: 1.4,
+            duration: 1.3 + Math.random() * 1.1,
+            ease: "power2.out",
+            onComplete: () => {
+              gsap.to(p, { opacity: 0, duration: 0.5, onComplete: () => p.remove() });
+            }
+          }
+        );
+      }
+    };
 
     let tl0: gsap.core.Timeline | null = null;
     let tl1: gsap.core.Timeline | null = null;
@@ -383,8 +375,10 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
       stopAutoplay();
       if (reduceMotion) return;
       autoplayTimer = setTimeout(() => {
-        const nextChapter = (currentChapter + 1) % 2;
+        const nextChapter = (currentChapter + 1) % 3;
         if (nextChapter === 0) {
+          startSeriesFlow();
+        } else if (nextChapter === 1) {
           playGiza();
         } else {
           playOsireion();
@@ -430,32 +424,14 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
       }
     };
 
-    // Actualizar botones de navegación
-    const updateNav = (step: number) => {
-      stepBtns.forEach((btn) => {
-        const s = parseInt(btn.dataset.step || "0", 10);
-        if (s === step) {
-          btn.classList.add("is-active");
-          if (step === 0) {
-            btn.className = "afr-step-btn px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-[#FF4D55]/50 bg-[#FF4D55]/15 backdrop-blur-md text-[#FF4D55] is-active cursor-pointer";
-          } else {
-            btn.className = "afr-step-btn px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-[#8b5a45]/60 bg-[#8b5a45]/20 backdrop-blur-md text-[#dcbba8] is-active cursor-pointer";
-          }
-        } else {
-          btn.classList.remove("is-active");
-          btn.className = "afr-step-btn px-3 py-1 rounded-full text-[9px] font-mono tracking-widest uppercase transition-all duration-300 border border-white/10 bg-white/5 backdrop-blur-md text-stone-400 hover:text-white cursor-pointer";
-        }
-      });
-    };
+
 
     // Reset Giza
     const resetGiza = () => {
       tl0?.kill();
       tl0 = null;
       if (dustLayer) dustLayer.innerHTML = "";
-      if (badge0) gsap.set(badge0, { opacity: 0, y: -16 });
       if (sub0) gsap.set(sub0, { opacity: 0, y: 35, filter: "blur(14px)" });
-      if (cta0) gsap.set(cta0, { opacity: 0, y: 20 });
       if (cascadeWrap) gsap.set(cascadeWrap, { y: 0, filter: "none" });
       slices.forEach((slice) => {
         gsap.set(slice, { yPercent: -140, opacity: 0, scaleY: 1.25 });
@@ -466,29 +442,25 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
     const resetOsireion = () => {
       tl1?.kill();
       tl1 = null;
-      if (badge1) gsap.set(badge1, { opacity: 0, y: -16 });
       if (titleMain1) {
         gsap.set(titleMain1, { clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)", opacity: 1 });
       }
       if (waterLine1) gsap.set(waterLine1, { top: "0%", opacity: 0 });
-      if (sub1) gsap.set(sub1, { opacity: 0.2, y: 40, filter: "blur(10px)" });
-      if (desc1) gsap.set(desc1, { opacity: 0, y: 20 });
-      if (cta1) gsap.set(cta1, { opacity: 0, y: 20 });
+      if (sub1) gsap.set(sub1, { opacity: 0, y: 35, filter: "blur(10px)" });
       if (img1) gsap.set(img1, { scale: 1.05 });
     };
 
     // Reproducir Capítulo I: Giza
     const playGiza = () => {
       resetGiza();
-      updateNav(0);
-      currentChapter = 0;
+      currentChapter = 1;
 
+      gsap.to(introOverlay, { opacity: 0, duration: 0.6, pointerEvents: "none" });
       gsap.to(layer0, { opacity: 1, duration: 0.6, pointerEvents: "auto" });
       gsap.to(layer1, { opacity: 0, duration: 0.6, pointerEvents: "none" });
 
       if (reduceMotion) {
-        if (badge0 && sub0) gsap.set([badge0, sub0], { opacity: 1, y: 0, filter: "none" });
-        if (cta0) gsap.set(cta0, { opacity: 1, y: 0 });
+        if (sub0) gsap.set(sub0, { opacity: 1, y: 0, filter: "none" });
         slices.forEach((s) => gsap.set(s, { yPercent: 0, opacity: 1, scaleY: 1 }));
         scheduleNextChapter();
         return;
@@ -501,8 +473,7 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
       });
       tl0 = mainTl;
 
-      if (badge0) mainTl.to(badge0, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" });
-      mainTl.addLabel("flood");
+      mainTl.addLabel("flood", 0.2);
 
       slices.forEach((slice, idx) => {
         const randomDelay = (idx % 3) * 0.08 + Math.sin(idx * 0.8) * 0.12 + 0.1;
@@ -526,24 +497,21 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
         ).to(cascadeWrap, { y: 0, filter: "blur(0px)", duration: 0.4, ease: "power2.out" });
       }
 
-      if (sub0) mainTl.to(sub0, { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.6, ease: "power3.out" }, "impact+=0.5");
-      if (cta0) mainTl.to(cta0, { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, "impact+=1.0");
+      if (sub0) mainTl.to(sub0, { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.6, ease: "power3.out" }, "impact+=0.4");
     };
 
     // Reproducir Capítulo II: El Osireion (Nivel Freático)
     const playOsireion = () => {
       resetOsireion();
-      updateNav(1);
-      currentChapter = 1;
+      currentChapter = 2;
 
+      gsap.to(introOverlay, { opacity: 0, duration: 0.6, pointerEvents: "none" });
       gsap.to(layer1, { opacity: 1, duration: 0.7, pointerEvents: "auto" });
       gsap.to(layer0, { opacity: 0, duration: 0.7, pointerEvents: "none" });
 
       if (reduceMotion) {
-        if (badge1 && desc1) gsap.set([badge1, desc1], { opacity: 1, y: 0 });
         if (titleMain1) gsap.set(titleMain1, { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" });
         if (sub1) gsap.set(sub1, { opacity: 1, y: 0, filter: "none" });
-        if (cta1) gsap.set(cta1, { opacity: 1, y: 0 });
         scheduleNextChapter();
         return;
       }
@@ -557,12 +525,11 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
       tl1 = osiTl;
 
       if (img1) osiTl.to(img1, { scale: 1.0, duration: 4.0, ease: "power1.out" }, 0);
-      if (badge1) osiTl.to(badge1, { opacity: 1, y: 0, duration: 0.7 }, 0.2);
-      if (waterLine1) osiTl.to(waterLine1, { opacity: 0.85, duration: 0.3 }, 0.4);
+      if (waterLine1) osiTl.to(waterLine1, { opacity: 0.85, duration: 0.3 }, 0.3);
 
       // Descenso del agua por clip-path
       if (waterLine1) {
-        osiTl.to(waterLine1, { top: "100%", duration: 2.2, ease: "power2.inOut" }, 0.5);
+        osiTl.to(waterLine1, { top: "100%", duration: 2.2, ease: "power2.inOut" }, 0.4);
       }
       if (titleMain1) {
         osiTl.to(
@@ -575,32 +542,36 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
               if (waterLine1) gsap.to(waterLine1, { opacity: 0, duration: 0.4 });
             },
           },
-          0.5
+          0.4
         );
       }
 
-      // Ecos en la caverna (H2/H3 subiendo de 20% a 100%)
+      // Ecos en la caverna: Tagline canónico
       if (sub1) {
         osiTl.fromTo(
           sub1,
-          { opacity: 0.2, y: 40, filter: "blur(10px)" },
-          { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.7, ease: "power3.out" },
-          1.5
+          { opacity: 0, y: 35, filter: "blur(10px)" },
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.6, ease: "power3.out" },
+          1.4
         );
       }
-      if (desc1) osiTl.to(desc1, { opacity: 0.85, y: 0, duration: 1.1 }, 2.0);
-      if (cta1) osiTl.to(cta1, { opacity: 1, y: 0, duration: 0.9 }, 2.4);
     };
 
-    // Secuencia inicial con la apertura monumental de África
+    // Secuencia inicial con la apertura monumental de África (H1 ÁFRICA + H2 MISTERIOS Destacado)
     const startSeriesFlow = () => {
       resetGiza();
       resetOsireion();
       stopAutoplay();
+      currentChapter = 0;
 
+      if (cinabrioParticles) cinabrioParticles.innerHTML = "";
+      gsap.to(layer0, { opacity: 0, duration: 0.4, pointerEvents: "none" });
+      gsap.to(layer1, { opacity: 0, duration: 0.4, pointerEvents: "none" });
       gsap.set(introOverlay, { opacity: 1, pointerEvents: "auto" });
-      gsap.set(introTitle, { opacity: 0, scale: 1.08 });
-      gsap.set([introBadge, introSub], { opacity: 0, y: -12 });
+      gsap.set([beatAfrica, collectionH2], { opacity: 0 });
+      gsap.set(introSub, { opacity: 0, y: 18 });
+      if (shockwave) gsap.set(shockwave, { scale: 0.2, opacity: 0 });
+      if (shockwave2) gsap.set(shockwave2, { scale: 0.3, opacity: 0 });
 
       if (reduceMotion) {
         gsap.set(introOverlay, { opacity: 0, pointerEvents: "none" });
@@ -609,28 +580,100 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
       }
 
       const introTl = gsap.timeline();
-      introTl.to([introBadge, introSub], { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" })
-        .to(introTitle, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, "-=0.3")
-        .to({}, { duration: 1.2 })
-        .to([introTitle, introBadge, introSub], { opacity: 0, scale: 0.95, duration: 0.75, ease: "power2.in" })
-        .to(introOverlay, { opacity: 0, duration: 0.8, ease: "power2.inOut", onComplete: () => {
-          introOverlay.style.pointerEvents = "none";
-          playGiza();
-        }}, "-=0.2");
-    };
 
-    // Navegación por botones
-    stepBtns.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        stopAutoplay();
-        const step = parseInt(btn.dataset.step || "0", 10);
-        if (step === 0 && currentChapter !== 0) {
-          playGiza();
-        } else if (step === 1 && currentChapter !== 1) {
-          playOsireion();
-        }
-      });
-    });
+      // Respiración previa del resplandor cinabrio
+      introTl.fromTo(
+        [orb1, orb2],
+        { scale: 0.9, opacity: 0.6 },
+        { scale: 1.05, opacity: 1, duration: 0.8, ease: "power1.inOut" }
+      );
+
+      // CLÍMAX MONUMENTAL: "ÁFRICA" (H1)
+      introTl.addLabel("beatAfrica");
+      introTl.add(() => spawnCinabrioDust(45), "beatAfrica");
+
+      if (beatAfrica) {
+        introTl.fromTo(
+          beatAfrica,
+          { opacity: 0, scale: 2.2, filter: "blur(20px)" },
+          { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.68, ease: "power4.out" },
+          "beatAfrica"
+        );
+      }
+
+      if (shockwave) {
+        introTl.fromTo(
+          shockwave,
+          { scale: 0.2, opacity: 1 },
+          { scale: 7.5, opacity: 0, duration: 0.95, ease: "power2.out" },
+          "beatAfrica"
+        );
+      }
+      if (shockwave2) {
+        introTl.fromTo(
+          shockwave2,
+          { scale: 0.3, opacity: 0.9 },
+          { scale: 9.5, opacity: 0, duration: 1.15, ease: "power2.out" },
+          "beatAfrica+=0.06"
+        );
+      }
+
+      if (percussionBox) {
+        introTl.fromTo(
+          percussionBox,
+          { x: -5, y: 4 },
+          { x: 4, y: -3, duration: 0.04, repeat: 5, yoyo: true, ease: "none" },
+          "beatAfrica"
+        ).to(percussionBox, { x: 0, y: 0, duration: 0.15 });
+      }
+
+      introTl.to([orb1, orb2], { scale: 1.18, duration: 0.35, yoyo: true, repeat: 1, ease: "power2.out" }, "beatAfrica");
+
+      // REVELACIÓN DEL H2 DESTACADO: "MISTERIOS"
+      introTl.addLabel("beatMisterios", "beatAfrica+=0.3");
+      introTl.add(() => spawnCinabrioDust(18), "beatMisterios");
+
+      if (collectionH2) {
+        introTl.fromTo(
+          collectionH2,
+          { opacity: 0, scale: 1.4, y: 15, filter: "blur(10px)" },
+          { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: 0.5, ease: "power3.out" },
+          "beatMisterios"
+        );
+      }
+
+      // Tagline canónico
+      if (introSub) {
+        introTl.to(introSub, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "beatMisterios+=0.25");
+      }
+
+      // Micro-reverberación
+      if (beatAfrica) {
+        introTl.to(beatAfrica, { scale: 1.02, duration: 0.6, yoyo: true, repeat: 1, ease: "sine.inOut" }, "beatMisterios+=0.5");
+      }
+
+      // Pausa de contemplación antes de pasar al primer post
+      introTl.to({}, { duration: 2.2 });
+
+      // Transición fluida hacia Capítulo I (Giza)
+      introTl.to(
+        [percussionBox, introSub],
+        { opacity: 0, scale: 0.96, duration: 0.75, ease: "power3.in" }
+      );
+      introTl.to(
+        introOverlay,
+        {
+          opacity: 0,
+          duration: 0.85,
+          ease: "power2.inOut",
+          onComplete: () => {
+            introOverlay.style.pointerEvents = "none";
+            playGiza();
+          },
+        },
+        "-=0.25"
+      );
+    };
 
     // Control por Scroll
     let scrollTicking = false;
@@ -645,13 +688,15 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
           const currentScroll = -rect.top;
           const progress = Math.max(0, Math.min(1, currentScroll / totalScrollable));
 
-          // Entre 0 y 0.5 -> Capítulo I (Giza); entre 0.5 y 1.0 -> Capítulo II (Osireion)
-          if (progress > 0.52 && currentChapter === 0) {
+          if (progress < 0.33 && currentChapter !== 0) {
             stopAutoplay();
-            playOsireion();
-          } else if (progress < 0.45 && currentChapter === 1 && rect.top < 50) {
+            startSeriesFlow();
+          } else if (progress >= 0.33 && progress < 0.68 && currentChapter !== 1) {
             stopAutoplay();
             playGiza();
+          } else if (progress >= 0.68 && currentChapter !== 2) {
+            stopAutoplay();
+            playOsireion();
           }
         }
         scrollTicking = false;
