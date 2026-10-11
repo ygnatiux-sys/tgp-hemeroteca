@@ -42,15 +42,16 @@ const {
   sizes,
 } = Astro.props;
 
-let finalSrc = src;
+const rawSrc = typeof src === 'object' && src !== null && 'src' in src ? (src as any).src : src;
+let finalSrc = typeof rawSrc === 'string' ? rawSrc : '';
 let finalSrcSet: string | undefined = undefined;
-let finalWidth: number | undefined = undefined;
-let finalHeight: number | undefined = undefined;
+let finalWidth: number | undefined = typeof src === 'object' && src?.width ? src.width : undefined;
+let finalHeight: number | undefined = typeof src === 'object' && src?.height ? src.height : undefined;
 
-if (src && typeof src === 'string' && (src.startsWith('http://') || src.startsWith('https://'))) {
+if (finalSrc && (finalSrc.startsWith('http://') || finalSrc.startsWith('https://'))) {
   try {
     const opt = await getImage({ 
-      src, 
+      src: finalSrc, 
       inferSize, 
       format,
       ...(widths && widths.length > 0 ? { widths } : {}),
@@ -64,7 +65,7 @@ if (src && typeof src === 'string' && (src.startsWith('http://') || src.startsWi
     }
   } catch (_err) {
     // Fallback silencioso a la URL original sin romper el build
-    finalSrc = src;
+    finalSrc = typeof rawSrc === 'string' ? rawSrc : '';
   }
 }
 ---

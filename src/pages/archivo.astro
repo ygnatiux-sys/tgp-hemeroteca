@@ -12,6 +12,7 @@ import RowNetflixClasico from '../components/RowNetflixClasico.astro';
 import SpotlightMediaTray, { type TrayCollectionItem } from '../components/SpotlightMediaTray.astro';
 import Marquee from '../components/Marquee.astro';
 import HeroSpotifyColecciones from '../components/HeroSpotifyColecciones.astro';
+import { customCollections } from '../lib/custom-collections';
 import {
   getPublishableEssays,
   formatCategory,
@@ -75,14 +76,24 @@ const resolvedEssays = publishable.map(e => ({
 }));
 
 // ─── 12 PORTADAS PARA EL HERO PRINCIPAL ESTILO SPOTIFY ────────────────────────
-const archiveHeroTiles = resolvedEssays
-  .filter(e => e.img)
-  .slice(0, 12)
-  .map(e => ({
+const customHeroTiles = customCollections.flatMap(col =>
+  col.essays.map(e => ({
     src: sanitizeImageUrl(typeof e.img === 'object' && (e.img as any)?.src ? (e.img as any).src : (typeof e.img === 'string' ? e.img : '')),
     alt: e.entry.title || e.slug,
-    href: (e as any).isCinematicGSAP ? `/ensayos-cinematicos/${e.slug}/` : `/hemeroteca/${e.slug}/`,
-  }));
+    href: e.href,
+  }))
+);
+
+const archiveHeroTiles = [
+  ...customHeroTiles.slice(0, 4),
+  ...resolvedEssays
+    .filter(e => e.img)
+    .map(e => ({
+      src: sanitizeImageUrl(typeof e.img === 'object' && (e.img as any)?.src ? (e.img as any).src : (typeof e.img === 'string' ? e.img : '')),
+      alt: e.entry.title || e.slug,
+      href: (e as any).isCinematicGSAP ? `/ensayos-cinematicos/${e.slug}/` : `/hemeroteca/${e.slug}/`,
+    }))
+].slice(0, 12);
 
 // Agrupamiento por categorías para barras editoriales estilo suizo
 const essaysByCategory = categories.map(cat => {
@@ -90,6 +101,8 @@ const essaysByCategory = categories.map(cat => {
   return {
     catKey: cat,
     catLabel: formatCategory(cat),
+    href: `/colecciones/${cat}/`,
+    entorno: '',
     essays
   };
 }).filter(group => group.essays.length > 0);
@@ -100,12 +113,22 @@ if (uncategorized.length > 0) {
   essaysByCategory.push({
     catKey: 'otros',
     catLabel: 'Otras Investigaciones',
+    href: '/colecciones/',
+    entorno: '',
     essays: uncategorized
   });
 }
 
+// ─── COLECCIONES COMPLETAS (ESPECIALIZADAS + TEMÁTICAS GENERALES) ─────────────
+const allDisplayGroups = [
+  ...customCollections,
+  ...essaysByCategory,
+];
+
+const totalInvestigaciones = publishable.length + customCollections.reduce((acc, c) => acc + c.essays.length, 0);
+
 // Todas las Tarjetas de Categoría para el Slider del Archivo (Modo Row Netflix)
-const allCategoryCards = essaysByCategory.map(group => {
+const allCategoryCards = allDisplayGroups.map(group => {
   const leadEssay = group.essays[0];
   const yearRange = group.essays
     .map(e => e.entry.date ? new Date(e.entry.date).getFullYear() : null)
@@ -118,7 +141,8 @@ const allCategoryCards = essaysByCategory.map(group => {
       : `${yearRange[0]}–${yearRange[yearRange.length - 1]}`
     : '';
 
-  const rawEntorno = (leadEssay?.entry as any)?.sitio ||
+  const rawEntorno = group.entorno ||
+                     (leadEssay?.entry as any)?.sitio ||
                      (leadEssay?.entry as any)?.lugar ||
                      (leadEssay?.entry as any)?.site ||
                      (leadEssay?.entry as any)?.georreferencia ||
@@ -128,6 +152,7 @@ const allCategoryCards = essaysByCategory.map(group => {
   return {
     catKey: group.catKey,
     catLabel: group.catLabel,
+    href: group.href,
     count: group.essays.length,
     yearLabel,
     entorno: rawEntorno,
@@ -141,7 +166,7 @@ const categoryTrayItems: TrayCollectionItem[] = allCategoryCards.map(c => ({
   coverImage: c.img,
   category: "ORGANIZACIÓN TEMÁTICA",
   count: c.count,
-  link: `/colecciones/${c.catKey}/`,
+  link: c.href || `/colecciones/${c.catKey}/`,
 }));
 
 // ─── PORTADA DEL HERO: Imagen Wikimedia representativa del Archivo General ────
@@ -162,7 +187,7 @@ const archiveCover = archiveCoverEssay
 const archiveCoverUrl = sanitizeImageUrl(ARCHIVE_WIKI_COVER || archiveCover?.src || '');
 
 // ─── ITEMS PARA COVERFLOW 3D / MODE TRAY AL FINAL DEL ARCHIVO (UN COVER DE CADA COLECCIÓN) ───
-const coverflowPosts: CoverflowPost[] = essaysByCategory
+const coverflowPosts: CoverflowPost[] = allDisplayGroups
   .filter(group => group.essays.length > 0 && group.essays[0].img)
   .map(group => {
     const coverEssay = group.essays[0];
@@ -173,7 +198,7 @@ const coverflowPosts: CoverflowPost[] = essaysByCategory
       title: group.catLabel,
       subtitle: `${group.essays.length} ${group.essays.length === 1 ? 'dossier' : 'dossieres'} en esta colección`,
       image: imgUrl || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop',
-      link: `/colecciones/${group.catKey}/`,
+      link: group.href || `/colecciones/${group.catKey}/`,
       collectionLabel: 'Colección Especializada',
       date: coverEssay.entry?.date ? formatYear(coverEssay.entry.date) : undefined,
     };
@@ -222,7 +247,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
     isH1={true}
     titleFont="gloock"
     tiles={archiveHeroTiles}
-    titulo={`Explorá sin límites. Más de ${publishable.length} investigaciones del archivo TGP.`}
+    titulo={`Explorá sin límites. Más de ${totalInvestigaciones} investigaciones del archivo TGP.`}
     bajada="Registros documentales, arqueosemiótica y memoria histórica en un solo catálogo. Leé cuando quieras."
     ctaPrimary={{ label: "Explorar catálogo", href: "#archive-view-container" }}
     ctaSecondary={{ label: "Ver colecciones", href: "/colecciones/" }}
@@ -298,7 +323,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             data-cat-filter-btn="all"
             class="cat-filter-btn font-metadata text-xs uppercase tracking-[0.2em] px-2 py-1 text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
           >
-            TODAS LAS INVESTIGACIONES ({publishable.length})
+            TODAS LAS INVESTIGACIONES ({totalInvestigaciones})
           </button>
 
           {/* Desplegable Unificado Categoría / Tema */}
@@ -309,9 +334,9 @@ function createPremierSequences(essays: typeof resolvedEssays) {
               class="appearance-none font-metadata text-xs uppercase tracking-[0.2em] px-2 py-1 pr-6 border-none text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
             >
               <option value="all" class="bg-[#0a0a0a] text-white/50">POR CATEGORÍA / TEMA</option>
-              {categories.map(cat => (
-                <option value={cat} class="bg-[#151718] text-[#EFEBE3]">
-                  • {formatCategory(cat).toUpperCase()}
+              {allDisplayGroups.map(group => (
+                <option value={group.catKey} class="bg-[#151718] text-[#EFEBE3]">
+                  • {group.catLabel.toUpperCase()}
                 </option>
               ))}
             </select>
@@ -326,9 +351,10 @@ function createPremierSequences(essays: typeof resolvedEssays) {
         {/* Lista de Categorías con estructura cinemática: Post #1 Motor Cinemático Auto + 2 Amplias + Individuales 80/20 */}
         {/* Lista de Categorías con estructura cinemática Premier Unificada */}
         <section class="flex flex-col gap-16 md:gap-24" id="archive-list">
-          {essaysByCategory.map(group => {
+          {allDisplayGroups.map(group => {
             const coverEssay = group.essays[0];
             const restEssays = group.essays.slice(1);
+            const groupHref = group.href || `/colecciones/${group.catKey}/`;
 
             return (
               <div class="category-block flex flex-col gap-8" data-category-group={group.catKey}>
@@ -338,7 +364,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                     Colección Especializada · {group.essays.length} {group.essays.length === 1 ? 'Dossier' : 'Dossieres'}
                   </span>
 
-                  <a href={`/colecciones/${group.catKey}/`} class="group/cattitle inline-block">
+                  <a href={groupHref} class="group/cattitle inline-block">
                     <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-gloock font-black tracking-tight leading-[1.05] gradient-general-h1 glow-metallic-gloock uppercase transition-transform duration-500 group-hover/cattitle:scale-[1.02]">
                       {group.catLabel}
                     </h2>
@@ -346,7 +372,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
 
                   <div class="flex items-center gap-4 justify-center mt-1">
                     <a
-                      href={`/colecciones/${group.catKey}/`}
+                      href={groupHref}
                       class="font-metadata text-xs sm:text-[13px] uppercase tracking-[0.25em] text-white/60 hover:text-rust-orange transition-colors flex items-center gap-2 group/arrow"
                     >
                       <span>Explorar Colección Completa</span>
@@ -362,6 +388,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                       slug={coverEssay.slug}
                       entry={coverEssay.entry}
                       img={coverEssay.img}
+                      href={(coverEssay as any).href}
                       variant="hero"
                       enableCinemagraph={true}
                       hideExteriorTitle={true}
@@ -381,7 +408,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                     title: essay.entry.title || 'Dossier del Archivo',
                     excerpt: (essay.entry as any).dek || essay.entry.excerpt || '',
                     img: essay.img || resolveEssayImage(essay.entry, essay.slug),
-                    href: (essay as any).isCinematicGSAP ? `/ensayos-cinematicos/${essay.slug}/` : `/hemeroteca/${essay.slug}/`,
+                    href: (essay as any).href || ((essay as any).isCinematicGSAP ? `/ensayos-cinematicos/${essay.slug}/` : `/hemeroteca/${essay.slug}/`),
                     badge: `${group.catLabel} · Expediente ${idx + 1}`,
                   }));
 
@@ -390,7 +417,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                     title: heroEssayCandidate.entry.title || group.catLabel,
                     excerpt: (heroEssayCandidate.entry as any).dek || heroEssayCandidate.entry.excerpt || '',
                     img: heroEssayCandidate.img || resolveEssayImage(heroEssayCandidate.entry, heroEssayCandidate.slug),
-                    href: (heroEssayCandidate as any).isCinematicGSAP ? `/ensayos-cinematicos/${heroEssayCandidate.slug}/` : `/hemeroteca/${heroEssayCandidate.slug}/`,
+                    href: (heroEssayCandidate as any).href || ((heroEssayCandidate as any).isCinematicGSAP ? `/ensayos-cinematicos/${heroEssayCandidate.slug}/` : `/hemeroteca/${heroEssayCandidate.slug}/`),
                     badge: `${group.catLabel} · Registro Principal`,
                   };
 
@@ -413,7 +440,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                           hideHeader={true}
                           label={`COLECCIÓN ${group.catLabel.toUpperCase()}`}
                           headline={group.catLabel}
-                          ctaHref={`/colecciones/${group.catKey}/`}
+                          ctaHref={groupHref}
                           ctaLabel={`Explorar Colección Completa (${group.essays.length})`}
                         />
                       </div>
