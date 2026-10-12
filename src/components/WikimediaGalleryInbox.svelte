@@ -182,8 +182,8 @@
     id="wikimedia-inbox-section"
     class="fixed inset-0 z-[99999] w-screen h-screen overflow-y-auto flex flex-col animate-fadeIn transition-colors duration-300
     {theme === 'dia'
-      ? 'bg-[#fbfcfe] text-slate-800 selection:bg-blue-100 selection:text-blue-900'
-      : 'bg-[#121314] text-stone-200 selection:bg-emerald-900 selection:text-white'}"
+      ? 'bg-white text-[#1f1f1f] selection:bg-blue-100 selection:text-blue-900'
+      : 'bg-[#131314] text-[#e3e3e3] selection:bg-emerald-900 selection:text-white'}"
   >
     <!-- AMBIENT GLOW DIFUSO (Solo en modo Noche) -->
     {#if theme === 'noche'}
@@ -192,154 +192,144 @@
       <div class="fixed -bottom-40 left-1/3 w-[500px] h-[500px] rounded-full bg-amber-500/08 blur-[130px] pointer-events-none"></div>
     {/if}
 
-    <!-- BARRA SUPERIOR FIJA / TOOLBAR CINEMÁTICA -->
-    <header class="sticky top-0 z-40 backdrop-blur-md px-4 sm:px-8 py-3.5 shadow-sm shrink-0 transition-colors duration-300
+    <!-- BARRA SUPERIOR FIJA / BRANDING GEMINI -->
+    <header class="sticky top-0 z-40 backdrop-blur-xl px-5 sm:px-10 py-4 shrink-0 transition-colors duration-300
       {theme === 'dia'
-        ? 'bg-white/95 border-b border-slate-200/90'
-        : 'bg-[#121314]/95 border-b border-white/10'}"
+        ? 'bg-white/90 border-b border-slate-100'
+        : 'bg-[#131314]/90 border-b border-white/5'}"
     >
       <div class="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <!-- TÍTULO & BRANDING -->
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-lg shadow-sm
+        <!-- TÍTULO & BRANDING GEMINI -->
+        <div class="flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shadow-2xs
             {theme === 'dia'
-              ? 'bg-slate-100 border border-slate-200 text-blue-600'
-              : 'bg-emerald-950/80 border border-emerald-700/60 text-emerald-400'}"
+              ? 'bg-[#e8f0fe] text-[#1a73e8]'
+              : 'bg-[#1e1f20] text-emerald-400 border border-white/10'}"
           >
-            🏛
+            ✦
           </div>
           <div>
-            <div class="flex items-center gap-2">
-              <span class="inline-block w-2 h-2 rounded-full {theme === 'dia' ? 'bg-blue-600' : 'bg-emerald-400 animate-pulse'}"></span>
-              <span class="text-[11px] font-mono tracking-widest uppercase font-semibold
-                {theme === 'dia' ? 'text-blue-700' : 'text-emerald-400'}"
-              >
-                Estudio Visual · Pantalla Completa
-              </span>
-            </div>
-            <h1 class="text-xl sm:text-2xl font-sans tracking-tight font-semibold
-              {theme === 'dia' ? 'text-slate-900' : 'text-white'}"
+            <h1 class="text-xl sm:text-2xl font-sans tracking-tight font-bold
+              {theme === 'dia' ? 'text-[#1f1f1f]' : 'text-white'}"
             >
-              Banco Wikimedia Commons (CC0 / PD)
+              Banco Wikimedia Commons
             </h1>
+            <p class="text-xs sm:text-sm font-sans font-medium {theme === 'dia' ? 'text-[#444746]' : 'text-[#8e918f]'}">
+              Curaduría visual en alta resolución · Dominio Público & CC
+            </p>
           </div>
         </div>
 
         <!-- CONTROLES DE TEMA, VISTA Y SALIDA -->
-        <div class="flex items-center gap-3">
-          <!-- ☀️ / 🌙 CONMUTADOR DÍA / NOCHE (Gemini vs #121314 Glow) -->
+        <div class="flex items-center gap-2.5">
+          <!-- ☀️ / 🌙 CONMUTADOR DÍA / NOCHE -->
           <button
             type="button"
             on:click={toggleTheme}
-            class="flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-medium transition-all shadow-xs cursor-pointer
+            class="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-sans font-medium transition-all cursor-pointer
             {theme === 'dia'
-              ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
-              : 'bg-[#1a1c1e] hover:bg-[#232628] text-amber-300 border-white/10 shadow-[0_0_15px_-3px_rgba(251,191,36,0.15)]'}"
-            title="Alternar: Día (Brand Gemini) vs Noche (#121314 Glow)"
+              ? 'bg-[#f0f4f9] hover:bg-[#e2e7ef] text-[#1f1f1f]'
+              : 'bg-[#1e1f20] hover:bg-[#282a2c] text-amber-300 border border-white/10'}"
+            title="Alternar: Día (Brand Gemini) vs Noche (#131314)"
           >
             {#if theme === 'dia'}
               <span>☀️</span>
-              <span class="font-sans font-semibold">Día · Gemini</span>
+              <span class="font-semibold">Día · Gemini</span>
             {:else}
               <span>🌙</span>
-              <span class="font-sans font-semibold">Noche · #121314</span>
+              <span class="font-semibold">Noche · #131314</span>
             {/if}
           </button>
 
           <!-- CONMUTADOR DE TAMAÑO DE TARJETA -->
-          <div class="flex items-center p-1 rounded-xl border
-            {theme === 'dia' ? 'bg-slate-100 border-slate-200' : 'bg-[#181a1b] border-white/10'}"
+          <div class="flex items-center p-1 rounded-full
+            {theme === 'dia' ? 'bg-[#f0f4f9]' : 'bg-[#1e1f20] border border-white/10'}"
           >
             <button
               type="button"
-              class="px-3 py-1 rounded-lg text-xs font-sans transition-all cursor-pointer
+              class="px-3.5 py-1.5 rounded-full text-xs font-sans transition-all cursor-pointer
               {cardSize === 'grande'
-                ? (theme === 'dia' ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'bg-emerald-800 text-white font-bold')
-                : (theme === 'dia' ? 'text-slate-600 hover:text-slate-900' : 'text-stone-400 hover:text-white')}"
+                ? (theme === 'dia' ? 'bg-white text-[#1f1f1f] font-semibold shadow-xs' : 'bg-[#2d2f31] text-white font-semibold')
+                : (theme === 'dia' ? 'text-[#444746] hover:text-[#1f1f1f]' : 'text-stone-400 hover:text-white')}"
               on:click={() => (cardSize = 'grande')}
-              title="Tarjetas monumentales grandes (3 columnas)"
+              title="Tarjetas grandes"
             >
               ⊞ Grandes
             </button>
             <button
               type="button"
-              class="px-3 py-1 rounded-lg text-xs font-sans transition-all cursor-pointer
+              class="px-3.5 py-1.5 rounded-full text-xs font-sans transition-all cursor-pointer
               {cardSize === 'estandar'
-                ? (theme === 'dia' ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'bg-emerald-800 text-white font-bold')
-                : (theme === 'dia' ? 'text-slate-600 hover:text-slate-900' : 'text-stone-400 hover:text-white')}"
+                ? (theme === 'dia' ? 'bg-white text-[#1f1f1f] font-semibold shadow-xs' : 'bg-[#2d2f31] text-white font-semibold')
+                : (theme === 'dia' ? 'text-[#444746] hover:text-[#1f1f1f]' : 'text-stone-400 hover:text-white')}"
               on:click={() => (cardSize = 'estandar')}
-              title="Tarjetas estándar (4 columnas)"
+              title="Tarjetas medianas"
             >
               ▦ Medias
             </button>
           </div>
 
-          <span class="text-xs font-mono hidden sm:inline {theme === 'dia' ? 'text-slate-500' : 'text-stone-400'}">
-            {gallery.length} fotos
-          </span>
-
           <button
             type="button"
-            class="px-4 py-2 text-xs font-sans font-medium rounded-xl border transition-all cursor-pointer shadow-xs flex items-center gap-1.5
+            class="px-4 py-2 text-xs font-sans font-medium rounded-full transition-all cursor-pointer flex items-center gap-1.5
             {theme === 'dia'
-              ? 'bg-white hover:bg-slate-100 text-slate-700 border-slate-300'
-              : 'bg-[#181a1b] hover:bg-[#222527] text-stone-300 hover:text-white border-white/10 hover:border-emerald-500'}"
+              ? 'bg-[#f0f4f9] hover:bg-[#e2e7ef] text-[#1f1f1f]'
+              : 'bg-[#1e1f20] hover:bg-[#282a2c] text-[#e3e3e3] border border-white/10'}"
             on:click={() => (isOpen = false)}
             title="Cerrar y volver (Escape)"
           >
-            ✕ Salir
+            ✕ Cerrar
           </button>
         </div>
       </div>
 
-      <!-- SEGUNDA FILA: BUSCADOR AMPLIO & PRESETS -->
-      <div class="max-w-7xl mx-auto mt-3.5 pt-3 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 border-t
+      <!-- SEGUNDA FILA: BUSCADOR REDONDEADO GEMINI & PRESETS -->
+      <div class="max-w-7xl mx-auto mt-4 pt-3 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 border-t
         {theme === 'dia' ? 'border-slate-100' : 'border-white/5'}"
       >
         <!-- BUSCADOR LIBRE -->
         <div class="flex items-center gap-2 flex-1 max-w-3xl">
           <div class="relative flex-1">
-            <span class="absolute left-3.5 top-2.5 text-sm {theme === 'dia' ? 'text-slate-400' : 'text-stone-500'}">🔍</span>
+            <span class="absolute left-4 top-3 text-sm {theme === 'dia' ? 'text-[#747775]' : 'text-stone-400'}">🔍</span>
             <input
               type="text"
               bind:value={searchQuery}
               on:keydown={(e) => e.key === 'Enter' && ejecutarBusqueda()}
-              placeholder="Buscar conceptos (ej: teseo minotauro, egipto piramide roja, coliseo romano, persepolis)..."
-              class="w-full pl-9 pr-4 py-2.5 text-xs sm:text-sm rounded-2xl focus:outline-none transition-all font-sans
+              placeholder="Escribe lo que buscas (ej: teseo minotauro, egipto piramide roja, coliseo romano)..."
+              class="w-full pl-10 pr-5 py-2.5 text-sm rounded-full focus:outline-none transition-all font-sans
               {theme === 'dia'
-                ? 'bg-slate-50 border border-slate-200 text-slate-900 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
-                : 'bg-[#181a1b] border border-white/10 text-stone-100 focus:border-amber-400'}"
+                ? 'bg-[#f0f4f9] text-[#1f1f1f] placeholder-[#747775] focus:bg-white focus:ring-2 focus:ring-[#1a73e8]/20 focus:border-[#1a73e8] border border-transparent'
+                : 'bg-[#1e1f20] text-stone-100 placeholder-stone-500 focus:border-[#8ab4f8] border border-white/10'}"
             />
           </div>
           <button
             type="button"
             disabled={isLoading}
             on:click={() => ejecutarBusqueda()}
-            class="px-5 py-2.5 text-xs font-sans font-bold uppercase tracking-wider rounded-2xl transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shrink-0 shadow-md
+            class="px-6 py-2.5 text-sm font-sans font-semibold rounded-full transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shrink-0 shadow-sm
             {theme === 'dia'
-              ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20'
-              : 'bg-linear-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-black shadow-emerald-950/40'}"
+              ? 'bg-[#1a73e8] hover:bg-[#1557b0] text-white shadow-blue-500/10'
+              : 'bg-[#8ab4f8] hover:bg-[#aecbfa] text-[#131314]'}"
           >
             {#if isLoading}
               <span class="animate-spin text-sm">⟳</span>
               <span>Buscando…</span>
             {:else}
-              <span>✦ Buscar</span>
+              <span>Buscar</span>
             {/if}
           </button>
         </div>
 
-        <!-- COLECCIONES TEMÁTICAS -->
+        <!-- COLECCIONES TEMÁTICAS (PRESETS) -->
         <div class="flex flex-wrap items-center gap-1.5">
-          <span class="text-[10px] font-mono uppercase mr-1 font-semibold {theme === 'dia' ? 'text-slate-400' : 'text-stone-500'}">Presets:</span>
           {#each PRESETS as p}
             <button
               type="button"
               on:click={() => { searchQuery = p.query; ejecutarBusqueda(p.query); }}
-              class="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors cursor-pointer border
+              class="px-3.5 py-1.5 rounded-full text-xs font-sans font-medium transition-colors cursor-pointer
               {theme === 'dia'
-                ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
-                : 'bg-[#181a1b] hover:bg-[#222527] text-stone-300 hover:text-white border-white/10'}"
+                ? 'bg-[#f0f4f9] hover:bg-[#e2e7ef] text-[#1f1f1f]'
+                : 'bg-[#1e1f20] hover:bg-[#282a2c] text-[#e3e3e3] border border-white/10'}"
             >
               {p.label}
             </button>
@@ -348,64 +338,61 @@
       </div>
     </header>
 
-    <!-- BARRA SECUNDARIA DE SELECCIÓN Y ACCIONES MASIVAS -->
-    <div class="px-4 sm:px-8 py-2.5 shrink-0 border-b transition-colors
-      {theme === 'dia' ? 'bg-slate-50/80 border-slate-200 text-slate-600' : 'bg-[#0f1011] border-white/5 text-stone-400'}"
+    <!-- BARRA SECUNDARIA LIMPIA: CONTEO & SELECCIÓN GLOBAL -->
+    <div class="px-5 sm:px-10 py-2.5 shrink-0 transition-colors
+      {theme === 'dia' ? 'bg-[#f8fafd] text-[#444746]' : 'bg-[#181a1b] text-stone-400'}"
     >
-      <div class="max-w-7xl mx-auto flex items-center justify-between text-xs font-sans">
-        <div class="flex items-center gap-3">
+      <div class="max-w-7xl mx-auto flex items-center justify-between text-xs sm:text-sm font-sans">
+        <div class="flex items-center gap-2">
           {#if selectedIndices.size > 0}
-            <span class="font-bold flex items-center gap-1.5 {theme === 'dia' ? 'text-blue-600' : 'text-amber-400'}">
-              <span class="w-2 h-2 rounded-full {theme === 'dia' ? 'bg-blue-600' : 'bg-amber-400'}"></span>
-              {selectedIndices.size} seleccionada{selectedIndices.size === 1 ? '' : 's'} para ingesta
+            <span class="font-semibold flex items-center gap-1.5 {theme === 'dia' ? 'text-[#1a73e8]' : 'text-emerald-400'}">
+              <span class="w-2 h-2 rounded-full {theme === 'dia' ? 'bg-[#1a73e8]' : 'bg-emerald-400'}"></span>
+              {selectedIndices.size} seleccionada{selectedIndices.size === 1 ? '' : 's'} para tu mesa de trabajo
             </span>
           {:else}
-            <span class="{theme === 'dia' ? 'text-slate-400' : 'text-stone-500'}">Haz clic en las tarjetas para seleccionar tomas.</span>
+            <span class="{theme === 'dia' ? 'text-[#747775]' : 'text-stone-400'}">
+              Toca cualquier tarjeta para seleccionar o inspeccionar en detalle.
+            </span>
           {/if}
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3">
           <button
             type="button"
             on:click={selectAll}
-            class="px-3 py-1 rounded-lg text-xs cursor-pointer transition-colors border
-            {theme === 'dia'
-              ? 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200 shadow-2xs'
-              : 'bg-[#181a1b] hover:bg-[#222527] text-stone-300 hover:text-white border-white/10'}"
-            title="Seleccionar todas las imágenes cargadas"
+            class="font-medium hover:underline cursor-pointer {theme === 'dia' ? 'text-[#1a73e8]' : 'text-emerald-400'}"
           >
-            ⚡ Seleccionar Todas
+            Seleccionar todas
           </button>
-          <button
-            type="button"
-            on:click={clearSelection}
-            class="px-3 py-1 text-xs cursor-pointer transition-colors
-            {theme === 'dia' ? 'text-slate-500 hover:text-slate-900' : 'text-stone-400 hover:text-white'}"
-          >
-            Deseleccionar
-          </button>
+          {#if selectedIndices.size > 0}
+            <button
+              type="button"
+              on:click={clearSelection}
+              class="font-medium hover:underline cursor-pointer {theme === 'dia' ? 'text-[#747775] hover:text-[#1f1f1f]' : 'text-stone-400 hover:text-white'}"
+            >
+              Limpiar
+            </button>
+          {/if}
         </div>
       </div>
     </div>
 
-    <!-- ÁREA PRINCIPAL: GALERÍA MONUMENTAL -->
-    <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-8 py-6 pb-28 relative z-10">
+    <!-- ÁREA PRINCIPAL: GALERÍA MONUMENTAL LIMPIA (CERO SCRIMS / CERO MÁSCARAS) -->
+    <main class="flex-1 max-w-7xl mx-auto w-full px-5 sm:px-10 py-6 pb-36 relative z-10">
       {#if isLoading}
-        <div class="py-28 flex flex-col items-center justify-center gap-4">
+        <div class="py-32 flex flex-col items-center justify-center gap-4">
           <div class="flex gap-2.5">
-            <div class="w-3.5 h-3.5 rounded-full {theme === 'dia' ? 'bg-blue-600' : 'bg-emerald-400'} animate-bounce"></div>
-            <div class="w-3.5 h-3.5 rounded-full {theme === 'dia' ? 'bg-blue-600' : 'bg-emerald-400'} animate-bounce [animation-delay:0.15s]"></div>
-            <div class="w-3.5 h-3.5 rounded-full {theme === 'dia' ? 'bg-blue-600' : 'bg-emerald-400'} animate-bounce [animation-delay:0.3s]"></div>
+            <div class="w-3 h-3 rounded-full {theme === 'dia' ? 'bg-[#1a73e8]' : 'bg-[#8ab4f8]'} animate-bounce"></div>
+            <div class="w-3 h-3 rounded-full {theme === 'dia' ? 'bg-[#1a73e8]' : 'bg-[#8ab4f8]'} animate-bounce [animation-delay:0.15s]"></div>
+            <div class="w-3 h-3 rounded-full {theme === 'dia' ? 'bg-[#1a73e8]' : 'bg-[#8ab4f8]'} animate-bounce [animation-delay:0.3s]"></div>
           </div>
-          <span class="text-xs font-mono uppercase tracking-widest font-semibold
-            {theme === 'dia' ? 'text-blue-700' : 'text-emerald-400'}"
-          >
-            Lanzando peticiones concurrentes a Wikimedia Commons…
+          <span class="text-sm font-sans font-medium {theme === 'dia' ? 'text-[#444746]' : 'text-stone-400'}">
+            Cargando obras de alta resolución desde Wikimedia Commons…
           </span>
         </div>
 
       {:else if error}
-        <div class="p-6 rounded-2xl text-sm flex items-center gap-3 shadow-lg border
+        <div class="p-6 rounded-3xl text-sm flex items-center gap-3 border
           {theme === 'dia'
             ? 'bg-red-50 border-red-200 text-red-800'
             : 'bg-red-950/60 border-red-700/60 text-red-200'}"
@@ -418,114 +405,96 @@
         </div>
 
       {:else if gallery.length === 0}
-        <div class="py-28 flex flex-col items-center justify-center text-center gap-3 border border-dashed rounded-3xl
+        <div class="py-32 flex flex-col items-center justify-center text-center gap-3 rounded-3xl border border-dashed
           {theme === 'dia'
-            ? 'border-slate-300 bg-white shadow-xs'
-            : 'border-white/10 bg-[#161819]'}"
+            ? 'border-slate-200 bg-[#f8fafd]'
+            : 'border-white/10 bg-[#1e1f20]'}"
         >
-          <span class="text-4xl">🏛</span>
-          <h3 class="text-lg font-sans font-semibold {theme === 'dia' ? 'text-slate-800' : 'text-white'}">
-            Galería a la espera de consulta
+          <span class="text-4xl">✦</span>
+          <h3 class="text-lg font-sans font-semibold {theme === 'dia' ? 'text-[#1f1f1f]' : 'text-white'}">
+            Escribe un concepto para comenzar
           </h3>
-          <p class="text-xs max-w-md {theme === 'dia' ? 'text-slate-500' : 'text-stone-400'}">
-            Escribe un término en el buscador superior para explorar y seleccionar obras en alta resolución.
+          <p class="text-sm max-w-md {theme === 'dia' ? 'text-[#747775]' : 'text-stone-400'}">
+            Prueba buscando nombres de monumentos, deidades, ciudades antiguas o periodos históricos.
           </p>
         </div>
 
       {:else}
-        <!-- CUADRÍCULA MONUMENTAL BENTO SEGÚN SELECTOR DE TAMAÑO -->
-        <div class="grid {cardSize === 'grande' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'}">
+        <!-- CUADRÍCULA LIMPIA ESTILO BENTO GEMINI -->
+        <div class="grid {cardSize === 'grande' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5'}">
           {#each gallery as img, idx (img.url)}
             {@const isSelected = selectedIndices.has(idx)}
 
+            <!-- TARJETA BENTO IMPECABLE -->
             <div
-              class="group relative rounded-3xl overflow-hidden border transition-all duration-200 flex flex-col cursor-pointer
+              class="group relative rounded-3xl overflow-hidden transition-all duration-200 flex flex-col border
               {theme === 'dia'
                 ? (isSelected
-                    ? 'bg-white border-blue-600 ring-4 ring-blue-100 shadow-xl scale-[1.01]'
-                    : 'bg-white border-slate-200/90 hover:border-slate-300 shadow-sm hover:shadow-md hover:scale-[1.005]')
+                    ? 'bg-white border-[#1a73e8] ring-4 ring-[#1a73e8]/15 shadow-lg scale-[1.008]'
+                    : 'bg-white border-slate-200/90 hover:border-slate-300 shadow-xs hover:shadow-md')
                 : (isSelected
-                    ? 'bg-[#181a1b] border-amber-400/90 ring-2 ring-amber-400/40 shadow-2xl shadow-amber-950/40 scale-[1.01]'
-                    : 'bg-[#181a1b] border-white/10 hover:border-white/20 shadow-md hover:scale-[1.005]')}"
-              on:click={() => toggleSelect(idx)}
+                    ? 'bg-[#1e1f20] border-[#8ab4f8] ring-4 ring-[#8ab4f8]/20 shadow-xl scale-[1.008]'
+                    : 'bg-[#1e1f20] border-white/10 hover:border-white/20 shadow-sm')}"
             >
-              <!-- IMAGEN CONTENEDOR AMPLIO -->
-              <div class="relative {cardSize === 'grande' ? 'aspect-16/9 sm:aspect-16/10' : 'aspect-4/3'} overflow-hidden {theme === 'dia' ? 'bg-slate-100' : 'bg-black'}">
+              <!-- IMAGEN PURA (100% NATIVA, CERO SCRIMS, CERO MÁSCARAS) -->
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <!-- svelte-ignore a11y-no-static-element-interactions -->
+              <div
+                class="relative {cardSize === 'grande' ? 'aspect-16/10' : 'aspect-4/3'} overflow-hidden cursor-pointer {theme === 'dia' ? 'bg-[#f0f4f9]' : 'bg-black'}"
+                on:click={() => (previewImage = img)}
+                title="Toca para ver en escala completa y alta definición"
+              >
                 <img
                   src={img.thumbUrl}
                   alt={img.title}
                   loading="lazy"
-                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 />
 
-                <!-- GRADIENTE OSCURO INFERIOR -->
-                <div class="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
-
-                <!-- BADGE DE LICENCIA CC -->
-                <div class="absolute top-3 left-3 px-2 py-0.5 rounded-lg text-[10px] font-mono uppercase tracking-wider backdrop-blur-md shadow-sm font-semibold pointer-events-none
-                  {theme === 'dia'
-                    ? 'bg-white/90 text-slate-800 border border-slate-200'
-                    : 'bg-black/75 text-emerald-400 border border-emerald-900'}"
-                >
-                  {img.licenseShortName}
-                </div>
-
-                <!-- BOTÓN INSPECCIONAR EN DETALLE (FANCYBOX LIGHTBOX) -->
-                <button
-                  type="button"
-                  class="absolute top-3 right-3 p-2 rounded-xl backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 cursor-pointer shadow-md
-                  {theme === 'dia'
-                    ? 'bg-white/90 hover:bg-white text-slate-700 hover:text-black border border-slate-200'
-                    : 'bg-black/70 hover:bg-black text-stone-200 hover:text-white border border-white/10'}"
-                  on:click|stopPropagation={() => (previewImage = img)}
-                  title="Inspeccionar en pantalla completa"
-                >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                  </svg>
-                </button>
-
-                <!-- CHECKMARK DE SELECCIÓN -->
+                <!-- CHECKMARK CIRCULAR GEMINI CUANDO ESTÁ SELECCIONADA -->
                 {#if isSelected}
-                  <div class="absolute bottom-3 right-3 w-8 h-8 rounded-full text-sm font-black flex items-center justify-center shadow-xl border border-white/80 animate-fadeIn
-                    {theme === 'dia'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-linear-to-br from-amber-300 to-amber-600 text-black'}"
+                  <div class="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-md animate-fadeIn
+                    {theme === 'dia' ? 'bg-[#1a73e8] text-white' : 'bg-[#8ab4f8] text-[#131314]'}"
                   >
                     ✓
                   </div>
                 {/if}
               </div>
 
-              <!-- METADATOS Y ACCIONES -->
-              <div class="p-4 flex flex-col justify-between flex-1">
-                <div>
-                  <h4 class="text-xs font-sans font-semibold line-clamp-2 leading-snug mb-1 transition-colors
-                    {theme === 'dia' ? 'text-slate-900 group-hover:text-blue-600' : 'text-stone-100 group-hover:text-amber-300'}"
-                    title={img.title}
-                  >
-                    {img.title}
-                  </h4>
-                  <p class="text-[11px] font-sans truncate {theme === 'dia' ? 'text-slate-500' : 'text-stone-400'}">
-                    <span class="{theme === 'dia' ? 'text-slate-400' : 'text-stone-500'}">Autor:</span> {img.author}
-                  </p>
-                </div>
-
-                <div class="mt-4 pt-3 flex items-center justify-between border-t
-                  {theme === 'dia' ? 'border-slate-100' : 'border-white/5'}"
+              <!-- CONTENIDO INFERIOR: TÍTULO Y ACCIÓN CLARA -->
+              <div class="p-4 sm:p-5 flex flex-col justify-between flex-1 gap-3.5">
+                <h4
+                  class="text-sm sm:text-base font-sans font-semibold line-clamp-2 leading-snug cursor-pointer transition-colors
+                  {theme === 'dia' ? 'text-[#1f1f1f] group-hover:text-[#1a73e8]' : 'text-[#e3e3e3] group-hover:text-[#8ab4f8]'}"
+                  on:click={() => (previewImage = img)}
+                  title={img.title}
                 >
-                  <span class="text-[10px] font-mono {theme === 'dia' ? 'text-slate-400' : 'text-stone-500'}">
-                    Wikimedia CC
-                  </span>
+                  {img.title}
+                </h4>
+
+                <div class="flex items-center justify-between pt-1">
+                  <!-- Botón Ver Grande -->
                   <button
                     type="button"
-                    class="px-3.5 py-1.5 rounded-xl text-xs font-sans font-medium transition-all cursor-pointer
+                    class="text-xs font-sans font-medium cursor-pointer transition-colors
+                    {theme === 'dia' ? 'text-[#747775] hover:text-[#1f1f1f]' : 'text-stone-400 hover:text-white'}"
+                    on:click={() => (previewImage = img)}
+                  >
+                    🔍 Ver detalle
+                  </button>
+
+                  <!-- Botón Seleccionar Píldora -->
+                  <button
+                    type="button"
+                    class="px-4 py-1.5 rounded-full text-xs font-sans font-semibold transition-all cursor-pointer
                     {isSelected
-                      ? (theme === 'dia' ? 'bg-blue-600 text-white font-semibold' : 'bg-amber-400 text-black font-bold')
+                      ? (theme === 'dia'
+                          ? 'bg-[#e8f0fe] text-[#1a73e8]'
+                          : 'bg-[#283244] text-[#8ab4f8]')
                       : (theme === 'dia'
-                          ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
-                          : 'bg-[#222527] hover:bg-[#2c3033] text-stone-300 border border-white/10')}"
-                    on:click|stopPropagation={() => toggleSelect(idx)}
+                          ? 'bg-[#f0f4f9] hover:bg-[#e2e7ef] text-[#1f1f1f]'
+                          : 'bg-[#2d2f31] hover:bg-[#383a3d] text-white')}"
+                    on:click={() => toggleSelect(idx)}
                   >
                     {isSelected ? '✓ Seleccionada' : '+ Seleccionar'}
                   </button>
@@ -537,67 +506,69 @@
       {/if}
     </main>
 
-    <!-- BARRA INFERIOR FLOTANTE DE CONFIRMACIÓN -->
-    <footer class="fixed bottom-0 left-0 right-0 z-40 backdrop-blur-xl py-3.5 px-4 sm:px-8 shadow-2xl border-t transition-colors
-      {theme === 'dia'
-        ? 'bg-white/95 border-slate-200 text-slate-700'
-        : 'bg-[#121314]/95 border-white/10 text-stone-300'}"
-    >
-      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="text-xs font-sans">
+    <!-- ── BARRA FLOTANTE TIPO ISLA GEMINI LIVE (CENTRADITA Y ELEGANTE) ────────── -->
+    <div class="fixed bottom-6 inset-x-0 z-50 flex justify-center pointer-events-none px-4">
+      <div
+        class="pointer-events-auto backdrop-blur-2xl px-5 sm:px-7 py-3 rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.18)] border flex items-center gap-3 sm:gap-4 transition-all
+        {theme === 'dia'
+          ? 'bg-white/95 border-slate-200 text-[#1f1f1f]'
+          : 'bg-[#1e1f20]/95 border-white/10 text-white'}"
+      >
+        <!-- Contador -->
+        <span class="text-xs sm:text-sm font-sans font-medium whitespace-nowrap {theme === 'dia' ? 'text-[#444746]' : 'text-stone-300'}">
           {#if selectedIndices.size > 0}
-            <span class="font-bold {theme === 'dia' ? 'text-blue-600' : 'text-emerald-400'}">
-              {selectedIndices.size} imagen(es) seleccionadas
-            </span> para descargar o ingestar.
+            <strong class="{theme === 'dia' ? 'text-[#1a73e8]' : 'text-[#8ab4f8]'}">{selectedIndices.size}</strong> seleccionada{selectedIndices.size === 1 ? '' : 's'}
           {:else}
-            <span class="{theme === 'dia' ? 'text-slate-500' : 'text-stone-400'}">
-              Haz clic en una o más fotos para enviarlas a tu mesa de trabajo o descargarlas.
-            </span>
+            0 seleccionadas
           {/if}
-        </div>
+        </span>
 
-        <div class="flex items-center gap-3 w-full sm:w-auto">
-          <button
-            type="button"
-            class="px-4 py-2.5 text-xs font-sans cursor-pointer transition-colors
-            {theme === 'dia' ? 'text-slate-500 hover:text-slate-900' : 'text-stone-400 hover:text-white'}"
-            on:click={() => (isOpen = false)}
-          >
-            Cerrar
-          </button>
+        <div class="h-4 w-px {theme === 'dia' ? 'bg-slate-200' : 'bg-white/10'}"></div>
 
-          <button
-            type="button"
-            disabled={selectedIndices.size === 0 || isIngesting}
-            on:click={confirmarIngesta}
-            class="flex-1 sm:flex-none px-6 py-2.5 text-xs font-sans font-bold uppercase tracking-wider rounded-2xl transition-all shadow-md cursor-pointer flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed
-            {theme === 'dia'
-              ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20'
-              : 'bg-linear-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-black shadow-emerald-950/40'}"
-          >
-            {#if isIngesting}
-              <span class="animate-spin text-sm">⟳</span>
-              <span>Descargando…</span>
-            {:else}
-              <span>✦ Ingestar / Descargar ({selectedIndices.size})</span>
-            {/if}
-          </button>
+        <!-- Botón Ingestar Azul Google -->
+        <button
+          type="button"
+          disabled={selectedIndices.size === 0 || isIngesting}
+          on:click={confirmarIngesta}
+          class="px-5 sm:px-6 py-2 text-xs sm:text-sm font-sans font-semibold rounded-full transition-all cursor-pointer flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-xs
+          {theme === 'dia'
+            ? 'bg-[#1a73e8] hover:bg-[#1557b0] text-white'
+            : 'bg-[#8ab4f8] hover:bg-[#aecbfa] text-[#131314]'}"
+        >
+          {#if isIngesting}
+            <span class="animate-spin text-sm">⟳</span>
+            <span>Descargando…</span>
+          {:else}
+            <span>✦ Ingestar ({selectedIndices.size})</span>
+          {/if}
+        </button>
 
-          <button
-            type="button"
-            disabled={selectedIndices.size === 0 || isIngesting}
-            on:click={openBookzine}
-            class="px-4 py-2.5 text-xs font-sans font-semibold rounded-2xl transition-all cursor-pointer flex items-center gap-1.5 border disabled:opacity-40 disabled:cursor-not-allowed
-            {theme === 'dia'
-              ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
-              : 'bg-[#1e2022] hover:bg-[#282a2d] text-white border-white/10'}"
-            title="Abre la selección en el visor interactivo tipo Revista"
-          >
-            📖 Ver en Bookzine
-          </button>
-        </div>
+        <!-- Botón Bookzine -->
+        <button
+          type="button"
+          disabled={selectedIndices.size === 0 || isIngesting}
+          on:click={openBookzine}
+          class="px-4 py-2 text-xs sm:text-sm font-sans font-medium rounded-full transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed
+          {theme === 'dia'
+            ? 'bg-[#f0f4f9] hover:bg-[#e2e7ef] text-[#1f1f1f]'
+            : 'bg-[#2d2f31] hover:bg-[#383a3d] text-white'}"
+          title="Abre la selección en el visor interactivo tipo Revista"
+        >
+          📖 Bookzine
+        </button>
+
+        <!-- Botón Cerrar -->
+        <button
+          type="button"
+          class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-sans transition-colors cursor-pointer
+          {theme === 'dia' ? 'hover:bg-slate-100 text-[#747775] hover:text-[#1f1f1f]' : 'hover:bg-white/10 text-stone-400 hover:text-white'}"
+          on:click={() => (isOpen = false)}
+          title="Cerrar estudio"
+        >
+          ✕
+        </button>
       </div>
-    </footer>
+    </div>
   </section>
 {/if}
 
