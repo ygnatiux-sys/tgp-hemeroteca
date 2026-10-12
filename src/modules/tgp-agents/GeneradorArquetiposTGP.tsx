@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-
-// ─── Helper: Setter nativo de React 18 ─────────────────────────────────────
-// Keystatic usa inputs controlados por React. El simple `element.value = x`
-// no dispara el estado interno de React. Este helper usa el setter nativo
-// del prototipo para forzar que React detecte el cambio.
-import { setNativeValue } from '../../lib/keystaticDomHacks';
+import { 
+  setNativeValue, 
+  injectCoverImageIntoKeystatic, 
+  injectIntoKeystaticDocumentEditor, 
+  lockKeystaticSave 
+} from '../../lib/keystaticDomHacks';
 import { getTgpBackup, saveTgpBackup, clearTgpBackup } from '../../hooks/useTgpBackup';
+import { PRESETS_ARTE } from '../../config/presetsArte';
 
 export function GeneradorArquetiposTGP({ value, onChange }: any) {
   const [titulo, setTitulo] = useState('');
@@ -13,9 +14,21 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
   const [isGeneratingArt, setIsGeneratingArt] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  const [isSynced, setIsSynced] = useState(false); // true cuando «Traspasar» fue ejecutado
+  const [isSynced, setIsSynced] = useState(false); // true cuando «Consolidar» fue ejecutado
   const [generarAmbosJuntos, setGenerarAmbosJuntos] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // ── Modo de Portada & Fábrica Plegable ─────────────────────────────────────
+  const [modoPortada, setModoPortada] = useState<'ia' | 'wiki' | 'ninguna'>('ia');
+  const [isLabOpen, setIsLabOpen] = useState(false); // Fábrica plegada por defecto
+  const [estiloArte, setEstiloArte] = useState('cine'); // Cinemática 35mm Panavision por defecto
+  const [isConsolidating, setIsConsolidating] = useState(false);
+
+  // ── Wikimedia en vivo ─────────────────────────────────────────────────────
+  const [wikiBusqueda, setWikiBusqueda] = useState('');
+  const [wikiResultados, setWikiResultados] = useState<any[]>([]);
+  const [isSearchingWiki, setIsSearchingWiki] = useState(false);
+  const [wikiImagenSeleccionada, setWikiImagenSeleccionada] = useState<string | null>(null);
 
   // Estado local para el texto del informe, volanta, excerpt y categoría
   const [informe, setInforme] = useState(value || '');
@@ -24,7 +37,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
   const [categoryIA, setCategoryIA] = useState<string>('Arquetipos Globales');
   const [activeTab, setActiveTab] = useState<'preview' | 'raw'>('preview');
 
-  // ── Toggles para campos opcionales (default OFF → no sobrecargar el front-end) ──
+  // ── Toggles para campos opcionales ─────────────────────────────────────────
   const [syncVolanta,   setSyncVolanta]   = useState(false);
   const [syncExcerpt,  setSyncExcerpt]   = useState(false);
   const [syncCategory, setSyncCategory]  = useState(false);
@@ -224,7 +237,7 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
     }
   };
 
-  // 2. Generación de Arte de Portada con Nano Banana V2 / Imagen 3
+  // 2. Generación de Arte de Portada con Preset Cinemático 35mm
   const handleGenerarArte = async (): Promise<string | null> => {
     const temaFinal = detectPostTitle() || titulo.trim() || 'Arquetipo Universal';
     const slug = getSlugFromUrl();
@@ -241,8 +254,11 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
           mode: 'intelligent',
           intelligentInput: {
             title: temaFinal,
-            concept: `Arquetipo mitológico e histórico: ${temaFinal}`
-          }
+            concept: `Arquetipo mitológico e histórico: ${temaFinal}. Enfoque cinemático con granularidad y detalle vivo.`,
+            narrativeMode: 'historical-epic',
+            visualSensitivity: 'classic'
+          },
+          style: estiloArte || 'cine'
         }),
       });
 
@@ -273,6 +289,31 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
     }
   };
 
+  // 2.1 Búsqueda Inteligente en Wikimedia Commons (Anti-Drift)
+  const handleBuscarWiki = async () => {
+    const queryFinal = wikiBusqueda.trim() || detectPostTitle() || titulo.trim();
+    if (!queryFinal) {
+      alert('Ingresa un término para buscar en Wikimedia Commons.');
+      return;
+    }
+    setIsSearchingWiki(true);
+    setErrorMsg(null);
+    try {
+      const res = await fetch(`/api/local/candidatos?query=${encodeURIComponent(queryFinal)}`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.candidates) && data.candidates.length > 0) {
+        setWikiResultados(data.candidates);
+      } else {
+        alert('No se encontraron imágenes en Wikimedia para ese término. Intenta con un nombre alternativo en inglés.');
+      }
+    } catch (e: any) {
+      console.warn('Error buscando en Wikimedia:', e);
+      setErrorMsg(`Wikimedia: ${e.message}`);
+    } finally {
+      setIsSearchingWiki(false);
+    }
+  };
+
   // 3. Ejecución Unificada Conjunta (Redacción + Imagen)
   const handleGenerarAmbos = async () => {
     const arquetipoTema = detectPostTitle() || titulo.trim();
@@ -281,10 +322,59 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
       return;
     }
 
-    if (generarAmbosJuntos) {
+    if (modoPortada === 'ia') {
       await handleGenerarTexto();
       await handleGenerarArte();
     } else {
+      await handleGenerarTexto();
+    }
+  };
+
+  // 4. Consolidación Integral: Une Texto + Portada + Metadatos antes de Save
+  const handleConsolidarTodo = async () => {
+    if (!informe || informe.trim().length < 10) {
+      alert('⚠️ Primero debes generar o escribir el texto del arquetipo.');
+      return;
+    }
+
+    setIsConsolidating(true);
+    try {
+      // 1. Sincronizar texto en el editor de Keystatic
+      onChange(informe);
+      injectIntoKeystaticDocumentEditor(informe);
+
+      // 2. Sincronizar metadatos (Título, Fecha, Volanta, etc.)
+      syncFieldsToKeystaticDOM(volantaIA, categoryIA, excerptIA);
+
+      // 3. Determinar imagen de portada para inyectar
+      const imgParaVincular = modoPortada === 'ia' 
+        ? arteResult?.imageUrl 
+        : modoPortada === 'wiki' 
+          ? wikiImagenSeleccionada 
+          : null;
+
+      let portadaInyectada = false;
+      if (imgParaVincular) {
+        const slugPrefix = currentSlug || 'arquetipo';
+        portadaInyectada = await injectCoverImageIntoKeystatic(imgParaVincular, `${slugPrefix}-portada`);
+      }
+
+      // 4. Habilitar botón Save de Keystatic
+      setIsSynced(true);
+      lockKeystaticSave(false);
+
+      if (imgParaVincular && !portadaInyectada) {
+        alert('✓ Texto y metadatos sincronizados.\n\n⚠️ Keystatic requiere que descargues la imagen con el botón "Descargar Portada" y la arrastres al casillero "Imagen de Portada".');
+      } else {
+        alert('✅ ¡POST CONSOLIDADO EXITOSAMENTE!\n\n• Texto sincronizado.\n• Portada vinculada.\n• Metadatos listos.\n\nYa puedes presionar el botón azul "Save" en la barra superior.');
+      }
+    } catch (err: any) {
+      console.error('Error al consolidar post:', err);
+      alert(`Error al consolidar: ${err.message}`);
+    } finally {
+      setIsConsolidating(false);
+    }
+  };
       await handleGenerarTexto();
     }
   };

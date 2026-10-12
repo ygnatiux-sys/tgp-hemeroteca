@@ -33,8 +33,8 @@ export function resolveIntelligentDirection(
   const warnings: DirectionWarning[] = [];
   const locks: DirectionLocks = {}; // En modo inteligente no hay locks iniciales de usuario salvo overrides
 
-  const narrativeKey = (input.narrativeMode === 'auto' ? 'editorial-relic' : input.narrativeMode) as Exclude<NarrativeMode, 'auto'>;
-  const preset = NARRATIVE_PRESETS[narrativeKey] || NARRATIVE_PRESETS['editorial-relic'];
+  const narrativeKey = (input.narrativeMode === 'auto' ? 'historical-epic' : input.narrativeMode) as Exclude<NarrativeMode, 'auto'>;
+  const preset = NARRATIVE_PRESETS[narrativeKey] || NARRATIVE_PRESETS['historical-epic'];
   const p = preset.preferred;
 
   // Aspect ratio calculation

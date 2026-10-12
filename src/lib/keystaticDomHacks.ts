@@ -130,3 +130,50 @@ export function lockKeystaticSave(lock: boolean, warningMessage: string = '⚠�
     }
   });
 }
+
+/**
+ * Inyecta una imagen (URL remota, DataURI o File) en el campo fields.image (coverImage) de Keystatic.
+ * Simula la selección nativa vía DataTransfer sobre el input[type="file"].
+ */
+export async function injectCoverImageIntoKeystatic(imageSource: string | File, filename: string = 'cover.webp'): Promise<boolean> {
+  if (typeof document === 'undefined' || !imageSource) return false;
+
+  try {
+    let fileObj: File;
+
+    if (imageSource instanceof File) {
+      fileObj = imageSource;
+    } else {
+      const res = await fetch(imageSource);
+      const blob = await res.blob();
+      const mime = blob.type || 'image/jpeg';
+      const ext = mime.includes('png') ? 'png' : mime.includes('webp') ? 'webp' : 'jpg';
+      const cleanName = filename.includes('.') ? filename : `${filename}.${ext}`;
+      fileObj = new File([blob], cleanName, { type: mime });
+    }
+
+    // Buscar el input de archivo correspondiente a la portada en Keystatic
+    const fileInputs = Array.from(document.querySelectorAll<HTMLInputElement>('input[type="file"]'));
+    // Prioridad: el que tenga name o id con "cover" o "image", sino el primer input file
+    const targetInput = fileInputs.find(el => {
+      const n = (el.name || el.id || '').toLowerCase();
+      return n.includes('cover') || n.includes('portada');
+    }) || fileInputs[0];
+
+    if (!targetInput) {
+      console.warn('[TGP] No se encontró input de tipo archivo para la portada en Keystatic.');
+      return false;
+    }
+
+    const dt = new DataTransfer();
+    dt.items.add(fileObj);
+    targetInput.files = dt.files;
+    targetInput.dispatchEvent(new Event('change', { bubbles: true }));
+    targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+    return true;
+  } catch (err) {
+    console.error('[TGP] Error inyectando coverImage en Keystatic:', err);
+    return false;
+  }
+}
