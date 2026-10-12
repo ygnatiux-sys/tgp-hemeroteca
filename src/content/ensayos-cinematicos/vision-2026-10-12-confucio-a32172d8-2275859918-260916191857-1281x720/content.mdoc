@@ -1,0 +1,120 @@
+# INFORME TÉCNICO DE INGESTA VISUAL (DATA LAKE ARCHIVO TGP)
+
+**Identificador de Ingesta:** TGP-OSINT-17768ffc-a54e-40e1-b5f9-ad9f414768c3  
+**Clasificación de Seguridad:** Abierto / Uso Académico-Investigativo (OSINT / Data Lake)  
+**Vector de Origen:** Almacenamiento en la nube Cloudflare R2 (`storage.thegreatpuzzleproject.com`)  
+**Frecuencia de Muestreo Semántico:** Visión computacional multietiqueta + Análisis web cruzado  
+
+---
+
+## 1. IDENTIFICACIÓN CANÓNICA Y TOPONIMIA
+
+### 1.1. Determinación de Entidad Principal
+A partir del análisis ponderado de las signaturas visuales y el contraste con bases de conocimiento estructurado (Wikidata, Art & Architecture Thesaurus del Getty Institute), la entidad predominante con mayor índice de convergencia matemática es el **David** (Puntuación de Confianza Relativa: $1.023$). 
+
+* **Nombre canónico registrado:** *David* (Michelangelo)
+* **Designación en lengua de origen:** *Il David di Michelangelo*
+* **Descriptor AAT (Getty):** `300047600` (statues), `300047230` (sculpture), `300189808` (Renaissance)
+* **Identificador Wikidata:** `Q103126` (David by Michelangelo)
+* **Entidades subsidiarias detectadas:**
+  * *The Thinker* (*Le Penseur*, Auguste Rodin; Wikidata: `Q180031`) — Confianza: $0.821$.
+  * *Statue of Liberty* (*Liberty Enlightening the World*, Frédéric Auguste Bartholdi; Wikidata: `Q9202`) — Confianza: $0.766$.
+  * *Estatua viviente / Arte de calle* (Performance art; Wikidata: `Q1151616`) — Confianza: $0.581$.
+
+```
+[Árbol Taxonómico]
+Visual Arts
+ └── Sculpture (AAT: 300047230)
+      ├── Free-standing sculpture (Ronde-bosse)
+      │    └── Monumental Statuary
+      │         └── Heroic Nude / Biblical Typology
+      │              └── "David" (Michelangelo Buonarroti, 1501–1504)
+      └── Comparative Noise Classes:
+           ├── Bronze Castings (Rodin: "Le Penseur")
+           ├── Repoussé Copper / Structural Steel (Bartholdi: "Statue of Liberty")
+           └── Anthropomorphic Performance Art ("Living Statue")
+```
+
+### 1.2. Toponimia y Nomenclatura Histórica
+* **Topónimo Histórico de Emplazamiento Primario:** *Piazza della Signoria* (delante del *Palazzo Vecchio*, sede de la Signoria de Florencia), República de Florencia.
+* **Topónimo de Custodia Actual:** *Galleria dell'Accademia di Firenze*, Via Ricasoli 58/60, Florencia, Toscana, República Italiana.
+* **Nomenclatura Documental en Fuentes Primarias:** En los archivos de la *Opera del Duomo*, la pieza fue referenciada originalmente entre 1464 y 1501 como *"Il Gigante"* («El Gigante»), denominación atribuida al bloque masivo de mármol de Carrara extraído a mediados del siglo XV para el programa decorativo de los contrafuertes absidiales de la catedral florentina.
+
+---
+
+## 2. GEORREFERENCIACIÓN Y CONTEXTO ESPACIAL
+
+A pesar de que el archivo binario ingestor carece de metadatos EXIF de posicionamiento global directo (sin campos geográficos incrustados tipo `GPSLatitude` / `GPSLongitude`), el rastreo toponímico y la correspondencia visual exhaustiva permiten georreferenciar las coordenadas canónicas del objeto principal y sus vectores de dispersión espacial.
+
+```
++-----------------------------------------------------------------------------+
+| COORDENADAS WGS84: EMPLAZAMIENTOS CLAVE                                     |
++-----------------------------------------------------------------------------+
+| Emplazamiento Actual (Conservación de la Obra Original):                    |
+| Galleria dell'Accademia, Florencia, Italia                                   |
+|   • Latitud:  43° 46' 36.12" N  (43.776700)                                 |
+|   • Longitud: 11° 15' 34.02" E  (11.259450)                                 |
+|   • Elevación: 52 m s.n.m.                                                  |
++-----------------------------------------------------------------------------+
+| Emplazamiento Primitivo (1504–1873) / Copia in situ de Luigi Arrighetti:    |
+| Piazza della Signoria (Frontispicio del Palazzo Vecchio)                    |
+|   • Latitud:  43° 46' 09.84" N  (43.769400)                                 |
+|   • Longitud: 11° 15' 22.00" E  (11.256111)                                 |
+|   • Elevación: 50 m s.n.m.                                                  |
++-----------------------------------------------------------------------------+
+| Emplazamiento de la Copia Panorámica de Bronce (1874):                      |
+| Piazzale Michelangelo, Florencia, Italia                                    |
+|   • Latitud:  43° 45' 46.40" N  (43.762889)                                 |
+|   • Longitud: 11° 15' 54.70" E  (11.265194)                                 |
+|   • Elevación: 104 m s.n.m.                                                 |
++-----------------------------------------------------------------------------+
+| Cantera de Origen Geológico (Extracción del Bloque en el Quattrocento):      |
+| Cava di Fantiscritti / Bacino di Torano, Carrara, Alpes Apuanos             |
+|   • Latitud:  44° 05' 28.00" N  (44.091111)                                 |
+|   • Longitud: 10° 07' 48.00" E  (10.130000)                                 |
+|   • Elevación: ~450 m s.n.m.                                                |
++-----------------------------------------------------------------------------+
+```
+
+### 2.1. Orientación y Espacialidad Arquitectónica
+* **Vector Urbano Original:** La orientación original en la *Piazza della Signoria* encaraba la mirada de la figura hacia el suroeste, en dirección a Roma. Esta disposición poseía una deliberada carga geopolítica: la efigie simbolizaba la defensa de las libertades cívicas de la República de Florencia frente a la hegemonía pontificia y las ambiciones de los Médici exiliados.
+* **Microclima y Parámetros Ambientales (Tribuna de la Accademia):** Espacio cerrado diseñado expresamente a finales del siglo XIX con una claraboya cenital que provee iluminación difusa natural filtrada. Los parámetros contemporáneos de control de conservación preventiva dictan:
+  * Temperatura: $20^\circ \text{C} \pm 1.5^\circ \text{C}$.
+  * Humedad Relativa ($\text{HR}$): $50\% \pm 5\%$.
+  * Monitorización de vibraciones: Sensores sismométricos instalados en el plinto para mitigar el impacto de microondas inducidas por tránsito vehicular y afluencia pedestre masiva.
+
+---
+
+## 3. HISTORIA DOCUMENTAL Y REGISTRO ARQUEOLÓGICO
+
+```
+CRONOLOGÍA ARQUEOLÓGICA Y DOCUMENTAL
+========================================================================================
+1464-1466: Desbaste fallido del bloque por Agostino di Duccio.
+1476:      Segundo intento fallido de labra por Antonio Rossellino. Abandono del bloque.
+1501:      La Opera del Duomo asigna el contrato a Michelangelo Buonarroti (16 agosto).
+1504:      Conclusión de la obra (enero). Comisión de notables elige la Piazza della Signoria.
+           Traslado de cuatro días e instalación definitiva (junio-septiembre).
+1527:      Motines políticos en Florencia; fractura del brazo izquierdo en tres partes.
+1843:      Limpiezas agresivas con soluciones ácidas dirigidas por Aristodemo Costoli.
+1873:      Traslado mecánico monumental a la Galleria dell'Accademia para frenar la erosión.
+1910:      Instalación de la réplica en mármol de Luigi Arrighetti en la Piazza della Signoria.
+1991:      Ataque vandálico con martillo al pie izquierdo; recuperación de fragmentos óseos.
+2003-2004: Restauración diagnóstica integral del centenario (estudio de fisuras y yeso).
+========================================================================================
+```
+
+### 3.1. Documentación Archivística
+El proceso de génesis del *David* se encuentra documentado en las actas de las reuniones de los *Consoli dell'Arte della Lana* y los archivos de la *Opera di Santa Maria del Fiore*.
+
+1. **Contrato de 1501:** Con fecha de 16 de agosto de 1501, se formalizó el encargo a Michelangelo Buonarroti para transformar el bloque abandonado («*un certo huomo di marmo, dicto Gigante, male abbozzato et storpiato*») en una figura completa que debía coronar un estribo exterior de la catedral.
+2. **Dictamen de Reubicación (1504):** En enero de 1504, al advertirse que las dimensiones monumentales (más de 5 metros de altura) y el peso del bloque superaban la viabilidad de su izado a las alturas del Duomo, se convocó un comité de peritos compuesto por destacadas figuras artísticas de la Florencia renacentista:
+   * Leonardo da Vinci
+   * Sandro Botticelli
+   * Giuliano da Sangallo
+   * Cosimo Rosselli
+   * Andrea della Robbia  
+   El comité determinó retirar la obra del ámbito eclesiástico estricto e instalarla frente a la puerta del *Palazzo della Signoria*, confiriéndole carácter público y republicano.
+
+### 3.2. Daños Antropogénicos y Catástrofes Estructurales
+* **Incidente de 1527 (Guerras Italianas):** El 26 de abril de 1527, durante las revueltas contra el gobierno de los Médici, un banco arrojado desde las ventanas del Palazzo Vecchio impactó en el brazo izquierdo de la estatua, quebrándolo en tres secciones. Los fragmentos fueron recuperados por Giorgio Vasari y Francesco Salviati, y posteriormente reensamblados en 1543 mediante pernos metálicos bajo la supervisión de Cosimo I de
