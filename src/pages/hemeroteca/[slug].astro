@@ -36,13 +36,14 @@ export async function getStaticPaths() {
   const georefs = await getCollection("georreferencias").catch(() => []);
   const arquetipos = await getCollection("arquetiposGlobales").catch(() => []);
   const cinematicos = await getCollection("ensayosCinematicos").catch(() => []);
+  const notas = await getCollection("notas").catch(() => []);
 
-  const combined = [...essays, ...georefs, ...arquetipos, ...cinematicos];
+  const combined = [...essays, ...georefs, ...arquetipos, ...cinematicos, ...notas];
   const seen = new Set<string>();
 
   return combined
     .map((item) => ({
-      slug: item.id.replace(/\/index$/, ""),
+      slug: item.id.replace(/\/index$/, "").replace(/\.(md|mdx)$/, ""),
       item,
     }))
     .filter(({ slug }) => {
@@ -52,11 +53,17 @@ export async function getStaticPaths() {
     })
     .map(({ slug, item }) => ({
       params: { slug },
-      props: { data: item.data },
+      props: { data: item.data, isNota: (item as any).collection === 'notas' },
     }));
 }
 
 const { slug } = Astro.params;
+const { isNota } = Astro.props as any;
+
+if (isNota) {
+  return Astro.redirect(`/notas/${slug}`);
+}
+
 const data = Astro.props.data as any;
 const doc = data;
 

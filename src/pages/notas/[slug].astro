@@ -1,0 +1,195 @@
+---
+/**
+ * src/pages/notas/[slug].astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Lector de Notas de Cuaderno / Cuaderno de Campo TGP
+ * Renderiza notas ligeras y ensayos analíticos escritos en Markdown/MDX.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const notas = await getCollection('notas').catch(() => []);
+  return notas.map((entry) => {
+    const slug = entry.id.replace(/\.(md|mdx)$/, '');
+    return {
+      params: { slug },
+      props: { entry },
+    };
+  });
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const data = entry.data as any;
+
+const fechaFormateada = data.date
+  ? new Date(data.date).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+  : null;
+---
+
+<Layout
+  title={`${data.title || 'Nota'} · Notas de Cuaderno · TGP`}
+  description={data.title || 'Nota de cuaderno de campo de The Great Puzzle Project.'}
+  image={data.image || undefined}
+>
+  <main class="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-screen">
+    
+    <!-- Barra superior de navegación rápida -->
+    <nav class="mb-8 flex items-center justify-between border-b border-white/10 pb-4">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold">
+          Notas de Cuaderno
+        </span>
+        <span class="text-white/30 text-xs">/</span>
+        <span class="text-xs font-mono text-stone-400">Cuaderno de Campo</span>
+      </div>
+      <a
+        href="/archivo"
+        class="text-xs font-mono text-stone-300 hover:text-white px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+      >
+        ← Volver al Archivo
+      </a>
+    </nav>
+
+    <!-- Encabezado Editorial -->
+    <header class="mb-8">
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-serif text-white leading-tight font-normal tracking-tight mb-4">
+        {data.title || 'Sin Título'}
+      </h1>
+
+      {fechaFormateada && (
+        <div class="flex items-center gap-3 text-xs font-mono text-stone-400">
+          <time datetime={data.date?.toISOString?.() || data.date}>
+            📅 {fechaFormateada}
+          </time>
+          <span class="text-white/20">·</span>
+          <span>Registro Lingüístico &amp; Arqueosemiótico</span>
+        </div>
+      )}
+    </header>
+
+    <!-- Imagen de Portada (100% nítida, sin velos ni gradientes oscuros) -->
+    {data.image && (
+      <figure class="mb-10 rounded-2xl overflow-hidden border border-white/10 bg-black/40 shadow-2xl">
+        <img
+          src={data.image}
+          alt={data.title || 'Imagen de portada'}
+          class="w-full max-h-[480px] object-cover"
+          loading="eager"
+        />
+      </figure>
+    )}
+
+    <!-- Contenido del Artículo (MDX) con Estilos Editoriales -->
+    <article class="nota-cuaderno-body font-serif text-stone-200 text-lg leading-relaxed space-y-6">
+      <Content />
+    </article>
+
+    <!-- Cierre del Cuaderno -->
+    <footer class="mt-16 pt-8 border-t border-white/10 flex flex-wrap items-center justify-between gap-4">
+      <div class="text-xs font-mono text-stone-500">
+        The Great Puzzle Project · Archivo Epistémico &amp; Hemeroteca
+      </div>
+      <a
+        href="/archivo"
+        class="text-xs font-mono text-emerald-400 hover:text-emerald-300 transition-colors"
+      >
+        Explorar más investigaciones en la Hemeroteca →
+      </a>
+    </footer>
+
+  </main>
+</Layout>
+
+<style is:global>
+  /* ── Estilos Editoriales para Tablas y Contenido de Notas de Cuaderno ──── */
+  .nota-cuaderno-body p {
+    margin-bottom: 1.5rem;
+    line-height: 1.85;
+    color: #e5e5e5;
+  }
+
+  .nota-cuaderno-body strong {
+    color: #ffffff;
+    font-weight: 700;
+  }
+
+  .nota-cuaderno-body h2 {
+    font-size: 1.75rem;
+    color: #ffffff;
+    font-weight: 600;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
+  }
+
+  .nota-cuaderno-body h3 {
+    font-size: 1.35rem;
+    color: #fbbf24;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .nota-cuaderno-body ul, .nota-cuaderno-body ol {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .nota-cuaderno-body li {
+    margin-bottom: 0.5rem;
+    line-height: 1.75;
+  }
+
+  /* ── Tablas Comparativas (ej: Sánscrito vs Romaní) ─────────────────────── */
+  .nota-cuaderno-body table {
+    width: 100%;
+    margin: 2rem 0;
+    border-collapse: collapse;
+    background: rgba(18, 19, 20, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 0.95rem;
+  }
+
+  .nota-cuaderno-body th {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fbbf24;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .nota-cuaderno-body td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    color: #d4d4d8;
+  }
+
+  .nota-cuaderno-body tr:hover td {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .nota-cuaderno-body blockquote {
+    border-left: 3px solid #10b981;
+    padding-left: 1.25rem;
+    color: #a1a1aa;
+    font-style: italic;
+    margin: 1.5rem 0;
+  }
+</style>
