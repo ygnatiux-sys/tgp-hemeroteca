@@ -286,7 +286,7 @@
 
       <div class="flex items-center gap-3">
         <!-- SELECTOR DE POST -->
-        <div class="relative min-w-[260px] sm:min-w-[320px]">
+        <div class="relative min-w-65 sm:min-w-[320px]">
           <select
             class="w-full bg-[#0d1511] text-xs sm:text-sm text-stone-200 border border-[#1e2e24] rounded-lg px-3 py-2 pr-8 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
             value={selectedSlug}
@@ -424,7 +424,7 @@
               />
 
               <!-- GRADIENTE OSCURO INFERIOR -->
-              <div class="absolute inset-0 bg-gradient-to-t from-[#0b120e] via-transparent to-black/30 pointer-events-none"></div>
+              <div class="absolute inset-0 bg-linear-to-t from-[#0b120e] via-transparent to-black/30 pointer-events-none"></div>
 
               <!-- MEDALLA DE ORDEN NUMÉRICO / CHECK (GSAP TARGET) -->
               {#if isSelected}
@@ -434,7 +434,7 @@
                       ★ HERO
                     </span>
                   {:else}
-                    <span class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-300 to-amber-600 text-black font-mono font-black text-sm shadow-xl flex items-center justify-center border border-white/60">
+                    <span class="w-8 h-8 rounded-full bg-linear-to-br from-amber-300 to-amber-600 text-black font-mono font-black text-sm shadow-xl flex items-center justify-center border border-white/60">
                       #{selectionOrder}
                     </span>
                   {/if}
@@ -520,7 +520,7 @@
       <div class="flex items-center gap-3 w-full sm:w-auto">
         <button
           type="button"
-          class="flex-1 sm:flex-none px-6 py-3 rounded-xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer shadow-xl flex items-center justify-center gap-2 {selectedCandidateIds.length > 0 && !isProcessing ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-black shadow-emerald-900/40' : 'bg-stone-800 text-stone-500 cursor-not-allowed opacity-50'}"
+          class="flex-1 sm:flex-none px-6 py-3 rounded-xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer shadow-xl flex items-center justify-center gap-2 {selectedCandidateIds.length > 0 && !isProcessing ? 'bg-linear-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-black shadow-emerald-900/40' : 'bg-stone-800 text-stone-500 cursor-not-allowed opacity-50'}"
           disabled={selectedCandidateIds.length === 0 || isProcessing}
           on:click={confirmarYProcesar}
         >
@@ -565,7 +565,7 @@
         </div>
 
         <!-- VISOR CENTRAL DE IMAGEN -->
-        <div class="relative flex-1 bg-black flex items-center justify-center overflow-hidden min-h-[300px]">
+        <div class="relative flex-1 bg-black flex items-center justify-center overflow-hidden min-h-75">
           <img
             src={lightboxCandidate.url}
             alt={lightboxCandidate.title}
