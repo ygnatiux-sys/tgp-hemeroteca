@@ -28,6 +28,12 @@
     audioUrl?: string;
     premiumLoading?: boolean;
     premiumError?: string;
+    tokenUsage?: {
+      promptTokenCount?: number;
+      candidatesTokenCount?: number;
+      totalTokenCount?: number;
+    };
+    motorUsado?: 'osint' | 'multimodal';
   }
 
   // ── Config ────────────────────────────────────────────────────────────────
@@ -85,6 +91,18 @@
   let manualDensidad: 'breve' | 'profundo_breve' | 'premium' = 'profundo_breve';
   let manualModelo: 'flash' | 'pro' = 'pro';
   let selectedCollection = 'ensayosCinematicos';
+  let visionMotor: 'osint' | 'multimodal' = 'osint';
+  let selectedBot: 'omni' | 'assistant' | 'redes' | 'liminal' = 'omni';
+  let abortController: AbortController | null = null;
+
+  function cancelarIngesta() {
+    if (abortController) {
+      abortController.abort();
+      abortController = null;
+    }
+    isLoading = false;
+    error = 'Ingesta cancelada por el usuario.';
+  }
 
   // Refs de DOM (Svelte bind:this)
   let promptEl: HTMLTextAreaElement;
@@ -199,12 +217,16 @@
     if (!finalPrompt || isLoading) return;
     if (finalLabel !== 'Manual' && (!hasImage || !imageFile)) return;
 
+    abortController = new AbortController();
+    const signal = abortController.signal;
+
     isLoading = true;
     error = null;
     try {
       let resultText = '';
       let d1Id: string | undefined = undefined;
       let r2Url: string | undefined = undefined;
+      let tokenUsage: any = undefined;
 
       // FLUJO A: Puesto de Mando (ChatOps Desk) → Enrutador Maestro Cloud Run
       if (finalLabel === 'Manual') {
@@ -218,7 +240,8 @@
             photoUrl = osintData.imagen_url || '';
             r2Url = osintData.imagen_url;
             d1Id = osintData.id;
-          } catch (imgErr) {
+          } catch (imgErr: any) {
+            if (imgErr?.name === 'AbortError') throw imgErr;
             console.warn('[Scriptorium Desk] Continuó sin R2 previo:', imgErr);
           }
         }
@@ -238,7 +261,9 @@
             modoLibrePrompt: finalPrompt,
             photoUrl: photoUrl || previewUrl || '',
             imagen: photoUrl ? 'r2' : (hasImage ? 'custom' : 'wikimedia'),
+            bot: selectedBot,
           }),
+          signal,
         });
 
         if (!res.ok) {
@@ -263,6 +288,7 @@
           transmuteStatus: 'idle',
           d1Id,
           r2Url,
+          motorUsado: 'multimodal',
         }, ...results];
 
         prompt = '';
@@ -270,25 +296,50 @@
         return;
       }
 
-      // FLUJO B: Presets de Cascada Cognitiva (OSINT Data Lake Clásico)
+      // FLUJO B: Presets de Cascada Cognitiva
       const { base64, mimeType } = await fileToBase64(imageFile!);
       const fullBase64 = `data:${mimeType};base64,${base64}`;
 
-      try {
-        const osintData = await ejecutarIngestaExhaustiva(EXHAUSTIVE_ENDPOINT, fullBase64, API_KEY);
-        resultText = osintData.informe || '';
-        d1Id = osintData.id;
-        r2Url = osintData.imagen_url;
-      } catch (osintErr) {
-        console.warn('[Scriptorium] Falló ingesta exhaustiva, ejecutando fallback Vision directo:', osintErr);
+      if (visionMotor === 'multimodal') {
+        // MODO GEMINI MULTIMODAL DIRECTO (análisis visual conceptual + auditoría de tokens)
+        const targetModel = manualModelo === 'pro' ? 'gemini-2.5-pro' : 'gemini-3.8-flash';
         const res = await fetch(VISION_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY },
-          body: JSON.stringify({ prompt: finalPrompt, base64, mimeType }),
+          body: JSON.stringify({
+            prompt: finalPrompt,
+            base64,
+            mimeType,
+            model: targetModel,
+          }),
+          signal,
         });
+
         if (!res.ok) throw new Error(`Error ${res.status}: ${await res.text()}`);
         const data = await res.json();
         resultText = data.response ?? '(Sin respuesta)';
+        tokenUsage = data.usage;
+      } else {
+        // MODO GOOGLE CLOUD VISION OSINT CLÁSICO (OCR + coordenadas + fuentes web)
+        try {
+          const osintData = await ejecutarIngestaExhaustiva(EXHAUSTIVE_ENDPOINT, fullBase64, API_KEY);
+          resultText = osintData.informe || '';
+          d1Id = osintData.id;
+          r2Url = osintData.imagen_url;
+        } catch (osintErr: any) {
+          if (osintErr?.name === 'AbortError') throw osintErr;
+          console.warn('[Scriptorium] Falló ingesta exhaustiva, ejecutando fallback Vision directo:', osintErr);
+          const res = await fetch(VISION_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY },
+            body: JSON.stringify({ prompt: finalPrompt, base64, mimeType }),
+            signal,
+          });
+          if (!res.ok) throw new Error(`Error ${res.status}: ${await res.text()}`);
+          const data = await res.json();
+          resultText = data.response ?? '(Sin respuesta)';
+          tokenUsage = data.usage;
+        }
       }
 
       results = [{
@@ -302,13 +353,20 @@
         transmuteStatus: 'idle',
         d1Id,
         r2Url,
+        tokenUsage,
+        motorUsado: visionMotor,
       }, ...results];
 
       setTimeout(() => resultsEl?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     } catch (err: any) {
-      error = err.message ?? 'Error de conexión con TGP Mind.';
+      if (err?.name === 'AbortError') {
+        error = 'Ingesta cancelada por el usuario.';
+      } else {
+        error = err.message ?? 'Error de conexión con TGP Mind.';
+      }
     } finally {
       isLoading = false;
+      abortController = null;
     }
   }
 
@@ -450,10 +508,10 @@
           </div>
           <div>
             <h1 class="text-xl sm:text-2xl font-sans tracking-tight font-bold {theme === 'dia' ? 'text-[#1f1f1f]' : 'text-white'}">
-              TGP Scriptorium
+              TGP Scriptorium · Ingestor Cognitivo
             </h1>
             <p class="text-xs sm:text-sm font-sans font-medium {theme === 'dia' ? 'text-[#444746]' : 'text-[#8e918f]'}">
-              Motor Cognitivo Multimodal · Visión, OCR & Hemeroteca
+              Data Lake OSINT & Transmutador Editorial a Hemeroteca
             </p>
           </div>
         </div>
@@ -584,7 +642,7 @@
 
           <!-- Nota informativa anclada -->
           <div class="mt-auto p-4 rounded-2xl border text-xs leading-relaxed font-sans {theme === 'dia' ? 'bg-[#f0f4f9] border-transparent text-[#444746]' : 'bg-[#181a1b] border-white/5 text-stone-400'}">
-            <strong class="{theme === 'dia' ? 'text-[#1f1f1f]' : 'text-stone-200'}">TGP Scriptorium:</strong> Ingesta directa de archivos locales, bibliotecas en Google Cloud y curaduría de obras históricas sin salir de la interfaz.
+            <strong class="{theme === 'dia' ? 'text-[#1f1f1f]' : 'text-stone-200'}">TGP Ingestor Cognitivo:</strong> Ingesta directa de archivos locales, Google Fotos y Wikimedia. Extrae datos y genera monografías listas para transmutar a Hemeroteca.
           </div>
 
         </div>
@@ -593,13 +651,28 @@
         <!-- ── COLUMNA DERECHA (55%): Cascada Cognitiva & Puesto de Mando ────── -->
         <div class="w-full lg:w-[55%] p-5 sm:p-7 lg:p-8 flex flex-col gap-6 {embedded ? '' : 'overflow-hidden min-h-0'} {theme === 'dia' ? 'bg-white' : 'bg-[#131314]'}">
           <div class="flex flex-col gap-4 {embedded ? (theme === 'dia' ? 'border-b border-slate-100 pb-5' : 'border-b border-white/5 pb-5') : (theme === 'dia' ? 'bg-[#f8fafd] p-6 rounded-3xl border border-slate-100 shrink-0' : 'bg-[#1e1f20] p-6 rounded-3xl border border-white/5 shrink-0')}">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-wrap items-center justify-between gap-2">
               <span class="text-sm font-sans font-bold uppercase tracking-wider {theme === 'dia' ? 'text-[#1f1f1f]' : 'text-stone-200'}">
                 2. Cascada Cognitiva
               </span>
-              <div class="text-xs sm:text-sm font-sans font-medium {hasImage ? 'text-[#1a73e8]' : (theme === 'dia' ? 'text-[#747775]' : 'text-stone-500')} flex items-center gap-1.5">
-                <span class="text-sm">{hasImage ? '✓' : '◌'}</span>
-                <span>{hasImage ? 'Documento Listo' : 'Requiere Imagen'}</span>
+              <!-- Conmutador de Motor de Análisis -->
+              <div class="flex items-center gap-1 p-1 rounded-full text-xs {theme === 'dia' ? 'bg-[#f0f4f9]' : 'bg-[#181a1b] border border-white/10'}">
+                <button
+                  type="button"
+                  on:click={() => (visionMotor = 'osint')}
+                  class="px-3 py-1 rounded-full font-medium transition-all cursor-pointer {visionMotor === 'osint' ? (theme === 'dia' ? 'bg-white text-[#1f1f1f] shadow-2xs font-semibold' : 'bg-[#25282a] text-white shadow-2xs font-semibold') : (theme === 'dia' ? 'text-[#747775] hover:text-[#1f1f1f]' : 'text-stone-400 hover:text-stone-200')}"
+                  title="Google Cloud Vision (OCR + Coordenadas + Páginas web)"
+                >
+                  🌐 Cloud Vision OSINT
+                </button>
+                <button
+                  type="button"
+                  on:click={() => (visionMotor = 'multimodal')}
+                  class="px-3 py-1 rounded-full font-medium transition-all cursor-pointer {visionMotor === 'multimodal' ? 'bg-[#1a73e8] text-white shadow-2xs font-semibold' : (theme === 'dia' ? 'text-[#747775] hover:text-[#1a73e8]' : 'text-stone-400 hover:text-[#8ab4f8]')}"
+                  title="Gemini Multimodal Directo (Análisis visual conceptual y conteo de tokens)"
+                >
+                  ✦ Gemini Multimodal
+                </button>
               </div>
             </div>
 
@@ -757,6 +830,23 @@
                       🧠 Pro
                     </button>
                   </div>
+
+                  <div class="hidden lg:block h-4 w-px {theme === 'dia' ? 'bg-slate-300/80' : 'bg-white/15'}"></div>
+
+                  <!-- Grupo 4: Bot Telegram -->
+                  <div class="flex items-center gap-1">
+                    <span class="text-[11px] font-sans uppercase font-semibold mr-0.5 {theme === 'dia' ? 'text-[#747775]' : 'text-stone-400'}">Bot:</span>
+                    <select
+                      bind:value={selectedBot}
+                      class="text-xs py-1.5 px-3 rounded-full font-semibold focus:outline-none shadow-2xs cursor-pointer border-0 {theme === 'dia' ? 'bg-white text-[#1f1f1f]' : 'bg-[#151718] text-stone-200'}"
+                      title="Selecciona el bot de Telegram a notificar"
+                    >
+                      <option value="omni">Omni Bot</option>
+                      <option value="assistant">Erudito (Assistant)</option>
+                      <option value="redes">Redes Sociales</option>
+                      <option value="liminal">Liminal (Dev)</option>
+                    </select>
+                  </div>
                 </div>
 
                 <!-- Textarea Amplio Tipo Desk (Puesto de Mando) -->
@@ -803,15 +893,24 @@
           <!-- Feed de Resultados Apilados -->
           <div class="{embedded ? 'space-y-4 pt-2' : 'flex-1 min-h-0 overflow-y-auto space-y-4 pr-1'}" bind:this={resultsEl}>
             {#if isLoading}
-              <div class="h-full flex flex-col items-center justify-center py-12 gap-3 {theme === 'dia' ? 'text-slate-500' : 'text-stone-400'}">
+              <div class="h-full flex flex-col items-center justify-center py-12 gap-3.5 {theme === 'dia' ? 'text-slate-500' : 'text-stone-400'}">
                 <div class="flex gap-2">
                   <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-bounce"></div>
                   <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.15s]"></div>
                   <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.3s]"></div>
                 </div>
                 <div class="text-xs font-mono uppercase tracking-widest font-medium {theme === 'dia' ? 'text-slate-600' : 'text-stone-300'}">
-                  {activePillLabel ? `Ejecutando ${activePillLabel} con Gemini Vision…` : 'Procesando con Gemini Vision…'}
+                  {activePillLabel ? `Ejecutando ${activePillLabel} con ${visionMotor === 'multimodal' ? 'Gemini Multimodal' : 'Gemini Vision'}…` : 'Procesando…'}
                 </div>
+                <!-- Botón de STOP / Cancelar Ingesta -->
+                <button
+                  type="button"
+                  on:click={cancelarIngesta}
+                  class="mt-2 px-5 py-2 rounded-full text-xs font-sans font-semibold bg-red-100 hover:bg-red-200 text-red-800 border border-red-300 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                >
+                  <span>🛑</span>
+                  <span>Detener Ingesta</span>
+                </button>
               </div>
             {:else if results.length === 0}
               <div class="h-full flex flex-col items-center justify-center py-16 text-center gap-2 {theme === 'dia' ? 'text-slate-400' : 'text-stone-500'}">
@@ -842,6 +941,11 @@
                         <a href={r.r2Url} target="_blank" rel="noopener noreferrer" class="text-[10px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md {theme === 'dia' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:underline' : 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60 hover:underline'}" title="Ver imagen en Cloudflare R2">
                           ☁ R2 Image ↗
                         </a>
+                      {/if}
+                      {#if r.tokenUsage?.totalTokenCount}
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full {theme === 'dia' ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-amber-950/60 text-amber-300 border border-amber-800/60'}" title="Gasto de tokens Gemini">
+                          ✦ {r.tokenUsage.totalTokenCount.toLocaleString()} tokens ({r.tokenUsage.promptTokenCount ?? 0}p · {r.tokenUsage.candidatesTokenCount ?? 0}r)
+                        </span>
                       {/if}
                     </div>
                     <div class="flex items-center gap-2">

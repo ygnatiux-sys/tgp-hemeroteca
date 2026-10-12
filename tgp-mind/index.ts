@@ -434,9 +434,19 @@ app.post('/api/bot/generate', async (c) => {
     }
 
     if (botToken && chatId) {
+      const hemerotecaUrl = `https://thegreatpuzzleproject.com/hemeroteca`;
+      const hemerotecaLink = isHemeroteca
+        ? `\n\n🏛️ Ver en Hemeroteca: ${hemerotecaUrl}`
+        : '';
       const headerText = isHemeroteca
-        ? `📚 Hemeroteca TGP (${modLabel}):\n\n${textoGenerado}`
+        ? `📚 Hemeroteca TGP (${modLabel}):\n\n${textoGenerado}${hemerotecaLink}`
         : `${redLabel} via TGP Mind (${modLabel}):\n\n${textoGenerado}`;
+
+      const replyMarkup = isHemeroteca ? {
+        inline_keyboard: [[
+          { text: "🏛️ Abrir en Hemeroteca TGP", url: hemerotecaUrl }
+        ]]
+      } : undefined;
 
       if (imagenUrl) {
         fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
@@ -446,13 +456,18 @@ app.post('/api/bot/generate', async (c) => {
             chat_id: chatId,
             photo: imagenUrl,
             caption: headerText.slice(0, 1024),
+            reply_markup: replyMarkup,
           }),
         }).catch(() => {});
       } else {
         fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: chatId, text: headerText.slice(0, 4000) }),
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: headerText.slice(0, 4000),
+            reply_markup: replyMarkup,
+          }),
         }).catch(() => {});
       }
     }
@@ -618,11 +633,16 @@ app.post('/api/vision', async (c) => {
   if (!prompt || !base64Data) return c.json({ error: 'Faltan campos requeridos (prompt o base64).' }, 400);
 
   try {
+    const targetModel = body?.model || 'gemini-3.8-flash';
     const response = await genai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: targetModel,
       contents: [{ text: prompt }, { inlineData: { data: base64Data, mimeType } }]
     });
-    return c.json({ response: response.text, model: 'gemini-3.8-flash' });
+    return c.json({
+      response: response.text,
+      model: targetModel,
+      usage: response.usageMetadata,
+    });
   } catch (error: any) {
     console.error('[Vision API] Error:', error);
     return c.json({ error: 'Error procesando la imagen.' }, 500);
