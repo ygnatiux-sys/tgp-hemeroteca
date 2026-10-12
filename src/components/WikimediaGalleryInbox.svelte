@@ -180,7 +180,7 @@
   <!-- ESTUDIO A PANTALLA COMPLETA REAL (100vw x 100vh) -->
   <section
     id="wikimedia-inbox-section"
-    class="fixed inset-0 z-50 w-screen h-screen overflow-y-auto flex flex-col animate-fadeIn transition-colors duration-300
+    class="fixed inset-0 z-[99999] w-screen h-screen overflow-y-auto flex flex-col animate-fadeIn transition-colors duration-300
     {theme === 'dia'
       ? 'bg-[#fbfcfe] text-slate-800 selection:bg-blue-100 selection:text-blue-900'
       : 'bg-[#121314] text-stone-200 selection:bg-emerald-900 selection:text-white'}"
@@ -606,7 +606,7 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
-    class="fixed inset-0 z-60 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 sm:p-8 animate-fadeIn"
+    class="fixed inset-0 z-[100000] bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 sm:p-8 animate-fadeIn"
     on:click|self={closeFancybox}
   >
     <div class="relative max-w-5xl w-full max-h-[92vh] rounded-3xl overflow-hidden flex flex-col shadow-2xl border

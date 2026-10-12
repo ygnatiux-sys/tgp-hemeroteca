@@ -401,7 +401,7 @@
         <div class="hidden sm:block h-5 w-px bg-[#18281e]"></div>
 
         <!-- 2. SELECTOR DE POST DE KEYSTATIC -->
-        <div class="relative min-w-65 sm:min-w-[280px]">
+        <div class="relative min-w-65 sm:min-w-70">
           <select
             class="w-full bg-[#0d1511] text-xs text-stone-200 border border-[#1e2e24] rounded-lg px-3 py-2 pr-8 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
             value={isManualMode ? '' : selectedSlug}

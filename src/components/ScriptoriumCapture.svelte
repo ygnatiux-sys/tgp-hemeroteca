@@ -956,11 +956,9 @@
         </div>
       </div>
 
-      <!-- ── GALERÍA WIKIMEDIA COMMONS INLINE (En el scroll libre abajo de la mesa de trabajo) ──── -->
-      <div class="px-4 sm:px-6 pb-6 border-t {theme === 'dia' ? 'border-slate-200/80 bg-slate-50/40' : 'border-white/10 bg-[#121314]'}">
-        <WikimediaGalleryInbox bind:isOpen={isWikiInboxOpen} onSelect={handleWikiSelect} />
-      </div>
-
     </div>
   </div>
 {/if}
+
+<!-- ── GALERÍA WIKIMEDIA COMMONS A PANTALLA COMPLETA (Desanclada a nivel raíz) ──── -->
+<WikimediaGalleryInbox bind:isOpen={isWikiInboxOpen} onSelect={handleWikiSelect} />
