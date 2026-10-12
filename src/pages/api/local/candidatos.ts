@@ -60,6 +60,33 @@ export const GET: APIRoute = async ({ request }) => {
       } catch {}
     }
 
+    // 2.1 Búsqueda manual por texto libre (independiente de Keystatic)
+    const customQuery = url.searchParams.get('query')?.trim();
+    if (customQuery) {
+      const pseudoSlug = customQuery
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'busqueda-manual';
+
+      const { extraerCandidatosDraft } = await import('../../../../scripts/lib/wikimedia-engine.mjs');
+      const liveResult = await extraerCandidatosDraft(customQuery, '', 10);
+      const candidates = liveResult.candidates || [];
+
+      return new Response(JSON.stringify({
+        success: true,
+        isManualQuery: true,
+        query: customQuery,
+        slug: pseudoSlug,
+        title: customQuery,
+        hasHero: false,
+        coverImage: '',
+        candidates,
+        allPosts,
+      }), { status: 200, headers });
+    }
+
     // 3. Si se solicita un slug en particular
     if (targetSlug) {
       const postMatch = allPosts.find(p => p.slug === targetSlug);
@@ -68,6 +95,7 @@ export const GET: APIRoute = async ({ request }) => {
 
       // Verificar si ya está en draftData
       let existingCandidates = draftData?.posts?.find((p: any) => p.slug === targetSlug)?.candidates;
+
 
       if (!existingCandidates || forceRefresh) {
         // Ejecutar extracción dinámica en vivo

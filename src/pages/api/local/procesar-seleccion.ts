@@ -154,6 +154,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Generar archivo assets_array.json para DaVinci Resolve
+    fs.mkdirSync(contentPostDir, { recursive: true });
     const arrayJsonPath = path.join(contentPostDir, 'assets_array.json');
     let postTitle = slug;
     if (fs.existsSync(jsonPath)) {

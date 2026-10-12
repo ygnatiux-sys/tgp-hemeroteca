@@ -38,20 +38,27 @@
   let candidates: Candidate[] = [];
   let mode: 'hero' | 'video-array' = 'hero';
 
+  // Búsqueda Manual Libre
+  let searchInput: string = '';
+  let isManualMode: boolean = false;
+  let manualQueryTitle: string = '';
+
   // Selección: array ordenado de IDs de candidatos seleccionados
   let selectedCandidateIds: string[] = [];
 
   // Lightbox
   let lightboxCandidate: Candidate | null = null;
-  let lightboxOpen = false;
+  let lightboxOpen: boolean = false;
 
   // Estados de carga y feedback
-  let isLoading = false;
-  let isProcessing = false;
+  let isLoading: boolean = false;
+  let isProcessing: boolean = false;
   let statusMessage: { type: 'success' | 'error' | 'info'; text: string; details?: any } | null = null;
 
   // Referencias a elementos DOM para animaciones GSAP
   let cardRefs: Record<string, HTMLElement> = {};
+  let skeletonRefs: HTMLElement[] = [];
+  let skeletonTween: gsap.core.Tween | null = null;
   let lightboxBackdropEl: HTMLElement;
   let lightboxDialogEl: HTMLElement;
   let actionBarEl: HTMLElement;
@@ -64,6 +71,8 @@
   async function cargarDatosIniciales() {
     isLoading = true;
     statusMessage = null;
+    iniciarAnimacionEsqueletos();
+
     try {
       const res = await fetch('/api/local/candidatos');
       const data = await res.json();
@@ -81,16 +90,21 @@
     } catch (err: any) {
       statusMessage = { type: 'error', text: `Error cargando datos: ${err.message}` };
     } finally {
+      detenerAnimacionEsqueletos();
       isLoading = false;
     }
   }
 
   async function seleccionarPost(slug: string, forceRefresh = false) {
+    isManualMode = false;
+    manualQueryTitle = '';
     selectedSlug = slug;
     currentPost = allPosts.find(p => p.slug === slug) || null;
     selectedCandidateIds = [];
     isLoading = true;
     statusMessage = null;
+
+    iniciarAnimacionEsqueletos();
 
     try {
       const url = `/api/local/candidatos?slug=${encodeURIComponent(slug)}${forceRefresh ? '&refresh=true' : ''}`;
@@ -101,13 +115,10 @@
         if (candidates.length === 0) {
           statusMessage = {
             type: 'info',
-            text: 'No se encontraron candidatos automáticos. Puedes intentar "Refrescar Búsqueda" para rastrear nuevamente en Wikimedia.'
+            text: 'No se encontraron candidatos automáticos. Puedes intentar "Refrescar" o escribir un término manual arriba.'
           };
-        } else {
-          // Preseleccionar la primera imagen si estamos en modo hero
-          if (mode === 'hero' && candidates.length > 0) {
-            selectedCandidateIds = [candidates[0].id];
-          }
+        } else if (mode === 'hero' && candidates.length > 0) {
+          selectedCandidateIds = [candidates[0].id];
         }
       } else {
         statusMessage = { type: 'error', text: data.error || 'Error al obtener candidatos.' };
@@ -115,13 +126,90 @@
     } catch (err: any) {
       statusMessage = { type: 'error', text: `Fallo de conexión: ${err.message}` };
     } finally {
+      detenerAnimacionEsqueletos();
       isLoading = false;
       await tick();
       animarAparicionTarjetas();
     }
   }
 
+  // ── BÚSQUEDA MANUAL POR TEXTO LIBRE ──────────────────────────────────────────
+  async function ejecutarBusquedaManual() {
+    const q = searchInput.trim();
+    if (!q) return;
+
+    isManualMode = true;
+    manualQueryTitle = q;
+    selectedCandidateIds = [];
+    isLoading = true;
+    statusMessage = null;
+
+    iniciarAnimacionEsqueletos();
+
+    try {
+      const url = `/api/local/candidatos?query=${encodeURIComponent(q)}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.success) {
+        selectedSlug = data.slug;
+        currentPost = {
+          slug: data.slug,
+          title: `Búsqueda Libre: "${q}"`,
+          hasHero: false,
+          excerpt: '',
+        };
+        candidates = data.candidates || [];
+        if (candidates.length === 0) {
+          statusMessage = {
+            type: 'info',
+            text: `No se encontraron imágenes en Wikimedia Commons para "${q}". Prueba con un término alternativo en inglés o español.`
+          };
+        } else if (mode === 'hero' && candidates.length > 0) {
+          selectedCandidateIds = [candidates[0].id];
+        }
+      } else {
+        statusMessage = { type: 'error', text: data.error || 'Error en búsqueda manual.' };
+      }
+    } catch (err: any) {
+      statusMessage = { type: 'error', text: `Fallo de conexión: ${err.message}` };
+    } finally {
+      detenerAnimacionEsqueletos();
+      isLoading = false;
+      await tick();
+      animarAparicionTarjetas();
+    }
+  }
+
+  function volverAModoPost() {
+    isManualMode = false;
+    searchInput = '';
+    manualQueryTitle = '';
+    if (allPosts.length > 0) {
+      seleccionarPost(allPosts[0].slug);
+    }
+  }
+
   // ── ANIMACIONES GSAP ───────────────────────────────────────────────────────
+  function iniciarAnimacionEsqueletos() {
+    if (skeletonTween) skeletonTween.kill();
+    tick().then(() => {
+      const els = skeletonRefs.filter(Boolean);
+      if (els.length > 0) {
+        skeletonTween = gsap.fromTo(els,
+          { opacity: 0.35, scale: 0.985 },
+          { opacity: 0.85, scale: 1, duration: 0.75, stagger: 0.06, repeat: -1, yoyo: true, ease: 'sine.inOut' }
+        );
+      }
+    });
+  }
+
+  function detenerAnimacionEsqueletos() {
+    if (skeletonTween) {
+      skeletonTween.kill();
+      skeletonTween = null;
+    }
+  }
+
   function animarAparicionTarjetas() {
     const cards = Object.values(cardRefs).filter(Boolean);
     if (cards.length > 0) {
@@ -134,7 +222,6 @@
 
   function animarSeleccion(cardEl: HTMLElement, badgeEl?: HTMLElement) {
     if (!cardEl) return;
-    // Pop suave / back.out
     gsap.fromTo(cardEl,
       { scale: 0.96 },
       { scale: 1, duration: 0.35, ease: 'back.out(2.2)' }
@@ -152,14 +239,11 @@
     const cardEl = cardRefs[candidate.id];
 
     if (mode === 'hero') {
-      // Modo Hero: selección única (reemplazo)
       selectedCandidateIds = [candidate.id];
       animarSeleccion(cardEl);
     } else {
-      // Modo Video Array: hasta 7 imágenes
       const idx = selectedCandidateIds.indexOf(candidate.id);
       if (idx !== -1) {
-        // Deseleccionar
         selectedCandidateIds = selectedCandidateIds.filter(id => id !== candidate.id);
       } else {
         if (selectedCandidateIds.length >= 7) {
@@ -254,7 +338,6 @@
           details: result,
         };
 
-        // Actualizar estado del post en la lista local
         const post = allPosts.find(p => p.slug === selectedSlug);
         if (post) {
           post.hasHero = true;
@@ -274,27 +357,62 @@
 
 <div class="curador-root min-h-screen bg-[#060a08] text-stone-200 font-sans selection:bg-emerald-900 selection:text-white">
   <!-- ENCABEZADO SUPERIOR -->
-  <header class="border-b border-[#141f18] bg-[#080e0a]/90 backdrop-blur-md sticky top-0 z-40 px-4 sm:px-8 py-4">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+  <header class="border-b border-[#141f18] bg-[#080e0a]/90 backdrop-blur-md sticky top-0 z-40 px-4 sm:px-8 py-3.5">
+    <div class="max-w-7xl mx-auto flex flex-col xl:flex-row xl:items-center justify-between gap-4">
       <div>
         <div class="flex items-center gap-2">
           <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span class="text-[11px] font-mono tracking-widest uppercase text-emerald-400 font-semibold">TGP · Human-in-the-Loop</span>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-serif text-white tracking-wide mt-0.5">Control Visual & Curaduría de Arte</h1>
+        <h1 class="text-2xl font-serif text-white tracking-wide mt-0.5">Control Visual & Curaduría de Arte</h1>
       </div>
 
-      <div class="flex items-center gap-3">
-        <!-- SELECTOR DE POST -->
-        <div class="relative min-w-65 sm:min-w-[320px]">
+      <!-- CONTROLES SUPERIORES: BUSCADOR MANUAL + SELECTOR DE POSTS -->
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- 1. BUSCADOR DE TEXTO LIBRE (MANUAL INPUT) -->
+        <form on:submit|preventDefault={ejecutarBusquedaManual} class="flex items-center gap-1.5 flex-1 sm:flex-none">
+          <div class="relative w-full sm:w-64 md:w-72">
+            <input
+              type="text"
+              bind:value={searchInput}
+              placeholder="Buscar tema libre (ej. Coliseo Romano)..."
+              class="w-full bg-[#0d1511] text-xs text-stone-200 border border-[#1e2e24] focus:border-amber-400 rounded-lg pl-3 pr-7 py-2 focus:outline-none transition-colors placeholder:text-stone-500"
+            />
+            {#if searchInput}
+              <button
+                type="button"
+                on:click={() => searchInput = ''}
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-stone-500 hover:text-stone-300 text-xs cursor-pointer"
+              >
+                ✕
+              </button>
+            {/if}
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading || isProcessing || !searchInput.trim()}
+            class="px-3.5 py-2 text-xs font-mono font-bold uppercase tracking-wider bg-linear-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black rounded-lg transition-all cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+          >
+            Buscar Manual
+          </button>
+        </form>
+
+        <div class="hidden sm:block h-5 w-px bg-[#18281e]"></div>
+
+        <!-- 2. SELECTOR DE POST DE KEYSTATIC -->
+        <div class="relative min-w-65 sm:min-w-[280px]">
           <select
-            class="w-full bg-[#0d1511] text-xs sm:text-sm text-stone-200 border border-[#1e2e24] rounded-lg px-3 py-2 pr-8 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
-            value={selectedSlug}
+            class="w-full bg-[#0d1511] text-xs text-stone-200 border border-[#1e2e24] rounded-lg px-3 py-2 pr-8 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+            value={isManualMode ? '' : selectedSlug}
             on:change={(e) => seleccionarPost(e.currentTarget.value)}
           >
+            {#if isManualMode}
+              <option value="" disabled selected>— Tema Manual Activo —</option>
+            {/if}
             {#each allPosts as p}
               <option value={p.slug}>
-                {p.hasHero ? '✓' : '✗'} {p.title} ({p.slug})
+                {p.hasHero ? '✓' : '✗'} {p.title}
               </option>
             {/each}
           </select>
@@ -304,7 +422,7 @@
           type="button"
           class="px-3 py-2 text-xs font-mono bg-[#111c15] hover:bg-[#18281e] text-emerald-300 border border-[#1e3025] hover:border-emerald-500 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
           disabled={isLoading || isProcessing}
-          on:click={() => seleccionarPost(selectedSlug, true)}
+          on:click={() => isManualMode ? ejecutarBusquedaManual() : seleccionarPost(selectedSlug, true)}
           title="Forzar nueva búsqueda en Wikimedia"
         >
           <svg class="w-3.5 h-3.5 {isLoading ? 'animate-spin' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -318,25 +436,41 @@
 
   <!-- CONTENIDO PRINCIPAL -->
   <main class="max-w-7xl mx-auto px-4 sm:px-8 py-6 pb-36">
-    <!-- BARRA DE CONFIGURACIÓN DEL POST ACTIVO -->
+    <!-- BARRA DE CONFIGURACIÓN DEL CONTEXTO ACTIVO -->
     <div class="bg-[#0b120e] border border-[#16241b] rounded-2xl p-5 mb-8 shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-6">
       <div>
-        <div class="flex items-center gap-2 mb-1">
-          <span class="text-xs font-mono px-2 py-0.5 rounded bg-[#132018] text-stone-400 border border-[#1f3326]">
-            Slug: {selectedSlug || 'Ninguno'}
-          </span>
-          {#if currentPost?.hasHero}
-            <span class="text-xs font-mono px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-700/60">
-              Hero Actual Asignado
+        <div class="flex items-center gap-2 mb-1 flex-wrap">
+          {#if isManualMode}
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-amber-950/90 text-amber-300 border border-amber-600/70 font-semibold">
+              Búsqueda Libre: "{manualQueryTitle}"
             </span>
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-[#132018] text-stone-400 border border-[#1f3326]">
+              Slug: {selectedSlug}
+            </span>
+            <button
+              type="button"
+              on:click={volverAModoPost}
+              class="text-xs font-mono text-stone-400 hover:text-white underline cursor-pointer ml-1"
+            >
+              (✕ Volver a Posts)
+            </button>
           {:else}
-            <span class="text-xs font-mono px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-700/60">
-              Hero Vacío (Requiere Portada)
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-[#132018] text-stone-400 border border-[#1f3326]">
+              Slug: {selectedSlug || 'Ninguno'}
             </span>
+            {#if currentPost?.hasHero}
+              <span class="text-xs font-mono px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-700/60">
+                Hero Actual Asignado
+              </span>
+            {:else}
+              <span class="text-xs font-mono px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-700/60">
+                Hero Vacío (Requiere Portada)
+              </span>
+            {/if}
           {/if}
         </div>
         <h2 class="text-xl sm:text-2xl font-serif text-white font-normal">
-          {currentPost?.title || 'Selecciona un post'}
+          {currentPost?.title || 'Selecciona un post o busca un tema'}
         </h2>
       </div>
 
@@ -388,22 +522,56 @@
       </div>
     {/if}
 
-    <!-- SPINNER DE CARGA -->
-    {#if isLoading}
-      <div class="py-24 text-center">
-        <div class="inline-block w-12 h-12 border-4 border-[#17271e] border-t-emerald-400 rounded-full animate-spin mb-4"></div>
-        <p class="text-sm font-mono text-stone-400">Rastreando archivos y resolviendo entidad con Gemini Flash Anti-Drift...</p>
+    <!-- CUADRÍCULA DE ESQUELETOS (SKELETON PLACEHOLDERS CON GSAP) -->
+    {#if isLoading || candidates.length === 0}
+      <div class="mb-5 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="inline-block w-2.5 h-2.5 rounded-full {isLoading ? 'bg-amber-400 animate-ping' : 'bg-emerald-600'}"></span>
+          <span class="text-xs font-mono uppercase tracking-wider text-stone-400 font-medium">
+            {isLoading ? 'Rastreando Wikimedia Commons (10 Slots Designados en curso)...' : 'Cuadrícula Lista (10 Espacios esperando búsqueda)'}
+          </span>
+        </div>
+        <span class="text-[11px] font-mono text-stone-500">10 slots 16:9</span>
       </div>
-    {:else if candidates.length === 0}
-      <div class="py-24 text-center border border-dashed border-[#17271e] rounded-2xl bg-[#090f0c]">
-        <span class="text-3xl mb-2 block">🏛️</span>
-        <h3 class="text-lg font-serif text-white">Sin imágenes candidatas en el borrador</h3>
-        <p class="text-xs text-stone-400 max-w-md mx-auto mt-1 mb-4">
-          Presiona "Refrescar" arriba para consultar a Wikimedia Commons y obtener hasta 10 opciones de alta resolución.
-        </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {#each Array(10) as _, i}
+          <div
+            bind:this={skeletonRefs[i]}
+            class="bg-[#0a0f0c] border border-[#142017] rounded-xl overflow-hidden p-0 flex flex-col shadow-lg transition-all"
+          >
+            <!-- CONTENEDOR 16:9 SKELETON -->
+            <div class="relative w-full aspect-video bg-[#0d1511] flex items-center justify-center overflow-hidden">
+              <!-- MEDALLA DE RANURA -->
+              <div class="absolute top-3 left-3 px-2 py-0.5 rounded-md bg-black/60 border border-[#1a2c20] text-[10px] font-mono text-emerald-400/80 font-semibold">
+                Slot #{String(i + 1).padStart(2, '0')}
+              </div>
+
+              <!-- RETÍCULA CINEMÁTICA 16:9 -->
+              <div class="w-16 h-10 border border-dashed border-[#1a2c20] rounded flex items-center justify-center opacity-40">
+                <span class="text-[10px] font-mono text-stone-600">16:9</span>
+              </div>
+
+              <div class="absolute inset-0 bg-linear-to-t from-[#0a0f0c] via-transparent to-transparent pointer-events-none"></div>
+            </div>
+
+            <!-- PLACEHOLDERS DE METADATOS -->
+            <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+              <div class="space-y-2">
+                <div class="h-3.5 bg-[#121c15] rounded-md w-3/4"></div>
+                <div class="h-2.5 bg-[#0e1711] rounded-md w-1/2"></div>
+              </div>
+              <div class="pt-3 border-t border-[#121c15] flex items-center justify-between">
+                <div class="h-2.5 bg-[#101b13] rounded w-16"></div>
+                <div class="h-2.5 bg-[#142218] rounded w-20"></div>
+              </div>
+            </div>
+          </div>
+        {/each}
       </div>
+
     {:else}
-      <!-- GALERÍA DE CANDIDATAS -->
+      <!-- GALERÍA REAL DE CANDIDATAS DISPONIBLES -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {#each candidates as cand, idx}
           {@const isSelected = selectedCandidateIds.includes(cand.id)}
