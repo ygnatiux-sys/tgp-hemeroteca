@@ -375,9 +375,6 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
       setIsConsolidating(false);
     }
   };
-      await handleGenerarTexto();
-    }
-  };
 
   return (
     <div className="p-6 bg-theme-dark border border-amber-500/30 rounded-2xl font-sans text-stone-200 shadow-2xl my-6">
@@ -389,10 +386,10 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
           </div>
           <div>
             <h3 className="text-sm font-metadata uppercase tracking-[0.2em] text-amber-400 font-bold">
-              Motor de Arquetipos Globales & Arte Unificado TGP
+              Motor de Arquetipos Globales · Flujo Unificado
             </h3>
             <p className="text-[11px] text-white/40 font-metadata">
-              Gemini 3.1 Pro (10 Fases Históricas) + Nano Banana / Imagen 3 (Portada)
+              Gemini 3.1 Pro (10 Fases Históricas) + Portada Cinemática 35mm / Wikimedia CC0
             </p>
           </div>
         </div>
@@ -433,82 +430,278 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
         </div>
       </div>
 
-      {/* TOGGLE: GENERAR REDACCIÓN + IMAGEN A LA VEZ */}
-      <div className="flex items-center gap-3 p-3.5 mb-5 bg-amber-500/5 border border-amber-500/20 rounded-xl">
-        <label className="relative inline-flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            checked={generarAmbosJuntos}
-            onChange={(e) => setGenerarAmbosJuntos(e.target.checked)}
-            className="sr-only peer"
-          />
-          <div className="w-10 h-5 bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-stone-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-        </label>
-        <div className="text-xs">
-          <span className="font-metadata font-bold text-amber-300">Generar Redacción + Portada IA en un solo clic</span>
-          <p className="text-stone-400 text-[11px]">Genera el informe erudito de 10 fases y materializa la portada cinemática simultáneamente.</p>
+      {/* ── BOTONERA DE MODO DE PORTADA (3 MODOS BIEN SEPARADOS Y VISIBLES) ── */}
+      <div className="mb-6 p-4 bg-black/40 border border-white/10 rounded-xl">
+        <span className="block text-[11px] font-mono uppercase tracking-[0.15em] text-amber-400 font-bold mb-3">
+          1. Selección de Estrategia Visual de Portada
+        </span>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* Opción 1: IA Cinemática */}
+          <button
+            type="button"
+            onClick={() => setModoPortada('ia')}
+            className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col gap-1 ${
+              modoPortada === 'ia'
+                ? 'bg-amber-500/15 border-amber-400/60 shadow-[0_0_15px_rgba(245,158,11,0.2)] text-white'
+                : 'bg-white/5 border-white/10 text-stone-400 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <div className="flex items-center gap-2 font-mono text-xs font-bold text-amber-300">
+              <span>🎨</span> Portada IA Cinemática
+            </div>
+            <p className="text-[10px] text-stone-400 leading-tight">
+              35mm Panavision, textura Kodak Vision3 y alta definición (sin piezas de museo).
+            </p>
+          </button>
+
+          {/* Opción 2: Wikimedia Commons */}
+          <button
+            type="button"
+            onClick={() => setModoPortada('wiki')}
+            className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col gap-1 ${
+              modoPortada === 'wiki'
+                ? 'bg-emerald-500/15 border-emerald-400/60 shadow-[0_0_15px_rgba(16,185,129,0.2)] text-white'
+                : 'bg-white/5 border-white/10 text-stone-400 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <div className="flex items-center gap-2 font-mono text-xs font-bold text-emerald-300">
+              <span>🏛</span> Foto Wikimedia Commons
+            </div>
+            <p className="text-[10px] text-stone-400 leading-tight">
+              Archivo histórico auténtico con licencia CC0 libre de derechos.
+            </p>
+          </button>
+
+          {/* Opción 3: Solo Texto */}
+          <button
+            type="button"
+            onClick={() => setModoPortada('ninguna')}
+            className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col gap-1 ${
+              modoPortada === 'ninguna'
+                ? 'bg-zinc-700/30 border-zinc-400/60 text-white'
+                : 'bg-white/5 border-white/10 text-stone-400 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <div className="flex items-center gap-2 font-mono text-xs font-bold text-zinc-300">
+              <span>📝</span> Solo Texto Editorial
+            </div>
+            <p className="text-[10px] text-stone-400 leading-tight">
+              Publicación puramente textual sin imagen de portada obligatoria.
+            </p>
+          </button>
         </div>
       </div>
 
-      {/* BOTONES DE ACCIÓN */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-        {/* BOTÓN 1: PRINCIPAL CONJUNTO */}
-        <button
-          type="button"
-          disabled={isGenerating || isGeneratingArt}
-          onClick={handleGenerarAmbos}
-          className={`md:col-span-3 py-4 px-6 rounded-xl font-metadata text-xs uppercase tracking-[0.2em] font-bold transition-all shadow-xl flex items-center justify-center gap-3 cursor-pointer ${
-            isGenerating || isGeneratingArt
-              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse'
-              : 'bg-linear-to-r from-amber-900 via-amber-800 to-amber-600 hover:from-amber-800 hover:to-amber-500 text-white border border-amber-400/40 hover:shadow-[0_0_20px_rgba(245,158,11,0.3)]'
-          }`}
-        >
-          {isGenerating || isGeneratingArt ? (
-            <>
-              <div className="w-4.5 h-4.5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-              <span>{isGenerating ? 'Generando Informe Erudito...' : 'Materializando Portada IA...'}</span>
-            </>
-          ) : (
-            <>
-              <span>✦ 1. Generar Redacción + Portada Unificada (Proceso Completo)</span>
-            </>
+      {/* ── PANEL DE ACCIÓN Y GENERACIÓN SEGÚN MODO ── */}
+      {modoPortada === 'ia' && (
+        <div className="mb-6 p-4 bg-amber-950/20 border border-amber-500/30 rounded-xl space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span className="text-xs font-mono font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                <span>✦</span> Fábrica de Portadas IA · Cinemática 35mm
+              </span>
+              <p className="text-[11px] text-stone-400">
+                Preset activo: <strong className="text-amber-400 font-mono">Panavision Anamorphic (Kodak Vision3)</strong>
+              </p>
+            </div>
+
+            {/* BOTÓN COLAPSAR / PLEGAR FÁBRICA */}
+            <button
+              type="button"
+              onClick={() => setIsLabOpen(!isLabOpen)}
+              className="px-3 py-1.5 bg-white/5 hover:bg-white/15 text-stone-300 rounded-lg text-[11px] font-mono border border-white/10 transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              <span>{isLabOpen ? '▲ Plegar Fábrica' : '▼ Opciones Técnicas de Cámara'}</span>
+            </button>
+          </div>
+
+          {/* OPCIONES TÉCNICAS COLAPSABLES */}
+          {isLabOpen && (
+            <div className="p-3 bg-black/50 border border-white/10 rounded-lg space-y-3">
+              <label className="block text-[11px] font-mono text-stone-400">
+                Seleccionar Estilo Fotográfico / Cinemático:
+              </label>
+              <select
+                value={estiloArte}
+                onChange={(e) => setEstiloArte(e.target.value)}
+                className="w-full bg-zinc-900 border border-white/15 text-stone-200 text-xs font-mono rounded-lg p-2.5 focus:outline-none focus:border-amber-400"
+              >
+                <option value="cine">🎬 Cine (Panavision Anamorphic 35mm · Arri Alexa 65) [Recomendado]</option>
+                <option value="expedicion-90s">📷 Expedición 90s (Kodak Portra 400 · Leica M6)</option>
+                <option value="editorial">✨ Editorial (Vogue Still Life · 35mm Film Grain)</option>
+                <option value="dark-academia">🏛️ Dark Academia (Claroscuro Editorial · Cobre & Obsidiana)</option>
+                <option value="concepto">📐 Concepto (Surrealismo Geométrico)</option>
+                <option value="archivo-museo">🏛️ Archivo Museo (Hasselblad Macro · Fondo Negro Vitrina)</option>
+              </select>
+              <p className="text-[10px] text-stone-500 font-mono">
+                * El estilo "Archivo Museo" solo se usará si lo seleccionas manualmente aquí.
+              </p>
+            </div>
           )}
-        </button>
 
-        {/* BOTÓN 2: SOLO TEXTO */}
-        <button
-          type="button"
-          disabled={isGenerating}
-          onClick={handleGenerarTexto}
-          className="py-2.5 px-4 bg-white/5 hover:bg-white/10 text-stone-300 border border-white/10 rounded-lg text-xs font-metadata transition-all cursor-pointer flex items-center justify-center gap-2"
-        >
-          <span>📜 2. Solo Redacción (Texto)</span>
-        </button>
+          {/* BOTONES DE DISPARO IA */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <button
+              type="button"
+              disabled={isGenerating || isGeneratingArt}
+              onClick={handleGenerarAmbos}
+              className={`py-3.5 px-4 rounded-xl font-metadata text-xs uppercase tracking-wider font-bold transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
+                isGenerating || isGeneratingArt
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse'
+                  : 'bg-linear-to-r from-amber-900 via-amber-800 to-amber-600 hover:from-amber-800 hover:to-amber-500 text-white border border-amber-400/40'
+              }`}
+            >
+              {isGenerating || isGeneratingArt ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                  <span>{isGenerating ? 'Generando Texto...' : 'Materializando Portada...'}</span>
+                </>
+              ) : (
+                <>
+                  <span>✦ Generar Ensayo + Portada Cinemática</span>
+                </>
+              )}
+            </button>
 
-        {/* BOTÓN 3: SOLO PORTADA IA */}
-        <button
-          type="button"
-          disabled={isGeneratingArt}
-          onClick={handleGenerarArte}
-          className="py-2.5 px-4 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 rounded-lg text-xs font-metadata transition-all cursor-pointer flex items-center justify-center gap-2"
-        >
-          <span>🎨 3. Solo Portada IA (Nano Banana)</span>
-        </button>
+            <button
+              type="button"
+              disabled={isGeneratingArt}
+              onClick={handleGenerarArte}
+              className="py-3.5 px-4 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 rounded-xl text-xs font-metadata font-bold transition-all cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span>🎨 Regenerar Solo Portada IA</span>
+            </button>
+          </div>
+        </div>
+      )}
 
-        {/* BOTÓN 4: TRASPASAR TODO (con toggles para campos opcionales) */}
-        <button
-          type="button"
-          onClick={() => {
-            if (!informe) return alert('No hay texto para sincronizar.');
-            onChange(informe);
-            syncFieldsToKeystaticDOM(volantaIA, categoryIA, excerptIA);
-            setIsSynced(true);
-            lockKeystatiSave(false);
-          }}
-          className="py-2.5 px-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 rounded-lg text-xs font-metadata transition-all cursor-pointer flex items-center justify-center gap-2"
-        >
-          <span>{isSynced ? '✅ Traspasado — Podés hacer Save' : '✓ Traspasar Todo a Keystatic'}</span>
-        </button>
+      {/* ── PANEL MODO WIKIMEDIA COMMONS ── */}
+      {modoPortada === 'wiki' && (
+        <div className="mb-6 p-4 bg-emerald-950/20 border border-emerald-500/30 rounded-xl space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span className="text-xs font-mono font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                <span>🏛</span> Búsqueda Directa en Wikimedia Commons (CC0)
+              </span>
+              <p className="text-[11px] text-stone-400">
+                Extrae fotos históricas, arqueológicas y artísticas con el motor del Ingestor.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={wikiBusqueda}
+              onChange={(e) => setWikiBusqueda(e.target.value)}
+              placeholder="Buscar obra, yacimiento o deidad (ej: Alexander mosaic, Delphi sanctuary, Samson)..."
+              className="grow px-3.5 py-2.5 bg-black/40 border border-white/15 rounded-lg text-xs font-mono text-white focus:outline-none focus:border-emerald-400"
+            />
+            <button
+              type="button"
+              disabled={isSearchingWiki}
+              onClick={handleBuscarWiki}
+              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap"
+            >
+              {isSearchingWiki ? 'Buscando…' : '🔍 Buscar Fotos'}
+            </button>
+          </div>
+
+          {/* RESULTADOS DE WIKIMEDIA */}
+          {wikiResultados.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 max-h-60 overflow-y-auto">
+              {wikiResultados.map((item, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => setWikiImagenSeleccionada(item.url || item.thumbUrl)}
+                  className={`p-2 rounded-lg border transition-all cursor-pointer flex flex-col gap-1.5 ${
+                    wikiImagenSeleccionada === (item.url || item.thumbUrl)
+                      ? 'bg-emerald-500/20 border-emerald-400 ring-2 ring-emerald-400'
+                      : 'bg-black/40 border-white/10 hover:border-white/30'
+                  }`}
+                >
+                  <img
+                    src={item.thumbUrl || item.url}
+                    alt={item.title || 'Foto'}
+                    className="h-20 w-full object-cover rounded"
+                  />
+                  <span className="text-[10px] font-mono text-stone-300 truncate">
+                    {item.title || `Foto ${idx + 1}`}
+                  </span>
+                  <button
+                    type="button"
+                    className="text-[9px] font-mono py-0.5 px-1 bg-white/10 rounded text-center text-emerald-300"
+                  >
+                    {wikiImagenSeleccionada === (item.url || item.thumbUrl) ? '✓ Seleccionada' : 'Seleccionar'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* BOTÓN GENERAR TEXTO PARA EL MODO WIKI */}
+          <button
+            type="button"
+            disabled={isGenerating}
+            onClick={handleGenerarTexto}
+            className="w-full py-3 px-4 bg-emerald-900/30 hover:bg-emerald-900/50 border border-emerald-500/40 text-emerald-300 rounded-xl text-xs font-metadata font-bold transition-all cursor-pointer flex items-center justify-center gap-2"
+          >
+            <span>📜 Generar Solo Texto del Ensayo</span>
+          </button>
+        </div>
+      )}
+
+      {/* ── PANEL MODO SOLO TEXTO ── */}
+      {modoPortada === 'ninguna' && (
+        <div className="mb-6 p-4 bg-zinc-900/40 border border-white/10 rounded-xl">
+          <button
+            type="button"
+            disabled={isGenerating}
+            onClick={handleGenerarTexto}
+            className="w-full py-3 px-4 bg-white/10 hover:bg-white/15 border border-white/20 text-white rounded-xl text-xs font-metadata font-bold transition-all cursor-pointer flex items-center justify-center gap-2"
+          >
+            <span>📜 Generar Ensayo Puramente Textual</span>
+          </button>
+        </div>
+      )}
+
+      {/* ═════════════════════════════════════════════════════════════════════
+          BOTÓN PRINCIPAL: CONSOLIDAR TODO ANTES DE SAVE (CERO POSTS VACÍOS)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <div className="mb-6 p-4 bg-linear-to-r from-emerald-950/60 to-emerald-900/40 border-2 border-emerald-500/50 rounded-2xl shadow-xl">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <span className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-widest block">
+              Paso Obligatorio de Consolidación
+            </span>
+            <p className="text-[11px] text-stone-300 leading-tight mt-0.5">
+              Une el texto redactado con la portada seleccionada e inyecta los metadatos para que el post no quede huérfano.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            disabled={isConsolidating || !informe || informe.trim().length < 10}
+            onClick={handleConsolidarTodo}
+            className={`py-3.5 px-6 rounded-xl font-metadata text-xs uppercase tracking-wider font-bold transition-all shadow-xl flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap ${
+              isConsolidating
+                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400 animate-pulse'
+                : isSynced
+                  ? 'bg-emerald-500 text-stone-950 border border-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.4)]'
+                  : (!informe || informe.trim().length < 10)
+                    ? 'bg-white/5 text-stone-600 border border-white/10 cursor-not-allowed'
+                    : 'bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)]'
+            }`}
+          >
+            {isConsolidating ? (
+              <span>Vinculando Portada y Texto…</span>
+            ) : isSynced ? (
+              <span>✅ ¡Post Consolidado! (Listo para Save)</span>
+            ) : (
+              <span>✦ Consolidar Post Completo (Texto + Portada)</span>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* PANEL DE TOGGLES: Campos Opcionales — qué se inyecta en Keystatic */}
@@ -631,6 +824,39 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
               <p className="line-clamp-2 text-[11px] text-stone-400 font-mono bg-black/40 p-2 rounded border border-white/5">
                 <strong className="text-stone-500 uppercase text-[10px] block">Prompt de Imagen:</strong> 
                 {arteResult.imagePrompt}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PREVIEW DE LA FOTO SELECCIONADA EN WIKIMEDIA */}
+      {modoPortada === 'wiki' && wikiImagenSeleccionada && (
+        <div 
+          className="mb-5 p-4 rounded-xl border"
+          style={{
+            backgroundColor: '#06130d',
+            borderColor: 'rgba(16, 185, 129, 0.3)',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.4)'
+          }}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold flex items-center gap-2">
+              <span>🏛</span> Foto Seleccionada de Wikimedia Commons (CC0)
+            </span>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 items-start">
+            <div className="w-full sm:w-52 flex flex-col gap-2">
+              <img
+                src={wikiImagenSeleccionada}
+                alt="Portada Wikimedia"
+                className="h-32 rounded-lg border border-white/10 shadow-lg object-cover"
+                style={{ maxHeight: '140px' }}
+              />
+            </div>
+            <div className="text-xs text-stone-300 space-y-2 overflow-hidden flex-1">
+              <p className="text-stone-300 font-mono text-[11px]">
+                Esta foto de archivo histórico será vinculada como portada oficial de la nota en Keystatic al pulsar "Consolidar Post Completo".
               </p>
             </div>
           </div>
