@@ -1,0 +1,27 @@
+---
+/**
+ * src/pages/admin/curador.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Panel Administrativo Interno de Curaduría Visual (Human-in-the-Loop)
+ * Permite seleccionar portadas web (Hero 16:9) y Video Arrays para DaVinci.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+import '../../styles/global.css';
+import CuradorVisual from '../../components/admin/CuradorVisual.svelte';
+
+export const prerender = false;
+---
+
+<!doctype html>
+<html lang="es" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Curador Visual & Control Humano (HITL) · TGP</title>
+    <link rel="icon" type="image/webp" href="/images/favicon.TGP.webp" />
+    <meta name="robots" content="noindex, nofollow" />
+  </head>
+  <body class="bg-[#060a08] text-stone-200 antialiased overflow-x-hidden selection:bg-emerald-900 selection:text-white min-h-screen">
+    <CuradorVisual client:only="svelte" />
+  </body>
+</html>
