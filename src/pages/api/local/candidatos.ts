@@ -63,28 +63,37 @@ export const GET: APIRoute = async ({ request }) => {
     // 2.1 Búsqueda manual por texto libre (independiente de Keystatic)
     const customQuery = url.searchParams.get('query')?.trim();
     if (customQuery) {
-      const pseudoSlug = customQuery
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '') || 'busqueda-manual';
+      try {
+        const pseudoSlug = customQuery
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '') || 'busqueda-manual';
 
-      const { extraerCandidatosDraft } = await import('../../../../scripts/lib/wikimedia-engine.mjs');
-      const liveResult = await extraerCandidatosDraft(customQuery, '', 10, true);
-      const candidates = liveResult.candidates || [];
+        const { extraerCandidatosDraft } = await import('../../../../scripts/lib/wikimedia-engine.mjs');
+        const liveResult = await extraerCandidatosDraft(customQuery, '', 10, true);
+        const candidates = liveResult.candidates || [];
 
-      return new Response(JSON.stringify({
-        success: true,
-        isManualQuery: true,
-        query: customQuery,
-        slug: pseudoSlug,
-        title: customQuery,
-        hasHero: false,
-        coverImage: '',
-        candidates,
-        allPosts,
-      }), { status: 200, headers });
+        return new Response(JSON.stringify({
+          success: true,
+          isManualQuery: true,
+          query: customQuery,
+          slug: pseudoSlug,
+          title: customQuery,
+          hasHero: false,
+          coverImage: '',
+          candidates,
+          allPosts,
+        }), { status: 200, headers });
+      } catch (manualErr: any) {
+        console.error('🚨 Error crítico en búsqueda manual:', manualErr);
+        return new Response(JSON.stringify({
+          success: false,
+          error: 'Fallo en el motor de búsqueda manual. Revisa la terminal del servidor.',
+          details: manualErr?.message || String(manualErr),
+        }), { status: 500, headers });
+      }
     }
 
     // 3. Si se solicita un slug en particular

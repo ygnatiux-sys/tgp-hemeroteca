@@ -194,9 +194,11 @@ async function buscarCommonsCandidatos(categoriaCommons, keywords, isManualQuery
   }
 
   // 2. Por Keywords de Búsqueda
-  if (candidatos.length < 5 && keywords && keywords.length > 0) {
-    const searchString = keywords.join(' ') + ' -map -flag -icon -diagram';
-    const sUrl = `${base}?action=query&generator=search&gsrsearch=${encodeURIComponent(searchString)}&gsrnamespace=6&gsrlimit=12&prop=imageinfo&iiprop=url|thumburl|mime|size|extmetadata&iiurlwidth=800&format=json`;
+  if ((isManualQuery || candidatos.length < 5) && keywords && keywords.length > 0) {
+    const searchString = isManualQuery 
+      ? keywords.join(' ') 
+      : keywords.join(' ') + ' -map -flag -icon -diagram';
+    const sUrl = `${base}?action=query&generator=search&gsrsearch=${encodeURIComponent(searchString)}&gsrnamespace=6&gsrlimit=15&prop=imageinfo&iiprop=url|thumburl|mime|size|extmetadata&iiurlwidth=800&format=json`;
     const data = await fetchCommonsJson(sUrl);
     const kwList = parsePagesToCandidates(data?.query?.pages);
     
