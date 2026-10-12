@@ -1,26 +1,30 @@
 ---
-import Layout from '../layouts/Layout.astro';
+/**
+ * src/pages/laboratorio-visual.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * TGP R2 Staging · Conversor & Subida R2
+ * Mesa de trabajo independiente sin colisión con el header público de la Hemeroteca.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+import '../styles/global.css';
 import VisualLaboratory from '../components/VisualLaboratory.svelte';
+
+export const prerender = false;
 ---
 
-<Layout title="Laboratorio Visual TGP · Ingesta & Procesamiento">
-  <main class="w-full max-w-430 mx-auto px-3 sm:px-6 lg:px-8 py-4 min-h-screen">
-    <header class="mb-6 border-b border-zinc-200 pb-5 flex items-center justify-between">
-      <div>
-        <span class="text-xs uppercase tracking-widest text-emerald-700 font-mono font-medium">Infraestructura Visual TGP</span>
-        <h1 class="text-3xl font-serif font-light text-zinc-900 mt-1">Laboratorio Visual</h1>
-      </div>
-      <a
-        href="/tgp-app/"
-        class="px-4 py-2 text-xs font-mono uppercase tracking-wider text-zinc-600 hover:text-zinc-900 bg-white hover:bg-zinc-50 border border-zinc-200 hover:border-zinc-400 rounded-full transition-all shadow-2xs"
-      >
-        ← Volver al Hub
-      </a>
-    </header>
-
-    <VisualLaboratory client:load />
-  </main>
-</Layout>
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TGP R2 Staging · Conversor & Subida R2</title>
+    <link rel="icon" type="image/webp" href="/images/favicon.TGP.webp" />
+    <meta name="robots" content="noindex, nofollow" />
+  </head>
+  <body class="antialiased overflow-x-hidden min-h-screen">
+    <VisualLaboratory client:only="svelte" />
+  </body>
+</html>
 
 <style is:global>
   .picker-dialog-bg {

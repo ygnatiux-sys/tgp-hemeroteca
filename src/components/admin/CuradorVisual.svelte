@@ -63,10 +63,25 @@
   let lightboxDialogEl: HTMLElement;
   let actionBarEl: HTMLElement;
 
-  // ── CICLO DE VIDA Y CARGA INICIAL ───────────────────────────────────────────
+  // ── Tema Dual: 'dia' (Brand Gemini limpio) vs 'noche' (Carbón Pixel #121314) ──
+  let theme: 'dia' | 'noche' = 'dia';
+
   onMount(async () => {
+    if (typeof localStorage !== 'undefined') {
+      const saved = localStorage.getItem('tgp_ui_theme');
+      if (saved === 'dia' || saved === 'noche') {
+        theme = saved;
+      }
+    }
     await cargarDatosIniciales();
   });
+
+  function toggleTheme() {
+    theme = theme === 'dia' ? 'noche' : 'dia';
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('tgp_ui_theme', theme);
+    }
+  }
 
   async function cargarDatosIniciales() {
     isLoading = true;
@@ -355,34 +370,96 @@
   }
 </script>
 
-<div class="curador-root min-h-screen bg-[#060a08] text-stone-200 font-sans selection:bg-emerald-900 selection:text-white">
+<div class="curador-root min-h-screen font-sans transition-colors duration-300
+  {theme === 'dia'
+    ? 'bg-white text-[#1f1f1f] selection:bg-blue-100 selection:text-blue-900'
+    : 'bg-[#121314] text-[#e3e3e3] selection:bg-blue-950 selection:text-white'}"
+>
+  <!-- AMBIENT GLOW DIFUSO (Solo en modo Noche) -->
+  {#if theme === 'noche'}
+    <div class="fixed -top-40 -left-40 w-125 h-125 rounded-full bg-blue-500/08 blur-[140px] pointer-events-none"></div>
+    <div class="fixed top-1/3 -right-40 w-137.5 h-137.5 rounded-full bg-violet-500/08 blur-[150px] pointer-events-none"></div>
+  {/if}
+
   <!-- ENCABEZADO SUPERIOR -->
-  <header class="border-b border-[#141f18] bg-[#080e0a]/90 backdrop-blur-md sticky top-0 z-40 px-4 sm:px-8 py-3.5">
+  <header class="sticky top-0 z-40 backdrop-blur-xl px-4 sm:px-8 py-3.5 border-b transition-colors duration-300
+    {theme === 'dia'
+      ? 'bg-white/90 border-slate-100'
+      : 'bg-[#131314]/90 border-white/5'}"
+  >
     <div class="max-w-7xl mx-auto flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="text-[11px] font-mono tracking-widest uppercase text-emerald-400 font-semibold">TGP · Human-in-the-Loop</span>
+      <!-- BRANDING & TÍTULO ALUSIVO -->
+      <div class="flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shadow-2xs shrink-0
+          {theme === 'dia' ? 'bg-[#e8f0fe] text-[#1a73e8]' : 'bg-[#1e1f20] text-emerald-400 border border-white/10'}"
+        >
+          ✦
         </div>
-        <h1 class="text-2xl font-serif text-white tracking-wide mt-0.5">Control Visual & Curaduría de Arte</h1>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono font-semibold tracking-wider uppercase
+              {theme === 'dia' ? 'text-[#1a73e8]' : 'text-emerald-400'}">
+              TGP Remediation
+            </span>
+          </div>
+          <h1 class="text-xl sm:text-2xl font-sans tracking-tight font-bold
+            {theme === 'dia' ? 'text-[#1f1f1f]' : 'text-white'}">
+            Asignador de Portadas
+          </h1>
+          <p class="text-xs font-sans font-medium mt-0.5
+            {theme === 'dia' ? 'text-[#444746]' : 'text-[#8e918f]'}">
+            Detecta posts sin portada (Hero Vacío), busca en Wikimedia Commons y asigna portadas a disco y Keystatic.
+          </p>
+        </div>
       </div>
 
-      <!-- CONTROLES SUPERIORES: BUSCADOR MANUAL + SELECTOR DE POSTS -->
-      <div class="flex flex-wrap items-center gap-3">
+      <!-- CONTROLES SUPERIORES: BUSCADOR MANUAL + SELECTOR DE POSTS + THEME TOGGLE -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <!-- ☀️ / 🌙 CONMUTADOR DÍA / NOCHE -->
+        <button
+          type="button"
+          on:click={toggleTheme}
+          class="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-sans font-medium transition-all cursor-pointer shadow-2xs
+          {theme === 'dia' ? 'bg-[#f0f4f9] hover:bg-[#e2e7ef] text-[#1f1f1f]' : 'bg-[#1e1f20] hover:bg-[#282a2c] text-amber-300 border border-white/10'}"
+          title="Alternar: Día (Brand Gemini) vs Noche (Carbón Pixel)"
+        >
+          {#if theme === 'dia'}
+            <span>☀️</span>
+            <span class="font-semibold">Día · Gemini</span>
+          {:else}
+            <span>🌙</span>
+            <span class="font-semibold">Noche · Carbón</span>
+          {/if}
+        </button>
+
+        <a
+          href="/tgp-app/"
+          class="px-4 py-2 text-xs font-sans font-semibold rounded-full transition-all inline-flex items-center gap-1.5 shadow-2xs
+          {theme === 'dia' ? 'text-[#1a73e8] bg-[#e8f0fe] hover:bg-[#d2e3fc]' : 'text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-800'}"
+          title="Volver al Hub de TGP App"
+        >
+          ← Hub
+        </a>
+
+        <div class="hidden sm:block h-5 w-px {theme === 'dia' ? 'bg-slate-200' : 'bg-white/10'}"></div>
+
         <!-- 1. BUSCADOR DE TEXTO LIBRE (MANUAL INPUT) -->
         <form on:submit|preventDefault={ejecutarBusquedaManual} class="flex items-center gap-1.5 flex-1 sm:flex-none">
-          <div class="relative w-full sm:w-64 md:w-72">
+          <div class="relative w-full sm:w-60 md:w-68">
             <input
               type="text"
               bind:value={searchInput}
-              placeholder="Buscar tema libre (ej. Coliseo Romano)..."
-              class="w-full bg-[#0d1511] text-xs text-stone-200 border border-[#1e2e24] focus:border-amber-400 rounded-lg pl-3 pr-7 py-2 focus:outline-none transition-colors placeholder:text-stone-500"
+              placeholder="Buscar tema libre (ej. Coliseo)..."
+              class="w-full text-xs rounded-full pl-3.5 pr-7 py-2 focus:outline-none transition-all
+              {theme === 'dia'
+                ? 'bg-[#f0f4f9] text-[#1f1f1f] placeholder-[#747775] border border-transparent focus:bg-white focus:border-[#1a73e8]'
+                : 'bg-[#1e1f20] text-stone-200 placeholder-stone-500 border border-white/10 focus:border-[#8ab4f8]'}"
             />
             {#if searchInput}
               <button
                 type="button"
                 on:click={() => searchInput = ''}
-                class="absolute right-2 top-1/2 -translate-y-1/2 text-stone-500 hover:text-stone-300 text-xs cursor-pointer"
+                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-200 text-xs cursor-pointer"
               >
                 ✕
               </button>
@@ -392,18 +469,22 @@
           <button
             type="submit"
             disabled={isLoading || isProcessing || !searchInput.trim()}
-            class="px-3.5 py-2 text-xs font-mono font-bold uppercase tracking-wider bg-linear-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black rounded-lg transition-all cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+            class="px-4 py-2 text-xs font-sans font-semibold rounded-full transition-all cursor-pointer shadow-xs disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap
+            {theme === 'dia'
+              ? 'bg-[#1a73e8] hover:bg-[#1557b0] text-white'
+              : 'bg-[#8ab4f8] hover:bg-[#aecbfa] text-[#131314]'}"
           >
             Buscar Manual
           </button>
         </form>
 
-        <div class="hidden sm:block h-5 w-px bg-[#18281e]"></div>
-
         <!-- 2. SELECTOR DE POST DE KEYSTATIC -->
-        <div class="relative min-w-65 sm:min-w-70">
+        <div class="relative min-w-56 sm:min-w-64">
           <select
-            class="w-full bg-[#0d1511] text-xs text-stone-200 border border-[#1e2e24] rounded-lg px-3 py-2 pr-8 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+            class="w-full text-xs rounded-full px-3.5 py-2 pr-8 focus:outline-none transition-all cursor-pointer font-medium
+            {theme === 'dia'
+              ? 'bg-[#f0f4f9] text-[#1f1f1f] border border-transparent focus:border-[#1a73e8]'
+              : 'bg-[#1e1f20] text-stone-200 border border-white/10 focus:border-[#8ab4f8]'}"
             value={isManualMode ? '' : selectedSlug}
             on:change={(e) => seleccionarPost(e.currentTarget.value)}
           >
@@ -420,7 +501,10 @@
 
         <button
           type="button"
-          class="px-3 py-2 text-xs font-mono bg-[#111c15] hover:bg-[#18281e] text-emerald-300 border border-[#1e3025] hover:border-emerald-500 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
+          class="px-3.5 py-2 text-xs font-sans font-semibold rounded-full transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs disabled:opacity-50
+          {theme === 'dia'
+            ? 'bg-[#f0f4f9] hover:bg-[#e2e7ef] text-[#1f1f1f]'
+            : 'bg-[#1e1f20] hover:bg-[#282a2c] text-stone-200 border border-white/10'}"
           disabled={isLoading || isProcessing}
           on:click={() => isManualMode ? ejecutarBusquedaManual() : seleccionarPost(selectedSlug, true)}
           title="Forzar nueva búsqueda en Wikimedia"
@@ -437,48 +521,62 @@
   <!-- CONTENIDO PRINCIPAL -->
   <main class="max-w-7xl mx-auto px-4 sm:px-8 py-6 pb-36">
     <!-- BARRA DE CONFIGURACIÓN DEL CONTEXTO ACTIVO -->
-    <div class="bg-[#0b120e] border border-[#16241b] rounded-2xl p-5 mb-8 shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+    <div class="rounded-3xl p-6 mb-8 border transition-colors duration-300 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-6
+      {theme === 'dia'
+        ? 'bg-[#f8fafd] border-slate-100'
+        : 'bg-[#1e1f20] border-white/10'}"
+    >
       <div>
-        <div class="flex items-center gap-2 mb-1 flex-wrap">
+        <div class="flex items-center gap-2 mb-2 flex-wrap">
           {#if isManualMode}
-            <span class="text-xs font-mono px-2 py-0.5 rounded bg-amber-950/90 text-amber-300 border border-amber-600/70 font-semibold">
+            <span class="text-xs font-mono px-3 py-1 rounded-full font-semibold
+              {theme === 'dia' ? 'bg-amber-100 text-amber-900 border border-amber-200' : 'bg-amber-950/80 text-amber-300 border border-amber-800'}">
               Búsqueda Libre: "{manualQueryTitle}"
             </span>
-            <span class="text-xs font-mono px-2 py-0.5 rounded bg-[#132018] text-stone-400 border border-[#1f3326]">
+            <span class="text-xs font-mono px-3 py-1 rounded-full
+              {theme === 'dia' ? 'bg-slate-200 text-slate-700' : 'bg-[#151718] text-stone-400 border border-white/10'}">
               Slug: {selectedSlug}
             </span>
             <button
               type="button"
               on:click={volverAModoPost}
-              class="text-xs font-mono text-stone-400 hover:text-white underline cursor-pointer ml-1"
+              class="text-xs font-sans text-[#1a73e8] hover:underline cursor-pointer ml-1"
             >
               (✕ Volver a Posts)
             </button>
           {:else}
-            <span class="text-xs font-mono px-2 py-0.5 rounded bg-[#132018] text-stone-400 border border-[#1f3326]">
+            <span class="text-xs font-mono px-3 py-1 rounded-full
+              {theme === 'dia' ? 'bg-slate-200 text-slate-700' : 'bg-[#151718] text-stone-400 border border-white/10'}">
               Slug: {selectedSlug || 'Ninguno'}
             </span>
             {#if currentPost?.hasHero}
-              <span class="text-xs font-mono px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-700/60">
-                Hero Actual Asignado
+              <span class="text-xs font-mono px-3 py-1 rounded-full font-semibold
+                {theme === 'dia' ? 'bg-emerald-100 text-emerald-900 border border-emerald-200' : 'bg-emerald-950/80 text-emerald-300 border border-emerald-800'}">
+                Hero Asignado ✓
               </span>
             {:else}
-              <span class="text-xs font-mono px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-700/60">
-                Hero Vacío (Requiere Portada)
+              <span class="text-xs font-mono px-3 py-1 rounded-full font-semibold
+                {theme === 'dia' ? 'bg-amber-100 text-amber-900 border border-amber-200' : 'bg-amber-950/80 text-amber-300 border border-amber-800'}">
+                Hero Vacío (Requiere Portada) ✗
               </span>
             {/if}
           {/if}
         </div>
-        <h2 class="text-xl sm:text-2xl font-serif text-white font-normal">
+        <h2 class="text-xl sm:text-2xl font-sans font-bold
+          {theme === 'dia' ? 'text-[#1f1f1f]' : 'text-white'}">
           {currentPost?.title || 'Selecciona un post o busca un tema'}
         </h2>
       </div>
 
-      <!-- SELECTOR DUAL DE MODO -->
-      <div class="flex items-center bg-[#070b09] p-1.5 rounded-xl border border-[#152219]">
+      <!-- SELECTOR DUAL DE MODO (PÍLDORAS) -->
+      <div class="flex items-center p-1 rounded-full border
+        {theme === 'dia' ? 'bg-[#f0f4f9] border-slate-200' : 'bg-[#151718] border-white/10'}">
         <button
           type="button"
-          class="px-4 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center gap-2 {mode === 'hero' ? 'bg-emerald-800/90 text-white shadow-md font-semibold' : 'text-stone-400 hover:text-white'}"
+          class="px-4 py-2 rounded-full text-xs font-sans font-semibold transition-all cursor-pointer flex items-center gap-2
+          {mode === 'hero'
+            ? 'bg-[#1a73e8] text-white shadow-xs'
+            : (theme === 'dia' ? 'text-[#444746] hover:text-[#1f1f1f]' : 'text-stone-400 hover:text-white')}"
           on:click={() => cambiarModo('hero')}
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -489,7 +587,10 @@
 
         <button
           type="button"
-          class="px-4 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center gap-2 {mode === 'video-array' ? 'bg-[#997321] text-white shadow-md font-semibold' : 'text-stone-400 hover:text-white'}"
+          class="px-4 py-2 rounded-full text-xs font-sans font-semibold transition-all cursor-pointer flex items-center gap-2
+          {mode === 'video-array'
+            ? 'bg-amber-600 text-white shadow-xs'
+            : (theme === 'dia' ? 'text-[#444746] hover:text-[#1f1f1f]' : 'text-stone-400 hover:text-white')}"
           on:click={() => cambiarModo('video-array')}
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -502,19 +603,25 @@
 
     <!-- FEEDBACK TOAST / ESTADOS -->
     {#if statusMessage}
-      <div class="mb-6 p-4 rounded-xl border flex items-start gap-3 shadow-lg {statusMessage.type === 'success' ? 'bg-emerald-950/70 border-emerald-700/60 text-emerald-200' : statusMessage.type === 'error' ? 'bg-red-950/70 border-red-700/60 text-red-200' : 'bg-[#101b14] border-[#1d3224] text-stone-300'}">
+      <div class="mb-6 p-4 rounded-2xl border flex items-start gap-3 shadow-xs
+        {statusMessage.type === 'success'
+          ? (theme === 'dia' ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-emerald-950/70 border-emerald-800 text-emerald-200')
+          : statusMessage.type === 'error'
+            ? (theme === 'dia' ? 'bg-red-50 border-red-200 text-red-900' : 'bg-red-950/70 border-red-800 text-red-200')
+            : (theme === 'dia' ? 'bg-blue-50 border-blue-200 text-blue-900' : 'bg-blue-950/60 border-blue-800 text-blue-200')}"
+      >
         <span class="text-xl">
           {statusMessage.type === 'success' ? '✨' : statusMessage.type === 'error' ? '⚠️' : 'ℹ️'}
         </span>
-        <div class="flex-1 text-sm">
-          <p class="font-medium">{statusMessage.text}</p>
+        <div class="flex-1 text-sm font-sans">
+          <p class="font-semibold">{statusMessage.text}</p>
           {#if statusMessage.details?.coverImage}
-            <p class="font-mono text-xs text-emerald-300 mt-1">
+            <p class="font-mono text-xs mt-1 text-[#1a73e8]">
               Ruta asignada: {statusMessage.details.coverImage}
             </p>
           {/if}
           {#if statusMessage.details?.assetsArrayFile}
-            <p class="font-mono text-xs text-amber-300 mt-1">
+            <p class="font-mono text-xs mt-1 text-amber-600">
               Archivo DaVinci: {statusMessage.details.assetsArrayFile}
             </p>
           {/if}
@@ -526,44 +633,44 @@
     {#if isLoading || candidates.length === 0}
       <div class="mb-5 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <span class="inline-block w-2.5 h-2.5 rounded-full {isLoading ? 'bg-amber-400 animate-ping' : 'bg-emerald-600'}"></span>
-          <span class="text-xs font-mono uppercase tracking-wider text-stone-400 font-medium">
-            {isLoading ? 'Rastreando Wikimedia Commons (10 Slots Designados en curso)...' : 'Cuadrícula Lista (10 Espacios esperando búsqueda)'}
+          <span class="inline-block w-2.5 h-2.5 rounded-full {isLoading ? 'bg-amber-400 animate-ping' : (theme === 'dia' ? 'bg-emerald-500' : 'bg-emerald-400')}"></span>
+          <span class="text-xs font-sans uppercase tracking-wider font-semibold {theme === 'dia' ? 'text-[#444746]' : 'text-stone-400'}">
+            {isLoading ? 'Rastreando Wikimedia Commons (10 Slots en curso)...' : 'Cuadrícula Lista (10 Espacios esperando búsqueda)'}
           </span>
         </div>
-        <span class="text-[11px] font-mono text-stone-500">10 slots 16:9</span>
+        <span class="text-[11px] font-mono {theme === 'dia' ? 'text-slate-400' : 'text-stone-500'}">10 slots 16:9</span>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {#each Array(10) as _, i}
           <div
             bind:this={skeletonRefs[i]}
-            class="bg-[#0a0f0c] border border-[#142017] rounded-xl overflow-hidden p-0 flex flex-col shadow-lg transition-all"
+            class="rounded-3xl overflow-hidden border p-0 flex flex-col shadow-xs transition-all
+            {theme === 'dia' ? 'bg-[#f8fafd] border-slate-200' : 'bg-[#1e1f20] border-white/10'}"
           >
             <!-- CONTENEDOR 16:9 SKELETON -->
-            <div class="relative w-full aspect-video bg-[#0d1511] flex items-center justify-center overflow-hidden">
-              <!-- MEDALLA DE RANURA -->
-              <div class="absolute top-3 left-3 px-2 py-0.5 rounded-md bg-black/60 border border-[#1a2c20] text-[10px] font-mono text-emerald-400/80 font-semibold">
+            <div class="relative w-full aspect-video flex items-center justify-center overflow-hidden
+              {theme === 'dia' ? 'bg-[#edf2f7]' : 'bg-[#151718]'}">
+              <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold
+                {theme === 'dia' ? 'bg-white text-slate-600 shadow-2xs' : 'bg-[#1e1f20] text-stone-400 border border-white/10'}">
                 Slot #{String(i + 1).padStart(2, '0')}
               </div>
-
-              <!-- RETÍCULA CINEMÁTICA 16:9 -->
-              <div class="w-16 h-10 border border-dashed border-[#1a2c20] rounded flex items-center justify-center opacity-40">
-                <span class="text-[10px] font-mono text-stone-600">16:9</span>
+              <div class="w-16 h-10 border border-dashed rounded flex items-center justify-center opacity-40
+                {theme === 'dia' ? 'border-slate-400 text-slate-500' : 'border-white/20 text-stone-500'}">
+                <span class="text-[10px] font-mono">16:9</span>
               </div>
-
-              <div class="absolute inset-0 bg-linear-to-t from-[#0a0f0c] via-transparent to-transparent pointer-events-none"></div>
             </div>
 
             <!-- PLACEHOLDERS DE METADATOS -->
-            <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+            <div class="p-5 space-y-3 flex-1 flex flex-col justify-between">
               <div class="space-y-2">
-                <div class="h-3.5 bg-[#121c15] rounded-md w-3/4"></div>
-                <div class="h-2.5 bg-[#0e1711] rounded-md w-1/2"></div>
+                <div class="h-4 rounded-md w-3/4 {theme === 'dia' ? 'bg-slate-200' : 'bg-[#2a2b2e]'}"></div>
+                <div class="h-3 rounded-md w-1/2 {theme === 'dia' ? 'bg-slate-100' : 'bg-[#252629]'}"></div>
               </div>
-              <div class="pt-3 border-t border-[#121c15] flex items-center justify-between">
-                <div class="h-2.5 bg-[#101b13] rounded w-16"></div>
-                <div class="h-2.5 bg-[#142218] rounded w-20"></div>
+              <div class="pt-3 border-t flex items-center justify-between
+                {theme === 'dia' ? 'border-slate-100' : 'border-white/10'}">
+                <div class="h-3 rounded w-16 {theme === 'dia' ? 'bg-slate-200' : 'bg-[#2a2b2e]'}"></div>
+                <div class="h-3 rounded w-20 {theme === 'dia' ? 'bg-slate-200' : 'bg-[#2a2b2e]'}"></div>
               </div>
             </div>
           </div>
@@ -571,7 +678,7 @@
       </div>
 
     {:else}
-      <!-- GALERÍA REAL DE CANDIDATAS DISPONIBLES -->
+      <!-- GALERÍA REAL DE CANDIDATAS DISPONIBLES (CERO SCRIMS NI MÁSCARAS) -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {#each candidates as cand, idx}
           {@const isSelected = selectedCandidateIds.includes(cand.id)}
@@ -579,11 +686,18 @@
 
           <div
             bind:this={cardRefs[cand.id]}
-            class="group relative bg-[#0b120e] rounded-xl overflow-hidden border transition-all duration-300 cursor-pointer shadow-md flex flex-col {isSelected ? 'border-amber-400/90 ring-2 ring-amber-400/40 shadow-amber-950/40 shadow-2xl scale-[1.01]' : 'border-[#16241b] hover:border-[#273e31] hover:scale-[1.005]'}"
+            class="group relative rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer flex flex-col
+            {isSelected
+              ? (theme === 'dia'
+                  ? 'border-[#1a73e8] ring-3 ring-[#1a73e8]/20 bg-white shadow-xl scale-[1.01]'
+                  : 'border-[#8ab4f8] ring-3 ring-[#8ab4f8]/30 bg-[#1e1f20] shadow-xl scale-[1.01]')
+              : (theme === 'dia'
+                  ? 'bg-white border-slate-200/90 hover:border-slate-300 shadow-xs hover:shadow-md hover:scale-[1.005]'
+                  : 'bg-[#1e1f20] border-white/10 hover:border-white/20 shadow-xs hover:scale-[1.005]')}"
             on:click={() => toggleSeleccion(cand)}
           >
-            <!-- CONTENEDOR DE IMAGEN (16:9 PREVIEW) -->
-            <div class="relative w-full aspect-video bg-[#050806] overflow-hidden">
+            <!-- CONTENEDOR DE IMAGEN (16:9 PREVIEW, 100% NÍTIDA, SIN SCRIM) -->
+            <div class="relative w-full aspect-video overflow-hidden {theme === 'dia' ? 'bg-[#f0f4f9]' : 'bg-black'}">
               <img
                 src={cand.thumbUrl}
                 alt={cand.title}
@@ -591,18 +705,15 @@
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
 
-              <!-- GRADIENTE OSCURO INFERIOR -->
-              <div class="absolute inset-0 bg-linear-to-t from-[#0b120e] via-transparent to-black/30 pointer-events-none"></div>
-
-              <!-- MEDALLA DE ORDEN NUMÉRICO / CHECK (GSAP TARGET) -->
+              <!-- MEDALLA DE SELECCIÓN -->
               {#if isSelected}
                 <div class="absolute top-3 left-3 flex items-center justify-center">
                   {#if mode === 'hero'}
-                    <span class="px-2.5 py-1 rounded-md bg-emerald-500 text-black font-mono font-bold text-xs shadow-lg flex items-center gap-1">
+                    <span class="px-3 py-1.5 rounded-full bg-[#1a73e8] text-white font-sans font-bold text-xs shadow-lg flex items-center gap-1">
                       ★ HERO
                     </span>
                   {:else}
-                    <span class="w-8 h-8 rounded-full bg-linear-to-br from-amber-300 to-amber-600 text-black font-mono font-black text-sm shadow-xl flex items-center justify-center border border-white/60">
+                    <span class="w-8 h-8 rounded-full bg-amber-500 text-black font-mono font-black text-sm shadow-xl flex items-center justify-center border-2 border-white">
                       #{selectionOrder}
                     </span>
                   {/if}
@@ -612,49 +723,50 @@
               <!-- BOTÓN INSPECCIONAR EN LIGHTBOX -->
               <button
                 type="button"
-                class="absolute top-3 right-3 p-2 rounded-lg bg-black/60 hover:bg-black/90 text-stone-200 hover:text-white backdrop-blur-md border border-white/10 transition-all opacity-80 group-hover:opacity-100 cursor-pointer"
+                class="absolute top-3 right-3 p-2 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 cursor-pointer shadow-md"
                 on:click|stopPropagation={() => abrirLightbox(cand)}
-                title="Inspeccionar en pantalla completa"
+                title="Inspeccionar en detalle"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                 </svg>
               </button>
 
-              <!-- BADGES TÉCNICOS -->
-              <div class="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[11px] font-mono text-stone-300 pointer-events-none">
-                <span class="bg-black/60 px-2 py-0.5 rounded backdrop-blur-xs">
+              <!-- BADGES TÉCNICOS INFERIORES -->
+              <div class="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-[11px] font-mono pointer-events-none">
+                <span class="bg-black/60 text-white px-2.5 py-0.5 rounded-full backdrop-blur-xs">
                   {cand.width} × {cand.height} px
                 </span>
-                <span class="bg-black/60 px-2 py-0.5 rounded backdrop-blur-xs text-amber-300">
+                <span class="bg-black/60 text-amber-300 px-2.5 py-0.5 rounded-full backdrop-blur-xs font-semibold">
                   {cand.aspectRatio}:1
                 </span>
               </div>
             </div>
 
             <!-- METADATOS Y CRÉDITOS CC -->
-            <div class="p-4 flex-1 flex flex-col justify-between">
+            <div class="p-5 flex-1 flex flex-col justify-between">
               <div>
-                <h4 class="text-xs font-serif text-stone-100 line-clamp-2 leading-snug mb-2 font-normal" title={cand.title}>
+                <h4 class="text-xs font-sans font-semibold line-clamp-2 leading-snug mb-2.5 {theme === 'dia' ? 'text-[#1f1f1f]' : 'text-stone-100'}" title={cand.title}>
                   {cand.title}
                 </h4>
 
-                <div class="text-[11px] text-stone-400 space-y-0.5 font-mono">
+                <div class="text-[11px] space-y-1 font-sans {theme === 'dia' ? 'text-[#444746]' : 'text-stone-400'}">
                   <p class="truncate" title={cand.attribution?.author}>
-                    <span class="text-stone-500">Autor:</span> {cand.attribution?.author || 'Desconocido'}
+                    <span class="font-medium {theme === 'dia' ? 'text-[#747775]' : 'text-stone-500'}">Autor:</span> {cand.attribution?.author || 'Desconocido'}
                   </p>
-                  <p class="truncate text-emerald-400/90" title={cand.attribution?.license}>
-                    <span class="text-stone-500">Licencia:</span> {cand.attribution?.license || 'CC'}
+                  <p class="truncate {theme === 'dia' ? 'text-[#1a73e8]' : 'text-emerald-400'}" title={cand.attribution?.license}>
+                    <span class="font-medium {theme === 'dia' ? 'text-[#747775]' : 'text-stone-500'}">Licencia:</span> {cand.attribution?.license || 'CC'}
                   </p>
                 </div>
               </div>
 
               <!-- BOTÓN INFERIOR DE ACCIÓN -->
-              <div class="mt-4 pt-3 border-t border-[#142017] flex items-center justify-between">
-                <span class="text-[10px] font-mono uppercase tracking-wider text-stone-500">
+              <div class="mt-4 pt-3.5 border-t flex items-center justify-between
+                {theme === 'dia' ? 'border-slate-100' : 'border-white/10'}">
+                <span class="text-[10px] font-mono uppercase tracking-wider {theme === 'dia' ? 'text-[#747775]' : 'text-stone-500'}">
                   {cand.sourceType.replace(/_/g, ' ')}
                 </span>
-                <span class="text-xs font-medium {isSelected ? 'text-amber-400 font-semibold' : 'text-stone-400 group-hover:text-stone-200'}">
+                <span class="text-xs font-sans font-semibold {isSelected ? (theme === 'dia' ? 'text-[#1a73e8]' : 'text-amber-400') : (theme === 'dia' ? 'text-[#444746] group-hover:text-[#1a73e8]' : 'text-stone-400 group-hover:text-stone-200')}">
                   {isSelected ? (mode === 'hero' ? '✓ Seleccionada' : `Toma #${selectionOrder}`) : '+ Elegir'}
                 </span>
               </div>
@@ -665,43 +777,48 @@
     {/if}
   </main>
 
-  <!-- BARRA DE ACCIÓN FLOTANTE (CONFIRMACIÓN HITL) -->
+  <!-- BARRA DE ACCIÓN FLOTANTE (PÍLDORA ESTILO GEMINI LIVE) -->
   <footer
     bind:this={actionBarEl}
-    class="fixed bottom-0 left-0 right-0 z-40 bg-[#070d09]/95 backdrop-blur-lg border-t border-[#17271e] py-3.5 px-4 sm:px-8 shadow-2xl"
+    class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-2xl w-[92%] rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.18)] backdrop-blur-2xl px-6 py-3.5 border flex flex-col sm:flex-row items-center justify-between gap-4 transition-colors duration-300
+    {theme === 'dia'
+      ? 'bg-white/95 border-slate-200/90 text-[#1f1f1f]'
+      : 'bg-[#1e1f20]/95 border-white/10 text-white'}"
   >
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-[#0f1b13] border border-[#1e3326] flex items-center justify-center text-amber-400 font-mono font-bold text-lg">
-          {selectedCandidateIds.length}
+    <div class="flex items-center gap-3.5">
+      <div class="w-10 h-10 rounded-full flex items-center justify-center font-mono font-bold text-base shadow-2xs
+        {theme === 'dia' ? 'bg-[#e8f0fe] text-[#1a73e8]' : 'bg-[#151718] text-amber-400 border border-white/10'}">
+        {selectedCandidateIds.length}
+      </div>
+      <div>
+        <div class="text-[11px] font-sans font-semibold uppercase tracking-wider {theme === 'dia' ? 'text-[#747775]' : 'text-stone-400'}">
+          {mode === 'hero' ? 'Selección para Portada Web' : 'Selección para DaVinci Resolve'}
         </div>
-        <div>
-          <div class="text-xs font-mono uppercase tracking-wider text-stone-400">
-            {mode === 'hero' ? 'Selección para Portada Web' : 'Selección para DaVinci Resolve'}
-          </div>
-          <div class="text-sm font-medium text-white">
-            {selectedCandidateIds.length === 0 ? 'Selecciona al menos una foto' : `${selectedCandidateIds.length} ${selectedCandidateIds.length === 1 ? 'imagen elegida' : 'imágenes elegidas'}`}
-          </div>
+        <div class="text-sm font-sans font-bold {theme === 'dia' ? 'text-[#1f1f1f]' : 'text-white'}">
+          {selectedCandidateIds.length === 0 ? 'Selecciona al menos una foto' : `${selectedCandidateIds.length} ${selectedCandidateIds.length === 1 ? 'imagen elegida' : 'imágenes elegidas'}`}
         </div>
       </div>
+    </div>
 
-      <div class="flex items-center gap-3 w-full sm:w-auto">
-        <button
-          type="button"
-          class="flex-1 sm:flex-none px-6 py-3 rounded-xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer shadow-xl flex items-center justify-center gap-2 {selectedCandidateIds.length > 0 && !isProcessing ? 'bg-linear-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-black shadow-emerald-900/40' : 'bg-stone-800 text-stone-500 cursor-not-allowed opacity-50'}"
-          disabled={selectedCandidateIds.length === 0 || isProcessing}
-          on:click={confirmarYProcesar}
-        >
-          {#if isProcessing}
-            <svg class="w-4 h-4 animate-spin text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            Procesando Sharp & WebP...
-          {:else}
-            <span>✓ Confirmar & Descargar en Disco</span>
-          {/if}
-        </button>
-      </div>
+    <div class="flex items-center gap-3 w-full sm:w-auto">
+      <button
+        type="button"
+        class="w-full sm:w-auto px-6 py-2.5 rounded-full font-sans text-xs uppercase tracking-wider font-semibold transition-all cursor-pointer shadow-xs flex items-center justify-center gap-2
+        {selectedCandidateIds.length > 0 && !isProcessing
+          ? 'bg-[#1a73e8] hover:bg-[#1557b0] text-white'
+          : (theme === 'dia' ? 'bg-slate-100 text-slate-400 cursor-not-allowed opacity-60' : 'bg-[#2a2b2e] text-stone-500 cursor-not-allowed opacity-50')}"
+        disabled={selectedCandidateIds.length === 0 || isProcessing}
+        on:click={confirmarYProcesar}
+      >
+        {#if isProcessing}
+          <svg class="w-4 h-4 animate-spin text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Procesando Sharp & WebP...
+        {:else}
+          <span>✓ Confirmar & Descargar en Disco</span>
+        {/if}
+      </button>
     </div>
   </footer>
 
@@ -709,23 +826,29 @@
   {#if lightboxOpen && lightboxCandidate}
     <div
       bind:this={lightboxBackdropEl}
-      class="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 sm:p-8"
+      class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 sm:p-8"
       on:click={cerrarLightbox}
     >
       <div
         bind:this={lightboxDialogEl}
-        class="relative max-w-5xl w-full bg-[#090f0c] border border-[#1b2f22] rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]"
+        class="relative max-w-5xl w-full rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] border
+        {theme === 'dia' ? 'bg-white border-slate-200 text-slate-900' : 'bg-[#181a1b] border-white/10 text-stone-100'}"
         on:click|stopPropagation
       >
         <!-- CABECERA LIGHTBOX -->
-        <div class="p-4 border-b border-[#142218] flex items-center justify-between bg-[#060a08]">
+        <div class="px-5 py-3.5 border-b flex items-center justify-between
+          {theme === 'dia' ? 'bg-slate-50 border-slate-200' : 'bg-[#121314] border-white/10'}">
           <div class="truncate pr-4">
-            <span class="text-[10px] font-mono tracking-widest text-emerald-400 uppercase">Inspección de Grano & Enfoque</span>
-            <h3 class="text-sm font-serif text-white truncate">{lightboxCandidate.title}</h3>
+            <span class="text-[10px] font-mono tracking-widest uppercase font-semibold
+              {theme === 'dia' ? 'text-[#1a73e8]' : 'text-emerald-400'}">
+              Inspección de Grano & Detalle
+            </span>
+            <h3 class="text-sm font-sans font-semibold truncate">{lightboxCandidate.title}</h3>
           </div>
           <button
             type="button"
-            class="p-2 rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-white transition-all cursor-pointer"
+            class="p-2 rounded-xl text-sm font-mono transition-all cursor-pointer
+            {theme === 'dia' ? 'bg-slate-200 hover:bg-slate-300 text-slate-700' : 'bg-[#222527] hover:bg-[#2c3033] text-stone-300 hover:text-white'}"
             on:click={cerrarLightbox}
           >
             ✕
@@ -733,19 +856,20 @@
         </div>
 
         <!-- VISOR CENTRAL DE IMAGEN -->
-        <div class="relative flex-1 bg-black flex items-center justify-center overflow-hidden min-h-75">
+        <div class="relative flex-1 bg-black/90 flex items-center justify-center overflow-hidden min-h-75 p-4">
           <img
             src={lightboxCandidate.url}
             alt={lightboxCandidate.title}
-            class="max-w-full max-h-[65vh] object-contain"
+            class="max-w-full max-h-[65vh] object-contain rounded-2xl"
           />
         </div>
 
         <!-- PIE DE DETALLES Y LICENCIAS -->
-        <div class="p-4 bg-[#090f0c] border-t border-[#142218] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="text-xs font-mono text-stone-300 space-y-1">
-            <p><span class="text-stone-500">Resolución Original:</span> {lightboxCandidate.width} × {lightboxCandidate.height} px ({lightboxCandidate.aspectRatio}:1)</p>
-            <p><span class="text-stone-500">Atribución CC:</span> {lightboxCandidate.attribution?.author} · {lightboxCandidate.attribution?.license}</p>
+        <div class="p-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4
+          {theme === 'dia' ? 'bg-slate-50 border-slate-200' : 'bg-[#121314] border-white/10'}">
+          <div class="text-xs font-sans space-y-1 {theme === 'dia' ? 'text-slate-600' : 'text-stone-300'}">
+            <p><span class="font-semibold {theme === 'dia' ? 'text-slate-800' : 'text-stone-400'}">Resolución:</span> {lightboxCandidate.width} × {lightboxCandidate.height} px ({lightboxCandidate.aspectRatio}:1)</p>
+            <p><span class="font-semibold {theme === 'dia' ? 'text-slate-800' : 'text-stone-400'}">Atribución CC:</span> {lightboxCandidate.attribution?.author} · {lightboxCandidate.attribution?.license}</p>
           </div>
 
           <div class="flex items-center gap-3">
@@ -753,14 +877,16 @@
               href={lightboxCandidate.url}
               target="_blank"
               rel="noopener noreferrer"
-              class="px-3 py-1.5 rounded-lg text-xs font-mono text-stone-400 hover:text-white bg-[#111c15] border border-[#1b2d21] transition-all"
+              class="px-4 py-2 rounded-full text-xs font-sans font-semibold transition-all
+              {theme === 'dia' ? 'bg-slate-200 hover:bg-slate-300 text-slate-800' : 'bg-[#222527] hover:bg-[#2c3033] text-stone-200'}"
             >
               Abrir Original ↗
             </a>
 
             <button
               type="button"
-              class="px-4 py-2 rounded-lg text-xs font-mono font-bold uppercase tracking-wider bg-amber-400 hover:bg-amber-300 text-black transition-all cursor-pointer"
+              class="px-5 py-2 rounded-full text-xs font-sans font-semibold text-white transition-all cursor-pointer shadow-xs
+              {theme === 'dia' ? 'bg-[#1a73e8] hover:bg-[#1557b0]' : 'bg-[#8ab4f8] text-[#131314] hover:bg-[#aecbfa]'}"
               on:click={() => {
                 if (lightboxCandidate) toggleSeleccion(lightboxCandidate);
                 cerrarLightbox();

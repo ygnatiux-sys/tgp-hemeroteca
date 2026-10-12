@@ -17,8 +17,28 @@
     ? (import.meta as any).env?.TGP_MIND_API_KEY || (import.meta as any).env?.TGP_API_TOKEN
     : null) ?? '2771';
 
+  import { onMount } from 'svelte';
   import { openGooglePicker } from '../lib/google-picker';
   import WikimediaGalleryInbox from './WikimediaGalleryInbox.svelte';
+
+  // ── Modo Día (Gemini) / Noche (Carbón Pixel) ──────────────────────────────
+  let darkMode = false;
+
+  onMount(() => {
+    const saved = localStorage.getItem('tgp_r2_staging_dark');
+    if (saved !== null) {
+      darkMode = saved === 'true';
+    } else {
+      darkMode = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+    }
+  });
+
+  function toggleDarkMode() {
+    darkMode = !darkMode;
+    try {
+      localStorage.setItem('tgp_r2_staging_dark', String(darkMode));
+    } catch {}
+  }
 
   // Credenciales Google manejadas por el backend (Cloud Run) — sin exposicion en frontend
 
@@ -195,23 +215,40 @@
 </script>
 
 <!-- ── TEMPLATE ──────────────────────────────────────────────────────────── -->
-<div class="vl-root">
+<div class="vl-root {darkMode ? 'theme-dark' : 'theme-light'}">
 
   <!-- ── Header ─────────────────────────────────────────────────────────── -->
   <div class="vl-header">
     <div class="vl-header-left">
-      <span class="vl-kicker">Infraestructura Visual TGP</span>
-      <h2 class="vl-title">Laboratorio Visual · Ingesta &amp; Procesamiento</h2>
+      <span class="vl-kicker">TGP R2 Staging · Conversor &amp; Subida R2</span>
+      <h1 class="vl-title">Mesa de Staging Visual</h1>
+      <p class="vl-brief">
+        Mesa de pruebas rápida para procesar imágenes sueltas, aplicar transformaciones de visión por computadora (OpenCV / ITI) y subirlas a Cloudflare R2 con registro en D1.
+      </p>
     </div>
-    <div style="display:flex; align-items:center; gap:10px;">
+    <div class="vl-header-actions">
       <a
         href="/tgp-app/"
-        class="vl-btn vl-btn--gray"
-        style="text-decoration:none; font-size:11px; padding:6px 14px; border-radius:9999px; display:inline-flex; align-items:center; gap:6px;"
+        class="vl-btn vl-btn--ghost"
         title="Volver al Hub de TGP App"
       >
-        ← Volver a TGP App
+        ← Hub
       </a>
+
+      <!-- Conmutador Día (Gemini) / Noche (Carbón Pixel) -->
+      <button
+        type="button"
+        class="vl-btn vl-btn--ghost vl-theme-toggle"
+        on:click={toggleDarkMode}
+        title={darkMode ? 'Cambiar a modo Día (Gemini)' : 'Cambiar a modo Noche (Carbón Pixel)'}
+      >
+        {#if darkMode}
+          <span style="font-size:14px;">☀️</span> Día Gemini
+        {:else}
+          <span style="font-size:14px;">🌙</span> Noche Carbón
+        {/if}
+      </button>
+
       <span class="vl-badge">R2 + Cloud Run</span>
     </div>
   </div>
@@ -403,35 +440,53 @@
 </div>
 
 <style>
-  /* ── Root / tokens (Modo Claro Limpio · Mesa de Trabajo) ─────────────────── */
-  .vl-root {
-    --bg:           #ffffff;
-    --bg2:          #f9fafb;
-    --bg3:          #f4f4f5;
-    --border:       #e4e4e7;
-    --border-soft:  #f4f4f5;
-    --accent-gold:  #b45309;
-    --accent-green: #047857;
-    --accent-amber: #b45309;
-    --accent-blue:  #1d4ed8;
-    --accent-purple:#6d28d9;
-    --text:         #18181b;
-    --text-muted:   #52525b;
-    --text-dim:     #71717a;
-    --font-serif:   'Cinzel', 'Georgia', serif;
-    --font-mono:    'IBM Plex Mono', monospace;
-    --radius:       16px;
-    --radius-sm:    10px;
+  /* ── Variables de Tema: Día (Gemini) vs Noche (Carbón Pixel) ──────────────── */
+  .vl-root.theme-light {
+    --vl-bg:            #ffffff;
+    --vl-surface:       #f8f9fa;
+    --vl-surface-card:  #ffffff;
+    --vl-border:        #dadce0;
+    --vl-border-subtle: #f1f3f4;
+    --vl-text:          #202124;
+    --vl-text-muted:    #5f6368;
+    --vl-text-dim:      #80868b;
+    --vl-accent-blue:   #1a73e8;
+    --vl-accent-hover:  #1557b0;
+    --vl-accent-green:  #137333;
+    --vl-accent-amber:  #b06000;
+    --vl-btn-ghost-bg:  #f1f3f4;
+    --vl-btn-ghost-hov: #e8eaed;
+    --vl-card-shadow:   0 1px 3px rgba(60,64,67,0.08);
+  }
 
-    background:    var(--bg);
-    color:         var(--text);
-    border:        1px solid var(--border);
-    border-radius: var(--radius);
-    padding:       28px;
+  .vl-root.theme-dark {
+    --vl-bg:            #121314;
+    --vl-surface:       #1e1f20;
+    --vl-surface-card:  #1e1f20;
+    --vl-border:        #3c4043;
+    --vl-border-subtle: #282a2c;
+    --vl-text:          #e8eaed;
+    --vl-text-muted:    #9aa0a6;
+    --vl-text-dim:      #80868b;
+    --vl-accent-blue:   #8ab4f8;
+    --vl-accent-hover:  #aecbfa;
+    --vl-accent-green:  #81c995;
+    --vl-accent-amber:  #fdd663;
+    --vl-btn-ghost-bg:  #2d2e30;
+    --vl-btn-ghost-hov: #3c4043;
+    --vl-card-shadow:   0 1px 3px rgba(0,0,0,0.3);
+  }
+
+  .vl-root {
+    background:    var(--vl-bg);
+    color:         var(--vl-text);
+    min-height:    100vh;
+    padding:       24px 32px 48px;
+    font-family:   system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    transition:    background 0.25s ease, color 0.25s ease;
+    box-sizing:    border-box;
+    width:         100%;
     max-width:     100%;
-    margin:        0 auto;
-    font-family:   var(--font-mono);
-    box-shadow:    0 1px 3px rgba(0,0,0,0.04);
   }
 
   /* ── Header ──────────────────────────────────────────────────────────── */
@@ -439,176 +494,232 @@
     display:         flex;
     align-items:     flex-start;
     justify-content: space-between;
-    border-bottom:   1px solid var(--border);
-    padding-bottom:  18px;
-    margin-bottom:   24px;
-    gap:             12px;
+    border-bottom:   1px solid var(--vl-border);
+    padding-bottom:  20px;
+    margin-bottom:   28px;
+    gap:             16px;
     flex-wrap:       wrap;
   }
-  .vl-header-left { display: flex; flex-direction: column; gap: 4px; }
+  .vl-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 780px;
+  }
   .vl-kicker {
-    font-size:      10px;
-    letter-spacing: 0.25em;
+    font-size:      11px;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    color:          var(--accent-green);
-    font-weight:    600;
+    color:          var(--vl-accent-blue);
+    font-weight:    700;
+    font-family:    'IBM Plex Mono', monospace;
   }
   .vl-title {
-    font-family:    var(--font-serif);
-    font-size:      22px;
-    font-weight:    500;
-    color:          var(--text);
-    letter-spacing: 0.02em;
-    margin:         0;
+    font-size:      26px;
+    font-weight:    600;
+    color:          var(--vl-text);
+    letter-spacing: -0.01em;
+    margin:         2px 0 4px 0;
+  }
+  .vl-brief {
+    font-size:   13px;
+    color:       var(--vl-text-muted);
+    margin:      0;
+    line-height: 1.5;
+  }
+  .vl-header-actions {
+    display:     flex;
+    align-items: center;
+    gap:         10px;
+    flex-wrap:   wrap;
   }
   .vl-badge {
-    font-size:     10px;
-    font-weight:   500;
-    padding:       4px 10px;
-    border-radius: 6px;
-    background:    var(--bg3);
-    border:        1px solid var(--border);
-    color:         var(--text-muted);
+    font-size:     11px;
+    font-weight:   600;
+    padding:       6px 14px;
+    border-radius: 9999px;
+    background:    var(--vl-surface);
+    border:        1px solid var(--vl-border);
+    color:         var(--vl-text-muted);
     white-space:   nowrap;
-    flex-shrink:   0;
+    font-family:   'IBM Plex Mono', monospace;
   }
 
   /* ── Secciones ───────────────────────────────────────────────────────── */
   .vl-section {
-    border-bottom:  1px solid var(--border-soft);
-    padding-bottom: 24px;
-    margin-bottom:  24px;
+    border-bottom:  1px solid var(--vl-border-subtle);
+    padding-bottom: 26px;
+    margin-bottom:  26px;
     display:        flex;
     flex-direction: column;
     gap:            16px;
   }
   .vl-step-label {
-    font-size:      10px;
+    font-size:      11px;
     font-weight:    700;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color:          var(--text-muted);
+    color:          var(--vl-text-muted);
+    font-family:    'IBM Plex Mono', monospace;
   }
 
-  /* ── Botones base ────────────────────────────────────────────────────── */
+  /* ── Botones Material You (Píldoras) ─────────────────────────────────── */
   .vl-btn {
-    display:        flex;
+    display:        inline-flex;
     align-items:    center;
+    justify-content: center;
     gap:            8px;
-    padding:        9px 16px;
-    border-radius:  var(--radius-sm);
-    font-family:    var(--font-mono);
-    font-size:      12px;
+    padding:        10px 20px;
+    border-radius:  9999px;
+    font-size:      13px;
     font-weight:    600;
     cursor:         pointer;
-    transition:     all 0.2s;
+    transition:     all 0.2s ease;
     border:         1px solid transparent;
     white-space:    nowrap;
+    text-decoration: none;
+    box-sizing:     border-box;
   }
   .vl-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-  .vl-btn-icon { color: var(--accent-gold); }
+  .vl-btn-icon { color: var(--vl-accent-amber); font-weight: bold; }
 
   .vl-btn--primary {
-    background: #ffffff;
-    border-color: #d4d4d8;
-    color: #18181b;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    background: var(--vl-accent-blue);
+    color:      #ffffff;
+    border:     1px solid transparent;
+    box-shadow: 0 1px 3px rgba(26,115,232,0.25);
   }
   .vl-btn--primary:hover:not(:disabled) {
-    background: #f4f4f5;
-    border-color: #a1a1aa;
+    background: var(--vl-accent-hover);
   }
+  .theme-dark .vl-btn--primary {
+    color: #121314;
+    background: var(--vl-accent-blue);
+  }
+
   .vl-btn--green {
-    background:   #ecfdf5;
-    border-color: #a7f3d0;
-    color:        #065f46;
-    box-shadow:   0 1px 2px rgba(0,0,0,0.03);
+    background: var(--vl-surface);
+    border:     1px solid var(--vl-border);
+    color:      var(--vl-accent-green);
   }
-  .vl-btn--green:hover:not(:disabled) { background: #d1fae5; }
+  .vl-btn--green:hover:not(:disabled) {
+    background: var(--vl-btn-ghost-hov);
+  }
+
   .vl-btn--amber {
-    background:   #fffbeb;
-    border-color: #fde68a;
-    color:        #92400e;
+    background: var(--vl-surface);
+    border:     1px solid var(--vl-border);
+    color:      var(--vl-accent-amber);
   }
-  .vl-btn--amber:hover:not(:disabled) { background: #fef3c7; }
+  .vl-btn--amber:hover:not(:disabled) {
+    background: var(--vl-btn-ghost-hov);
+  }
+
   .vl-btn--blue {
-    background:   #eff6ff;
-    border-color: #bfdbfe;
-    color:        #1e40af;
+    background: var(--vl-accent-blue);
+    color:      #ffffff;
   }
-  .vl-btn--blue:hover:not(:disabled) { background: #dbeafe; }
+  .vl-btn--blue:hover:not(:disabled) {
+    background: var(--vl-accent-hover);
+  }
+  .theme-dark .vl-btn--blue {
+    color: #121314;
+  }
+
   .vl-btn--purple {
-    background:   #faf5ff;
-    border-color: #e9d5ff;
-    color:        #6b21a8;
+    background: var(--vl-surface);
+    border:     1px solid var(--vl-border);
+    color:      var(--vl-text);
   }
-  .vl-btn--purple:hover:not(:disabled) { background: #f3e8ff; }
+  .vl-btn--purple:hover:not(:disabled) {
+    background: var(--vl-btn-ghost-hov);
+  }
+
   .vl-btn--gray {
-    background:   #f4f4f5;
-    border-color: #e4e4e7;
-    color:        #27272a;
+    background: var(--vl-surface);
+    border:     1px solid var(--vl-border);
+    color:      var(--vl-text);
   }
-  .vl-btn--gray:hover:not(:disabled) { background: #e4e4e7; }
+  .vl-btn--gray:hover:not(:disabled) {
+    background: var(--vl-btn-ghost-hov);
+  }
+
+  .vl-btn--ghost {
+    background: var(--vl-btn-ghost-bg);
+    border:     1px solid transparent;
+    color:      var(--vl-text);
+  }
+  .vl-btn--ghost:hover {
+    background: var(--vl-btn-ghost-hov);
+  }
+
+  .vl-theme-toggle {
+    font-size:   12px;
+    font-weight: 600;
+  }
 
   /* ── Ingesta row ─────────────────────────────────────────────────────── */
   .vl-ingesta-row {
     display:     flex;
     flex-wrap:   wrap;
     align-items: center;
-    gap:         10px;
+    gap:         12px;
   }
   .vl-file-chip {
-    font-size:     11px;
+    font-size:     12px;
     font-weight:   600;
-    color:         #047857;
-    background:    #ecfdf5;
-    border:        1px solid #a7f3d0;
-    padding:       5px 12px;
-    border-radius: 6px;
+    color:         var(--vl-accent-green);
+    background:    var(--vl-surface);
+    border:        1px solid var(--vl-border);
+    padding:       6px 14px;
+    border-radius: 9999px;
+    font-family:   'IBM Plex Mono', monospace;
   }
 
-  /* ── Preview del original ────────────────────────────────────────────── */
+  /* ── Preview del original (Cero scrims ni velos oscuros) ──────────────── */
   .vl-original-preview {
     display:       flex;
     align-items:   center;
-    gap:           14px;
-    background:    #f9fafb;
-    border:        1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding:       12px 16px;
+    gap:           16px;
+    background:    var(--vl-surface);
+    border:        1px solid var(--vl-border);
+    border-radius: 14px;
+    padding:       12px 18px;
+    max-width:     580px;
   }
   .vl-original-img {
-    width:         56px;
-    height:        56px;
+    width:         64px;
+    height:        64px;
     object-fit:    cover;
-    border-radius: 8px;
-    border:        1px solid #d4d4d8;
+    border-radius: 10px;
+    border:        1px solid var(--vl-border);
     flex-shrink:   0;
   }
   .vl-original-meta {
     display:        flex;
     flex-direction: column;
-    gap:            3px;
+    gap:            4px;
   }
   .vl-original-name {
-    font-size:     12px;
+    font-size:     13px;
     font-weight:   600;
-    color:         var(--text);
+    color:         var(--vl-text);
     overflow:      hidden;
     text-overflow: ellipsis;
     white-space:   nowrap;
-    max-width:     360px;
+    max-width:     400px;
   }
   .vl-original-size {
-    font-size: 11px;
-    color:     var(--text-dim);
+    font-size:   11px;
+    color:       var(--vl-text-muted);
+    font-family: 'IBM Plex Mono', monospace;
   }
 
   /* ── Motores row ─────────────────────────────────────────────────────── */
   .vl-motores-row {
     display:   flex;
     flex-wrap: wrap;
-    gap:       10px;
+    gap:       12px;
   }
 
   /* ── Procesando ──────────────────────────────────────────────────────── */
@@ -616,26 +727,26 @@
     display:       flex;
     align-items:   center;
     gap:           12px;
-    padding:       18px 20px;
-    background:    #fffbeb;
-    border:        1px solid #fde68a;
-    border-radius: var(--radius-sm);
+    padding:       18px 22px;
+    background:    var(--vl-surface);
+    border:        1px solid var(--vl-border);
+    border-radius: 14px;
     margin-bottom: 20px;
-    color:         #92400e;
+    color:         var(--vl-text);
     font-size:     13px;
     font-weight:   500;
   }
 
   /* ── Resultado / panel de distribución ───────────────────────────────── */
   .vl-result-panel {
-    background:    #f9fafb;
-    border:        1px solid var(--border);
-    border-radius: var(--radius);
-    padding:       22px;
+    background:    var(--vl-surface);
+    border:        1px solid var(--vl-border);
+    border-radius: 16px;
+    padding:       24px;
     display:       flex;
     flex-direction: column;
-    gap:           16px;
-    box-shadow:    0 1px 2px rgba(0,0,0,0.03);
+    gap:           18px;
+    box-shadow:    var(--vl-card-shadow);
   }
   .vl-result-header {
     display:         flex;
@@ -643,92 +754,93 @@
     justify-content: space-between;
   }
   .vl-result-ready {
-    display:     flex;
-    align-items: center;
-    gap:         8px;
-    font-size:   11px;
-    letter-spacing: 0.15em;
+    display:        flex;
+    align-items:    center;
+    gap:            8px;
+    font-size:      12px;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color:       var(--accent-green);
-    font-weight: 700;
+    color:          var(--vl-accent-green);
+    font-weight:    700;
+    font-family:    'IBM Plex Mono', monospace;
   }
   .vl-ready-dot {
     width:         8px;
     height:        8px;
     border-radius: 50%;
-    background:    var(--accent-green);
+    background:    var(--vl-accent-green);
     flex-shrink:   0;
   }
   .vl-result-format {
-    font-size: 10px;
-    font-family: var(--font-mono);
-    color:     var(--text-dim);
+    font-size:   11px;
+    font-family: 'IBM Plex Mono', monospace;
+    color:       var(--vl-text-muted);
   }
   .vl-result-img-wrap {
-    background:    #ffffff;
-    border:        1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding:       14px;
+    background:    var(--vl-bg);
+    border:        1px solid var(--vl-border);
+    border-radius: 12px;
+    padding:       16px;
     display:       flex;
     align-items:   center;
     justify-content: center;
   }
   .vl-result-img {
-    max-height:  340px;
-    max-width:   100%;
-    object-fit:  contain;
-    border:      1px solid #e4e4e7;
+    max-height:    440px;
+    max-width:     100%;
+    object-fit:    contain;
     border-radius: 8px;
-    background:  #fafafa;
+    border:        1px solid var(--vl-border-subtle);
   }
 
   /* ── Panel distribución ──────────────────────────────────────────────── */
   .vl-dist-panel {
-    border-top:  1px solid var(--border);
-    padding-top: 16px;
+    border-top:  1px solid var(--vl-border-subtle);
+    padding-top: 18px;
     display:     flex;
     flex-direction: column;
-    gap:         14px;
+    gap:         16px;
   }
   .vl-dist-row {
     display:         flex;
     flex-wrap:       wrap;
     align-items:     center;
     justify-content: space-between;
-    gap:             10px;
+    gap:             12px;
   }
   .vl-dist-label {
-    font-size:      10px;
-    letter-spacing: 0.15em;
+    font-size:      11px;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color:          var(--text-muted);
-    font-weight:    600;
+    color:          var(--vl-text-muted);
+    font-weight:    700;
+    font-family:    'IBM Plex Mono', monospace;
   }
   .vl-folder-row {
     display:     flex;
     align-items: center;
     gap:         8px;
   }
-  .vl-folder-hint { font-size: 11px; color: var(--text-dim); }
+  .vl-folder-hint { font-size: 12px; color: var(--vl-text-muted); }
   .vl-select {
-    background:    #ffffff;
-    border:        1px solid #d4d4d8;
-    color:         var(--text);
-    font-family:   var(--font-mono);
+    background:    var(--vl-bg);
+    border:        1px solid var(--vl-border);
+    color:         var(--vl-text);
+    font-family:   'IBM Plex Mono', monospace;
     font-size:     12px;
-    padding:       5px 12px;
-    border-radius: 6px;
+    padding:       6px 14px;
+    border-radius: 8px;
     outline:       none;
     cursor:        pointer;
     transition:    border-color 0.2s;
   }
-  .vl-select:focus { border-color: var(--accent-green); }
+  .vl-select:focus { border-color: var(--vl-accent-blue); }
 
   /* ── Grid de acciones ────────────────────────────────────────────────── */
   .vl-actions-grid {
     display:               grid;
     grid-template-columns: repeat(3, 1fr);
-    gap:                   10px;
+    gap:                   12px;
   }
   @media (max-width: 600px) {
     .vl-actions-grid { grid-template-columns: 1fr; }
@@ -736,13 +848,13 @@
 
   /* ── R2 éxito ────────────────────────────────────────────────────────── */
   .vl-r2-success {
-    background:    #ecfdf5;
-    border:        1px solid #a7f3d0;
-    border-radius: var(--radius-sm);
-    padding:       14px;
+    background:    var(--vl-surface);
+    border:        1px solid var(--vl-border);
+    border-radius: 12px;
+    padding:       16px;
     display:       flex;
     flex-direction: column;
-    gap:           8px;
+    gap:           10px;
   }
   .vl-r2-success-header {
     display:         flex;
@@ -750,32 +862,33 @@
     justify-content: space-between;
   }
   .vl-r2-label {
-    font-size:  11px;
-    color:      #065f46;
+    font-size:   12px;
+    color:       var(--vl-accent-green);
     font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
   }
   .vl-copy-btn {
-    font-family:   var(--font-mono);
-    font-size:     10px;
+    font-family:   'IBM Plex Mono', monospace;
+    font-size:     11px;
     font-weight:   600;
-    background:    #d1fae5;
-    border:        1px solid #a7f3d0;
-    border-radius: 4px;
-    color:         #065f46;
-    padding:       4px 10px;
+    background:    var(--vl-btn-ghost-bg);
+    border:        1px solid var(--vl-border);
+    border-radius: 9999px;
+    color:         var(--vl-text);
+    padding:       5px 12px;
     cursor:        pointer;
     transition:    background 0.2s;
   }
-  .vl-copy-btn:hover { background: #a7f3d0; }
+  .vl-copy-btn:hover { background: var(--vl-btn-ghost-hov); }
   .vl-r2-url-input {
     width:         100%;
-    background:    #ffffff;
-    border:        1px solid #a7f3d0;
-    border-radius: 6px;
-    padding:       7px 12px;
-    font-family:   var(--font-mono);
+    background:    var(--vl-bg);
+    border:        1px solid var(--vl-border);
+    border-radius: 8px;
+    padding:       8px 14px;
+    font-family:   'IBM Plex Mono', monospace;
     font-size:     12px;
-    color:         #065f46;
+    color:         var(--vl-text);
     outline:       none;
     box-sizing:    border-box;
   }
@@ -784,11 +897,16 @@
   .vl-error {
     background:    #fef2f2;
     border:        1px solid #fecaca;
-    border-radius: var(--radius-sm);
-    padding:       12px 16px;
-    font-size:     12px;
+    border-radius: 12px;
+    padding:       12px 18px;
+    font-size:     13px;
     color:         #b91c1c;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
+  }
+  .theme-dark .vl-error {
+    background: #3c1414;
+    border-color: #5c1d1d;
+    color: #fca5a5;
   }
 
   /* ── Spinners ────────────────────────────────────────────────────────── */
@@ -796,8 +914,8 @@
     display:       inline-block;
     width:         16px;
     height:        16px;
-    border:        2px solid rgba(180,83,9,0.3);
-    border-top-color: var(--accent-amber);
+    border:        2px solid rgba(138,180,248,0.3);
+    border-top-color: var(--vl-accent-blue);
     border-radius: 50%;
     animation:     vl-spin 0.75s linear infinite;
     flex-shrink:   0;
@@ -807,8 +925,8 @@
     height: 12px;
   }
   .vl-spinner--blue {
-    border-color:     rgba(29,78,216,0.3);
-    border-top-color: var(--accent-blue);
+    border-color:     rgba(26,115,232,0.3);
+    border-top-color: var(--vl-accent-blue);
   }
   @keyframes vl-spin {
     to { transform: rotate(360deg); }
