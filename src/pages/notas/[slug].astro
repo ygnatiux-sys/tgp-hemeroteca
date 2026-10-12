@@ -6,7 +6,7 @@
  * Renderiza notas ligeras y ensayos analíticos escritos en Markdown/MDX.
  * ─────────────────────────────────────────────────────────────────────────────
  */
-import { getCollection, render } from 'astro:content';
+import { getCollection, getEntry, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 
 export const prerender = true;
@@ -22,7 +22,17 @@ export async function getStaticPaths() {
   });
 }
 
-const { entry } = Astro.props;
+const { slug } = Astro.params;
+let entry = Astro.props.entry;
+
+if (!entry && slug) {
+  entry = (await getEntry('notas', slug)) || (await getEntry('notas', `${slug}.mdx`)) || (await getEntry('notas', `${slug}.md`));
+}
+
+if (!entry) {
+  return Astro.redirect('/404');
+}
+
 const { Content } = await render(entry);
 const data = entry.data as any;
 
