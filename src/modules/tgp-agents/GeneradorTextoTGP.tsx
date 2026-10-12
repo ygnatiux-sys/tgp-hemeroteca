@@ -149,6 +149,10 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
     const sitioToUse = overrides?.sitio !== undefined ? overrides.sitio : (sitioGeohistoricoInput || temaToUse);
     const conImagenToUse = overrides?.conImagen !== undefined ? overrides.conImagen : publicarConImagen;
 
+    if (import.meta.env.PROD) {
+      return null;
+    }
+
     try {
       const res = await fetch('/api/guardar-ensayo', {
         method: 'POST',
@@ -164,10 +168,17 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
           publicarConImagen: conImagenToUse
         })
       });
+      if (!res.ok) {
+        if (res.status === 404) {
+          console.warn('[guardar-ensayo] Endpoint local no disponible en producción');
+          return null;
+        }
+      }
       const data = await res.json();
       return data;
     } catch (e) {
-      console.error('Error guardando directamente en disco:', e);
+      console.warn('[guardar-ensayo] Fallback silencioso:', e);
+      return null;
     }
   };
 
@@ -376,6 +387,11 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
 
     const slug = temaToUse.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
 
+    if (import.meta.env.PROD) {
+      alert('En producción pública, guardá tus cambios usando el botón Save de Keystatic.');
+      return;
+    }
+
     try {
       const res = await fetch('/api/guardar-georreferencia', {
         method: 'POST',
@@ -393,6 +409,12 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
           publicarConImagen
         })
       });
+      if (!res.ok) {
+        if (res.status === 404) {
+          alert('Endpoint local no disponible en producción.');
+          return;
+        }
+      }
       const data = await res.json();
       if (data.success) {
         alert(`GEORREFERENCIA GUARDADA EN LA COLECCIÓN INDEPENDIENTE:\n\nsrc/content/georreferencias/${slug}/`);
@@ -400,7 +422,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         alert(`Error guardando georreferencia: ${data.error}`);
       }
     } catch (e: any) {
-      alert(`Error de conexión: ${e.message}`);
+      console.warn('[guardar-georreferencia] Fallback silencioso:', e);
     }
   };
 

@@ -24,12 +24,25 @@ function startupLogger() {
   };
 }
 
+function localApiDevPlugin() {
+  return {
+    name: 'tgp-local-api-dev',
+    hooks: {
+      'astro:server:setup': async ({ server }) => {
+        const { handleLocalApi } = await import('../api/local/router.ts');
+        server.middlewares.use(handleLocalApi);
+      }
+    }
+  };
+}
+
 export const tgpIntegrations = [
   react(),
   svelte(), // ← ScriptoriumCapture.svelte y futuras islas Svelte
   markdoc(), 
   keystatic(), // ← activo en todos los entornos (local + Cloudflare Worker)
-  startupLogger()
+  startupLogger(),
+  localApiDevPlugin()
 ];
 
 export const tgpViteConfig = {

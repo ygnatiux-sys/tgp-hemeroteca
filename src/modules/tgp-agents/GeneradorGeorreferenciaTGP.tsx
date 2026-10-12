@@ -405,6 +405,13 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
       contentMarkdown: informe
     });
 
+    if (import.meta.env.PROD) {
+      setIsSynced(true);
+      lockKeystatiSave(false);
+      setStatusFeedback('✅ Datos listos. Presioná el botón azul «Save» de Keystatic para publicar en GitHub.');
+      return;
+    }
+
     try {
       const res = await fetch('/api/guardar-georreferencia', {
         method: 'POST',
@@ -422,6 +429,15 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
           publicarConImagen: generarConImagen
         })
       });
+
+      if (!res.ok) {
+        if (res.status === 404) {
+          setIsSynced(true);
+          lockKeystatiSave(false);
+          setStatusFeedback('✅ Datos listos en Keystatic.');
+          return;
+        }
+      }
 
       const data = await res.json();
       if (data.success) {
@@ -935,31 +951,33 @@ export function GeneradorGeorreferenciaTGP({ value, onChange }: any) {
           {isSynced ? '✅ TRASPASADO — Podés hacer Save' : '⚡ TRASPASAR TODO AL FORMULARIO & EDITOR'}
         </button>
 
-        {/* BOTÓN 2: CONFIRMAR EN DISCO — solo activo si ya fue traspasado */}
-        <button
-          type="button"
-          onClick={handleConfirmarSincronizacion}
-          disabled={!isSynced || !informe || informe.length < 10}
-          title={!isSynced ? 'Primero presioná «Traspasar Todo»' : ''}
-          style={{
-            padding: '16px',
-            background: (!isSynced || !informe || informe.length < 10)
-              ? '#1f2937'
-              : isSaved
-                ? 'linear-gradient(135deg, #1b5e20, #2e7d32)'
-                : 'linear-gradient(135deg, #0d47a1, #1565c0)',
-            color: (!isSynced || !informe || informe.length < 10) ? '#666' : '#fff',
-            border: '1px solid #42a5f5',
-            borderRadius: '8px',
-            fontWeight: 800,
-            fontSize: '0.9rem',
-            letterSpacing: '0.04em',
-            cursor: (!isSynced || !informe || informe.length < 10) ? 'not-allowed' : 'pointer',
-            boxShadow: '0 4px 12px rgba(21, 101, 192, 0.35)'
-          }}
-        >
-          {isSaved ? '✅ ¡LISTO! Presioná Save en Keystatic' : '💾 CONFIRMAR & PREPARAR PARA SAVE'}
-        </button>
+        {/* BOTÓN 2: CONFIRMAR EN DISCO — solo visible en modo local (dev) */}
+        {import.meta.env.DEV && (
+          <button
+            type="button"
+            onClick={handleConfirmarSincronizacion}
+            disabled={!isSynced || !informe || informe.length < 10}
+            title={!isSynced ? 'Primero presioná «Traspasar Todo»' : ''}
+            style={{
+              padding: '16px',
+              background: (!isSynced || !informe || informe.length < 10)
+                ? '#1f2937'
+                : isSaved
+                  ? 'linear-gradient(135deg, #1b5e20, #2e7d32)'
+                  : 'linear-gradient(135deg, #0d47a1, #1565c0)',
+              color: (!isSynced || !informe || informe.length < 10) ? '#666' : '#fff',
+              border: '1px solid #42a5f5',
+              borderRadius: '8px',
+              fontWeight: 800,
+              fontSize: '0.9rem',
+              letterSpacing: '0.04em',
+              cursor: (!isSynced || !informe || informe.length < 10) ? 'not-allowed' : 'pointer',
+              boxShadow: '0 4px 12px rgba(21, 101, 192, 0.35)'
+            }}
+          >
+            {isSaved ? '✅ ¡LISTO! Guardado en disco' : '💾 GUARDAR EN DISCO LOCAL'}
+          </button>
+        )}
       </div>
     </div>
   );

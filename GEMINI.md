@@ -58,3 +58,12 @@ Al iniciar o proponer un NUEVO POST, ENSAYO O DOSSIER CINEMÁTICO, el agente DEB
    - DEBE presentar explícitamente **las 3 mejores combinaciones de [FX + Fuente + Paleta]**, explicando por qué encajan con la narrativa.
    - La **Opción 1** se formulará siempre como *(Recomendada Principal)*.
 
+
+# PROTOCOLO OBLIGATORIO PARA PRUEBAS Y LABORATORIOS (CERO CÓDIGO HUÉRFANO)
+
+Cuando el agente cree componentes ad-hoc, páginas de prueba o "labs" para evaluar un diseño, efecto o post:
+1. Crea el entorno de prueba y presenta las opciones al usuario.
+2. En el momento exacto en que el usuario apruebe el diseño final, el agente DEBE eliminar automáticamente todos los archivos de prueba, rutas de testeo y código residual que haya generado para ese laboratorio.
+3. En el repositorio solo debe quedar el archivo final del post o componente limpio y listo para producción. Queda estrictamente prohibido dejar archivos huérfanos.
+
+

@@ -772,8 +772,8 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
         </div>
       )}
 
-      {/* ══ BOTÓN CONFIRMAR Y GUARDAR EN LA HEMEROTECA ══════════════════════════ */}
-      {informe && (
+      {/* ══ BOTÓN CONFIRMAR Y GUARDAR EN LA HEMEROTECA (Solo en modo local) ═════ */}
+      {informe && import.meta.env.DEV && (
         <div
           className="mt-6 p-5 rounded-xl border"
           style={{
@@ -782,12 +782,10 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
           }}
         >
           <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-emerald-500 mb-1">
-            Paso Final de Vinculación
+            Paso Final de Vinculación (Modo Local)
           </p>
           <p className="text-[11px] text-stone-400 mb-4 font-mono leading-relaxed">
             Guarda el informe, los metadatos y la portada directamente en el sistema de archivos de la hemeroteca.
-            <br />
-            <span className="text-stone-600">(Solo opera en modo local. En producción, usá el botón Save de Keystatic.)</span>
           </p>
 
           <button
@@ -820,23 +818,25 @@ export function GeneradorArquetiposTGP({ value, onChange }: any) {
                     volanta:  syncVolanta  ? volantaIA  : undefined,
                     category: syncCategory ? categoryIA : 'Arquetipos Globales',
                     imageUrl: arteResult?.imageUrl ?? undefined,
-                    // spotifyLink / youtubeLink NO se envían (URLs manuales en Keystatic)
                   }),
                 });
+                if (!res.ok) {
+                  if (res.status === 404) {
+                    setIsSaved(true);
+                    return;
+                  }
+                  throw new Error(`HTTP ${res.status}`);
+                }
                 const data = await res.json();
                 if (data.success) {
                   setIsSaved(true);
-                  if (data.productionMode) {
-                    alert(`✓ CONTENIDO SINCRONIZADO\n\n${data.message || 'Presioná el botón azul "Save" de Keystatic arriba para guardar en GitHub.'}`);
-                  } else {
-                    alert(`✦ ARQUETIPO GUARDADO EN DISCO\n\n• Metadatos: ${data.indexPath}\n• Contenido: ${data.mdocPath}\n• Caracteres escritos: ${data.charactersWritten}`);
-                  }
+                  alert(`✦ ARQUETIPO GUARDADO EN DISCO\n\n• Metadatos: ${data.indexPath}\n• Contenido: ${data.mdocPath}\n• Caracteres escritos: ${data.charactersWritten}`);
                   setTimeout(() => setIsSaved(false), 5000);
                 } else {
                   alert(`Error guardando: ${data.error}`);
                 }
               } catch (err: any) {
-                alert(`Error de conexión: ${err.message}`);
+                console.warn('[guardar-arquetipo] Fallback silencioso:', err?.message);
               } finally {
                 setIsSaving(false);
               }

@@ -302,6 +302,10 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
     const excToUse = overrides?.excerpt !== undefined ? overrides.excerpt : excerptIA;
     const imgToUse = overrides?.image !== undefined ? overrides.image : previewImage;
 
+    if (import.meta.env.PROD) {
+      return null;
+    }
+
     try {
       const res = await fetch('/api/guardar-cinematico', {
         method: 'POST',
@@ -314,10 +318,16 @@ export function GeneradorCinematicosTGP({ value, onChange }: GeminiCinematicProp
           imageUrl: imgToUse,
         })
       });
+      if (!res.ok) {
+        if (res.status === 404) {
+          console.warn('[guardar-cinematico] Endpoint local no disponible en producción');
+          return null;
+        }
+      }
       const data = await res.json();
       return data;
     } catch (e) {
-      console.error('[TGP] Error guardando ensayo cinemático:', e);
+      console.warn('[guardar-cinematico] Fallback silencioso:', e);
       return null;
     }
   };

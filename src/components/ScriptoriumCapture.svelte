@@ -329,8 +329,12 @@
     if (e.target === e.currentTarget) isOpen = false;
   }
 
-  // ── Transmutación → Keystatic CMS ─────────────────────────────────────────
+  const isDev = Boolean(import.meta.env?.DEV);
+
+  // ── Transmutación → Keystatic CMS (Solo en Dev / Desk Local) ─────────────
   async function transmuteToKeystatic(index: number, r: VisionResult) {
+    if (!isDev) return;
+
     results = results.map((item, i) =>
       i === index ? { ...item, transmuteStatus: 'sending', transmuteError: undefined } : item
     );
@@ -351,6 +355,10 @@
         }),
       });
       if (!res.ok) {
+        if (res.status === 404) {
+          console.warn('[transmute] Endpoint local no disponible en producción');
+          return;
+        }
         const msg = await res.text();
         throw new Error(msg || `HTTP ${res.status}`);
       }
@@ -802,6 +810,7 @@
 
                   <!-- ── BARRA DE ACCIÓN PRINCIPAL (Siempre visible arriba) ── -->
                   <div class="p-2.5 bg-white rounded-xl border border-zinc-200/90 shadow-2xs flex flex-wrap items-center justify-between gap-2">
+                    {#if isDev}
                     <div class="flex flex-wrap items-center gap-2">
                       <button
                         type="button"
@@ -842,6 +851,7 @@
                         <option value="informesPremium">Informes Premium</option>
                       </select>
                     </div>
+                    {/if}
 
                     <!-- Botón Ensayo Premium + Audio TTS -->
                     <button
