@@ -17,12 +17,14 @@
 
 import { createServer } from 'http';
 import { URL } from 'url';
-import 'dotenv/config';
+import dotenv from 'dotenv';
+dotenv.config();
+dotenv.config({ path: 'tgp-mind/.env' });
 
 const CLIENT_ID     = process.env.GOOGLE_CLIENT_ID || process.env.PUBLIC_GOOGLE_CLIENT_ID || '';
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
 const REDIRECT_URI  = 'http://localhost:3999/callback';
-const SCOPES        = 'https://www.googleapis.com/auth/photoslibrary.readonly';
+const SCOPES        = 'https://www.googleapis.com/auth/photospicker.mediaitems.readonly https://www.googleapis.com/auth/photoslibrary.readonly';
 
 if (!CLIENT_ID || !CLIENT_SECRET) {
   console.error('ERROR: Faltan GOOGLE_CLIENT_ID y/o GOOGLE_CLIENT_SECRET en .env');
