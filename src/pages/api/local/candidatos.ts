@@ -71,7 +71,7 @@ export const GET: APIRoute = async ({ request }) => {
         .replace(/^-+|-+$/g, '') || 'busqueda-manual';
 
       const { extraerCandidatosDraft } = await import('../../../../scripts/lib/wikimedia-engine.mjs');
-      const liveResult = await extraerCandidatosDraft(customQuery, '', 10);
+      const liveResult = await extraerCandidatosDraft(customQuery, '', 10, true);
       const candidates = liveResult.candidates || [];
 
       return new Response(JSON.stringify({

@@ -41,7 +41,7 @@ export async function resolverEntidadCanonica(tema, excerpt = '') {
       wikiEn: tema,
       wikiEs: tema,
       categoriaCommons: '',
-      keywords: tema.toLowerCase().split(/\s+/).filter(w => w.length > 3),
+      keywords: tema.toLowerCase().split(/\s+/).filter(w => w.length > 2),
     };
   }
 
@@ -76,7 +76,7 @@ Devuelve ÚNICAMENTE un objeto JSON válido con esta estructura exacta (sin mark
       wikiEn: tema,
       wikiEs: tema,
       categoriaCommons: '',
-      keywords: tema.toLowerCase().split(/\s+/).filter(w => w.length > 3),
+      keywords: tema.toLowerCase().split(/\s+/).filter(w => w.length > 2),
     };
   }
 }
@@ -124,7 +124,7 @@ async function buscarWikipediaPageImage(title, lang = 'en') {
 }
 
 // Buscar imágenes en Wikimedia Commons con metadatos completos y filtro duro
-async function buscarCommonsCandidatos(categoriaCommons, keywords) {
+async function buscarCommonsCandidatos(categoriaCommons, keywords, isManualQuery = false) {
   const candidatos = [];
   const base = 'https://commons.wikimedia.org/w/api.php';
 
@@ -151,8 +151,13 @@ async function buscarCommonsCandidatos(categoriaCommons, keywords) {
 
       // FILTRO DURO RUIDO Y ORIENTACIÓN
       if (/(flag|map|diagram|locator|coat_of_arms|icon|symbol|chart|plan|drawing_sheet)/i.test(title)) continue;
-      if (width < 1000) continue; // Exige resolución digna
-      if (width < height * 1.05) continue; // Descartar orientación puramente vertical / retrato estrecho
+
+      const minWidth = isManualQuery ? 800 : 1000;
+      if (width < minWidth) continue; // Exige resolución digna
+
+      const ratio = width / height;
+      if (!isManualQuery && ratio < 1.05) continue; // Estricto para posts automáticos (Hero)
+      if (isManualQuery && ratio < 0.75) continue;  // Permisivo (cuadradas/levemente verticales) para búsquedas manuales
 
       const meta = info.extmetadata || {};
       const artist = cleanHtml(meta.Artist?.value || 'Wikimedia Commons');
@@ -404,11 +409,21 @@ export async function curarWikimedia({ title, excerpt = '', isVideoArray = false
 }
 
 // ── 5. MODO DRAFT / HITL: EXTRAER HASTA 10 CANDIDATOS SIN DESCARGA PESADA ──────
-export async function extraerCandidatosDraft(title, excerpt = '', limit = 10) {
-  console.log(`\n🔍 [Draft HITL] Extrayendo candidatos para: "${title}"...`);
+export async function extraerCandidatosDraft(title, excerpt = '', limit = 10, isManualQuery = false) {
+  console.log(`\n🔍 [Draft HITL] Extrayendo candidatos para: "${title}" (Manual: ${isManualQuery})...`);
 
   // Paso 1: Resolver entidad canónica con Gemini Flash
-  const canon = await resolverEntidadCanonica(title, excerpt);
+  let canon;
+  if (isManualQuery) {
+    canon = {
+      wikiEn: title,
+      wikiEs: title,
+      categoriaCommons: '',
+      keywords: title.toLowerCase().split(/\s+/).filter(w => w.length > 2),
+    };
+  } else {
+    canon = await resolverEntidadCanonica(title, excerpt);
+  }
   console.log(`   🏛️ Canon: en="${canon.wikiEn}" | es="${canon.wikiEs}" | cat="${canon.categoriaCommons}"`);
 
   const candidatos = [];
@@ -431,7 +446,7 @@ export async function extraerCandidatosDraft(title, excerpt = '', limit = 10) {
   }
 
   // Paso 3: Buscar en Commons por categoría y keywords
-  const commonsList = await buscarCommonsCandidatos(canon.categoriaCommons, canon.keywords);
+  const commonsList = await buscarCommonsCandidatos(canon.categoriaCommons, canon.keywords, isManualQuery);
   for (const c of commonsList) {
     if (!vistasUrl.has(c.url)) {
       vistasUrl.add(c.url);
