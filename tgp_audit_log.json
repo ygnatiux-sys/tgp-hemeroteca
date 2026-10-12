@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-09-17T05:47:53.844Z",
-  "totalFilesAudited": 31,
+  "timestamp": "2026-10-12T05:49:20.965Z",
+  "totalFilesAudited": 20,
   "keystatic": {
     "collections": [
       {
         "file": "keystatic.config.ts",
-        "line": 37,
+        "line": 146,
         "label": "'Ensayos'",
         "storagePath": "'src/content/ensayos/*/'",
         "fields": [
@@ -36,7 +36,7 @@
       },
       {
         "file": "keystatic.config.ts",
-        "line": 190,
+        "line": 189,
         "label": "'Arquetipos Globales'",
         "storagePath": "'src/content/arquetipos-globales/*/'",
         "fields": [
@@ -67,7 +67,7 @@
       },
       {
         "file": "keystatic.config.ts",
-        "line": 349,
+        "line": 232,
         "label": "'Dirección de Arte (IA)'",
         "storagePath": "'src/content/estilos-visuales/*'",
         "fields": [
@@ -77,7 +77,7 @@
       },
       {
         "file": "keystatic.config.ts",
-        "line": 381,
+        "line": 252,
         "label": "'Georreferencias Arqueosemióticas'",
         "storagePath": "'src/content/georreferencias/*/'",
         "fields": [
@@ -101,13 +101,14 @@
       },
       {
         "file": "keystatic.config.ts",
-        "line": 496,
+        "line": 292,
         "label": "'Ensayos Cinemáticos (GSAP)'",
         "storagePath": "'src/content/ensayos-cinematicos/*/'",
         "fields": [
           "title",
           "generadorTexto",
           "agenteErudito",
+          "generador",
           "atmosfera",
           "coverImage",
           "gallery",
@@ -119,7 +120,7 @@
       },
       {
         "file": "keystatic.config.ts",
-        "line": 606,
+        "line": 339,
         "label": "'🧪 Informes Premium'",
         "storagePath": "'src/content/informes/*/'",
         "fields": [
@@ -133,30 +134,47 @@
           "imagenDestacada",
           "contenido"
         ]
+      },
+      {
+        "file": "keystatic.config.ts",
+        "line": 390,
+        "label": "'📝 Simple Nota'",
+        "storagePath": "'src/content/notas/*'",
+        "fields": [
+          "title",
+          "image",
+          "date",
+          "content"
+        ]
       }
     ],
     "fieldsDetected": {
       "title": {
-        "occurrences": 4,
+        "occurrences": 5,
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 43,
+            "line": 152,
             "snippet": "title: fields.slug({ name: { label: 'Título' } })"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 196,
+            "line": 195,
             "snippet": "title: fields.slug({ name: { label: 'Título del Arquetipo' } })"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 387,
+            "line": 258,
             "snippet": "title: fields.slug({ name: { label: 'Nombre del Sitio / Lugar' } })"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 503,
+            "line": 298,
+            "snippet": "title: fields.slug({ name: { label: 'Título' } })"
+          },
+          {
+            "file": "keystatic.config.ts",
+            "line": 396,
             "snippet": "title: fields.slug({ name: { label: 'Título' } })"
           }
         ]
@@ -166,38 +184,43 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 45,
-            "snippet": "volanta: fields.text({\r"
+            "line": 153,
+            "snippet": "volanta: volantaField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 198,
-            "snippet": "volanta: fields.text({\r"
+            "line": 196,
+            "snippet": "volanta: volantaField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 628,
-            "snippet": "volanta: fields.text({\r"
+            "line": 347,
+            "snippet": "volanta: fields.text({ label: 'Volanta / Excerpt', description: 'Aparecerá en tipografía Mono por encima del título principal.', multiline: true })"
           }
         ]
       },
       "generador": {
-        "occurrences": 3,
+        "occurrences": 4,
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 50,
-            "snippet": "generador: fields.text({ \r"
+            "line": 154,
+            "snippet": "generador: fields.text({ "
           },
           {
             "file": "keystatic.config.ts",
-            "line": 203,
-            "snippet": "generador: fields.text({ \r"
+            "line": 197,
+            "snippet": "generador: fields.text({ "
           },
           {
             "file": "keystatic.config.ts",
-            "line": 613,
-            "snippet": "generador: {\r"
+            "line": 301,
+            "snippet": "generador: fields.text({ "
+          },
+          {
+            "file": "keystatic.config.ts",
+            "line": 345,
+            "snippet": "generador: createTgpEngineField('⚡ Generador de Informe Premium', GeneradorInformePremium)"
           }
         ]
       },
@@ -206,13 +229,13 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 55,
-            "snippet": "notasInvestigador: fields.text({\r"
+            "line": 158,
+            "snippet": "notasInvestigador: notasInvestigadorField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 208,
-            "snippet": "notasInvestigador: fields.text({\r"
+            "line": 201,
+            "snippet": "notasInvestigador: notasInvestigadorField"
           }
         ]
       },
@@ -221,17 +244,17 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 62,
-            "snippet": "generadorTexto: {\r"
+            "line": 161,
+            "snippet": "generadorTexto: createTgpEngineField('1. Motor de Pensamiento & Arte Unificado TGP', GeneradorTextoTGP)"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 215,
-            "snippet": "generadorTexto: {\r"
+            "line": 204,
+            "snippet": "generadorTexto: createTgpEngineField('1. Motor de Arquetipos Globales TGP (Informe & Contenido)', GeneradorArquetiposTGP)"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 506,
+            "line": 299,
             "snippet": "generadorTexto: geminiCinematicField as any"
           }
         ]
@@ -241,23 +264,23 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 76,
-            "snippet": "agenteErudito: agenteEruditoField as any"
+            "line": 162,
+            "snippet": "agenteErudito: agenteEruditoField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 229,
-            "snippet": "agenteErudito: agenteEruditoField as any"
+            "line": 205,
+            "snippet": "agenteErudito: agenteEruditoField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 404,
-            "snippet": "agenteErudito: agenteEruditoField as any"
+            "line": 262,
+            "snippet": "agenteErudito: agenteEruditoField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 509,
-            "snippet": "agenteErudito: agenteEruditoField as any"
+            "line": 300,
+            "snippet": "agenteErudito: agenteEruditoField"
           }
         ]
       },
@@ -266,18 +289,18 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 79,
-            "snippet": "bancoImagenesWikimedia: {\r"
+            "line": 163,
+            "snippet": "bancoImagenesWikimedia: bancoImagenesWikimediaField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 232,
-            "snippet": "bancoImagenesWikimedia: {\r"
+            "line": 206,
+            "snippet": "bancoImagenesWikimedia: bancoImagenesWikimediaField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 407,
-            "snippet": "bancoImagenesWikimedia: {\r"
+            "line": 263,
+            "snippet": "bancoImagenesWikimedia: createTgpEngineField('📷 Buscador & Galería de Archivo Wikimedia Commons', BuscadorWikimediaTGP)"
           }
         ]
       },
@@ -286,43 +309,48 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 93,
-            "snippet": "generadorImagen: {\r"
+            "line": 164,
+            "snippet": "generadorImagen: generadorImagenField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 246,
-            "snippet": "generadorImagen: {\r"
+            "line": 207,
+            "snippet": "generadorImagen: generadorImagenField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 421,
-            "snippet": "generadorImagen: {\r"
+            "line": 264,
+            "snippet": "generadorImagen: createTgpEngineField('🎨 Motor de Arte Nano Banana (Laboratorio Manual)', MotorArteTGP)"
           }
         ]
       },
       "date": {
-        "occurrences": 4,
+        "occurrences": 5,
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 106,
-            "snippet": "date: fields.date({ label: 'Fecha' })"
+            "line": 166,
+            "snippet": "date: dateField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 259,
-            "snippet": "date: fields.date({ label: 'Fecha' })"
+            "line": 209,
+            "snippet": "date: dateField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 451,
-            "snippet": "date: fields.date({ label: 'Fecha' })"
+            "line": 281,
+            "snippet": "date: dateField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 589,
-            "snippet": "date: fields.date({\r"
+            "line": 334,
+            "snippet": "date: fields.date({ label: 'Fecha de Publicación', defaultValue: { kind: 'today' } })"
+          },
+          {
+            "file": "keystatic.config.ts",
+            "line": 406,
+            "snippet": "date: fields.date({"
           }
         ]
       },
@@ -331,18 +359,18 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 108,
-            "snippet": "category: {\r"
+            "line": 167,
+            "snippet": "category: createCategoryField('Historia')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 261,
-            "snippet": "category: {\r"
+            "line": 210,
+            "snippet": "category: createCategoryField('Arquetipos Globales')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 453,
-            "snippet": "category: fields.text({\r"
+            "line": 282,
+            "snippet": "category: fields.text({ label: 'Categoría Disciplinar', defaultValue: 'Arqueosemiótica' })"
           }
         ]
       },
@@ -351,13 +379,13 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 121,
-            "snippet": "themeColor: fields.select({\r"
+            "line": 168,
+            "snippet": "themeColor: createThemeColorField('british-green')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 274,
-            "snippet": "themeColor: fields.select({\r"
+            "line": 211,
+            "snippet": "themeColor: createThemeColorField('rust-orange')"
           }
         ]
       },
@@ -366,18 +394,18 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 133,
-            "snippet": "sitioGeohistorico: fields.text({\r"
+            "line": 170,
+            "snippet": "sitioGeohistorico: fields.text({"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 287,
-            "snippet": "sitioGeohistorico: fields.text({\r"
+            "line": 213,
+            "snippet": "sitioGeohistorico: fields.text({"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 434,
-            "snippet": "sitioGeohistorico: fields.text({\r"
+            "line": 266,
+            "snippet": "sitioGeohistorico: fields.text({"
           }
         ]
       },
@@ -386,18 +414,18 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 137,
-            "snippet": "publicarConImagen: fields.checkbox({\r"
+            "line": 175,
+            "snippet": "publicarConImagen: publicarConImagenField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 292,
-            "snippet": "publicarConImagen: fields.checkbox({\r"
+            "line": 218,
+            "snippet": "publicarConImagen: publicarConImagenField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 458,
-            "snippet": "publicarConImagen: fields.checkbox({\r"
+            "line": 283,
+            "snippet": "publicarConImagen: publicarConImagenField"
           }
         ]
       },
@@ -406,18 +434,18 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 142,
-            "snippet": "draft: fields.checkbox({ \r"
+            "line": 176,
+            "snippet": "draft: draftField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 298,
-            "snippet": "draft: fields.checkbox({ \r"
+            "line": 219,
+            "snippet": "draft: draftField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 464,
-            "snippet": "draft: fields.checkbox({ \r"
+            "line": 284,
+            "snippet": "draft: draftField"
           }
         ]
       },
@@ -426,23 +454,23 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 147,
-            "snippet": "coverImage: fields.image({ \r"
+            "line": 177,
+            "snippet": "coverImage: createCoverImage('ensayos')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 304,
-            "snippet": "coverImage: fields.image({ \r"
+            "line": 220,
+            "snippet": "coverImage: createCoverImage('arquetipos-globales')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 470,
-            "snippet": "coverImage: fields.image({ \r"
+            "line": 285,
+            "snippet": "coverImage: createCoverImage('georreferencias', 'Imagen del Sitio (Opcional)')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 568,
-            "snippet": "coverImage: fields.image({ \r"
+            "line": 330,
+            "snippet": "coverImage: createCoverImage('ensayos-cinematicos')"
           }
         ]
       },
@@ -451,13 +479,13 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 152,
-            "snippet": "isCinematic: fields.checkbox({\r"
+            "line": 178,
+            "snippet": "isCinematic: isCinematicField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 309,
-            "snippet": "isCinematic: fields.checkbox({\r"
+            "line": 221,
+            "snippet": "isCinematic: isCinematicField"
           }
         ]
       },
@@ -466,18 +494,18 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 157,
-            "snippet": "gallery: fields.array(fields.image({\r"
+            "line": 179,
+            "snippet": "gallery: createGallery('ensayos')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 314,
-            "snippet": "gallery: fields.array(fields.image({\r"
+            "line": 222,
+            "snippet": "gallery: createGallery('arquetipos-globales')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 574,
-            "snippet": "gallery: fields.array(fields.image({\r"
+            "line": 331,
+            "snippet": "gallery: createGallery('ensayos-cinematicos', 'Galería de Imágenes Cinemáticas (GSAP)')"
           }
         ]
       },
@@ -486,13 +514,13 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 165,
-            "snippet": "videoBg: fields.text({ label: 'URL del Video Cinemagraph' })"
+            "line": 180,
+            "snippet": "videoBg: videoBgField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 322,
-            "snippet": "videoBg: fields.text({ label: 'URL del Video Cinemagraph' })"
+            "line": 223,
+            "snippet": "videoBg: videoBgField"
           }
         ]
       },
@@ -501,13 +529,13 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 166,
-            "snippet": "spotifyLink: fields.url({ label: 'Link de Spotify Podcast (Opcional)' })"
+            "line": 181,
+            "snippet": "spotifyLink: spotifyLinkField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 323,
-            "snippet": "spotifyLink: fields.url({ label: 'Link de Spotify Podcast (Opcional)' })"
+            "line": 224,
+            "snippet": "spotifyLink: spotifyLinkField"
           }
         ]
       },
@@ -516,13 +544,13 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 167,
-            "snippet": "youtubeLink: fields.url({ label: 'Link de YouTube Podcast (Opcional)' })"
+            "line": 182,
+            "snippet": "youtubeLink: youtubeLinkField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 324,
-            "snippet": "youtubeLink: fields.url({ label: 'Link de YouTube Podcast (Opcional)' })"
+            "line": 225,
+            "snippet": "youtubeLink: youtubeLinkField"
           }
         ]
       },
@@ -531,22 +559,22 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 168,
-            "snippet": "excerpt: fields.text({ label: 'Excerpt (Sinopsis / Cita Filosofica 2-4 Renglones)', multiline: true })"
+            "line": 183,
+            "snippet": "excerpt: excerptField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 325,
-            "snippet": "excerpt: fields.text({ label: 'Excerpt (Sinopsis / Cita Filosofica 2-4 Renglones)', multiline: true })"
+            "line": 226,
+            "snippet": "excerpt: excerptField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 476,
+            "line": 286,
             "snippet": "excerpt: fields.text({ label: 'Sinopsis / Excerpt', multiline: true })"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 583,
+            "line": 332,
             "snippet": "excerpt: fields.text({ label: 'Excerpt / Sinopsis (Opcional)', multiline: true })"
           }
         ]
@@ -556,48 +584,53 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 169,
-            "snippet": "dek: fields.text({\r"
+            "line": 184,
+            "snippet": "dek: dekField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 327,
-            "snippet": "dek: fields.text({\r"
+            "line": 227,
+            "snippet": "dek: dekField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 478,
-            "snippet": "dek: fields.text({\r"
-          },
-          {
-            "file": "keystatic.config.ts",
-            "line": 584,
-            "snippet": "dek: fields.text({\r"
-          }
-        ]
-      },
-      "content": {
-        "occurrences": 4,
-        "locations": [
-          {
-            "file": "keystatic.config.ts",
-            "line": 174,
-            "snippet": "content: fields.document({\r"
+            "line": 287,
+            "snippet": "dek: dekField"
           },
           {
             "file": "keystatic.config.ts",
             "line": 333,
-            "snippet": "content: fields.document({\r"
+            "snippet": "dek: dekField"
+          }
+        ]
+      },
+      "content": {
+        "occurrences": 5,
+        "locations": [
+          {
+            "file": "keystatic.config.ts",
+            "line": 185,
+            "snippet": "content: createContentDocument('ensayos')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 484,
-            "snippet": "content: fields.document({\r"
+            "line": 228,
+            "snippet": "content: createContentDocument('arquetipos-globales')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 595,
-            "snippet": "content: fields.document({\r"
+            "line": 288,
+            "snippet": "content: createContentDocument('georreferencias', 'Informe Geohistórico Multidimensional')"
+          },
+          {
+            "file": "keystatic.config.ts",
+            "line": 335,
+            "snippet": "content: createContentDocument('ensayos-cinematicos')"
+          },
+          {
+            "file": "keystatic.config.ts",
+            "line": 412,
+            "snippet": "content: fields.mdx({ label: 'Contenido de la Nota' })"
           }
         ]
       },
@@ -606,7 +639,7 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 355,
+            "line": 238,
             "snippet": "nombre: fields.slug({ name: { label: 'Identificador del Estilo' } })"
           }
         ]
@@ -616,8 +649,8 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 356,
-            "snippet": "constructorEstilo: {\r"
+            "line": 239,
+            "snippet": "constructorEstilo: createTgpEngineField('Laboratorio de Estilos e Imágenes TGP', ProbadorArteTGP, {"
           }
         ]
       },
@@ -626,8 +659,8 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 390,
-            "snippet": "generadorGeoref: {\r"
+            "line": 261,
+            "snippet": "generadorGeoref: createTgpEngineField('🌐 Motor de Georreferencias Arqueosemióticas (Gemini 3.1 Pro)', GeneradorGeorreferenciaTGP)"
           }
         ]
       },
@@ -636,8 +669,8 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 439,
-            "snippet": "volantaHook: fields.text({\r"
+            "line": 270,
+            "snippet": "volantaHook: fields.text({"
           }
         ]
       },
@@ -646,8 +679,8 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 445,
-            "snippet": "saberMasDato: fields.text({\r"
+            "line": 275,
+            "snippet": "saberMasDato: fields.text({"
           }
         ]
       },
@@ -656,8 +689,8 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 512,
-            "snippet": "atmosfera: fields.conditional(\r"
+            "line": 306,
+            "snippet": "atmosfera: fields.conditional("
           }
         ]
       },
@@ -666,7 +699,7 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 626,
+            "line": 346,
             "snippet": "titulo: fields.slug({ name: { label: 'Título del Informe' } })"
           }
         ]
@@ -676,8 +709,8 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 634,
-            "snippet": "coleccion: fields.select({\r"
+            "line": 349,
+            "snippet": "coleccion: fields.select({"
           }
         ]
       },
@@ -686,8 +719,8 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 645,
-            "snippet": "fuenteVisual: fields.select({\r"
+            "line": 355,
+            "snippet": "fuenteVisual: fields.select({"
           }
         ]
       },
@@ -696,8 +729,8 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 654,
-            "snippet": "directrices: fields.text({\r"
+            "line": 361,
+            "snippet": "directrices: fields.text({"
           }
         ]
       },
@@ -706,8 +739,8 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 660,
-            "snippet": "tags: fields.multiselect({\r"
+            "line": 367,
+            "snippet": "tags: fields.multiselect({"
           }
         ]
       },
@@ -716,8 +749,8 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 674,
-            "snippet": "imagenDestacada: fields.text({\r"
+            "line": 376,
+            "snippet": "imagenDestacada: fields.text({"
           }
         ]
       },
@@ -726,8 +759,18 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 680,
-            "snippet": "contenido: fields.markdoc({\r"
+            "line": 382,
+            "snippet": "contenido: fields.markdoc({"
+          }
+        ]
+      },
+      "image": {
+        "occurrences": 1,
+        "locations": [
+          {
+            "file": "keystatic.config.ts",
+            "line": 399,
+            "snippet": "image: fields.image({"
           }
         ]
       }
@@ -735,26 +778,31 @@
     "duplicatedFields": [
       {
         "fieldName": "title",
-        "occurrences": 4,
+        "occurrences": 5,
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 43,
+            "line": 152,
             "snippet": "title: fields.slug({ name: { label: 'Título' } })"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 196,
+            "line": 195,
             "snippet": "title: fields.slug({ name: { label: 'Título del Arquetipo' } })"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 387,
+            "line": 258,
             "snippet": "title: fields.slug({ name: { label: 'Nombre del Sitio / Lugar' } })"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 503,
+            "line": 298,
+            "snippet": "title: fields.slug({ name: { label: 'Título' } })"
+          },
+          {
+            "file": "keystatic.config.ts",
+            "line": 396,
             "snippet": "title: fields.slug({ name: { label: 'Título' } })"
           }
         ]
@@ -765,39 +813,44 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 45,
-            "snippet": "volanta: fields.text({\r"
+            "line": 153,
+            "snippet": "volanta: volantaField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 198,
-            "snippet": "volanta: fields.text({\r"
+            "line": 196,
+            "snippet": "volanta: volantaField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 628,
-            "snippet": "volanta: fields.text({\r"
+            "line": 347,
+            "snippet": "volanta: fields.text({ label: 'Volanta / Excerpt', description: 'Aparecerá en tipografía Mono por encima del título principal.', multiline: true })"
           }
         ]
       },
       {
         "fieldName": "generador",
-        "occurrences": 3,
+        "occurrences": 4,
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 50,
-            "snippet": "generador: fields.text({ \r"
+            "line": 154,
+            "snippet": "generador: fields.text({ "
           },
           {
             "file": "keystatic.config.ts",
-            "line": 203,
-            "snippet": "generador: fields.text({ \r"
+            "line": 197,
+            "snippet": "generador: fields.text({ "
           },
           {
             "file": "keystatic.config.ts",
-            "line": 613,
-            "snippet": "generador: {\r"
+            "line": 301,
+            "snippet": "generador: fields.text({ "
+          },
+          {
+            "file": "keystatic.config.ts",
+            "line": 345,
+            "snippet": "generador: createTgpEngineField('⚡ Generador de Informe Premium', GeneradorInformePremium)"
           }
         ]
       },
@@ -807,13 +860,13 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 55,
-            "snippet": "notasInvestigador: fields.text({\r"
+            "line": 158,
+            "snippet": "notasInvestigador: notasInvestigadorField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 208,
-            "snippet": "notasInvestigador: fields.text({\r"
+            "line": 201,
+            "snippet": "notasInvestigador: notasInvestigadorField"
           }
         ]
       },
@@ -823,17 +876,17 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 62,
-            "snippet": "generadorTexto: {\r"
+            "line": 161,
+            "snippet": "generadorTexto: createTgpEngineField('1. Motor de Pensamiento & Arte Unificado TGP', GeneradorTextoTGP)"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 215,
-            "snippet": "generadorTexto: {\r"
+            "line": 204,
+            "snippet": "generadorTexto: createTgpEngineField('1. Motor de Arquetipos Globales TGP (Informe & Contenido)', GeneradorArquetiposTGP)"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 506,
+            "line": 299,
             "snippet": "generadorTexto: geminiCinematicField as any"
           }
         ]
@@ -844,23 +897,23 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 76,
-            "snippet": "agenteErudito: agenteEruditoField as any"
+            "line": 162,
+            "snippet": "agenteErudito: agenteEruditoField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 229,
-            "snippet": "agenteErudito: agenteEruditoField as any"
+            "line": 205,
+            "snippet": "agenteErudito: agenteEruditoField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 404,
-            "snippet": "agenteErudito: agenteEruditoField as any"
+            "line": 262,
+            "snippet": "agenteErudito: agenteEruditoField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 509,
-            "snippet": "agenteErudito: agenteEruditoField as any"
+            "line": 300,
+            "snippet": "agenteErudito: agenteEruditoField"
           }
         ]
       },
@@ -870,18 +923,18 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 79,
-            "snippet": "bancoImagenesWikimedia: {\r"
+            "line": 163,
+            "snippet": "bancoImagenesWikimedia: bancoImagenesWikimediaField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 232,
-            "snippet": "bancoImagenesWikimedia: {\r"
+            "line": 206,
+            "snippet": "bancoImagenesWikimedia: bancoImagenesWikimediaField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 407,
-            "snippet": "bancoImagenesWikimedia: {\r"
+            "line": 263,
+            "snippet": "bancoImagenesWikimedia: createTgpEngineField('📷 Buscador & Galería de Archivo Wikimedia Commons', BuscadorWikimediaTGP)"
           }
         ]
       },
@@ -891,44 +944,49 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 93,
-            "snippet": "generadorImagen: {\r"
+            "line": 164,
+            "snippet": "generadorImagen: generadorImagenField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 246,
-            "snippet": "generadorImagen: {\r"
+            "line": 207,
+            "snippet": "generadorImagen: generadorImagenField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 421,
-            "snippet": "generadorImagen: {\r"
+            "line": 264,
+            "snippet": "generadorImagen: createTgpEngineField('🎨 Motor de Arte Nano Banana (Laboratorio Manual)', MotorArteTGP)"
           }
         ]
       },
       {
         "fieldName": "date",
-        "occurrences": 4,
+        "occurrences": 5,
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 106,
-            "snippet": "date: fields.date({ label: 'Fecha' })"
+            "line": 166,
+            "snippet": "date: dateField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 259,
-            "snippet": "date: fields.date({ label: 'Fecha' })"
+            "line": 209,
+            "snippet": "date: dateField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 451,
-            "snippet": "date: fields.date({ label: 'Fecha' })"
+            "line": 281,
+            "snippet": "date: dateField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 589,
-            "snippet": "date: fields.date({\r"
+            "line": 334,
+            "snippet": "date: fields.date({ label: 'Fecha de Publicación', defaultValue: { kind: 'today' } })"
+          },
+          {
+            "file": "keystatic.config.ts",
+            "line": 406,
+            "snippet": "date: fields.date({"
           }
         ]
       },
@@ -938,18 +996,18 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 108,
-            "snippet": "category: {\r"
+            "line": 167,
+            "snippet": "category: createCategoryField('Historia')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 261,
-            "snippet": "category: {\r"
+            "line": 210,
+            "snippet": "category: createCategoryField('Arquetipos Globales')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 453,
-            "snippet": "category: fields.text({\r"
+            "line": 282,
+            "snippet": "category: fields.text({ label: 'Categoría Disciplinar', defaultValue: 'Arqueosemiótica' })"
           }
         ]
       },
@@ -959,13 +1017,13 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 121,
-            "snippet": "themeColor: fields.select({\r"
+            "line": 168,
+            "snippet": "themeColor: createThemeColorField('british-green')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 274,
-            "snippet": "themeColor: fields.select({\r"
+            "line": 211,
+            "snippet": "themeColor: createThemeColorField('rust-orange')"
           }
         ]
       },
@@ -975,18 +1033,18 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 133,
-            "snippet": "sitioGeohistorico: fields.text({\r"
+            "line": 170,
+            "snippet": "sitioGeohistorico: fields.text({"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 287,
-            "snippet": "sitioGeohistorico: fields.text({\r"
+            "line": 213,
+            "snippet": "sitioGeohistorico: fields.text({"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 434,
-            "snippet": "sitioGeohistorico: fields.text({\r"
+            "line": 266,
+            "snippet": "sitioGeohistorico: fields.text({"
           }
         ]
       },
@@ -996,18 +1054,18 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 137,
-            "snippet": "publicarConImagen: fields.checkbox({\r"
+            "line": 175,
+            "snippet": "publicarConImagen: publicarConImagenField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 292,
-            "snippet": "publicarConImagen: fields.checkbox({\r"
+            "line": 218,
+            "snippet": "publicarConImagen: publicarConImagenField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 458,
-            "snippet": "publicarConImagen: fields.checkbox({\r"
+            "line": 283,
+            "snippet": "publicarConImagen: publicarConImagenField"
           }
         ]
       },
@@ -1017,18 +1075,18 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 142,
-            "snippet": "draft: fields.checkbox({ \r"
+            "line": 176,
+            "snippet": "draft: draftField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 298,
-            "snippet": "draft: fields.checkbox({ \r"
+            "line": 219,
+            "snippet": "draft: draftField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 464,
-            "snippet": "draft: fields.checkbox({ \r"
+            "line": 284,
+            "snippet": "draft: draftField"
           }
         ]
       },
@@ -1038,23 +1096,23 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 147,
-            "snippet": "coverImage: fields.image({ \r"
+            "line": 177,
+            "snippet": "coverImage: createCoverImage('ensayos')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 304,
-            "snippet": "coverImage: fields.image({ \r"
+            "line": 220,
+            "snippet": "coverImage: createCoverImage('arquetipos-globales')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 470,
-            "snippet": "coverImage: fields.image({ \r"
+            "line": 285,
+            "snippet": "coverImage: createCoverImage('georreferencias', 'Imagen del Sitio (Opcional)')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 568,
-            "snippet": "coverImage: fields.image({ \r"
+            "line": 330,
+            "snippet": "coverImage: createCoverImage('ensayos-cinematicos')"
           }
         ]
       },
@@ -1064,13 +1122,13 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 152,
-            "snippet": "isCinematic: fields.checkbox({\r"
+            "line": 178,
+            "snippet": "isCinematic: isCinematicField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 309,
-            "snippet": "isCinematic: fields.checkbox({\r"
+            "line": 221,
+            "snippet": "isCinematic: isCinematicField"
           }
         ]
       },
@@ -1080,18 +1138,18 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 157,
-            "snippet": "gallery: fields.array(fields.image({\r"
+            "line": 179,
+            "snippet": "gallery: createGallery('ensayos')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 314,
-            "snippet": "gallery: fields.array(fields.image({\r"
+            "line": 222,
+            "snippet": "gallery: createGallery('arquetipos-globales')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 574,
-            "snippet": "gallery: fields.array(fields.image({\r"
+            "line": 331,
+            "snippet": "gallery: createGallery('ensayos-cinematicos', 'Galería de Imágenes Cinemáticas (GSAP)')"
           }
         ]
       },
@@ -1101,13 +1159,13 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 165,
-            "snippet": "videoBg: fields.text({ label: 'URL del Video Cinemagraph' })"
+            "line": 180,
+            "snippet": "videoBg: videoBgField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 322,
-            "snippet": "videoBg: fields.text({ label: 'URL del Video Cinemagraph' })"
+            "line": 223,
+            "snippet": "videoBg: videoBgField"
           }
         ]
       },
@@ -1117,13 +1175,13 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 166,
-            "snippet": "spotifyLink: fields.url({ label: 'Link de Spotify Podcast (Opcional)' })"
+            "line": 181,
+            "snippet": "spotifyLink: spotifyLinkField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 323,
-            "snippet": "spotifyLink: fields.url({ label: 'Link de Spotify Podcast (Opcional)' })"
+            "line": 224,
+            "snippet": "spotifyLink: spotifyLinkField"
           }
         ]
       },
@@ -1133,13 +1191,13 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 167,
-            "snippet": "youtubeLink: fields.url({ label: 'Link de YouTube Podcast (Opcional)' })"
+            "line": 182,
+            "snippet": "youtubeLink: youtubeLinkField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 324,
-            "snippet": "youtubeLink: fields.url({ label: 'Link de YouTube Podcast (Opcional)' })"
+            "line": 225,
+            "snippet": "youtubeLink: youtubeLinkField"
           }
         ]
       },
@@ -1149,22 +1207,22 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 168,
-            "snippet": "excerpt: fields.text({ label: 'Excerpt (Sinopsis / Cita Filosofica 2-4 Renglones)', multiline: true })"
+            "line": 183,
+            "snippet": "excerpt: excerptField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 325,
-            "snippet": "excerpt: fields.text({ label: 'Excerpt (Sinopsis / Cita Filosofica 2-4 Renglones)', multiline: true })"
+            "line": 226,
+            "snippet": "excerpt: excerptField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 476,
+            "line": 286,
             "snippet": "excerpt: fields.text({ label: 'Sinopsis / Excerpt', multiline: true })"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 583,
+            "line": 332,
             "snippet": "excerpt: fields.text({ label: 'Excerpt / Sinopsis (Opcional)', multiline: true })"
           }
         ]
@@ -1175,49 +1233,54 @@
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 169,
-            "snippet": "dek: fields.text({\r"
+            "line": 184,
+            "snippet": "dek: dekField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 327,
-            "snippet": "dek: fields.text({\r"
+            "line": 227,
+            "snippet": "dek: dekField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 478,
-            "snippet": "dek: fields.text({\r"
+            "line": 287,
+            "snippet": "dek: dekField"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 584,
-            "snippet": "dek: fields.text({\r"
+            "line": 333,
+            "snippet": "dek: dekField"
           }
         ]
       },
       {
         "fieldName": "content",
-        "occurrences": 4,
+        "occurrences": 5,
         "locations": [
           {
             "file": "keystatic.config.ts",
-            "line": 174,
-            "snippet": "content: fields.document({\r"
+            "line": 185,
+            "snippet": "content: createContentDocument('ensayos')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 333,
-            "snippet": "content: fields.document({\r"
+            "line": 228,
+            "snippet": "content: createContentDocument('arquetipos-globales')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 484,
-            "snippet": "content: fields.document({\r"
+            "line": 288,
+            "snippet": "content: createContentDocument('georreferencias', 'Informe Geohistórico Multidimensional')"
           },
           {
             "file": "keystatic.config.ts",
-            "line": 595,
-            "snippet": "content: fields.document({\r"
+            "line": 335,
+            "snippet": "content: createContentDocument('ensayos-cinematicos')"
+          },
+          {
+            "file": "keystatic.config.ts",
+            "line": 412,
+            "snippet": "content: fields.mdx({ label: 'Contenido de la Nota' })"
           }
         ]
       }
@@ -1308,76 +1371,19 @@
         "type": "Method_Call",
         "expression": "ai.models.generateContent",
         "file": "src\\pages\\api\\generar-tgp.ts",
-        "line": 129,
+        "line": 147,
         "codeSnippet": "ai.models.generateContent({\n          model: 'gemini-3.1-pro-preview',\n          contents: [{ role: 'user', parts: [{ text: prompt }] }],\n          co..."
       }
     ],
     "modelsReferenced": {
       "./src/keystatic/geminiCinematic": 1,
-      "gemini-": 1,
       "gemini-2.5-pro": 1,
       "../../config/geminiPrompts": 2,
       "gemini-3.1-pro-preview": 4,
       "gemini-3.6-flash": 2,
       "gemini-3.1-flash-image-preview": 1
     },
-    "apiEndpoints": [
-      {
-        "url": "/api/agente-erudito",
-        "file": "src\\components\\AgenteEruditoTGP.tsx",
-        "line": 157
-      },
-      {
-        "url": "/api/generar-arquetipo",
-        "file": "src\\components\\GeneradorArquetiposTGP.tsx",
-        "line": 217
-      },
-      {
-        "url": "/api/generar-arte",
-        "file": "src\\components\\GeneradorArquetiposTGP.tsx",
-        "line": 265
-      },
-      {
-        "url": "/api/generar-georreferencia",
-        "file": "src\\components\\GeneradorGeorreferenciaTGP.tsx",
-        "line": 343
-      },
-      {
-        "url": "/api/generar-arte",
-        "file": "src\\components\\GeneradorGeorreferenciaTGP.tsx",
-        "line": 409
-      },
-      {
-        "url": "/api/generar-tgp",
-        "file": "src\\components\\GeneradorTextoTGP.tsx",
-        "line": 224
-      },
-      {
-        "url": "/api/generar-arte",
-        "file": "src\\components\\GeneradorTextoTGP.tsx",
-        "line": 277
-      },
-      {
-        "url": "/api/generar-georreferencia",
-        "file": "src\\components\\GeneradorTextoTGP.tsx",
-        "line": 337
-      },
-      {
-        "url": "/api/generar-arte",
-        "file": "src\\components\\MotorArteTGP.tsx",
-        "line": 226
-      },
-      {
-        "url": "/api/generar-sujeto",
-        "file": "src\\components\\ProbadorArteTGP.tsx",
-        "line": 55
-      },
-      {
-        "url": "/api/generar-arte",
-        "file": "src\\components\\ProbadorArteTGP.tsx",
-        "line": 92
-      }
-    ]
+    "apiEndpoints": []
   },
   "quarantineActionsTaken": []
 }

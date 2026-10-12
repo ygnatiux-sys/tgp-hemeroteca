@@ -7,5 +7,6 @@
   "excerpt": "Realiza un informe neutral y exhaustivo de esta imagen. Describe literalmente qué se ve, extrae cualquier texto legible (OCR) y señala las entidades principales.",
   "atmosfera": {
     "discriminant": "obsidiana"
-  }
+  },
+  "coverImage": "https://assets.thegreatpuzzleproject.com/osint/633e0e3a-aac0-453a-ba21-ff9b3203bc6a.webp"
 }

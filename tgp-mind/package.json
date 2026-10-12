@@ -10,7 +10,7 @@
     "start": "node dist/index.js",
     "deploy": "bash deploy.sh",
     "deploy:win": "powershell -ExecutionPolicy Bypass -File deploy.ps1",
-    "query": "node ../scratch/query_d1.js"
+    "query": "node ../scripts/db-tools/query_d1.js"
   },
   "engines": {
     "node": ">=22"

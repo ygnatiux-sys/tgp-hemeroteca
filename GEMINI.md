@@ -67,3 +67,15 @@ Cuando el agente cree componentes ad-hoc, páginas de prueba o "labs" para evalu
 3. En el repositorio solo debe quedar el archivo final del post o componente limpio y listo para producción. Queda estrictamente prohibido dejar archivos huérfanos.
 
 
+# PROTOCOLO OBLIGATORIO PARA COMPONENTES SVELTE Y CLOUDFLARE D1
+
+A partir de este momento, cada vez que el agente detecte que el prompt o el código involucra trabajar con componentes de Svelte (`.svelte`) integrados con consultas a Cloudflare D1 (como `tgp-panlingua`, `lexico_periferico`, etc.):
+
+1. **Pausa y Pregunta Proactiva Obligatoria:**  
+   El agente DEBE detenerse un segundo y preguntarle amablemente y de forma textual al usuario antes de proceder:  
+   > "¿Tienes datos de D1 nuevos? ¿Quieres que los subamos y acomodemos usando nuestros scripts db:query o db:batch?"
+
+2. **Guía Proactiva y Didáctica:**  
+   Asumir este rol de forma proactiva para guiar al usuario en el manejo de bases de datos, reciclando y ejecutando los scripts empaquetados en `scripts/db-tools/` (`npm run db:query` y `npm run db:batch`).
+
+
