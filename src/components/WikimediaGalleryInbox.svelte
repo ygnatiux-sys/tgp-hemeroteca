@@ -180,16 +180,16 @@
   <!-- ESTUDIO A PANTALLA COMPLETA REAL (100vw x 100vh) -->
   <section
     id="wikimedia-inbox-section"
-    class="fixed inset-0 z-[99999] w-screen h-screen overflow-y-auto flex flex-col animate-fadeIn transition-colors duration-300
+    class="fixed inset-0 z-99999 w-screen h-screen overflow-y-auto flex flex-col animate-fadeIn transition-colors duration-300
     {theme === 'dia'
       ? 'bg-white text-[#1f1f1f] selection:bg-blue-100 selection:text-blue-900'
       : 'bg-[#131314] text-[#e3e3e3] selection:bg-emerald-900 selection:text-white'}"
   >
     <!-- AMBIENT GLOW DIFUSO (Solo en modo Noche) -->
     {#if theme === 'noche'}
-      <div class="fixed -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-emerald-500/10 blur-[140px] pointer-events-none"></div>
-      <div class="fixed top-1/3 -right-40 w-[550px] h-[550px] rounded-full bg-violet-500/10 blur-[150px] pointer-events-none"></div>
-      <div class="fixed -bottom-40 left-1/3 w-[500px] h-[500px] rounded-full bg-amber-500/08 blur-[130px] pointer-events-none"></div>
+      <div class="fixed -top-40 -left-40 w-125 h-125 rounded-full bg-emerald-500/10 blur-[140px] pointer-events-none"></div>
+      <div class="fixed top-1/3 -right-40 w-137.5 h-137.5 rounded-full bg-violet-500/10 blur-[150px] pointer-events-none"></div>
+      <div class="fixed -bottom-40 left-1/3 w-125 h-125 rounded-full bg-amber-500/08 blur-[130px] pointer-events-none"></div>
     {/if}
 
     <!-- BARRA SUPERIOR FIJA / BRANDING GEMINI -->
@@ -577,7 +577,7 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
-    class="fixed inset-0 z-[100000] bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 sm:p-8 animate-fadeIn"
+    class="fixed inset-0 z-100000 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 sm:p-8 animate-fadeIn"
     on:click|self={closeFancybox}
   >
     <div class="relative max-w-5xl w-full max-h-[92vh] rounded-3xl overflow-hidden flex flex-col shadow-2xl border
@@ -604,7 +604,7 @@
       </div>
 
       <!-- Imagen en Alta Resolución -->
-      <div class="flex-1 overflow-auto flex items-center justify-center p-4 bg-black/90 min-h-[300px]">
+      <div class="flex-1 overflow-auto flex items-center justify-center p-4 bg-black/90 min-h-75">
         <img
           src={previewImage.url}
           alt={previewImage.title}
