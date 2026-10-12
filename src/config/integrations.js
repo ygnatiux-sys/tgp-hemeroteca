@@ -29,8 +29,12 @@ function localApiDevPlugin() {
     name: 'tgp-local-api-dev',
     hooks: {
       'astro:server:setup': async ({ server }) => {
-        const { handleLocalApi } = await import('../api/local/router.ts');
-        server.middlewares.use(handleLocalApi);
+        try {
+          const { handleLocalApi } = await import('../api/local/router.ts');
+          server.middlewares.use(handleLocalApi);
+        } catch (err) {
+          console.error('[tgp-local-api-dev] Error cargando router local:', err);
+        }
       }
     }
   };

@@ -1,9 +1,9 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { handleGuardarEnsayo } from './guardar-ensayo';
-import { handleGuardarCinematico } from './guardar-cinematico';
-import { handleGuardarArquetipo } from './guardar-arquetipo';
-import { handleGuardarGeorreferencia } from './guardar-georreferencia';
-import { handleTransmute } from './transmute';
+import { handleGuardarEnsayo } from './guardar-ensayo.ts';
+import { handleGuardarCinematico } from './guardar-cinematico.ts';
+import { handleGuardarArquetipo } from './guardar-arquetipo.ts';
+import { handleGuardarGeorreferencia } from './guardar-georreferencia.ts';
+import { handleTransmute } from './transmute.ts';
 
 export async function handleLocalApi(
   req: IncomingMessage,
