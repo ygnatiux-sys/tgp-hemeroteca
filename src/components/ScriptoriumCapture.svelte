@@ -4,6 +4,7 @@
   // Reimplementación nativa en Svelte 5 de TgpVisionBoard (React)
   // Estética Material You / MD3 Light · Tailwind CSS puro
   // ─────────────────────────────────────────────────────────────────────────────
+  import { onMount } from 'svelte';
   import { marked } from 'marked';
   import { openGooglePicker } from '../lib/google-picker';
   import { ejecutarIngestaExhaustiva, ejecutarRedaccionPremium } from '../lib/vision-osint';
@@ -58,6 +59,25 @@
   let error: string | null = null;
   let pickerLoading = false;
   let isWikiInboxOpen = false;
+
+  // ── Tema Dual: 'dia' (Brand Gemini limpio) vs 'noche' (#121314 con ambient glow) ──
+  let theme: 'dia' | 'noche' = 'dia';
+
+  onMount(() => {
+    if (typeof localStorage !== 'undefined') {
+      const saved = localStorage.getItem('tgp_ui_theme');
+      if (saved === 'dia' || saved === 'noche') {
+        theme = saved;
+      }
+    }
+  });
+
+  function toggleTheme() {
+    theme = theme === 'dia' ? 'noche' : 'dia';
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('tgp_ui_theme', theme);
+    }
+  }
 
   // ── Estado Cascada Cognitiva & Puesto de Mando (Desk) ─────────────────────
   let showManualPrompt = true;
@@ -414,22 +434,44 @@
     aria-modal={!embedded ? 'true' : undefined}
     aria-label="TGP Vision Board"
   >
-    <div class="w-full {embedded ? 'border border-zinc-200/90 bg-white' : 'bg-white rounded-2xl shadow-2xl max-w-6xl h-[88vh] max-h-[88vh] overflow-hidden border border-zinc-200'} flex flex-col text-zinc-900 select-auto">
+    <div class="w-full transition-all duration-300 select-auto {embedded ? (theme === 'dia' ? 'border border-slate-200/90 bg-white rounded-3xl shadow-[0_4px_30px_-5px_rgba(0,0,0,0.06)]' : 'border border-white/10 bg-[#121314] rounded-3xl shadow-2xl relative overflow-hidden text-stone-100') : (theme === 'dia' ? 'bg-white rounded-3xl shadow-2xl max-w-7xl h-[88vh] max-h-[88vh] overflow-hidden border border-slate-200' : 'bg-[#121314] rounded-3xl shadow-2xl max-w-7xl h-[88vh] max-h-[88vh] overflow-hidden border border-white/10 relative text-stone-100')} flex flex-col">
+
+      <!-- Ambient Glow difuso en modo noche -->
+      {#if theme === 'noche'}
+        <div class="absolute -top-32 -left-32 w-80 h-80 rounded-full bg-emerald-500/10 blur-[120px] pointer-events-none"></div>
+        <div class="absolute top-1/2 -right-32 w-80 h-80 rounded-full bg-violet-500/10 blur-[130px] pointer-events-none"></div>
+      {/if}
 
       <!-- Header del workspace -->
-      <header class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-zinc-200 bg-zinc-50/80 shrink-0">
+      <header class="flex items-center justify-between px-6 sm:px-8 py-4 border-b shrink-0 transition-colors duration-300 relative z-10 {theme === 'dia' ? 'border-slate-100 bg-white/95 text-slate-900' : 'border-white/10 bg-[#121314]/95 text-white'}">
         <div>
-          <div class="text-[11px] font-mono font-medium tracking-widest uppercase text-emerald-700">
+          <div class="text-[11px] font-mono font-medium tracking-widest uppercase {theme === 'dia' ? 'text-blue-600' : 'text-emerald-400'}">
             TGP Scriptorium · Motor Cognitivo Multimodal
           </div>
-          <div class="text-xl font-bold text-zinc-900 mt-0.5">
+          <div class="text-xl sm:text-2xl font-sans tracking-tight font-bold {theme === 'dia' ? 'text-slate-900' : 'text-white'} mt-0.5">
             Vision / Iconografía
           </div>
         </div>
         <div class="flex items-center gap-3">
+          <!-- ☀️ / 🌙 CONMUTADOR DÍA / NOCHE -->
+          <button
+            type="button"
+            on:click={toggleTheme}
+            class="flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-medium transition-all shadow-xs cursor-pointer {theme === 'dia' ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300' : 'bg-[#1a1c1e] hover:bg-[#232628] text-amber-300 border-white/10 shadow-[0_0_15px_-3px_rgba(251,191,36,0.15)]'}"
+            title="Alternar: Día (Brand Gemini) vs Noche (#121314 Glow)"
+          >
+            {#if theme === 'dia'}
+              <span>☀️</span>
+              <span class="font-sans font-semibold">Día · Gemini</span>
+            {:else}
+              <span>🌙</span>
+              <span class="font-sans font-semibold">Noche · #121314</span>
+            {/if}
+          </button>
+
           <a
             href="/tgp-app/"
-            class="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-emerald-800 bg-emerald-50 hover:bg-emerald-100 hover:text-emerald-900 border border-emerald-200 rounded-full transition-colors inline-flex items-center gap-1.5 shadow-2xs"
+            class="px-4 py-2 text-xs font-sans font-semibold uppercase tracking-wider rounded-full transition-all inline-flex items-center gap-1.5 border shadow-2xs {theme === 'dia' ? 'text-blue-800 bg-blue-50/80 hover:bg-blue-100 border-blue-200' : 'text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/60 border-emerald-800'}"
             title="Volver al Panel Principal de TGP App"
           >
             ← Volver al Hub
@@ -437,7 +479,7 @@
           {#if !embedded}
             <button
               type="button"
-              class="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-zinc-600 bg-zinc-100 hover:bg-zinc-200 hover:text-zinc-900 border border-zinc-200 rounded-full transition-colors cursor-pointer"
+              class="px-4 py-2 text-xs font-sans font-semibold uppercase tracking-wider rounded-full transition-colors cursor-pointer border {theme === 'dia' ? 'text-slate-600 bg-slate-100 hover:bg-slate-200 border-slate-300' : 'text-stone-300 bg-[#1e2022] hover:bg-[#282a2d] border-white/10'}"
               on:click={() => (isOpen = false)}
             >
               ✕ Cerrar
@@ -447,21 +489,21 @@
       </header>
 
       <!-- Workspace en 2 columnas (45% Ingesta / 55% Puesto de Mando) -->
-      <div class="flex flex-col lg:flex-row flex-1 {embedded ? 'items-start' : 'min-h-0 overflow-hidden'} divide-y lg:divide-y-0 lg:divide-x divide-zinc-200">
+      <div class="flex flex-col lg:flex-row flex-1 {embedded ? 'items-start' : 'min-h-0 overflow-hidden'} divide-y lg:divide-y-0 lg:divide-x {theme === 'dia' ? 'divide-slate-100' : 'divide-white/5'}">
 
         <!-- ── COLUMNA IZQUIERDA (45%): Ingesta Visual y Visor ──────── -->
-        <div class="w-full lg:w-[45%] p-4 sm:p-6 lg:p-7 flex flex-col gap-5 {embedded ? 'lg:sticky lg:top-4 self-start' : 'overflow-y-auto'} bg-zinc-50/40">
+        <div class="w-full lg:w-[45%] p-5 sm:p-7 lg:p-8 flex flex-col gap-6 {embedded ? 'lg:sticky lg:top-4 self-start' : 'overflow-y-auto'} {theme === 'dia' ? 'bg-[#fbfcfe]' : 'bg-[#151718]'}">
 
           <!-- Selección / Ingesta de Imagen -->
           <div class="flex flex-col gap-2">
-            <span class="block text-xs font-bold uppercase tracking-wider text-zinc-600">
+            <span class="block text-xs font-bold uppercase tracking-wider {theme === 'dia' ? 'text-slate-600' : 'text-stone-400'}">
               1. Selección de Imagen
             </span>
 
             {#if !previewUrl}
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div
-                class="border-2 border-dashed rounded-xl p-6 lg:p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 min-h-50 {isDragging ? 'border-emerald-500 bg-emerald-50/70 scale-[0.99]' : 'border-zinc-300 bg-white hover:bg-zinc-50 hover:border-zinc-400'}"
+                class="border-2 border-dashed rounded-2xl p-6 lg:p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 min-h-50 {isDragging ? 'border-emerald-500 bg-emerald-500/10 scale-[0.99]' : theme === 'dia' ? 'border-slate-300 bg-white hover:bg-slate-50/80 hover:border-slate-400' : 'border-white/15 bg-[#1a1c1e] hover:bg-[#202225] hover:border-white/25'}"
                 on:dragover={handleDragOver}
                 on:dragleave={handleDragLeave}
                 on:drop={handleDrop}
@@ -474,15 +516,15 @@
                   class="hidden"
                   on:change={handleFileChange}
                 />
-                <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mb-2.5 shadow-2xs">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center text-xl mb-2.5 shadow-2xs {theme === 'dia' ? 'bg-emerald-50 text-emerald-600' : 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/60'}">
                   ↑
                 </div>
-                <div class="text-sm font-semibold text-zinc-800">Arrastrá una imagen aquí</div>
-                <div class="text-xs text-zinc-500 mt-0.5">o hacé clic para explorar desde tu equipo</div>
-                <div class="text-[10px] text-zinc-400 mt-2 font-mono">JPG · PNG · WEBP · GIF · TIFF</div>
+                <div class="text-sm font-semibold {theme === 'dia' ? 'text-slate-800' : 'text-stone-200'}">Arrastrá una imagen aquí</div>
+                <div class="text-xs mt-0.5 {theme === 'dia' ? 'text-slate-500' : 'text-stone-400'}">o hacé clic para explorar desde tu equipo</div>
+                <div class="text-[10px] mt-2 font-mono {theme === 'dia' ? 'text-slate-400' : 'text-stone-500'}">JPG · PNG · WEBP · GIF · TIFF</div>
               </div>
             {:else}
-              <div class="relative rounded-xl overflow-hidden border border-zinc-200 bg-zinc-900 aspect-video shadow-2xs group flex items-center justify-center">
+              <div class="relative rounded-2xl overflow-hidden border {theme === 'dia' ? 'border-slate-200 bg-slate-900' : 'border-white/15 bg-black'} aspect-video shadow-2xs group flex items-center justify-center">
                 <img src={previewUrl} alt={imageName} class="w-full h-full object-contain" />
                 <div class="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-3 flex items-center justify-between text-white">
                   <span class="text-xs font-medium truncate max-w-[70%]" title={imageName}>{imageName}</span>
@@ -503,20 +545,20 @@
           </div>
 
           <!-- Separador -->
-          <div class="flex items-center gap-3 text-xs text-zinc-400 font-medium">
-            <div class="flex-1 h-px bg-zinc-200"></div>
+          <div class="flex items-center gap-3 text-xs {theme === 'dia' ? 'text-slate-400' : 'text-stone-500'} font-medium">
+            <div class="flex-1 h-px {theme === 'dia' ? 'bg-slate-200' : 'bg-white/10'}"></div>
             <span>o desde tu nube de Google</span>
-            <div class="flex-1 h-px bg-zinc-200"></div>
+            <div class="flex-1 h-px {theme === 'dia' ? 'bg-slate-200' : 'bg-white/10'}"></div>
           </div>
 
           <!-- Botón de apertura nativa del Google Picker -->
           <button
             type="button"
-            class="w-full py-3 px-4 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-blue-900 font-semibold text-xs flex items-center justify-center gap-2.5 transition-all duration-150 cursor-pointer shadow-2xs hover:shadow-xs disabled:opacity-60 disabled:cursor-not-allowed group"
+            class="w-full py-3 px-4 rounded-xl border font-semibold text-xs flex items-center justify-center gap-2.5 transition-all duration-150 cursor-pointer shadow-2xs hover:shadow-xs disabled:opacity-60 disabled:cursor-not-allowed group {theme === 'dia' ? 'border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-blue-900' : 'border-blue-800/80 bg-blue-950/40 hover:bg-blue-900/50 text-blue-200'}"
             on:click={abrirGooglePicker}
             disabled={pickerLoading}
           >
-            <svg class="w-5 h-5 shrink-0 text-blue-600 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
+            <svg class="w-5 h-5 shrink-0 text-blue-500 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/>
             </svg>
             <span>{pickerLoading ? 'Abriendo Google Fotos…' : 'Abrir mis Fotos (Google Fotos)'}</span>
@@ -525,7 +567,7 @@
           <!-- Botón Galería Wikimedia Commons (CC0) -->
           <button
             type="button"
-            class="w-full py-3 px-4 rounded-xl border border-emerald-300 bg-emerald-50/80 hover:bg-emerald-100 text-emerald-950 font-semibold text-xs flex items-center justify-center gap-2.5 transition-all duration-150 cursor-pointer shadow-2xs hover:shadow-xs group"
+            class="w-full py-3 px-4 rounded-xl border font-semibold text-xs flex items-center justify-center gap-2.5 transition-all duration-150 cursor-pointer shadow-2xs hover:shadow-xs group {theme === 'dia' ? 'border-emerald-300 bg-emerald-50/80 hover:bg-emerald-100 text-emerald-950' : 'border-emerald-800/80 bg-emerald-950/50 hover:bg-emerald-900/60 text-emerald-200'}"
             on:click={() => (isWikiInboxOpen = true)}
           >
             <span class="text-base group-hover:scale-110 transition-transform">🏛</span>
@@ -533,21 +575,21 @@
           </button>
 
           <!-- Nota informativa anclada -->
-          <div class="mt-auto p-4 rounded-xl bg-zinc-100/70 border border-zinc-200/80 text-[11px] text-zinc-500 leading-relaxed">
-            <span class="font-semibold text-zinc-700">TGP Scriptorium:</span> Accedé a tus imágenes locales o navegá por tus carpetas y fotos en Google Cloud sin salir de la interfaz.
+          <div class="mt-auto p-4 rounded-xl border text-[11px] leading-relaxed {theme === 'dia' ? 'bg-slate-100/70 border-slate-200/80 text-slate-500' : 'bg-[#181a1b] border-white/5 text-stone-400'}">
+            <span class="font-semibold {theme === 'dia' ? 'text-slate-700' : 'text-stone-300'}">TGP Scriptorium:</span> Accedé a tus imágenes locales o navegá por tus carpetas y fotos en Google Cloud sin salir de la interfaz.
           </div>
 
         </div>
 
         <!-- ── COLUMNA DERECHA: Prompt + Resultados ───────────────────────── -->
         <!-- ── COLUMNA DERECHA (55%): Cascada Cognitiva & Puesto de Mando ────── -->
-        <div class="w-full lg:w-[55%] p-4 sm:p-6 lg:p-7 flex flex-col gap-5 {embedded ? '' : 'overflow-hidden min-h-0'} bg-white">
-          <div class="flex flex-col gap-3.5 {embedded ? 'border-b border-zinc-200/80 pb-4' : 'bg-zinc-50 p-5 rounded-2xl border border-zinc-200 shrink-0'}">
+        <div class="w-full lg:w-[55%] p-4 sm:p-6 lg:p-7 flex flex-col gap-5 {embedded ? '' : 'overflow-hidden min-h-0'} {theme === 'dia' ? 'bg-white' : 'bg-[#121314]'}">
+          <div class="flex flex-col gap-3.5 {embedded ? (theme === 'dia' ? 'border-b border-slate-200/80 pb-4' : 'border-b border-white/10 pb-4') : (theme === 'dia' ? 'bg-slate-50 p-5 rounded-2xl border border-slate-200 shrink-0' : 'bg-[#181a1b] p-5 rounded-2xl border border-white/10 shrink-0')}">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-zinc-600">
+              <span class="text-xs font-bold uppercase tracking-wider {theme === 'dia' ? 'text-slate-600' : 'text-stone-400'}">
                 2. Cascada Cognitiva
               </span>
-              <div class="text-xs font-medium {hasImage ? 'text-emerald-700' : 'text-zinc-400'} flex items-center gap-1.5">
+              <div class="text-xs font-medium {hasImage ? 'text-emerald-500' : (theme === 'dia' ? 'text-slate-400' : 'text-stone-500')} flex items-center gap-1.5">
                 <span class="text-sm">{hasImage ? '✓' : '◌'}</span>
                 <span>{hasImage ? 'Documento Listo' : 'Requiere Imagen'}</span>
               </div>
@@ -558,18 +600,18 @@
               type="button"
               disabled={!hasImage || isLoading}
               on:click={() => triggerPreset('Informe Base', 'Realiza un informe neutral y exhaustivo de esta imagen. Describe literalmente qué se ve, extrae cualquier texto legible (OCR) y señala las entidades principales.')}
-              class="w-full p-3.5 rounded-xl bg-emerald-100/90 hover:bg-emerald-200/90 text-emerald-900 border border-emerald-300 font-semibold text-sm transition-all duration-200 shadow-2xs flex items-center justify-between group disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              class="w-full p-3.5 rounded-xl border font-semibold text-sm transition-all duration-200 shadow-2xs flex items-center justify-between group disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer {theme === 'dia' ? 'bg-emerald-100/90 hover:bg-emerald-200/90 text-emerald-950 border-emerald-300' : 'bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-100 border-emerald-800'}"
             >
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-emerald-200/80 text-emerald-800 flex items-center justify-center font-bold text-base group-hover:scale-105 transition-transform">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-base group-hover:scale-105 transition-transform {theme === 'dia' ? 'bg-emerald-200/80 text-emerald-800' : 'bg-emerald-900/80 text-emerald-300'}">
                   ✦
                 </div>
                 <div class="text-left">
-                  <div class="text-sm font-bold text-emerald-950">Informe Base (OCR + Entidades)</div>
-                  <div class="text-xs text-emerald-700 font-normal">Lectura literal, transcripción de texto y catálogo de entidades</div>
+                  <div class="text-sm font-bold {theme === 'dia' ? 'text-emerald-950' : 'text-emerald-100'}">Informe Base (OCR + Entidades)</div>
+                  <div class="text-xs font-normal {theme === 'dia' ? 'text-emerald-700' : 'text-emerald-400'}">Lectura literal, transcripción de texto y catálogo de entidades</div>
                 </div>
               </div>
-              <span class="text-xs font-mono font-bold uppercase tracking-wider px-2.5 py-1 bg-white/80 rounded-lg text-emerald-800 border border-emerald-200 shadow-2xs">
+              <span class="text-xs font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border shadow-2xs {theme === 'dia' ? 'bg-white/80 text-emerald-800 border-emerald-200' : 'bg-black/50 text-emerald-300 border-emerald-700/60'}">
                 {isLoading && activePillLabel === 'Informe Base' ? 'Procesando…' : 'Ejecutar ↵'}
               </span>
             </button>
@@ -584,7 +626,9 @@
                 class="px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed
                 {activePillLabel === 'Arqueohistoria' && isLoading 
                   ? 'bg-amber-100 border-amber-300 text-amber-900 font-semibold' 
-                  : 'bg-white hover:bg-amber-50 border-zinc-200 hover:border-amber-300 text-zinc-800 hover:text-amber-900 shadow-2xs'}"
+                  : theme === 'dia' 
+                    ? 'bg-white hover:bg-amber-50 border-slate-200 hover:border-amber-300 text-slate-800 hover:text-amber-900 shadow-2xs'
+                    : 'bg-[#1e2022] hover:bg-[#282a2d] border-white/10 text-stone-300 hover:text-amber-300 shadow-2xs'}"
               >
                 🏺 Arqueohistoria
               </button>
@@ -597,7 +641,9 @@
                 class="px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed
                 {activePillLabel === 'Hermenéutica' && isLoading 
                   ? 'bg-purple-100 border-purple-300 text-purple-900 font-semibold' 
-                  : 'bg-white hover:bg-purple-50 border-zinc-200 hover:border-purple-300 text-zinc-800 hover:text-purple-900 shadow-2xs'}"
+                  : theme === 'dia'
+                    ? 'bg-white hover:bg-purple-50 border-slate-200 hover:border-purple-300 text-slate-800 hover:text-purple-900 shadow-2xs'
+                    : 'bg-[#1e2022] hover:bg-[#282a2d] border-white/10 text-stone-300 hover:text-purple-300 shadow-2xs'}"
               >
                 👁 Hermenéutica
               </button>
@@ -608,8 +654,8 @@
                 on:click={() => (showManualPrompt = !showManualPrompt)}
                 class="px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer
                 {showManualPrompt 
-                  ? 'bg-zinc-900 border-zinc-900 text-white shadow-xs' 
-                  : 'bg-white hover:bg-zinc-100 border-zinc-200 text-zinc-700 shadow-2xs'}"
+                  ? (theme === 'dia' ? 'bg-slate-900 border-slate-900 text-white shadow-xs' : 'bg-emerald-600 border-emerald-500 text-white shadow-xs')
+                  : (theme === 'dia' ? 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700 shadow-2xs' : 'bg-[#1e2022] hover:bg-[#282a2d] border-white/10 text-stone-300 shadow-2xs')}"
               >
                 🎛 Puesto de Mando {showManualPrompt ? '▲' : '▼'}
               </button>
@@ -619,16 +665,16 @@
             {#if showManualPrompt}
               <div class="mt-2 space-y-2.5 pt-2">
                 <!-- Barra Horizontal Única: Destino + Densidad + Motor -->
-                <div class="flex flex-wrap items-center justify-between gap-2 p-2 bg-zinc-100/80 rounded-xl border border-zinc-200 text-xs">
+                <div class="flex flex-wrap items-center justify-between gap-2 p-2 rounded-xl border text-xs {theme === 'dia' ? 'bg-slate-100/80 border-slate-200' : 'bg-[#1e2022] border-white/10'}">
                   <!-- Grupo 1: Colección Destino -->
                   <div class="flex items-center gap-1.5">
-                    <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 flex items-center gap-1">
+                    <span class="text-[11px] font-mono font-bold uppercase tracking-wider {theme === 'dia' ? 'text-slate-500' : 'text-stone-400'} flex items-center gap-1">
                       <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                       Destino:
                     </span>
                     <select
                       bind:value={selectedCollection}
-                      class="text-xs py-1 px-2.5 bg-white border border-zinc-300 rounded-lg text-zinc-800 font-semibold focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-2xs cursor-pointer"
+                      class="text-xs py-1 px-2.5 rounded-lg font-semibold focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-2xs cursor-pointer border {theme === 'dia' ? 'bg-white border-slate-300 text-slate-800' : 'bg-[#151718] border-white/15 text-stone-200'}"
                       title="Selecciona la colección de destino en Keystatic"
                     >
                       <option value="ensayosCinematicos">Ensayos Cinemáticos - GSAP</option>
@@ -640,18 +686,18 @@
                     </select>
                   </div>
 
-                  <div class="hidden sm:block h-4 w-px bg-zinc-300/80"></div>
+                  <div class="hidden sm:block h-4 w-px {theme === 'dia' ? 'bg-slate-300/80' : 'bg-white/15'}"></div>
 
                   <!-- Grupo 2: Densidad -->
                   <div class="flex items-center gap-1">
-                    <span class="text-[10px] font-mono text-zinc-400 uppercase font-semibold mr-0.5">Densidad:</span>
+                    <span class="text-[10px] font-mono uppercase font-semibold mr-0.5 {theme === 'dia' ? 'text-slate-400' : 'text-stone-400'}">Densidad:</span>
                     <button
                       type="button"
                       on:click={() => (manualDensidad = 'breve')}
                       class="px-2 py-0.5 rounded-md text-[11px] font-medium border transition-all cursor-pointer shadow-2xs
                         {manualDensidad === 'breve'
                           ? 'bg-emerald-600 text-white border-emerald-700 font-semibold'
-                          : 'bg-white text-zinc-700 hover:bg-zinc-100 border-zinc-200'}"
+                          : theme === 'dia' ? 'bg-white text-slate-700 hover:bg-slate-100 border-slate-200' : 'bg-[#151718] text-stone-300 hover:bg-[#202225] border-white/10'}"
                     >
                       ⚡ Breve
                     </button>
@@ -661,7 +707,7 @@
                       class="px-2 py-0.5 rounded-md text-[11px] font-medium border transition-all cursor-pointer shadow-2xs
                         {manualDensidad === 'profundo_breve'
                           ? 'bg-emerald-600 text-white border-emerald-700 font-semibold'
-                          : 'bg-white text-zinc-700 hover:bg-zinc-100 border-zinc-200'}"
+                          : theme === 'dia' ? 'bg-white text-slate-700 hover:bg-slate-100 border-slate-200' : 'bg-[#151718] text-stone-300 hover:bg-[#202225] border-white/10'}"
                     >
                       🧠 Profundo
                     </button>
@@ -671,24 +717,24 @@
                       class="px-2 py-0.5 rounded-md text-[11px] font-medium border transition-all cursor-pointer shadow-2xs
                         {manualDensidad === 'premium'
                           ? 'bg-purple-700 text-white border-purple-800 font-semibold'
-                          : 'bg-white text-purple-900 hover:bg-purple-50 border-purple-200'}"
+                          : theme === 'dia' ? 'bg-white text-purple-900 hover:bg-purple-50 border-purple-200' : 'bg-[#151718] text-purple-300 hover:bg-purple-950/40 border-purple-800/40'}"
                     >
                       🏛️ Tratado
                     </button>
                   </div>
 
-                  <div class="hidden md:block h-4 w-px bg-zinc-300/80"></div>
+                  <div class="hidden md:block h-4 w-px {theme === 'dia' ? 'bg-slate-300/80' : 'bg-white/15'}"></div>
 
                   <!-- Grupo 3: Motor -->
                   <div class="flex items-center gap-1">
-                    <span class="text-[10px] font-mono text-zinc-400 uppercase font-semibold mr-0.5">Motor:</span>
+                    <span class="text-[10px] font-mono uppercase font-semibold mr-0.5 {theme === 'dia' ? 'text-slate-400' : 'text-stone-400'}">Motor:</span>
                     <button
                       type="button"
                       on:click={() => (manualModelo = 'flash')}
                       class="px-2 py-0.5 rounded-md text-[11px] font-medium border transition-all cursor-pointer shadow-2xs
                         {manualModelo === 'flash'
                           ? 'bg-amber-600 text-white border-amber-700 font-semibold'
-                          : 'bg-white text-zinc-700 hover:bg-amber-50 border-zinc-200'}"
+                          : theme === 'dia' ? 'bg-white text-slate-700 hover:bg-amber-50 border-slate-200' : 'bg-[#151718] text-stone-300 hover:bg-[#202225] border-white/10'}"
                     >
                       ⚡ Flash
                     </button>
@@ -698,14 +744,14 @@
                       class="px-2 py-0.5 rounded-md text-[11px] font-medium border transition-all cursor-pointer shadow-2xs
                         {manualModelo === 'pro'
                           ? 'bg-blue-600 text-white border-blue-700 font-semibold'
-                          : 'bg-white text-zinc-700 hover:bg-blue-50 border-zinc-200'}"
+                          : theme === 'dia' ? 'bg-white text-slate-700 hover:bg-blue-50 border-slate-200' : 'bg-[#151718] text-stone-300 hover:bg-[#202225] border-white/10'}"
                     >
                       🧠 Pro
                     </button>
                   </div>
 
                   <!-- Atajo -->
-                  <span class="text-[10px] font-mono text-zinc-400 hidden xl:inline ml-auto">Ctrl + Enter</span>
+                  <span class="text-[10px] font-mono {theme === 'dia' ? 'text-slate-400' : 'text-stone-500'} hidden xl:inline ml-auto">Ctrl + Enter</span>
                 </div>
 
                 <!-- Textarea Amplio Tipo Desk (Puesto de Mando) -->
@@ -713,7 +759,7 @@
                   bind:this={promptEl}
                   bind:value={prompt}
                   rows="4"
-                  class="w-full px-4 py-3 text-sm bg-white border border-zinc-300 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-y shadow-2xs font-sans leading-relaxed min-h-27.5"
+                  class="w-full px-4 py-3 text-sm rounded-xl transition-all resize-y shadow-2xs font-sans leading-relaxed min-h-27.5 border {theme === 'dia' ? 'bg-white border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500' : 'bg-[#1a1c1e] border-white/15 text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500'}"
                   placeholder="Escribe tu consulta, mini-charla reflexiva o instrucción ChatOps. Admite Slash Commands directos (ej: /video fascinum romano o /hemeroteca pro 1500t El mito de Ícaro)..."
                   on:keydown={handlePromptKeydown}
                   disabled={isLoading}
@@ -721,14 +767,14 @@
 
                 <!-- Footer del Desk con Botón de Ejecución Directa -->
                 <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
-                  <span class="text-[11px] font-mono text-zinc-500">
+                  <span class="text-[11px] font-mono {theme === 'dia' ? 'text-slate-500' : 'text-stone-400'}">
                     💡 Admite diálogo extenso o Slash Commands directos hacia el Orquestador Cloud Run.
                   </span>
                   <button
                     type="button"
                     disabled={!prompt.trim() || isLoading}
                     on:click={() => handleSubmit(undefined, 'Manual')}
-                    class="px-5 py-2.5 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-xl transition-all shadow-sm hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+                    class="px-5 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2 {theme === 'dia' ? 'bg-slate-900 hover:bg-black text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}"
                   >
                     {#if isLoading && activePillLabel === 'Manual'}
                       <span class="animate-spin text-sm">⟳</span>
@@ -752,54 +798,54 @@
           <!-- Feed de Resultados Apilados -->
           <div class="{embedded ? 'space-y-4 pt-2' : 'flex-1 min-h-0 overflow-y-auto space-y-4 pr-1'}" bind:this={resultsEl}>
             {#if isLoading}
-              <div class="h-full flex flex-col items-center justify-center py-12 gap-3 text-zinc-500">
+              <div class="h-full flex flex-col items-center justify-center py-12 gap-3 {theme === 'dia' ? 'text-slate-500' : 'text-stone-400'}">
                 <div class="flex gap-2">
                   <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-bounce"></div>
                   <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.15s]"></div>
                   <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.3s]"></div>
                 </div>
-                <div class="text-xs font-mono uppercase tracking-widest text-zinc-600 font-medium">
+                <div class="text-xs font-mono uppercase tracking-widest font-medium {theme === 'dia' ? 'text-slate-600' : 'text-stone-300'}">
                   {activePillLabel ? `Ejecutando ${activePillLabel} con Gemini Vision…` : 'Procesando con Gemini Vision…'}
                 </div>
               </div>
             {:else if results.length === 0}
-              <div class="h-full flex flex-col items-center justify-center py-16 text-center text-zinc-400 gap-2">
-                <div class="text-3xl text-zinc-300">◈</div>
-                <div class="text-sm font-medium text-zinc-600">
-                  Carga una imagen y pulsa <strong class="text-zinc-800">Informe Base</strong> o cualquier píldora<br />para iniciar la cascada cognitiva.
+              <div class="h-full flex flex-col items-center justify-center py-16 text-center gap-2 {theme === 'dia' ? 'text-slate-400' : 'text-stone-500'}">
+                <div class="text-3xl {theme === 'dia' ? 'text-slate-300' : 'text-stone-600'}">◈</div>
+                <div class="text-sm font-medium {theme === 'dia' ? 'text-slate-600' : 'text-stone-400'}">
+                  Carga una imagen y pulsa <strong class="{theme === 'dia' ? 'text-slate-800' : 'text-stone-200'}">Informe Base</strong> o cualquier píldora<br />para iniciar la cascada cognitiva.
                 </div>
               </div>
             {:else}
               {#each results as r, i (i)}
-                <div class="p-4 sm:p-5 rounded-xl bg-zinc-50/70 border border-zinc-200 flex flex-col gap-3.5">
+                <div class="p-4 sm:p-5 rounded-2xl border flex flex-col gap-3.5 shadow-2xs {theme === 'dia' ? 'bg-slate-50/80 border-slate-200' : 'bg-[#181a1b] border-white/10'}">
                   <!-- Header con píldora, timestamp y badges de R2/D1 -->
-                  <header class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-200/80 pb-3">
+                  <header class="flex flex-wrap items-center justify-between gap-2 border-b pb-3 {theme === 'dia' ? 'border-slate-200/80' : 'border-white/10'}">
                     <div class="flex items-center gap-2">
                       <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-2xs
-                        {r.pillLabel === 'Informe Base' ? 'bg-emerald-100 text-emerald-900 border border-emerald-200' :
-                         r.pillLabel === 'Arqueohistoria' ? 'bg-amber-100 text-amber-900 border border-amber-200' :
-                         r.pillLabel === 'Hermenéutica' ? 'bg-purple-100 text-purple-900 border border-purple-200' :
-                         'bg-zinc-200 text-zinc-800 border border-zinc-300'}">
+                        {r.pillLabel === 'Informe Base' ? (theme === 'dia' ? 'bg-emerald-100 text-emerald-900 border border-emerald-200' : 'bg-emerald-950/80 text-emerald-300 border border-emerald-800') :
+                         r.pillLabel === 'Arqueohistoria' ? (theme === 'dia' ? 'bg-amber-100 text-amber-900 border border-amber-200' : 'bg-amber-950/80 text-amber-300 border border-amber-800') :
+                         r.pillLabel === 'Hermenéutica' ? (theme === 'dia' ? 'bg-purple-100 text-purple-900 border border-purple-200' : 'bg-purple-950/80 text-purple-300 border border-purple-800') :
+                         (theme === 'dia' ? 'bg-slate-200 text-slate-800 border border-slate-300' : 'bg-[#202225] text-stone-300 border border-white/10')}">
                         {r.pillLabel || 'Informe Base'}
                       </span>
                       {#if r.d1Id}
-                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200" title="Registro persistido en Cloudflare D1">
+                        <span class="text-[10px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md {theme === 'dia' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-blue-950/60 text-blue-300 border border-blue-800/60'}" title="Registro persistido en Cloudflare D1">
                           🗄 D1: {r.d1Id.slice(0, 8)}…
                         </span>
                       {/if}
                       {#if r.r2Url}
-                        <a href={r.r2Url} target="_blank" rel="noopener noreferrer" class="text-[10px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 hover:underline" title="Ver imagen en Cloudflare R2">
+                        <a href={r.r2Url} target="_blank" rel="noopener noreferrer" class="text-[10px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md {theme === 'dia' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:underline' : 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60 hover:underline'}" title="Ver imagen en Cloudflare R2">
                           ☁ R2 Image ↗
                         </a>
                       {/if}
                     </div>
                     <div class="flex items-center gap-2">
-                      <span class="text-[11px] font-mono text-zinc-500">
+                      <span class="text-[11px] font-mono {theme === 'dia' ? 'text-slate-500' : 'text-stone-400'}">
                         {r.timestamp.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                       </span>
                       <button
                         type="button"
-                        class="text-xs font-mono text-zinc-500 hover:text-zinc-900 px-2 py-0.5 rounded hover:bg-zinc-200 transition-colors cursor-pointer"
+                        class="text-xs font-mono px-2 py-0.5 rounded transition-colors cursor-pointer {theme === 'dia' ? 'text-slate-500 hover:text-slate-900 hover:bg-slate-200' : 'text-stone-400 hover:text-stone-100 hover:bg-[#25282a]'}"
                         on:click={() => navigator.clipboard.writeText(r.response)}
                         title="Copiar Markdown al portapapeles"
                       >
@@ -809,7 +855,7 @@
                   </header>
 
                   <!-- ── BARRA DE ACCIÓN PRINCIPAL (Siempre visible arriba) ── -->
-                  <div class="p-2.5 bg-white rounded-xl border border-zinc-200/90 shadow-2xs flex flex-wrap items-center justify-between gap-2">
+                  <div class="p-2.5 rounded-xl border shadow-2xs flex flex-wrap items-center justify-between gap-2 {theme === 'dia' ? 'bg-white border-slate-200/90' : 'bg-[#151718] border-white/10'}">
                     {#if isDev}
                     <div class="flex flex-wrap items-center gap-2">
                       <button
@@ -818,7 +864,7 @@
                         on:click={() => transmuteToKeystatic(i, r)}
                         class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl border transition-all duration-200 cursor-pointer disabled:cursor-not-allowed
                           {r.transmuteStatus === 'success'
-                            ? 'bg-emerald-100 border-emerald-300 text-emerald-900'
+                            ? (theme === 'dia' ? 'bg-emerald-100 border-emerald-300 text-emerald-900' : 'bg-emerald-950 border-emerald-700 text-emerald-300')
                             : r.transmuteStatus === 'error'
                             ? 'bg-red-50 border-red-300 text-red-800 hover:bg-red-100'
                             : r.transmuteStatus === 'sending'
@@ -840,7 +886,7 @@
 
                       <select
                         bind:value={selectedCollection}
-                        class="text-xs py-2 px-3 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all cursor-pointer shadow-2xs font-medium"
+                        class="text-xs py-2 px-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all cursor-pointer shadow-2xs font-medium border {theme === 'dia' ? 'bg-slate-50 border-slate-300 text-slate-800' : 'bg-[#1a1c1e] border-white/15 text-stone-200'}"
                         title="Seleccionar colección de destino en Keystatic"
                       >
                         <option value="ensayosCinematicos">Ensayos Cinemáticos - GSAP</option>
@@ -858,7 +904,7 @@
                       type="button"
                       disabled={r.premiumLoading}
                       on:click={() => generarEnsayoAudio(i, r)}
-                      class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border border-purple-300 bg-purple-50 hover:bg-purple-100 text-purple-900 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-2xs"
+                      class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-2xs {theme === 'dia' ? 'border-purple-300 bg-purple-50 hover:bg-purple-100 text-purple-900' : 'border-purple-800/80 bg-purple-950/50 hover:bg-purple-900/60 text-purple-200'}"
                       title="Genera un ensayo profundo con Grounding y audio TTS es-AR"
                     >
                       {#if r.premiumLoading}
@@ -872,10 +918,10 @@
                   </div>
 
                   {#if r.audioUrl}
-                    <div class="p-3 bg-purple-50/70 border border-purple-200 rounded-2xl flex flex-col gap-1.5">
-                      <div class="flex items-center justify-between text-xs text-purple-900 font-semibold">
+                    <div class="p-3 rounded-2xl flex flex-col gap-1.5 border {theme === 'dia' ? 'bg-purple-50/70 border-purple-200' : 'bg-purple-950/40 border-purple-900/60'}">
+                      <div class="flex items-center justify-between text-xs font-semibold {theme === 'dia' ? 'text-purple-900' : 'text-purple-200'}">
                         <span>🎧 Audio Neuronal (es-AR):</span>
-                        <a href={r.audioUrl} target="_blank" rel="noopener noreferrer" class="font-mono text-[11px] text-purple-700 hover:underline">Descargar MP3 ↗</a>
+                        <a href={r.audioUrl} target="_blank" rel="noopener noreferrer" class="font-mono text-[11px] {theme === 'dia' ? 'text-purple-700' : 'text-purple-300'} hover:underline">Descargar MP3 ↗</a>
                       </div>
                       <audio controls class="w-full h-8" src={r.audioUrl}></audio>
                     </div>
@@ -889,14 +935,14 @@
 
                   <!-- Contenido Markdown y Vista de Imagen -->
                   <div class="flex gap-4 items-start">
-                    <div class="w-20 h-20 rounded-xl overflow-hidden border border-zinc-200 bg-zinc-100 shrink-0 shadow-2xs">
+                    <div class="w-20 h-20 rounded-xl overflow-hidden border shrink-0 shadow-2xs {theme === 'dia' ? 'border-slate-200 bg-slate-100' : 'border-white/10 bg-black'}">
                       <img src={r.imagePreview} alt={r.imageName} class="w-full h-full object-cover" />
                     </div>
                     <div class="flex-1 min-w-0">
-                      <div class="text-xs font-medium text-zinc-500 mb-2 line-clamp-1 italic">
+                      <div class="text-xs font-medium mb-2 line-clamp-1 italic {theme === 'dia' ? 'text-slate-500' : 'text-stone-400'}">
                         ↳ "{r.prompt}"
                       </div>
-                      <div class="prose prose-zinc max-w-none text-xs leading-relaxed text-zinc-800 font-sans">
+                      <div class="prose max-w-none text-xs leading-relaxed font-sans {theme === 'dia' ? 'prose-slate text-slate-800' : 'prose-invert text-stone-200'}">
                         <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                         {@html marked.parse(r.response)}
                       </div>
@@ -911,7 +957,7 @@
       </div>
 
       <!-- ── GALERÍA WIKIMEDIA COMMONS INLINE (En el scroll libre abajo de la mesa de trabajo) ──── -->
-      <div class="px-4 sm:px-6 pb-6 border-t border-zinc-200/80 bg-zinc-50/20">
+      <div class="px-4 sm:px-6 pb-6 border-t {theme === 'dia' ? 'border-slate-200/80 bg-slate-50/40' : 'border-white/10 bg-[#121314]'}">
         <WikimediaGalleryInbox bind:isOpen={isWikiInboxOpen} onSelect={handleWikiSelect} />
       </div>
 
