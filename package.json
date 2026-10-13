@@ -60,6 +60,7 @@
     "@aws-sdk/client-s3": "^3.1121.0",
     "@google/genai": "^1.50.1",
     "@google/generative-ai": "^0.24.1",
+    "@imgly/background-removal-node": "^1.4.5",
     "@keystatic/astro": "^6.0.0",
     "@keystatic/core": "^0.6.8",
     "@panzoom/panzoom": "^4.5.1",
