@@ -14,6 +14,7 @@ import { type MubiCinematicItem } from '../components/MubiBlockCinematic.astro';
 import TriplicoRevelacion, { type TriplicoPost } from '../components/TriplicoRevelacion.astro';
 import ToboganPosts from '../components/ToboganPosts.astro';
 import AppleShowcaseBento, { type BentoHistoryItem } from '../components/AppleShowcaseBento.astro';
+import AppleBentoArchetypes from '../components/AppleBentoArchetypes.astro';
 import { sanitizeImageUrl, getPublishableEssays, resolveEssayImage, isValidImageSrc, formatCategory, normalizeCategory } from '../lib/content-filter';
 
 // Portada Hero Cinemática (Monjes Novicios Leyendo en el Templo - Wikimedia Commons)
@@ -487,6 +488,15 @@ const triplicoHero: TriplicoPost | undefined = mubiCinematicItems.slice(3).find(
       collectionDesc="Estrategas del mundo antiguo, mitos fundacionales, arqueología y memoria cultural en un tapiz panorámico suspendido."
     />
   )}
+
+  {/* ── BENTO ULTRA-WIDE TORNASOL HISTÓRICO: ARQUETIPOS GLOBALES ── */}
+  <AppleBentoArchetypes
+    badgeLabel="Archivo Vivo"
+    tagline="Cada época. Sin fragmentos perdidos. Ahora en el mapa."
+    subtext="Acceso libre y sin registro. Más de 50 investigaciones resguardadas."
+    ctaHref="/colecciones/"
+    ctaLabel="Explorar las 14 colecciones"
+  />
 
 </Layout>
 

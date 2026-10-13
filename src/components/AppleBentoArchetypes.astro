@@ -1,0 +1,185 @@
+---
+/**
+ * AppleBentoArchetypes.astro
+ * Bento Ultra-Wide "Tornasol Histórico" inspirado en el Banner de Conversión de Apple TV (MLS).
+ * 
+ * Arquitectura Z-Index Optimizada (Cero Colisiones):
+ * - Contenedor con `isolate` para crear un Stacking Context autónomo.
+ * - Jerarquía limpia de 3 capas:
+ *   - z-0: Fondo tornasolado diagonal (Azul Pizarra -> Bronce/Ámbar) + Glow difuso.
+ *   - z-10: Capa de bustos/esculturas escalonadas (con orden natural del DOM, mask-image de desvanecimiento inferior y pointer-events-none).
+ *   - z-20: Bloque de texto editorial y botón píldora interactivo (pointer-events-auto).
+ */
+
+interface ArchetypeFigure {
+  src: string;
+  alt: string;
+  title?: string;
+  classNames: string;
+  style?: string;
+}
+
+interface Props {
+  badgeLabel?: string;
+  tagline?: string;
+  subtext?: string;
+  ctaHref?: string;
+  ctaLabel?: string;
+  figures?: ArchetypeFigure[];
+}
+
+const {
+  badgeLabel = "Archivo Vivo",
+  tagline = "Cada época. Sin fragmentos perdidos. Ahora en el mapa.",
+  subtext = "Acceso libre y sin registro. Más de 50 investigaciones resguardadas.",
+  ctaHref = "/colecciones/",
+  ctaLabel = "Explorar las 14 colecciones",
+  figures,
+} = Astro.props;
+
+// Estatuas y figuras míticas de Arquetipos Globales con escorzo y perspectiva
+const defaultFigures: ArchetypeFigure[] = [
+  // 4. Fondo lejano derecho (asomando al borde)
+  {
+    src: "https://storage.thegreatpuzzleproject.com/alternativa/moai.jpg",
+    alt: "Monolito Ancestral",
+    title: "Moai",
+    classNames: "archetype-layer absolute right-[-2%] bottom-0 h-[74%] w-auto object-contain opacity-75 brightness-85 contrast-115 [mask-image:linear-gradient(to_bottom,black_65%,transparent_96%)] [-webkit-mask-image:linear-gradient(to_bottom,black_65%,transparent_96%)] filter sepia-[0.15]",
+  },
+  // 3. Fondo medio izquierda (más chico, figura arcaica)
+  {
+    src: "https://storage.thegreatpuzzleproject.com/arquetipos-globales/pazuzu/coverImage.jpg",
+    alt: "Pazuzu · Bronce Asirio",
+    title: "Pazuzu",
+    classNames: "archetype-layer absolute right-[50%] sm:right-[48%] bottom-0 h-[78%] w-auto object-contain opacity-85 brightness-90 contrast-110 [mask-image:linear-gradient(to_bottom,black_75%,transparent_98%)] [-webkit-mask-image:linear-gradient(to_bottom,black_75%,transparent_98%)] filter sepia-[0.18]",
+  },
+  // 2. Plano medio centro (mediano, busto en escorzo mirando hacia el CTA)
+  {
+    src: "https://storage.thegreatpuzzleproject.com/alternativa/olmeca.jpg",
+    alt: "Cabeza Colosal Olmeca",
+    title: "Megalito Olmeca",
+    classNames: "archetype-layer absolute right-[26%] sm:right-[24%] bottom-0 h-[88%] w-auto object-contain brightness-95 contrast-110 drop-shadow-[-15px_10px_25px_rgba(0,0,0,0.6)] [mask-image:linear-gradient(to_bottom,black_80%,transparent_99%)] [-webkit-mask-image:linear-gradient(to_bottom,black_80%,transparent_99%)] filter sepia-[0.12]",
+  },
+  // 1. PROTAGONISTA EN PRIMER PLANO (Townley Venus / Gran estatua clásica de Ostia mirando hacia la izquierda)
+  {
+    src: "https://storage.thegreatpuzzleproject.com/British_Museum_Townley_Venus_01.jpg",
+    alt: "Estatua Clásica de Venus · British Museum",
+    title: "Venus",
+    classNames: "archetype-layer absolute right-[4%] sm:right-[5%] bottom-[-5%] h-[102%] w-auto object-contain contrast-110 drop-shadow-[-20px_15px_35px_rgba(0,0,0,0.8)] [mask-image:linear-gradient(to_bottom,black_85%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_85%,transparent_100%)] filter sepia-[0.08]",
+  },
+];
+
+const layers = figures && figures.length > 0 ? figures : defaultFigures;
+---
+
+<section class="w-full px-4 sm:px-6 md:px-10 py-8 md:py-12 bg-transparent">
+  <!-- BENTO ULTRA-WIDE TORNASOL (Pastilla panorámica con isolate) -->
+  <div
+    id="bento-tornasol-arquetipos"
+    class="relative isolate w-full max-w-400 h-100 md:h-105 mx-auto rounded-[28px] overflow-hidden bg-[#08090c] border border-white/10 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.9)] select-none group/tornasol"
+  >
+    {/* ── 1. FONDO TORNASOLADO HISTÓRICO (2 TONOS EN CHOQUE DIAGONAL + GLOW) ── */}
+    {/* Base diagonal: Negro/Azul Pizarra a la izquierda -> Bronce/Ámbar a la derecha */}
+    <div
+      class="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(108deg,#07080b_0%,#0f1523_38%,#5a2818_72%,#b86530_92%,#d89c4a_100%)]"
+    />
+
+    {/* Luz atmosférica cálida (Glow) detrás de las cabezas para despegarlas */}
+    <div
+      class="pointer-events-none absolute right-[6%] top-[-10%] w-[58%] h-[120%] z-0 bg-[radial-gradient(circle_at_60%_45%,rgba(235,145,75,0.42)_0%,rgba(140,45,30,0.22)_45%,transparent_75%)] blur-2xl"
+    />
+
+    {/* Filtro sutil de grano/viñeta lateral */}
+    <div
+      class="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(90deg,rgba(7,8,11,0.92)_0%,rgba(7,8,11,0.6)_35%,transparent_60%)]"
+    />
+
+    {/* ── 2. ESTÁTUAS Y ARQUETIPOS RECORTADOS EN PROFUNDIDAD (ORDEN NATURAL DEL DOM) ── */}
+    <div class="pointer-events-none select-none absolute inset-y-0 right-0 w-[65%] sm:w-[62%] z-10 overflow-hidden">
+      {layers.map((fig) => (
+        <img
+          src={fig.src}
+          alt={fig.alt}
+          loading="lazy"
+          decoding="async"
+          class={fig.classNames}
+        />
+      ))}
+    </div>
+
+    {/* ── 3. BLOQUE DE TEXTO Y CTA A LA IZQUIERDA (SANS MODERNA APPLE STYLE) ── */}
+    <div class="relative z-20 h-full w-full md:w-[46%] lg:w-[42%] pl-6 sm:pl-10 md:pl-14 pr-6 flex flex-col justify-center items-start pointer-events-auto">
+      
+      {/* Identificador superior estilo Apple TV */}
+      <div class="flex items-center gap-2.5 mb-3.5">
+        <span class="text-white font-bold tracking-tight text-xl md:text-2xl font-sans">
+          TGP
+        </span>
+        <span class="text-[11px] uppercase tracking-[0.2em] font-mono px-2.5 py-0.5 rounded-full bg-white/10 text-amber-300/90 border border-white/15 backdrop-blur-md">
+          {badgeLabel}
+        </span>
+      </div>
+
+      {/* Tagline Sans-Serif audaz y compacta */}
+      <h2 class="font-sans text-2xl sm:text-3xl md:text-[34px] font-bold text-white leading-[1.14] tracking-[-0.02em] mb-6 max-w-sm sm:max-w-md">
+        {tagline}
+      </h2>
+
+      {/* Botón Píldora Blanco (Estilo Apple TV Accept Button) */}
+      <a
+        href={ctaHref}
+        class="px-8 py-3.5 rounded-full bg-[#f5f5f7] hover:bg-white text-[#1d1d1f] font-sans text-xs sm:text-sm font-semibold tracking-tight transition-all duration-300 shadow-xl hover:scale-[1.03] active:scale-[0.98] inline-flex items-center gap-2 group/btn"
+      >
+        <span>{ctaLabel}</span>
+        <span class="text-xs transition-transform group-hover/btn:translate-x-0.5">→</span>
+      </a>
+
+      {/* Micro-copy sutil debajo del CTA */}
+      <p class="font-sans text-xs text-white/55 mt-3.5 tracking-normal">
+        {subtext}
+      </p>
+
+    </div>
+  </div>
+</section>
+
+<script>
+  import gsap from 'gsap';
+
+  function initBentoTornasol() {
+    const bento = document.getElementById('bento-tornasol-arquetipos');
+    if (!bento) return;
+
+    const layers = bento.querySelectorAll<HTMLElement>('.archetype-layer');
+    if (layers.length === 0) return;
+
+    // Animación de entrada escalonada en cascada con expo.out
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            gsap.fromTo(
+              layers,
+              { opacity: 0, x: 45, scale: 1.05 },
+              {
+                opacity: 1,
+                x: 0,
+                scale: 1,
+                duration: 0.75,
+                ease: 'expo.out',
+                stagger: 0.07,
+              }
+            );
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+
+    observer.observe(bento);
+  }
+
+  document.addEventListener('DOMContentLoaded', initBentoTornasol);
+  document.addEventListener('astro:page-load', initBentoTornasol);
+</script>
