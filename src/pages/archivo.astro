@@ -397,9 +397,9 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                   </div>
                 </div>
 
-                {/* 1. Post Cover Cinemático de la Colección (Hero Full Bleed) */}
+                {/* 1. Post Cover Cinemático de la Colección (Hero Full Bleed Proporcionado) */}
                 {coverEssay && (
-                  <div class="w-full">
+                  <div class="w-full max-w-6xl mx-auto">
                     <CinematicArchiveCard
                       slug={coverEssay.slug}
                       entry={coverEssay.entry}
@@ -438,7 +438,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                   };
 
                   return (
-                    <div class="w-full pt-16 sm:pt-24 md:pt-28 pb-12 sm:pb-20 flex flex-col items-center">
+                    <div class="w-full pt-6 sm:pt-8 md:pt-10 pb-6 sm:pb-10 flex flex-col items-center">
                       {/* CollectionRestTray preservado en codebase y deshabilitado temporalmente en Archivo */}
                       {/*
                       <CollectionRestTray
@@ -573,7 +573,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
         vibeClass="vibe-travel-senses"
         isH1={false}
         fontClass="font-gloock font-black gradient-general-h1 glow-metallic-gloock"
-        heightClass="h-[75vh]"
+        heightClass="h-[58vh] min-h-120 max-h-145"
         marginClass="mt-0 mb-0"
         roundedClass="rounded-none"
         showSocialInTitle={true}

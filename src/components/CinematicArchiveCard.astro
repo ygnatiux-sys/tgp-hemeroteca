@@ -86,14 +86,14 @@ const isDuo40 = variant === "duo-40";
 
 // Relación de aspecto de la imagen según variante
 const imageAspectClass = isHero
-  ? "aspect-video"
+  ? "aspect-video max-h-[58vh]"
   : isDuo40
     ? "aspect-[4/3] sm:aspect-16/10"
     : "aspect-[4/3] sm:aspect-video";
 
 // Tamaño tipográfico del H1 interior (+1px global para máxima presencia)
 const titleClass = isHero
-  ? "text-[2rem] sm:text-4xl md:text-5xl lg:text-[4.5rem] font-extrabold leading-[1.05]"
+  ? "text-[1.85rem] sm:text-3xl md:text-4xl lg:text-5xl xl:text-[3.6rem] font-extrabold leading-[1.08] max-w-4xl mx-auto"
   : isDuo40
     ? "text-[1.35rem] sm:text-[1.55rem] md:text-[1.85rem] font-extrabold leading-[1.05]"
     : "text-[1.5rem] sm:text-[1.85rem] md:text-[2.5rem] font-extrabold leading-[1.05]";
@@ -253,7 +253,7 @@ const fitClass =
   }
   <a
     href={href}
-    class={`relative w-full ${imageAspectClass} rounded-xl md:rounded-2xl overflow-hidden block ${isHero && isPortraitArt ? "bg-[#08090a]" : "bg-stone-900/60"} border border-white/10 shadow-xl shrink-0 cac-modal-trigger`}
+    class={`relative w-full ${imageAspectClass} rounded-2xl md:rounded-3xl overflow-hidden block ${isHero && isPortraitArt ? "bg-[#08090a]" : "bg-stone-900/60"} ${isHero ? "border-0 shadow-2xl" : "border border-white/10 shadow-xl"} shrink-0 cac-modal-trigger`}
   >
     {
       safeImg ? (
@@ -296,7 +296,7 @@ const fitClass =
     }
 
     {
-      /* Scrim gradiente adaptativo — solo en tarjetas menores; en Hero la imagen comienza límpida y el scrim solo se activa en el pasaje a frase */
+      /* Scrim gradiente adaptativo — solo en tarjetas menores */
     }
     {
       !isHero && (
@@ -308,6 +308,24 @@ const fitClass =
               : "background: linear-gradient(to top, rgba(12,10,9,0.92) 0%, rgba(12,10,9,0.45) 45%, transparent 100%);"
           }
         ></div>
+      )
+    }
+
+    {
+      /* ✦ Viñeta perimetral suave para tarjetas Hero — Funde bordes sin costuras duras ("sin exagerar") */
+    }
+    {
+      isHero && (
+        <>
+          <div
+            class="absolute inset-0 pointer-events-none z-12"
+            style="background: radial-gradient(ellipse at center, transparent 46%, rgba(8,9,10,0.36) 74%, rgba(8,9,10,0.92) 100%);"
+          />
+          <div
+            class="absolute inset-0 pointer-events-none z-14"
+            style="background: linear-gradient(to top, rgba(8,9,10,0.86) 0%, rgba(8,9,10,0.32) 42%, transparent 75%);"
+          />
+        </>
       )
     }
 
