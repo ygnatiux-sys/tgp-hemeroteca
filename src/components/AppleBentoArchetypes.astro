@@ -1,14 +1,12 @@
 ---
 /**
  * AppleBentoArchetypes.astro
- * Bento Ultra-Wide "Tornasol Histórico" inspirado en el Banner de Conversión de Apple TV (MLS).
- * 
- * Arquitectura Z-Index Optimizada (Cero Colisiones):
- * - Contenedor con `isolate` para crear un Stacking Context autónomo.
- * - Jerarquía limpia de 3 capas:
- *   - z-0: Fondo tornasolado diagonal (Azul Pizarra -> Bronce/Ámbar) + Glow difuso.
- *   - z-10: Capa de bustos/esculturas escalonadas (con orden natural del DOM, mask-image de desvanecimiento inferior y pointer-events-none).
- *   - z-20: Bloque de texto editorial y botón píldora interactivo (pointer-events-auto).
+ * Bento Ultra-Wide "Tornasol Histórico" (Apple TV Style).
+ * Incorpora:
+ * - Parche anti-bordes cuadrados con máscara radial elíptica [mask-image:radial-gradient(ellipse_65%_75%_at_50%_45%,black_40%,transparent_95%)].
+ * - Sombra direccional hacia la izquierda drop-shadow-[-20px_15px_30px_rgba(0,0,0,0.75)].
+ * - Filtro cálido de unificación contrast-115 sepia-[0.12].
+ * - Animación GSAP "Magnetic Convergence + Dolly Zoom" en bucle cinemático.
  */
 
 interface ArchetypeFigure {
@@ -16,7 +14,6 @@ interface ArchetypeFigure {
   alt: string;
   title?: string;
   classNames: string;
-  style?: string;
 }
 
 interface Props {
@@ -37,35 +34,28 @@ const {
   figures,
 } = Astro.props;
 
-// Estatuas y figuras míticas de Arquetipos Globales con escorzo y perspectiva
+// Trío Cinematográfico para la Convergencia Magnética
 const defaultFigures: ArchetypeFigure[] = [
-  // 4. Fondo lejano derecho (asomando al borde)
+  // 0. Fondo lejano (Derecha - Monolito Ancestral / Pazuzu)
   {
     src: "https://storage.thegreatpuzzleproject.com/alternativa/moai.jpg",
     alt: "Monolito Ancestral",
     title: "Moai",
-    classNames: "archetype-layer absolute right-[-2%] bottom-0 h-[74%] w-auto object-contain opacity-75 brightness-85 contrast-115 [mask-image:linear-gradient(to_bottom,black_65%,transparent_96%)] [-webkit-mask-image:linear-gradient(to_bottom,black_65%,transparent_96%)] filter sepia-[0.15]",
+    classNames: "busto-layer absolute right-[-2%] bottom-0 h-[76%] w-auto object-contain opacity-75 brightness-85 contrast-115 [mask-image:radial-gradient(ellipse_65%_75%_at_50%_45%,black_40%,transparent_95%)] [-webkit-mask-image:radial-gradient(ellipse_65%_75%_at_50%_45%,black_40%,transparent_95%)] filter sepia-[0.15]",
   },
-  // 3. Fondo medio izquierda (más chico, figura arcaica)
-  {
-    src: "https://storage.thegreatpuzzleproject.com/arquetipos-globales/pazuzu/coverImage.jpg",
-    alt: "Pazuzu · Bronce Asirio",
-    title: "Pazuzu",
-    classNames: "archetype-layer absolute right-[50%] sm:right-[48%] bottom-0 h-[78%] w-auto object-contain opacity-85 brightness-90 contrast-110 [mask-image:linear-gradient(to_bottom,black_75%,transparent_98%)] [-webkit-mask-image:linear-gradient(to_bottom,black_75%,transparent_98%)] filter sepia-[0.18]",
-  },
-  // 2. Plano medio centro (mediano, busto en escorzo mirando hacia el CTA)
+  // 1. Plano medio (Izquierda - Cabeza Colosal Olmeca, converge hacia la derecha)
   {
     src: "https://storage.thegreatpuzzleproject.com/alternativa/olmeca.jpg",
     alt: "Cabeza Colosal Olmeca",
     title: "Megalito Olmeca",
-    classNames: "archetype-layer absolute right-[26%] sm:right-[24%] bottom-0 h-[88%] w-auto object-contain brightness-95 contrast-110 drop-shadow-[-15px_10px_25px_rgba(0,0,0,0.6)] [mask-image:linear-gradient(to_bottom,black_80%,transparent_99%)] [-webkit-mask-image:linear-gradient(to_bottom,black_80%,transparent_99%)] filter sepia-[0.12]",
+    classNames: "busto-layer absolute right-[32%] sm:right-[30%] bottom-0 h-[88%] w-auto object-contain brightness-90 contrast-115 drop-shadow-[-20px_15px_30px_rgba(0,0,0,0.75)] [mask-image:radial-gradient(ellipse_65%_75%_at_50%_45%,black_40%,transparent_95%)] [-webkit-mask-image:radial-gradient(ellipse_65%_75%_at_50%_45%,black_40%,transparent_95%)] filter sepia-[0.12]",
   },
-  // 1. PROTAGONISTA EN PRIMER PLANO (Townley Venus / Gran estatua clásica de Ostia mirando hacia la izquierda)
+  // 2. Primer plano (Derecha - Venus clásica, converge hacia el centro)
   {
     src: "https://storage.thegreatpuzzleproject.com/British_Museum_Townley_Venus_01.jpg",
     alt: "Estatua Clásica de Venus · British Museum",
     title: "Venus",
-    classNames: "archetype-layer absolute right-[4%] sm:right-[5%] bottom-[-5%] h-[102%] w-auto object-contain contrast-110 drop-shadow-[-20px_15px_35px_rgba(0,0,0,0.8)] [mask-image:linear-gradient(to_bottom,black_85%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_85%,transparent_100%)] filter sepia-[0.08]",
+    classNames: "busto-layer absolute right-[4%] sm:right-[5%] bottom-[-5%] h-[102%] w-auto object-contain brightness-95 contrast-115 drop-shadow-[-25px_18px_35px_rgba(0,0,0,0.85)] [mask-image:radial-gradient(ellipse_65%_75%_at_50%_45%,black_40%,transparent_95%)] [-webkit-mask-image:radial-gradient(ellipse_65%_75%_at_50%_45%,black_40%,transparent_95%)] filter sepia-[0.08]",
   },
 ];
 
@@ -84,18 +74,18 @@ const layers = figures && figures.length > 0 ? figures : defaultFigures;
       class="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(108deg,#07080b_0%,#0f1523_38%,#5a2818_72%,#b86530_92%,#d89c4a_100%)]"
     />
 
-    {/* Luz atmosférica cálida (Glow) detrás de las cabezas para despegarlas */}
+    {/* Luz atmosférica cálida (Glow reactivo GSAP) detrás de las cabezas */}
     <div
-      class="pointer-events-none absolute right-[6%] top-[-10%] w-[58%] h-[120%] z-0 bg-[radial-gradient(circle_at_60%_45%,rgba(235,145,75,0.42)_0%,rgba(140,45,30,0.22)_45%,transparent_75%)] blur-2xl"
+      class="bento-glow pointer-events-none absolute right-[6%] top-[-10%] w-[58%] h-[120%] z-0 bg-[radial-gradient(circle_at_60%_45%,rgba(235,145,75,0.45)_0%,rgba(140,45,30,0.25)_45%,transparent_75%)] blur-2xl transform origin-center"
     />
 
-    {/* Filtro sutil de grano/viñeta lateral */}
+    {/* Filtro sutil de viñeta lateral izquierda para lectura nítida */}
     <div
-      class="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(90deg,rgba(7,8,11,0.92)_0%,rgba(7,8,11,0.6)_35%,transparent_60%)]"
+      class="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(90deg,rgba(7,8,11,0.94)_0%,rgba(7,8,11,0.65)_36%,transparent_62%)]"
     />
 
-    {/* ── 2. ESTÁTUAS Y ARQUETIPOS RECORTADOS EN PROFUNDIDAD (ORDEN NATURAL DEL DOM) ── */}
-    <div class="pointer-events-none select-none absolute inset-y-0 right-0 w-[65%] sm:w-[62%] z-10 overflow-hidden">
+    {/* ── 2. ESTÁTUAS CON MÁSCARA RADIAL ELÍPTICA (SIN BORDES CUADRADOS) ── */}
+    <div class="pointer-events-none select-none absolute inset-y-0 right-0 w-[68%] sm:w-[64%] z-10 overflow-hidden">
       {layers.map((fig) => (
         <img
           src={fig.src}
@@ -150,34 +140,52 @@ const layers = figures && figures.length > 0 ? figures : defaultFigures;
     const bento = document.getElementById('bento-tornasol-arquetipos');
     if (!bento) return;
 
-    const layers = bento.querySelectorAll<HTMLElement>('.archetype-layer');
-    if (layers.length === 0) return;
+    // Seleccionamos las capas de arquetipos y el glow de fondo
+    const layers = gsap.utils.toArray<HTMLElement>('#bento-tornasol-arquetipos .busto-layer');
+    const glow = bento.querySelector<HTMLElement>('.bento-glow');
+    if (layers.length < 3) return;
 
-    // Animación de entrada escalonada en cascada con expo.out
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            gsap.fromTo(
-              layers,
-              { opacity: 0, x: 45, scale: 1.05 },
-              {
-                opacity: 1,
-                x: 0,
-                scale: 1,
-                duration: 0.75,
-                ease: 'expo.out',
-                stagger: 0.07,
-              }
-            );
-            observer.disconnect();
-          }
-        });
-      },
-      { threshold: 0.25 }
-    );
+    // Timeline en loop con estética "Trailer Cut" (Rápido al juntarse -> Tensión Dolly Zoom -> Corte)
+    const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.2 });
 
-    observer.observe(bento);
+    // 1. SNAP-IN: Vienen separados y se juntan magnéticamente al centro en 0.55s
+    tl.fromTo(layers[0], // Fondo lejano (Derecha)
+      { x: 110, scale: 1.18, opacity: 0, filter: 'blur(6px)' },
+      { x: 0, scale: 1, opacity: 0.75, filter: 'blur(0px)', duration: 0.55, ease: 'expo.out' }, 0
+    )
+    .fromTo(layers[1], // Plano medio (Cabeza Olmeca - viene desde la izquierda juntándose hacia la Venus)
+      { x: -80, scale: 0.9, opacity: 0 },
+      { x: 15, scale: 1, opacity: 0.95, duration: 0.6, ease: 'expo.out' }, 0.06
+    )
+    .fromTo(layers[2], // Primer plano (Venus - entra fuerte desde la derecha hacia el centro)
+      { x: 95, scale: 1.12, opacity: 0 },
+      { x: -10, scale: 1, opacity: 1, duration: 0.65, ease: 'expo.out' }, 0.12
+    )
+
+    // 2. TENSIÓN MAGNÉTICA (Efecto Vértigo / Contra-movimiento dinámico durante 2.4s)
+    // Mientras la Cabeza Olmeca y la Venus se siguen acercando milimétricamente, el glow respira
+    .to(layers[1], { x: 32, scale: 0.97, duration: 2.4, ease: 'sine.inOut' }, 0.65)
+    .to(layers[2], { x: -28, scale: 1.06, duration: 2.4, ease: 'sine.inOut' }, 0.65)
+    .to(layers[0], { x: -20, scale: 1.03, duration: 2.4, ease: 'sine.inOut' }, 0.65)
+    .fromTo(glow, 
+      { scale: 0.9, opacity: 0.5, x: 30 }, 
+      { scale: 1.25, opacity: 0.95, x: -20, duration: 2.4, ease: 'sine.inOut' }, 0.65
+    )
+
+    // 3. WHIP-OUT (Salida rápida en 0.35s hacia el centro antes de reiniciar o cambiar de trío)
+    .to(layers, {
+      x: (i: number) => (i === 1 ? 60 : -60), // Se cruzan al salir
+      scale: 1.08,
+      opacity: 0,
+      filter: 'blur(4px)',
+      duration: 0.35,
+      stagger: 0.03,
+      ease: 'power3.in'
+    }, 3.05);
+
+    // Pausa en hover para contemplar la composición fija si el usuario interactúa
+    bento.addEventListener('mouseenter', () => tl.pause());
+    bento.addEventListener('mouseleave', () => tl.play());
   }
 
   document.addEventListener('DOMContentLoaded', initBentoTornasol);
