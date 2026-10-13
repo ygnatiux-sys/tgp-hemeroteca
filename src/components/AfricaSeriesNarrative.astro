@@ -45,12 +45,12 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
 
 <section
   id="africa-series-container"
-  class={`relative w-full h-[380vh] bg-[#141210] text-white select-none ${className}`}
+  class={`relative w-full h-[180vh] bg-transparent text-white select-none ${className}`}
   data-autoplay={autoplayDuration}
   aria-label="Serie Destacada: Misterios del África"
 >
-  <!-- Contenedor Sticky a Pantalla Completa (Full Bleed) -->
-  <div class="sticky top-0 h-screen w-full overflow-hidden bg-[#141210]">
+  <!-- Contenedor Sticky Enmarcado Editorial (Panorámica No Full-Bleed) -->
+  <div class="sticky top-4 sm:top-6 h-[calc(100vh-2rem)] sm:h-[calc(100vh-3rem)] w-full overflow-hidden bg-[#141210] rounded-3xl sm:rounded-4xl border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)]">
 
     <!-- ══════════════════════════════════════════════════════════════════════
          INTRO MONUMENTAL: 'MISTERIOS DEL ÁFRICA' — AMBIENT GLOW Y RITMO DE PERCUSIÓN
@@ -77,13 +77,13 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
         <!-- Nombre de la Colección: H1 ÁFRICA + H2 MISTERIOS Destacado -->
         <div class="afr-percussion-box relative flex flex-col items-center justify-center">
           <!-- H1 Monumental -->
-          <h1 class="afr-beat-africa font-serif font-black uppercase text-[clamp(4.8rem,18.5vw,18rem)] leading-[0.84] tracking-[-0.035em] whitespace-nowrap text-transparent opacity-0 will-change-transform">
+          <h1 class="afr-beat-africa font-serif font-black uppercase text-[clamp(3.8rem,12vw,12.5rem)] leading-[0.84] tracking-[-0.035em] whitespace-nowrap text-transparent opacity-0 will-change-transform">
             ÁFRICA
           </h1>
 
           <!-- H2 Destacado de la Colección -->
           <div class="afr-collection-wrap relative inline-block mt-3 overflow-visible">
-            <h2 class="afr-collection-h2 font-mono font-bold uppercase text-[clamp(1.4rem,4.8vw,3.8rem)] tracking-[0.42em] text-[#ff4d55] drop-shadow-[0_0_35px_rgba(255,77,85,0.55)] m-0 opacity-0 will-change-transform">
+            <h2 class="afr-collection-h2 font-mono font-bold uppercase text-[clamp(1.2rem,3.5vw,3rem)] tracking-[0.42em] text-[#ff4d55] drop-shadow-[0_0_35px_rgba(255,77,85,0.55)] m-0 opacity-0 will-change-transform">
               MISTERIOS
             </h2>
           </div>

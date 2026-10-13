@@ -35,7 +35,7 @@ const { className = "" } = Astro.props;
 
 <section
   id="scroll-narrative-container"
-  class={`america-unified-stage relative w-full h-svh min-h-145 bg-[#050607] text-[#e2e8f0] select-none overflow-hidden ${className}`}
+  class={`america-unified-stage relative w-full h-[78vh] min-h-140 max-h-210 bg-[#050607] text-[#e2e8f0] select-none overflow-hidden rounded-3xl sm:rounded-4xl border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)] ${className}`}
   aria-label="Colección Destacada: América Secrets"
 >
   <!-- ════════════════════════════════════════════════════════════════════════
@@ -58,14 +58,14 @@ const { className = "" } = Astro.props;
     <!-- Escenario Central del Título CNC -->
     <div class="relative z-20 flex flex-col items-center justify-center text-center px-4 max-w-6xl w-full">
       <!-- TÍTULO: AMÉRICA (Masa imponente con gradiente titanio / andesita) -->
-      <h1 class="america-title-word font-fraunces font-black uppercase text-[clamp(4.2rem,16vw,15.5rem)] leading-[0.85] tracking-[-0.03em] whitespace-nowrap opacity-0">
+      <h1 class="america-title-word font-fraunces font-black uppercase text-[clamp(3.8rem,12vw,12.5rem)] leading-[0.85] tracking-[-0.03em] whitespace-nowrap opacity-0">
         AMÉRICA
       </h1>
 
       <!-- CORTE LÁSER CNC: SECRETS revelado por hilo láser de diamante -->
       <div class="america-cnc-wrap relative inline-block mt-3 overflow-visible">
         <!-- Texto final revelado -->
-        <h2 class="america-secrets-word font-['Chivo_Mono'] font-bold uppercase text-[clamp(1.4rem,4.5vw,3.6rem)] tracking-[0.38em] text-[#4ef2d2] drop-shadow-[0_0_30px_rgba(78,242,210,0.45)] m-0">
+        <h2 class="america-secrets-word font-['Chivo_Mono'] font-bold uppercase text-[clamp(1.2rem,3.5vw,3rem)] tracking-[0.38em] text-[#4ef2d2] drop-shadow-[0_0_30px_rgba(78,242,210,0.45)] m-0">
           SECRETS
         </h2>
 

@@ -39,12 +39,12 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
 
 <section
   id="alt-narrative-container"
-  class={`relative w-full h-[500vh] bg-[#0a0a0a] text-white select-none ${className}`}
+  class={`relative w-full h-[200vh] bg-transparent text-white select-none ${className}`}
   data-autoplay={autoplayDuration}
   aria-label="Colección Alternative"
 >
-  <!-- Contenedor Sticky a Pantalla Completa (Full Bleed) -->
-  <div class="sticky top-0 h-screen w-full overflow-hidden bg-[#0a0a0a]">
+  <!-- Contenedor Sticky Enmarcado Editorial (Panorámica No Full-Bleed) -->
+  <div class="sticky top-4 sm:top-6 h-[calc(100vh-2rem)] sm:h-[calc(100vh-3rem)] w-full overflow-hidden bg-[#0a0a0a] rounded-3xl sm:rounded-4xl border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)]">
     
     <!-- HEADER EDITORIAL DE LA COLECCIÓN (Minimalista: Solo Nombre de Colección) -->
     <header class="absolute top-5 sm:top-7 inset-x-0 z-30 flex items-center justify-between px-5 sm:px-10 pointer-events-none">
@@ -76,12 +76,12 @@ const { className = "", autoplayDuration = 6000 } = Astro.props;
       <!-- Escenario Central: ALTERNATIVE (H1) + COLECCIÓN (H2) -->
       <div class="relative z-20 flex flex-col items-center justify-center text-center px-4 max-w-6xl w-full select-none">
         <div class="alt-intro-box relative flex flex-col items-center justify-center">
-          <h1 class="alt-intro-title font-fraunces font-black uppercase text-[clamp(4.2rem,17vw,16.5rem)] leading-[0.84] tracking-[-0.035em] whitespace-nowrap text-transparent opacity-0 will-change-transform">
+          <h1 class="alt-intro-title font-fraunces font-black uppercase text-[clamp(3.5rem,12vw,12rem)] leading-[0.84] tracking-[-0.035em] whitespace-nowrap text-transparent opacity-0 will-change-transform">
             ALTERNATIVE
           </h1>
 
           <div class="alt-intro-h2-wrap relative inline-block mt-3 overflow-visible">
-            <h2 class="alt-intro-h2 font-mono font-bold uppercase text-[clamp(1.4rem,4.8vw,3.8rem)] tracking-[0.42em] text-[#E69A46] drop-shadow-[0_0_35px_rgba(230,154,70,0.55)] m-0 opacity-0 will-change-transform">
+            <h2 class="alt-intro-h2 font-mono font-bold uppercase text-[clamp(1.2rem,3.5vw,3rem)] tracking-[0.42em] text-[#E69A46] drop-shadow-[0_0_35px_rgba(230,154,70,0.55)] m-0 opacity-0 will-change-transform">
               COLECCIÓN
             </h2>
           </div>
