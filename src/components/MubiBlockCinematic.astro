@@ -242,24 +242,28 @@ for (let i = 0; i < list.length; i += 3) {
     width: 100%;
     max-width: 90rem;
     box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
   }
 
   /* ── Bloque de 3 tarjetas ── */
   .mubi-block {
+    grid-column: 1;
+    grid-row: 1;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
     width: 100%;
-    position: relative;
     padding: 0 clamp(1rem, 3.5vw, 3rem);
     box-sizing: border-box;
+    visibility: hidden;
+    pointer-events: none;
   }
 
-  .mubi-block:not(.mubi-active) {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    visibility: hidden;
+  .mubi-block.mubi-active {
+    visibility: visible;
+    pointer-events: auto;
   }
 
   /* ── Tarjeta individual en proporción amplia ── */
@@ -514,14 +518,7 @@ for (let i = 0; i < list.length; i += 3) {
         onComplete: () => {
           // Limpieza de visibilidad estructural
           currentBlock.classList.remove("mubi-active");
-          currentBlock.style.position = "";
-          currentBlock.style.visibility = "";
-          currentBlock.style.pointerEvents = "";
-
           nextBlock.classList.add("mubi-active");
-          nextBlock.style.position = "";
-          nextBlock.style.visibility = "";
-          nextBlock.style.pointerEvents = "";
 
           currentIndex = nextIndex;
           updateDots(currentIndex);

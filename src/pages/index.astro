@@ -567,7 +567,7 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
           TRANSICIÓN EDITORIAL: LÍNEA TIPO ARCADA SUTIL + BOTÓN VER MÁS
       ═══════════════════════════════════════════════════════════════════ */}
       {gridItems.length > 0 && (
-        <section class="relative w-full overflow-hidden pt-20 md:pt-28 pb-0 flex flex-col items-center justify-center select-none">
+        <section class="relative z-30 w-full overflow-hidden pt-20 md:pt-28 pb-0 flex flex-col items-center justify-center select-none">
           
           {/* Eyebrow & Botón "Ver más" con chevron apuntando hacia abajo */}
           <div class="relative z-20 flex flex-col items-center gap-3.5 mb-10 md:mb-14 px-4 text-center">
@@ -577,7 +577,7 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
 
             <a
               id="btn-ver-mas-cinematicos"
-              href="#cg-section"
+              href="#seccion-ensayos-cinematicos"
               class="group relative inline-flex items-center gap-3.5 px-8 py-3.5 sm:px-10 sm:py-4 rounded-xl bg-[#E50914] hover:bg-[#b80710] text-white font-cinzel font-bold text-sm sm:text-base tracking-[0.16em] uppercase shadow-[0_0_35px_rgba(229,9,20,0.5)] hover:shadow-[0_0_55px_rgba(229,9,20,0.85)] transition-all duration-300 hover:scale-[1.03] active:scale-95 cursor-pointer no-underline"
               aria-label="Ver más ensayos cinemáticos"
             >
@@ -667,7 +667,7 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
     if (!btn) return;
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      const target = document.getElementById('cg-section');
+      const target = document.getElementById('seccion-ensayos-cinematicos');
       if (!target) return;
       // @ts-ignore
       const smoother = window.ScrollSmoother?.get();

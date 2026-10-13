@@ -185,22 +185,22 @@ const uid = "bc-" + Math.random().toString(36).slice(2, 8);
 .bc-stage {
   position: relative;
   width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
 }
 
 .bc-page {
-  transition: opacity 0.4s ease;
-}
-
-.bc-page:not(.bc-active) {
-  position: absolute;
-  inset: 0;
+  grid-column: 1;
+  grid-row: 1;
+  width: 100%;
   visibility: hidden;
   pointer-events: none;
   opacity: 0;
+  transition: opacity 0.4s ease;
 }
 
 .bc-page.bc-active {
-  position: relative;
   visibility: visible;
   pointer-events: auto;
   opacity: 1;

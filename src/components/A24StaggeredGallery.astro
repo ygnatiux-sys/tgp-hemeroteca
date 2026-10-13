@@ -353,10 +353,10 @@ const activeCollections: ActiveCollection[] = Object.entries(realCollectionsMap)
     </div>
 
     <!-- Contenedor del Stage de Posts (Sincronizado con la franja superior) -->
-    <div class="a24-posts-stage relative w-full">
+    <div class="a24-posts-stage relative w-full grid grid-cols-1 grid-rows-1">
       {activeCollections.map((col, cIdx) => (
         <div 
-          class={`a24-posts-group ${cIdx === 0 ? 'active opacity-100 relative pointer-events-auto z-10' : 'opacity-0 absolute inset-0 pointer-events-none z-0'}`}
+          class={`a24-posts-group col-start-1 row-start-1 w-full ${cIdx === 0 ? 'active opacity-100 pointer-events-auto z-10' : 'opacity-0 pointer-events-none z-0'}`}
           data-group-index={cIdx}
         >
           <!-- Grilla de 3 Posts con TAMAÑO UNIFORME AMPLIO Y VISIBLE -->
@@ -537,17 +537,17 @@ function initA24SyncedStage() {
         duration: 0.25,
         ease: "power2.in",
         onComplete: () => {
-          currentGroup.classList.remove("active", "relative");
-          currentGroup.classList.add("absolute", "pointer-events-none");
+          currentGroup.classList.remove("active");
+          currentGroup.classList.add("pointer-events-none");
           gsap.set(currentGroup, { zIndex: 0 });
         }
       }, 0);
     }
 
     if (nextGroup && nextCards) {
-      nextGroup.classList.remove("absolute", "pointer-events-none");
-      nextGroup.classList.add("active", "relative", "pointer-events-auto");
-      gsap.set(nextGroup, { zIndex: 10, opacity: 1 });
+      nextGroup.classList.remove("pointer-events-none");
+      nextGroup.classList.add("active", "pointer-events-auto");
+      gsap.set(nextGroup, { zIndex: 10, opacity: 1, y: 0 });
 
       // Stagger secuencial para que las 3 tarjetas aparezcan "una después de otra"
       gsap.set(nextCards, { opacity: 0, y: 24, scale: 1.02 });
