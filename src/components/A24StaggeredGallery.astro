@@ -3,10 +3,10 @@
 /**
  * A24StaggeredGallery.astro
  * Grilla editorial escalonada asimétrica inspirada en A24 y Apple Editorial.
- * - 3 columnas en desktop con desfasaje vertical orgánico (:nth-child(3n+2) -> 48px, :nth-child(3n+3) -> 24px).
- * - Pósters de gran formato aspect-[3/4] con zoom al hover.
- * - Limpieza de caracteres Markdown crudos en descripciones y títulos.
- * - Padding inferior pb-28 para compensar el desplazamiento de las columnas.
+ * - Cada 3 posts de la grilla escalonada, se intercala una franja panorámica Apple Bento.
+ * - La franja Apple Bento rota con loop automático, micro-zoom y fade GSAP.
+ * - Pausa automática por interacción de usuario (hover/touch) para lectura y clics en CTA.
+ * - Limpieza estricta de caracteres Markdown crudos en títulos y extractos.
  */
 
 import { resolveEssayImage, sanitizeImageUrl, formatCategory } from "../lib/content-filter";
@@ -51,7 +51,7 @@ const cleanMarkdown = (text?: string) => {
   return text.replace(/^[#*\->\s]+/gm, '').trim();
 };
 
-// Normalización de tarjetas
+// Normalización de todas las tarjetas
 const displayItems = items.slice(0, max).map((item) => {
   const rawImg = item.img || item.image || resolveEssayImage(item.entry || item, item.slug);
   const image = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '')) 
@@ -74,6 +74,13 @@ const displayItems = items.slice(0, max).map((item) => {
     badge
   };
 });
+
+// Partición en tandas de 3 posts
+type DisplayItem = typeof displayItems[0];
+const triplets: DisplayItem[][] = [];
+for (let i = 0; i < displayItems.length; i += 3) {
+  triplets.push(displayItems.slice(i, i + 3));
+}
 ---
 
 {displayItems.length > 0 && (
@@ -103,55 +110,146 @@ const displayItems = items.slice(0, max).map((item) => {
     )}
   </header>
 
-  <!-- ── GRILLA ESCALONADA ASIMÉTRICA (STAGGERED OFFSET) ── -->
-  <div class="a24-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 items-start w-full pb-28">
-    {displayItems.map((item, idx) => (
-      <a 
-        href={item.href}
-        class="a24-card group relative flex flex-col w-full text-white no-underline transition-all duration-500"
-        data-index={idx}
-      >
-        <!-- Contenedor del Póster (aspect-3/4 con fondo neutral y borde elegante) -->
-        <div class="relative w-full aspect-3/4 overflow-hidden rounded-xl bg-neutral-900 border border-white/10 shadow-2xl transition-all duration-500 group-hover:border-amber-500/40 group-hover:shadow-[0_24px_50px_rgba(0,0,0,0.85)] group-hover:-translate-y-1">
-          <img 
-            src={item.image} 
-            alt={item.title} 
-            loading="lazy" 
-            decoding="async" 
-            class="w-full h-full object-cover object-center transition-all duration-700 ease-out group-hover:scale-105 pointer-events-none"
-          />
+  <!-- ── CONTENEDOR PRINCIPAL INTERCALADO: 3 POSTS -> FRANJA APPLE BENTO -> 3 POSTS ── -->
+  <div class="flex flex-col gap-12 lg:gap-16 w-full pb-28">
+    {triplets.map((triplet, tIdx) => (
+      <div class="w-full flex flex-col gap-12 lg:gap-16">
+        
+        {/* GRILLA ESCALONADA ASIMÉTRICA DE 3 COLUMNAS */}
+        <div class="a24-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 items-start w-full">
+          {triplet.map((item, idx) => (
+            <a 
+              href={item.href}
+              class="a24-card group relative flex flex-col w-full text-white no-underline transition-all duration-500"
+              data-index={idx}
+            >
+              {/* Contenedor del Póster aspect-3/4 */}
+              <div class="relative w-full aspect-3/4 overflow-hidden rounded-xl bg-neutral-900 border border-white/10 shadow-2xl transition-all duration-500 group-hover:border-amber-500/40 group-hover:shadow-[0_24px_50px_rgba(0,0,0,0.85)] group-hover:-translate-y-1">
+                <img 
+                  src={item.image} 
+                  alt={item.title} 
+                  loading="lazy" 
+                  decoding="async" 
+                  class="w-full h-full object-cover object-center transition-all duration-700 ease-out group-hover:scale-105 pointer-events-none"
+                />
 
-          <!-- Scrim degradado inferior para legibilidad cinematográfica -->
-          <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/45 to-transparent pointer-events-none"></div>
+                <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/45 to-transparent pointer-events-none"></div>
 
-          <!-- Badge Superior Flotante -->
-          <div class="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/70 backdrop-blur-sm border border-white/15 pointer-events-none">
-            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-            <span class="text-[10px] md:text-[11px] font-mono tracking-wider text-zinc-300 uppercase">
-              {item.badge}
-            </span>
-          </div>
+                <!-- Badge Superior Flotante -->
+                <div class="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/70 backdrop-blur-sm border border-white/15 pointer-events-none">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                  <span class="text-[10px] md:text-[11px] font-mono tracking-wider text-zinc-300 uppercase">
+                    {item.badge}
+                  </span>
+                </div>
 
-          <!-- Información tipográfica al pie de la tarjeta -->
-          <div class="absolute bottom-0 left-0 right-0 p-5 md:p-6 z-20 flex flex-col gap-1.5 pointer-events-none">
-            <h3 class="font-cinzel text-xl lg:text-2xl font-bold uppercase tracking-tight text-white drop-shadow-md leading-snug transition-colors duration-300 group-hover:text-amber-200">
-              {item.title}
-            </h3>
+                <!-- Info al pie del póster -->
+                <div class="absolute bottom-0 left-0 right-0 p-5 md:p-6 z-20 flex flex-col gap-1.5 pointer-events-none">
+                  <h3 class="font-cinzel text-xl lg:text-2xl font-bold uppercase tracking-tight text-white drop-shadow-md leading-snug transition-colors duration-300 group-hover:text-amber-200">
+                    {item.title}
+                  </h3>
 
-            {item.excerpt && (
-              <p class="font-sans text-xs md:text-sm text-zinc-300/90 line-clamp-2 leading-relaxed font-normal mt-0.5">
-                {item.excerpt}
-              </p>
+                  {item.excerpt && (
+                    <p class="font-sans text-xs md:text-sm text-zinc-300/90 line-clamp-2 leading-relaxed font-normal mt-0.5">
+                      {item.excerpt}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        {/* FRANJA PANORÁMICA APPLE BENTO INTERCALADA (Con posts de esta tanda) */}
+        <div class="w-full pt-4 pb-2">
+          <div 
+            class="a24-apple-bento relative w-full h-90 sm:h-100 md:h-108 rounded-[28px] overflow-hidden bg-black border border-white/10 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.85)] select-none group/bento"
+            data-bento-id={tIdx}
+          >
+            {/* 1. Capa de Imágenes Panorámicas Superpuestas */}
+            <div class="relative w-full h-full overflow-hidden">
+              {triplet.map((post, pIdx) => (
+                <div 
+                  class={`bento-slide absolute inset-0 w-full h-full transition-all duration-700 ${pIdx === 0 ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                  data-slide-index={pIdx}
+                >
+                  <div class="absolute right-0 top-0 w-[72%] sm:w-[68%] md:w-[65%] h-full overflow-hidden">
+                    <img 
+                      src={post.image} 
+                      alt={post.title} 
+                      class="bento-slide-img w-full h-full object-cover object-center transform scale-100 transition-transform duration-700"
+                      loading="lazy" 
+                      decoding="async" 
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* 2. Máscara de Fusión Apple TV + Ambient Glow Cobrizo */}
+            <div class="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,#000000_0%,#000000_34%,rgba(0,0,0,0.82)_48%,rgba(0,0,0,0)_68%)]"></div>
+            <div class="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_0%_0%,rgba(190,90,55,0.38)_0%,transparent_50%)]"></div>
+
+            {/* 3. Bloque Editorial Izquierdo */}
+            <div class="absolute inset-y-0 left-0 z-20 w-full md:w-[50%] lg:w-[46%] pl-6 sm:pl-10 md:pl-14 pr-6 flex flex-col justify-center pointer-events-none">
+              {triplet.map((post, pIdx) => (
+                <div 
+                  class={`bento-content absolute max-w-lg transition-all duration-500 ${pIdx === 0 ? 'opacity-100 pointer-events-auto z-20' : 'opacity-0 pointer-events-none z-10'}`}
+                  data-content-index={pIdx}
+                >
+                  <span class="text-xs uppercase tracking-[0.25em] text-amber-500 font-bold mb-2.5 block font-mono">
+                    {post.badge || "HISTORIA"}
+                  </span>
+                  <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold font-cinzel text-white leading-[1.12] tracking-tight mb-3 line-clamp-2">
+                    {post.title}
+                  </h3>
+                  {post.excerpt && (
+                    <p class="text-xs sm:text-sm text-zinc-300/85 mb-6 leading-relaxed line-clamp-3 font-sans">
+                      {post.excerpt}
+                    </p>
+                  )}
+                  <div class="flex items-center gap-3 flex-wrap">
+                    <a 
+                      href={post.href}
+                      class="bento-cta-primary px-6 py-2.5 rounded-full bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-semibold tracking-wide transition shadow-md hover:scale-[1.02] active:scale-[0.98] pointer-events-auto cursor-pointer"
+                    >
+                      Leer Investigación
+                    </a>
+                    <a 
+                      href="/colecciones/"
+                      class="px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/20 text-[#E3DDD3] text-xs font-medium backdrop-blur-md transition hover:scale-[1.02] active:scale-[0.98] pointer-events-auto cursor-pointer"
+                    >
+                      Colección {post.badge}
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* 4. Indicador Inferior Derecho de Dots */}
+            {triplet.length > 1 && (
+              <div class="absolute bottom-5 right-6 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
+                {triplet.map((_, dotIdx) => (
+                  <button 
+                    type="button" 
+                    class={`bento-dot transition-all duration-300 rounded-full cursor-pointer ${dotIdx === 0 ? 'w-5 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/30 hover:bg-white/60'}`}
+                    data-dot-index={dotIdx}
+                    aria-label={`Ir al post ${dotIdx + 1}`}
+                  ></button>
+                ))}
+              </div>
             )}
+
           </div>
         </div>
-      </a>
+
+      </div>
     ))}
   </div>
 
   <!-- Botón móvil ver catálogo -->
   {actionHref && actionText && (
-    <div class="sm:hidden text-center mt-2">
+    <div class="sm:hidden text-center mt-4">
       <a 
         href={actionHref}
         class="inline-flex items-center gap-2 text-xs font-mono tracking-widest text-amber-400 uppercase py-3 px-6 rounded-full bg-white/5 border border-white/10"
@@ -178,9 +276,168 @@ const displayItems = items.slice(0, max).map((item) => {
     transform: translateY(3rem); /* 48px */
   }
 
-  /* Columna 3 (3n + 3): Desplazamiento intermedio hacia abajo de 24px (ritmo orgánico A24) */
+  /* Columna 3 (3n + 3): Desplazamiento intermedio de 24px (ritmo orgánico A24) */
   .a24-card:nth-child(3n + 3) {
     transform: translateY(1.5rem); /* 24px */
   }
 }
 </style>
+
+<script>
+import gsap from "gsap";
+
+function initA24AppleBentos() {
+  document.querySelectorAll<HTMLElement>(".a24-apple-bento").forEach((bento) => {
+    if (bento.dataset.initReady === "1") return;
+    bento.dataset.initReady = "1";
+
+    const slides = bento.querySelectorAll<HTMLElement>(".bento-slide");
+    const contents = bento.querySelectorAll<HTMLElement>(".bento-content");
+    const dots = bento.querySelectorAll<HTMLButtonElement>(".bento-dot");
+    const total = slides.length;
+    if (total <= 1) return;
+
+    let currentIndex = 0;
+    let isTransitioning = false;
+    let loopTween: gsap.core.Tween | null = null;
+    let isHovered = false;
+
+    function updateDots(activeIdx: number) {
+      dots.forEach((dot, idx) => {
+        if (idx === activeIdx) {
+          dot.className = "bento-dot transition-all duration-300 rounded-full cursor-pointer w-5 h-1.5 bg-white shadow-[0_0_8px_rgba(255,255,255,0.7)]";
+        } else {
+          dot.className = "bento-dot transition-all duration-300 rounded-full cursor-pointer w-1.5 h-1.5 bg-white/30 hover:bg-white/60";
+        }
+      });
+    }
+
+    function goToSlide(nextIndex: number) {
+      if (nextIndex === currentIndex || isTransitioning) return;
+      isTransitioning = true;
+
+      const currentSlide = slides[currentIndex];
+      const nextSlide = slides[nextIndex];
+      const currentContent = contents[currentIndex];
+      const nextContent = contents[nextIndex];
+
+      const tl = gsap.timeline({
+        defaults: { ease: "expo.out" },
+        onComplete: () => {
+          currentIndex = nextIndex;
+          isTransitioning = false;
+        }
+      });
+
+      // 1. Salida rápida del texto actual (250ms con power2.in)
+      if (currentContent) {
+        gsap.set(currentContent, { zIndex: 10 });
+        tl.to(currentContent, {
+          opacity: 0,
+          y: -10,
+          duration: 0.25,
+          ease: "power2.in",
+          onComplete: () => {
+            gsap.set(currentContent, { pointerEvents: "none", zIndex: 0 });
+          }
+        }, 0);
+      }
+
+      // 2. Salida de la imagen actual con leve retroceso
+      if (currentSlide) {
+        tl.to(currentSlide, {
+          opacity: 0,
+          scale: 0.98,
+          x: -25,
+          duration: 0.45,
+          onComplete: () => {
+            gsap.set(currentSlide, { pointerEvents: "none" });
+          }
+        }, 0);
+      }
+
+      // 3. Entrada instantánea con micro-zoom (550ms expo.out)
+      if (nextSlide) {
+        gsap.set(nextSlide, { pointerEvents: "auto" });
+        tl.fromTo(nextSlide,
+          { opacity: 0, scale: 1.05, x: 35 },
+          { opacity: 1, scale: 1, x: 0, duration: 0.55 },
+          0.08
+        );
+      }
+
+      // 4. Entrada limpia del nuevo texto y botones
+      if (nextContent) {
+        gsap.set(nextContent, { zIndex: 20, pointerEvents: "auto" });
+        tl.fromTo(nextContent,
+          { opacity: 0, y: 14, pointerEvents: "auto" },
+          { 
+            opacity: 1, 
+            y: 0, 
+            duration: 0.5,
+            onComplete: () => {
+              gsap.set(nextContent, { pointerEvents: "auto", zIndex: 20 });
+            }
+          },
+          0.15
+        );
+      }
+
+      updateDots(nextIndex);
+    }
+
+    // Programación continua con gsap.delayedCall (pausa y reanudación exacta)
+    function scheduleNext() {
+      if (loopTween) loopTween.kill();
+      loopTween = gsap.delayedCall(4.5, () => {
+        if (!isHovered) {
+          const next = (currentIndex + 1) % total;
+          goToSlide(next);
+          scheduleNext();
+        }
+      });
+    }
+
+    function pauseLoop() {
+      isHovered = true;
+      if (loopTween) loopTween.pause();
+    }
+
+    function resumeLoop() {
+      isHovered = false;
+      if (loopTween) {
+        loopTween.resume();
+      } else {
+        scheduleNext();
+      }
+    }
+
+    // Interacción manual por dots
+    dots.forEach((dot, idx) => {
+      dot.addEventListener("click", (e) => {
+        e.stopPropagation();
+        goToSlide(idx);
+        scheduleNext();
+      });
+    });
+
+    // Pausa por hover/touch para que el usuario pueda leer y clickear CTA
+    bento.addEventListener("mouseenter", pauseLoop);
+    bento.addEventListener("mouseleave", resumeLoop);
+    bento.addEventListener("touchstart", pauseLoop, { passive: true });
+    bento.addEventListener("touchend", resumeLoop, { passive: true });
+
+    // Control de visibilidad de pestaña
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) pauseLoop();
+      else resumeLoop();
+    });
+
+    scheduleNext();
+  });
+}
+
+document.addEventListener("astro:page-load", initA24AppleBentos);
+if (document.readyState !== "loading") initA24AppleBentos();
+else document.addEventListener("DOMContentLoaded", initA24AppleBentos);
+</script>
