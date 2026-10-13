@@ -1,12 +1,13 @@
 ---
+// src/components/BlockCarousel.astro
 /**
  * BlockCarousel.astro
- * Carrusel por bloques rígidos de 3 tarjetas — MUBI style.
- * Mecánica: Stagger Fade Out → Stagger Fade In con GSAP.
- * Probado con datos hardcoded internamente.
- *
- * Props:
- *   cards — array de { title, label, image, href }
+ * Refactorizado al layout MUBI / Criterion Channel ("Hero Spotlight + Satélites"):
+ * - Grid de 4 columnas (Hero: 2 cols, Satélites: 1 col cada una).
+ * - Aspect ratios estrictos: Hero aspect-[4/5] y Satélites aspect-[2/3].
+ * - Jerarquía tipográfica: text-2xl lg:text-3xl en Hero, text-lg lg:text-xl en satélites.
+ * - Limpieza de Markdown en títulos y extractos.
+ * - Stagger fade GSAP con autoplay, pause on hover y controles de navegación.
  */
 
 interface Card {
@@ -14,6 +15,7 @@ interface Card {
   label?: string;
   image: string;
   href: string;
+  excerpt?: string;
 }
 
 interface Props {
@@ -22,19 +24,24 @@ interface Props {
   cards: Card[];
   cardsPerPage?: number;    // Default: 3
   autoplay?: number;        // Segundos. 0 = sin autoplay. Default: 7
-  height?: string;          // CSS height del stage. Default: "65vh"
+  height?: string;          // Opcional
 }
 
 const {
-  eyebrow  = "Colecciones",
+  eyebrow  = "Organización Temática",
   heading  = "Colecciones",
   cards    = [],
   cardsPerPage = 3,
   autoplay = 7,
-  height   = "65vh",
 } = Astro.props;
 
-// Partir el array en páginas de N cards
+// Limpiador de símbolos de Markdown crudo
+const cleanMarkdown = (text?: string) => {
+  if (!text) return "";
+  return text.replace(/^[#*\->\s]+/gm, '').trim();
+};
+
+// Partir el array en páginas de 3 cards (1 Hero + 2 Satélites)
 const pages: Card[][] = [];
 for (let i = 0; i < cards.length; i += cardsPerPage) {
   pages.push(cards.slice(i, i + cardsPerPage));
@@ -46,61 +53,115 @@ const uid = "bc-" + Math.random().toString(36).slice(2, 8);
 {cards.length > 0 && (
 <section
   id={uid}
-  class="bc-root"
+  class="bc-root w-full relative overflow-hidden"
   data-autoplay={autoplay}
   data-total={totalPages}
 >
 
   <!-- ── HEADER ── -->
-  <div class="bc-header">
+  <div class="bc-header flex items-end justify-between gap-4 pb-5 border-b border-white/10">
     <div>
-      {eyebrow && <span class="bc-eyebrow">{eyebrow}</span>}
-      <h2 class="bc-heading">{heading}</h2>
+      {eyebrow && (
+        <span class="bc-eyebrow block text-[10px] font-mono tracking-[0.4em] uppercase text-amber-500 font-bold mb-1">
+          {eyebrow}
+        </span>
+      )}
+      <h2 class="bc-heading font-cinzel text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-linear-to-b from-slate-200 to-slate-500 m-0 leading-tight">
+        {heading}
+      </h2>
     </div>
+
+    {totalPages > 1 && (
+      <div class="hidden sm:flex items-center gap-2">
+        <span class="text-xs font-mono text-zinc-400 tracking-widest">
+          BLOQUE <span class="bc-cur text-white font-bold">01</span> / {String(totalPages).padStart(2, "0")}
+        </span>
+      </div>
+    )}
   </div>
 
-  <!-- ── STAGE WRAPPER CON CHEVRONS NATIVOS SLIDER NETFLIX ── -->
-  <div class="relative w-full group/stage">
+  <!-- ── STAGE WRAPPER CON CHEVRONS FLOTANTES ── -->
+  <div class="relative w-full group/stage mt-6">
     {totalPages > 1 && (
       <>
-        <!-- Botón Anterior Flotante en Cápsula (Nativo Netflix) -->
+        <!-- Botón Anterior Flotante -->
         <button 
-          class="bc-prev absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-40 w-9 md:w-10 h-16 md:h-20 rounded-full bg-black/40 hover:bg-black/85 text-[#E3DDD3]/40 hover:text-[#EFEBE3] border border-[#E3DDD3]/10 hover:border-[#E3DDD3]/30 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl focus:outline-none"
+          class="bc-prev absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-40 w-10 h-16 md:h-20 rounded-full bg-black/60 hover:bg-black/90 text-zinc-300 hover:text-white border border-white/15 hover:border-amber-500/50 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-0 group-hover/stage:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl focus:outline-none"
           type="button"
-          aria-label="Anterior"
+          aria-label="Página anterior"
         >
-          <svg class="w-5 h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <svg class="w-5 h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
         </button>
 
-        <!-- Botón Siguiente Flotante en Cápsula (Nativo Netflix) -->
+        <!-- Botón Siguiente Flotante -->
         <button 
-          class="bc-next absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-40 w-9 md:w-10 h-16 md:h-20 rounded-full bg-black/40 hover:bg-black/85 text-[#E3DDD3]/40 hover:text-[#EFEBE3] border border-[#E3DDD3]/10 hover:border-[#E3DDD3]/30 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl focus:outline-none"
+          class="bc-next absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-40 w-10 h-16 md:h-20 rounded-full bg-black/60 hover:bg-black/90 text-zinc-300 hover:text-white border border-white/15 hover:border-amber-500/50 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-0 group-hover/stage:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xl focus:outline-none"
           type="button"
-          aria-label="Siguiente"
+          aria-label="Página siguiente"
         >
-          <svg class="w-5 h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <svg class="w-5 h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
           </svg>
         </button>
       </>
     )}
 
-    <!-- ── STAGE ── -->
-    <div class="bc-stage" style={`--bc-h:${height}`}>
+    <!-- ── STAGE DE GRILLA MUBI (Hero Spotlight + Satélites) ── -->
+    <div class="bc-stage relative w-full">
       {pages.map((page, pi) => (
-        <div class={`bc-page ${pi === 0 ? "bc-active" : ""}`} data-page={pi} aria-hidden={pi !== 0 ? "true" : "false"}>
-          {page.map((card) => (
-            <a href={card.href} class="bc-card">
-              <img src={card.image} alt={card.title} loading="lazy" decoding="async" />
-              <div class="bc-scrim"></div>
-              <div class="bc-info">
-                {card.label && <span class="bc-label">{card.label}</span>}
-                <p class="bc-title">{card.title}</p>
-              </div>
-            </a>
-          ))}
+        <div 
+          class={`bc-page ${pi === 0 ? "bc-active" : ""} grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 items-start w-full`} 
+          data-page={pi} 
+          aria-hidden={pi !== 0 ? "true" : "false"}
+        >
+          {page.map((card, ci) => {
+            const isHero = ci % 3 === 0;
+            const cleanedTitle = cleanMarkdown(card.title);
+            const cleanedExcerpt = cleanMarkdown(card.excerpt);
+            
+            return (
+              <a 
+                href={card.href} 
+                class={`bc-card group/card relative flex flex-col w-full text-white no-underline transition-all duration-300 ${isHero ? 'col-span-1 md:col-span-2 lg:col-span-2' : 'col-span-1'}`}
+              >
+                <!-- Contenedor Multimedia con Proporción MUBI Estricta -->
+                <div class={`relative w-full rounded-xl overflow-hidden bg-[#0c0d10] border border-white/10 shadow-2xl transition-all duration-500 group-hover/card:border-amber-500/40 group-hover/card:shadow-[0_20px_45px_rgba(0,0,0,0.85)] ${isHero ? 'aspect-[4/5]' : 'aspect-[2/3]'}`}>
+                  <img 
+                    src={card.image} 
+                    alt={cleanedTitle} 
+                    loading="lazy" 
+                    decoding="async" 
+                    class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105 pointer-events-none"
+                  />
+                  
+                  <!-- Scrim degradado inferior para legibilidad del texto -->
+                  <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/45 to-transparent pointer-events-none"></div>
+
+                  <!-- Badge superior flotante -->
+                  <div class="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/70 backdrop-blur-sm border border-white/15 pointer-events-none">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                    <span class="text-[10px] md:text-[11px] font-mono tracking-wider text-zinc-300 uppercase">
+                      {card.label || "DOSSIER CINEMÁTICO"}
+                    </span>
+                  </div>
+
+                  <!-- Bloque Tipográfico anclado en la base del póster -->
+                  <div class="absolute bottom-0 left-0 right-0 p-5 md:p-6 z-20 flex flex-col gap-1.5 pointer-events-none">
+                    <h3 class={`font-cinzel font-bold uppercase tracking-tight text-white drop-shadow-md transition-colors duration-300 group-hover/card:text-amber-200 ${isHero ? 'text-2xl lg:text-3xl leading-[1.08]' : 'text-lg lg:text-xl leading-[1.15]'}`}>
+                      {cleanedTitle}
+                    </h3>
+                    {cleanedExcerpt && (
+                      <p class={`font-sans text-white/80 line-clamp-2 leading-relaxed font-normal ${isHero ? 'text-sm md:text-base' : 'text-xs'}`}>
+                        {cleanedExcerpt}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </a>
+            );
+          })}
         </div>
       ))}
     </div>
@@ -110,165 +171,42 @@ const uid = "bc-" + Math.random().toString(36).slice(2, 8);
 )}
 
 <style>
-/* ── ROOT ── */
-.bc-root {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-}
-
-/* ── HEADER ── */
-.bc-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-bottom: 1.25rem;
-}
-.bc-eyebrow {
-  display: block;
-  font-size: 0.625rem;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  margin-bottom: 0.25rem;
-  /* color hereda del proyecto */
-  color: var(--color-rust-orange, #e07a5f);
-  font-family: var(--font-metadata, sans-serif);
-}
-.bc-heading {
-  font-size: clamp(1.5rem, 3vw, 3rem);
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  background-image: linear-gradient(180deg, #CBD5E1 0%, #334155 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  margin: 0;
-  font-family: var(--font-cinzel, serif);
-}
-
-/* ── STAGE — contenedor de altura fija ── */
+/* ── PÁGINAS — La activa define el flujo del stage, las inactivas se ocultan de forma absoluta ── */
 .bc-stage {
   position: relative;
   width: 100%;
-  height: var(--bc-h, 65vh);
-  min-height: 400px;
-  max-height: 720px;
 }
 
-/* ── PÁGINAS — apiladas sobre sí, una visible a la vez ── */
 .bc-page {
+  transition: opacity 0.4s ease;
+}
+
+.bc-page:not(.bc-active) {
   position: absolute;
   inset: 0;
-  display: flex;
-  gap: 0.875rem;
-  /* oculto por defecto */
   visibility: hidden;
   pointer-events: none;
+  opacity: 0;
 }
+
 .bc-page.bc-active {
+  position: relative;
   visibility: visible;
   pointer-events: auto;
-}
-
-/* ── TARJETA ── */
-.bc-card {
-  flex: 1 1 0;
-  min-width: 0;
-  position: relative;
-  overflow: hidden;
-  display: block;
-  border-radius: 1rem;
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
-  text-decoration: none;
-  /* estado inicial siempre visible — GSAP lo anima */
   opacity: 1;
-  transition: border-color 0.4s ease, box-shadow 0.4s ease;
-}
-.bc-card:hover {
-  border-color: rgba(224, 122, 95, 0.45);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), 0 0 20px rgba(224, 122, 95, 0.15);
-}
-.bc-card img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  pointer-events: none;
-  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.bc-card:hover img { transform: scale(1.025); }
-
-/* ── SCRIM ── */
-.bc-scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top,
-    rgba(0,0,0,0.92) 0%,
-    rgba(0,0,0,0.55) 30%,
-    transparent 60%
-  );
-  pointer-events: none;
 }
 
-/* ── INFO ── */
-.bc-info {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1.5rem 1.5rem 1.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  z-index: 2;
-}
-.bc-label {
-  font-family: var(--font-metadata, sans-serif);
-  font-size: 0.65rem;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: var(--color-rust-orange, #e07a5f);
-  line-height: 1;
-  display: block;
-}
-.bc-title {
-  font-family: var(--font-alegreya, serif);
-  font-size: clamp(1rem, 1.5vw, 1.5rem);
-  font-weight: 800;
-  line-height: 1.2;
-  color: #fff;
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  /* gradient title si el proyecto tiene esta utilidad */
-  background-image: linear-gradient(180deg, #e8e0d8 0%, #a89e92 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* ── RESPONSIVE ── */
-@media (max-width: 768px) {
-  .bc-stage {
-    height: clamp(380px, 60vh, 560px);
-  }
-  /* En móvil solo 1 card */
-  .bc-page { gap: 0; }
-  .bc-card:not(:first-child) { display: none; }
+/* ── Tarjeta base para animación GSAP ── */
+.bc-card {
+  min-width: 0;
+  cursor: pointer;
 }
 </style>
 
 <script>
 import gsap from "gsap";
 
-function init() {
+function initBlockCarousel() {
   document.querySelectorAll<HTMLElement>(".bc-root").forEach((root) => {
     if (root.dataset.ready === "1") return;
     root.dataset.ready = "1";
@@ -309,7 +247,7 @@ function init() {
       const cardsOut = Array.from(pageOut.querySelectorAll<HTMLElement>(".bc-card"));
       const cardsIn  = Array.from(pageIn.querySelectorAll<HTMLElement>(".bc-card"));
 
-      /* Preparar el bloque entrante: activo pero cards en opacity 0 con y: 20 */
+      /* Preparar el bloque entrante: visible pero cards en opacity 0 con y: 20 */
       pageIn.classList.add("bc-active");
       pageIn.setAttribute("aria-hidden", "false");
       gsap.set(cardsIn, { opacity: 0, y: 20 });
@@ -319,7 +257,7 @@ function init() {
 
       const tl = gsap.timeline({
         onComplete() {
-          /* Limpiar bloque saliente y resetear sus cards para el loop */
+          /* Ocultar bloque saliente y resetear sus cards para el próximo loop */
           pageOut.classList.remove("bc-active");
           pageOut.setAttribute("aria-hidden", "true");
           gsap.set(cardsOut, { clearProps: "all" });
@@ -330,7 +268,7 @@ function init() {
         }
       });
 
-      /* 1 — STAGGER FADE OUT del bloque saliente (desplazamiento -20px y curva suave) */
+      /* 1 — STAGGER FADE OUT del bloque saliente (-20px) */
       tl.to(cardsOut, {
         opacity: 0,
         y: -20,
@@ -339,7 +277,7 @@ function init() {
         ease: "power2.inOut",
       });
 
-      /* 2 — STAGGER FADE IN del bloque entrante (inercia cinemática power3.out) */
+      /* 2 — STAGGER FADE IN del bloque entrante (inercia power3.out) */
       tl.to(cardsIn, {
         opacity: 1,
         y: 0,
@@ -363,12 +301,12 @@ function init() {
     btnPrev?.addEventListener("click", () => go(-1));
     btnNext?.addEventListener("click", () => go( 1));
 
-    /* Arrancar */
+    /* Arrancar autoplay */
     schedule();
   });
 }
 
-document.addEventListener("astro:page-load", init);
-if (document.readyState !== "loading") init();
-else document.addEventListener("DOMContentLoaded", init);
+document.addEventListener("astro:page-load", initBlockCarousel);
+if (document.readyState !== "loading") initBlockCarousel();
+else document.addEventListener("DOMContentLoaded", initBlockCarousel);
 </script>
