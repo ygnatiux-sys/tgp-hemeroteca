@@ -2,19 +2,16 @@
 // src/components/A24StaggeredGallery.astro
 /**
  * A24StaggeredGallery.astro
- * Escenario Editorial Cinemático y Compacto (Stage Dinámico):
- * - Secuencia cíclica automática:
- *   1. Full Bleed de colección especial con letras masivas metálicas (PUMA PUNKU, ASIA SECRETS, EL UMBRAL).
- *   2. Secuencia de 3 posts coherentes con esa colección en grilla escalonada A24 (0px, 48px, 24px).
- *   3. Franja panorámica Apple Bento de la colección con CTAs funcionales.
- *   4. Transición automática a la siguiente colección y loop continuo.
- * - Pausa automática por interacción de usuario (hover/touch) para lectura y navegación sin interrupciones.
- * - Todos los botones y tarjetas conducen a rutas reales de la hemeroteca y colecciones.
+ * Arquitectura Editorial Sincronizada:
+ * 1. Franja Bento Ultra (Superior): Formato ultra-panorámico (max-w-[1520px], no full-bleed) que rota
+ *    automáticamente entre las colecciones temáticas reales del sitio con ambient glow, epígrafe poético y CTAs.
+ * 2. Array de 3 Posts Coherentes (Inferior): Ubicado DEBAJO de la franja. Las 3 tarjetas tienen tamaño uniforme
+ *    amplio y nivelado (sin recortes ni desniveles), y aparecen secuencialmente "uno después de otro" con stagger.
+ * 3. Sanitización Estricta: Se limpian nombres de archivo con hashes, prefijos multimodales y caracteres Markdown crudos.
+ * 4. Control de Usuario: Pausa inmediata en hover/touch y reanudación exacta al salir.
  */
 
 import { resolveEssayImage, sanitizeImageUrl, formatCategory } from "../lib/content-filter";
-import imgPumapunku from "../assets/alternativa/pumapunku.jpg";
-import imgGunungPadang from "../assets/alternativa/gunung-padang.jpg";
 
 interface Item {
   title?: string;
@@ -51,7 +48,7 @@ interface Props {
 }
 
 const {
-  title = "Ensayos Recientes",
+  title = "Ensayos Recientes & Colecciones",
   eyebrow = "Archivo de Ensayos",
   items = [],
   collections = [],
@@ -66,20 +63,38 @@ const cleanMarkdown = (text?: string) => {
   return text.replace(/^[#*\->\s]+/gm, '').replace(/[*_`]/g, '').trim();
 };
 
+// Sanitizador de títulos editoriales para eliminar prefijos de escaneo y hashes
+const sanitizeTitle = (rawTitle?: string) => {
+  if (!rawTitle) return "Investigación Editorial";
+  let t = rawTitle;
+  t = t.replace(/^Captura\s+(?:Hermenéutica|Puesto de Mando|Multimodal)\s*[—–·-]\s*/i, "");
+  t = t.replace(/^ensayosCinematicos\s*[—–·-]\s*/i, "");
+  t = t.replace(/_[a-f0-9]{8,}(?:_[a-f0-9]+)*\.(?:webp|jpg|jpeg|png)$/i, "");
+  t = t.replace(/\.(?:webp|jpg|jpeg|png)$/i, "");
+  if (/confucio/i.test(t)) {
+    return "Confucio y la Armonía Celeste";
+  }
+  if (/consulta-manual/i.test(t)) {
+    return "La Lepra en el Oriente Próximo: ¿Enfermedad Sagrada?";
+  }
+  t = t.replace(/_+/g, " ").trim();
+  return cleanMarkdown(t);
+};
+
 // Normalizador unificado de posts
-const normalizePost = (item: any) => {
+const normalizePost = (item: any, fallbackBadge: string = "ENSAYO") => {
   const rawImg = item.img || item.image || item.entry?.coverImage || resolveEssayImage(item.entry || item, item.slug);
   const image = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '')) 
     || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop';
   
-  const rawTitle = item.title || item.titulo || item.entry?.title || "Sin título";
-  const cleanedTitle = cleanMarkdown(rawTitle);
+  const rawTitle = item.title || item.titulo || item.entry?.title || "Investigación Editorial";
+  const cleanedTitle = sanitizeTitle(rawTitle);
 
   const rawExcerpt = item.excerpt || item.entry?.excerpt || item.entry?.dek || item.subtitle || "";
   const cleanedExcerpt = cleanMarkdown(rawExcerpt);
 
   const href = item.link || item.href || (item.slug ? ((item as any).isCinematicGSAP ? `/ensayos-cinematicos/${item.slug}/` : `/hemeroteca/${item.slug}/`) : '#');
-  const badge = item.collectionLabel || formatCategory(item.category || item.entry?.category || "ENSAYO EDITORIAL");
+  const badge = item.collectionLabel || formatCategory(item.category || item.entry?.category || fallbackBadge);
 
   return {
     title: cleanedTitle,
@@ -90,123 +105,99 @@ const normalizePost = (item: any) => {
   };
 };
 
-const allNormalizedItems = items.map(normalizePost);
+// Mapa oficial de epígrafes poéticos por colección temática (extraídos de colecciones/index.astro)
+const epigraphMap: Record<string, string> = {
+  "arqueosemiotica": "Los signos sobreviven a los imperios. Cada glifo, un mensaje lanzado a la eternidad sin destinatario conocido.",
+  "filosofia": "El pensamiento como territorio. Las ideas no mueren: se transforman, se heredan, se contradicen.",
+  "historia": "El tiempo no es lineal. Es una red de causas que la memoria humana teje y desteje sin cesar.",
+  "mitologia": "Antes del dato, existió el mito. El relato que une cielo y tierra antes de que la ciencia los separara.",
+  "ensayos-cinematicos": "Imágenes que piensan. El cine como forma de conocimiento antes de que el conocimiento fuera escrito.",
+  "arquetipos": "Figuras que reaparecen en cada cultura. Los arquetipos son la gramática secreta del ser humano.",
+};
 
-// ─── COLECCIONES ESPECIALES CURADAS CON POSTS COHERENTES ────────────────────
-interface CuratedCollection {
+// ─── COLECCIONES REALES SANITIZADAS (SOLO LAS EXISTENTES) ────────────────────
+const allItemsNormalized = items.map(i => normalizePost(i));
+
+interface ActiveCollection {
   key: string;
-  massiveTitle: string;
-  kicker: string;
-  subtitle: string;
-  telemetry: string;
-  fullBleedImage: string;
-  bentoImage: string;
+  label: string;
+  count: number;
+  epigraph: string;
+  image: string;
   href: string;
-  badge: string;
   posts: ReturnType<typeof normalizePost>[];
 }
 
-// 1. Colección Especial A: PUMA PUNKU / MEGALITISMO GLOBAL
-const pumapunkuPosts = allNormalizedItems
-  .filter(p => /gunung|diquis|aramu|klerksdorp|stonehenge|yonaguni|andesita|megalit|piramide|saqqara/i.test(p.title + ' ' + p.excerpt))
-  .slice(0, 3);
-
-const pumapunkuFallback = allNormalizedItems.slice(0, 3);
-const finalPumapunkuPosts = pumapunkuPosts.length >= 3 ? pumapunkuPosts : [
-  ...pumapunkuPosts,
-  ...pumapunkuFallback.filter(f => !pumapunkuPosts.some(p => p.title === f.title))
-].slice(0, 3);
-
-// 2. Colección Especial B: ASIA SECRETS / MISTICISMO & VACÍO
-const asiaPosts = allNormalizedItems
-  .filter(p => /buda|nichiren|confucio|krishnamurti|sadhguru|asia|oriente|zen|vedico|delfos/i.test(p.title + ' ' + p.excerpt))
-  .slice(0, 3);
-
-const asiaFallback = allNormalizedItems.slice(3, 6);
-const finalAsiaPosts = asiaPosts.length >= 3 ? asiaPosts : [
-  ...asiaPosts,
-  ...asiaFallback.filter(f => !asiaPosts.some(p => p.title === f.title))
-].slice(0, 3);
-
-// 3. Colección Especial C: EL UMBRAL / HISTORIA DEL LIBRO & ARCHIVO
-const umbralPosts = allNormalizedItems
-  .filter(p => /umbral|borges|catedral|escolastica|tacito|tucidides|hemeroteca|archivo|historia|razon/i.test(p.title + ' ' + p.excerpt))
-  .slice(0, 3);
-
-const umbralFallback = allNormalizedItems.slice(6, 9);
-const finalUmbralPosts = umbralPosts.length >= 3 ? umbralPosts : [
-  ...umbralPosts,
-  ...umbralFallback.filter(f => !umbralPosts.some(p => p.title === f.title))
-].slice(0, 3);
-
-const curatedCollections: CuratedCollection[] = [
-  {
-    key: "arqueosemiotica",
-    massiveTitle: "PUMA PUNKU",
-    kicker: "COLECCIÓN ESPECIAL // ALTIPLANO 3800M",
-    subtitle: "Mecanizado ancestral, andesita de precisión y la anomalía del encastre hermético.",
-    telemetry: "TELEMETRÍA LÍTICA · TOLERANCIA ±0.05 MM · ÁNGULO 90.0° INT.",
-    fullBleedImage: typeof imgPumapunku === 'object' && imgPumapunku?.src ? imgPumapunku.src : (imgPumapunku as any),
-    bentoImage: typeof imgGunungPadang === 'object' && imgGunungPadang?.src ? imgGunungPadang.src : (imgGunungPadang as any),
-    href: "/colecciones/arqueosemiotica/",
-    badge: "ANDESITA CNC · ARQUEOSEMIÓTICA",
-    posts: finalPumapunkuPosts
+const realCollectionsMap: Record<string, { label: string; image: string }> = {
+  "arqueosemiotica": {
+    label: "Arqueosemiótica",
+    image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop"
   },
-  {
-    key: "filosofia",
-    massiveTitle: "ASIA SECRETS",
-    kicker: "COLECCIÓN TEMÁTICA // MISTICISMO ORIENTAL",
-    subtitle: "Rutas del vacío, ontología del despertar y la cinematografía de la tradición sagrada.",
-    telemetry: "HERMENÉUTICA VÉDICA · BUDISMO SOBERANO · ARCHIVO ORIENTAL",
-    fullBleedImage: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1600&auto=format&fit=crop",
-    bentoImage: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop",
-    href: "/colecciones/filosofia/",
-    badge: "TRADICIÓN & VACÍO",
-    posts: finalAsiaPosts
+  "filosofia": {
+    label: "Filosofía",
+    image: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1600&auto=format&fit=crop"
   },
-  {
-    key: "historia",
-    massiveTitle: "EL UMBRAL",
-    kicker: "ARCHIVÍSTICA // MEMORIA MATERIAL",
-    subtitle: "Tratados sobre la imprenta, el laberinto infinito y la fenomenología del publicar.",
-    telemetry: "HISTORIA DEL SABER · CORPUS SELECCIONADO · REGISTRO TGP",
-    fullBleedImage: "https://images.unsplash.com/photo-1507842229451-7f01be8610ce?q=80&w=1600&auto=format&fit=crop",
-    bentoImage: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?q=80&w=1200&auto=format&fit=crop",
-    href: "/colecciones/historia/",
-    badge: "HISTORIA & ARCHIVO",
-    posts: finalUmbralPosts
+  "historia": {
+    label: "Historia",
+    image: "https://images.unsplash.com/photo-1507842229451-7f01be8610ce?q=80&w=1600&auto=format&fit=crop"
+  },
+  "mitologia": {
+    label: "Mitología",
+    image: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?q=80&w=1600&auto=format&fit=crop"
+  },
+  "ensayos-cinematicos": {
+    label: "Ensayos Cinemáticos",
+    image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1600&auto=format&fit=crop"
   }
-];
+};
 
-// ─── CONSTRUCCIÓN DE LA SECUENCIA DE DIAPOSITIVAS DEL ESCENARIO ─────────────
-// Para cada colección especial:
-// Diapositiva 1: Full Bleed con letras masivas metálicas
-// Diapositiva 2: Secuencia de 3 posts coherentes (A24 Staggered Grid)
-// Diapositiva 3: Franja Apple Bento de la colección
-type SlideItem = 
-  | { type: 'fullbleed'; col: CuratedCollection }
-  | { type: 'triplet'; col: CuratedCollection; posts: ReturnType<typeof normalizePost>[] }
-  | { type: 'bento'; col: CuratedCollection };
+// Extraer o estructurar solo las colecciones que existen en el catálogo
+const activeCollections: ActiveCollection[] = Object.entries(realCollectionsMap).map(([key, info]) => {
+  // Buscar si la colección vino en las props
+  const propCol = collections.find(c => c.key === key || c.label.toLowerCase() === info.label.toLowerCase());
+  
+  let colPosts: ReturnType<typeof normalizePost>[] = [];
+  if (propCol && Array.isArray(propCol.essays) && propCol.essays.length > 0) {
+    colPosts = propCol.essays.slice(0, 3).map(e => normalizePost(e, info.label));
+  } else {
+    // Filtrar de items generales por coincidencia temática
+    colPosts = allItemsNormalized.filter(p => {
+      const match = (p.badge + ' ' + p.title + ' ' + p.excerpt).toLowerCase();
+      if (key === "arqueosemiotica") return /arqueo|semiot|gunung|diquis|aramu|litic|megalit|piramide/i.test(match);
+      if (key === "filosofia") return /filosof|buda|nichiren|confucio|krishnamurti|sadhguru|oriente|deseo/i.test(match);
+      if (key === "historia") return /histor|umbral|borges|catedral|escolastica|archivo|tacito|romano/i.test(match);
+      if (key === "mitologia") return /mito|argonauta|demeter|dios|sagrad|kheper/i.test(match);
+      if (key === "ensayos-cinematicos") return /cinematic|caligula|dahshur|alejandro|sombra/i.test(match);
+      return false;
+    }).slice(0, 3);
+  }
 
-const stageSlides: SlideItem[] = [];
-curatedCollections.forEach((col) => {
-  stageSlides.push({ type: 'fullbleed', col });
-  stageSlides.push({ type: 'triplet', col, posts: col.posts });
-  stageSlides.push({ type: 'bento', col });
+  // Si tiene menos de 3, completar con posts seguros para mantener siempre la tríada
+  if (colPosts.length < 3) {
+    const needed = 3 - colPosts.length;
+    const fillers = allItemsNormalized.filter(f => !colPosts.some(p => p.title === f.title)).slice(0, needed);
+    colPosts = [...colPosts, ...fillers];
+  }
+
+  const rawCover = propCol?.coverEssay?.img || propCol?.coverEssay?.image;
+  const coverUrl = sanitizeImageUrl(typeof rawCover === 'object' && rawCover?.src ? rawCover.src : (typeof rawCover === 'string' ? rawCover : '')) || info.image;
+
+  return {
+    key,
+    label: info.label,
+    count: propCol?.count || colPosts.length || 4,
+    epigraph: epigraphMap[key] || "Corpus documental y memoria material en el acervo de la hemeroteca.",
+    image: coverUrl,
+    href: `/colecciones/${key}/`,
+    posts: colPosts
+  };
 });
 ---
 
-<!-- Fuentes de Precisión para el Título Monumental CNC y Telemetría -->
-<link rel="preconnect" href="https://api.fontshare.com" />
-<link href="https://api.fontshare.com/v2/css?f[]=panchang@800,900&display=swap" rel="stylesheet" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@400;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
-
 <section id="sec-ensayos-recientes" class="a24-root w-full relative">
   
-  <!-- ── CABECERA EDITORIAL Y NAVEGACIÓN ── -->
-  <header class="flex items-end justify-between gap-4 pb-6 border-b border-white/10 mb-8 md:mb-10">
+  <!-- ── CABECERA EDITORIAL ── -->
+  <header class="flex items-end justify-between gap-4 pb-6 border-b border-white/10 mb-8 md:mb-10 w-full max-w-[94vw] xl:max-w-380 2xl:max-w-390 mx-auto">
     <div>
       {eyebrow && (
         <span class="block text-[10px] font-mono tracking-[0.4em] uppercase text-amber-500 font-bold mb-1.5">
@@ -219,11 +210,11 @@ curatedCollections.forEach((col) => {
     </div>
 
     <div class="flex items-center gap-4">
-      <!-- Indicador dinámico de diapositiva activa -->
-      <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-black/50 border border-white/10 backdrop-blur-md">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span class="text-xs font-mono text-zinc-400 tracking-wider">
-          ESCENARIO <span class="a24-cur-idx text-white font-bold">01</span> / {String(stageSlides.length).padStart(2, "0")}
+      <!-- Indicador dinámico de colección activa -->
+      <div class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 border border-white/10 backdrop-blur-md">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+        <span class="text-xs font-mono text-zinc-300 tracking-wider">
+          COLECCIÓN <span class="a24-cur-idx text-white font-bold">01</span> / {String(activeCollections.length).padStart(2, "0")}
         </span>
       </div>
 
@@ -239,247 +230,192 @@ curatedCollections.forEach((col) => {
     </div>
   </header>
 
-  <!-- ── ESCENARIO COMPACTO PRINCIPAL (STAGE DINÁMICO GSAP) ── -->
-  <div 
-    class="a24-stage-container relative w-full h-155 sm:h-162.5 md:h-170 rounded-[28px] overflow-hidden bg-[#07080a] border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)] select-none group/stage"
-    data-total-slides={stageSlides.length}
-  >
-
-    {/* Flechas de Navegación Manual Flotantes */}
-    <button 
-      type="button" 
-      class="a24-nav-prev absolute left-3 md:left-5 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-0 group-hover/stage:opacity-100 hover:scale-110 active:scale-95 cursor-pointer shadow-xl pointer-events-auto"
-      aria-label="Diapositiva anterior"
+  <!-- ── 1. FRANJA BENTO ULTRA (SUPERIOR, PANORÁMICA, NO FULL BLEED) ── -->
+  <div class="w-full max-w-[94vw] xl:max-w-380 2xl:max-w-390 mx-auto mb-10 md:mb-14">
+    <div 
+      class="a24-bento-stage relative w-full h-85 sm:h-95 md:h-105 rounded-[28px] overflow-hidden bg-black border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)] select-none group/bento"
+      data-total-collections={activeCollections.length}
     >
-      <svg class="w-5 h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-      </svg>
-    </button>
+      
+      {/* Flechas de Navegación Manual Flotantes */}
+      <button 
+        type="button" 
+        class="a24-bento-prev absolute left-3 md:left-5 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-0 group-hover/bento:opacity-100 hover:scale-110 active:scale-95 cursor-pointer shadow-xl pointer-events-auto"
+        aria-label="Colección anterior"
+      >
+        <svg class="w-5 h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </button>
 
-    <button 
-      type="button" 
-      class="a24-nav-next absolute right-3 md:right-5 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-0 group-hover/stage:opacity-100 hover:scale-110 active:scale-95 cursor-pointer shadow-xl pointer-events-auto"
-      aria-label="Diapositiva siguiente"
-    >
-      <svg class="w-5 h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-      </svg>
-    </button>
+      <button 
+        type="button" 
+        class="a24-bento-next absolute right-3 md:right-5 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-0 group-hover/bento:opacity-100 hover:scale-110 active:scale-95 cursor-pointer shadow-xl pointer-events-auto"
+        aria-label="Colección siguiente"
+      >
+        <svg class="w-5 h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      </button>
 
-    {/* ── CONTENEDOR DE DIAPOSITIVAS SUPERPUESTAS ── */}
-    <div class="relative w-full h-full">
-      {stageSlides.map((slide, sIdx) => {
-        const isFirst = sIdx === 0;
-
-        // 1. TIPO FULL BLEED (Letras Masivas como PUMA PUNKU)
-        if (slide.type === 'fullbleed') {
-          return (
-            <div 
-              class={`a24-slide a24-slide-fullbleed absolute inset-0 w-full h-full ${isFirst ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
-              data-slide-index={sIdx}
-            >
-              <!-- Fondo de Alta Resolución a Sangre -->
+      {/* Diapositivas de la Franja Bento Ultra */}
+      <div class="relative w-full h-full">
+        {activeCollections.map((col, cIdx) => (
+          <div 
+            class={`a24-bento-slide absolute inset-0 w-full h-full ${cIdx === 0 ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
+            data-collection-index={cIdx}
+          >
+            <!-- Imagen Panorámica Derecha de la Colección -->
+            <div class="absolute right-0 top-0 w-[72%] sm:w-[68%] md:w-[64%] h-full overflow-hidden">
               <img 
-                src={slide.col.fullBleedImage} 
-                alt={slide.col.massiveTitle}
-                class="absolute inset-0 w-full h-full object-cover object-center scale-100 transition-transform duration-1000 ease-out pointer-events-none"
-                loading="eager"
-                decoding="async"
+                src={col.image} 
+                alt={col.label}
+                class="w-full h-full object-cover object-center transform scale-100 transition-transform duration-1000 ease-out pointer-events-none"
+                loading="eager" 
+                decoding="async" 
               />
-
-              <!-- Scrim y Viñeta Cinemática de Negro Basalto -->
-              <div class="absolute inset-0 bg-radial from-transparent via-black/40 to-black/90 pointer-events-none"></div>
-              <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/30 to-black/60 pointer-events-none"></div>
-
-              <!-- Grilla de ingeniería sutil -->
-              <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
-
-              <!-- Contenido Central y Titular Monumental Metalizado -->
-              <div class="relative z-20 w-full h-full flex flex-col items-center justify-center text-center p-6 sm:p-10 md:p-14">
-                
-                <!-- Badge de Telemetría Topográfica -->
-                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-black/75 border border-[#4ef2d2]/40 backdrop-blur-md text-[#4ef2d2] font-mono text-[10px] md:text-xs uppercase tracking-[0.3em] mb-4 md:mb-6 shadow-lg">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#4ef2d2] shadow-[0_0_8px_#4ef2d2] animate-pulse"></span>
-                  <span>{slide.col.kicker}</span>
-                </div>
-
-                <!-- Título Masivo Estilo Puma Punku con Corte Metálico Titanio -->
-                <h1 class="a24-massive-title font-black uppercase tracking-wider text-center select-none m-0">
-                  {slide.col.massiveTitle}
-                </h1>
-
-                <!-- Subtítulo de Telemetría y Precisión -->
-                <p class="font-mono text-xs sm:text-sm text-zinc-300 tracking-[0.2em] uppercase mt-3 md:mt-4 max-w-2xl drop-shadow-md">
-                  {slide.col.telemetry}
-                </p>
-
-                <p class="font-sans text-xs sm:text-sm text-white/80 max-w-xl mt-2 line-clamp-2 drop-shadow">
-                  {slide.col.subtitle}
-                </p>
-
-                <!-- Botón CTA funcional hacia la colección -->
-                <div class="mt-6 md:mt-8">
-                  <a 
-                    href={slide.col.href}
-                    class="group inline-flex items-center gap-3 px-7 py-3 rounded-full bg-white text-zinc-950 font-bold text-xs md:text-sm uppercase tracking-wider hover:bg-zinc-200 transition-all duration-300 shadow-2xl pointer-events-auto cursor-pointer relative z-30 hover:scale-105 active:scale-95"
-                  >
-                    <span>Explorar Colección</span>
-                    <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
-                  </a>
-                </div>
-
-              </div>
             </div>
-          );
-        }
 
-        // 2. TIPO SECUENCIA DE 3 POSTS COHERENTES (A24 Staggered Grid)
-        if (slide.type === 'triplet') {
-          return (
-            <div 
-              class={`a24-slide a24-slide-triplet absolute inset-0 w-full h-full p-6 sm:p-8 md:p-12 flex flex-col justify-between overflow-hidden bg-black/95 ${isFirst ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
-              data-slide-index={sIdx}
-            >
-              <!-- Cabecera de la Tanda -->
-              <div class="flex items-center justify-between pb-4 border-b border-white/10 z-20">
-                <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                  <span class="text-xs font-mono tracking-[0.3em] uppercase text-zinc-300 font-bold">
-                    TRES INVESTIGACIONES · {slide.col.massiveTitle}
-                  </span>
-                </div>
+            <!-- Máscara de Fusión Apple TV + Ambient Glow Cobrizo -->
+            <div class="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,#000000_0%,#000000_36%,rgba(0,0,0,0.85)_50%,rgba(0,0,0,0)_72%)]"></div>
+            <div class="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_0%_0%,rgba(190,90,55,0.42)_0%,transparent_50%)]"></div>
+
+            <!-- Bloque Editorial Izquierdo -->
+            <div class="absolute inset-y-0 left-0 z-20 w-full md:w-[54%] lg:w-[48%] pl-6 sm:pl-10 md:pl-14 pr-6 flex flex-col justify-center">
+              
+              <div class="flex items-center gap-2 mb-2.5">
+                <span class="text-xs uppercase tracking-[0.25em] text-amber-500 font-bold block font-mono">
+                  COLECCIÓN TEMÁTICA // {col.count} INVESTIGACIONES
+                </span>
+              </div>
+
+              <h3 class="text-3xl sm:text-4xl md:text-5xl font-black font-cinzel text-white leading-[1.08] tracking-tight mb-3 uppercase">
+                {col.label}
+              </h3>
+
+              <p class="text-xs sm:text-sm text-zinc-300/90 mb-6 leading-relaxed line-clamp-3 font-sans max-w-lg">
+                {col.epigraph}
+              </p>
+
+              <!-- Botones CTA 100% Funcionales -->
+              <div class="flex items-center gap-3 flex-wrap pointer-events-auto">
                 <a 
-                  href={slide.col.href} 
-                  class="text-[11px] font-mono tracking-widest text-amber-400 hover:text-amber-300 uppercase transition pointer-events-auto cursor-pointer"
+                  href={col.href}
+                  class="px-6 py-2.5 rounded-full bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-semibold tracking-wide transition shadow-lg hover:scale-[1.02] active:scale-[0.98] pointer-events-auto cursor-pointer"
                 >
-                  Ver Colección Completa →
+                  Explorar {col.label}
+                </a>
+                <a 
+                  href="/archivo/"
+                  class="px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/20 text-[#E3DDD3] text-xs font-medium backdrop-blur-md transition hover:scale-[1.02] active:scale-[0.98] pointer-events-auto cursor-pointer"
+                >
+                  Ver Catálogo General
                 </a>
               </div>
-
-              <!-- Grilla de 3 Posts Escalonados A24 (col 1 base, col 2 +48px, col 3 +24px) -->
-              <div class="a24-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 items-start w-full my-auto z-20">
-                {slide.posts.map((post, pIdx) => (
-                  <a 
-                    href={post.href}
-                    class="a24-card group relative flex flex-col w-full text-white no-underline transition-all duration-500 pointer-events-auto cursor-pointer"
-                    data-card-idx={pIdx}
-                  >
-                    <!-- Contenedor del Póster aspect-3/4 -->
-                    <div class="relative w-full aspect-3/4 overflow-hidden rounded-xl bg-neutral-900 border border-white/10 shadow-2xl transition-all duration-500 group-hover:border-amber-500/40 group-hover:shadow-[0_20px_45px_rgba(0,0,0,0.85)] group-hover:-translate-y-1">
-                      <img 
-                        src={post.image} 
-                        alt={post.title} 
-                        loading="lazy" 
-                        decoding="async" 
-                        class="w-full h-full object-cover object-center transition-all duration-700 ease-out group-hover:scale-105 pointer-events-none"
-                      />
-
-                      <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/45 to-transparent pointer-events-none"></div>
-
-                      <!-- Badge Superior Flotante -->
-                      <div class="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/70 backdrop-blur-sm border border-white/15 pointer-events-none">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                        <span class="text-[10px] font-mono tracking-wider text-zinc-300 uppercase">
-                          {post.badge}
-                        </span>
-                      </div>
-
-                      <!-- Info al pie del póster -->
-                      <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5 z-20 flex flex-col gap-1 pointer-events-none">
-                        <h3 class="font-cinzel text-lg sm:text-xl font-bold uppercase tracking-tight text-white drop-shadow leading-snug transition-colors duration-300 group-hover:text-amber-200 line-clamp-2">
-                          {post.title}
-                        </h3>
-
-                        {post.excerpt && (
-                          <p class="font-sans text-xs text-zinc-300/85 line-clamp-2 leading-relaxed font-normal mt-0.5">
-                            {post.excerpt}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </a>
-                ))}
-              </div>
-
-              <!-- Pie de Tanda -->
-              <div class="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-zinc-400 z-20">
-                <span>SECUENCIA COHERENTE DE INVESTIGACIÓN</span>
-                <span class="text-white/60">HEMEROTECA TGP // DOSSIER ACTIVO</span>
-              </div>
             </div>
-          );
-        }
 
-        // 3. TIPO FRANJA APPLE BENTO DE LA COLECCIÓN
-        if (slide.type === 'bento') {
-          return (
-            <div 
-              class={`a24-slide a24-slide-bento absolute inset-0 w-full h-full overflow-hidden bg-black ${isFirst ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
-              data-slide-index={sIdx}
-            >
-              <!-- Imagen Panorámica Derecha de la Colección -->
-              <div class="absolute right-0 top-0 w-[72%] sm:w-[68%] md:w-[64%] h-full overflow-hidden">
-                <img 
-                  src={slide.col.bentoImage} 
-                  alt={slide.col.massiveTitle}
-                  class="w-full h-full object-cover object-center transform scale-100 transition-transform duration-1000 ease-out"
-                  loading="lazy" 
-                  decoding="async" 
-                />
-              </div>
+          </div>
+        ))}
+      </div>
 
-              <!-- Máscara de Fusión Apple TV + Ambient Glow Cobrizo -->
-              <div class="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,#000000_0%,#000000_36%,rgba(0,0,0,0.85)_50%,rgba(0,0,0,0)_70%)]"></div>
-              <div class="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_0%_0%,rgba(190,90,55,0.42)_0%,transparent_50%)]"></div>
+      <!-- Indicadores de Puntos Centrales Inferiores -->
+      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/10 pointer-events-auto">
+        {activeCollections.map((_, dotIdx) => (
+          <button 
+            type="button" 
+            class={`a24-bento-dot transition-all duration-300 rounded-full cursor-pointer ${dotIdx === 0 ? 'w-5 h-2 bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]' : 'w-2 h-2 bg-white/30 hover:bg-white/60'}`}
+            data-bento-dot={dotIdx}
+            aria-label={`Ir a colección ${dotIdx + 1}`}
+          ></button>
+        ))}
+      </div>
 
-              <!-- Bloque Editorial Izquierdo -->
-              <div class="absolute inset-y-0 left-0 z-20 w-full md:w-[52%] lg:w-[48%] pl-6 sm:pl-10 md:pl-14 pr-6 flex flex-col justify-center">
-                <span class="text-xs uppercase tracking-[0.25em] text-amber-500 font-bold mb-2.5 block font-mono">
-                  {slide.col.kicker}
-                </span>
+    </div>
+  </div>
 
-                <h3 class="text-3xl sm:text-4xl md:text-5xl font-black font-cinzel text-white leading-[1.08] tracking-tight mb-3">
-                  {slide.col.massiveTitle}
-                </h3>
-
-                <p class="text-xs sm:text-sm text-zinc-300/85 mb-6 leading-relaxed line-clamp-3 font-sans max-w-lg">
-                  {slide.col.subtitle}
-                </p>
-
-                <!-- Botones CTA 100% Funcionales -->
-                <div class="flex items-center gap-3 flex-wrap">
-                  <a 
-                    href={slide.col.href}
-                    class="px-6 py-2.5 rounded-full bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-semibold tracking-wide transition shadow-lg hover:scale-[1.02] active:scale-[0.98] pointer-events-auto cursor-pointer"
-                  >
-                    Explorar Colección
-                  </a>
-                  <a 
-                    href="/archivo/"
-                    class="px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/20 text-[#E3DDD3] text-xs font-medium backdrop-blur-md transition hover:scale-[1.02] active:scale-[0.98] pointer-events-auto cursor-pointer"
-                  >
-                    Ver Archivo General
-                  </a>
-                </div>
-              </div>
-
-            </div>
-          );
-        }
-
-        return null;
-      })}
+  <!-- ── 2. ARRAY DE 3 POSTS (DEBAJO DE LA FRANJA, TAMAÑO UNIFORME, AMPLIO Y VISIBLE) ── -->
+  <div class="w-full max-w-[94vw] xl:max-w-380 2xl:max-w-390 mx-auto">
+    
+    <!-- Subtítulo / Encabezado dinámico de los 3 posts -->
+    <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
+      <div class="flex items-center gap-2.5">
+        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+        <span class="text-xs font-mono uppercase tracking-[0.25em] text-zinc-300 font-bold">
+          INVESTIGACIONES EN <span class="a24-posts-col-name text-amber-300">{activeCollections[0].label.toUpperCase()}</span>
+        </span>
+      </div>
+      <a 
+        href={activeCollections[0].href} 
+        class="a24-posts-col-link text-[11px] font-mono uppercase tracking-widest text-amber-400 hover:text-amber-300 transition pointer-events-auto cursor-pointer"
+      >
+        Ver Colección Completa →
+      </a>
     </div>
 
-    <!-- ── INDICADORES DINÁMICOS INFERIORES CENTRALES ── -->
-    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/10 pointer-events-auto">
-      {stageSlides.map((_, dotIdx) => (
-        <button 
-          type="button" 
-          class={`a24-dot transition-all duration-300 rounded-full cursor-pointer ${dotIdx === 0 ? 'w-5 h-2 bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]' : 'w-2 h-2 bg-white/30 hover:bg-white/60'}`}
-          data-dot-index={dotIdx}
-          aria-label={`Ir a diapositiva ${dotIdx + 1}`}
-        ></button>
+    <!-- Contenedor del Stage de Posts (Sincronizado con la franja superior) -->
+    <div class="a24-posts-stage relative w-full">
+      {activeCollections.map((col, cIdx) => (
+        <div 
+          class={`a24-posts-group ${cIdx === 0 ? 'active opacity-100 relative pointer-events-auto z-10' : 'opacity-0 absolute inset-0 pointer-events-none z-0'}`}
+          data-group-index={cIdx}
+        >
+          <!-- Grilla de 3 Posts con TAMAÑO UNIFORME AMPLIO Y VISIBLE -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch w-full">
+            {col.posts.map((post, pIdx) => (
+              <a 
+                href={post.href}
+                class="a24-post-card group/card relative flex flex-col w-full text-white no-underline transition-all duration-300 pointer-events-auto cursor-pointer"
+                data-card-idx={pIdx}
+              >
+                <!-- Tarjeta Nivelada y Amplia (Altura homogénea h-120 a h-150 sin desniveles) -->
+                <div class="relative w-full h-120 sm:h-135 md:h-145 rounded-2xl overflow-hidden bg-neutral-900 border border-white/10 shadow-2xl transition-all duration-500 group-hover/card:border-amber-500/40 group-hover/card:shadow-[0_24px_50px_rgba(0,0,0,0.85)] group-hover/card:-translate-y-1.5">
+                  
+                  <!-- Capa de Bokeh de fondo -->
+                  <img 
+                    src={post.image} 
+                    alt="" 
+                    aria-hidden="true"
+                    class="absolute inset-0 w-full h-full object-cover scale-150 blur-3xl brightness-75 saturate-150 pointer-events-none"
+                  />
+
+                  <!-- Imagen principal -->
+                  <img 
+                    src={post.image} 
+                    alt={post.title} 
+                    loading="lazy" 
+                    decoding="async" 
+                    class="relative z-10 w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover/card:scale-105 pointer-events-none"
+                  />
+
+                  <!-- Scrim degradado inferior -->
+                  <div class="absolute inset-0 z-15 bg-linear-to-t from-black/95 via-black/45 to-transparent pointer-events-none"></div>
+
+                  <!-- Badge Superior Flotante -->
+                  <div class="absolute top-3.5 left-3.5 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 pointer-events-none">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                    <span class="text-[10px] md:text-[11px] font-mono tracking-wider text-zinc-300 uppercase">
+                      {post.badge}
+                    </span>
+                  </div>
+
+                  <!-- Bloque Editorial al Pie -->
+                  <div class="absolute bottom-0 left-0 right-0 p-5 sm:p-6 lg:p-7 z-20 flex flex-col gap-1.5 pointer-events-none">
+                    <h3 class="font-cinzel text-xl sm:text-2xl font-bold uppercase tracking-tight text-white drop-shadow leading-snug transition-colors duration-300 group-hover/card:text-amber-200 line-clamp-2">
+                      {post.title}
+                    </h3>
+
+                    {post.excerpt && (
+                      <p class="font-sans text-xs sm:text-sm text-zinc-300/85 line-clamp-2 leading-relaxed font-normal mt-0.5">
+                        {post.excerpt}
+                      </p>
+                    )}
+                  </div>
+
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
       ))}
     </div>
 
@@ -487,7 +423,7 @@ curatedCollections.forEach((col) => {
 
   <!-- Botón móvil ver catálogo -->
   {actionHref && actionText && (
-    <div class="sm:hidden text-center mt-6">
+    <div class="sm:hidden text-center mt-8">
       <a 
         href={actionHref}
         class="inline-flex items-center gap-2 text-xs font-mono tracking-widest text-amber-400 uppercase py-3 px-6 rounded-full bg-white/5 border border-white/10"
@@ -500,80 +436,52 @@ curatedCollections.forEach((col) => {
 
 </section>
 
-<style>
-/* ── TIPOGRAFÍA MONUMENTAL PUMA PUNKU / CORTE METÁLICO TITANIO ── */
-.a24-massive-title {
-  font-family: 'Panchang', 'Space Grotesk', system-ui, sans-serif;
-  font-weight: 900;
-  font-size: clamp(2.4rem, 6.8vw, 6.5rem);
-  line-height: 0.94;
-  letter-spacing: 0.06em;
-  color: #c2c5cc;
-  background: linear-gradient(
-    180deg,
-    #ffffff 0%,
-    #d8dbe0 25%,
-    #a8acb5 60%,
-    #626670 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 14px 35px rgba(0, 0, 0, 0.98))
-          drop-shadow(0 0 25px rgba(69, 123, 119, 0.35));
-}
-
-/* ── OFFSET VERTICAL ESCALONADO A24 (Solo en Desktop lg: >= 1024px) ── */
-@media (min-width: 1024px) {
-  /* Columna 1 (3n + 1): Posición base */
-  .a24-card:nth-child(3n + 1) {
-    transform: translateY(0);
-  }
-
-  /* Columna 2 (3n + 2): Desplazamiento hacia abajo de 48px */
-  .a24-card:nth-child(3n + 2) {
-    transform: translateY(3rem); /* 48px */
-  }
-
-  /* Columna 3 (3n + 3): Desplazamiento intermedio de 24px */
-  .a24-card:nth-child(3n + 3) {
-    transform: translateY(1.5rem); /* 24px */
-  }
-}
-</style>
-
 <script>
 import gsap from "gsap";
 
-function initA24StageMaster() {
-  const container = document.querySelector<HTMLElement>(".a24-stage-container");
-  if (!container || container.dataset.stageInit === "1") return;
-  container.dataset.stageInit = "1";
+function initA24SyncedStage() {
+  const root = document.querySelector<HTMLElement>(".a24-root");
+  if (!root || root.dataset.syncedInit === "1") return;
+  root.dataset.syncedInit = "1";
 
-  const slides = container.querySelectorAll<HTMLElement>(".a24-slide");
-  const dots = container.querySelectorAll<HTMLButtonElement>(".a24-dot");
-  const counterSpan = document.querySelector<HTMLElement>(".a24-cur-idx");
-  const prevBtn = container.querySelector<HTMLButtonElement>(".a24-nav-prev");
-  const nextBtn = container.querySelector<HTMLButtonElement>(".a24-nav-next");
-  const total = slides.length;
+  const bentoSlides = root.querySelectorAll<HTMLElement>(".a24-bento-slide");
+  const bentoDots = root.querySelectorAll<HTMLButtonElement>(".a24-bento-dot");
+  const postGroups = root.querySelectorAll<HTMLElement>(".a24-posts-group");
+  const curIdxSpan = root.querySelector<HTMLElement>(".a24-cur-idx");
+  const colNameSpan = root.querySelector<HTMLElement>(".a24-posts-col-name");
+  const colLinkAnchor = root.querySelector<HTMLAnchorElement>(".a24-posts-col-link");
+  const prevBtn = root.querySelector<HTMLButtonElement>(".a24-bento-prev");
+  const nextBtn = root.querySelector<HTMLButtonElement>(".a24-bento-next");
+
+  const total = bentoSlides.length;
   if (total <= 1) return;
 
   let currentIndex = 0;
   let isTransitioning = false;
-  let loopCall: gsap.core.Tween | null = null;
+  let loopTimer: gsap.core.Tween | null = null;
   let isHovered = false;
 
-  function updateDots(activeIdx: number) {
-    dots.forEach((dot, idx) => {
+  function updateIndicators(activeIdx: number) {
+    bentoDots.forEach((dot, idx) => {
       if (idx === activeIdx) {
-        dot.className = "a24-dot transition-all duration-300 rounded-full cursor-pointer w-5 h-2 bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]";
+        dot.className = "a24-bento-dot transition-all duration-300 rounded-full cursor-pointer w-5 h-2 bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]";
       } else {
-        dot.className = "a24-dot transition-all duration-300 rounded-full cursor-pointer w-2 h-2 bg-white/30 hover:bg-white/60";
+        dot.className = "a24-bento-dot transition-all duration-300 rounded-full cursor-pointer w-2 h-2 bg-white/30 hover:bg-white/60";
       }
     });
 
-    if (counterSpan) {
-      counterSpan.textContent = String(activeIdx + 1).padStart(2, "0");
+    if (curIdxSpan) {
+      curIdxSpan.textContent = String(activeIdx + 1).padStart(2, "0");
+    }
+
+    // Actualizar nombre y link de la colección en el encabezado de los posts
+    const activeBentoTitle = bentoSlides[activeIdx]?.querySelector("h3")?.textContent?.trim();
+    const activeBentoLink = bentoSlides[activeIdx]?.querySelector<HTMLAnchorElement>("a")?.getAttribute("href");
+    if (colNameSpan && activeBentoTitle) {
+      colNameSpan.textContent = activeBentoTitle;
+    }
+    if (colLinkAnchor && activeBentoLink) {
+      colLinkAnchor.setAttribute("href", activeBentoLink);
     }
   }
 
@@ -581,8 +489,14 @@ function initA24StageMaster() {
     if (nextIndex === currentIndex || isTransitioning) return;
     isTransitioning = true;
 
-    const currentSlide = slides[currentIndex];
-    const nextSlide = slides[nextIndex];
+    // 1. Elementos Bento superiores
+    const currentBento = bentoSlides[currentIndex];
+    const nextBento = bentoSlides[nextIndex];
+
+    // 2. Elementos de Posts inferiores
+    const currentGroup = postGroups[currentIndex];
+    const nextGroup = postGroups[nextIndex];
+    const nextCards = nextGroup?.querySelectorAll<HTMLElement>(".a24-post-card");
 
     const tl = gsap.timeline({
       defaults: { ease: "expo.out" },
@@ -592,45 +506,68 @@ function initA24StageMaster() {
       }
     });
 
-    // 1. Salida de la diapositiva actual (350ms con leve escala y desvanecimiento)
-    if (currentSlide) {
-      tl.to(currentSlide, {
+    // ─── A. TRANSICIÓN DE LA FRANJA BENTO SUPERIOR ───
+    if (currentBento) {
+      tl.to(currentBento, {
         opacity: 0,
+        x: -25,
         scale: 0.98,
-        y: -12,
-        duration: 0.35,
+        duration: 0.32,
         ease: "power2.in",
         onComplete: () => {
-          gsap.set(currentSlide, { pointerEvents: "none", zIndex: 0 });
+          gsap.set(currentBento, { pointerEvents: "none", zIndex: 0 });
         }
       }, 0);
     }
 
-    // 2. Entrada de la nueva diapositiva (600ms con curva suave Apple TV+)
-    if (nextSlide) {
-      gsap.set(nextSlide, { zIndex: 10, pointerEvents: "auto" });
-      tl.fromTo(nextSlide,
-        { opacity: 0, scale: 1.03, y: 15 },
-        { 
-          opacity: 1, 
-          scale: 1, 
-          y: 0, 
-          duration: 0.6,
-          onStart: () => {
-            gsap.set(nextSlide, { pointerEvents: "auto", zIndex: 10 });
-          }
-        },
+    if (nextBento) {
+      gsap.set(nextBento, { zIndex: 10, pointerEvents: "auto" });
+      tl.fromTo(nextBento,
+        { opacity: 0, scale: 1.03, x: 30 },
+        { opacity: 1, scale: 1, x: 0, duration: 0.55 },
         0.1
       );
     }
 
-    updateDots(nextIndex);
+    // ─── B. TRANSICIÓN DEL ARRAY DE 3 POSTS INFERIOR (UNO DESPUÉS DE OTRO) ───
+    if (currentGroup) {
+      tl.to(currentGroup, {
+        opacity: 0,
+        y: -10,
+        duration: 0.25,
+        ease: "power2.in",
+        onComplete: () => {
+          currentGroup.classList.remove("active", "relative");
+          currentGroup.classList.add("absolute", "pointer-events-none");
+          gsap.set(currentGroup, { zIndex: 0 });
+        }
+      }, 0);
+    }
+
+    if (nextGroup && nextCards) {
+      nextGroup.classList.remove("absolute", "pointer-events-none");
+      nextGroup.classList.add("active", "relative", "pointer-events-auto");
+      gsap.set(nextGroup, { zIndex: 10, opacity: 1 });
+
+      // Stagger secuencial para que las 3 tarjetas aparezcan "una después de otra"
+      gsap.set(nextCards, { opacity: 0, y: 24, scale: 1.02 });
+      tl.to(nextCards, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.52,
+        stagger: 0.08,
+        ease: "expo.out"
+      }, 0.15);
+    }
+
+    updateIndicators(nextIndex);
   }
 
-  // Programación continua con gsap.delayedCall (pausa y reanudación exacta sin reseteos)
+  // Programación continua con gsap.delayedCall (pausa y reanudación exacta)
   function scheduleNext() {
-    if (loopCall) loopCall.kill();
-    loopCall = gsap.delayedCall(5.0, () => {
+    if (loopTimer) loopTimer.kill();
+    loopTimer = gsap.delayedCall(5.5, () => {
       if (!isHovered) {
         const next = (currentIndex + 1) % total;
         goToSlide(next);
@@ -641,20 +578,20 @@ function initA24StageMaster() {
 
   function pauseLoop() {
     isHovered = true;
-    if (loopCall) loopCall.pause();
+    if (loopTimer) loopTimer.pause();
   }
 
   function resumeLoop() {
     isHovered = false;
-    if (loopCall) {
-      loopCall.resume();
+    if (loopTimer) {
+      loopTimer.resume();
     } else {
       scheduleNext();
     }
   }
 
-  // Navegación manual por puntos
-  dots.forEach((dot, idx) => {
+  // Interacción manual por puntos
+  bentoDots.forEach((dot, idx) => {
     dot.addEventListener("click", (e) => {
       e.stopPropagation();
       goToSlide(idx);
@@ -681,13 +618,13 @@ function initA24StageMaster() {
     });
   }
 
-  // Control de interacción del usuario (pausa al posar cursor o tocar, reanuda al salir)
-  container.addEventListener("mouseenter", pauseLoop);
-  container.addEventListener("mouseleave", resumeLoop);
-  container.addEventListener("touchstart", pauseLoop, { passive: true });
-  container.addEventListener("touchend", resumeLoop, { passive: true });
+  // Pausa por hover o touch en cualquier parte del componente (franja o tarjetas)
+  root.addEventListener("mouseenter", pauseLoop);
+  root.addEventListener("mouseleave", resumeLoop);
+  root.addEventListener("touchstart", pauseLoop, { passive: true });
+  root.addEventListener("touchend", resumeLoop, { passive: true });
 
-  // Detección de visibilidad de pestaña
+  // Control de visibilidad de pestaña
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) pauseLoop();
     else resumeLoop();
@@ -696,7 +633,7 @@ function initA24StageMaster() {
   scheduleNext();
 }
 
-document.addEventListener("astro:page-load", initA24StageMaster);
-if (document.readyState !== "loading") initA24StageMaster();
-else document.addEventListener("DOMContentLoaded", initA24StageMaster);
+document.addEventListener("astro:page-load", initA24SyncedStage);
+if (document.readyState !== "loading") initA24SyncedStage();
+else document.addEventListener("DOMContentLoaded", initA24SyncedStage);
 </script>
