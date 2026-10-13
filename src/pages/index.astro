@@ -273,6 +273,10 @@ const collections = Array.from(categoryGroups.entries())
     label: formatCategory(essays[0].entry.category),
     count: essays.length,
     coverEssay: essays[0],
+    essays: essays.map(e => ({
+      ...e,
+      img: resolveEssayImage(e.entry, e.slug),
+    })),
   }))
   .sort((a, b) => b.count - a.count);
 
@@ -464,6 +468,7 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
             title="Ensayos Recientes"
             eyebrow="Archivo de Ensayos"
             items={resolvedRecent}
+            collections={collections}
             max={12}
             actionText={`Ver Catálogo Completo (${publishable.length}) →`}
             actionHref="/archivo/"

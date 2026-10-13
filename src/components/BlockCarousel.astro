@@ -108,11 +108,11 @@ const uid = "bc-" + Math.random().toString(36).slice(2, 8);
       </>
     )}
 
-    <!-- ── STAGE DE GRILLA MUBI (Hero Spotlight + Satélites) ── -->
+    <!-- ── STAGE DE GRILLA MUBI / BENTO TRÍPTICO NIVELADO ── -->
     <div class="bc-stage relative w-full">
       {pages.map((page, pi) => (
         <div 
-          class={`bc-page ${pi === 0 ? "bc-active" : ""} grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 items-start w-full`} 
+          class={`bc-page ${pi === 0 ? "bc-active" : ""} grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 items-stretch w-full`} 
           data-page={pi} 
           aria-hidden={pi !== 0 ? "true" : "false"}
         >
@@ -126,21 +126,31 @@ const uid = "bc-" + Math.random().toString(36).slice(2, 8);
                 href={card.href} 
                 class={`bc-card group/card relative flex flex-col w-full text-white no-underline transition-all duration-300 ${isHero ? 'col-span-1 md:col-span-2 lg:col-span-2' : 'col-span-1'}`}
               >
-                <!-- Contenedor Multimedia con Proporción MUBI Estricta -->
-                <div class={`relative w-full rounded-xl overflow-hidden bg-[#0c0d10] border border-white/10 shadow-2xl transition-all duration-500 group-hover/card:border-amber-500/40 group-hover/card:shadow-[0_20px_45px_rgba(0,0,0,0.85)] ${isHero ? 'aspect-4/5' : 'aspect-2/3'}`}>
+                <!-- Contenedor Multimedia Nivelado (Misma Altura para las 3 Tarjetas con Bokeh) -->
+                <div class="relative w-full h-[520px] sm:h-[560px] md:h-[600px] lg:h-[640px] rounded-2xl overflow-hidden bg-[#0c0d10] border border-white/10 shadow-2xl transition-all duration-500 group-hover/card:border-amber-500/40 group-hover/card:shadow-[0_24px_50px_rgba(0,0,0,0.85)]">
+                  
+                  <!-- Capa de Bokeh expandido de fondo (estilo TgpHeroTriptych) -->
+                  <img 
+                    src={card.image} 
+                    alt="" 
+                    aria-hidden="true"
+                    class="absolute inset-0 w-full h-full object-cover scale-150 blur-3xl brightness-75 saturate-150 pointer-events-none"
+                  />
+
+                  <!-- Imagen neta principal -->
                   <img 
                     src={card.image} 
                     alt={cleanedTitle} 
                     loading="lazy" 
                     decoding="async" 
-                    class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105 pointer-events-none"
+                    class="relative z-10 w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105 pointer-events-none"
                   />
                   
                   <!-- Scrim degradado inferior para legibilidad del texto -->
-                  <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/45 to-transparent pointer-events-none"></div>
+                  <div class="absolute inset-0 z-15 bg-linear-to-t from-black/95 via-black/45 to-transparent pointer-events-none"></div>
 
                   <!-- Badge superior flotante -->
-                  <div class="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/70 backdrop-blur-sm border border-white/15 pointer-events-none">
+                  <div class="absolute top-3.5 left-3.5 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 pointer-events-none">
                     <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                     <span class="text-[10px] md:text-[11px] font-mono tracking-wider text-zinc-300 uppercase">
                       {card.label || "DOSSIER CINEMÁTICO"}
@@ -148,12 +158,12 @@ const uid = "bc-" + Math.random().toString(36).slice(2, 8);
                   </div>
 
                   <!-- Bloque Tipográfico anclado en la base del póster -->
-                  <div class="absolute bottom-0 left-0 right-0 p-5 md:p-6 z-20 flex flex-col gap-1.5 pointer-events-none">
-                    <h3 class={`font-cinzel font-bold uppercase tracking-tight text-white drop-shadow-md transition-colors duration-300 group-hover/card:text-amber-200 ${isHero ? 'text-2xl lg:text-3xl leading-[1.08]' : 'text-lg lg:text-xl leading-[1.15]'}`}>
+                  <div class="absolute bottom-0 left-0 right-0 p-5 md:p-6 lg:p-7 z-20 flex flex-col gap-1.5 pointer-events-none">
+                    <h3 class={`font-cinzel font-bold uppercase tracking-tight text-white drop-shadow-md transition-colors duration-300 group-hover/card:text-amber-200 ${isHero ? 'text-2xl sm:text-3xl lg:text-4xl leading-[1.08]' : 'text-xl sm:text-2xl leading-[1.12]'}`}>
                       {cleanedTitle}
                     </h3>
                     {cleanedExcerpt && (
-                      <p class={`font-sans text-white/80 line-clamp-2 leading-relaxed font-normal ${isHero ? 'text-sm md:text-base' : 'text-xs'}`}>
+                      <p class={`font-sans text-white/80 line-clamp-2 leading-relaxed font-normal ${isHero ? 'text-sm md:text-base' : 'text-xs md:text-sm'}`}>
                         {cleanedExcerpt}
                       </p>
                     )}
@@ -234,7 +244,7 @@ function initBlockCarousel() {
       if (hovered) timer.pause();
     }
 
-    /* ── Transición principal ── */
+    /* ── Transición principal con física Apple TV+ (rápida de a 3, expo.out y micro-zoom) ── */
     function go(delta: number) {
       if (busy) return;
       const next = (cur + delta + totalPages) % totalPages;
@@ -247,17 +257,18 @@ function initBlockCarousel() {
       const cardsOut = Array.from(pageOut.querySelectorAll<HTMLElement>(".bc-card"));
       const cardsIn  = Array.from(pageIn.querySelectorAll<HTMLElement>(".bc-card"));
 
-      /* Preparar el bloque entrante: visible pero cards en opacity 0 con y: 20 */
+      /* Preparar el bloque entrante: visible y en posición de entrada con micro-zoom */
       pageIn.classList.add("bc-active");
       pageIn.setAttribute("aria-hidden", "false");
-      gsap.set(cardsIn, { opacity: 0, y: 20 });
+      gsap.set(cardsIn, { opacity: 0, x: 28, scale: 1.04 });
 
       /* Actualizar paginación */
       if (curEl) curEl.textContent = String(next + 1).padStart(2, "0");
 
       const tl = gsap.timeline({
+        defaults: { ease: "expo.out" },
         onComplete() {
-          /* Ocultar bloque saliente y resetear sus cards para el próximo loop */
+          /* Ocultar bloque saliente y resetear sus cards */
           pageOut.classList.remove("bc-active");
           pageOut.setAttribute("aria-hidden", "true");
           gsap.set(cardsOut, { clearProps: "all" });
@@ -268,23 +279,25 @@ function initBlockCarousel() {
         }
       });
 
-      /* 1 — STAGGER FADE OUT del bloque saliente (-20px) */
+      /* 1 — Salida ultrarrápida del bloque actual (280ms) con leve retroceso a la izquierda */
       tl.to(cardsOut, {
         opacity: 0,
-        y: -20,
-        duration: 0.55,
-        stagger: 0.1,
-        ease: "power2.inOut",
-      });
+        x: -25,
+        scale: 0.98,
+        duration: 0.28,
+        stagger: 0.05,
+        ease: "power2.in",
+      }, 0);
 
-      /* 2 — STAGGER FADE IN del bloque entrante (inercia power3.out) */
+      /* 2 — Entrada explosiva sincronizada de las nuevas 3 tarjetas (550ms expo.out) */
       tl.to(cardsIn, {
         opacity: 1,
-        y: 0,
-        duration: 0.65,
-        stagger: 0.1,
-        ease: "power3.out",
-      });
+        x: 0,
+        scale: 1,
+        duration: 0.55,
+        stagger: 0.07,
+        ease: "expo.out",
+      }, 0.12);
     }
 
     /* ── Hover: pausa y reanuda el timer ── */
