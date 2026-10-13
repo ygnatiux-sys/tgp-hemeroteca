@@ -12,6 +12,7 @@ import CinematicArchiveCard from '../components/CinematicArchiveCard.astro';
 import CinematicPostEngine from '../components/CinematicPostEngine.astro';
 import SliderCinematico from '../components/SliderCinematico.astro';
 import RowNetflixClasico from '../components/RowNetflixClasico.astro';
+import A24StaggeredGallery from '../components/A24StaggeredGallery.astro';
 import BlockCarousel from '../components/BlockCarousel.astro';
 import SpotlightHero from '../components/SpotlightHero.astro';
 import CinematicGrid from '../components/CinematicGrid.astro';
@@ -455,18 +456,17 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
 
 
       {/* ═══════════════════════════════════════════════════════════════════
-          BLOQUE 3: ENSAYOS RECIENTES — ROW NETFLIX CLÁSICO
+          BLOQUE 3: ENSAYOS RECIENTES — GRILLA ESCALONADA A24 / APPLE EDITORIAL
       ═══════════════════════════════════════════════════════════════════ */}
       {resolvedRecent.length > 0 && (
-        <section class="flex flex-col gap-6 md:gap-8 reveal-item -mx-4 px-4 md:mx-0 md:px-0">
-          <RowNetflixClasico 
+        <section class="flex flex-col gap-6 md:gap-8 reveal-item w-full">
+          <A24StaggeredGallery 
             title="Ensayos Recientes"
             eyebrow="Archivo de Ensayos"
             items={resolvedRecent}
-            max={15}
+            max={12}
             actionText={`Ver Catálogo Completo (${publishable.length}) →`}
             actionHref="/archivo/"
-            cardAspect="vertical"
           />
         </section>
       )}

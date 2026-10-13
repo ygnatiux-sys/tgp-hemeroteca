@@ -1,0 +1,186 @@
+---
+// src/components/A24StaggeredGallery.astro
+/**
+ * A24StaggeredGallery.astro
+ * Grilla editorial escalonada asimétrica inspirada en A24 y Apple Editorial.
+ * - 3 columnas en desktop con desfasaje vertical orgánico (:nth-child(3n+2) -> 48px, :nth-child(3n+3) -> 24px).
+ * - Pósters de gran formato aspect-[3/4] con zoom al hover.
+ * - Limpieza de caracteres Markdown crudos en descripciones y títulos.
+ * - Padding inferior pb-28 para compensar el desplazamiento de las columnas.
+ */
+
+import { resolveEssayImage, sanitizeImageUrl, formatCategory } from "../lib/content-filter";
+
+interface Item {
+  title?: string;
+  titulo?: string;
+  subtitle?: string;
+  excerpt?: string;
+  image?: string | any;
+  img?: string | any;
+  link?: string;
+  href?: string;
+  slug?: string;
+  collectionLabel?: string;
+  category?: string;
+  date?: string;
+  entry?: any;
+}
+
+interface Props {
+  title?: string;
+  eyebrow?: string;
+  items?: Item[];
+  max?: number;
+  actionText?: string;
+  actionHref?: string;
+}
+
+const {
+  title = "Ensayos Recientes",
+  eyebrow = "Archivo de Ensayos",
+  items = [],
+  max = 12,
+  actionText = "Ver Catálogo Completo →",
+  actionHref = "/archivo/",
+} = Astro.props;
+
+// Limpiador estricto de símbolos Markdown (#, ##, *, -, >)
+const cleanMarkdown = (text?: string) => {
+  if (!text) return "";
+  return text.replace(/^[#*\->\s]+/gm, '').trim();
+};
+
+// Normalización de tarjetas
+const displayItems = items.slice(0, max).map((item) => {
+  const rawImg = item.img || item.image || resolveEssayImage(item.entry || item, item.slug);
+  const image = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '')) 
+    || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop';
+  
+  const rawTitle = item.title || item.titulo || item.entry?.title || "Sin título";
+  const cleanedTitle = cleanMarkdown(rawTitle);
+
+  const rawExcerpt = item.excerpt || item.entry?.excerpt || item.subtitle || "";
+  const cleanedExcerpt = cleanMarkdown(rawExcerpt);
+
+  const href = item.link || item.href || (item.slug ? `/hemeroteca/${item.slug}/` : '#');
+  const badge = item.collectionLabel || formatCategory(item.category || item.entry?.category || "ENSAYOS CINEMÁTICOS");
+
+  return {
+    title: cleanedTitle,
+    excerpt: cleanedExcerpt,
+    image,
+    href,
+    badge
+  };
+});
+---
+
+{displayItems.length > 0 && (
+<section id="sec-ensayos-recientes" class="a24-root w-full relative">
+  
+  <!-- ── CABECERA EDITORIAL ── -->
+  <header class="flex items-end justify-between gap-4 pb-6 border-b border-white/10 mb-10 md:mb-14">
+    <div>
+      {eyebrow && (
+        <span class="block text-[10px] font-mono tracking-[0.4em] uppercase text-amber-500 font-bold mb-1.5">
+          {eyebrow}
+        </span>
+      )}
+      <h2 class="font-cinzel text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-linear-to-b from-slate-100 to-slate-400 m-0 leading-tight">
+        {title}
+      </h2>
+    </div>
+
+    {actionHref && actionText && (
+      <a 
+        href={actionHref}
+        class="group hidden sm:inline-flex items-center gap-2 text-xs font-mono tracking-widest text-zinc-400 hover:text-amber-400 transition-colors uppercase"
+      >
+        <span>{actionText}</span>
+        <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+      </a>
+    )}
+  </header>
+
+  <!-- ── GRILLA ESCALONADA ASIMÉTRICA (STAGGERED OFFSET) ── -->
+  <div class="a24-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 items-start w-full pb-28">
+    {displayItems.map((item, idx) => (
+      <a 
+        href={item.href}
+        class="a24-card group relative flex flex-col w-full text-white no-underline transition-all duration-500"
+        data-index={idx}
+      >
+        <!-- Contenedor del Póster (aspect-3/4 con fondo neutral y borde elegante) -->
+        <div class="relative w-full aspect-3/4 overflow-hidden rounded-xl bg-neutral-900 border border-white/10 shadow-2xl transition-all duration-500 group-hover:border-amber-500/40 group-hover:shadow-[0_24px_50px_rgba(0,0,0,0.85)] group-hover:-translate-y-1">
+          <img 
+            src={item.image} 
+            alt={item.title} 
+            loading="lazy" 
+            decoding="async" 
+            class="w-full h-full object-cover object-center transition-all duration-700 ease-out group-hover:scale-105 pointer-events-none"
+          />
+
+          <!-- Scrim degradado inferior para legibilidad cinematográfica -->
+          <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/45 to-transparent pointer-events-none"></div>
+
+          <!-- Badge Superior Flotante -->
+          <div class="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/70 backdrop-blur-sm border border-white/15 pointer-events-none">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+            <span class="text-[10px] md:text-[11px] font-mono tracking-wider text-zinc-300 uppercase">
+              {item.badge}
+            </span>
+          </div>
+
+          <!-- Información tipográfica al pie de la tarjeta -->
+          <div class="absolute bottom-0 left-0 right-0 p-5 md:p-6 z-20 flex flex-col gap-1.5 pointer-events-none">
+            <h3 class="font-cinzel text-xl lg:text-2xl font-bold uppercase tracking-tight text-white drop-shadow-md leading-snug transition-colors duration-300 group-hover:text-amber-200">
+              {item.title}
+            </h3>
+
+            {item.excerpt && (
+              <p class="font-sans text-xs md:text-sm text-zinc-300/90 line-clamp-2 leading-relaxed font-normal mt-0.5">
+                {item.excerpt}
+              </p>
+            )}
+          </div>
+        </div>
+      </a>
+    ))}
+  </div>
+
+  <!-- Botón móvil ver catálogo -->
+  {actionHref && actionText && (
+    <div class="sm:hidden text-center mt-2">
+      <a 
+        href={actionHref}
+        class="inline-flex items-center gap-2 text-xs font-mono tracking-widest text-amber-400 uppercase py-3 px-6 rounded-full bg-white/5 border border-white/10"
+      >
+        <span>{actionText}</span>
+        <span>→</span>
+      </a>
+    </div>
+  )}
+
+</section>
+)}
+
+<style>
+/* ── OFFSET VERTICAL ESCALONADO (Solo en Desktop lg: >= 1024px) ── */
+@media (min-width: 1024px) {
+  /* Columna 1 (3n + 1): Posición base */
+  .a24-card:nth-child(3n + 1) {
+    transform: translateY(0);
+  }
+
+  /* Columna 2 (3n + 2): Desplazamiento hacia abajo de 48px */
+  .a24-card:nth-child(3n + 2) {
+    transform: translateY(3rem); /* 48px */
+  }
+
+  /* Columna 3 (3n + 3): Desplazamiento intermedio hacia abajo de 24px (ritmo orgánico A24) */
+  .a24-card:nth-child(3n + 3) {
+    transform: translateY(1.5rem); /* 24px */
+  }
+}
+</style>
