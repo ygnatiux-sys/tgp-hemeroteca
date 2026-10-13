@@ -17,22 +17,17 @@ const targets = [
   {
     id: 'busto-venus',
     name: 'Venus (Townley Venus / British Museum)',
-    src: 'https://storage.thegreatpuzzleproject.com/British_Museum_Townley_Venus_01.jpg',
+    src: fs.existsSync(path.resolve('src/assets/arquetipos-globales/venus/coverImage.jpg'))
+      ? path.resolve('src/assets/arquetipos-globales/venus/coverImage.jpg')
+      : 'https://storage.thegreatpuzzleproject.com/British_Museum_Townley_Venus_01.jpg',
     out: path.join(BUSTS_DIR, 'busto-venus.png'),
     mimeType: 'image/jpeg',
   },
   {
-    id: 'busto-hermes',
-    name: 'Hermes / Mercurio',
-    src: path.resolve('src/assets/ensayos/mercurio/coverImage.jpg'),
-    out: path.join(BUSTS_DIR, 'busto-hermes.png'),
-    mimeType: 'image/jpeg',
-  },
-  {
-    id: 'busto-socrates',
-    name: 'Sócrates (Busto Clásico)',
-    src: path.resolve('src/assets/ensayos/socrates2/coverImage.jpg'),
-    out: path.join(BUSTS_DIR, 'busto-socrates.png'),
+    id: 'busto-olmeca',
+    name: 'Cabeza Colosal Olmeca',
+    src: path.resolve('src/assets/alternativa/olmeca.jpg'),
+    out: path.join(BUSTS_DIR, 'busto-olmeca.png'),
     mimeType: 'image/jpeg',
   },
   {
