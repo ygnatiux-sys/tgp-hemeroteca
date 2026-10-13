@@ -1,0 +1,205 @@
+---
+// src/components/TgpHeroTriptych.astro
+interface Panel {
+  image: string;
+  alt: string;
+  objectPosition?: string;
+}
+
+interface Props {
+  kicker?: string;
+  title?: string;
+  tagLabel?: string;
+  subtitle?: string;
+  ctaText?: string;
+  ctaHref?: string;
+  panels?: [Panel, Panel, Panel];
+}
+
+const {
+  kicker = "ARCHAEOSEMIOTICS // DOSSIER 04",
+  title = "LA ARQUITECTURA DEL SILENCIO",
+  tagLabel = "Memoria Material",
+  subtitle = "Tres estratos de piedra y signo donde la ingeniería arcaica codificó el tiempo antes de la escritura.",
+  ctaText = "Explorar ensayo",
+  ctaHref = "#ensayo",
+  panels = [
+    {
+      image: "https://images.unsplash.com/photo-1544967082-d9d25d867d66?q=80&w=1400&auto=format&fit=crop",
+      alt: "Figura 1 - Estrato izquierdo con aire bokeh",
+      objectPosition: "80% center"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop",
+      alt: "Figura 2 - Eje central",
+      objectPosition: "center center"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=800&auto=format&fit=crop",
+      alt: "Figura 3 - Corte lateral derecho",
+      objectPosition: "30% center"
+    }
+  ]
+} = Astro.props;
+---
+
+<section class="relative w-full h-[82vh] min-h-[580px] max-h-[860px] bg-[#09090b] text-white overflow-hidden rounded-2xl select-none shadow-2xl border border-white/5">
+  
+  <!-- CONTENEDOR DEL TRÍPTICO ASIMÉTRICO (48% / 37% / 15%) -->
+  <div class="absolute inset-0 w-full h-full flex z-0">
+    
+    <!-- PANEL 1 (48%): Contiene el espacio negativo con bokeh a la izquierda + Figura 1 -->
+    <div class="tgp-panel relative w-full md:w-[48%] h-full overflow-hidden">
+      <!-- Fondo Bokeh expandido para garantizar atmósfera suave en la zona del CTA -->
+      <img 
+        src={panels[0].image} 
+        alt="" 
+        aria-hidden="true"
+        class="absolute inset-0 w-full h-full object-cover scale-125 blur-2xl brightness-75 saturate-125 pointer-events-none"
+      />
+      <!-- Figura 1 principal con fundido suave hacia la izquierda -->
+      <img 
+        src={panels[0].image} 
+        alt={panels[0].alt}
+        style={`object-position: ${panels[0].objectPosition};`}
+        class="tgp-panel-img relative z-10 w-full h-full object-cover mask-left-bokeh"
+      />
+      <!-- Sombra sutil en el corte derecho del panel 1 -->
+      <div class="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-black/50 to-transparent z-20 pointer-events-none"></div>
+    </div>
+
+    <!-- PANEL 2 (37%): Figura central protagonista -->
+    <div class="tgp-panel relative hidden md:block md:w-[37%] h-full overflow-hidden border-l border-white/10">
+      <img 
+        src={panels[1].image} 
+        alt="" 
+        aria-hidden="true"
+        class="absolute inset-0 w-full h-full object-cover scale-110 blur-xl brightness-75 pointer-events-none"
+      />
+      <img 
+        src={panels[1].image} 
+        alt={panels[1].alt}
+        style={`object-position: ${panels[1].objectPosition};`}
+        class="tgp-panel-img relative z-10 w-full h-full object-cover mask-center-soft"
+      />
+      <!-- Sombra de acople izquierda y derecha del panel central -->
+      <div class="absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-black/40 to-transparent z-20 pointer-events-none"></div>
+      <div class="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-black/40 to-transparent z-20 pointer-events-none"></div>
+    </div>
+
+    <!-- PANEL 3 (15%): Franja vertical estrecha a la derecha -->
+    <div class="tgp-panel relative hidden lg:block lg:w-[15%] h-full overflow-hidden border-l border-white/10">
+      <img 
+        src={panels[2].image} 
+        alt="" 
+        aria-hidden="true"
+        class="absolute inset-0 w-full h-full object-cover scale-110 blur-xl brightness-75 pointer-events-none"
+      />
+      <img 
+        src={panels[2].image} 
+        alt={panels[2].alt}
+        style={`object-position: ${panels[2].objectPosition};`}
+        class="tgp-panel-img relative z-10 w-full h-full object-cover brightness-90 contrast-105"
+      />
+      <!-- Fundido suave en la unión izquierda -->
+      <div class="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-black/45 to-transparent z-20 pointer-events-none"></div>
+    </div>
+
+  </div>
+
+  <!-- GRADIENTES ATMOSFÉRICOS PARA LEGIBILIDAD DEL BLOQUE INFERIOR IZQUIERDO -->
+  <div class="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/40 to-transparent z-10 pointer-events-none"></div>
+  <div class="absolute inset-y-0 left-0 w-full md:w-[48%] bg-gradient-to-r from-[#09090b]/80 via-[#09090b]/35 to-transparent z-10 pointer-events-none"></div>
+
+  <!-- BLOQUE EDITORIAL & CTA (Anclado abajo a la izquierda como en Apple TV+) -->
+  <div class="relative z-20 w-full h-full flex flex-col justify-end items-start p-8 md:p-14 pb-12 md:pb-16 max-w-xl">
+    
+    <span class="tgp-anim text-[11px] font-mono uppercase tracking-[0.22em] text-zinc-300/80 mb-2">
+      {kicker}
+    </span>
+
+    <h1 class="tgp-anim text-3xl md:text-5xl font-extrabold tracking-tight uppercase leading-[0.95] text-white mb-4 drop-shadow-sm">
+      {title}
+    </h1>
+
+    <div class="tgp-anim flex items-center gap-2.5 mb-3">
+      <span class="px-2.5 py-0.5 text-[11px] font-semibold bg-white/15 backdrop-blur-md rounded-full text-white border border-white/10">
+        TGP
+      </span>
+      <span class="text-xs md:text-sm font-semibold text-zinc-200 tracking-wide">
+        {tagLabel}
+      </span>
+    </div>
+
+    <p class="tgp-anim text-xs md:text-sm text-zinc-300/90 leading-relaxed mb-6 max-w-md font-normal">
+      {subtitle}
+    </p>
+
+    <a 
+      href={ctaHref} 
+      class="tgp-anim group inline-flex items-center gap-2.5 px-7 py-3 bg-white text-zinc-950 rounded-full font-semibold text-sm hover:bg-zinc-200 transition-all duration-300 shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+    >
+      <svg class="w-3.5 h-3.5 fill-current transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z" />
+      </svg>
+      <span>{ctaText}</span>
+    </a>
+  </div>
+
+  <!-- INDICADOR INFERIOR CENTRAL (Cápsula estilo Apple TV) -->
+  <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/10">
+    <span class="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]"></span>
+    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span>
+    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span>
+    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span>
+  </div>
+
+</section>
+
+<style>
+  /* Hace que la mitad izquierda del Panel 1 deje ver la capa bokeh inferior y la figura emerja nítida a la derecha */
+  .mask-left-bokeh {
+    mask-image: linear-gradient(to right, transparent 5%, rgba(0,0,0,0.35) 35%, black 65%);
+    -webkit-mask-image: linear-gradient(to right, transparent 5%, rgba(0,0,0,0.35) 35%, black 65%);
+  }
+
+  /* Suaviza levemente los bordes laterales del panel central para integrarlo a su propio bokeh */
+  .mask-center-soft {
+    mask-image: linear-gradient(to right, rgba(0,0,0,0.6) 0%, black 18%, black 85%, rgba(0,0,0,0.7) 100%);
+    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0.6) 0%, black 18%, black 85%, rgba(0,0,0,0.7) 100%);
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  function initTriptych() {
+    const panels = document.querySelectorAll('.tgp-panel-img');
+    const texts = document.querySelectorAll('.tgp-anim');
+
+    if (!panels.length && !texts.length) return;
+
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+    // Entrada de enfoque progresivo en los 3 paneles (simula apertura de diafragma)
+    tl.fromTo(
+      panels,
+      { scale: 1.08, filter: 'blur(6px)', opacity: 0 },
+      { scale: 1, filter: 'blur(0px)', opacity: 1, duration: 1.3, stagger: 0.14 }
+    )
+    // Entrada compacta del bloque de texto inferior izquierdo
+    .fromTo(
+      texts,
+      { y: 18, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.75, stagger: 0.08 },
+      '-=0.9'
+    );
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTriptych);
+  } else {
+    initTriptych();
+  }
+  document.addEventListener('astro:page-load', initTriptych);
+</script>
