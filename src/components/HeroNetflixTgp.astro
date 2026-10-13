@@ -128,7 +128,7 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
 ---
 
 <section
-  class={`relative w-full min-h-screen md:min-h-svh flex flex-col justify-between overflow-hidden bg-[#070709] text-white select-none isolation-auto ${className}`}
+  class={`relative w-full min-h-screen md:min-h-svh flex flex-col justify-between overflow-hidden bg-[#070709] text-white select-none isolate ${className}`}
   aria-label={titulo}
   style={`--tgp-accent: ${accentColor};`}
 >
@@ -174,21 +174,19 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
       </div>
     </div>
 
-    {/* Resplandor cálido superior izquierdo (coherente con HeroSpotifyColecciones) */}
+    {/* Viñeta perimetral limpia en los bordes para eliminar costuras sin tapar las portadas */}
     <div
-      class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_65%_75%_at_0%_0%,rgba(224,122,95,0.45)_0%,rgba(224,122,95,0.15)_40%,transparent_72%)]"
+      class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_46%,rgba(7,7,9,0.35)_75%,rgba(7,7,9,0.96)_100%)]"
     />
 
-    {/* Degradado lateral de protección de texto: oscuro a la izquierda, completamente transparente a la derecha */}
+    {/* Protección suave y localizada detrás del texto editorial principal */}
     <div
-      class="absolute inset-0 pointer-events-none bg-linear-to-r from-[#070709]/95 via-[#070709]/75 via-45% to-transparent to-75%"
+      class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_22%_45%,rgba(7,7,9,0.78)_0%,rgba(7,7,9,0.32)_52%,transparent_75%)]"
     />
 
-    {/* Gradiente superior sutil para navbar */}
-    <div class="absolute inset-x-0 top-0 h-28 bg-linear-to-b from-black/70 to-transparent pointer-events-none" />
-
-    {/* Gradiente inferior suave (permite luz hacia abajo para el UX) */}
-    <div class="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-[#070709]/70 to-transparent pointer-events-none" />
+    {/* Sellado de costuras superior e inferior para evitar bordes duros */}
+    <div class="absolute inset-x-0 top-0 h-28 bg-linear-to-b from-[#070709] via-[#070709]/70 to-transparent pointer-events-none" />
+    <div class="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-[#070709] via-[#070709]/75 to-transparent pointer-events-none" />
   </div>
 
   {/* ═══════════════════════════════════════════════════════════════════════
@@ -278,6 +276,9 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
     transform: translate(-46%, -50%) rotate(-13.5deg) scale(1.15);
     transform-origin: center center;
     filter: brightness(1.02) contrast(1.05) saturate(1.0);
+    transform-style: flat;
+    backface-visibility: hidden;
+    contain: paint;
   }
 
   @media (min-width: 1024px) {
@@ -312,6 +313,8 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
     background-color: #121413;
     box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    transform: translateZ(0);
+    backface-visibility: hidden;
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
   }
 
