@@ -1,12 +1,23 @@
 ---
 // src/components/TgpHeroTriptych.astro
-interface Panel {
+export interface Panel {
   image: string;
   alt: string;
   objectPosition?: string;
 }
 
+export interface SlideItem {
+  kicker: string;
+  title: string;
+  tagLabel: string;
+  subtitle: string;
+  ctaText: string;
+  ctaHref: string;
+  panels: [Panel, Panel, Panel];
+}
+
 interface Props {
+  slides?: SlideItem[];
   kicker?: string;
   title?: string;
   tagLabel?: string;
@@ -16,190 +27,393 @@ interface Props {
   panels?: [Panel, Panel, Panel];
 }
 
+const defaultSlides: SlideItem[] = [
+  {
+    kicker: "ARCHAEOSEMIOTICS // DOSSIER 04",
+    title: "LA ARQUITECTURA DEL SILENCIO",
+    tagLabel: "Memoria Material",
+    subtitle: "Tres estratos de piedra y signo donde la ingeniería arcaica codificó el tiempo antes de la escritura.",
+    ctaText: "Explorar dossier",
+    ctaHref: "/colecciones/enigmas-subterraneos/",
+    panels: [
+      {
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1200&auto=format&fit=crop",
+        alt: "Figura 1 - Recortada sobre el margen derecho del Panel 1",
+        objectPosition: "center 20%"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1200&auto=format&fit=crop",
+        alt: "Figura 2 - Protagonista central",
+        objectPosition: "center 25%"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=900&auto=format&fit=crop",
+        alt: "Figura 3 - Franja estrecha derecha",
+        objectPosition: "center 20%"
+      }
+    ]
+  },
+  {
+    kicker: "PROTO-HISTORY // DOSSIER 02",
+    title: "EL LABERINTO DEL UMBRAL",
+    tagLabel: "Sistemas Arcaicos",
+    subtitle: "Rutas soterradas y cámaras herméticas diseñadas para desafiar la termodinámica del desierto.",
+    ctaText: "Ver investigación",
+    ctaHref: "/colecciones/asia-secrets/",
+    panels: [
+      {
+        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1200&auto=format&fit=crop",
+        alt: "Retrato 1 - Vértice izquierdo",
+        objectPosition: "center 20%"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1200&auto=format&fit=crop",
+        alt: "Retrato 2 - Protagonista central",
+        objectPosition: "center 25%"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=900&auto=format&fit=crop",
+        alt: "Retrato 3 - Margen derecho",
+        objectPosition: "center 20%"
+      }
+    ]
+  },
+  {
+    kicker: "SACRED GEOMETRY // DOSSIER 07",
+    title: "LA CANTERA DE LOS DIOSES",
+    tagLabel: "Arqueoastronomía",
+    subtitle: "Alineaciones estelares y monolitos tallados con tolerancia submilimétrica en la alta cordillera.",
+    ctaText: "Descubrir acervo",
+    ctaHref: "/colecciones/america-secrets/",
+    panels: [
+      {
+        image: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=1200&auto=format&fit=crop",
+        alt: "Retrato 1 - Estrato inicial",
+        objectPosition: "center 20%"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1200&auto=format&fit=crop",
+        alt: "Retrato 2 - Eje sagrado",
+        objectPosition: "center 25%"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=900&auto=format&fit=crop",
+        alt: "Retrato 3 - Horizonte este",
+        objectPosition: "center 20%"
+      }
+    ]
+  }
+];
+
 const {
-  kicker = "ARCHAEOSEMIOTICS // DOSSIER 04",
-  title = "LA ARQUITECTURA DEL SILENCIO",
-  tagLabel = "Memoria Material",
-  subtitle = "Tres estratos de piedra y signo donde la ingeniería arcaica codificó el tiempo antes de la escritura.",
-  ctaText = "Explorar ensayo",
-  ctaHref = "#ensayo",
-  panels = [
-    {
-      image: "https://images.unsplash.com/photo-1544967082-d9d25d867d66?q=80&w=1400&auto=format&fit=crop",
-      alt: "Figura 1 - Estrato izquierdo con aire bokeh",
-      objectPosition: "80% center"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop",
-      alt: "Figura 2 - Eje central",
-      objectPosition: "center center"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=800&auto=format&fit=crop",
-      alt: "Figura 3 - Corte lateral derecho",
-      objectPosition: "30% center"
-    }
-  ]
+  slides,
+  kicker,
+  title,
+  tagLabel,
+  subtitle,
+  ctaText,
+  ctaHref,
+  panels
 } = Astro.props;
+
+// Si se pasan props individuales, se respetan envolviéndolas en el slide 0
+const allSlides: SlideItem[] = slides && slides.length > 0 
+  ? slides 
+  : (title && panels 
+      ? [{
+          kicker: kicker || defaultSlides[0].kicker,
+          title: title,
+          tagLabel: tagLabel || defaultSlides[0].tagLabel,
+          subtitle: subtitle || defaultSlides[0].subtitle,
+          ctaText: ctaText || defaultSlides[0].ctaText,
+          ctaHref: ctaHref || defaultSlides[0].ctaHref,
+          panels: panels
+        }, ...defaultSlides.slice(1)]
+      : defaultSlides);
 ---
 
-<section class="relative w-full h-[82vh] min-h-[580px] max-h-[860px] bg-[#09090b] text-white overflow-hidden rounded-2xl select-none shadow-2xl border border-white/5">
+<section class="tgp-hero-triptych-container relative w-full h-[78vh] min-h-135 max-h-205 bg-[#0b0c10] text-white overflow-hidden rounded-xl select-none shadow-2xl">
   
-  <!-- CONTENEDOR DEL TRÍPTICO ASIMÉTRICO (48% / 37% / 15%) -->
-  <div class="absolute inset-0 w-full h-full flex z-0">
-    
-    <!-- PANEL 1 (48%): Contiene el espacio negativo con bokeh a la izquierda + Figura 1 -->
-    <div class="tgp-panel relative w-full md:w-[48%] h-full overflow-hidden">
-      <!-- Fondo Bokeh expandido para garantizar atmósfera suave en la zona del CTA -->
-      <img 
-        src={panels[0].image} 
-        alt="" 
-        aria-hidden="true"
-        class="absolute inset-0 w-full h-full object-cover scale-125 blur-2xl brightness-75 saturate-125 pointer-events-none"
-      />
-      <!-- Figura 1 principal con fundido suave hacia la izquierda -->
-      <img 
-        src={panels[0].image} 
-        alt={panels[0].alt}
-        style={`object-position: ${panels[0].objectPosition};`}
-        class="tgp-panel-img relative z-10 w-full h-full object-cover mask-left-bokeh"
-      />
-      <!-- Sombra sutil en el corte derecho del panel 1 -->
-      <div class="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-black/50 to-transparent z-20 pointer-events-none"></div>
-    </div>
+  <!-- CONTENEDOR DE SLIDES SUPERPUESTOS CON TRÍPTICO ASIMÉTRICO (48% / 38% / 14%) -->
+  <div class="absolute inset-0 w-full h-full z-0 overflow-hidden">
+    {allSlides.map((slide, sIdx) => (
+      <div 
+        class={`showcase-slide absolute inset-0 w-full h-full flex ${sIdx === 0 ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
+        data-slide-index={sIdx}
+      >
+        <!-- PANEL 1 (48%): Mitad izquierda = Puro Bokeh | Mitad derecha = Figura 1 con suave fade -->
+        <div class="tgp-panel relative w-full md:w-[48%] h-full overflow-hidden bg-[#12131a]">
+          <!-- Fondo Bokeh expandido para colchón del CTA -->
+          <img 
+            src={slide.panels[0].image} 
+            alt="" 
+            aria-hidden="true"
+            class="absolute inset-0 w-full h-full object-cover scale-150 blur-3xl brightness-75 saturate-150 pointer-events-none"
+          />
+          <!-- Figura 1 anclada exclusivamente en el 62% derecho -->
+          <div class="absolute right-0 top-0 w-[62%] h-full z-10 overflow-hidden mask-figure-one">
+            <img 
+              src={slide.panels[0].image} 
+              alt={slide.panels[0].alt}
+              style={`object-position: ${slide.panels[0].objectPosition || 'center 20%'};`}
+              class="w-full h-full object-cover"
+            />
+          </div>
+        </div>
 
-    <!-- PANEL 2 (37%): Figura central protagonista -->
-    <div class="tgp-panel relative hidden md:block md:w-[37%] h-full overflow-hidden border-l border-white/10">
-      <img 
-        src={panels[1].image} 
-        alt="" 
-        aria-hidden="true"
-        class="absolute inset-0 w-full h-full object-cover scale-110 blur-xl brightness-75 pointer-events-none"
-      />
-      <img 
-        src={panels[1].image} 
-        alt={panels[1].alt}
-        style={`object-position: ${panels[1].objectPosition};`}
-        class="tgp-panel-img relative z-10 w-full h-full object-cover mask-center-soft"
-      />
-      <!-- Sombra de acople izquierda y derecha del panel central -->
-      <div class="absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-black/40 to-transparent z-20 pointer-events-none"></div>
-      <div class="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-black/40 to-transparent z-20 pointer-events-none"></div>
-    </div>
+        <!-- PANEL 2 (38%): Figura 2 protagonista con corte vertical neto -->
+        <div class="tgp-panel relative hidden md:block md:w-[38%] h-full overflow-hidden">
+          <img 
+            src={slide.panels[1].image} 
+            alt="" 
+            aria-hidden="true"
+            class="absolute inset-0 w-full h-full object-cover scale-125 blur-2xl brightness-90 pointer-events-none"
+          />
+          <img 
+            src={slide.panels[1].image} 
+            alt={slide.panels[1].alt}
+            style={`object-position: ${slide.panels[1].objectPosition || 'center 25%'};`}
+            class="relative z-10 w-full h-full object-cover mask-figure-two"
+          />
+        </div>
 
-    <!-- PANEL 3 (15%): Franja vertical estrecha a la derecha -->
-    <div class="tgp-panel relative hidden lg:block lg:w-[15%] h-full overflow-hidden border-l border-white/10">
-      <img 
-        src={panels[2].image} 
-        alt="" 
-        aria-hidden="true"
-        class="absolute inset-0 w-full h-full object-cover scale-110 blur-xl brightness-75 pointer-events-none"
-      />
-      <img 
-        src={panels[2].image} 
-        alt={panels[2].alt}
-        style={`object-position: ${panels[2].objectPosition};`}
-        class="tgp-panel-img relative z-10 w-full h-full object-cover brightness-90 contrast-105"
-      />
-      <!-- Fundido suave en la unión izquierda -->
-      <div class="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-black/45 to-transparent z-20 pointer-events-none"></div>
-    </div>
-
+        <!-- PANEL 3 (14%): Figura 3 en franja vertical estrecha a la derecha -->
+        <div class="tgp-panel relative hidden lg:block lg:w-[14%] h-full overflow-hidden">
+          <img 
+            src={slide.panels[2].image} 
+            alt={slide.panels[2].alt}
+            style={`object-position: ${slide.panels[2].objectPosition || 'center 20%'};`}
+            class="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+    ))}
   </div>
 
-  <!-- GRADIENTES ATMOSFÉRICOS PARA LEGIBILIDAD DEL BLOQUE INFERIOR IZQUIERDO -->
-  <div class="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/40 to-transparent z-10 pointer-events-none"></div>
-  <div class="absolute inset-y-0 left-0 w-full md:w-[48%] bg-gradient-to-r from-[#09090b]/80 via-[#09090b]/35 to-transparent z-10 pointer-events-none"></div>
+  <!-- VIÑETA SUTIL EN LA ESQUINA INFERIOR IZQUIERDA PARA EL TEXTO -->
+  <div class="absolute bottom-0 left-0 w-full md:w-[45%] h-[65%] bg-linear-to-t from-black/85 via-black/40 to-transparent z-15 pointer-events-none"></div>
 
-  <!-- BLOQUE EDITORIAL & CTA (Anclado abajo a la izquierda como en Apple TV+) -->
-  <div class="relative z-20 w-full h-full flex flex-col justify-end items-start p-8 md:p-14 pb-12 md:pb-16 max-w-xl">
-    
-    <span class="tgp-anim text-[11px] font-mono uppercase tracking-[0.22em] text-zinc-300/80 mb-2">
-      {kicker}
-    </span>
+  <!-- BLOQUE EDITORIAL SUPERPUESTO (FÍSICA APPLE TV+) -->
+  <div class="relative z-20 w-full h-full flex flex-col justify-end items-start p-7 md:p-12 pb-10 md:pb-12 pointer-events-none">
+    {allSlides.map((slide, sIdx) => (
+      <div 
+        class={`showcase-content absolute bottom-7 md:bottom-12 left-7 md:left-12 max-w-[340px] md:max-w-[380px] font-sans ${sIdx === 0 ? 'opacity-100 pointer-events-auto z-30' : 'opacity-0 pointer-events-none z-0'}`}
+        data-content-index={sIdx}
+      >
+        <span class="block text-[10px] font-mono uppercase tracking-[0.2em] text-white/75 mb-1">
+          {slide.kicker}
+        </span>
 
-    <h1 class="tgp-anim text-3xl md:text-5xl font-extrabold tracking-tight uppercase leading-[0.95] text-white mb-4 drop-shadow-sm">
-      {title}
-    </h1>
+        <h1 class="!font-sans !text-2xl md:!text-[32px] !font-black tracking-tight uppercase !leading-[1.02] text-white !mb-3">
+          {slide.title}
+        </h1>
 
-    <div class="tgp-anim flex items-center gap-2.5 mb-3">
-      <span class="px-2.5 py-0.5 text-[11px] font-semibold bg-white/15 backdrop-blur-md rounded-full text-white border border-white/10">
-        TGP
-      </span>
-      <span class="text-xs md:text-sm font-semibold text-zinc-200 tracking-wide">
-        {tagLabel}
-      </span>
-    </div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="px-2 py-0.5 text-[10px] font-bold bg-black/60 backdrop-blur-md rounded-full text-white border border-white/15">
+            TGP
+          </span>
+          <span class="text-xs font-semibold text-white/95">
+            {slide.tagLabel}
+          </span>
+        </div>
 
-    <p class="tgp-anim text-xs md:text-sm text-zinc-300/90 leading-relaxed mb-6 max-w-md font-normal">
-      {subtitle}
-    </p>
+        <p class="!text-xs md:!text-[13px] text-white/80 !leading-snug !mb-5 font-normal">
+          {slide.subtitle}
+        </p>
 
-    <a 
-      href={ctaHref} 
-      class="tgp-anim group inline-flex items-center gap-2.5 px-7 py-3 bg-white text-zinc-950 rounded-full font-semibold text-sm hover:bg-zinc-200 transition-all duration-300 shadow-xl hover:scale-[1.02] active:scale-[0.98]"
-    >
-      <svg class="w-3.5 h-3.5 fill-current transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 24 24">
-        <path d="M8 5v14l11-7z" />
-      </svg>
-      <span>{ctaText}</span>
-    </a>
+        <a 
+          href={slide.ctaHref} 
+          class="showcase-cta group inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-white text-zinc-950 rounded-full font-semibold text-xs md:text-sm hover:bg-zinc-200 transition-all duration-200 shadow-lg pointer-events-auto cursor-pointer relative z-30"
+        >
+          <svg class="w-3.5 h-3.5 fill-current transition-transform duration-200 group-hover:translate-x-0.5" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+          <span>{slide.ctaText}</span>
+        </a>
+      </div>
+    ))}
   </div>
 
-  <!-- INDICADOR INFERIOR CENTRAL (Cápsula estilo Apple TV) -->
-  <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/10">
-    <span class="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]"></span>
-    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span>
-    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span>
-    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span>
+  <!-- INDICADORES INFERIORES CENTRALES DINÁMICOS -->
+  <div class="showcase-indicators absolute bottom-3.5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/10">
+    {allSlides.map((_, i) => (
+      <button 
+        type="button" 
+        class={`showcase-dot transition-all duration-300 rounded-full cursor-pointer ${i === 0 ? 'w-4 h-2 bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.7)]' : 'w-2 h-2 bg-white/35 hover:bg-white/60'}`}
+        data-dot-index={i}
+        aria-label={`Ir a la diapositiva ${i + 1}`}
+      ></button>
+    ))}
   </div>
 
 </section>
 
 <style>
-  /* Hace que la mitad izquierda del Panel 1 deje ver la capa bokeh inferior y la figura emerja nítida a la derecha */
-  .mask-left-bokeh {
-    mask-image: linear-gradient(to right, transparent 5%, rgba(0,0,0,0.35) 35%, black 65%);
-    -webkit-mask-image: linear-gradient(to right, transparent 5%, rgba(0,0,0,0.35) 35%, black 65%);
+  /* Funde suavemente el borde izquierdo de la Figura 1 hacia el bokeh del CTA */
+  .mask-figure-one {
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.5) 22%, black 48%, black 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.5) 22%, black 48%, black 100%);
   }
 
-  /* Suaviza levemente los bordes laterales del panel central para integrarlo a su propio bokeh */
-  .mask-center-soft {
-    mask-image: linear-gradient(to right, rgba(0,0,0,0.6) 0%, black 18%, black 85%, rgba(0,0,0,0.7) 100%);
-    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0.6) 0%, black 18%, black 85%, rgba(0,0,0,0.7) 100%);
+  /* Mantiene el corte vertical e integra suavemente los bordes del Panel 2 */
+  .mask-figure-two {
+    mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.85) 0%, black 12%, black 88%, rgba(0, 0, 0, 0.85) 100%);
+    -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.85) 0%, black 12%, black 88%, rgba(0, 0, 0, 0.85) 100%);
   }
 </style>
 
 <script>
   import { gsap } from 'gsap';
 
-  function initTriptych() {
-    const panels = document.querySelectorAll('.tgp-panel-img');
-    const texts = document.querySelectorAll('.tgp-anim');
+  function initShowcaseMotion() {
+    const container = document.querySelector('.tgp-hero-triptych-container') as HTMLElement | null;
+    if (!container || container.dataset.showcaseInit === 'true') return;
+    container.dataset.showcaseInit = 'true';
 
-    if (!panels.length && !texts.length) return;
+    const slides = gsap.utils.toArray<HTMLElement>('.showcase-slide');
+    const contents = gsap.utils.toArray<HTMLElement>('.showcase-content');
+    const dots = gsap.utils.toArray<HTMLButtonElement>('.showcase-dot');
+    if (slides.length <= 1) return;
 
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    let currentIndex = 0;
+    let isAnimating = false;
+    let loopCall: gsap.core.Tween | null = null;
+    let isHovered = false;
 
-    // Entrada de enfoque progresivo en los 3 paneles (simula apertura de diafragma)
-    tl.fromTo(
-      panels,
-      { scale: 1.08, filter: 'blur(6px)', opacity: 0 },
-      { scale: 1, filter: 'blur(0px)', opacity: 1, duration: 1.3, stagger: 0.14 }
-    )
-    // Entrada compacta del bloque de texto inferior izquierdo
-    .fromTo(
-      texts,
-      { y: 18, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.75, stagger: 0.08 },
-      '-=0.9'
-    );
+    function updateDots(index: number) {
+      dots.forEach((dot, idx) => {
+        if (idx === index) {
+          dot.className = 'showcase-dot transition-all duration-300 rounded-full cursor-pointer w-4 h-2 bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.7)]';
+        } else {
+          dot.className = 'showcase-dot transition-all duration-300 rounded-full cursor-pointer w-2 h-2 bg-white/35 hover:bg-white/60';
+        }
+      });
+    }
+
+    function goToSlide(nextIndex: number) {
+      if (nextIndex === currentIndex || isAnimating) return;
+      isAnimating = true;
+
+      const currentSlide = slides[currentIndex];
+      const nextSlide = slides[nextIndex];
+      const currentContent = contents[currentIndex];
+      const nextContent = contents[nextIndex];
+
+      const tl = gsap.timeline({
+        defaults: { ease: 'expo.out' },
+        onComplete: () => {
+          isAnimating = false;
+        }
+      });
+
+      // 1. Salida ultrarrápida del contenido actual (250ms)
+      gsap.set(currentContent, { zIndex: 0 });
+      tl.to(currentContent, {
+        opacity: 0,
+        y: -10,
+        duration: 0.25,
+        ease: 'power2.in',
+        onComplete: () => {
+          gsap.set(currentContent, { pointerEvents: 'none', zIndex: 0 });
+        }
+      }, 0);
+
+      // 2. Salida de la imagen/sábana actual con un leve retroceso
+      tl.to(currentSlide, {
+        opacity: 0,
+        scale: 0.98,
+        x: -25,
+        duration: 0.45,
+        onComplete: () => {
+          gsap.set(currentSlide, { pointerEvents: 'none', zIndex: 0 });
+        }
+      }, 0);
+
+      // 3. Entrada instantánea de la nueva imagen (corte moderno con micro-zoom)
+      gsap.set(nextSlide, { zIndex: 10, pointerEvents: 'auto' });
+      tl.fromTo(nextSlide,
+        { opacity: 0, scale: 1.05, x: 35 },
+        { opacity: 1, scale: 1, x: 0, duration: 0.55 },
+        0.08
+      );
+
+      // 4. Entrada limpia del nuevo Tagline y botones CTA a la izquierda
+      gsap.set(nextContent, { zIndex: 30, pointerEvents: 'auto' });
+      tl.fromTo(nextContent,
+        { opacity: 0, y: 14, pointerEvents: 'auto' },
+        { 
+          opacity: 1, 
+          y: 0, 
+          duration: 0.5,
+          onComplete: () => {
+            gsap.set(nextContent, { pointerEvents: 'auto', zIndex: 30 });
+          }
+        },
+        0.15
+      );
+
+      currentIndex = nextIndex;
+      updateDots(currentIndex);
+    }
+
+    // Programación continua con gsap.delayedCall (permite pausar y reanudar exactamente donde estaba)
+    function scheduleNext() {
+      if (loopCall) loopCall.kill();
+      loopCall = gsap.delayedCall(4.5, () => {
+        if (!isHovered) {
+          const next = (currentIndex + 1) % slides.length;
+          goToSlide(next);
+          scheduleNext();
+        }
+      });
+    }
+
+    function pauseLoop() {
+      isHovered = true;
+      if (loopCall) loopCall.pause();
+    }
+
+    function resumeLoop() {
+      isHovered = false;
+      if (loopCall) {
+        loopCall.resume();
+      } else {
+        scheduleNext();
+      }
+    }
+
+    // Navegación manual por puntos: salta y reinicia ciclo continuo desde esa posición
+    dots.forEach((dot, idx) => {
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        goToSlide(idx);
+        scheduleNext();
+      });
+    });
+
+    // Control de interacción del usuario (pausa y reanudación exacta)
+    container.addEventListener('mouseenter', pauseLoop);
+    container.addEventListener('mouseleave', resumeLoop);
+    container.addEventListener('touchstart', pauseLoop, { passive: true });
+    container.addEventListener('touchend', resumeLoop, { passive: true });
+
+    // Detección de visibilidad de pestaña
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        pauseLoop();
+      } else {
+        resumeLoop();
+      }
+    });
+
+    // Iniciar bucle automático inmediato
+    scheduleNext();
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initTriptych);
+    document.addEventListener('DOMContentLoaded', initShowcaseMotion);
   } else {
-    initTriptych();
+    initShowcaseMotion();
   }
-  document.addEventListener('astro:page-load', initTriptych);
+  document.addEventListener('astro:page-load', initShowcaseMotion);
 </script>
