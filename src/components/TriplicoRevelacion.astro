@@ -142,7 +142,8 @@ if (headline.includes('.')) {
   <div
     id={stageId}
     class:list={[
-      "relative w-full overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 shadow-2xl bg-black",
+      "relative w-full overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl bg-black",
+      isArchive ? "border-0" : "border border-white/10",
       isArchive ? "aspect-video max-h-[58vh] min-h-[50vh] md:min-h-125 md:max-h-145" : "aspect-21/9 sm:aspect-[2.39/1] min-h-[58vh] md:min-h-140 max-h-175"
     ]}
   >
@@ -191,6 +192,13 @@ if (headline.includes('.')) {
               class={`hero-bg-img absolute inset-0 w-full h-full pointer-events-none brightness-95 contrast-[1.02] z-0 ${heroFitClass}`}
               style="object-position: 50% 50%;"
             />
+            {/* Viñeta perimetral suave si isArchive */}
+            {isArchive && (
+              <div
+                class="absolute inset-0 pointer-events-none z-1"
+                style="background: radial-gradient(ellipse at center, transparent 48%, rgba(8,9,10,0.38) 74%, rgba(8,9,10,0.92) 100%);"
+              />
+            )}
           </div>
 
           {/* SUB-STAGE 1: MODO CINEMÁTICO DE PRESENTACIÓN H1 (FLANCO OPUESTO AL PANEO / CERO COLISIÓN) */}
