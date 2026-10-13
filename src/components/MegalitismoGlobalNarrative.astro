@@ -99,20 +99,21 @@ const { className = "", autoplayDuration = 8000 } = Astro.props;
         id="maui-bg-img"
         src="/images/haamonga-a-maui.jpg"
         alt="Trilito de coral Haʻamonga ʻa Maui en Tonga al atardecer"
-        class="mega-img absolute inset-0 w-full h-full object-cover object-[center_48%] filter brightness-[0.45] contrast-[1.25] saturate-[0.75] will-change-transform"
+        class="mega-img absolute inset-0 w-full h-full object-cover object-[center_48%] filter brightness-105 contrast-102 will-change-transform"
         loading="lazy"
         decoding="async"
       />
     </div>
 
-    <!-- Scrim oscuro sutil en la zona de textos para contraste absoluto -->
+    <!-- Viñeta perimetral limpia en los bordes para eliminar costuras sin tapar la foto -->
     <div
-      class="absolute inset-0 pointer-events-none bg-linear-to-t from-black/85 via-black/30 to-transparent"
+      class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(5,5,5,0.35)_75%,rgba(5,5,5,0.92)_100%)]"
     ></div>
+    <!-- Sellado sutil de zócalo inferior para transición limpia al scroll -->
     <div
-      class="absolute inset-x-0 top-0 h-36 bg-linear-to-b from-black/75 to-transparent pointer-events-none"
+      class="absolute inset-x-0 bottom-0 h-36 bg-linear-to-t from-[#050505] to-transparent pointer-events-none"
     ></div>
-    <div class="mega-grain absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay"></div>
+    <div class="mega-grain absolute inset-0 opacity-15 pointer-events-none mix-blend-overlay"></div>
 
     <!-- FX Cinemático de Destello (Sun Flare): colocado en el vano donde rompe el sol -->
     <div
