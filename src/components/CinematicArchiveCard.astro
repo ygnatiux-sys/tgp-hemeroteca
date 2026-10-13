@@ -54,9 +54,13 @@ const isCinematic =
   entry.category === "Ensayos Cinemáticos" ||
   entry.category === "ensayos-cinematicos" ||
   normalizeCategory(entry.category) === "ensayos-cinematicos";
+const isNota =
+  (entry as any)?.isNota ||
+  entry.category === "Notas de Cuaderno" ||
+  normalizeCategory(entry.category) === "notas-de-cuaderno";
 const href =
   customHref ||
-  (isCinematic ? `/ensayos-cinematicos/${slug}/` : `/hemeroteca/${slug}/`);
+  (isNota ? `/notas/${slug}/` : isCinematic ? `/ensayos-cinematicos/${slug}/` : `/hemeroteca/${slug}/`);
 
 // Lógica de ruteo y CTA limpia
 let secondaryLabel = "VER REGISTRO";

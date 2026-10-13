@@ -118,7 +118,8 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
           const rawImg = item.img || entry.coverImage;
           const imgUrl = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '')) || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop';
           const isCinematic = entry.category === 'Ensayos Cinemáticos' || entry.category === 'ensayos-cinematicos' || normalizeCategory(entry.category) === 'ensayos-cinematicos';
-          const href = isCinematic ? `/ensayos-cinematicos/${item.slug}/` : `/hemeroteca/${item.slug}/`;
+          const isNota = (item as any)?.isNota || (entry as any)?.isNota || entry.category === 'Notas de Cuaderno' || normalizeCategory(entry.category) === 'notas-de-cuaderno';
+          const href = (item as any).href || (entry as any).href || (isNota ? `/notas/${item.slug}/` : isCinematic ? `/ensayos-cinematicos/${item.slug}/` : `/hemeroteca/${item.slug}/`);
 
           const fitClass = 'object-cover';
 
@@ -146,7 +147,7 @@ const uid = `rest-tray-${categoryKey}-${Math.random().toString(36).substring(2, 
               />
 
               {/* Capa de atenuación para tarjetas secundarias en perspectiva */}
-              <div class="card-side-dimmer absolute inset-0 bg-black/45 pointer-events-none transition-opacity duration-500 z-[15]" />
+              <div class="card-side-dimmer absolute inset-0 bg-black/45 pointer-events-none transition-opacity duration-500 z-15" />
 
               {/* NORMAL-UI: Título, excerpt, CTA — siempre visible, opacity 1 por defecto */}
               <div 

@@ -391,6 +391,7 @@ export function normalizeCategory(cat?: string | null): string {
   if (raw.includes('prehistor')) return 'prehistoria';
   if (raw.includes('linguist') || raw.includes('lingueist') || raw.includes('lengua')) return 'linguistica';
   if (raw.includes('antropolog')) return 'antropologia';
+  if (raw.includes('cuaderno') || raw === 'notas' || raw === 'notas de cuaderno' || raw === 'notas-de-cuaderno') return 'notas-de-cuaderno';
 
   // Convertir cualquier categoría no mapeada a slug-con-guiones (sin espacios)
   return raw.replace(/\s+/g, '-');
@@ -415,6 +416,7 @@ export function formatCategory(cat?: string | null): string {
     'prehistoria': 'Prehistoria',
     'linguistica': 'Lingüística',
     'antropologia': 'Antropología',
+    'notas-de-cuaderno': 'Notas de Cuaderno',
     'ensayo': 'Ensayo',
   };
   if (map[normalized]) return map[normalized];

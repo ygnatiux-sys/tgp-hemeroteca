@@ -174,6 +174,8 @@ const notas = defineCollection({
     title: z.string().optional().catch("Sin Título"),
     image: z.string().optional().nullable().catch(null),
     date: z.coerce.date().optional().nullable().catch(null),
+    category: z.string().optional().default("Notas de Cuaderno"),
+    excerpt: z.string().optional().catch("Nota y registro de cuaderno de campo."),
   }),
 });
 

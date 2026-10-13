@@ -409,7 +409,10 @@ export default config({
         }),
 
         // El editor para escribir el cuerpo del post
-        content: fields.mdx({ label: 'Contenido de la Nota' }),
+        content: fields.mdx({ 
+          label: 'Contenido de la Nota',
+          extension: 'md',
+        }),
       },
     }),
   },

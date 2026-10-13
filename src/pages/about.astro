@@ -13,7 +13,8 @@ import MazoCartasGSAP from '../components/MazoCartasGSAP.astro';
 import { type MubiCinematicItem } from '../components/MubiBlockCinematic.astro';
 import TriplicoRevelacion, { type TriplicoPost } from '../components/TriplicoRevelacion.astro';
 import ToboganPosts from '../components/ToboganPosts.astro';
-import { sanitizeImageUrl, getPublishableEssays, resolveEssayImage, isValidImageSrc } from '../lib/content-filter';
+import AppleShowcaseBento, { type BentoHistoryItem } from '../components/AppleShowcaseBento.astro';
+import { sanitizeImageUrl, getPublishableEssays, resolveEssayImage, isValidImageSrc, formatCategory, normalizeCategory } from '../lib/content-filter';
 
 // Portada Hero Cinemática (Monjes Novicios Leyendo en el Templo - Wikimedia Commons)
 const ABOUT_WIKI_COVER = '/src/assets/remotas/monks-1822569-1280.webp';
@@ -42,6 +43,26 @@ const toboganPosts = publishable
   }))
   .filter(c => typeof c.src === 'string' && c.src.length > 4)
   .slice(0, 11);
+
+// ── Posts de la Colección Historia para el Bento Ultra-Wide estilo Apple TV ──
+const historiaPosts: BentoHistoryItem[] = publishable
+  .filter(e => {
+    const norm = normalizeCategory(e.entry.category);
+    return norm.startsWith('historia') || (e.entry.category && e.entry.category.toLowerCase().includes('historia'));
+  })
+  .map(e => {
+    const rawImg = resolveEssayImage(e.entry, e.slug);
+    const imgUrl = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : ''));
+    return {
+      slug: e.slug,
+      title: (e.entry.title || e.slug) as string,
+      subtitle: (e.entry.dek || e.entry.excerpt || '') as string,
+      category: formatCategory(e.entry.category),
+      img: imgUrl,
+      href: `/hemeroteca/${e.slug}/`,
+    };
+  })
+  .filter(item => typeof item.img === 'string' && item.img.length > 4);
 
 // ── Ensayos Cinemáticos para el Showcase por Bloques MUBI (de a 3 tarjetas) ──
 const allCinematicosRaw = await getCollection('ensayosCinematicos').catch(() => []);
@@ -453,6 +474,17 @@ const triplicoHero: TriplicoPost | undefined = mubiCinematicItems.slice(3).find(
       descripcion="Cada investigación publicada es una pieza de un rompecabezas mayor. Un archivo vivo donde el conocimiento se recuerda y se experimenta en una caída continua."
       cta={{ label: "Explorar Hemeroteca", href: "/archivo/" }}
       badge="Acervo Visual"
+    />
+  )}
+
+  {/* ── BENTO ULTRA-WIDE ESTILO APPLE TV: COLECCIÓN HISTORIA ── */}
+  {historiaPosts.length > 0 && (
+    <AppleShowcaseBento
+      posts={historiaPosts}
+      collectionHref="/colecciones/historia/"
+      collectionTagline="COLECCIÓN HISTORIA · ARCHIVO TGP"
+      collectionTitle="Explorá los anales del tiempo.<br>La Colección Historia."
+      collectionDesc="Estrategas del mundo antiguo, mitos fundacionales, arqueología y memoria cultural en un tapiz panorámico suspendido."
     />
   )}
 

@@ -30,6 +30,7 @@ export async function getStaticPaths() {
   const allArquetiposRaw = await getCollection('arquetiposGlobales').catch(() => []);
   const allCinematicosRaw = await getCollection('ensayosCinematicos').catch(() => []);
   const allGeorefsRaw = await getCollection('georreferencias').catch(() => []);
+  const allNotasRaw = await getCollection('notas').catch(() => []);
 
   const isProd = import.meta.env.PROD;
   const publishableCinematicos = allCinematicosRaw.map(item => ({
@@ -46,8 +47,22 @@ export async function getStaticPaths() {
     }
   }));
 
+  const publishableNotas = allNotasRaw.map(item => ({
+    slug: item.id.replace(/\.(md|mdx)$/, ''),
+    isNota: true,
+    entry: {
+      title: item.data.title || 'Sin Título',
+      category: 'Notas de Cuaderno',
+      coverImage: item.data.image || null,
+      excerpt: item.data.excerpt || 'Nota y registro de cuaderno de campo.',
+      date: item.data.date ? new Date(item.data.date).toISOString() : null,
+      isNota: true,
+    }
+  }));
+
   const publishable = [
     ...publishableCinematicos,
+    ...publishableNotas,
     ...getPublishableEssays(allEssaysRaw, isProd),
     ...getPublishableEssays(allArquetiposRaw, isProd),
     ...getPublishableEssays(allGeorefsRaw, isProd)
@@ -93,13 +108,14 @@ const heroGallerySlides = resolvedEssays
   .slice(0, 8)
   .map((e: typeof resolvedEssays[0]) => {
     const isCine = (e as any).isCinematicGSAP || e.entry?.category === 'Ensayos Cinemáticos';
+    const isNota = (e as any).isNota || (e.entry as any)?.isNota || e.entry?.category === 'Notas de Cuaderno';
     return {
       id:            e.slug,
       title:         e.entry.title || 'Sin Título',
       subtitle:      e.entry.volanta || e.entry.dek || undefined,
       category:      formatCategory(e.entry.category || label),
       year:          formatYear(e.entry.date),
-      link:          isCine ? `/ensayos-cinematicos/${e.slug}/` : `/hemeroteca/${e.slug}/`,
+      link:          isNota ? `/notas/${e.slug}/` : isCine ? `/ensayos-cinematicos/${e.slug}/` : `/hemeroteca/${e.slug}/`,
       image:         sanitizeImageUrl((e.img as any)?.src ?? e.img),
       imagePosition: (e.entry as any)?.coverImagePosition ||
                      (e.entry as any)?.imagePosition ||
@@ -124,6 +140,7 @@ const categoryDustTexts: Record<string, string> = {
   'mitologia':           'El mito no miente. **Habla de otra verdad,** una que la historia no puede tocar. Los [[mitos]] son el lenguaje del alma colectiva: relatos que explican lo que la ciencia aún no puede y que el olvido todavía no se ha llevado.',
   'prehistoria':         'Antes de la escritura, hubo [[pintura]]. Antes de la ciudad, hubo rito. La prehistoria es el capítulo más largo del libro humano, escrito en hueso, pigmento y piedra. **Todo lo que somos nació allí.**',
   'georreferencias':     'Cartografía viva de [[lugares sagrados]] y coordenadas liminales. Hitos geohistóricos que anclan el mito a la roca, desafiando las cronologías convencionales con su muda presencia.',
+  'notas-de-cuaderno':   'El [[cuaderno de campo]] como sismógrafo del pensamiento. Apuntes, conexiones relámpago y notas marginales donde las ideas germinan antes de volverse sistema.',
 };
 
 const defaultDustText = `La colección [[${label}]] concentra investigaciones que excavan más allá de la superficie. **Cada documento es un umbral.** Un conjunto de rastros que aguardan la mirada que los vuelva a nombrar, trazar y comprender.`;
@@ -184,7 +201,8 @@ const dustText = categoryDustTexts[key] ?? defaultDustText;
           {resolvedEssays.map((item, idx) => {
             const itemImg = item.img ? sanitizeImageUrl((item.img as any)?.src ?? item.img) : null;
             const isCine = (item as any).isCinematicGSAP || item.entry?.category === 'Ensayos Cinemáticos';
-            const linkUrl = isCine ? `/ensayos-cinematicos/${item.slug}/` : `/hemeroteca/${item.slug}/`;
+            const isNota = (item as any).isNota || (item.entry as any)?.isNota || item.entry?.category === 'Notas de Cuaderno';
+            const linkUrl = isNota ? `/notas/${item.slug}/` : isCine ? `/ensayos-cinematicos/${item.slug}/` : `/hemeroteca/${item.slug}/`;
 
             return (
               <a

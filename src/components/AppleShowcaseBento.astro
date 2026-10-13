@@ -1,0 +1,307 @@
+---
+/**
+ * AppleShowcaseBento.astro
+ * Componente "Bento Ultra-Wide" estilo Apple TV (Proporción 3.4 : 1 panorámica).
+ * Presenta la Colección de Historia con una sábana inclinada a -9° y rotación de dossiers destacados.
+ */
+export interface BentoHistoryItem {
+  slug: string;
+  title: string;
+  subtitle?: string;
+  category?: string;
+  img: string;
+  href: string;
+}
+
+interface Props {
+  posts: BentoHistoryItem[];
+  collectionHref?: string;
+  collectionTitle?: string;
+  collectionTagline?: string;
+  collectionDesc?: string;
+}
+
+const {
+  posts = [],
+  collectionHref = "/colecciones/historia/",
+  collectionTitle = "Explorá sin límites.<br>La Colección Historia.",
+  collectionTagline = "COLECCIÓN HISTORIA · TGP",
+  collectionDesc = "Estrategas del mundo antiguo, mitos fundacionales, arqueología y memoria cultural en un tapiz panorámico de alta densidad.",
+} = Astro.props;
+
+// Sábana de portadas para el Slide 0 (8 a 12 ítems)
+const sheetPosts = posts.slice(0, 8);
+// Dossiers individuales destacados para los Slides 1 a 4
+const featuredPosts = posts.slice(0, 4);
+const totalSlides = 1 + featuredPosts.length;
+---
+
+<section class="w-full px-4 sm:px-6 md:px-10 py-10 md:py-16 bg-transparent">
+  <div
+    id="tgp-apple-bento"
+    class="relative w-full max-w-400 h-100 md:h-107.5 mx-auto rounded-[28px] overflow-hidden bg-black border border-white/10 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.85)] group/bento select-none"
+  >
+    {/* ── 1. CAPA DE IMÁGENES / SÁBANAS (DERECHA) ── */}
+    <div class="relative w-full h-full overflow-hidden">
+      
+      {/* SLIDE 0: Muestreo Base (La sábana inclinada a -9° de portadas de Historia) */}
+      <div class="showcase-slide absolute inset-0 w-full h-full opacity-100" data-slide-index="0">
+        <div class="showcase-grid-sheet pointer-events-none absolute right-[-6%] sm:right-[-4%] md:right-[-2%] top-[-26%] w-[72%] sm:w-[68%] md:w-[65%] h-[155%] grid grid-cols-4 gap-3 md:gap-3.5 -rotate-[9deg] opacity-90 transition-transform duration-700">
+          {sheetPosts.map((post, idx) => (
+            <div
+              class={`relative w-full aspect-4/5 rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-stone-900 ${
+                idx >= 4 ? 'translate-x-6' : ''
+              }`}
+            >
+              <img
+                src={post.img}
+                alt={post.title}
+                class="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* SLIDES 1+: Posts Individuales Destacados */}
+      {featuredPosts.map((post, idx) => (
+        <div
+          class="showcase-slide absolute inset-0 w-full h-full opacity-0 pointer-events-none"
+          data-slide-index={idx + 1}
+        >
+          <div class="absolute right-0 top-0 w-[70%] sm:w-[68%] h-full overflow-hidden">
+            <img
+              src={post.img}
+              alt={post.title}
+              class="w-full h-full object-cover object-center transform scale-100 transition-transform duration-700"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* ── 2. MÁSCARA DE FUSIÓN + AMBIENT GLOW COBRIZO (Fijos sobre las imágenes) ── */}
+    {/* Fundido negro de izquierda a derecha estilo Apple TV */}
+    <div
+      class="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,#000000_0%,#000000_34%,rgba(0,0,0,0.82)_48%,rgba(0,0,0,0)_68%)]"
+    ></div>
+
+    {/* Ambient Glow Cobrizo TGP en el vértice superior izquierdo */}
+    <div
+      class="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_0%_0%,rgba(190,90,55,0.38)_0%,transparent_50%)]"
+    ></div>
+
+    {/* ── 3. CONTENIDO EDITORIAL IZQUIERDO ── */}
+    <div class="absolute inset-y-0 left-0 z-20 w-full md:w-[48%] lg:w-[44%] pl-6 sm:pl-10 md:pl-14 pr-6 flex flex-col justify-center">
+      
+      {/* TEXTO SLIDE 0 (Base / Colección Historia) */}
+      <div class="showcase-content absolute max-w-lg transition-opacity duration-300" data-content-index="0">
+        <span class="text-xs uppercase tracking-[0.25em] text-rust-orange font-bold mb-2.5 block font-mono">
+          {collectionTagline}
+        </span>
+        <h2
+          class="text-2xl sm:text-3xl md:text-4xl font-bold font-gloock text-white leading-[1.12] tracking-tight mb-3"
+          set:html={collectionTitle}
+        />
+        <p class="text-xs sm:text-sm text-[#E3DDD3]/75 mb-6 leading-relaxed line-clamp-3">
+          {collectionDesc}
+        </p>
+        <div class="flex items-center gap-3 flex-wrap">
+          <a
+            href={collectionHref}
+            class="px-6 py-2.5 rounded-full bg-[#f5f5f7] hover:bg-white text-black text-xs font-semibold tracking-wide transition shadow-md hover:scale-[1.02] active:scale-[0.98]"
+          >
+            Explorar Colección
+          </a>
+          <a
+            href="/archivo/"
+            class="px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/20 text-[#E3DDD3] text-xs font-medium backdrop-blur-md transition hover:scale-[1.02] active:scale-[0.98]"
+          >
+            Ver todo el Archivo
+          </a>
+        </div>
+      </div>
+
+      {/* TEXTO SLIDES 1+: Posts Individuales */}
+      {featuredPosts.map((post, idx) => (
+        <div
+          class="showcase-content absolute max-w-lg opacity-0 pointer-events-none transition-opacity duration-300"
+          data-content-index={idx + 1}
+        >
+          <span class="text-xs uppercase tracking-[0.25em] text-rust-orange/90 font-medium mb-2.5 block font-mono">
+            {post.category || 'Historia · Expediente'}
+          </span>
+          <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold font-gloock text-white leading-[1.12] tracking-tight mb-3 line-clamp-2">
+            {post.title}
+          </h2>
+          <p class="text-xs sm:text-sm text-[#E3DDD3]/75 mb-6 leading-relaxed line-clamp-3">
+            {post.subtitle || 'Investigación histórica, arqueológica y documental resguardada en el archivo TGP.'}
+          </p>
+          <div class="flex items-center gap-3 flex-wrap">
+            <a
+              href={post.href}
+              class="px-6 py-2.5 rounded-full bg-[#f5f5f7] hover:bg-white text-black text-xs font-semibold tracking-wide transition shadow-md hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Leer Investigación
+            </a>
+            <a
+              href={collectionHref}
+              class="px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/20 text-[#E3DDD3] text-xs font-medium backdrop-blur-md transition hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Colección Historia
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* ── 4. CONTROLADORES DISCRETOS (Píldoras de Navegación estilo Apple TV) ── */}
+    <div class="absolute bottom-5 sm:bottom-6 right-6 sm:right-10 z-30 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+      {Array.from({ length: totalSlides }).map((_, idx) => (
+        <button
+          type="button"
+          class={`showcase-dot transition-all duration-300 rounded-full cursor-pointer ${
+            idx === 0 ? 'w-6 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/30 hover:bg-white/60'
+          }`}
+          data-dot-index={idx}
+          aria-label={`Ir al slide ${idx + 1}`}
+        />
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  import gsap from 'gsap';
+
+  function initAppleBento() {
+    const container = document.getElementById('tgp-apple-bento');
+    if (!container) return;
+
+    const slides = container.querySelectorAll<HTMLElement>('.showcase-slide');
+    const contents = container.querySelectorAll<HTMLElement>('.showcase-content');
+    const dots = container.querySelectorAll<HTMLButtonElement>('.showcase-dot');
+    const total = slides.length;
+    if (total === 0) return;
+
+    let currentIndex = 0;
+    let isTransitioning = false;
+    let autoInterval: any = null;
+
+    function updateDots(activeIdx: number) {
+      dots.forEach((dot, idx) => {
+        if (idx === activeIdx) {
+          dot.classList.remove('w-1.5', 'bg-white/30');
+          dot.classList.add('w-6', 'bg-white');
+        } else {
+          dot.classList.remove('w-6', 'bg-white');
+          dot.classList.add('w-1.5', 'bg-white/30');
+        }
+      });
+    }
+
+    function goToSlide(nextIndex: number) {
+      if (nextIndex === currentIndex || isTransitioning) return;
+      isTransitioning = true;
+
+      const currentSlide = slides[currentIndex];
+      const nextSlide = slides[nextIndex];
+      const currentContent = contents[currentIndex];
+      const nextContent = contents[nextIndex];
+
+      const tl = gsap.timeline({
+        defaults: { ease: 'expo.out' },
+        onComplete: () => {
+          currentIndex = nextIndex;
+          isTransitioning = false;
+        }
+      });
+
+      // 1. Salida ultrarrápida del texto actual (250ms)
+      if (currentContent) {
+        tl.to(currentContent, {
+          opacity: 0,
+          y: -10,
+          duration: 0.25,
+          ease: 'power2.in',
+          onComplete: () => {
+            gsap.set(currentContent, { pointerEvents: 'none' });
+          }
+        }, 0);
+      }
+
+      // 2. Salida de la imagen/sábana actual con leve retroceso
+      if (currentSlide) {
+        tl.to(currentSlide, {
+          opacity: 0,
+          scale: 0.98,
+          x: -25,
+          duration: 0.45,
+          onComplete: () => {
+            gsap.set(currentSlide, { pointerEvents: 'none' });
+          }
+        }, 0);
+      }
+
+      // 3. Entrada instantánea con micro-zoom (550ms con expo.out)
+      if (nextSlide) {
+        tl.fromTo(nextSlide,
+          { opacity: 0, scale: 1.05, x: 35, pointerEvents: 'auto' },
+          { opacity: 1, scale: 1, x: 0, duration: 0.55 },
+          0.08
+        );
+      }
+
+      // 4. Entrada limpia del nuevo texto y botones CTA
+      if (nextContent) {
+        tl.fromTo(nextContent,
+          { opacity: 0, y: 14, pointerEvents: 'auto' },
+          { opacity: 1, y: 0, duration: 0.5 },
+          0.15
+        );
+      }
+
+      updateDots(nextIndex);
+    }
+
+    function startAutoLoop() {
+      stopAutoLoop();
+      autoInterval = setInterval(() => {
+        const next = (currentIndex + 1) % total;
+        goToSlide(next);
+      }, 4500);
+    }
+
+    function stopAutoLoop() {
+      if (autoInterval) {
+        clearInterval(autoInterval);
+        autoInterval = null;
+      }
+    }
+
+    // Interacción manual por dots
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        const idx = Number(dot.dataset.dotIndex);
+        if (!isNaN(idx)) {
+          goToSlide(idx);
+          startAutoLoop();
+        }
+      });
+    });
+
+    // Pausa en hover para lectura relajada
+    container.addEventListener('mouseenter', stopAutoLoop);
+    container.addEventListener('mouseleave', startAutoLoop);
+
+    // Iniciar loop
+    startAutoLoop();
+  }
+
+  document.addEventListener('DOMContentLoaded', initAppleBento);
+  document.addEventListener('astro:page-load', initAppleBento);
+</script>

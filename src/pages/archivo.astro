@@ -32,6 +32,7 @@ const allEssaysRaw = await getCollection('ensayos').catch(err => {
 
 const allCinematicosRaw = await getCollection('ensayosCinematicos').catch(() => []);
 const allArquetiposRaw = await getCollection('arquetiposGlobales').catch(() => []);
+const allNotasRaw = await getCollection('notas').catch(() => []);
 
 const isProd = import.meta.env.PROD;
 const publishableEssays = getPublishableEssays(allEssaysRaw, isProd);
@@ -49,11 +50,26 @@ const publishableCinematicos = allCinematicosRaw.map(item => ({
   }
 }));
 const publishableArquetipos = getPublishableEssays(allArquetiposRaw, isProd);
+const publishableNotas = allNotasRaw.map(item => ({
+  slug: item.id.replace(/\.(md|mdx)$/, ''),
+  isNota: true,
+  href: `/notas/${item.id.replace(/\.(md|mdx)$/, '')}/`,
+  entry: {
+    title: item.data.title || 'Sin Título',
+    category: 'Notas de Cuaderno',
+    coverImage: item.data.image || null,
+    excerpt: item.data.excerpt || 'Nota y registro de cuaderno de campo.',
+    date: item.data.date ? new Date(item.data.date).toISOString() : null,
+    isNota: true,
+    href: `/notas/${item.id.replace(/\.(md|mdx)$/, '')}/`,
+  }
+}));
 
 const publishable = [
   ...publishableCinematicos,
   ...publishableEssays,
-  ...publishableArquetipos
+  ...publishableArquetipos,
+  ...publishableNotas
 ].sort(sortEssaysByVisualFirst);
 
 // ─── CATEGORÍAS Y AÑOS REALES PARA FILTROS ───────────────────────────────────
@@ -91,7 +107,7 @@ const archiveHeroTiles = [
     .map(e => ({
       src: sanitizeImageUrl(typeof e.img === 'object' && (e.img as any)?.src ? (e.img as any).src : (typeof e.img === 'string' ? e.img : '')),
       alt: e.entry.title || e.slug,
-      href: (e as any).isCinematicGSAP ? `/ensayos-cinematicos/${e.slug}/` : `/hemeroteca/${e.slug}/`,
+      href: (e as any).href || ((e as any).isNota ? `/notas/${e.slug}/` : (e as any).isCinematicGSAP ? `/ensayos-cinematicos/${e.slug}/` : `/hemeroteca/${e.slug}/`),
     }))
 ].slice(0, 12);
 
@@ -214,7 +230,7 @@ function mapToSlideData(essays: typeof resolvedEssays) {
     date: e.entry.date ? formatYear(e.entry.date) : '',
     image: (e.img as any)?.src ?? e.img,
     imagePosition: (e.entry as any).coverImagePosition || (e.entry as any).imagePosition || 'center center',
-    link: `/hemeroteca/${e.slug}`,
+    link: (e as any).href || ((e as any).isNota ? `/notas/${e.slug}/` : (e as any).isCinematicGSAP ? `/ensayos-cinematicos/${e.slug}/` : `/hemeroteca/${e.slug}/`),
     papersLink: undefined, // Deshabilitado globalmente: (e.entry as any).papersSlug ? `/papers/${(e.entry as any).papersSlug}` : undefined,
   }));
 }
@@ -408,7 +424,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                     title: essay.entry.title || 'Dossier del Archivo',
                     excerpt: (essay.entry as any).dek || essay.entry.excerpt || '',
                     img: essay.img || resolveEssayImage(essay.entry, essay.slug),
-                    href: (essay as any).href || ((essay as any).isCinematicGSAP ? `/ensayos-cinematicos/${essay.slug}/` : `/hemeroteca/${essay.slug}/`),
+                    href: (essay as any).href || ((essay as any).isNota ? `/notas/${essay.slug}/` : (essay as any).isCinematicGSAP ? `/ensayos-cinematicos/${essay.slug}/` : `/hemeroteca/${essay.slug}/`),
                     badge: `${group.catLabel} · Expediente ${idx + 1}`,
                   }));
 
@@ -417,7 +433,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                     title: heroEssayCandidate.entry.title || group.catLabel,
                     excerpt: (heroEssayCandidate.entry as any).dek || heroEssayCandidate.entry.excerpt || '',
                     img: heroEssayCandidate.img || resolveEssayImage(heroEssayCandidate.entry, heroEssayCandidate.slug),
-                    href: (heroEssayCandidate as any).href || ((heroEssayCandidate as any).isCinematicGSAP ? `/ensayos-cinematicos/${heroEssayCandidate.slug}/` : `/hemeroteca/${heroEssayCandidate.slug}/`),
+                    href: (heroEssayCandidate as any).href || ((heroEssayCandidate as any).isNota ? `/notas/${heroEssayCandidate.slug}/` : (heroEssayCandidate as any).isCinematicGSAP ? `/ensayos-cinematicos/${heroEssayCandidate.slug}/` : `/hemeroteca/${heroEssayCandidate.slug}/`),
                     badge: `${group.catLabel} · Registro Principal`,
                   };
 

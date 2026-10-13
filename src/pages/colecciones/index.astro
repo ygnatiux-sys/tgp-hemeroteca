@@ -29,6 +29,7 @@ const allEssaysRaw = await getCollection('ensayos').catch(() => []);
 const allCinematicosRaw = await getCollection('ensayosCinematicos').catch(() => []);
 const allArquetiposRaw = await getCollection('arquetiposGlobales').catch(() => []);
 const allGeorefsRaw = await getCollection('georreferencias').catch(() => []);
+const allNotasRaw = await getCollection('notas').catch(() => []);
 const isProd = import.meta.env.PROD;
 const publishableGeorefs = getPublishableEssays(allGeorefsRaw, isProd);
 const publishableCinematicos = allCinematicosRaw.map(item => ({
@@ -44,8 +45,23 @@ const publishableCinematicos = allCinematicosRaw.map(item => ({
   }
 }));
 
+const publishableNotas = allNotasRaw.map(item => ({
+  slug: item.id.replace(/\.(md|mdx)$/, ''),
+  isNota: true,
+  entry: {
+    title: item.data.title || 'Sin Título',
+    category: 'Notas de Cuaderno',
+    coverImage: item.data.image || null,
+    excerpt: item.data.excerpt || 'Nota y registro de cuaderno de campo.',
+    date: item.data.date ? new Date(item.data.date).toISOString() : null,
+    isNota: true,
+    href: `/notas/${item.id.replace(/\.(md|mdx)$/, '')}/`,
+  }
+}));
+
 const publishable = [
   ...publishableCinematicos,
+  ...publishableNotas,
   ...getPublishableEssays(allEssaysRaw, isProd),
   ...getPublishableEssays(allArquetiposRaw, isProd),
   ...publishableGeorefs
@@ -185,6 +201,7 @@ const epigraphMap: Record<string, string> = {
   "historia-antigua":  "Las [[civilizaciones]] no colapsan: **se transforman.** Sus ruinas son preguntas, no respuestas.",
   "historia-medieval": "Entre el [[fin del mundo]] romano y el alba del moderno, **siglos de invención** que el olvido llama oscuros.",
   "religion":          "Lo [[sagrado]] como necesidad primaria. **Cada fe,** un intento humano de darle nombre al misterio.",
+  "notas-de-cuaderno": "El [[cuaderno de campo]] como sismógrafo del pensamiento. Apuntes rápidos, fósiles lingüísticos y memoria viva.",
 };
 ---
 

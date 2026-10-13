@@ -110,7 +110,7 @@ const sanitizedItems = items.map((item, idx) => {
                   format="webp"
                   loading={idx === 0 ? "eager" : "lazy"}
                   decoding="async"
-                  class="object-center brightness-80 contrast-[1.05] transition-transform duration-1000 ease-out img-nativa"
+                  class="visor-slide-img object-cover object-center w-full h-full brightness-80 contrast-[1.05] transition-transform duration-700 ease-out img-nativa"
                 />
               ) : (
                 <div class="w-full h-full bg-linear-to-br from-[#1b1c24] via-theme-dark to-black flex items-center justify-center">
@@ -122,10 +122,12 @@ const sanitizedItems = items.map((item, idx) => {
               <div class="absolute inset-0 shadow-[inset_0_0_90px_rgba(0,0,0,0.85)] pointer-events-none" />
               <div class="absolute inset-0 bg-linear-to-r from-transparent via-[#0e1013]/40 to-[#0e1013] hidden lg:block pointer-events-none" />
               <div class="absolute inset-0 bg-linear-to-t from-[#0e1013] via-[#0e1013]/60 to-transparent lg:hidden pointer-events-none" />
+              {/* Ambient Glow Cobrizo TGP estilo Bento Ultra-Wide */}
+              <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(190,90,55,0.32)_0%,transparent_55%)]" />
             </div>
 
             {/* 2. Zona de Texto 40% Editorial con Cinzel Extrabold y Steel Gradient */}
-            <div class="lg:w-[40%] flex flex-col justify-between p-6 sm:p-8 lg:p-10 flex-1 min-w-0 bg-[#0e1013] z-10">
+            <div class="visor-slide-content lg:w-[40%] flex flex-col justify-between p-6 sm:p-8 lg:p-10 flex-1 min-w-0 bg-[#0e1013] z-10 transition-opacity duration-300">
               <div class="flex flex-col gap-3 md:gap-3.5">
                 {/* Metadatos superiores limpios: sólo label y fecha */}
                 <div class="flex items-center gap-2.5 flex-wrap">
@@ -217,6 +219,7 @@ const sanitizedItems = items.map((item, idx) => {
 
       let currentIndex = 0;
       let isAnimating = false;
+      let autoInterval: any = null;
 
       function goToSlide(newIndex: number, direction: 'next' | 'prev' = 'next') {
         if (isAnimating || newIndex === currentIndex) return;
@@ -226,6 +229,9 @@ const sanitizedItems = items.map((item, idx) => {
         isAnimating = true;
         const currentSlide = slides[currentIndex];
         const nextSlide = slides[newIndex];
+        const currentContent = currentSlide.querySelector('.visor-slide-content');
+        const nextContent = nextSlide.querySelector('.visor-slide-content');
+        const nextImg = nextSlide.querySelector('.visor-slide-img');
 
         // Actualizar números y dots
         if (currentNumEl) {
@@ -254,45 +260,93 @@ const sanitizedItems = items.map((item, idx) => {
           }
         });
 
-        // Animación fluida con GSAP
-        const xOffset = direction === 'next' ? 50 : -50;
+        const xOffset = direction === 'next' ? 30 : -30;
 
-        gsap.to(currentSlide, {
-          opacity: 0,
-          x: -xOffset,
-          duration: 0.55,
-          ease: 'power2.inOut',
+        const tl = gsap.timeline({
+          defaults: { ease: 'expo.out' },
           onComplete: () => {
             currentSlide.style.pointerEvents = 'none';
             currentSlide.style.zIndex = '0';
+            currentIndex = newIndex;
+            isAnimating = false;
           }
         });
 
+        // 1. Salida rápida del texto actual (250ms)
+        if (currentContent) {
+          tl.to(currentContent, {
+            opacity: 0,
+            y: -10,
+            duration: 0.25,
+            ease: 'power2.in',
+          }, 0);
+        }
+
+        // 2. Salida del slide con sutil retroceso de escala (450ms)
+        tl.to(currentSlide, {
+          opacity: 0,
+          scale: 0.98,
+          x: -xOffset,
+          duration: 0.45,
+        }, 0);
+
+        // 3. Entrada instantánea con micro-zoom (550ms con expo.out)
         nextSlide.style.pointerEvents = 'auto';
         nextSlide.style.zIndex = '10';
-        gsap.fromTo(
+        tl.fromTo(
           nextSlide,
-          { opacity: 0, x: xOffset },
-          {
-            opacity: 1,
-            x: 0,
-            duration: 0.65,
-            ease: 'power3.out',
-            onComplete: () => {
-              currentIndex = newIndex;
-              isAnimating = false;
-            }
-          }
+          { opacity: 0, scale: 1.05, x: xOffset },
+          { opacity: 1, scale: 1, x: 0, duration: 0.55 },
+          0.08
         );
+
+        // Micro-zoom sobre la imagen
+        if (nextImg) {
+          tl.fromTo(nextImg,
+            { scale: 1.06 },
+            { scale: 1, duration: 0.65, ease: 'expo.out' },
+            0.08
+          );
+        }
+
+        // 4. Entrada limpia del texto con micro-desfase (y: 12 -> 0)
+        if (nextContent) {
+          tl.fromTo(
+            nextContent,
+            { opacity: 0, y: 12 },
+            { opacity: 1, y: 0, duration: 0.5 },
+            0.15
+          );
+        }
+      }
+
+      function startAutoPlay() {
+        stopAutoPlay();
+        autoInterval = setInterval(() => {
+          goToSlide(currentIndex + 1, 'next');
+        }, 4500);
+      }
+
+      function stopAutoPlay() {
+        if (autoInterval) {
+          clearInterval(autoInterval);
+          autoInterval = null;
+        }
       }
 
       // Eventos de botones exteriores en la cabecera
       root.querySelectorAll('.visor-prev-btn').forEach(btn => {
-        btn.addEventListener('click', () => goToSlide(currentIndex - 1, 'prev'));
+        btn.addEventListener('click', () => {
+          goToSlide(currentIndex - 1, 'prev');
+          startAutoPlay();
+        });
       });
 
       root.querySelectorAll('.visor-next-btn').forEach(btn => {
-        btn.addEventListener('click', () => goToSlide(currentIndex + 1, 'next'));
+        btn.addEventListener('click', () => {
+          goToSlide(currentIndex + 1, 'next');
+          startAutoPlay();
+        });
       });
 
       // Eventos de Dots
@@ -300,6 +354,7 @@ const sanitizedItems = items.map((item, idx) => {
         dot.addEventListener('click', () => {
           const dir = dotIdx > currentIndex ? 'next' : 'prev';
           goToSlide(dotIdx, dir);
+          startAutoPlay();
         });
       });
 
@@ -313,9 +368,20 @@ const sanitizedItems = items.map((item, idx) => {
             const dir = itemIdx > currentIndex ? 'next' : 'prev';
             goToSlide(itemIdx, dir);
             root.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            startAutoPlay();
           }
         });
       });
+
+      // Pausa inteligente en hover sobre el escenario del visor
+      const stageEl = root.querySelector('.visor-stage');
+      if (stageEl) {
+        stageEl.addEventListener('mouseenter', stopAutoPlay);
+        stageEl.addEventListener('mouseleave', startAutoPlay);
+      }
+
+      // Iniciar auto-rotación
+      startAutoPlay();
 
       // Soporte Swipe táctil
       let touchStartX = 0;
