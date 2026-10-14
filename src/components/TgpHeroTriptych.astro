@@ -1,8 +1,28 @@
 ---
-// src/components/TgpHeroTriptych.astro
+/**
+ * src/components/TgpHeroTriptych.astro
+ *
+ * Showcase Cinemático estilo Apple TV+.
+ * Muestra 3 posts en formato cuadrado por diapositiva y avanza en secuencias de 3 en 3.
+ * Transición fluida con GSAP, indicadores dinámicos, soporte para interacción táctil y pausa en hover.
+ */
+import { sanitizeImageUrl, isValidImageSrc } from '../lib/content-filter';
+
+export interface TriptychPost {
+  title: string;
+  excerpt?: string;
+  category?: string;
+  img: string;
+  href: string;
+  date?: string;
+}
+
 export interface Panel {
   image: string;
   alt: string;
+  title?: string;
+  href?: string;
+  category?: string;
   objectPosition?: string;
 }
 
@@ -17,6 +37,7 @@ export interface SlideItem {
 }
 
 interface Props {
+  posts?: TriptychPost[];
   slides?: SlideItem[];
   kicker?: string;
   title?: string;
@@ -27,85 +48,8 @@ interface Props {
   panels?: [Panel, Panel, Panel];
 }
 
-const defaultSlides: SlideItem[] = [
-  {
-    kicker: "ARCHAEOSEMIOTICS // DOSSIER 04",
-    title: "LA ARQUITECTURA DEL SILENCIO",
-    tagLabel: "Memoria Material",
-    subtitle: "Tres estratos de piedra y signo donde la ingeniería arcaica codificó el tiempo antes de la escritura.",
-    ctaText: "Explorar dossier",
-    ctaHref: "/colecciones/enigmas-subterraneos/",
-    panels: [
-      {
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1200&auto=format&fit=crop",
-        alt: "Figura 1 - Recortada sobre el margen derecho del Panel 1",
-        objectPosition: "center 20%"
-      },
-      {
-        image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1200&auto=format&fit=crop",
-        alt: "Figura 2 - Protagonista central",
-        objectPosition: "center 25%"
-      },
-      {
-        image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=900&auto=format&fit=crop",
-        alt: "Figura 3 - Franja estrecha derecha",
-        objectPosition: "center 20%"
-      }
-    ]
-  },
-  {
-    kicker: "PROTO-HISTORY // DOSSIER 02",
-    title: "EL LABERINTO DEL UMBRAL",
-    tagLabel: "Sistemas Arcaicos",
-    subtitle: "Rutas soterradas y cámaras herméticas diseñadas para desafiar la termodinámica del desierto.",
-    ctaText: "Ver investigación",
-    ctaHref: "/colecciones/asia-secrets/",
-    panels: [
-      {
-        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1200&auto=format&fit=crop",
-        alt: "Retrato 1 - Vértice izquierdo",
-        objectPosition: "center 20%"
-      },
-      {
-        image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1200&auto=format&fit=crop",
-        alt: "Retrato 2 - Protagonista central",
-        objectPosition: "center 25%"
-      },
-      {
-        image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=900&auto=format&fit=crop",
-        alt: "Retrato 3 - Margen derecho",
-        objectPosition: "center 20%"
-      }
-    ]
-  },
-  {
-    kicker: "SACRED GEOMETRY // DOSSIER 07",
-    title: "LA CANTERA DE LOS DIOSES",
-    tagLabel: "Arqueoastronomía",
-    subtitle: "Alineaciones estelares y monolitos tallados con tolerancia submilimétrica en la alta cordillera.",
-    ctaText: "Descubrir acervo",
-    ctaHref: "/colecciones/america-secrets/",
-    panels: [
-      {
-        image: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=1200&auto=format&fit=crop",
-        alt: "Retrato 1 - Estrato inicial",
-        objectPosition: "center 20%"
-      },
-      {
-        image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1200&auto=format&fit=crop",
-        alt: "Retrato 2 - Eje sagrado",
-        objectPosition: "center 25%"
-      },
-      {
-        image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=900&auto=format&fit=crop",
-        alt: "Retrato 3 - Horizonte este",
-        objectPosition: "center 20%"
-      }
-    ]
-  }
-];
-
 const {
+  posts,
   slides,
   kicker,
   title,
@@ -116,114 +60,219 @@ const {
   panels
 } = Astro.props;
 
-// Si se pasan props individuales, se respetan envolviéndolas en el slide 0
-const allSlides: SlideItem[] = slides && slides.length > 0 
-  ? slides 
-  : (title && panels 
-      ? [{
-          kicker: kicker || defaultSlides[0].kicker,
-          title: title,
-          tagLabel: tagLabel || defaultSlides[0].tagLabel,
-          subtitle: subtitle || defaultSlides[0].subtitle,
-          ctaText: ctaText || defaultSlides[0].ctaText,
-          ctaHref: ctaHref || defaultSlides[0].ctaHref,
-          panels: panels
-        }, ...defaultSlides.slice(1)]
-      : defaultSlides);
+// Construcción dinámica de Slides a partir de Posts Reales en bloques de 3 en 3
+let computedSlides: SlideItem[] = [];
+
+if (posts && posts.length >= 3) {
+  for (let i = 0; i < posts.length; i += 3) {
+    const chunk = posts.slice(i, i + 3);
+    if (chunk.length < 3) break;
+    const p1 = chunk[0];
+    const p2 = chunk[1];
+    const p3 = chunk[2];
+    const slideNumber = String(Math.floor(i / 3) + 1).padStart(2, '0');
+
+    computedSlides.push({
+      kicker: `${(p1.category || 'ARCHIVO TGP').toUpperCase()} // DOSSIER ${slideNumber}`,
+      title: p1.title,
+      tagLabel: p1.category || 'Investigación',
+      subtitle: p1.excerpt ? p1.excerpt.replace(/[#*_`]/g, '').slice(0, 150) + '…' : 'Investigación profunda y análisis documental del acervo.',
+      ctaText: 'Ver investigación',
+      ctaHref: p1.href,
+      panels: [
+        {
+          image: p1.img,
+          alt: p1.title,
+          title: p1.title,
+          href: p1.href,
+          category: p1.category,
+          objectPosition: 'center 20%'
+        },
+        {
+          image: p2.img,
+          alt: p2.title,
+          title: p2.title,
+          href: p2.href,
+          category: p2.category,
+          objectPosition: 'center 25%'
+        },
+        {
+          image: p3.img,
+          alt: p3.title,
+          title: p3.title,
+          href: p3.href,
+          category: p3.category,
+          objectPosition: 'center 20%'
+        }
+      ]
+    });
+  }
+}
+
+// Fallback de respaldo con imágenes temáticas de historia/arqueología si no se pasan posts ni slides
+const defaultSlides: SlideItem[] = [
+  {
+    kicker: "ARCHAEOSEMIOTICS // DOSSIER 01",
+    title: "LA ARQUITECTURA DEL TIEMPO",
+    tagLabel: "Memoria Material",
+    subtitle: "Estratos líticos y signos rituales donde la civilización humana codificó el tiempo antes de la escritura.",
+    ctaText: "Ver investigación",
+    ctaHref: "/archivo/",
+    panels: [
+      {
+        image: "/src/assets/remotas/stepped-pyramid-of-djoser-at-saqqara.webp",
+        alt: "Pirámide Escalonada de Saqqara",
+        title: "Pirámide de Saqqara",
+        category: "Arqueosemiótica",
+        objectPosition: "center 20%"
+      },
+      {
+        image: "https://storage.thegreatpuzzleproject.com/wikimedia/1790166100412-8c88f7a9.webp",
+        alt: "La Pirámide Roja en Dahshur",
+        title: "Pirámide Roja",
+        category: "Ensayos Cinemáticos",
+        objectPosition: "center 25%"
+      },
+      {
+        image: "https://storage.thegreatpuzzleproject.com/wikimedia/1791676137832-aca96ac9.webp",
+        alt: "Terrazas Megalíticas de Gunung Padang",
+        title: "Gunung Padang",
+        category: "Prehistoria",
+        objectPosition: "center 20%"
+      }
+    ]
+  }
+];
+
+const allSlides: SlideItem[] = computedSlides.length > 0
+  ? computedSlides
+  : (slides && slides.length > 0 
+      ? slides 
+      : (title && panels 
+          ? [{
+              kicker: kicker || defaultSlides[0].kicker,
+              title: title,
+              tagLabel: tagLabel || defaultSlides[0].tagLabel,
+              subtitle: subtitle || defaultSlides[0].subtitle,
+              ctaText: ctaText || defaultSlides[0].ctaText,
+              ctaHref: ctaHref || defaultSlides[0].ctaHref,
+              panels: panels
+            }]
+          : defaultSlides));
 ---
 
-<section class="tgp-hero-triptych-container relative w-full h-[78vh] min-h-135 max-h-205 bg-[#0b0c10] text-white overflow-hidden rounded-xl select-none shadow-2xl">
+<section class="tgp-hero-triptych-container relative w-full h-[76vh] min-h-135 max-h-195 bg-[#08090c] text-white overflow-hidden rounded-2xl md:rounded-3xl select-none shadow-[0_30px_70px_-15px_rgba(0,0,0,0.95)] border border-white/10">
   
-  <!-- CONTENEDOR DE SLIDES SUPERPUESTOS CON TRÍPTICO ASIMÉTRICO (48% / 38% / 14%) -->
+  <!-- CONTENEDOR DE SLIDES SUPERPUESTOS CON 3 POSTS EN FORMATO CUADRADO -->
   <div class="absolute inset-0 w-full h-full z-0 overflow-hidden">
     {allSlides.map((slide, sIdx) => (
       <div 
-        class={`showcase-slide absolute inset-0 w-full h-full flex ${sIdx === 0 ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
+        class={`showcase-slide absolute inset-0 w-full h-full flex items-center justify-between px-6 sm:px-10 md:px-14 lg:px-16 ${sIdx === 0 ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
         data-slide-index={sIdx}
       >
-        <!-- PANEL 1 (48%): Mitad izquierda = Puro Bokeh | Mitad derecha = Figura 1 con suave fade -->
-        <div class="tgp-panel relative w-full md:w-[48%] h-full overflow-hidden bg-[#12131a]">
-          <!-- Fondo Bokeh expandido para colchón del CTA -->
+        <!-- FONDO ATMOSFÉRICO EXPANDIDO (BOKEH CINEMÁTICO SUAVE DEL POST PRINCIPAL) -->
+        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <img 
             src={slide.panels[0].image} 
             alt="" 
             aria-hidden="true"
-            class="absolute inset-0 w-full h-full object-cover scale-150 blur-3xl brightness-75 saturate-150 pointer-events-none"
+            class="w-full h-full object-cover scale-125 blur-3xl opacity-30 brightness-75 saturate-125"
           />
-          <!-- Figura 1 anclada exclusivamente en el 62% derecho -->
-          <div class="absolute right-0 top-0 w-[62%] h-full z-10 overflow-hidden mask-figure-one">
-            <img 
-              src={slide.panels[0].image} 
-              alt={slide.panels[0].alt}
-              style={`object-position: ${slide.panels[0].objectPosition || 'center 20%'};`}
-              class="w-full h-full object-cover"
-            />
-          </div>
+          <div class="absolute inset-0 bg-linear-to-r from-[#08090c] via-[#08090c]/85 via-50% to-transparent z-1"></div>
         </div>
 
-        <!-- PANEL 2 (38%): Figura 2 protagonista con corte vertical neto -->
-        <div class="tgp-panel relative hidden md:block md:w-[38%] h-full overflow-hidden">
-          <img 
-            src={slide.panels[1].image} 
-            alt="" 
-            aria-hidden="true"
-            class="absolute inset-0 w-full h-full object-cover scale-125 blur-2xl brightness-90 pointer-events-none"
-          />
-          <img 
-            src={slide.panels[1].image} 
-            alt={slide.panels[1].alt}
-            style={`object-position: ${slide.panels[1].objectPosition || 'center 25%'};`}
-            class="relative z-10 w-full h-full object-cover mask-figure-two"
-          />
+        <!-- ESPACIO IZQUIERDO RESERVADO PARA EL BLOQUE EDITORIAL (SHOWCASE-CONTENT) -->
+        <div class="w-full md:w-[44%] lg:w-[40%] h-full shrink-0"></div>
+
+        <!-- CONTENEDOR DERECHO: 3 POSTS EN FORMATO CUADRADO PROPORCIONADO -->
+        <div class="relative z-10 w-full md:w-[56%] lg:w-[60%] flex items-center justify-end gap-3 sm:gap-4 md:gap-5 overflow-hidden py-6">
+          {slide.panels.map((panel, pIdx) => {
+            const isMainPanel = pIdx === 0;
+            return (
+              <a
+                href={panel.href || slide.ctaHref}
+                class={`group/card relative block aspect-square rounded-2xl overflow-hidden border border-white/15 bg-black/60 shadow-2xl transition-all duration-500 hover:border-amber-400/60 hover:scale-[1.03] hover:shadow-[0_15px_35px_rgba(217,119,6,0.25)] ${
+                  isMainPanel
+                    ? 'w-[42%] sm:w-[38%] md:w-[36%] z-20'
+                    : pIdx === 1
+                      ? 'w-[34%] sm:w-[32%] md:w-[32%] z-15'
+                      : 'hidden sm:block sm:w-[28%] md:w-[28%] z-10'
+                }`}
+              >
+                <!-- Imagen en formato cuadrado -->
+                <img
+                  src={panel.image}
+                  alt={panel.alt || panel.title || ''}
+                  loading={sIdx === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                  class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105"
+                  style={`object-position: ${panel.objectPosition || 'center 25%'};`}
+                />
+
+                <!-- Scrim inferior para rotulado -->
+                <div class="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/90 via-black/40 to-transparent pointer-events-none"></div>
+
+                <!-- Rotulado del post -->
+                <div class="absolute inset-x-0 bottom-0 p-3 sm:p-4 flex flex-col gap-1 pointer-events-none">
+                  {panel.category && (
+                    <span class="text-[8px] sm:text-[9px] uppercase tracking-[0.2em] font-mono text-amber-300/90 font-bold line-clamp-1">
+                      {panel.category}
+                    </span>
+                  )}
+                  {panel.title && (
+                    <h3 class="font-sans font-bold text-xs sm:text-sm text-white line-clamp-2 leading-tight drop-shadow-md group-hover/card:text-amber-200 transition-colors">
+                      {panel.title}
+                    </h3>
+                  )}
+                </div>
+
+                <!-- Badge de orden sutil -->
+                <div class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-black/55 backdrop-blur-md border border-white/10 text-[9px] font-mono text-white/70">
+                  0{pIdx + 1}
+                </div>
+              </a>
+            );
+          })}
         </div>
 
-        <!-- PANEL 3 (14%): Figura 3 en franja vertical estrecha a la derecha -->
-        <div class="tgp-panel relative hidden lg:block lg:w-[14%] h-full overflow-hidden">
-          <img 
-            src={slide.panels[2].image} 
-            alt={slide.panels[2].alt}
-            style={`object-position: ${slide.panels[2].objectPosition || 'center 20%'};`}
-            class="w-full h-full object-cover"
-          />
-        </div>
       </div>
     ))}
   </div>
 
-  <!-- VIÑETA SUTIL EN LA ESQUINA INFERIOR IZQUIERDA PARA EL TEXTO -->
-  <div class="absolute bottom-0 left-0 w-full md:w-[45%] h-[65%] bg-linear-to-t from-black/85 via-black/40 to-transparent z-15 pointer-events-none"></div>
+  <!-- VIÑETA LATERAL IZQUIERDA PARA EL TEXTO -->
+  <div class="absolute bottom-0 left-0 w-full md:w-[46%] h-full bg-linear-to-r from-[#08090c] via-[#08090c]/80 to-transparent z-15 pointer-events-none"></div>
 
   <!-- BLOQUE EDITORIAL SUPERPUESTO (FÍSICA APPLE TV+) -->
-  <div class="relative z-20 w-full h-full flex flex-col justify-end items-start p-7 md:p-12 pb-10 md:pb-12 pointer-events-none">
+  <div class="relative z-20 w-full h-full flex flex-col justify-center items-start p-7 md:p-14 lg:p-16 pointer-events-none">
     {allSlides.map((slide, sIdx) => (
       <div 
-        class={`showcase-content absolute bottom-7 md:bottom-12 left-7 md:left-12 max-w-85 md:max-w-95 font-sans ${sIdx === 0 ? 'opacity-100 pointer-events-auto z-30' : 'opacity-0 pointer-events-none z-0'}`}
+        class={`showcase-content absolute inset-y-0 left-7 md:left-14 lg:left-16 flex flex-col justify-center items-start max-w-sm sm:max-w-md md:max-w-lg font-sans ${sIdx === 0 ? 'opacity-100 pointer-events-auto z-30' : 'opacity-0 pointer-events-none z-0'}`}
         data-content-index={sIdx}
       >
-        <span class="block text-[10px] font-mono uppercase tracking-[0.2em] text-white/75 mb-1">
+        <span class="block text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.25em] text-amber-300/90 mb-2 font-bold">
           {slide.kicker}
         </span>
 
-        <h1 class="font-sans! text-2xl! md:text-[32px]! font-black! tracking-tight uppercase leading-[1.02]! text-white mb-3!">
+        <h2 class="font-sans text-2xl sm:text-3xl md:text-[34px] font-black tracking-tight uppercase leading-[1.08] text-white mb-3">
           {slide.title}
-        </h1>
+        </h2>
 
-        <div class="flex items-center gap-2 mb-2">
-          <span class="px-2 py-0.5 text-[10px] font-bold bg-black/60 backdrop-blur-md rounded-full text-white border border-white/15">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="px-2 py-0.5 text-[10px] font-bold bg-white/10 backdrop-blur-md rounded-full text-white border border-white/15 font-mono">
             TGP
           </span>
-          <span class="text-xs font-semibold text-white/95">
+          <span class="text-xs font-semibold text-white/90">
             {slide.tagLabel}
           </span>
         </div>
 
-        <p class="text-xs! md:text-[13px]! text-white/80 leading-snug! mb-5! font-normal">
+        <p class="text-xs sm:text-sm text-white/75 leading-relaxed mb-6 font-normal max-w-md">
           {slide.subtitle}
         </p>
 
         <a 
           href={slide.ctaHref} 
-          class="showcase-cta group inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-white text-zinc-950 rounded-full font-semibold text-xs md:text-sm hover:bg-zinc-200 transition-all duration-200 shadow-lg pointer-events-auto cursor-pointer relative z-30"
+          class="showcase-cta group inline-flex items-center justify-center gap-2.5 px-7 py-3 bg-white text-zinc-950 rounded-full font-semibold text-xs sm:text-sm hover:bg-zinc-200 transition-all duration-200 shadow-xl pointer-events-auto cursor-pointer relative z-30 hover:scale-[1.03] active:scale-[0.98]"
         >
           <svg class="w-3.5 h-3.5 fill-current transition-transform duration-200 group-hover:translate-x-0.5" viewBox="0 0 24 24">
             <path d="M8 5v14l11-7z" />
@@ -235,32 +284,20 @@ const allSlides: SlideItem[] = slides && slides.length > 0
   </div>
 
   <!-- INDICADORES INFERIORES CENTRALES DINÁMICOS -->
-  <div class="showcase-indicators absolute bottom-3.5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/10">
-    {allSlides.map((_, i) => (
-      <button 
-        type="button" 
-        class={`showcase-dot transition-all duration-300 rounded-full cursor-pointer ${i === 0 ? 'w-4 h-2 bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.7)]' : 'w-2 h-2 bg-white/35 hover:bg-white/60'}`}
-        data-dot-index={i}
-        aria-label={`Ir a la diapositiva ${i + 1}`}
-      ></button>
-    ))}
-  </div>
+  {allSlides.length > 1 && (
+    <div class="showcase-indicators absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/55 backdrop-blur-md border border-white/15">
+      {allSlides.map((_, i) => (
+        <button 
+          type="button" 
+          class={`showcase-dot transition-all duration-300 rounded-full cursor-pointer ${i === 0 ? 'w-5 h-2 bg-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.7)]' : 'w-2 h-2 bg-white/35 hover:bg-white/60'}`}
+          data-dot-index={i}
+          aria-label={`Ir al trío de posts ${i + 1}`}
+        ></button>
+      ))}
+    </div>
+  )}
 
 </section>
-
-<style>
-  /* Funde suavemente el borde izquierdo de la Figura 1 hacia el bokeh del CTA */
-  .mask-figure-one {
-    mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.5) 22%, black 48%, black 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.5) 22%, black 48%, black 100%);
-  }
-
-  /* Mantiene el corte vertical e integra suavemente los bordes del Panel 2 */
-  .mask-figure-two {
-    mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.85) 0%, black 12%, black 88%, rgba(0, 0, 0, 0.85) 100%);
-    -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.85) 0%, black 12%, black 88%, rgba(0, 0, 0, 0.85) 100%);
-  }
-</style>
 
 <script>
   import { gsap } from 'gsap';
@@ -283,7 +320,7 @@ const allSlides: SlideItem[] = slides && slides.length > 0
     function updateDots(index: number) {
       dots.forEach((dot, idx) => {
         if (idx === index) {
-          dot.className = 'showcase-dot transition-all duration-300 rounded-full cursor-pointer w-4 h-2 bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.7)]';
+          dot.className = 'showcase-dot transition-all duration-300 rounded-full cursor-pointer w-5 h-2 bg-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.7)]';
         } else {
           dot.className = 'showcase-dot transition-all duration-300 rounded-full cursor-pointer w-2 h-2 bg-white/35 hover:bg-white/60';
         }
@@ -300,63 +337,77 @@ const allSlides: SlideItem[] = slides && slides.length > 0
       const nextContent = contents[nextIndex];
 
       const tl = gsap.timeline({
-        defaults: { ease: 'expo.out' },
         onComplete: () => {
           isAnimating = false;
         }
       });
 
-      // 1. Salida ultrarrápida del contenido actual (250ms)
-      gsap.set(currentContent, { zIndex: 0 });
-      tl.to(currentContent, {
-        opacity: 0,
-        y: -10,
-        duration: 0.25,
-        ease: 'power2.in',
-        onComplete: () => {
-          gsap.set(currentContent, { pointerEvents: 'none', zIndex: 0 });
-        }
-      }, 0);
-
-      // 2. Salida de la imagen/sábana actual con un leve retroceso
-      tl.to(currentSlide, {
-        opacity: 0,
-        scale: 0.98,
-        x: -25,
-        duration: 0.45,
-        onComplete: () => {
-          gsap.set(currentSlide, { pointerEvents: 'none', zIndex: 0 });
-        }
-      }, 0);
-
-      // 3. Entrada instantánea de la nueva imagen (corte moderno con micro-zoom)
-      gsap.set(nextSlide, { zIndex: 10, pointerEvents: 'auto' });
-      tl.fromTo(nextSlide,
-        { opacity: 0, scale: 1.05, x: 35 },
-        { opacity: 1, scale: 1, x: 0, duration: 0.55 },
-        0.08
+      tl.to(
+        currentSlide,
+        {
+          opacity: 0,
+          scale: 0.98,
+          duration: 0.7,
+          ease: 'power3.inOut',
+          onComplete: () => {
+            currentSlide.style.zIndex = '0';
+            currentSlide.style.pointerEvents = 'none';
+          }
+        },
+        0
       );
 
-      // 4. Entrada limpia del nuevo Tagline y botones CTA a la izquierda
-      gsap.set(nextContent, { zIndex: 30, pointerEvents: 'auto' });
-      tl.fromTo(nextContent,
-        { opacity: 0, y: 14, pointerEvents: 'auto' },
-        { 
-          opacity: 1, 
-          y: 0, 
+      tl.to(
+        currentContent,
+        {
+          opacity: 0,
+          y: -12,
           duration: 0.5,
+          ease: 'power2.in',
           onComplete: () => {
-            gsap.set(nextContent, { pointerEvents: 'auto', zIndex: 30 });
+            currentContent.style.zIndex = '0';
+            currentContent.style.pointerEvents = 'none';
+          }
+        },
+        0
+      );
+
+      tl.fromTo(
+        nextSlide,
+        { opacity: 0, scale: 1.02 },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.8,
+          ease: 'power3.out',
+          onStart: () => {
+            nextSlide.style.zIndex = '10';
+            nextSlide.style.pointerEvents = 'auto';
           }
         },
         0.15
+      );
+
+      tl.fromTo(
+        nextContent,
+        { opacity: 0, y: 15 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.65,
+          ease: 'power2.out',
+          onStart: () => {
+            nextContent.style.zIndex = '30';
+            nextContent.style.pointerEvents = 'auto';
+          }
+        },
+        0.2
       );
 
       currentIndex = nextIndex;
       updateDots(currentIndex);
     }
 
-    // Programación continua con gsap.delayedCall (permite pausar y reanudar exactamente donde estaba)
     function scheduleNext() {
       if (loopCall) loopCall.kill();
       loopCall = gsap.delayedCall(4.5, () => {
@@ -382,7 +433,6 @@ const allSlides: SlideItem[] = slides && slides.length > 0
       }
     }
 
-    // Navegación manual por puntos: salta y reinicia ciclo continuo desde esa posición
     dots.forEach((dot, idx) => {
       dot.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -391,13 +441,11 @@ const allSlides: SlideItem[] = slides && slides.length > 0
       });
     });
 
-    // Control de interacción del usuario (pausa y reanudación exacta)
     container.addEventListener('mouseenter', pauseLoop);
     container.addEventListener('mouseleave', resumeLoop);
     container.addEventListener('touchstart', pauseLoop, { passive: true });
     container.addEventListener('touchend', resumeLoop, { passive: true });
 
-    // Detección de visibilidad de pestaña
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         pauseLoop();
@@ -406,7 +454,6 @@ const allSlides: SlideItem[] = slides && slides.length > 0
       }
     });
 
-    // Iniciar bucle automático inmediato
     scheduleNext();
   }
 

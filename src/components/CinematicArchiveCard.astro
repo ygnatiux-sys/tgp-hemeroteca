@@ -84,9 +84,21 @@ if (entry.youtubeLink) {
 const isHero = variant === "hero";
 const isDuo40 = variant === "duo-40";
 
-// Relación de aspecto de la imagen según variante
+// Detección de retratos / rostros humanos / monolitos / fauna para encuadre y aspect ratio
+const explicitPos = (entry as any)?.titlePosition || null;
+const isPortraitArt =
+  /olmeca|cabeza|monolito|aguara|hegel|homero|saturno|busto|estatua|retrato|filosofia|moctezuma|gengis|tatu|rostro|portrait|escultura|venus|urano|arquetipo|personaje|fauna|animal|tero|perdiz|tapir|vaca|hunza/i.test(
+    `${entry?.title || ""} ${slug || ""} ${entry?.category || ""}`,
+  );
+const titlePos = explicitPos || (isPortraitArt ? "top" : "bottom");
+
+// Relación de aspecto de la imagen según variante y sujeto:
+// Sujetos con verticalidad (Olmeca, Hegel, bustos, retratos) adoptan Univisium (2:1 / 18:9) con mayor altura.
+// Paisajes y sitios abiertos continúan en Cinemascope (2.39:1 / 21:9).
 const imageAspectClass = isHero
-  ? "aspect-video max-h-[58vh]"
+  ? isPortraitArt
+    ? "aspect-[2/1] min-h-115 md:min-h-130 max-h-[68vh]"
+    : "aspect-21/9 sm:aspect-[2.39/1] max-h-[60vh]"
   : isDuo40
     ? "aspect-[4/3] sm:aspect-16/10"
     : "aspect-[4/3] sm:aspect-video";
@@ -205,13 +217,6 @@ function parseHeroPhrase(text: string) {
 
 const heroPhraseHTML = heroPhraseRaw ? parseHeroPhrase(heroPhraseRaw) : "";
 
-// Detección de retratos / rostros humanos / fauna para alineación inteligente del título (Arriba vs Abajo)
-const explicitPos = (entry as any)?.titlePosition || null;
-const isPortraitArt =
-  /aguara|hegel|homero|saturno|busto|estatua|retrato|filosofia|moctezuma|gengis|tatu|rostro|portrait|escultura|venus|urano|arquetipo|personaje|fauna|animal|tero|perdiz|tapir|vaca|hunza/i.test(
-    `${entry?.title || ""} ${slug || ""} ${entry?.category || ""}`,
-  );
-const titlePos = explicitPos || (isPortraitArt ? "top" : "bottom");
 const explicitBgContrast = (entry as any)?.bgContrast || null;
 const bgContrast =
   explicitBgContrast || (titlePos === "top" ? "light" : "dark");
@@ -280,7 +285,9 @@ const fitClass =
           } ${isHero ? "brightness-100 contrast-100" : "brightness-90 group-hover:brightness-100"} ${fitClass} ${resolveMultivisionClass(img)}`}
           style={
             isHero
-              ? "object-position: 50% 50%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
+              ? isPortraitArt
+                ? "object-position: 50% 25%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
+                : "object-position: 50% 50%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
               : undefined
           }
           data-flip-id={`card-image-${cardId}`}

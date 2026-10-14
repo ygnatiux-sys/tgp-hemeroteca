@@ -12,6 +12,7 @@ import RowNetflixClasico from '../components/RowNetflixClasico.astro';
 import SpotlightMediaTray, { type TrayCollectionItem } from '../components/SpotlightMediaTray.astro';
 import Marquee from '../components/Marquee.astro';
 import AppleBentoArchetypes from '../components/AppleBentoArchetypes.astro';
+import TgpHeroTriptych, { type TriptychPost } from '../components/TgpHeroTriptych.astro';
 import HeroSpotifyColecciones from '../components/HeroSpotifyColecciones.astro';
 import { customCollections } from '../lib/custom-collections';
 import {
@@ -111,6 +112,19 @@ const archiveHeroTiles = [
       href: (e as any).href || ((e as any).isNota ? `/notas/${e.slug}/` : (e as any).isCinematicGSAP ? `/ensayos-cinematicos/${e.slug}/` : `/hemeroteca/${e.slug}/`),
     }))
 ].slice(0, 12);
+
+// ─── POSTS PARA EL SHOWCASE CINEMÁTICO TRIPTYCH (SECUENCIA DE 3 EN 3) ────────
+const triptychRealPosts: TriptychPost[] = resolvedEssays
+  .filter(e => e.img)
+  .slice(0, 15)
+  .map(e => ({
+    title: e.entry.title || e.slug,
+    excerpt: e.entry.excerpt || '',
+    category: formatCategory(e.entry.category),
+    img: sanitizeImageUrl(typeof e.img === 'object' && (e.img as any)?.src ? (e.img as any).src : (typeof e.img === 'string' ? e.img : '')),
+    href: (e as any).href || ((e as any).isNota ? `/notas/${e.slug}/` : (e as any).isCinematicGSAP ? `/ensayos-cinematicos/${e.slug}/` : `/hemeroteca/${e.slug}/`),
+    date: e.entry.date ? formatDate(e.entry.date) : undefined
+  }));
 
 // Agrupamiento por categorías para barras editoriales estilo suizo
 const essaysByCategory = categories.map(cat => {
@@ -597,6 +611,21 @@ function createPremierSequences(essays: typeof resolvedEssays) {
           eyebrow="Galería 3D del Archivo"
         />
       </section>
+    )}
+
+    {/* ── SHOWCASE CINEMÁTICO: DIAPOSITIVAS DE 3 EN 3 CON POSTS REALES ── */}
+    {triptychRealPosts.length >= 3 && (
+      <div class="w-full mt-20 md:mt-28">
+        <div class="flex flex-col items-center justify-center text-center pb-6 gap-2 w-full max-w-4xl mx-auto">
+          <span class="font-metadata text-[12px] sm:text-xs uppercase tracking-[0.35em] text-rust-orange font-bold">
+            Showcase Editorial · Secuencia Dinámica
+          </span>
+          <h2 class="text-2xl sm:text-3xl md:text-4xl font-gloock font-black tracking-tight leading-[1.05] gradient-general-h1 uppercase">
+            Hemeroteca Destacada
+          </h2>
+        </div>
+        <TgpHeroTriptych posts={triptychRealPosts} />
+      </div>
     )}
 
     {/* ── BENTO ULTRA CINEMÁTICO: EJEMPLAR FINAL ANTES DEL FOOTER ── */}
