@@ -275,7 +275,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
   />
 
   <div id="archive-view-container" class="min-h-screen pb-32 pt-12">
-    <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 flex flex-col gap-12 md:gap-16">
+    <div class="w-full max-w-430 2xl:max-w-460 mx-auto px-3 sm:px-6 md:px-8 lg:px-10 flex flex-col gap-12 md:gap-16">
       {/* ══════════════════════════════════════════════════════════════════
           SISTEMA DE SOLAPAS PRINCIPALES (TABS MINIMALISTAS)
       ══════════════════════════════════════════════════════════════════ */}
@@ -400,7 +400,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
 
                 {/* 1. Post Cover Cinemático de la Colección (Hero Full Bleed Proporcionado) */}
                 {coverEssay && (
-                  <div class="w-full max-w-6xl mx-auto">
+                  <div class="w-full">
                     <CinematicArchiveCard
                       slug={coverEssay.slug}
                       entry={coverEssay.entry}
@@ -448,7 +448,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                         categoryLabel={group.catLabel}
                       />
                       */}
-                      <div class="w-full max-w-6xl mx-auto">
+                      <div class="w-full">
                         <TriplicoRevelacion
                           posts={triplicoCategoryPosts}
                           heroPost={triplicoCategoryHero}
@@ -600,7 +600,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
     )}
 
     {/* ── BENTO ULTRA CINEMÁTICO: EJEMPLAR FINAL ANTES DEL FOOTER ── */}
-    <div class="w-full max-w-6xl mx-auto mt-20 md:mt-28 px-4 sm:px-0">
+    <div class="w-full mt-20 md:mt-28">
       <div class="flex flex-col items-center justify-center text-center pb-6 gap-2 w-full max-w-4xl mx-auto">
         <span class="font-metadata text-[12px] sm:text-xs uppercase tracking-[0.35em] text-rust-orange font-bold">
           Bento Ultra · Convergencia Arquetípica
