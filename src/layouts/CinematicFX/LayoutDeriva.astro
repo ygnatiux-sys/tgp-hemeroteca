@@ -3,6 +3,7 @@ import { resolveMultivisionClass } from "../../lib/multivision";
 import { sanitizeImageUrl, isValidImageSrc } from '../../lib/content-filter';
 import Layout from '../Layout.astro';
 import TypeMagyk from '../../components/TypeMagyk.astro';
+import CinematicBentoHero from '../../components/CinematicBentoHero.astro';
 
 interface Props {
   frontmatter: any;
@@ -17,14 +18,17 @@ const rawImages: any[] = [
   ...(Array.isArray(frontmatter.gallery) ? frontmatter.gallery : []),
 ];
 const directCover = frontmatter.coverImage || frontmatter.image || frontmatter.portada;
-if (directCover && !rawImages.length) {
-  rawImages.push(directCover);
-}
+const coverImg = directCover || rawImages[0];
+const coverImgUrl = (coverImg && isValidImageSrc(coverImg)) ? (sanitizeImageUrl(coverImg) || undefined) : undefined;
 
-const title = frontmatter.title || 'Dossier — Deriva';
-const excerpt = frontmatter.excerpt || '';
-const rawCover = rawImages[0];
-const coverImgUrl = (rawCover && isValidImageSrc(rawCover)) ? (sanitizeImageUrl(rawCover) || undefined) : undefined;
+const candidateSecondary = rawImages.find((img: any) => {
+  const safe = sanitizeImageUrl(img);
+  return safe && safe !== coverImgUrl;
+}) || (rawImages.length > 1 && sanitizeImageUrl(rawImages[1]) !== coverImgUrl ? rawImages[1] : undefined);
+const secondaryImgUrl = (candidateSecondary && isValidImageSrc(candidateSecondary)) ? (sanitizeImageUrl(candidateSecondary) || undefined) : undefined;
+
+const title = frontmatter?.title || 'Dossier — Deriva';
+const excerpt = frontmatter?.excerpt || '';
 ---
 
 <Layout title={title} description={excerpt} image={coverImgUrl} headerTransparentUntilScroll={true} footerVariant="minimal">
@@ -63,31 +67,20 @@ const coverImgUrl = (rawCover && isValidImageSrc(rawCover)) ? (sanitizeImageUrl(
       )}
     </div>
 
-    {/* Header */}
-    <header class="relative z-30 pt-24 pb-8 px-6 max-w-4xl mx-auto">
-      <div class="flex flex-col gap-4">
-        <span class="font-metadata text-[9px] uppercase tracking-[0.5em] text-[#c9a86c]/70">Ensayo Cinemático · Deriva</span>
-        <h1 class="font-cinzel font-extrabold text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight gradient-general-h1 drop-shadow-[0_2px_30px_rgba(0,0,0,0.9)]">
-          {title}
-        </h1>
-        {excerpt && <p class="font-serif text-white/60 text-lg italic leading-relaxed max-w-2xl">{excerpt}</p>}
-        {coverImgUrl && (
-          <div class="relative w-full aspect-video md:aspect-21/9 rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] mt-4 group">
-            <img
-              src={coverImgUrl}
-              alt={title}
-              loading="eager"
-              fetchpriority="high"
-              decoding="async"
-              class="object-center transition-transform duration-1000 group-hover:scale-105 img-nativa"
-            />
-            <div class="absolute inset-0 bg-linear-to-t from-[#0b0c0d] via-transparent to-transparent opacity-40"></div>
-          </div>
-        )}
-      </div>
+    {/* Header Monumental Bento Ultra Cinemascope (21:9) */}
+    <header class="relative z-30 w-full">
+      <CinematicBentoHero
+        title={title}
+        excerpt={excerpt}
+        atmosfera={frontmatter.atmosfera?.discriminant || frontmatter.atmosfera || 'Deriva'}
+        coverImage={coverImgUrl}
+        secondaryImage={secondaryImgUrl}
+        instanceId="deriva-bento-hero"
+      />
     </header>
 
-    <div class="relative z-30 max-w-4xl mx-auto px-6 mb-12">
+    {/* Divisor atmosférico y ancla de lectura cinemática */}
+    <div id="cinematic-reading-start" class="relative z-30 max-w-4xl mx-auto px-6 mb-12 scroll-mt-24">
       <div class="h-px w-full bg-linear-to-r from-transparent via-[#c9a86c]/30 to-transparent"></div>
     </div>
 

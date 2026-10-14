@@ -1,0 +1,201 @@
+---
+/**
+ * src/components/CinematicBentoHero.astro
+ *
+ * Hero Monumental en proporción Cinemascope (2.39:1 / 21:9) estilo Bento Ultra.
+ * Soporta composición de 1 o 2 imágenes (Paisaje panorámico + Figura/Estatua recortada con máscara radial).
+ * Incluye timeline GSAP reactiva con respiración contrapuesta y pausa en hover.
+ */
+import { sanitizeImageUrl, isValidImageSrc } from '../lib/content-filter';
+
+interface Props {
+  title: string;
+  excerpt?: string;
+  atmosfera?: string;
+  coverImage?: string | any;
+  secondaryImage?: string | any;
+  instanceId?: string;
+}
+
+const {
+  title,
+  excerpt = '',
+  atmosfera = 'Obsidiana',
+  coverImage,
+  secondaryImage,
+  instanceId = 'hero-cinematic-bento',
+} = Astro.props;
+
+const safeCover = (coverImage && isValidImageSrc(coverImage)) ? sanitizeImageUrl(coverImage) : null;
+const safeSecondary = (secondaryImage && isValidImageSrc(secondaryImage)) ? sanitizeImageUrl(secondaryImage) : null;
+
+// Limpieza de Markdown residual del excerpt para visualización limpia
+const cleanExcerpt = excerpt ? excerpt.replace(/^##\s+[IVXLCDM\d\.\s]+:\s*/i, '').replace(/[#*_`]/g, '').trim() : '';
+---
+
+<section class="w-full max-w-430 2xl:max-w-460 mx-auto px-3 sm:px-6 md:px-8 lg:px-10 pt-20 md:pt-24 pb-8 md:pb-12 bg-transparent select-none">
+  <!-- CONTENEDOR HERO BENTO ULTRA CINEMASCOPE (21:9 / 2.39:1) -->
+  <div
+    id={instanceId}
+    class="cinematic-bento-card relative isolate w-full aspect-21/9 sm:aspect-[2.39/1] min-h-115 md:min-h-130 max-h-170 rounded-3xl sm:rounded-4xl overflow-hidden bg-[#07080a] border border-white/10 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.95)] group/bento"
+  >
+    {/* ── 1. FONDO PANORÁMICO (CAPA 1: PAISAJE CINEMASCOPE) ── */}
+    {safeCover && (
+      <div class="bento-bg-layer absolute inset-0 z-0 overflow-hidden will-change-transform">
+        <img
+          src={safeCover}
+          alt={title}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          class="w-full h-full object-cover object-center scale-[1.03] will-change-transform transition-transform duration-1000 group-hover/bento:scale-[1.06]"
+        />
+      </div>
+    )}
+
+    {/* ── 2. GRADIENTES CINEMATOGRÁFICOS DE LECTURA Y PROFUNDIDAD ── */}
+    {/* Scrim lateral izquierdo para garantizar contraste absoluto del texto */}
+    <div
+      class="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,#060709_0%,rgba(6,7,9,0.92)_35%,rgba(6,7,9,0.55)_60%,rgba(6,7,9,0.15)_80%,transparent_100%)]"
+    ></div>
+
+    {/* Viñeta inferior y superior sutil */}
+    <div
+      class="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(6,7,9,0.6)_0%,transparent_25%,transparent_70%,rgba(6,7,9,0.95)_100%)]"
+    ></div>
+
+    {/* Glow atmosférico reactivo ámbar/dorado detrás de la figura */}
+    <div
+      class="bento-glow pointer-events-none absolute right-[10%] top-[-10%] w-[55%] h-[120%] z-10 bg-[radial-gradient(circle_at_60%_45%,rgba(216,156,74,0.38)_0%,rgba(140,45,30,0.22)_45%,transparent_75%)] blur-3xl transform origin-center"
+    ></div>
+
+    {/* ── 3. FIGURA PROTAGÓNICA SECUNDARIA (CAPA 2: ESTATUA / BUSTO / RELIEVE) ── */}
+    {safeSecondary && (
+      <div class="pointer-events-none select-none absolute inset-y-0 right-0 w-[55%] sm:w-[50%] md:w-[45%] z-20 overflow-hidden flex items-end justify-center pr-4 sm:pr-8 md:pr-14">
+        <div class="bento-sculpture-layer relative w-full h-[88%] sm:h-[92%] flex items-end justify-center will-change-transform">
+          <img
+            src={safeSecondary}
+            alt={`Detalle escultórico de ${title}`}
+            loading="eager"
+            decoding="async"
+            class="max-h-full max-w-full object-contain object-bottom drop-shadow-[-25px_18px_35px_rgba(0,0,0,0.95)] mask-[radial-gradient(ellipse_75%_80%_at_50%_48%,black_45%,transparent_95%)] filter brightness-95 contrast-110"
+          />
+        </div>
+      </div>
+    )}
+
+    {/* ── 4. BLOQUE EDITORIAL Y METADATOS (LADO IZQUIERDO) ── */}
+    <div class="relative z-30 h-full w-full md:w-[55%] lg:w-[50%] pl-6 sm:pl-10 md:pl-14 lg:pl-16 pr-6 flex flex-col justify-center items-start pointer-events-auto">
+      
+      {/* Insignia / Badge minimalista estilo Apple / Archivo */}
+      <div class="flex items-center gap-2.5 mb-4">
+        <span class="text-white font-bold tracking-tight text-lg md:text-xl font-sans">
+          TGP
+        </span>
+        <span class="text-[10px] md:text-[11px] uppercase tracking-[0.25em] font-mono px-3 py-1 rounded-full bg-white/10 text-amber-300/90 border border-white/15 backdrop-blur-md">
+          Ensayo Cinemático · {atmosfera}
+        </span>
+      </div>
+
+      {/* Titular Monumental en Cinemascope */}
+      <h1 class="font-cinzel text-2xl sm:text-3xl md:text-4xl lg:text-[44px] font-extrabold text-[#EFEBE3] leading-[1.08] tracking-tight mb-4 max-w-xl drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] gradient-general-h1">
+        {title}
+      </h1>
+
+      {/* Excerpt Litúrgico / Dek */}
+      {cleanExcerpt && (
+        <p class="font-serif italic text-white/70 text-sm sm:text-base md:text-lg leading-relaxed max-w-lg mb-6 line-clamp-3 sm:line-clamp-4">
+          {cleanExcerpt}
+        </p>
+      )}
+
+      {/* Botón CTA Cinemático con Ancla Suave */}
+      <a
+        href="#cinematic-reading-start"
+        class="px-7 py-3 rounded-full bg-[#f5f5f7] hover:bg-white text-[#121316] font-sans text-xs sm:text-sm font-semibold tracking-wide transition-all duration-300 shadow-xl hover:scale-[1.03] active:scale-[0.98] inline-flex items-center gap-2.5 group/btn"
+      >
+        <span>INICIAR LECTURA CINEMÁTICA</span>
+        <span class="text-xs transition-transform group-hover/btn:translate-y-0.5">↓</span>
+      </a>
+
+      {/* Micro-nota de formato */}
+      <div class="flex items-center gap-2 mt-4 text-[10px] uppercase tracking-[0.2em] text-white/40 font-mono">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+        <span>Pantalla Ancha · Cinemascope 2.39:1</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+  import gsap from 'gsap';
+
+  function initCinematicBentoHeroes() {
+    const cards = document.querySelectorAll<HTMLElement>('.cinematic-bento-card');
+    cards.forEach((card) => {
+      const bg = card.querySelector<HTMLElement>('.bento-bg-layer');
+      const sculpture = card.querySelector<HTMLElement>('.bento-sculpture-layer');
+      const glow = card.querySelector<HTMLElement>('.bento-glow');
+
+      // Animación GSAP de entrada fluida y respiración en contrapunto
+      const tl = gsap.timeline({ repeat: -1, yoyo: true });
+
+      if (sculpture) {
+        // Modo Dúo (Paisaje + Escultura): Respiración en sentidos opuestos
+        tl.to(bg, {
+          scale: 1.05,
+          x: -12,
+          duration: 3.6,
+          ease: 'sine.inOut'
+        }, 0);
+
+        tl.to(sculpture, {
+          scale: 1.03,
+          x: 10,
+          y: -6,
+          duration: 3.6,
+          ease: 'sine.inOut'
+        }, 0);
+
+        if (glow) {
+          tl.to(glow, {
+            scale: 1.25,
+            opacity: 0.85,
+            x: -20,
+            duration: 3.6,
+            ease: 'sine.inOut'
+          }, 0);
+        }
+      } else if (bg) {
+        // Modo Paisaje Solo: Sutil paneo cinemático Ken Burns
+        tl.to(bg, {
+          scale: 1.06,
+          x: -16,
+          duration: 4.2,
+          ease: 'sine.inOut'
+        }, 0);
+
+        if (glow) {
+          tl.to(glow, {
+            scale: 1.2,
+            opacity: 0.7,
+            duration: 4.2,
+            ease: 'sine.inOut'
+          }, 0);
+        }
+      }
+
+      // Pausa interactiva al posar el cursor
+      card.addEventListener('mouseenter', () => tl.pause());
+      card.addEventListener('mouseleave', () => tl.play());
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCinematicBentoHeroes);
+  } else {
+    initCinematicBentoHeroes();
+  }
+  document.addEventListener('astro:page-load', initCinematicBentoHeroes);
+</script>
