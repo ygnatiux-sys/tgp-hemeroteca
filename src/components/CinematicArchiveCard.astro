@@ -227,8 +227,12 @@ const { gradientClass: cardGradientClass, strokeClass } =
     explicitGradient,
   );
 
+// Solo bustos o estatuas recortadas aisladas usan contain; paisajes y fauna usan cover cinematográfico
+const isStrictStatueOrBust = /busto|estatua|escultura|saturno/i.test(
+  `${entry?.title || ""} ${slug || ""}`,
+);
 const fitClass =
-  isHero && isPortraitArt ? "object-contain! bg-[#08090a]" : "object-cover";
+  isHero && isStrictStatueOrBust ? "object-contain! bg-[#08090a]" : "object-cover";
 ---
 
 <article
@@ -253,7 +257,7 @@ const fitClass =
   }
   <a
     href={href}
-    class={`relative w-full ${imageAspectClass} rounded-2xl md:rounded-3xl overflow-hidden block ${isHero && isPortraitArt ? "bg-[#08090a]" : "bg-stone-900/60"} ${isHero ? "border-0 shadow-2xl" : "border border-white/10 shadow-xl"} shrink-0 cac-modal-trigger`}
+    class={`relative w-full ${imageAspectClass} rounded-2xl md:rounded-3xl overflow-hidden block ${isHero && isStrictStatueOrBust ? "bg-[#08090a]" : "bg-stone-900/60"} ${isHero ? "border-0 shadow-2xl" : "border border-white/10 shadow-xl"} shrink-0 cac-modal-trigger`}
   >
     {
       safeImg ? (

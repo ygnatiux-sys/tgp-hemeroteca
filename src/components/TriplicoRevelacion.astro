@@ -144,7 +144,7 @@ if (headline.includes('.')) {
     class:list={[
       "relative w-full overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl bg-black",
       isArchive ? "border-0" : "border border-white/10",
-      isArchive ? "aspect-video max-h-[58vh] min-h-[50vh] md:min-h-125 md:max-h-145" : "aspect-21/9 sm:aspect-[2.39/1] min-h-[58vh] md:min-h-140 max-h-175"
+      isArchive ? "aspect-21/9 sm:aspect-[2.39/1] min-h-[38vh] md:min-h-85 max-h-115" : "aspect-21/9 sm:aspect-[2.39/1] min-h-[58vh] md:min-h-140 max-h-175"
     ]}
   >
 
@@ -565,6 +565,7 @@ if (headline.includes('.')) {
           onComplete: () => {
             if (isArchiveVariant) {
               isRunning = false;
+              gsap.set(gridLayer, { autoAlpha: 1, pointerEvents: 'auto', zIndex: 35 });
               return;
             }
             // TRAS CONCLUIR LAS 3 CARDS Y UN BREVE DESCANSO:
@@ -605,13 +606,13 @@ if (headline.includes('.')) {
                 } else {
                   gsap.set(heroLayer, { zIndex: 30 });
                   gsap.to(heroLayer, { 
-                    autoAlpha: 1, 
-                    pointerEvents: 'auto', 
-                    duration: 1.0,
-                    onComplete: () => {
-                      triggerSoftPush();
-                    }
-                  });
+                        autoAlpha: 1, 
+                        pointerEvents: 'auto', 
+                        duration: 1.0,
+                        onComplete: () => {
+                          triggerSoftPush();
+                        }
+                      });
                 }
               }
             });
@@ -619,7 +620,13 @@ if (headline.includes('.')) {
         });
 
         // ── PASO 0: INTERLUDIO CINEMÁTICO NOMBRE DE LA COLECCIÓN (H1 GRADIENT) ──
-        if (titleInterludeLayer && interludeTitleBox) {
+        if (isArchiveVariant) {
+          // En archivo saltamos directo al desfile dinámico acelerado de los 3 posts
+          gsap.set(titleInterludeLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
+          gsap.set(heroLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
+          gsap.set(spotlightLayer, { autoAlpha: 1, zIndex: 35, pointerEvents: 'auto' });
+          gsap.set(gridLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
+        } else if (titleInterludeLayer && interludeTitleBox) {
           gsap.set(titleInterludeLayer, { autoAlpha: 1, zIndex: 40, pointerEvents: 'none' });
           gsap.set(heroLayer, { autoAlpha: 0, zIndex: 10, pointerEvents: 'none' });
           gsap.set(spotlightLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
@@ -651,7 +658,7 @@ if (headline.includes('.')) {
         const heroTextContent = heroLayer.querySelector<HTMLElement>('.hero-text-content');
         const heroPhraseElem = heroLayer.querySelector<HTMLElement>('.hero-phrase');
 
-        if (heroImg) {
+        if (heroImg && !isArchiveVariant) {
           const heroStartTime = mainTl.duration();
           mainTl.set(heroLayer, { zIndex: 30 });
           mainTl.to(heroLayer, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.4 }, heroStartTime);
@@ -711,7 +718,7 @@ if (headline.includes('.')) {
         // ── PASO B: PRESENTACIÓN INDIVIDUAL DE LAS 3 CARDS (ESTILO VERTICAL STACK) ──
         if (spotlightCards.length > 0) {
           mainTl.set(spotlightLayer, { zIndex: 35 });
-          mainTl.to(spotlightLayer, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.4 });
+          mainTl.to(spotlightLayer, { autoAlpha: 1, pointerEvents: 'auto', duration: (isArchiveVariant ? 0.3 : 0.4) });
 
           spotlightCards.forEach((card, idx) => {
             const titleStage = card.querySelector<HTMLElement>('.spotlight-title-stage');
@@ -722,17 +729,19 @@ if (headline.includes('.')) {
             const spotlightImg = card.querySelector<HTMLElement>('.spotlight-img');
             const isRightAligned = idx % 2 === 1;
             const cardStartTime = mainTl.duration();
+            const panDuration = isArchiveVariant ? 1.8 : 5.6;
+            const cardHold = isArchiveVariant ? 1.5 : 5.5;
 
             // Activar tarjeta con z-index superior
             mainTl.set(card, { zIndex: 25 }, cardStartTime);
-            mainTl.to(card, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.4 }, cardStartTime);
+            mainTl.to(card, { autoAlpha: 1, pointerEvents: 'auto', duration: (isArchiveVariant ? 0.3 : 0.4) }, cardStartTime);
 
             // PANEO CINEMÁTICO DE CÁMARA (20% 50% + Zoom 1.08 estilo Vertical Stack)
             if (spotlightImg) {
               const panTarget = isRightAligned ? '20% 50%' : '80% 50%';
               mainTl.fromTo(spotlightImg,
                 { objectPosition: '50% 50%', scale: 1 },
-                { objectPosition: panTarget, scale: 1.08, duration: 5.6, ease: 'cubic-bezier(0.25, 1, 0.5, 1)' },
+                { objectPosition: panTarget, scale: 1.08, duration: panDuration, ease: 'cubic-bezier(0.25, 1, 0.5, 1)' },
                 cardStartTime
               );
             }
@@ -743,18 +752,18 @@ if (headline.includes('.')) {
               mainTl.set(titleStage, { zIndex: 30, autoAlpha: 1 }, cardStartTime);
               mainTl.fromTo(titleBox,
                 { autoAlpha: 0, x: titleXStart, filter: 'blur(6px)' },
-                { autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' },
+                { autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: (isArchiveVariant ? 0.35 : 0.8), ease: 'power2.out' },
                 cardStartTime + 0.1
               );
               mainTl.to(titleBox,
-                { autoAlpha: 0, x: titleXStart / 2, duration: 0.5, ease: 'power2.in' },
-                cardStartTime + 1.9
+                { autoAlpha: 0, x: titleXStart / 2, duration: (isArchiveVariant ? 0.25 : 0.5), ease: 'power2.in' },
+                cardStartTime + (isArchiveVariant ? 0.6 : 1.9)
               );
               mainTl.to(titleStage,
-                { autoAlpha: 0, duration: 0.4, ease: 'power2.inOut' },
-                cardStartTime + 2.1
+                { autoAlpha: 0, duration: (isArchiveVariant ? 0.25 : 0.4), ease: 'power2.inOut' },
+                cardStartTime + (isArchiveVariant ? 0.7 : 2.1)
               );
-              mainTl.set(titleStage, { zIndex: 0 }, cardStartTime + 2.5);
+              mainTl.set(titleStage, { zIndex: 0 }, cardStartTime + (isArchiveVariant ? 0.8 : 2.5));
             }
 
             // ── SUB-STAGE 2: ESCENA PRESERVADA INTACTA (FRASE SOBERANA + ARTEFACTO) ──
@@ -766,8 +775,8 @@ if (headline.includes('.')) {
             if (cinematicLayer) {
               mainTl.fromTo(cinematicLayer,
                 { autoAlpha: 0 },
-                { autoAlpha: 1, duration: 0.8, ease: 'power2.out' },
-                cardStartTime + 2.3
+                { autoAlpha: 1, duration: (isArchiveVariant ? 0.35 : 0.8), ease: 'power2.out' },
+                cardStartTime + (isArchiveVariant ? 0.7 : 2.3)
               );
             }
 
@@ -775,58 +784,27 @@ if (headline.includes('.')) {
               const xStart = isRightAligned ? 40 : -40;
               mainTl.fromTo(textContent,
                 { autoAlpha: 0, x: xStart, filter: 'blur(8px)' },
-                { autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' },
-                cardStartTime + 2.3
+                { autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: (isArchiveVariant ? 0.45 : 0.9), ease: 'power2.out' },
+                cardStartTime + (isArchiveVariant ? 0.7 : 2.3)
               );
             }
 
             // Lectura contemplativa de la frase + salida suave y reducción de z-index
-            mainTl.to(card, { autoAlpha: 0, pointerEvents: 'none', zIndex: 20, duration: 0.6, ease: 'power2.in' }, cardStartTime + 5.5);
+            mainTl.to(card, { autoAlpha: 0, pointerEvents: 'none', zIndex: 20, duration: (isArchiveVariant ? 0.3 : 0.6), ease: 'power2.in' }, cardStartTime + cardHold);
           });
 
-          mainTl.to(spotlightLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none', duration: 0.4 });
+          mainTl.to(spotlightLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none', duration: 0.3 });
         }
 
-        // ── FINAL DE LA SECUENCIA ──
-        if (isArchiveVariant) {
-          // CORRECCIÓN: DE LA PRESENTACIÓN AL FINAL, PASAMOS DIRECTO A KHEPER COMO PORTADA COVER Y SU H1 EXTRABOLD
-          if (heroImg && heroTitleStage && heroTitleBox) {
-            mainTl.set(heroLayer, { zIndex: 40 });
-            mainTl.to(heroLayer, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.8, ease: 'power2.out' });
-
-            mainTl.fromTo(heroImg,
-              { scale: 1.04 },
-              { scale: 1.0, duration: 2.0, ease: 'power2.out' },
-              '<'
-            );
-
-            if (heroCinematicLayer) {
-              mainTl.set(heroCinematicLayer, { autoAlpha: 0 });
-            }
-
-            mainTl.set(heroTitleStage, { zIndex: 35 });
-            mainTl.fromTo(heroTitleStage,
-              { autoAlpha: 0, scale: 0.96 },
-              { autoAlpha: 1, scale: 1.0, duration: 1.0, ease: 'power2.out' },
-              '<0.2'
-            );
-            mainTl.fromTo(heroTitleBox,
-              { autoAlpha: 0, x: -30, filter: 'blur(6px)' },
-              { autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' },
-              '<'
-            );
-          }
-        } else {
-          // ── PASO C: PANTALLA FINAL CON LAS 3 CARDS JUNTAS (HEREDADO EN COLECCIONES) ──
-          mainTl.set(gridLayer, { zIndex: 35 });
-          mainTl.to(gridLayer, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.8, ease: 'power2.out' });
-          const gridCards = gridLayer.querySelectorAll('a');
-          mainTl.fromTo(gridCards,
-            { autoAlpha: 0, y: 18, scale: 0.97 },
-            { autoAlpha: 1, y: 0, scale: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out' },
-            '-=0.4'
-          );
-        }
+        // ── FINAL DE LA SECUENCIA: PANTALLA FINAL CON LAS 3 CARDS JUNTAS (ANCLAJE BENTO) ──
+        mainTl.set(gridLayer, { zIndex: 35 });
+        mainTl.to(gridLayer, { autoAlpha: 1, pointerEvents: 'auto', duration: (isArchiveVariant ? 0.5 : 0.8), ease: 'power2.out' });
+        const gridCards = gridLayer.querySelectorAll('a');
+        mainTl.fromTo(gridCards,
+          { autoAlpha: 0, y: (isArchiveVariant ? 14 : 18), scale: 0.98 },
+          { autoAlpha: 1, y: 0, scale: 1, duration: (isArchiveVariant ? 0.5 : 0.7), stagger: (isArchiveVariant ? 0.07 : 0.1), ease: 'power3.out' },
+          '-=0.3'
+        );
       };
 
       // IntersectionObserver para activar la secuencia al entrar al viewport o al interactuar

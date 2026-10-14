@@ -11,6 +11,7 @@ import TriplicoRevelacion, { type TriplicoPost } from '../components/TriplicoRev
 import RowNetflixClasico from '../components/RowNetflixClasico.astro';
 import SpotlightMediaTray, { type TrayCollectionItem } from '../components/SpotlightMediaTray.astro';
 import Marquee from '../components/Marquee.astro';
+import AppleBentoArchetypes from '../components/AppleBentoArchetypes.astro';
 import HeroSpotifyColecciones from '../components/HeroSpotifyColecciones.astro';
 import { customCollections } from '../lib/custom-collections';
 import {
@@ -447,7 +448,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                         categoryLabel={group.catLabel}
                       />
                       */}
-                      <div class="w-full">
+                      <div class="w-full max-w-6xl mx-auto">
                         <TriplicoRevelacion
                           posts={triplicoCategoryPosts}
                           heroPost={triplicoCategoryHero}
@@ -597,6 +598,25 @@ function createPremierSequences(essays: typeof resolvedEssays) {
         />
       </section>
     )}
+
+    {/* ── BENTO ULTRA CINEMÁTICO: EJEMPLAR FINAL ANTES DEL FOOTER ── */}
+    <div class="w-full max-w-6xl mx-auto mt-20 md:mt-28 px-4 sm:px-0">
+      <div class="flex flex-col items-center justify-center text-center pb-6 gap-2 w-full max-w-4xl mx-auto">
+        <span class="font-metadata text-[12px] sm:text-xs uppercase tracking-[0.35em] text-rust-orange font-bold">
+          Bento Ultra · Convergencia Arquetípica
+        </span>
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-gloock font-black tracking-tight leading-[1.05] gradient-general-h1 uppercase">
+          Archivo Vivo
+        </h2>
+      </div>
+      <AppleBentoArchetypes
+        badgeLabel="ARCHIVO HISTÓRICO · TGP"
+        tagline="Cada época. Sin fragmentos perdidos. Ahora en el mapa."
+        subtext="Acceso libre y sin registro. Catálogo completo de arqueosemiótica e investigaciones profundas."
+        ctaHref="/colecciones/"
+        ctaLabel="Explorar las Colecciones"
+      />
+    </div>
   </div>
 
   <script>
