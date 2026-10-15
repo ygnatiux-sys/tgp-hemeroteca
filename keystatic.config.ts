@@ -1,16 +1,14 @@
 import { config, fields, collection } from '@keystatic/core';
-import { 
-  GeneradorTextoTGP, 
-  GeneradorArquetiposTGP,
-  MotorArteTGP, 
-  ProbadorArteTGP, 
-  BuscadorWikimediaTGP,
-  SelectorCategoriaTGP,
-  GeneradorGeorreferenciaTGP,
-  AgenteEruditoTGP,
-  GeneradorInformePremium,
-  componentBlocks 
-} from './src/components';
+import { GeneradorTextoTGP } from './src/modules/tgp-agents/GeneradorTextoTGP';
+import { GeneradorArquetiposTGP } from './src/modules/tgp-agents/GeneradorArquetiposTGP';
+import { MotorArteTGP } from './src/modules/tgp-agents/MotorArteTGP';
+import { ProbadorArteTGP } from './src/modules/tgp-agents/ProbadorArteTGP';
+import { BuscadorWikimediaTGP } from './src/modules/tgp-agents/BuscadorWikimediaTGP';
+import { SelectorCategoriaTGP } from './src/modules/tgp-agents/SelectorCategoriaTGP';
+import { GeneradorGeorreferenciaTGP } from './src/modules/tgp-agents/GeneradorGeorreferenciaTGP';
+import { AgenteEruditoTGP } from './src/modules/tgp-agents/AgenteEruditoTGP';
+import { GeneradorInformePremium } from './src/modules/tgp-agents/GeneradorInformePremium';
+import { componentBlocks } from './src/components/component-blocks';
 import { geminiCinematicField } from './src/keystatic/geminiCinematic';
 
 // ─── HELPER: Abstracción de Motores de IA TGP ─────────────────────────────────

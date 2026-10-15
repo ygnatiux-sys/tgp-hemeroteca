@@ -82,7 +82,8 @@ export const tgpViteConfig = {
       'escape-string-regexp',
       '@braintree/sanitize-url',
       'fast-deep-equal',
-      '@sindresorhus/slugify'
+      '@sindresorhus/slugify',
+      'marked'
     ]
   },
   ssr: {
