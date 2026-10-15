@@ -10,5 +10,7 @@
   "publicarConImagen": true,
   "draft": false,
   "isCinematic": false,
-  "gallery": []
+  "gallery": [],
+  "coverImage": "/src/assets/arquetipos-globales/sanson/coverImage.jpg",
+  "notasInvestigador": "Portada HD Wikimedia Commons: File:Peter_Paul_Rubens_-_Samson_and_Delilah_-_Google_Art_Project.jpg | Sansón y Dalila por Peter Paul Rubens | Dominio Público | Curada TGP Batch 2"
 }

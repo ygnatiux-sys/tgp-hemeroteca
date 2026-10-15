@@ -10,5 +10,7 @@
   "publicarConImagen": true,
   "draft": false,
   "isCinematic": false,
-  "gallery": []
+  "gallery": [],
+  "coverImage": "/src/assets/arquetipos-globales/urano/coverImage.jpg",
+  "notasInvestigador": "Portada HD Wikimedia Commons: File:Uranus2.jpg | Urano en color real capturado por NASA / Voyager 2 | Dominio Público NASA | Curada TGP Batch 2"
 }

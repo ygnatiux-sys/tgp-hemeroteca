@@ -10,5 +10,7 @@
   "publicarConImagen": true,
   "draft": false,
   "isCinematic": false,
-  "gallery": []
+  "gallery": [],
+  "coverImage": "/src/assets/arquetipos-globales/el-puma-americano/coverImage.jpg",
+  "notasInvestigador": "Portada HD Wikimedia Commons: File:Puma (Puma concolor concolor) female Leona Amarga.jpg | Puma concolor en hábitat andino-patagónico | CC-BY-SA | Curada TGP Batch 2"
 }
