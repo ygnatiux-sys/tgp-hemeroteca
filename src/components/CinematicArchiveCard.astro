@@ -96,10 +96,10 @@ const titlePos = explicitPos || (isPortraitArt ? "top" : "bottom");
 // - Monumental (16:10 / 1.60:1) para bustos, estatuas, fauna y retratos.
 // - Panorámico (19:10 / 1.90:1) para paisajes, arquitectura y vistas abiertas.
 const imageAspectClass = isHero
-  ? IMMERSIVE_CLASSES[immersiveVariant].container
+  ? ((IMMERSIVE_CLASSES as any)[immersiveVariant]?.container || IMMERSIVE_CLASSES.monumental.container)
   : isDuo40
-    ? "aspect-[4/3] sm:aspect-16/10"
-    : "aspect-[4/3] sm:aspect-video";
+    ? "aspect-4/3 sm:aspect-16/10"
+    : "aspect-4/3 sm:aspect-video";
 
 // Tamaño tipográfico del H1 interior (+1px global para máxima presencia)
 const titleClass = isHero

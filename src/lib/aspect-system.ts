@@ -61,6 +61,11 @@ export function resolveImmersiveVariant(
  */
 export const IMMERSIVE_CLASSES = {
   // Para bustos críticos que sufren recorte: IMAX Digital 19:10 (631px) con anclaje superior libre (15%)
+  'imax-bust': {
+    container: 'aspect-4/3 sm:aspect-19/10 min-h-[460px] md:min-h-[631px] max-h-[82vh]',
+    imgClass: 'object-cover',
+    imgStyle: 'object-position: 50% 15%;',
+  },
   imaxBust: {
     container: 'aspect-4/3 sm:aspect-19/10 min-h-[460px] md:min-h-[631px] max-h-[82vh]',
     imgClass: 'object-cover',
