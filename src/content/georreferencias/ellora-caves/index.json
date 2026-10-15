@@ -7,5 +7,7 @@
   "date": "2026-09-10",
   "category": "Arqueosemiótica",
   "publicarConImagen": true,
-  "draft": false
+  "draft": false,
+  "coverImage": "/src/assets/georreferencias/ellora-caves/coverImage.webp",
+  "notasInvestigador": "Portada HD: remotas/courtyard-and-mahabharata-reliefs-at-the-kailasa-t.webp | Relieves del Mahabharata en el Templo Kailasa, Cuevas de Ellora | CC-BY-SA | Curada TGP Batch Final"
 }

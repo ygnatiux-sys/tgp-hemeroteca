@@ -7,5 +7,8 @@
   "category": "Arqueosemiótica",
   "publicarConImagen": true,
   "draft": false,
-  "dek": "Ischigualasto y sus formaciones triásicas: el registro fósil más completo del origen de los dinosaurios."
+  "dek": "Ischigualasto y sus formaciones triásicas: el registro fósil más completo del origen de los dinosaurios.",
+  "coverImage": "/src/assets/georreferencias/valle-de-la-luna/coverImage.webp",
+  "date": "2026-10-15",
+  "notasInvestigador": "Portada HD: remotas/anfiteatro-valle-de-la-luna-san-pedro-de-atacama-c.webp | Anfiteatro del Valle de la Luna, Desierto de Atacama | CC-BY-SA | Curada TGP Batch Final"
 }

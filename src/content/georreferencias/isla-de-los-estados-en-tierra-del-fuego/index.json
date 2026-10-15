@@ -12,5 +12,7 @@
   "publicarConImagen": true,
   "draft": false,
   "excerpt": "Una exploración integral de la Isla de los Estados, abarcando su geología extrema, el trágico legado del presidio de Puerto Cook y su mitología austral. El informe devela el cruce histórico entre la arqueología fueguina y las narrativas liminales.",
-  "dek": "Crónicas del faro del fin del mundo y los mares tempestuosos de Tierra del Fuego."
+  "dek": "Crónicas del faro del fin del mundo y los mares tempestuosos de Tierra del Fuego.",
+  "coverImage": "/src/assets/georreferencias/isla-de-los-estados-en-tierra-del-fuego/coverImage.webp",
+  "notasInvestigador": "Portada HD: remotas/isla-de-los-estados.webp | Faro del Fin del Mundo e Isla de los Estados, Tierra del Fuego | CC-BY-SA | Curada TGP Batch Final"
 }

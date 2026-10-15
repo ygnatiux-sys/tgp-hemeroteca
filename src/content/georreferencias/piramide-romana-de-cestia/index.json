@@ -7,5 +7,7 @@
   "date": "2026-09-08",
   "category": "Arqueosemiótica",
   "publicarConImagen": true,
-  "draft": false
+  "draft": false,
+  "coverImage": "/src/assets/georreferencias/piramide-romana-de-cestia/coverImage.webp",
+  "notasInvestigador": "Portada HD: remotas/piramide-cestia.webp | Pirámide de Cayo Cestio en Roma junto a Porta San Paolo | CC-BY-SA | Curada TGP Batch Final"
 }

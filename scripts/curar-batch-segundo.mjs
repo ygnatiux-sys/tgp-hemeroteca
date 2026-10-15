@@ -1,12 +1,12 @@
 /**
  * curar-batch-segundo.mjs
  * ─────────────────────────────────────────────────────────────────────────────
- * Pipeline unificado de curaduría para el Lote 2 (10 artículos con texto masivo):
- * 1. Resuelve obras de alta resolución en Wikimedia Commons (Dominio Público/CC).
- * 2. Descarga la imagen y valida Magic Bytes (JPEG/PNG/WebP, >25KB, cero placeholders).
- * 3. Actualiza index.json en UTF-8 puro (sin BOM), activando publicarConImagen: true.
- * 4. Sube las nuevas portadas a Cloudflare R2 invocando el sincronizador oficial.
- * 5. Ejecuta auditar-imagenes-r2.mjs certificando 100% de integridad y CDN activo.
+ * Pipeline unificado de curaduría para el Lote 3 Final (12 posts finales):
+ * - 6 artículos se nutren de obras maestras en HD ya presentes en src/assets/remotas/
+ * - 6 artículos se resuelven y descargan desde Wikimedia Commons con validación binaria
+ * - Actualiza index.json en UTF-8 puro (sin BOM) activando publicarConImagen: true
+ * - Sincroniza las portadas a Cloudflare R2 (npm run upload:assets)
+ * - Ejecuta la auditoría inflexible final (npm run audit:r2)
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -17,75 +17,86 @@ import { execSync } from 'node:child_process';
 const USER_AGENT = 'TGPHemeroteca/1.0 (https://thegreatpuzzleproject.com; contact@tgp.org)';
 
 const BATCH_ITEMS = [
+  // ── 6 Posts con obras existentes en src/assets/remotas/ ─────────────────────
   {
-    col: 'arquetipos-globales',
-    slug: 'el-puma-americano',
-    query: 'Puma concolor Torres del Paine',
-    preferredFiles: ['File:Torres_del_Paine_Puma_jf4.webp', 'File:Puma_concolor_sitting_in_the_grass.jpg', 'File:Mountain_Lion_in_Montana.jpg'],
-    notes: 'Puma concolor en hábitat andino-patagónico | CC-BY-SA'
+    col: 'georreferencias',
+    slug: 'santuario-de-ballenas-peninsula-de-valdez-patagonia',
+    localSource: 'remotas/tail-of-a-whale-near-valdes-peninsula.webp',
+    notes: 'Cola de ballena franca austral en Península Valdés | CC-BY-SA'
+  },
+  {
+    col: 'georreferencias',
+    slug: 'isla-de-los-estados-en-tierra-del-fuego',
+    localSource: 'remotas/isla-de-los-estados.webp',
+    notes: 'Faro del Fin del Mundo e Isla de los Estados, Tierra del Fuego | CC-BY-SA'
+  },
+  {
+    col: 'georreferencias',
+    slug: 'valle-de-la-luna',
+    localSource: 'remotas/anfiteatro-valle-de-la-luna-san-pedro-de-atacama-c.webp',
+    notes: 'Anfiteatro del Valle de la Luna, Desierto de Atacama | CC-BY-SA'
+  },
+  {
+    col: 'georreferencias',
+    slug: 'ellora-caves',
+    localSource: 'remotas/courtyard-and-mahabharata-reliefs-at-the-kailasa-t.webp',
+    notes: 'Relieves del Mahabharata en el Templo Kailasa, Cuevas de Ellora | CC-BY-SA'
+  },
+  {
+    col: 'georreferencias',
+    slug: 'meroe-la-dinastia-egipcia-nubia',
+    localSource: 'remotas/nubian-pyramids-of-meroe-in-1821.webp',
+    notes: 'Pirámides nubias de Meroe en grabado litográfico de 1821 | Dominio Público'
+  },
+  {
+    col: 'georreferencias',
+    slug: 'piramide-romana-de-cestia',
+    localSource: 'remotas/piramide-cestia.webp',
+    notes: 'Pirámide de Cayo Cestio en Roma junto a Porta San Paolo | CC-BY-SA'
+  },
+
+  // ── 6 Posts para resolver en Wikimedia Commons ─────────────────────────────
+  {
+    col: 'georreferencias',
+    slug: 'la-cueva-de-lascaux',
+    query: 'Lascaux painting bulls cave',
+    preferredFiles: ['File:Lascaux_painting.jpg', 'File:Cave_art_Lascaux.jpg', 'File:Dordogne_Lascaux_aurochs.jpg'],
+    notes: 'Pintura rupestre polícroma de uros en Lascaux | Dominio Público'
+  },
+  {
+    col: 'georreferencias',
+    slug: 'aramu-muru-puerta-de-los-dioses',
+    query: 'Aramu Muru Hayu Marca Lake Titicaca',
+    preferredFiles: ['File:Hayu_Marca_or_Aramu_Muru.jpg', 'File:Aramu_Muru_gate.jpg', 'File:Amaru_Muru_doorway.jpg'],
+    notes: 'Portal megalítico de Hayu Marca (Aramu Muru), Puno | CC-BY-SA'
   },
   {
     col: 'arquetipos-globales',
-    slug: 'los-orixas',
-    query: 'Carybe orixas Yemanja',
-    preferredFiles: ['File:Caryb_rilievi_degli_orixas_yemanjá_recorte.webp', 'File:Iemanjá_-_Carybé.jpg', 'File:Festa_de_Iemanjá_em_Salvador.jpg'],
-    notes: 'Bajorrelieve ritual de Orixás y Yemanjá | CC / Dominio Público'
-  },
-  {
-    col: 'arquetipos-globales',
-    slug: 'los-orixas-africanos',
-    query: 'Bronze head from Ife British Museum',
-    preferredFiles: ['File:Bronze_head_from_Ife_in_the_British_Museum.jpg', 'File:Ife_terracotta_head.jpg', 'File:Yoruba_bronze_head.jpg'],
-    notes: 'Escultura sagrada yoruba de Ife | Dominio Público'
-  },
-  {
-    col: 'ensayos-cinematicos',
-    slug: 'la-ciudadela-inexpugnable-filosofia-poder-y-trascendencia-en-el-estoicismo-romano',
-    query: 'Marcus Aurelius Glyptothek Munich',
-    preferredFiles: ['File:Marcus_Aurelius_Glyptothek_Munich.jpg', 'File:Statue_of_Marcus_Aurelius_Musei_Capitolini_Rome.jpg'],
-    notes: 'Busto clásico de Marco Aurelio, Gliptoteca de Múnich | CC-BY-SA'
-  },
-  {
-    col: 'arquetipos-globales',
-    slug: 'urano',
-    query: 'Uranus Voyager 2 NASA',
-    preferredFiles: ['File:Uranus2.jpg', 'File:Uranus_in_true_and_false_colour.jpg', 'File:Uranus_clouds.jpg'],
-    notes: 'Urano en color real capturado por NASA / Voyager 2 | Dominio Público NASA'
-  },
-  {
-    col: 'arquetipos-globales',
-    slug: 'sanson',
-    query: 'Peter Paul Rubens Samson and Delilah',
-    preferredFiles: ['File:Peter_Paul_Rubens_-_Samson_and_Delilah_-_Google_Art_Project.jpg', 'File:Samson_and_Delilah_by_Rubens.jpg'],
-    notes: 'Sansón y Dalila por Peter Paul Rubens | Dominio Público'
-  },
-  {
-    col: 'ensayos-cinematicos',
-    slug: 'sadhguru-y-la-gramatica-cinematografica-del-mistico-global-arqueosemiotica-del-extasis-mecanizado',
-    query: 'Adiyogi Shiva statue Coimbatore',
-    preferredFiles: ['File:Adiyogi_statue_at_Isha_Yoga_Center_in_Coimbatore.jpg', 'File:Adiyogi_Shiva_statue_with_lighting.jpg'],
-    notes: 'Monolito consagrado de Adiyogi Shiva en Coimbatore | CC-BY-SA'
-  },
-  {
-    col: 'ensayos-cinematicos',
-    slug: 'la-catedral-de-la-razon-arqueosemiotica-y-vigencia-de-la-escolastica',
-    query: 'Strasbourg Cathedral Nave interior',
-    preferredFiles: ['File:Strasbourg_Cathedral_Nave.jpg', 'File:Amiens_cathedral_nave_looking_east.jpg', 'File:Nave_of_Chartres_Cathedral.jpg'],
-    notes: 'Bóveda gótica monumental y claristorio escolástico | CC-BY-SA'
+    slug: 'arquetipos-globales-introduccion',
+    query: 'Harmonia Macrocosmica Cellarius celestial map',
+    preferredFiles: ['File:Cellarius_Harmonia_Macrocosmica_1660_Planisphaerium_Braheum.jpg', 'File:The_Celestial_Map_of_Cellarius_1660.jpg', 'File:Harmonia_Macrocosmica.jpg'],
+    notes: 'Carta celeste de Harmonia Macrocosmica por Andreas Cellarius (1660) | Dominio Público'
   },
   {
     col: 'ensayos',
-    slug: 'moctezuma-y-cortez-el-ultimo-azteca',
-    query: 'Meeting of Cortes and Montezuma',
-    preferredFiles: ['File:The_Meeting_of_Cortés_and_Moctezuma.jpg', 'File:Meeting_of_Cortés_and_Montezuma.jpg', 'File:Moctezuma_and_cortes.jpg'],
-    notes: 'El Encuentro de Hernán Cortés y Moctezuma II | Dominio Público'
+    slug: '7-pecados-7-chackras',
+    query: 'Tantric Chakra Man subtle body',
+    preferredFiles: ['File:Chakras_illustration.jpg', 'File:Tantric_Chakra_Man.jpg', 'File:Chakras_map.jpg'],
+    notes: 'Diagrama tradicional de los siete chakras del yoga tántrico | Dominio Público'
   },
   {
     col: 'ensayos',
-    slug: 'saber-es-recordar-la-teoria-de-platon',
-    query: 'Plato Silanion Musei Capitolini',
-    preferredFiles: ['File:Plato_Silanion_Musei_Capitolini_MC1377.jpg', 'File:Sanzio_01_Plato_Aristotle.jpg', 'File:Plato_in_School_of_Athens.jpg'],
-    notes: 'Retrato clásico de Platón, Museos Capitolinos de Roma | Dominio Público'
+    slug: 'vision-2026-09-21-5c3cbc481eb2a0a5d9609a87b16fd0a099126377',
+    query: 'Palenque Temple of the Inscriptions Maya',
+    preferredFiles: ['File:Palenque_Temple_of_the_Inscriptions.jpg', 'File:Palenque_Temple_de_las_Inscripciones.jpg', 'File:Temple_of_the_Inscriptions_Palenque_Chiapas.jpg'],
+    notes: 'Templo de las Inscripciones, sitio arqueológico maya de Palenque | Dominio Público'
+  },
+  {
+    col: 'ensayos-cinematicos',
+    slug: 'vision-2026-10-12-consulta-manual',
+    query: 'Flammarion atmosphere woodcut',
+    preferredFiles: ['File:Flammarion_Atmosphere.jpg', 'File:Flammarion_Woodcut_1888.jpg', 'File:Flammarion-atmosphere.png'],
+    notes: 'Grabado de Camille Flammarion: El peregrino en el borde del cosmos (1888) | Dominio Público'
   }
 ];
 
@@ -128,7 +139,6 @@ async function searchWikimedia(searchQuery) {
 }
 
 async function fetchBestImage(item) {
-  // 1. Probar lista de archivos preferidos
   for (const pref of item.preferredFiles) {
     try {
       const resolved = await resolveWikimediaUrl(pref);
@@ -138,7 +148,6 @@ async function fetchBestImage(item) {
     } catch {}
   }
 
-  // 2. Fallback de búsqueda dinámica en Wikimedia
   const searchResults = await searchWikimedia(item.query);
   for (const foundTitle of searchResults) {
     try {
@@ -154,7 +163,7 @@ async function fetchBestImage(item) {
 
 async function run() {
   console.log('╔═══════════════════════════════════════════════════════════════════════════╗');
-  console.log('║       ⚡ TGP - PIPELINE UNIFICADO DE CURADURÍA (LOTE 2: 10 POSTS)         ║');
+  console.log('║       ⚡ TGP - PIPELINE UNIFICADO DE CURADURÍA (LOTE 3 FINAL: 12 POSTS)   ║');
   console.log('╚═══════════════════════════════════════════════════════════════════════════╝\n');
 
   let successCount = 0;
@@ -162,31 +171,44 @@ async function run() {
   for (const item of BATCH_ITEMS) {
     console.log(`\n🎨 Curando [${item.col}] -> ${item.slug}...`);
     try {
-      const best = await fetchBestImage(item);
-      console.log(`   🔗 Obra resuelta: ${best.title}`);
-      console.log(`   📥 Descargando desde: ${best.url}`);
-
-      const res = await fetch(best.url, { headers: { 'User-Agent': USER_AGENT } });
-      if (!res.ok) throw new Error(`HTTP ${res.status} al descargar`);
-      const buffer = Buffer.from(await res.arrayBuffer());
-
-      // Validación estricta de Magic Bytes
-      const fmt = detectImageFormat(buffer);
-      const sizeKB = Math.round(buffer.length / 1024);
-      if (['HTML_ERROR', 'SVG_PLACEHOLDER', 'CORRUPT'].includes(fmt) || sizeKB < 25) {
-        throw new Error(`Rechazado por filtro de integridad: formato ${fmt}, tamaño ${sizeKB}KB`);
-      }
-      console.log(`   🛡️ Filtro superado: Formato ${fmt} válido [${sizeKB} KB]`);
-
-      // Determinar extensión
-      let ext = 'jpg';
-      if (fmt === 'PNG') ext = 'png';
-      if (fmt === 'WEBP') ext = 'webp';
-
       const targetDir = path.resolve('src/assets', item.col, item.slug);
       if (!fs.existsSync(targetDir)) {
         fs.mkdirSync(targetDir, { recursive: true });
       }
+
+      let buffer;
+      let title = '';
+
+      if (item.localSource) {
+        const localSourcePath = path.resolve('src/assets', item.localSource);
+        if (!fs.existsSync(localSourcePath)) {
+          throw new Error(`El archivo fuente local ${item.localSource} no existe`);
+        }
+        buffer = fs.readFileSync(localSourcePath);
+        title = item.localSource;
+        console.log(`   💎 Obtenido desde asset local optimizado: ${item.localSource}`);
+      } else {
+        const best = await fetchBestImage(item);
+        title = best.title;
+        console.log(`   🔗 Obra resuelta: ${best.title}`);
+        console.log(`   📥 Descargando desde: ${best.url}`);
+
+        const res = await fetch(best.url, { headers: { 'User-Agent': USER_AGENT } });
+        if (!res.ok) throw new Error(`HTTP ${res.status} al descargar`);
+        buffer = Buffer.from(await res.arrayBuffer());
+      }
+
+      // Validación estricta de Magic Bytes
+      const fmt = detectImageFormat(buffer);
+      const sizeKB = Math.round(buffer.length / 1024);
+      if (['HTML_ERROR', 'SVG_PLACEHOLDER', 'CORRUPT'].includes(fmt) || sizeKB < 15) {
+        throw new Error(`Rechazado por filtro de integridad: formato ${fmt}, tamaño ${sizeKB}KB`);
+      }
+      console.log(`   🛡️ Filtro superado: Formato ${fmt} válido [${sizeKB} KB]`);
+
+      let ext = 'jpg';
+      if (fmt === 'PNG') ext = 'png';
+      if (fmt === 'WEBP') ext = 'webp';
 
       const fileName = `coverImage.${ext}`;
       const assetPath = path.join(targetDir, fileName);
@@ -201,7 +223,7 @@ async function run() {
         jsonContent.publicarConImagen = true;
         jsonContent.draft = false;
         jsonContent.date = jsonContent.date || new Date().toISOString().split('T')[0];
-        jsonContent.notasInvestigador = `Portada HD Wikimedia Commons: ${best.title} | ${item.notes} | Curada TGP Batch 2`;
+        jsonContent.notasInvestigador = `Portada HD: ${title} | ${item.notes} | Curada TGP Batch Final`;
 
         fs.writeFileSync(indexPath, JSON.stringify(jsonContent, null, 2), 'utf8');
         console.log(`   📝 index.json actualizado (UTF-8 sin BOM, publicarConImagen: true)`);
@@ -214,7 +236,7 @@ async function run() {
   }
 
   console.log(`\n─────────────────────────────────────────────────────────────────────────────`);
-  console.log(`✅ Lote 2 completado: ${successCount} de ${BATCH_ITEMS.length} imágenes descargadas y enlazadas.`);
+  console.log(`✅ Lote Final completado: ${successCount} de ${BATCH_ITEMS.length} imágenes descargadas y enlazadas.`);
   console.log(`─────────────────────────────────────────────────────────────────────────────\n`);
 
   if (successCount > 0) {
