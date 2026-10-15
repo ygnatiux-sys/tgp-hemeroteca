@@ -7,6 +7,7 @@
  * Incluye timeline GSAP reactiva con respiración contrapuesta y pausa en hover.
  */
 import { sanitizeImageUrl, isValidImageSrc } from '../lib/content-filter';
+import { isCriticalBust, IMMERSIVE_CLASSES } from '../lib/aspect-system';
 
 interface Props {
   title: string;
@@ -31,13 +32,28 @@ const safeSecondary = (secondaryImage && isValidImageSrc(secondaryImage)) ? sani
 
 // Limpieza de Markdown residual del excerpt para visualización limpia
 const cleanExcerpt = excerpt ? excerpt.replace(/^##\s+[IVXLCDM\d\.\s]+:\s*/i, '').replace(/[#*_`]/g, '').trim() : '';
+
+// Detección selectiva de bustos para IMAX Digital (631px) vs Univisium (600px)
+const isBust = isCriticalBust({ title, dek: excerpt }, instanceId);
+const bentoContainerClass = isBust
+  ? IMMERSIVE_CLASSES.imaxBust.container
+  : IMMERSIVE_CLASSES.bentoUltra.container;
+const bentoObjectPosition = isBust
+  ? 'object-position: 50% 15%;'
+  : 'object-position: 50% 28%;';
+const badgeFormatLabel = isBust
+  ? 'Pantalla Ancha · IMAX Digital 19:10'
+  : 'Pantalla Ancha · Univisium 2:1';
 ---
 
 <section class="w-full max-w-430 2xl:max-w-460 mx-auto px-3 sm:px-6 md:px-8 lg:px-10 pt-20 md:pt-24 pb-8 md:pb-12 bg-transparent select-none">
-  <!-- CONTENEDOR HERO BENTO ULTRA UNIVISIUM (2:1 / 18:9) -->
+  <!-- CONTENEDOR HERO BENTO ULTRA DINÁMICO (IMAX 19:10 para bustos / UNIVISIUM 2:1 para paisajes) -->
   <div
     id={instanceId}
-    class="cinematic-bento-card relative isolate w-full aspect-4/3 sm:aspect-2/1 min-h-125 md:min-h-145 max-h-185 rounded-3xl sm:rounded-4xl overflow-hidden bg-[#07080a] border border-white/10 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.95)] group/bento"
+    class:list={[
+      "cinematic-bento-card relative isolate w-full rounded-3xl sm:rounded-4xl overflow-hidden bg-[#07080a] border border-white/10 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.95)] group/bento",
+      bentoContainerClass
+    ]}
   >
     {/* ── 1. FONDO PANORÁMICO (CAPA 1: PAISAJE CINEMASCOPE) ── */}
     {safeCover && (
@@ -48,7 +64,8 @@ const cleanExcerpt = excerpt ? excerpt.replace(/^##\s+[IVXLCDM\d\.\s]+:\s*/i, ''
           loading="eager"
           fetchpriority="high"
           decoding="async"
-          class="w-full h-full object-cover object-center scale-[1.03] will-change-transform transition-transform duration-1000 group-hover/bento:scale-[1.06]"
+          class="w-full h-full object-cover scale-[1.03] will-change-transform transition-transform duration-1000 group-hover/bento:scale-[1.06]"
+          style={bentoObjectPosition}
         />
       </div>
     )}
@@ -121,7 +138,7 @@ const cleanExcerpt = excerpt ? excerpt.replace(/^##\s+[IVXLCDM\d\.\s]+:\s*/i, ''
       {/* Micro-nota de formato */}
       <div class="flex items-center gap-2 mt-4 text-[10px] uppercase tracking-[0.2em] text-white/40 font-mono">
         <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-        <span>Pantalla Ancha · Univisium 2:1</span>
+        <span>{badgeFormatLabel}</span>
       </div>
 
     </div>

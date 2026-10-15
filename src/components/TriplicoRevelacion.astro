@@ -11,6 +11,8 @@
  *   4. Retorno a Cabecera       → Tras un breve descanso en 3-cards, vuelve a la Portada Hero.
  */
 
+import { isCriticalBust } from '../lib/aspect-system';
+
 export interface TriplicoPost {
   title: string;
   excerpt?: string;
@@ -83,7 +85,8 @@ function parseHeroPhrase(text?: string) {
   return clean;
 }
 
-// Detección inteligente de arte para la imagen de cabecera / hero
+// Detección inteligente de arte y bustos críticos para la imagen de cabecera / hero
+const isHeroBust = hero ? isCriticalBust(hero) : false;
 const isHeroPortraitArt = hero ? (
   /gutenberg|imprenta|prensa|escarabajo|scarab|aguara|hegel|homero|saturno|busto|estatua|retrato|filosofia|moctezuma|gengis|tatu|rostro|portrait|escultura|venus|urano|arquetipo|personaje|fauna|animal|tero|perdiz|tapir|vaca|hunza|kheper|grabado|woodcut/i.test(`${hero.title || ''} ${hero.img || ''}`)
 ) : false;
@@ -144,7 +147,9 @@ if (headline.includes('.')) {
     class:list={[
       "relative w-full overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl bg-black",
       isArchive ? "border-0" : "border border-white/10",
-      isArchive ? "aspect-4/3 sm:aspect-2/1 min-h-[44vh] md:min-h-100 max-h-135" : "aspect-4/3 sm:aspect-2/1 min-h-[62vh] md:min-h-155 max-h-190"
+      isArchive
+        ? (isHeroBust ? "aspect-4/3 sm:aspect-19/10 min-h-[46vh] md:min-h-110 max-h-145" : "aspect-4/3 sm:aspect-2/1 min-h-[44vh] md:min-h-100 max-h-135")
+        : (isHeroBust ? "aspect-4/3 sm:aspect-19/10 min-h-[64vh] md:min-h-165 max-h-200" : "aspect-4/3 sm:aspect-2/1 min-h-[62vh] md:min-h-155 max-h-190")
     ]}
   >
 
@@ -190,7 +195,7 @@ if (headline.includes('.')) {
               loading="lazy"
               decoding="async"
               class={`hero-bg-img absolute inset-0 w-full h-full pointer-events-none brightness-95 contrast-[1.02] z-0 ${heroFitClass}`}
-              style={`object-position: ${isHeroPortraitArt ? '50% 20%' : '50% 28%'};`}
+              style={`object-position: ${isHeroBust ? '50% 15%' : isHeroPortraitArt ? '50% 20%' : '50% 28%'};`}
             />
             {/* Viñeta perimetral suave si isArchive */}
             {isArchive && (

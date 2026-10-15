@@ -88,7 +88,8 @@ const isDuo40 = variant === "duo-40";
 // Detección canónica de sujeto (busto/monolito vs paisaje) para encuadre y aspect ratio
 const explicitPos = (entry as any)?.titlePosition || null;
 const immersiveVariant = resolveImmersiveVariant(entry, slug);
-const isPortraitArt = immersiveVariant === 'monumental';
+const isPortraitArt = immersiveVariant === 'monumental' || immersiveVariant === 'imax-bust';
+const isImaxBust = immersiveVariant === 'imax-bust';
 const titlePos = explicitPos || (isPortraitArt ? "top" : "bottom");
 
 // Relación de aspecto inmersiva unificada (Sistema TGP):
@@ -282,9 +283,11 @@ const fitClass =
           } ${isHero ? "brightness-100 contrast-100" : "brightness-90 group-hover:brightness-100"} ${fitClass} ${resolveMultivisionClass(img)}`}
           style={
             isHero
-              ? isPortraitArt
-                ? "object-position: 50% 20%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
-                : "object-position: 50% 38%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
+              ? isImaxBust
+                ? "object-position: 50% 15%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
+                : isPortraitArt
+                  ? "object-position: 50% 20%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
+                  : "object-position: 50% 38%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
               : undefined
           }
           data-flip-id={`card-image-${cardId}`}
