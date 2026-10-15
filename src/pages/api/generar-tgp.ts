@@ -22,7 +22,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     const body = await request.json();
-    const { titulo, generarImagen, estilo, densidad, modoLibrePrompt } = body;
+    const { titulo, generarImagen, estilo, densidad, modoLibrePrompt, modoModelo } = body;
 
     if (!titulo) {
       return new Response(JSON.stringify({ error: 'Falta el título.' }), { status: 400, headers });
@@ -144,8 +144,10 @@ Devuelve estrictamente un JSON válido con esta estructura:
   "category": "La categoría disciplinar TGP más apropiada elegida únicamente de esta lista: [${CATEGORIAS_TGP.join(', ')}]"
 }`;
 
+        const targetModel = modoModelo === 'flash' ? 'gemini-2.5-flash' : 'gemini-3.1-pro-preview';
+
         const responseTexto = await ai.models.generateContent({
-          model: 'gemini-3.1-pro-preview',
+          model: targetModel,
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
           config: {
             responseMimeType: 'application/json',

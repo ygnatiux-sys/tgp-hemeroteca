@@ -17,6 +17,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
   const [excerptIA, setExcerptIA] = useState<string>('');
   const [categoryIA, setCategoryIA] = useState<string>('');
   const [densidad, setDensidad] = useState<'breve' | 'profundo_breve' | 'premium'>('profundo_breve');
+  const [modoModelo, setModoModelo] = useState<'flash' | 'pro'>('flash');
   const [modoLibrePrompt, setModoLibrePrompt] = useState('');
 
   const [arteResult, setArteResult] = useState<{
@@ -132,12 +133,20 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
    * se guardan cuando el usuario presiona "Confirmar & Guardar" manualmente.
    */
   const handleSaveDirectlyToDisk = async (overrides?: { text?: string; excerpt?: string; category?: string; image?: string; sitio?: string; conImagen?: boolean }) => {
-    const slugToUse = getSlugFromUrl();
+    let slugToUse = getSlugFromUrl();
 
-    // GUARD: Si no hay slug (post nuevo), NO guardar a disco.
-    // Keystatic maneja el save inicial. Nosotros solo actualizamos posts EXISTENTES.
+    // Si es un post nuevo (/create), resolver el slug desde el input de Keystatic o desde el título
     if (!slugToUse) {
-      console.info('[TGP] Post nuevo detectado: omitiendo guardado a disco. Keystatic manejará el save inicial.');
+      const slugInput = typeof document !== 'undefined' ? document.querySelector<HTMLInputElement>('input[name="slug"], input#slug') : null;
+      if (slugInput?.value?.trim()) {
+        slugToUse = slugInput.value.trim().toLowerCase().replace(/[^a-z0-9\-]+/g, '-');
+      } else if (effectiveTopic || titulo) {
+        slugToUse = (effectiveTopic || titulo).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      }
+    }
+
+    if (!slugToUse) {
+      alert('Por favor ingresa un título o slug arriba en Keystatic para poder crear el post.');
       return null;
     }
 
@@ -226,6 +235,7 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
           titulo: temaFinal, 
           generarImagen: false,
           densidad,
+          modoModelo,
           modoLibrePrompt: modoLibrePrompt.trim() || undefined
         }),
       });
@@ -453,23 +463,20 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
     syncFieldsToKeystaticDOM();
     setIsPublished(true);
 
-    const slugConfirmado = getSlugFromUrl();
-    if (slugConfirmado) {
-      // Post existente: guardar directamente a disco
-      const saveRes = await handleSaveDirectlyToDisk({
-        text: pendingRef.current.text ?? ensayo,
-        excerpt: pendingRef.current.excerpt ?? excerptIA,
-        category: pendingRef.current.category ?? categoryIA,
-        image: pendingRef.current.imageUrl ?? arteResult?.imageUrl ?? undefined
-      });
-      if (saveRes?.productionMode) {
-        alert(`✓ CONTENIDO SINCRONIZADO\n\n${saveRes.message || 'Presioná el botón azul "Save" de Keystatic arriba para guardar en GitHub.'}`);
-      } else {
-        alert('ENSAYO, EXCERPT, CATEGORÍA Y PORTADA GUARDADOS EXITOSAMENTE!');
-      }
+    const saveRes = await handleSaveDirectlyToDisk({
+      text: pendingRef.current.text ?? ensayo,
+      excerpt: pendingRef.current.excerpt ?? excerptIA,
+      category: pendingRef.current.category ?? categoryIA,
+      image: pendingRef.current.imageUrl ?? arteResult?.imageUrl ?? undefined
+    });
+
+    if (saveRes?.success || saveRes?.slug) {
+      const savedSlug = saveRes.slug || getSlugFromUrl() || 'nuevo-ensayo';
+      alert(`✓ ¡ENSAYO Y PORTADA GUARDADOS EXITOSAMENTE EN LA HEMEROTECA!\n\n• Archivo: src/content/ensayos/${savedSlug}/\n• Estado: Publicado en disco con fecha de hoy.\n• Listo para aparecer en tu sección de Ensayos Recientes.`);
+    } else if (saveRes?.productionMode) {
+      alert(`✓ CONTENIDO SINCRONIZADO\n\n${saveRes.message || 'Presioná el botón azul "Save" de Keystatic arriba para guardar en GitHub.'}`);
     } else {
-      // Post nuevo: solo sincronizar con Keystatic, el Save lo hace el usuario
-      alert('DATOS SINCRONIZADOS CON KEYSTATIC.\n\nAhora presiona el botón "Save" / "Create" de Keystatic para crear el post en el sistema de archivos.');
+      alert('✓ Datos sincronizados con el editor de Keystatic.');
     }
 
     setTimeout(() => setIsPublished(false), 4000);
@@ -655,6 +662,64 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
         <label htmlFor="toggleAmbos" style={{ fontSize: '0.9rem', color: generarAmbosJuntos ? '#d0ebd0' : '#d4c7ff', cursor: 'pointer', fontWeight: 600 }}>
           {generarAmbosJuntos ? 'Modo Simultáneo Activado (Texto + Excerpt + Portada en 1 clic)' : 'Modo Manual / Paso a Paso (Selecciona Texto o Portada individualmente)'}
         </label>
+      </div>
+
+      {/* SELECTOR DE MOTOR IA & AHORRO DE TOKENS (SANDBOX) */}
+      <div style={{ marginBottom: '18px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+          <label style={{ fontSize: '0.75rem', color: '#ffb74d', fontWeight: 700 }}>
+            MOTOR DE IA & GESTIÓN DE TOKENS (SANDBOX):
+          </label>
+          <span style={{ fontSize: '0.7rem', color: '#aaa', fontFamily: 'monospace' }}>
+            {modoModelo === 'flash' ? 'gemini-2.5-flash (Ahorro 95% / <2s)' : 'gemini-3.1-pro-preview (Magna Erudición)'}
+          </span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+          <button
+            type="button"
+            onClick={() => setModoModelo('flash')}
+            style={{
+              padding: '10px 14px',
+              background: modoModelo === 'flash' ? '#142538' : '#141414',
+              border: modoModelo === 'flash' ? '2px solid #64b5f6' : '1px solid #333',
+              borderRadius: '6px',
+              color: modoModelo === 'flash' ? '#90caf9' : '#888',
+              cursor: 'pointer',
+              fontWeight: 700,
+              fontSize: '0.82rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <span>⚡ Flash Breve</span>
+            <span style={{ fontSize: '0.68rem', fontWeight: 400, opacity: 0.85, background: 'rgba(100,181,246,0.15)', padding: '2px 6px', borderRadius: '4px' }}>Económico & Rápido</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setModoModelo('pro')}
+            style={{
+              padding: '10px 14px',
+              background: modoModelo === 'pro' ? '#2e1c0c' : '#141414',
+              border: modoModelo === 'pro' ? '2px solid #ffa726' : '1px solid #333',
+              borderRadius: '6px',
+              color: modoModelo === 'pro' ? '#ffcc80' : '#888',
+              cursor: 'pointer',
+              fontWeight: 700,
+              fontSize: '0.82rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <span>🧠 Pro Erudito</span>
+            <span style={{ fontSize: '0.68rem', fontWeight: 400, opacity: 0.85, background: 'rgba(255,167,38,0.15)', padding: '2px 6px', borderRadius: '4px' }}>Publicación Magna</span>
+          </button>
+        </div>
       </div>
 
       {/* SELECTOR DE DENSIDAD / EXTENSIÓN */}
