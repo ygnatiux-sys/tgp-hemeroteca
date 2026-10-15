@@ -35,8 +35,15 @@ tgp-scraper/Config.js
 tgp-scraper/.clasp.json
 tgp-scraper/node_modules/
 
-# Local utility scripts (pueden contener secretos hardcodeados)
+# Local utility scripts (pueden contener secretos hardcodeados o romper el deploy en Cloudflare)
 *.bat
+*.ps1
+scripts/*.ps1
+scripts/*temp*
+scripts/*tmp*
+scripts/scratch/
+convertir.js
+make_audio.js
 scratch/
 
 # Bases de datos locales y dumps SQL (datos privados, no van al repo)
