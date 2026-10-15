@@ -94,7 +94,7 @@
       icono: '📜',
       subtitulo: 'Hemeroteca General & Portada Home',
       keystaticPath: '/keystatic/collection/ensayos/create',
-      publicUrl: '/hemeroteca',
+      publicUrl: '/archivo',
       descripcion: 'Publicación clásica de investigación con citas primarias, aparato crítico y metadatos completos.',
     },
     ensayosCinematicos: {
