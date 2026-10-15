@@ -27,6 +27,60 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
     resolvedDirection?: any;
   } | null>(null);
 
+  // Borrador proveniente de Mesa de Staging Visual (Laboratorio)
+  const [stagingDraft, setStagingDraft] = useState<any>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('tgp_staging_draft');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && (parsed.title || parsed.content)) {
+          setStagingDraft(parsed);
+        }
+      }
+    } catch {}
+  }, []);
+
+  const handleCargarBorradorStaging = () => {
+    if (!stagingDraft) return;
+    if (stagingDraft.title) {
+      setTitulo(stagingDraft.title);
+      const titleInput = document.querySelector<HTMLInputElement>('input[name="title"], input[id^="title"]');
+      if (titleInput) setNativeValue(titleInput, stagingDraft.title);
+    }
+    if (stagingDraft.content) {
+      setEnsayo(stagingDraft.content);
+      onChange(stagingDraft.content);
+    }
+    if (stagingDraft.excerpt) {
+      setExcerptIA(stagingDraft.excerpt);
+      const excerptInput = document.querySelector<HTMLInputElement | HTMLTextAreaElement>('textarea[name="excerpt"], input[name="excerpt"]');
+      if (excerptInput) setNativeValue(excerptInput, stagingDraft.excerpt);
+    }
+    if (stagingDraft.category) {
+      setCategoryIA(stagingDraft.category);
+    }
+    if (stagingDraft.imageUrl) {
+      setArteResult({
+        imageUrl: stagingDraft.imageUrl,
+        imagePrompt: 'Importada desde Mesa de Staging',
+        brief: 'Imagen curada en Laboratorio Visual'
+      });
+    }
+    try {
+      localStorage.removeItem('tgp_staging_draft');
+    } catch {}
+    setStagingDraft(null);
+  };
+
+  const handleDescartarBorradorStaging = () => {
+    try {
+      localStorage.removeItem('tgp_staging_draft');
+    } catch {}
+    setStagingDraft(null);
+  };
+
   // Ref acumulador para evitar race conditions al guardar
   // Almacena el dato más reciente de cada campo durante una sesión de generación
   const pendingRef = useRef<{ text?: string; excerpt?: string; category?: string; imageUrl?: string }>({});
@@ -557,6 +611,64 @@ export function GeneradorTextoTGP({ value, onChange }: any) {
           ID: {currentSlug}
         </span>
       </div>
+
+      {/* BANNER DE BORRADOR DESDE MESA DE STAGING */}
+      {stagingDraft && (
+        <div style={{
+          marginBottom: '18px',
+          padding: '14px 18px',
+          background: 'rgba(76, 175, 80, 0.12)',
+          border: '1px solid rgba(76, 175, 80, 0.5)',
+          borderRadius: '8px',
+          fontSize: '0.85rem',
+          color: '#a5d6a7',
+          lineHeight: '1.5',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}>
+          <div>
+            <strong style={{ color: '#81c784' }}>📥 BORRADOR DETECTADO DESDE MESA DE STAGING:</strong>
+            <span style={{ color: '#fff', marginLeft: '6px' }}>"{stagingDraft.title}"</span>
+          </div>
+          <div style={{ fontSize: '0.78rem', color: '#c8e6c9' }}>
+            Contiene {stagingDraft.content?.length || 0} caracteres de análisis {stagingDraft.imageUrl ? '+ Portada R2' : ''}.
+          </div>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+            <button
+              type="button"
+              onClick={handleCargarBorradorStaging}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '6px',
+                background: '#2e7d32',
+                color: '#fff',
+                border: 'none',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                cursor: 'pointer'
+              }}
+            >
+              ⚡ Cargar en este artículo
+            </button>
+            <button
+              type="button"
+              onClick={handleDescartarBorradorStaging}
+              style={{
+                padding: '6px 12px',
+                borderRadius: '6px',
+                background: 'transparent',
+                color: '#aaa',
+                border: '1px solid #555',
+                fontSize: '0.8rem',
+                cursor: 'pointer'
+              }}
+            >
+              Descartar
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* AVISO PARA POSTS NUEVOS */}
       {isNewPost && (

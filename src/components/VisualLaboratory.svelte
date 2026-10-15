@@ -353,6 +353,187 @@
     copiado = true;
     setTimeout(() => (copiado = false), 2500);
   }
+
+  // ── Publicación Directa de Post desde Staging al Ecosistema TGP ────────────
+  let guardandoPost = false;
+  let postCreadoExitosamente: {
+    slug: string;
+    titulo: string;
+    webUrl: string;
+    keystaticUrl: string;
+    coleccion: string;
+  } | null = null;
+  let errorGuardadoPost: string | null = null;
+
+  function extraerMetadatosInforme(texto: string, modo: 'flash' | 'pro' | null, archivoNombre: string) {
+    let titulo = '';
+    let categoria = 'Historia';
+    let excerpt = '';
+    let tags: string[] = [];
+
+    const cleanMd = (str: string) => str.replace(/[*_#`]/g, '').trim();
+
+    if (modo === 'pro') {
+      const matchH1 = texto.match(/\*\*Titular H1 Sugerido:\*\*\s*(.+)/i) || texto.match(/Titular H1 Sugerido:\s*(.+)/i);
+      if (matchH1) titulo = cleanMd(matchH1[1]);
+
+      const matchDek = texto.match(/\*\*Subtítulo \/ Dek:\*\*\s*(.+)/i) || texto.match(/Subtítulo \/ Dek:\s*(.+)/i);
+      const matchExcerpt = texto.match(/\*\*Excerpt Editorial:\*\*\s*([\s\S]*?)(?=\n-|\n#|$)/i);
+      if (matchExcerpt) {
+        excerpt = cleanMd(matchExcerpt[1]);
+      } else if (matchDek) {
+        excerpt = cleanMd(matchDek[1]);
+      }
+
+      const matchCol = texto.match(/\*\*Colección Sugerida:\*\*\s*(.+)/i) || texto.match(/Colección Sugerida:\s*(.+)/i);
+      if (matchCol) categoria = cleanMd(matchCol[1]);
+
+      const matchTags = texto.match(/\*\*Tags para D1:\*\*\s*(.+)/i);
+      if (matchTags) {
+        tags = matchTags[1].split(',').map((t) => cleanMd(t)).filter(Boolean);
+      }
+    } else {
+      const matchSujeto = texto.match(/\*\*Sujeto \/ Obra:\*\*\s*(.+)/i) || texto.match(/Sujeto \/ Obra:\s*(.+)/i);
+      if (matchSujeto) titulo = cleanMd(matchSujeto[1]);
+
+      const matchEpoca = texto.match(/\*\*Cultura & Época:\*\*\s*(.+)/i) || texto.match(/Cultura & Época:\s*(.+)/i);
+      const matchAtmosfera = texto.match(/\*\*Atmósfera & Cromatismo:\*\*\s*(.+)/i) || texto.match(/Atmósfera & Cromatismo:\s*(.+)/i);
+      if (matchAtmosfera) {
+        excerpt = cleanMd(matchAtmosfera[1]);
+      } else if (matchEpoca) {
+        excerpt = cleanMd(matchEpoca[1]);
+      }
+
+      const matchCol = texto.match(/\*\*Colección TGP Recomendada:\*\*\s*(.+)/i) || texto.match(/Colección TGP Recomendada:\s*(.+)/i);
+      if (matchCol) categoria = cleanMd(matchCol[1]);
+    }
+
+    if (!titulo) {
+      titulo = archivoNombre ? archivoNombre.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ') : 'Nuevo Ensayo Arqueosemiótico';
+    }
+
+    const slug = titulo
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60) || `post-${Date.now()}`;
+
+    return { titulo, slug, categoria, excerpt, tags };
+  }
+
+  function abrirEditorConDraft(url: string) {
+    if (informeTexto || imagenBase) {
+      const meta = extraerMetadatosInforme(informeTexto || '', informeModoUsado, imagenBase?.name || '');
+      const draft = {
+        title: meta.titulo,
+        slug: meta.slug,
+        category: meta.categoria,
+        excerpt: meta.excerpt,
+        content: informeTexto || '',
+        imageUrl: r2Url || null,
+        timestamp: Date.now(),
+      };
+      try {
+        localStorage.setItem('tgp_staging_draft', JSON.stringify(draft));
+      } catch (e) {
+        console.warn('No se pudo guardar tgp_staging_draft:', e);
+      }
+    }
+    window.open(url, '_blank');
+  }
+
+  async function guardarPostDirecto(destinoId: ColeccionDestino) {
+    if (!imagenBase && !informeTexto) return;
+    guardandoPost = true;
+    errorGuardadoPost = null;
+    postCreadoExitosamente = null;
+
+    try {
+      const meta = extraerMetadatosInforme(informeTexto || '', informeModoUsado, imagenBase?.name || '');
+
+      let finalImageUrl = r2Url;
+      if (!finalImageUrl && imagenBase) {
+        const reader = new FileReader();
+        const base64Promise = new Promise<string>((resolve, reject) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+        });
+        reader.readAsDataURL(imagenBase);
+        finalImageUrl = await base64Promise;
+      }
+
+      let endpoint = '/api/guardar-ensayo';
+      let webUrl = `/hemeroteca/${meta.slug}/`;
+      let keystaticUrl = `/keystatic/collection/ensayos/item/${meta.slug}`;
+
+      if (destinoId === 'ensayosCinematicos') {
+        endpoint = '/api/guardar-cinematico';
+        webUrl = `/ensayos-cinematicos/${meta.slug}/`;
+        keystaticUrl = `/keystatic/collection/ensayosCinematicos/item/${meta.slug}`;
+      } else if (destinoId === 'arquetiposGlobales') {
+        endpoint = '/api/guardar-arquetipo';
+        webUrl = `/arquetipos/${meta.slug}/`;
+        keystaticUrl = `/keystatic/collection/arquetiposGlobales/item/${meta.slug}`;
+      } else if (destinoId === 'informesPremium') {
+        endpoint = '/api/guardar-informe-premium';
+        webUrl = `/colecciones/liminal/`;
+        keystaticUrl = `/keystatic/collection/informesPremium/item/${meta.slug}`;
+      } else if (destinoId === 'georreferencias') {
+        endpoint = '/api/guardar-georreferencia';
+        webUrl = `/georreferencias/${meta.slug}/`;
+        keystaticUrl = `/keystatic/collection/georreferencias/item/${meta.slug}`;
+      }
+
+      const payload: any = {
+        slug: meta.slug,
+        title: meta.titulo,
+        content: informeTexto || `Artículo dedicado a ${meta.titulo}.`,
+        excerpt: meta.excerpt,
+        category: meta.categoria,
+        imageUrl: finalImageUrl,
+        publicarConImagen: true,
+        tags: meta.tags,
+      };
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al guardar el post.');
+      }
+
+      postCreadoExitosamente = {
+        slug: meta.slug,
+        titulo: meta.titulo,
+        webUrl,
+        keystaticUrl,
+        coleccion: DESTINOS_TGP[destinoId].nombre,
+      };
+
+      try {
+        localStorage.setItem('tgp_staging_draft', JSON.stringify({
+          title: meta.titulo,
+          slug: meta.slug,
+          category: meta.categoria,
+          excerpt: meta.excerpt,
+          content: informeTexto || '',
+          imageUrl: finalImageUrl,
+          timestamp: Date.now(),
+        }));
+      } catch {}
+    } catch (err: any) {
+      console.error('Error guardando post directo:', err);
+      errorGuardadoPost = err.message || 'No se pudo guardar el post.';
+    } finally {
+      guardandoPost = false;
+    }
+  }
 </script>
 
 <!-- ── TEMPLATE ──────────────────────────────────────────────────────────── -->
@@ -712,17 +893,74 @@
         </div>
 
         <div class="vl-destino-card-right">
-          <a
-            href={actual.keystaticPath}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="vl-btn vl-btn--primary vl-btn--launcher"
-          >
-            <span>🚀 Abrir Editor en Keystatic</span>
-          </a>
+          {#if guardandoPost}
+            <div class="vl-processing" style="padding: 14px 20px;">
+              <div class="vl-spinner vl-spinner--blue"></div>
+              <span>Publicando en {actual.nombre} y escribiendo en disco…</span>
+            </div>
+          {:else if postCreadoExitosamente}
+            <div class="vl-post-creado-card">
+              <div class="vl-post-creado-head">
+                <span>✅ ¡Post Publicado en {postCreadoExitosamente.coleccion}!</span>
+                <span class="vl-post-creado-slug">{postCreadoExitosamente.slug}</span>
+              </div>
+              <p class="vl-post-creado-title">{postCreadoExitosamente.titulo}</p>
+              <div class="vl-post-creado-actions">
+                <a
+                  href={postCreadoExitosamente.webUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="vl-btn vl-btn--primary vl-btn--sm"
+                >
+                  <span>👁️ Ver en la Web</span>
+                </a>
+                <a
+                  href={postCreadoExitosamente.keystaticUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="vl-btn vl-btn--amber vl-btn--sm"
+                >
+                  <span>✏️ Editar en Keystatic</span>
+                </a>
+                <button
+                  type="button"
+                  class="vl-btn vl-btn--ghost vl-btn--sm"
+                  on:click={() => (postCreadoExitosamente = null)}
+                  title="Crear otra entrada"
+                >
+                  Publicar Otro
+                </button>
+              </div>
+            </div>
+          {:else}
+            {#if errorGuardadoPost}
+              <div class="vl-error" style="margin-bottom: 8px;">⚠ {errorGuardadoPost}</div>
+            {/if}
+
+            <button
+              type="button"
+              class="vl-btn vl-btn--primary vl-btn--launcher"
+              on:click={() => guardarPostDirecto(destinoSeleccionado)}
+              disabled={!informeTexto && !imagenBase}
+              title={!informeTexto ? 'Primero genera el informe Flash o Pro en el Paso 2' : `Guardar post directamente en ${actual.nombre}`}
+            >
+              <span>⚡ Publicar Directo en {actual.nombre}</span>
+            </button>
+
+            <button
+              type="button"
+              class="vl-btn vl-btn--ghost vl-btn--sm"
+              style="margin-top: 6px;"
+              on:click={() => abrirEditorConDraft(actual.keystaticPath)}
+              title="Abrir formulario en blanco en Keystatic precargando este borrador"
+            >
+              <span>🚀 Abrir Formulario en Keystatic ↗</span>
+            </button>
+          {/if}
+
           {#if r2Url}
-            <div class="vl-launcher-r2-hint">
-              <span>✓ Imagen en R2 lista para portada</span>
+            <div class="vl-launcher-r2-hint" style="margin-top: 8px;">
+              <span>✓ Portada en Cloudflare R2</span>
               <button type="button" class="vl-link-btn" on:click={copiarUrlR2}>
                 {copiado ? '✓ Copiado' : 'Copiar URL R2'}
               </button>
@@ -1857,5 +2095,50 @@
     color: var(--vl-accent-blue);
     text-decoration: underline;
     cursor: pointer;
+  }
+
+  /* ── Tarjeta de Post Creado Exitosamente ── */
+  .vl-post-creado-card {
+    background: rgba(76, 175, 80, 0.08);
+    border: 1px solid rgba(76, 175, 80, 0.4);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 420px;
+    box-sizing: border-box;
+    text-align: left;
+  }
+  .vl-post-creado-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    font-size: 13px;
+    color: #4caf50;
+    gap: 8px;
+  }
+  .vl-post-creado-slug {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--vl-text-muted);
+    background: var(--vl-surface);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--vl-border);
+  }
+  .vl-post-creado-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--vl-text);
+    line-height: 1.4;
+  }
+  .vl-post-creado-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
   }
 </style>
