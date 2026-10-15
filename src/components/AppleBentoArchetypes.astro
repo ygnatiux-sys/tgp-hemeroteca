@@ -38,24 +38,24 @@ const {
 const defaultFigures: ArchetypeFigure[] = [
   // 0. Fondo lejano detrás (Pazuzu asomando tras hombro derecho de Venus)
   {
-    src: "/busts/busto-pazuzu.png",
+    src: "https://storage.thegreatpuzzleproject.com/busts/busto-pazuzu.webp",
     alt: "Pazuzu Bronce Asirio",
     title: "Pazuzu",
-    classNames: "busto-layer absolute right-[1%] sm:right-[2%] bottom-[5%] h-[75%] w-auto object-contain z-[1] opacity-80 brightness-90 contrast-115 [mask-image:radial-gradient(ellipse_65%_75%_at_50%_45%,black_40%,transparent_95%)] [-webkit-mask-image:radial-gradient(ellipse_65%_75%_at_50%_45%,black_40%,transparent_95%)] filter sepia-[0.15] pointer-events-none",
+    classNames: "busto-layer absolute right-[2%] sm:right-[3%] bottom-[6%] h-[74%] w-auto object-contain z-[1] opacity-80 brightness-90 contrast-115 [mask-image:radial-gradient(ellipse_70%_80%_at_50%_50%,black_50%,transparent_95%)] [-webkit-mask-image:radial-gradient(ellipse_70%_80%_at_50%_50%,black_50%,transparent_95%)] filter sepia-[0.15] pointer-events-none",
   },
-  // 1. Plano medio izquierda (Cabeza Colosal Olmeca con aire propio)
+  // 1. Plano medio izquierda (Cabeza Colosal Olmeca centrada en su carril)
   {
-    src: "/busts/busto-olmeca.png",
+    src: "https://storage.thegreatpuzzleproject.com/busts/busto-olmeca.webp",
     alt: "Cabeza Colosal Olmeca",
     title: "Megalito Olmeca",
-    classNames: "busto-layer absolute right-[38%] sm:right-[40%] bottom-[8%] h-[68%] w-auto object-contain z-[2] brightness-90 contrast-115 drop-shadow-[-20px_15px_30px_rgba(0,0,0,0.85)] [mask-image:radial-gradient(ellipse_75%_80%_at_50%_45%,black_50%,transparent_95%)] [-webkit-mask-image:radial-gradient(ellipse_75%_80%_at_50%_45%,black_50%,transparent_95%)] filter sepia-[0.12] pointer-events-none",
+    classNames: "busto-layer absolute right-[45%] sm:right-[47%] bottom-[6%] h-[72%] w-auto object-contain z-[2] brightness-90 contrast-115 drop-shadow-[-20px_15px_30px_rgba(0,0,0,0.85)] [mask-image:radial-gradient(ellipse_80%_85%_at_50%_50%,black_60%,transparent_98%)] [-webkit-mask-image:radial-gradient(ellipse_80%_85%_at_50%_50%,black_60%,transparent_98%)] filter sepia-[0.12] pointer-events-none",
   },
-  // 2. Primer plano centro-derecha (Venus protagonista, 100% sólida y escala calibrada para dedos)
+  // 2. Primer plano centro-derecha (Venus protagonista, 100% sólida y escala calibrada)
   {
-    src: "/busts/busto-venus.png",
+    src: "https://storage.thegreatpuzzleproject.com/busts/busto-venus.webp",
     alt: "Estatua Clásica de Venus · British Museum",
     title: "Venus",
-    classNames: "busto-layer absolute right-[14%] bottom-[-5%] h-[90%] sm:h-[93%] w-auto object-contain z-[3] opacity-100 brightness-95 contrast-115 drop-shadow-[-25px_18px_35px_rgba(0,0,0,0.9)] filter sepia-[0.08] pointer-events-none",
+    classNames: "busto-layer absolute right-[10%] sm:right-[12%] bottom-[-5%] h-[92%] sm:h-[95%] w-auto object-contain z-[3] opacity-100 brightness-95 contrast-115 drop-shadow-[-25px_18px_35px_rgba(0,0,0,0.9)] filter sepia-[0.08] pointer-events-none",
   },
 ];
 
@@ -158,32 +158,31 @@ const layers = figures && figures.length > 0 ? figures : defaultFigures;
 
     // 1. SNAP-IN: Vienen separados y se asientan magnéticamente en sus 3 carriles
     tl.fromTo(layers[0], // Fondo lejano detrás (Pazuzu)
-      { x: 60, scale: 1.1, opacity: 0, filter: 'blur(4px)' },
+      { x: 35, scale: 1.05, opacity: 0, filter: 'blur(4px)' },
       { x: 0, scale: 1, opacity: 0.8, filter: 'blur(0px)', duration: 0.55, ease: 'expo.out' }, 0
     )
     .fromTo(layers[1], // Plano medio izquierda (Cabeza Olmeca - entra desde la izquierda a su carril)
-      { x: -60, scale: 0.94, opacity: 0 },
+      { x: -35, scale: 0.94, opacity: 0 },
       { x: 0, scale: 1, opacity: 0.95, duration: 0.6, ease: 'expo.out' }, 0.06
     )
     .fromTo(layers[2], // Primer plano centro-derecha (Venus - entra a su carril protagonista)
-      { x: 60, scale: 1.08, opacity: 0 },
+      { x: 35, scale: 1.05, opacity: 0 },
       { x: 0, scale: 1, opacity: 1, duration: 0.65, ease: 'expo.out' }, 0.12
     )
 
-    // 2. TENSIÓN MAGNÉTICA (Recorrido x reducido a la mitad: x: 12 y x: -12 para no taparse las caras)
-    // Mientras la Cabeza Olmeca y la Venus respiran en contra-movimiento sutil, el glow se expande
-    .to(layers[1], { x: 12, scale: 0.98, duration: 2.4, ease: 'sine.inOut' }, 0.65)
-    .to(layers[2], { x: -12, scale: 1.03, duration: 2.4, ease: 'sine.inOut' }, 0.65)
-    .to(layers[0], { x: -8, scale: 1.02, duration: 2.4, ease: 'sine.inOut' }, 0.65)
+    // 2. TENSIÓN MAGNÉTICA (Recorrido x calibrado para respirar sin taparse)
+    .to(layers[1], { x: 10, scale: 0.98, duration: 2.4, ease: 'sine.inOut' }, 0.65)
+    .to(layers[2], { x: -10, scale: 1.02, duration: 2.4, ease: 'sine.inOut' }, 0.65)
+    .to(layers[0], { x: -6, scale: 1.02, duration: 2.4, ease: 'sine.inOut' }, 0.65)
     .fromTo(glow, 
-      { scale: 0.92, opacity: 0.5, x: 20 }, 
-      { scale: 1.2, opacity: 0.95, x: -15, duration: 2.4, ease: 'sine.inOut' }, 0.65
+      { scale: 0.92, opacity: 0.5, x: 15 }, 
+      { scale: 1.2, opacity: 0.95, x: -10, duration: 2.4, ease: 'sine.inOut' }, 0.65
     )
 
     // 3. WHIP-OUT (Salida rápida en 0.35s hacia el centro antes de reiniciar el ciclo)
     .to(layers, {
-      x: (i: number) => (i === 1 ? 40 : -40), // Cruce ágil sin brusquedad
-      scale: 1.06,
+      x: (i: number) => (i === 1 ? 25 : -25), // Cruce ágil sin brusquedad
+      scale: 1.04,
       opacity: 0,
       filter: 'blur(4px)',
       duration: 0.35,

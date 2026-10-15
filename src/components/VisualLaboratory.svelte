@@ -53,6 +53,14 @@
   let errorMsg:         string | null = null;
   let isWikiInboxOpen   = false;
 
+  // ── Estado Informe IA (Gemini Vision Flash vs Pro) ────────────────────────
+  let modoHover:        'flash' | 'pro' | null = null;
+  let estadoInforme:    'idle' | 'generando' | 'completado' | 'error' = 'idle';
+  let informeTexto:     string | null = null;
+  let informeModoUsado: 'flash' | 'pro' | null = null;
+  let informeError:     string | null = null;
+  let copiadoInforme    = false;
+
   // ── Ref de DOM ────────────────────────────────────────────────────────────
   let fileInputEl: HTMLInputElement;
 
@@ -97,6 +105,7 @@
       r2Url           = null;
       estadoR2        = 'idle';
       errorMsg        = null;
+      limpiarInforme();
     }
   }
 
@@ -106,6 +115,64 @@
     r2Url           = null;
     estadoR2        = 'idle';
     errorMsg        = null;
+    limpiarInforme();
+  }
+
+  // ── Generación de Informe con IA (Gemini Multimodal Directo) ─────────────
+  async function generarInformeIA(modo: 'flash' | 'pro') {
+    if (!imagenBase) return;
+    estadoInforme = 'generando';
+    informeModoUsado = modo;
+    informeError = null;
+    copiadoInforme = false;
+
+    try {
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+      });
+      reader.readAsDataURL(imagenBase);
+      const base64Data = await base64Promise;
+
+      const res = await fetch('/api/informe-imagen', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageBase64: base64Data,
+          mimeType: imagenBase.type || 'image/jpeg',
+          modo,
+          nombreArchivo: imagenBase.name,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Error al generar informe con Gemini');
+      }
+
+      informeTexto = data.informe;
+      estadoInforme = 'completado';
+    } catch (err: any) {
+      console.error('Error generando informe IA:', err);
+      informeError = err.message || 'Error de conexión con el motor de IA.';
+      estadoInforme = 'error';
+    }
+  }
+
+  async function copiarInforme() {
+    if (!informeTexto) return;
+    await navigator.clipboard.writeText(informeTexto);
+    copiadoInforme = true;
+    setTimeout(() => (copiadoInforme = false), 2500);
+  }
+
+  function limpiarInforme() {
+    informeTexto = null;
+    estadoInforme = 'idle';
+    informeModoUsado = null;
+    informeError = null;
+    copiadoInforme = false;
   }
 
   // ── Procesamiento en Cloud Run ────────────────────────────────────────────
@@ -309,11 +376,165 @@
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════
-       PASO 2 · MOTORES DE TRANSFORMACIÓN
+       PASO 2 · DIAGNÓSTICO & ANÁLISIS CON IA (GEMINI MULTIMODAL)
+  ════════════════════════════════════════════════════════════════════ -->
+  {#if imagenBase}
+    <section class="vl-section vl-ai-section">
+      <div class="vl-section-header">
+        <span class="vl-step-label">2 · Diagnóstico &amp; Análisis Visual (Gemini Multimodal Directo)</span>
+        <span class="vl-badge vl-badge--cyan">1 Paso · Zero Cloud Run</span>
+      </div>
+
+      <!-- BOTONERA DE ELECCIÓN (FLASH VS PRO) -->
+      <div class="vl-ai-buttons-row">
+        <button
+          type="button"
+          class="vl-btn vl-btn--flash {informeModoUsado === 'flash' ? 'vl-btn--active' : ''}"
+          on:mouseenter={() => (modoHover = 'flash')}
+          on:mouseleave={() => (modoHover = null)}
+          on:click={() => generarInformeIA('flash')}
+          disabled={estadoInforme === 'generando'}
+        >
+          <span class="vl-btn-icon">⚡</span>
+          <span>Informe Flash (&lt; 2s)</span>
+          <span class="vl-btn-subtag">Triage Rápido</span>
+        </button>
+
+        <button
+          type="button"
+          class="vl-btn vl-btn--pro {informeModoUsado === 'pro' ? 'vl-btn--active' : ''}"
+          on:mouseenter={() => (modoHover = 'pro')}
+          on:mouseleave={() => (modoHover = null)}
+          on:click={() => generarInformeIA('pro')}
+          disabled={estadoInforme === 'generando'}
+        >
+          <span class="vl-btn-icon">🧠</span>
+          <span>Informe Pro (Erudito)</span>
+          <span class="vl-btn-subtag">Dossier Semiótico</span>
+        </button>
+      </div>
+
+      <!-- TARJETA HUD PRE-VUELO (WARNING & ESPECIFICACIÓN ANTES DE CLICKEAR) -->
+      <div
+        class="vl-hud-preview {modoHover === 'flash'
+          ? 'vl-hud--flash'
+          : modoHover === 'pro'
+          ? 'vl-hud--pro'
+          : 'vl-hud--idle'}"
+      >
+        {#if modoHover === 'flash'}
+          <div class="vl-hud-content">
+            <div class="vl-hud-top">
+              <span class="vl-hud-pill vl-hud-pill--flash">⚡ PRE-VUELO · ESPECIFICACIÓN FLASH</span>
+              <span class="vl-hud-metric">Modelo: <strong>gemini-2.5-flash</strong></span>
+              <span class="vl-hud-metric">Tiempo: <strong>&lt; 2 seg</strong></span>
+              <span class="vl-hud-metric">Consumo: <strong>Mínimo (~300 tokens)</strong></span>
+            </div>
+            <div class="vl-hud-body">
+              <p class="vl-hud-lead">
+                <strong>Propósito:</strong> Triage veloz, asignación de colección y metadatos cromáticos esenciales sin esperas.
+              </p>
+              <div class="vl-hud-list">
+                <span>✓ Sujeto / obra identificada</span>
+                <span>✓ Cultura y época estimada</span>
+                <span>✓ Atmósfera (3 tonos dominantes)</span>
+                <span>✓ Colección TGP sugerida</span>
+              </div>
+            </div>
+          </div>
+        {:else if modoHover === 'pro'}
+          <div class="vl-hud-content">
+            <div class="vl-hud-top">
+              <span class="vl-hud-pill vl-hud-pill--pro">🧠 PRE-VUELO · ESPECIFICACIÓN PRO</span>
+              <span class="vl-hud-metric">Modelo: <strong>gemini-3.1-pro</strong></span>
+              <span class="vl-hud-metric">Tiempo: <strong>5 - 10 seg</strong></span>
+              <span class="vl-hud-metric">Consumo: <strong>Moderado (~2,500 tokens)</strong></span>
+            </div>
+            <div class="vl-hud-body">
+              <p class="vl-hud-lead">
+                <strong>Propósito:</strong> Curaduría editorial profunda, análisis arqueosemiótico exhaustivo y redacción de ensayo histórico.
+              </p>
+              <div class="vl-hud-list">
+                <span>✓ 1. Iconografía minuciosa y contexto</span>
+                <span>✓ 2. Estratigrafía, materialidad y desgaste</span>
+                <span>✓ 3. Hermenéutica y mitología comparada</span>
+                <span>✓ 4. Ficha editorial (H1, Dek, Excerpt y Tags D1)</span>
+              </div>
+            </div>
+          </div>
+        {:else}
+          <div class="vl-hud-idle">
+            <span class="vl-hud-idle-icon">ℹ️</span>
+            <span>
+              Pasa el ratón sobre <strong>⚡ Informe Flash</strong> o <strong>🧠 Informe Pro</strong> para previsualizar modelo, tiempo de respuesta, consumo de tokens y estructura del informe antes de hacer clic.
+            </span>
+          </div>
+        {/if}
+      </div>
+
+      <!-- ESTADO DE PROCESAMIENTO IA -->
+      {#if estadoInforme === 'generando'}
+        <div class="vl-processing vl-ai-processing">
+          <div class="vl-spinner vl-spinner--blue"></div>
+          <span>
+            Analizando píxeles en Gemini Multimodal ({informeModoUsado === 'pro'
+              ? 'gemini-3.1-pro · Redactando Dossier Erudito'
+              : 'gemini-2.5-flash · Generando Síntesis Ágil'})…
+          </span>
+        </div>
+      {/if}
+
+      <!-- ERROR IA -->
+      {#if informeError}
+        <div class="vl-error">⚠ {informeError}</div>
+      {/if}
+
+      <!-- RESULTADO DEL INFORME IA -->
+      {#if informeTexto && estadoInforme === 'completado'}
+        <div class="vl-ai-report-card">
+          <div class="vl-ai-report-header">
+            <div class="vl-ai-report-badges">
+              <span
+                class="vl-badge-mode {informeModoUsado === 'pro'
+                  ? 'vl-badge-mode--pro'
+                  : 'vl-badge-mode--flash'}"
+              >
+                {informeModoUsado === 'pro' ? '🧠 Dossier Erudito Pro' : '⚡ Síntesis Flash'}
+              </span>
+              <span class="vl-ai-report-meta">Gemini Vision Multimodal · 1 Paso</span>
+            </div>
+            <div class="vl-ai-report-actions">
+              <button
+                type="button"
+                class="vl-btn vl-btn--ghost vl-btn--sm"
+                on:click={copiarInforme}
+              >
+                {copiadoInforme ? '✓ ¡Copiado!' : '📋 Copiar Markdown'}
+              </button>
+              <button
+                type="button"
+                class="vl-btn vl-btn--ghost vl-btn--sm"
+                on:click={limpiarInforme}
+                title="Cerrar informe"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+          <div class="vl-ai-report-body">
+            <pre class="vl-markdown-view">{informeTexto}</pre>
+          </div>
+        </div>
+      {/if}
+    </section>
+  {/if}
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       PASO 3 · MOTORES DE TRANSFORMACIÓN VISUAL
   ════════════════════════════════════════════════════════════════════ -->
   {#if imagenBase && estado !== 'procesando'}
     <section class="vl-section">
-      <span class="vl-step-label">2 · Motores de Transformación (Cloud Run)</span>
+      <span class="vl-step-label">3 · Motores de Transformación (Cloud Run)</span>
       <div class="vl-motores-row">
         <button
           class="vl-btn vl-btn--green"
@@ -930,5 +1151,245 @@
   }
   @keyframes vl-spin {
     to { transform: rotate(360deg); }
+  }
+
+  /* ── Módulo Informe IA (Flash vs Pro) ─────────────────────────────────── */
+  .vl-ai-section {
+    background: var(--vl-surface);
+    border: 1px solid var(--vl-border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: var(--vl-card-shadow);
+  }
+  .vl-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .vl-badge--cyan {
+    color: var(--vl-accent-blue);
+    border-color: rgba(26,115,232,0.3);
+    background: rgba(26,115,232,0.06);
+  }
+  .vl-ai-buttons-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .vl-btn--flash {
+    background: #e8f0fe;
+    color: #1a73e8;
+    border-color: #d2e3fc;
+  }
+  .vl-btn--flash:hover {
+    background: #d2e3fc;
+    color: #174ea6;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26,115,232,0.15);
+  }
+  .theme-dark .vl-btn--flash {
+    background: #1a2733;
+    color: #8ab4f8;
+    border-color: #2b3d52;
+  }
+  .theme-dark .vl-btn--flash:hover {
+    background: #233446;
+    color: #aecbfa;
+  }
+  .vl-btn--pro {
+    background: #fef7e0;
+    color: #b06000;
+    border-color: #feefc3;
+  }
+  .vl-btn--pro:hover {
+    background: #feefc3;
+    color: #8a4800;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(176,96,0,0.18);
+  }
+  .theme-dark .vl-btn--pro {
+    background: #2b2313;
+    color: #fdd663;
+    border-color: #44371e;
+  }
+  .theme-dark .vl-btn--pro:hover {
+    background: #382c16;
+    color: #ffe082;
+  }
+  .vl-btn-subtag {
+    font-size: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    background: rgba(0,0,0,0.06);
+    margin-left: 4px;
+  }
+  .theme-dark .vl-btn-subtag {
+    background: rgba(255,255,255,0.1);
+  }
+  .vl-btn--active {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  /* ── HUD Pre-Vuelo Interactivo ────────────────────────────────────────── */
+  .vl-hud-preview {
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 13px;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--vl-border);
+    background: var(--vl-surface-card);
+  }
+  .vl-hud--idle {
+    background: var(--vl-surface);
+    border-color: var(--vl-border-subtle);
+    color: var(--vl-text-muted);
+  }
+  .vl-hud-idle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1.5;
+  }
+  .vl-hud-idle-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .vl-hud--flash {
+    background: #f8fbff;
+    border-color: #8ab4f8;
+    box-shadow: 0 4px 16px rgba(26,115,232,0.08);
+  }
+  .theme-dark .vl-hud--flash {
+    background: #141c24;
+    border-color: #2b486f;
+  }
+  .vl-hud--pro {
+    background: #fffdf5;
+    border-color: #fdd663;
+    box-shadow: 0 4px 16px rgba(176,96,0,0.1);
+  }
+  .theme-dark .vl-hud--pro {
+    background: #1f190e;
+    border-color: #5c451a;
+  }
+  .vl-hud-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .vl-hud-pill {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    letter-spacing: 0.06em;
+  }
+  .vl-hud-pill--flash {
+    background: #1a73e8;
+    color: #ffffff;
+  }
+  .vl-hud-pill--pro {
+    background: #b06000;
+    color: #ffffff;
+  }
+  .vl-hud-metric {
+    font-size: 12px;
+    color: var(--vl-text);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .vl-hud-metric strong {
+    color: var(--vl-text);
+  }
+  .vl-hud-lead {
+    margin: 0 0 8px 0;
+    color: var(--vl-text);
+    line-height: 1.5;
+    font-size: 12.5px;
+  }
+  .vl-hud-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 6px;
+    font-size: 12px;
+    color: var(--vl-text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* ── Tarjeta de Informe Generado ──────────────────────────────────────── */
+  .vl-ai-processing {
+    margin-top: 10px;
+  }
+  .vl-ai-report-card {
+    margin-top: 12px;
+    border-radius: 14px;
+    border: 1px solid var(--vl-border);
+    background: var(--vl-bg);
+    overflow: hidden;
+  }
+  .vl-ai-report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--vl-surface);
+    border-bottom: 1px solid var(--vl-border-subtle);
+  }
+  .vl-ai-report-badges {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .vl-badge-mode {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
+    padding: 3px 10px;
+    border-radius: 9999px;
+  }
+  .vl-badge-mode--flash {
+    background: rgba(26,115,232,0.12);
+    color: var(--vl-accent-blue);
+  }
+  .vl-badge-mode--pro {
+    background: rgba(176,96,0,0.14);
+    color: var(--vl-accent-amber);
+  }
+  .vl-ai-report-meta {
+    font-size: 11px;
+    color: var(--vl-text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .vl-ai-report-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .vl-btn--sm {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  .vl-ai-report-body {
+    padding: 16px 20px;
+    max-height: 480px;
+    overflow-y: auto;
+  }
+  .vl-markdown-view {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--vl-text);
   }
 </style>
