@@ -144,7 +144,7 @@ if (headline.includes('.')) {
     class:list={[
       "relative w-full overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl bg-black",
       isArchive ? "border-0" : "border border-white/10",
-      isArchive ? "aspect-21/9 sm:aspect-[2.39/1] min-h-[38vh] md:min-h-85 max-h-115" : "aspect-21/9 sm:aspect-[2.39/1] min-h-[58vh] md:min-h-140 max-h-175"
+      isArchive ? "aspect-4/3 sm:aspect-2/1 min-h-[44vh] md:min-h-100 max-h-135" : "aspect-4/3 sm:aspect-2/1 min-h-[62vh] md:min-h-155 max-h-190"
     ]}
   >
 
@@ -190,7 +190,7 @@ if (headline.includes('.')) {
               loading="lazy"
               decoding="async"
               class={`hero-bg-img absolute inset-0 w-full h-full pointer-events-none brightness-95 contrast-[1.02] z-0 ${heroFitClass}`}
-              style="object-position: 50% 50%;"
+              style={`object-position: ${isHeroPortraitArt ? '50% 20%' : '50% 28%'};`}
             />
             {/* Viñeta perimetral suave si isArchive */}
             {isArchive && (

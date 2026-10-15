@@ -10,6 +10,7 @@ import {
   sanitizeImageUrl,
 } from "../lib/content-filter";
 import { recommendMetallicGradient } from "../lib/metallic-gradients";
+import { resolveImmersiveVariant, IMMERSIVE_CLASSES } from "../lib/aspect-system";
 
 interface Props {
   slug: string;
@@ -84,21 +85,17 @@ if (entry.youtubeLink) {
 const isHero = variant === "hero";
 const isDuo40 = variant === "duo-40";
 
-// Detección de retratos / rostros humanos / monolitos / fauna para encuadre y aspect ratio
+// Detección canónica de sujeto (busto/monolito vs paisaje) para encuadre y aspect ratio
 const explicitPos = (entry as any)?.titlePosition || null;
-const isPortraitArt =
-  /olmeca|cabeza|monolito|aguara|hegel|homero|saturno|busto|estatua|retrato|filosofia|moctezuma|gengis|tatu|rostro|portrait|escultura|venus|urano|arquetipo|personaje|fauna|animal|tero|perdiz|tapir|vaca|hunza/i.test(
-    `${entry?.title || ""} ${slug || ""} ${entry?.category || ""}`,
-  );
+const immersiveVariant = resolveImmersiveVariant(entry, slug);
+const isPortraitArt = immersiveVariant === 'monumental';
 const titlePos = explicitPos || (isPortraitArt ? "top" : "bottom");
 
-// Relación de aspecto de la imagen según variante y sujeto:
-// Sujetos con verticalidad (Olmeca, Hegel, bustos, retratos) adoptan Univisium (2:1 / 18:9) con mayor altura.
-// Paisajes y sitios abiertos continúan en Cinemascope (2.39:1 / 21:9).
+// Relación de aspecto inmersiva unificada (Sistema TGP):
+// - Monumental (16:10 / 1.60:1) para bustos, estatuas, fauna y retratos.
+// - Panorámico (19:10 / 1.90:1) para paisajes, arquitectura y vistas abiertas.
 const imageAspectClass = isHero
-  ? isPortraitArt
-    ? "aspect-[2/1] min-h-115 md:min-h-130 max-h-[68vh]"
-    : "aspect-21/9 sm:aspect-[2.39/1] max-h-[60vh]"
+  ? IMMERSIVE_CLASSES[immersiveVariant].container
   : isDuo40
     ? "aspect-[4/3] sm:aspect-16/10"
     : "aspect-[4/3] sm:aspect-video";
@@ -286,8 +283,8 @@ const fitClass =
           style={
             isHero
               ? isPortraitArt
-                ? "object-position: 50% 25%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
-                : "object-position: 50% 50%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
+                ? "object-position: 50% 20%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
+                : "object-position: 50% 38%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
               : undefined
           }
           data-flip-id={`card-image-${cardId}`}
