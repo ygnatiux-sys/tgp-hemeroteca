@@ -61,6 +61,80 @@
   let informeError:     string | null = null;
   let copiadoInforme    = false;
 
+  // ── Estado Canvas Monumental & Zoom ──────────────────────────────────────
+  let escalaCanvas:      'fit' | 'original' = 'fit';
+  let imagenDimensiones: { width: number; height: number } | null = null;
+  let vistaActual:       'original' | 'procesada' = 'original';
+
+  function onImageLoad(e: Event) {
+    const img = e.target as HTMLImageElement;
+    if (img) {
+      imagenDimensiones = { width: img.naturalWidth, height: img.naturalHeight };
+    }
+  }
+
+  // ── Estado Selector de Destino / Colección TGP ────────────────────────────
+  type ColeccionDestino = 'ensayos' | 'ensayosCinematicos' | 'arquetiposGlobales' | 'informesPremium' | 'georreferencias';
+  let destinoSeleccionado: ColeccionDestino = 'ensayos';
+
+  interface InfoDestino {
+    id: ColeccionDestino;
+    nombre: string;
+    icono: string;
+    subtitulo: string;
+    keystaticPath: string;
+    publicUrl: string;
+    descripcion: string;
+  }
+
+  const DESTINOS_TGP: Record<ColeccionDestino, InfoDestino> = {
+    ensayos: {
+      id: 'ensayos',
+      nombre: 'Ensayo Estándar',
+      icono: '📜',
+      subtitulo: 'Hemeroteca General & Portada Home',
+      keystaticPath: '/keystatic/collection/ensayos/create',
+      publicUrl: '/hemeroteca',
+      descripcion: 'Publicación clásica de investigación con citas primarias, aparato crítico y metadatos completos.',
+    },
+    ensayosCinematicos: {
+      id: 'ensayosCinematicos',
+      nombre: 'Ensayo Cinemático',
+      icono: '🎬',
+      subtitulo: 'Dossier GSAP Fullscreen',
+      keystaticPath: '/keystatic/collection/ensayosCinematicos/create',
+      publicUrl: '/ensayos-cinematicos',
+      descripcion: 'Experiencia inmersiva con galería cinemática GSAP, tipografía monumental y atmósfera audiovisual.',
+    },
+    arquetiposGlobales: {
+      id: 'arquetiposGlobales',
+      nombre: 'Arquetipo Global',
+      icono: '🏛️',
+      subtitulo: 'Genealogía Mitológica',
+      keystaticPath: '/keystatic/collection/arquetiposGlobales/create',
+      publicUrl: '/arquetipos',
+      descripcion: 'Catálogo de esculturas, bustos, dioses y figuras arquetípicas del Puzzle.',
+    },
+    informesPremium: {
+      id: 'informesPremium',
+      nombre: 'Informe Premium / Colección',
+      icono: '🧪',
+      subtitulo: 'Liminal, Heterodoxia, Anomalías...',
+      keystaticPath: '/keystatic/collection/informesPremium/create',
+      publicUrl: '/colecciones/liminal',
+      descripcion: 'Reporte monográfico exclusivo asignado a una de las 4 colecciones temáticas cerradas.',
+    },
+    georreferencias: {
+      id: 'georreferencias',
+      nombre: 'Georreferencia',
+      icono: '🌐',
+      subtitulo: 'Atlas Geohistórico / Mapa',
+      keystaticPath: '/keystatic/collection/georreferencias/create',
+      publicUrl: '/georreferencias',
+      descripcion: 'Ficha territorial con coordenadas, fotos de yacimiento y micro-narrativas etnográficas locales.',
+    },
+  };
+
   // ── Ref de DOM ────────────────────────────────────────────────────────────
   let fileInputEl: HTMLInputElement;
 
@@ -360,16 +434,71 @@
     </div>
 
     {#if imagenBase}
-      <!-- Miniatura de previsualización del archivo original -->
-      <div class="vl-original-preview">
-        <img
-          src={URL.createObjectURL(imagenBase)}
-          alt="Original"
-          class="vl-original-img"
-        />
-        <div class="vl-original-meta">
-          <span class="vl-original-name">{imagenBase.name}</span>
-          <span class="vl-original-size">{(imagenBase.size / 1024).toFixed(1)} KB</span>
+      <!-- ═══════════════════════════════════════════════════════════════════
+           ESPACIO MONUMENTAL DE VISUALIZACIÓN (CANVAS CENTRAL)
+      ════════════════════════════════════════════════════════════════════ -->
+      <div class="vl-monumental-container">
+        <!-- Barra de herramientas del Canvas -->
+        <div class="vl-monumental-bar">
+          <div class="vl-monumental-title-wrap">
+            <span class="vl-monumental-icon">👁</span>
+            <span class="vl-monumental-filename">{imagenBase.name}</span>
+            {#if imagenDimensiones}
+              <span class="vl-canvas-badge">{imagenDimensiones.width} × {imagenDimensiones.height} px</span>
+            {/if}
+            <span class="vl-canvas-badge">{(imagenBase.size / 1024).toFixed(1)} KB</span>
+            <span class="vl-canvas-badge">{imagenBase.type || 'image/webp'}</span>
+          </div>
+
+          <div class="vl-monumental-controls">
+            {#if imagenProcesada}
+              <div class="vl-toggle-group">
+                <button
+                  type="button"
+                  class="vl-toggle-btn {vistaActual === 'original' ? 'is-active' : ''}"
+                  on:click={() => (vistaActual = 'original')}
+                >
+                  Original
+                </button>
+                <button
+                  type="button"
+                  class="vl-toggle-btn {vistaActual === 'procesada' ? 'is-active' : ''}"
+                  on:click={() => (vistaActual = 'procesada')}
+                >
+                  Procesada
+                </button>
+              </div>
+            {/if}
+
+            <div class="vl-toggle-group">
+              <button
+                type="button"
+                class="vl-toggle-btn {escalaCanvas === 'fit' ? 'is-active' : ''}"
+                on:click={() => (escalaCanvas = 'fit')}
+                title="Ajustar imagen al espacio disponible"
+              >
+                Ajustar
+              </button>
+              <button
+                type="button"
+                class="vl-toggle-btn {escalaCanvas === 'original' ? 'is-active' : ''}"
+                on:click={() => (escalaCanvas = 'original')}
+                title="Ver tamaño 100% píxel real"
+              >
+                100% Píxel
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Escenario de la Imagen con Fondo de Descanso Visual -->
+        <div class="vl-canvas-stage {escalaCanvas === 'original' ? 'is-scrollable' : ''}">
+          <img
+            src={vistaActual === 'procesada' && imagenProcesada ? imagenProcesada : URL.createObjectURL(imagenBase)}
+            alt={imagenBase.name}
+            class="vl-canvas-img {escalaCanvas === 'fit' ? 'is-fit' : 'is-real'}"
+            on:load={onImageLoad}
+          />
         </div>
       </div>
     {/if}
@@ -530,11 +659,86 @@
   {/if}
 
   <!-- ═══════════════════════════════════════════════════════════════════
-       PASO 3 · MOTORES DE TRANSFORMACIÓN VISUAL
+       PASO 3 · ASIGNACIÓN DE COLECCIÓN & LANZADOR AL ECOSISTEMA TGP
+  ════════════════════════════════════════════════════════════════════ -->
+  {#if imagenBase}
+    {@const actual = DESTINOS_TGP[destinoSeleccionado]}
+    <section class="vl-section vl-destination-section">
+      <div class="vl-section-header">
+        <span class="vl-step-label">3 · Asignación de Colección &amp; Lanzador TGP</span>
+        <span class="vl-badge">Ruteo al CMS Keystatic &amp; Web</span>
+      </div>
+
+      <!-- Pastillas Selectoras de Destino -->
+      <div class="vl-destinos-pills">
+        {#each Object.values(DESTINOS_TGP) as dest}
+          <button
+            type="button"
+            class="vl-destino-pill {destinoSeleccionado === dest.id ? 'is-active' : ''}"
+            on:click={() => (destinoSeleccionado = dest.id)}
+          >
+            <span class="vl-pill-icon">{dest.icono}</span>
+            <span class="vl-pill-name">{dest.nombre}</span>
+          </button>
+        {/each}
+      </div>
+
+      <!-- Ficha de Destino Seleccionado -->
+      <div class="vl-destino-card">
+        <div class="vl-destino-card-left">
+          <div class="vl-destino-header">
+            <span class="vl-destino-icon">{actual.icono}</span>
+            <div>
+              <h3 class="vl-destino-title">{actual.nombre}</h3>
+              <p class="vl-destino-sub">{actual.subtitulo}</p>
+            </div>
+          </div>
+          <p class="vl-destino-desc">{actual.descripcion}</p>
+
+          <div class="vl-destino-routes">
+            <div class="vl-route-item">
+              <span class="vl-route-label">Editor Keystatic:</span>
+              <a href={actual.keystaticPath} target="_blank" rel="noopener noreferrer" class="vl-route-link">
+                {actual.keystaticPath} ↗
+              </a>
+            </div>
+            <div class="vl-route-item">
+              <span class="vl-route-label">Publicación Web:</span>
+              <a href={actual.publicUrl} target="_blank" rel="noopener noreferrer" class="vl-route-link">
+                {actual.publicUrl} ↗
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="vl-destino-card-right">
+          <a
+            href={actual.keystaticPath}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="vl-btn vl-btn--primary vl-btn--launcher"
+          >
+            <span>🚀 Abrir Editor en Keystatic</span>
+          </a>
+          {#if r2Url}
+            <div class="vl-launcher-r2-hint">
+              <span>✓ Imagen en R2 lista para portada</span>
+              <button type="button" class="vl-link-btn" on:click={copiarUrlR2}>
+                {copiado ? '✓ Copiado' : 'Copiar URL R2'}
+              </button>
+            </div>
+          {/if}
+        </div>
+      </div>
+    </section>
+  {/if}
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       PASO 4 · MOTORES DE TRANSFORMACIÓN VISUAL
   ════════════════════════════════════════════════════════════════════ -->
   {#if imagenBase && estado !== 'procesando'}
     <section class="vl-section">
-      <span class="vl-step-label">3 · Motores de Transformación (Cloud Run)</span>
+      <span class="vl-step-label">4 · Motores de Transformación (Cloud Run)</span>
       <div class="vl-motores-row">
         <button
           class="vl-btn vl-btn--green"
@@ -661,23 +865,23 @@
 </div>
 
 <style>
-  /* ── Variables de Tema: Día (Gemini) vs Noche (Carbón Pixel) ──────────────── */
+  /* ── Variables de Tema: Día (Gemini App Restful Gray) vs Noche (Carbón Pixel) ── */
   .vl-root.theme-light {
-    --vl-bg:            #ffffff;
-    --vl-surface:       #f8f9fa;
-    --vl-surface-card:  #ffffff;
-    --vl-border:        #dadce0;
-    --vl-border-subtle: #f1f3f4;
-    --vl-text:          #202124;
-    --vl-text-muted:    #5f6368;
-    --vl-text-dim:      #80868b;
-    --vl-accent-blue:   #1a73e8;
-    --vl-accent-hover:  #1557b0;
-    --vl-accent-green:  #137333;
-    --vl-accent-amber:  #b06000;
-    --vl-btn-ghost-bg:  #f1f3f4;
-    --vl-btn-ghost-hov: #e8eaed;
-    --vl-card-shadow:   0 1px 3px rgba(60,64,67,0.08);
+    --vl-bg:            #f0f4f9; /* Gris suave de descanso visual tipo Gemini App */
+    --vl-surface:       #ffffff; /* Tarjetas blancas flotantes */
+    --vl-surface-card:  #f8fafd; /* Cajas secundarias limpias */
+    --vl-border:        #e1e5ea; /* Bordes suaves ergonómicos */
+    --vl-border-subtle: #ebeef2;
+    --vl-text:          #1f1f1f; /* Material 3 Charcoal */
+    --vl-text-muted:    #444746;
+    --vl-text-dim:      #727775;
+    --vl-accent-blue:   #0b57d0; /* Azul insignia de Gemini */
+    --vl-accent-hover:  #0842a0;
+    --vl-accent-green:  #146c2e;
+    --vl-accent-amber:  #8f4e00;
+    --vl-btn-ghost-bg:  #e9eef6;
+    --vl-btn-ghost-hov: #dfe5ef;
+    --vl-card-shadow:   0 2px 12px rgba(11, 87, 208, 0.04), 0 1px 3px rgba(0, 0, 0, 0.03);
   }
 
   .vl-root.theme-dark {
@@ -1391,5 +1595,267 @@
     font-size: 13.5px;
     line-height: 1.65;
     color: var(--vl-text);
+  }
+
+  /* ── Canvas Monumental de Visualización ──────────────────────────────── */
+  .vl-monumental-container {
+    margin-top: 18px;
+    border-radius: 18px;
+    border: 1px solid var(--vl-border);
+    background: var(--vl-surface);
+    overflow: hidden;
+    box-shadow: var(--vl-card-shadow);
+  }
+  .vl-monumental-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    background: var(--vl-surface-card);
+    border-bottom: 1px solid var(--vl-border-subtle);
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .vl-monumental-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .vl-monumental-icon {
+    font-size: 16px;
+  }
+  .vl-monumental-filename {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--vl-text);
+  }
+  .vl-canvas-badge {
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    background: rgba(0,0,0,0.05);
+    color: var(--vl-text-muted);
+    border: 1px solid var(--vl-border-subtle);
+  }
+  .theme-dark .vl-canvas-badge {
+    background: rgba(255,255,255,0.08);
+  }
+  .vl-monumental-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .vl-toggle-group {
+    display: flex;
+    background: var(--vl-btn-ghost-bg);
+    padding: 3px;
+    border-radius: 9999px;
+    gap: 2px;
+  }
+  .vl-toggle-btn {
+    border: none;
+    background: transparent;
+    padding: 4px 12px;
+    font-size: 11.5px;
+    font-weight: 600;
+    border-radius: 9999px;
+    color: var(--vl-text-muted);
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .vl-toggle-btn.is-active {
+    background: var(--vl-surface);
+    color: var(--vl-text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .vl-canvas-stage {
+    position: relative;
+    width: 100%;
+    min-height: 280px;
+    max-height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef2f6;
+    background-image: 
+      linear-gradient(45deg, #e4e9f0 25%, transparent 25%),
+      linear-gradient(-45deg, #e4e9f0 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #e4e9f0 75%),
+      linear-gradient(-45deg, transparent 75%, #e4e9f0 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    overflow: hidden;
+    padding: 16px;
+  }
+  .theme-dark .vl-canvas-stage {
+    background: #18191a;
+    background-image: 
+      linear-gradient(45deg, #131415 25%, transparent 25%),
+      linear-gradient(-45deg, #131415 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #131415 75%),
+      linear-gradient(-45deg, transparent 75%, #131415 75%);
+    background-size: 20px 20px;
+  }
+  .vl-canvas-stage.is-scrollable {
+    overflow: auto;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+  .vl-canvas-img {
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+    transition: transform 0.2s ease;
+  }
+  .vl-canvas-img.is-fit {
+    max-height: 480px;
+    width: auto;
+    max-width: 100%;
+    object-contain: contain;
+  }
+  .vl-canvas-img.is-real {
+    max-width: none;
+    max-height: none;
+  }
+
+  /* ── Selector de Destino / Lanzador TGP ──────────────────────────────── */
+  .vl-destination-section {
+    background: var(--vl-surface);
+    border: 1px solid var(--vl-border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: var(--vl-card-shadow);
+  }
+  .vl-destinos-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .vl-destino-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 9999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    background: var(--vl-btn-ghost-bg);
+    color: var(--vl-text-muted);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .vl-destino-pill:hover {
+    background: var(--vl-btn-ghost-hov);
+    color: var(--vl-text);
+  }
+  .vl-destino-pill.is-active {
+    background: var(--vl-accent-blue);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(11,87,208,0.25);
+  }
+  .vl-pill-icon {
+    font-size: 14px;
+  }
+  .vl-destino-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 18px 22px;
+    background: var(--vl-surface-card);
+    border: 1px solid var(--vl-border);
+    border-radius: 14px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .vl-destino-card-left {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 650px;
+  }
+  .vl-destino-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .vl-destino-icon {
+    font-size: 28px;
+  }
+  .vl-destino-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--vl-text);
+  }
+  .vl-destino-sub {
+    margin: 0;
+    font-size: 12px;
+    color: var(--vl-text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .vl-destino-desc {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--vl-text-muted);
+  }
+  .vl-destino-routes {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .vl-route-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .vl-route-label {
+    color: var(--vl-text-dim);
+    min-width: 130px;
+  }
+  .vl-route-link {
+    color: var(--vl-accent-blue);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .vl-route-link:hover {
+    text-decoration: underline;
+  }
+  .vl-destino-card-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+  .vl-btn--launcher {
+    padding: 12px 24px;
+    font-size: 14px;
+    box-shadow: 0 4px 16px rgba(11,87,208,0.22);
+  }
+  .vl-launcher-r2-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--vl-accent-green);
+  }
+  .vl-link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--vl-accent-blue);
+    text-decoration: underline;
+    cursor: pointer;
   }
 </style>
