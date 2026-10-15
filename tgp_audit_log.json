@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-10-12T09:18:52.855Z",
-  "totalFilesAudited": 22,
+  "timestamp": "2026-10-15T04:44:52.685Z",
+  "totalFilesAudited": 24,
   "keystatic": {
     "collections": [
       {
@@ -630,7 +630,7 @@
           {
             "file": "keystatic.config.ts",
             "line": 412,
-            "snippet": "content: fields.mdx({ label: 'Contenido de la Nota' })"
+            "snippet": "content: fields.mdx({ "
           }
         ]
       },
@@ -1280,7 +1280,7 @@
           {
             "file": "keystatic.config.ts",
             "line": 412,
-            "snippet": "content: fields.mdx({ label: 'Contenido de la Nota' })"
+            "snippet": "content: fields.mdx({ "
           }
         ]
       }
@@ -1373,15 +1373,37 @@
         "file": "src\\pages\\api\\generar-tgp.ts",
         "line": 147,
         "codeSnippet": "ai.models.generateContent({\n          model: 'gemini-3.1-pro-preview',\n          contents: [{ role: 'user', parts: [{ text: prompt }] }],\n          co..."
+      },
+      {
+        "type": "GoogleGenAI_Client_Instance",
+        "file": "src\\pages\\api\\informe-imagen.ts",
+        "line": 44,
+        "codeSnippet": "new GoogleGenAI({ apiKey: API_KEY })"
+      },
+      {
+        "type": "Method_Call",
+        "expression": "ai.models.generateContent",
+        "file": "src\\pages\\api\\informe-imagen.ts",
+        "line": 90,
+        "codeSnippet": "ai.models.generateContent({\n        model: primaryModel,\n        contents: [\n          {\n            role: 'user',\n            parts: [\n              ..."
+      },
+      {
+        "type": "Method_Call",
+        "expression": "ai.models.generateContent",
+        "file": "src\\pages\\api\\informe-imagen.ts",
+        "line": 116,
+        "codeSnippet": "ai.models.generateContent({\n        model: fallbackModel,\n        contents: [\n          {\n            role: 'user',\n            parts: [\n             ..."
       }
     ],
     "modelsReferenced": {
       "./src/keystatic/geminiCinematic": 1,
-      "gemini-2.5-pro": 1,
+      "gemini-2.5-pro": 2,
       "../../config/geminiPrompts": 2,
-      "gemini-3.1-pro-preview": 4,
+      "gemini-3.1-pro-preview": 5,
       "gemini-3.6-flash": 2,
-      "gemini-3.1-flash-image-preview": 1
+      "gemini-3.1-flash-image-preview": 1,
+      "gemini-2.5-flash": 1,
+      "gemini-1.5-flash": 1
     },
     "apiEndpoints": []
   },

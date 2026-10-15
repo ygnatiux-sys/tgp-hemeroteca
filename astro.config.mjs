@@ -38,7 +38,10 @@ export default defineConfig({
       }
     },
     ssr: isDev
-      ? { external: ['react', 'react-dom'] }
+      ? {
+          external: ['react', 'react-dom'],
+          noExternal: ['@keystatic/core', '@keystatic/astro']
+        }
       : { noExternal: true }
   },
 

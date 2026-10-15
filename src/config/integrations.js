@@ -83,13 +83,6 @@ export const tgpViteConfig = {
       '@braintree/sanitize-url',
       'fast-deep-equal',
       '@sindresorhus/slugify'
-    ],
-    exclude: [
-      '@keystatic/core',
-      '@keystatic/core/ui',
-      '@keystatic/astro',
-      '@keystatic/astro/ui',
-      '@keystatic/astro/api'
     ]
   },
   ssr: {
