@@ -3,6 +3,7 @@ import { handleGuardarEnsayo } from './guardar-ensayo.ts';
 import { handleGuardarCinematico } from './guardar-cinematico.ts';
 import { handleGuardarArquetipo } from './guardar-arquetipo.ts';
 import { handleGuardarGeorreferencia } from './guardar-georreferencia.ts';
+import { handleGuardarInformePremium } from './guardar-informe-premium.ts';
 import { handleTransmute } from './transmute.ts';
 
 export async function handleLocalApi(
@@ -57,6 +58,8 @@ export async function handleLocalApi(
       result = await handleGuardarArquetipo(body);
     } else if (url === '/api/guardar-georreferencia') {
       result = await handleGuardarGeorreferencia(body);
+    } else if (url === '/api/guardar-informe-premium') {
+      result = await handleGuardarInformePremium(body);
     } else if (url === '/api/hemeroteca/transmute') {
       result = await handleTransmute(body);
     }
