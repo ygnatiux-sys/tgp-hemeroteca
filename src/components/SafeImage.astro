@@ -48,7 +48,13 @@ let finalSrcSet: string | undefined = undefined;
 let finalWidth: number | undefined = typeof src === 'object' && src?.width ? src.width : undefined;
 let finalHeight: number | undefined = typeof src === 'object' && src?.height ? src.height : undefined;
 
-if (finalSrc && (finalSrc.startsWith('http://') || finalSrc.startsWith('https://'))) {
+const isR2OrOptimized = typeof finalSrc === 'string' && (
+  finalSrc.includes('storage.thegreatpuzzleproject.com') || 
+  finalSrc.endsWith('.webp') ||
+  finalSrc.endsWith('.avif')
+);
+
+if (!isR2OrOptimized && finalSrc && (finalSrc.startsWith('http://') || finalSrc.startsWith('https://'))) {
   try {
     const opt = await getImage({ 
       src: finalSrc, 

@@ -1,4 +1,4 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig, passthroughImageService } from 'astro/config';
 import { tgpIntegrations, tgpViteConfig } from './src/config/integrations.js';
 import cloudflare from '@astrojs/cloudflare';
 import sitemap from '@astrojs/sitemap';
@@ -23,8 +23,9 @@ export default defineConfig({
   output: 'server',  // CRÍTICO: genera _worker.js para Cloudflare Pages Functions
   trailingSlash: 'ignore',
   
-  // Autorización de dominios remotos para el servicio de optimización de imágenes de Astro (<Image />, getImage())
+  // Servicio de optimización passthrough: compatible con Cloudflare Workers y elimina cuellos de botella runtime
   image: {
+    service: passthroughImageService(),
     domains: ['storage.thegreatpuzzleproject.com', 'upload.wikimedia.org', 'images.unsplash.com'],
   },
   
@@ -39,7 +40,7 @@ export default defineConfig({
     },
     ssr: isDev
       ? {
-          external: ['react', 'react-dom'],
+          external: ['react', 'react-dom', 'sharp'],
           noExternal: ['@keystatic/core', '@keystatic/astro']
         }
       : { noExternal: true }

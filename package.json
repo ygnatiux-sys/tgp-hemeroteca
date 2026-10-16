@@ -18,7 +18,7 @@
     "curar:visual": "node scripts/curador-visual.mjs",
     "curar:batch": "node scripts/curar-batch-segundo.mjs",
     "//3": "--- 3. DESPLIEGUE ---",
-    "sync": "npm run optimize:remote && npm run upload:assets && git pull origin main && git add . && git commit -m \"TGP Sync: Cierre de jornada y subida de assets\" && git push origin main",
+    "sync": "node check-images.mjs && npm run optimize:remote && npm run upload:assets && git pull origin main && git add . && git commit -m \"TGP Sync: Cierre de jornada y subida de assets\" && git push origin main",
     "//4": "--- EL CIERRE MAESTRO ---",
     "eod": "npm run doctor && npm run sanear && npm run sync",
     "//5": "--- BASE DE DATOS (Uso Manual) ---",

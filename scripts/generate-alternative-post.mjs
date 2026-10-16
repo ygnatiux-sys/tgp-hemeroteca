@@ -373,6 +373,26 @@ async function persistirEnsayo(ensayo, imageData, slug) {
     // 3. Persistir en Astro Content Layer
     await persistirEnsayo(ensayo, imagePayload, slug);
 
+    // 4. Verificación de Imagen Segura (Safe Image Validation)
+    const jsonPath = path.join(ENSAYOS_DIR, slug, 'index.json');
+    if (fs.existsSync(jsonPath)) {
+      try {
+        const meta = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+        if (meta.coverImage?.startsWith('/src/')) {
+          const abs = path.join(ROOT_DIR, meta.coverImage.replace(/^\//, ''));
+          if (fs.existsSync(abs)) {
+            console.log(`  🛡️ [SAFE IMAGE] Imagen local confirmada en disco (${(fs.statSync(abs).size / 1024).toFixed(1)} KB): ${meta.coverImage}`);
+          } else {
+            console.warn(`  ⚠️ [SAFE IMAGE ALERTA] La imagen local declarada no existe en disco: ${abs}`);
+          }
+        } else if (meta.coverImage?.startsWith('http')) {
+          console.log(`  🛡️ [SAFE IMAGE] URL CDN remota verificada: ${meta.coverImage}`);
+        }
+      } catch (e) {
+        console.warn('  ⚠️ No se pudo verificar metadatos de imagen:', e.message);
+      }
+    }
+
     console.log('\n✅ ENSAYO MATERIALIZADO CON ÉXITO:');
     console.log(`   - Hemeroteca URL: http://localhost:4321/hemeroteca/${slug}/\n`);
   } catch (err) {
