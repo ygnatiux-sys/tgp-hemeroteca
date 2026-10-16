@@ -18,7 +18,7 @@ import SpotlightHero from '../components/SpotlightHero.astro';
 import CinematicGrid from '../components/CinematicGrid.astro';
 import MubiBlockCinematic, { type MubiCinematicItem } from '../components/MubiBlockCinematic.astro';
 import TriplicoRevelacion, { type TriplicoPost } from '../components/TriplicoRevelacion.astro';
-import AlternativeScrollNarrative from '../components/AlternativeScrollNarrative.astro';
+import ImaxMax from '../components/ImaxMax.astro';
 import AfricaSeriesNarrative from '../components/AfricaSeriesNarrative.astro';
 import MegalitismoGlobalNarrative from '../components/MegalitismoGlobalNarrative.astro';
 import ScrollNarrative from '../components/ScrollNarrative.astro';
@@ -482,7 +482,7 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
       <div class="flex flex-col gap-12 sm:gap-16 md:gap-20 w-full">
         {/* COLECCIÓN: 'ALTERNATIVE' (HISTORIA PROFUNDA / ARCHIVO NO OFICIAL) */}
         <div class="w-screen relative left-1/2 -translate-x-1/2 max-w-430 2xl:max-w-460 px-3 sm:px-6 md:px-8 lg:px-10 flex flex-col">
-          <AlternativeScrollNarrative />
+          <ImaxMax collection="alternative" />
         </div>
 
         {/* SERIE DESTACADA: 'MISTERIOS DEL ÁFRICA' */}
