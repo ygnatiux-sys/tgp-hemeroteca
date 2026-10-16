@@ -229,7 +229,7 @@ export function resolveEssayImage(coverOrEntry?: any, slug?: string): any {
   const doc = coverOrEntry.entry || coverOrEntry.data || coverOrEntry;
 
   // 1. Portada asignada directa (revisar coverImage, image, portada, foto, imagen)
-  const directCandidate = doc?.coverImage || doc?.image || doc?.portada || doc?.foto || doc?.imagen;
+  const directCandidate = doc?.coverImage || doc?.heroUrl || doc?.image || doc?.portada || doc?.foto || doc?.imagen;
   if (directCandidate) {
     if (typeof directCandidate === 'string' && isValidImageSrc(directCandidate)) {
       return sanitizeImageUrl(directCandidate);

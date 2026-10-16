@@ -346,7 +346,9 @@ async function guardarPost(ensayo, imagePackage) {
     .replace(/(^-|-$)+/g, '');
   const slug = rawSlug.slice(0, 45).replace(/-$/, '');
 
-  const coverToUse = imagePackage.localAssetPath || imagePackage.primaryUrl;
+  const coverToUse = (imagePackage.r2Url && imagePackage.r2Url.includes('storage.thegreatpuzzleproject.com'))
+    ? imagePackage.r2Url
+    : (imagePackage.localAssetPath || imagePackage.primaryUrl);
   const galleryList = [coverToUse];
 
   if (format === 'keystatic') {
