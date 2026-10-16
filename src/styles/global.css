@@ -33,18 +33,18 @@
    PALETA Y VARIABLES DE TEMA (DARK ACADEMIA / MODO DÍA PAPIRO FRÍO)
 ═════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* Modo Oscuro Base (Theme Dark - #121413) */
-  --bg-main: #121413; /* Fondo Dark Academia idéntico a sección About */
-  --bg-alt: #1A1D1C;  /* Tono sutilmente elevado para contraste */
-  --bg-surface: rgba(255, 255, 255, 0.04);
-  --text-main: #C4C4C4;
-  --text-body: #B4B4B0;
+  /* Modo Oscuro Base (Theme Dark - Carbón Obsidiana Enriquecido) */
+  --bg-main: #161817; /* Carbón grafito cálido que elimina la densidad opaca de #121413 */
+  --bg-alt: #1F2221;  /* Tono sutilmente elevado para contraste */
+  --bg-surface: rgba(255, 255, 255, 0.055);
+  --text-main: #EDEDE8;
+  --text-body: #C5C5BF;
   --accent-primary: #EFEBE3;
   --accent-secondary: #EFEBE3;
   --accent-silver: #94A3B8;
-  --border-subtle: rgba(255, 255, 255, 0.1);
-  --header-bg: rgba(18, 20, 19, 0.85); /* Coincidencia exacta con --bg-main #121413 */
-  --header-border: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.14);
+  --header-bg: rgba(22, 24, 23, 0.88); /* Coincidencia exacta con --bg-main #161817 */
+  --header-border: rgba(255, 255, 255, 0.10);
   --theme-transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out, border-color 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
 }
 

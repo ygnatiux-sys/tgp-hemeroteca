@@ -280,7 +280,7 @@ const fitClass =
               : isHero
                 ? "transition-transform duration-1200 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.015]"
                 : "transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.02]"
-          } ${isHero ? "brightness-100 contrast-100" : "brightness-90 group-hover:brightness-100"} ${fitClass} ${resolveMultivisionClass(img)}`}
+          } ${isHero ? "brightness-100 contrast-100" : "brightness-98 contrast-102 group-hover:brightness-100"} ${fitClass} ${resolveMultivisionClass(img)}`}
           style={
             isHero
               ? isImaxBust
@@ -315,8 +315,8 @@ const fitClass =
           class="absolute inset-0 pointer-events-none z-10"
           style={
             titlePos === "top"
-              ? "background: linear-gradient(to bottom, rgba(12,10,9,0.92) 0%, rgba(12,10,9,0.45) 45%, transparent 100%);"
-              : "background: linear-gradient(to top, rgba(12,10,9,0.92) 0%, rgba(12,10,9,0.45) 45%, transparent 100%);"
+              ? "background: linear-gradient(to bottom, rgba(14,16,15,0.85) 0%, rgba(14,16,15,0.35) 35%, transparent 68%);"
+              : "background: linear-gradient(to top, rgba(14,16,15,0.88) 0%, rgba(14,16,15,0.35) 35%, transparent 68%);"
           }
         ></div>
       )
@@ -330,11 +330,11 @@ const fitClass =
         <>
           <div
             class="absolute inset-0 pointer-events-none z-12"
-            style="background: radial-gradient(ellipse at center, transparent 46%, rgba(8,9,10,0.36) 74%, rgba(8,9,10,0.92) 100%);"
+            style="background: radial-gradient(ellipse at center, transparent 55%, rgba(14,16,15,0.25) 80%, rgba(14,16,15,0.78) 100%);"
           />
           <div
             class="absolute inset-0 pointer-events-none z-14"
-            style="background: linear-gradient(to top, rgba(8,9,10,0.86) 0%, rgba(8,9,10,0.32) 42%, transparent 75%);"
+            style="background: linear-gradient(to top, rgba(14,16,15,0.80) 0%, rgba(14,16,15,0.25) 38%, transparent 68%);"
           />
         </>
       )
@@ -355,7 +355,7 @@ const fitClass =
               <div class="hidden md:block w-[38%] lg:w-[40%] h-full shrink-0" />
 
               {/* Zona derecha con scrim degradado y frase con tipografía serif y peso cinematográfico */}
-              <div class="w-full md:w-[62%] lg:w-[60%] h-full bg-linear-to-t md:bg-linear-to-r from-black/90 md:from-transparent via-black/95 to-black flex items-center justify-center p-6 sm:p-10 md:p-12 lg:p-16">
+              <div class="w-full md:w-[62%] lg:w-[60%] h-full bg-linear-to-t md:bg-linear-to-r from-black/75 md:from-transparent via-black/80 to-black/90 flex items-center justify-center p-6 sm:p-10 md:p-12 lg:p-16">
                 <p class="cac-hero-cinematic-text font-serif text-2xl sm:text-3xl md:text-4xl lg:text-[2.8rem] text-[#E3DDD3]/95 leading-[1.15] tracking-tight drop-shadow-2xl text-center md:text-left text-balance max-w-[34ch]">
                   <span
                     class="cac-hero-text-anim inline-block opacity-0"
@@ -367,7 +367,7 @@ const fitClass =
           ) : (
             /* 2. Modo Base 75/25: Frase acomodada en el borde inferior con franja mask suave, dejando 100% despejada la obra visual */
             <div class="w-full h-full flex justify-center items-end">
-              <div class="w-full bg-linear-to-t from-black via-black/95 to-transparent pt-16 md:pt-24 pb-8 md:pb-12 px-6 sm:px-12 text-center">
+              <div class="w-full bg-linear-to-t from-black/90 via-black/60 to-transparent pt-16 md:pt-24 pb-8 md:pb-12 px-6 sm:px-12 text-center">
                 <p class="cac-hero-cinematic-text font-serif text-xl sm:text-2xl md:text-3xl lg:text-[2.5rem] text-[#E3DDD3]/95 leading-snug tracking-tight drop-shadow-2xl text-center max-w-[42ch] mx-auto">
                   <span
                     class="cac-hero-text-anim inline-block opacity-0"

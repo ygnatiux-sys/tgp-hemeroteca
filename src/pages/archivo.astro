@@ -288,7 +288,11 @@ function createPremierSequences(essays: typeof resolvedEssays) {
     ]}
   />
 
-  <div id="archive-view-container" class="min-h-screen pb-32 pt-12">
+  <div 
+    id="archive-view-container" 
+    class="min-h-screen pb-32 pt-12 relative"
+    style="background: radial-gradient(circle at 50% -5%, rgba(240, 220, 190, 0.045) 0%, transparent 60%);"
+  >
     <div class="w-full max-w-430 2xl:max-w-460 mx-auto px-3 sm:px-6 md:px-8 lg:px-10 flex flex-col gap-12 md:gap-16">
       {/* ══════════════════════════════════════════════════════════════════
           SISTEMA DE SOLAPAS PRINCIPALES (TABS MINIMALISTAS)
@@ -314,7 +318,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             aria-controls="view-years"
             id="tab-btn-years"
             data-main-tab="years"
-            class="archive-main-tab-btn px-2 py-1 bg-transparent border-none text-white/50 font-metadata text-xs md:text-[13px] uppercase tracking-[0.25em] cursor-pointer transition-all duration-300 flex items-center hover:text-white/80"
+            class="archive-main-tab-btn px-2 py-1 bg-transparent border-none text-white/65 font-metadata text-xs md:text-[13px] uppercase tracking-[0.25em] cursor-pointer transition-all duration-300 flex items-center hover:text-white"
           >
             Por Año
           </button>
@@ -352,7 +356,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
           <button
             type="button"
             data-cat-filter-btn="all"
-            class="cat-filter-btn font-metadata text-xs uppercase tracking-[0.2em] px-2 py-1 text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
+            class="cat-filter-btn font-metadata text-xs uppercase tracking-[0.2em] px-2 py-1 text-white/65 bg-transparent hover:text-white cursor-pointer transition-colors duration-300 outline-none"
           >
             TODAS LAS INVESTIGACIONES ({totalInvestigaciones})
           </button>
@@ -362,11 +366,11 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             <select
               id="cat-linter-select"
               aria-label="Seleccionar categoría o tema de investigación"
-              class="appearance-none font-metadata text-xs uppercase tracking-[0.2em] px-2 py-1 pr-6 border-none text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
+              class="appearance-none font-metadata text-xs uppercase tracking-[0.2em] px-2 py-1 pr-6 border-none text-white/65 bg-transparent hover:text-white cursor-pointer transition-colors duration-300 outline-none"
             >
-              <option value="all" class="bg-[#0a0a0a] text-white/50">POR CATEGORÍA / TEMA</option>
+              <option value="all" class="bg-[#181a19] text-white/70">POR CATEGORÍA / TEMA</option>
               {allDisplayGroups.map(group => (
-                <option value={group.catKey} class="bg-[#151718] text-[#EFEBE3]">
+                <option value={group.catKey} class="bg-[#202322] text-[#EFEBE3]">
                   • {group.catLabel.toUpperCase()}
                 </option>
               ))}
@@ -497,7 +501,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
               <button
                 type="button"
                 data-year-filter-btn="all"
-                class="year-filter-btn font-metadata text-xs uppercase tracking-[0.2em] px-2 py-1 text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
+                class="year-filter-btn font-metadata text-xs uppercase tracking-[0.2em] px-2 py-1 text-white/65 bg-transparent hover:text-white cursor-pointer transition-colors duration-300 outline-none"
               >
                 TODOS LOS AÑOS ({publishable.length})
               </button>
@@ -506,11 +510,11 @@ function createPremierSequences(essays: typeof resolvedEssays) {
                 <select
                   id="year-linter-select"
                   aria-label="Seleccionar año de archivo"
-                  class="appearance-none font-metadata text-xs uppercase tracking-[0.2em] px-2 py-1 pr-6 border-none text-white/50 bg-transparent hover:text-white/90 cursor-pointer transition-colors duration-300 outline-none"
+                  class="appearance-none font-metadata text-xs uppercase tracking-[0.2em] px-2 py-1 pr-6 border-none text-white/65 bg-transparent hover:text-white cursor-pointer transition-colors duration-300 outline-none"
                 >
-                  <option value="all" class="bg-[#0a0a0a] text-white/50">POR AÑO</option>
+                  <option value="all" class="bg-[#181a19] text-white/70">POR AÑO</option>
                   {years.map(year => (
-                    <option value={year} class="bg-[#151718] text-[#EFEBE3]">
+                    <option value={year} class="bg-[#202322] text-[#EFEBE3]">
                       • AÑO {year}
                     </option>
                   ))}
@@ -664,7 +668,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
       const yearGroups = document.querySelectorAll<HTMLElement>('.archive-year-cinematic-group');
 
       const activeBtnClasses = ['text-[#EFEBE3]', 'font-gloock', 'text-sm', 'md:text-base', 'tracking-wide', 'normal-case'];
-      const inactiveBtnClasses = ['text-white/50', 'font-metadata', 'text-xs', 'md:text-[13px]', 'uppercase', 'tracking-[0.25em]'];
+      const inactiveBtnClasses = ['text-white/65', 'font-metadata', 'text-xs', 'md:text-[13px]', 'uppercase', 'tracking-[0.25em]'];
 
       // Función para cambiar de solapa principal
       const switchTab = (tabName: 'categories' | 'years') => {
