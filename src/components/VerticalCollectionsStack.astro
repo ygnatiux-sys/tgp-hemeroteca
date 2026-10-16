@@ -97,7 +97,7 @@ const epigraphMap: Record<string, string> = {
 
             {/* UI Normal (Título, Hero style limpio con gradiente inferior acotado estilo Derinkuyu) */}
             <div class="normal-ui absolute inset-0 transition-opacity duration-1000 ease-in-out">
-              <div class="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-black/85 via-black/30 to-transparent pointer-events-none z-10" />
+              <div class="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-black/70 via-black/20 to-transparent pointer-events-none z-10" />
               <div class="relative z-20 p-8 md:p-14 lg:p-18 flex flex-col justify-end h-full pointer-events-auto select-text cursor-text">
                 <span class="font-mono text-xs sm:text-sm uppercase tracking-[0.35em] text-rust-orange font-bold mb-2 block">
                   Colección TGP
@@ -116,7 +116,7 @@ const epigraphMap: Record<string, string> = {
               </div>
             </div>
 
-            {/* UI Cinemática (Frase limpia estilo Tríptico, sin backdrop-blur pesado) */}
+            {/* UI Cinemática (Frase limpia con scrim translúcido y sombra profunda en tipografía) */}
             <div 
               class="cinematic-layer absolute inset-0 opacity-0 pointer-events-none transition-all duration-1000 ease-in-out z-20 flex"
               style="visibility: hidden; backface-visibility: hidden;"
@@ -126,12 +126,12 @@ const epigraphMap: Record<string, string> = {
                 class:list={[
                   "w-full md:w-[60%] h-full flex items-center justify-center p-8 md:p-14 lg:p-20 transition-all duration-1000",
                   isRightAligned 
-                    ? "order-2 bg-linear-to-l from-black/95 via-black/80 to-transparent" 
-                    : "order-1 bg-linear-to-r from-black/95 via-black/80 to-transparent"
+                    ? "order-2 bg-linear-to-l from-black/50 via-black/25 to-transparent" 
+                    : "order-1 bg-linear-to-r from-black/50 via-black/25 to-transparent"
                 ]}
               >
                 <p 
-                  class="cinematic-text font-serif text-2xl md:text-4xl lg:text-[3rem] text-[#E3DDD3]/95 leading-tight drop-shadow-2xl text-center text-balance max-w-[90%] md:max-w-[35ch] lg:max-w-[40ch]"
+                  class="cinematic-text font-serif text-2xl md:text-4xl lg:text-[3rem] text-[#E3DDD3] leading-tight drop-shadow-[0_4px_28px_rgba(0,0,0,0.95)] text-center text-balance max-w-[90%] md:max-w-[35ch] lg:max-w-[40ch]"
                   data-phrase={epigraphText}
                 ></p>
               </div>
