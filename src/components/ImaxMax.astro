@@ -488,7 +488,7 @@ const isAmerica = collection === "america";
 </section>
 
 <style>
-  /* ALTERNATIVE STYLES */
+  /* ALTERNATIVE: INTRO */
   .alt-intro-title {
     font-family: 'Fraunces', serif;
     font-variation-settings: 'opsz' 144, 'SOFT' 100, 'WONK' 1;
@@ -498,67 +498,114 @@ const isAmerica = collection === "america";
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 60px rgba(230, 154, 70, 0.45));
   }
+
+  /* DERINKUYU: EXACTO ORIGINAL (Rojo terracota volcánico) */
   .alt-derin-h1 {
-    font-family: 'Clash Display', sans-serif;
-    background: linear-gradient(180deg, #FFFFFF 0%, #e8ba95 40%, #87361a 100%);
+    font-family: 'Clash Display', 'Inter', system-ui, sans-serif;
+    background: linear-gradient(180deg, #f2825c 0%, #d45632 32%, #9e2a18 70%, #4a0d06 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.95));
-  }
-  .alt-barabar-echo {
-    font-family: 'Syne', sans-serif;
-    -webkit-text-stroke: 1.5px rgba(243, 156, 18, 0.7);
-    color: transparent;
-    filter: drop-shadow(0 0 24px rgba(243, 156, 18, 0.5));
-  }
-  .alt-barabar-solid {
-    font-family: 'Syne', sans-serif;
-    background: linear-gradient(180deg, #FFFFFF 0%, #e5e5e5 30%, #7f8c8d 70%, #2c3e50 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 45px rgba(243, 156, 18, 0.35));
-  }
-  .alt-barabar-glint {
-    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.9) 50%, transparent 65%);
-    mix-blend-mode: overlay;
-  }
-  .alt-barabar-sub {
-    background: linear-gradient(180deg, #ffffff 0%, #f39c12 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .alt-half {
-    clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
-    background: linear-gradient(180deg, #FFFFFF 0%, #f0a2a5 40%, #7d1519 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.95));
-  }
-  .alt-bot {
-    clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
-  }
-  .alt-band {
-    background: linear-gradient(90deg, transparent 0%, rgba(255, 77, 85, 0.7) 30%, rgba(255, 255, 255, 0.95) 50%, rgba(255, 77, 85, 0.7) 70%, transparent 100%);
-    box-shadow: 0 0 35px #FF4D55;
-    mix-blend-mode: screen;
-  }
-  .alt-olmeca-tectonic .alt-half {
-    background: linear-gradient(180deg, #FFFFFF 0%, #F0C284 40%, #5a3d12 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .alt-olmeca-tectonic .alt-band {
-    background: linear-gradient(90deg, transparent 0%, rgba(240, 194, 132, 0.7) 30%, rgba(255, 255, 255, 0.95) 50%, rgba(240, 194, 132, 0.7) 70%, transparent 100%);
-    box-shadow: 0 0 35px #F0C284;
+    filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.98)) drop-shadow(0 0 45px rgba(184, 58, 36, 0.38));
   }
 
-  /* AMÉRICA SECRETS STYLES */
+  /* BARABAR: EXACTO ORIGINAL (Granito pulido espejo y acústica) */
+  .alt-barabar-solid,
+  .alt-barabar-echo {
+    font-family: 'Syne', sans-serif;
+  }
+  .alt-barabar-solid {
+    background: linear-gradient(180deg, #ffffff 0%, #e8edf1 26%, #b0b7bd 62%, #6e777f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.98)) drop-shadow(0 0 45px rgba(229, 229, 229, 0.28));
+  }
+  .alt-echo-1 { -webkit-text-stroke: 1.5px rgba(243, 156, 18, 0.55); color: transparent; }
+  .alt-echo-2 { -webkit-text-stroke: 1.5px rgba(229, 229, 229, 0.7); color: transparent; }
+  .alt-echo-3 { -webkit-text-stroke: 1.5px rgba(176, 183, 189, 0.6); color: transparent; }
+  .alt-echo-4 { -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.4); color: transparent; }
+  .alt-barabar-glint {
+    background: linear-gradient(
+      110deg,
+      transparent 18%,
+      rgba(255, 255, 255, 0.95) 45%,
+      rgba(243, 156, 18, 0.8) 50%,
+      rgba(255, 255, 255, 0.95) 55%,
+      transparent 82%
+    );
+    transform: translateX(-160%) skewX(-24deg);
+    mix-blend-mode: color-dodge;
+  }
+  .alt-barabar-sub {
+    background: linear-gradient(180deg, #fde3a7 0%, #f39c12 55%, #d35400 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 25px rgba(243, 156, 18, 0.45));
+  }
+
+  /* DIQUÍS: EXACTO ORIGINAL (Rojo Diquís intenso) */
+  .alt-diquis-h1,
+  .am-diquis-h1 {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'opsz' 9, 'SOFT' 0, 'WONK' 0;
+  }
+  .alt-diquis-tectonic .alt-half,
+  .am-diquis-tectonic .am-half {
+    background: linear-gradient(180deg, #ff4d55 0%, #e50914 42%, #9b0b11 78%, #4a0508 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 14px 38px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 35px rgba(229, 9, 20, 0.4));
+  }
+
+  /* OLMECAS: EXACTO ORIGINAL (Naranja / Oro de basalto colosal) */
+  .alt-olmeca-h1,
+  .am-olmeca-h1 {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'opsz' 9, 'SOFT' 0, 'WONK' 0;
+  }
+  .alt-olmeca-tectonic .alt-half,
+  .am-olmeca-tectonic .am-half {
+    background: linear-gradient(180deg, #f0c284 0%, #c98b4d 48%, #8a5328 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 14px 38px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 32px rgba(201, 139, 77, 0.38));
+  }
+
+  /* CORTES DENTADOS DE FALLA TECTÓNICA: EXACTOS ORIGINALES (13 vértices geológicos) */
+  .alt-top,
+  .am-top {
+    clip-path: polygon(
+      0 0, 100% 0, 100% 50%, 93% 52.5%, 84% 48.5%, 73% 53%, 61% 49%,
+      50% 52%, 38% 48%, 27% 53%, 15% 49.5%, 6% 52%, 0 50%
+    );
+  }
+  .alt-bot,
+  .am-bot {
+    clip-path: polygon(
+      0 50%, 6% 52%, 15% 49.5%, 27% 53%, 38% 48%, 50% 52%, 61% 49%,
+      73% 53%, 84% 48.5%, 93% 52.5%, 100% 50%, 100% 100%, 0 100%
+    );
+  }
+
+  /* FRANJA GLASSMÓRFICA AL 5% CON BLUR (Exacta original, sin opacidad artificial) */
+  .alt-band,
+  .am-band {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+  }
+
+  /* AMÉRICA SECRETS: INTRO */
   .am-intro-title {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'opsz' 144, 'SOFT' 100, 'WONK' 1;
     background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 45%, #94a3b8 80%, #475569 100%);
     -webkit-background-clip: text;
     background-clip: text;
@@ -571,63 +618,26 @@ const isAmerica = collection === "america";
       linear-gradient(to right, rgba(78, 242, 210, 0.08) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(78, 242, 210, 0.08) 1px, transparent 1px);
   }
+
+  /* PUMAPUNKU: EXACTO ORIGINAL (Andesita Quirúrgica / Panchang brutalista) */
   .am-pp-title {
     font-family: 'Panchang', 'Space Grotesk', system-ui, sans-serif;
-    background: linear-gradient(
-      180deg,
-      #f2f4f7 0%,
-      #d4d7de 30%,
-      #b0b4bd 65%,
-      #6c707a 100%
-    );
+    font-weight: 900;
+    background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 35%, #64748b 75%, #334155 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.98))
-            drop-shadow(0 0 30px rgba(78, 242, 210, 0.3));
+    filter: drop-shadow(0 20px 48px rgba(0, 0, 0, 0.98)) drop-shadow(0 0 35px rgba(78, 242, 210, 0.35));
   }
-  .am-half {
-    clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
-    background: linear-gradient(180deg, #FFFFFF 0%, #F0C284 40%, #5a3d12 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.95));
-  }
-  .am-bot {
-    clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
-  }
-  .am-band {
-    background: linear-gradient(90deg, transparent 0%, rgba(78, 242, 210, 0.7) 30%, rgba(255, 255, 255, 0.95) 50%, rgba(78, 242, 210, 0.7) 70%, transparent 100%);
-    box-shadow: 0 0 35px #4ef2d2;
-    mix-blend-mode: screen;
-  }
-  .am-olmeca-tectonic .am-half {
-    background: linear-gradient(180deg, #FFFFFF 0%, #F0C284 40%, #5a3d12 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .am-olmeca-tectonic .am-band {
-    background: linear-gradient(90deg, transparent 0%, rgba(240, 194, 132, 0.7) 30%, rgba(255, 255, 255, 0.95) 50%, rgba(240, 194, 132, 0.7) 70%, transparent 100%);
-    box-shadow: 0 0 35px #F0C284;
-  }
-  .am-diquis-tectonic .am-half {
-    background: linear-gradient(180deg, #FFFFFF 0%, #f0a2a5 40%, #7d1519 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .am-diquis-tectonic .am-band {
-    background: linear-gradient(90deg, transparent 0%, rgba(255, 77, 85, 0.7) 30%, rgba(255, 255, 255, 0.95) 50%, rgba(255, 77, 85, 0.7) 70%, transparent 100%);
-    box-shadow: 0 0 35px #FF4D55;
-  }
+
+  /* MOAIS RAPA NUI: EXACTO ORIGINAL */
   .am-moai-h1 {
-    background: linear-gradient(180deg, #FFFFFF 0%, #94a3b8 50%, #334155 100%);
+    font-family: 'Fraunces', serif;
+    background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 35%, #94a3b8 70%, #475569 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 45px rgba(78, 242, 210, 0.3));
+    filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.98)) drop-shadow(0 0 35px rgba(78, 242, 210, 0.35));
   }
 </style>
 
