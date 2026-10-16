@@ -145,37 +145,19 @@ if (headline.includes('.')) {
   <div
     id={stageId}
     class:list={[
-      "relative w-full overflow-hidden rounded-2xl md:rounded-3xl shadow-[0_24px_60px_-15px_rgba(0,0,0,0.9)] bg-[#121415] border border-white/20 ring-1 ring-white/10",
-      isArchive ? "border-0 ring-0" : "",
+      "relative w-full overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl bg-[#121415] border border-white/10",
+      isArchive ? "border-0" : "",
       isArchive
         ? (isHeroBust ? "aspect-4/3 sm:aspect-19/10 min-h-[46vh] md:min-h-110 max-h-145" : "aspect-4/3 sm:aspect-2/1 min-h-[44vh] md:min-h-100 max-h-135")
         : (isHeroBust ? "aspect-4/3 sm:aspect-19/10 min-h-[64vh] md:min-h-165 max-h-200" : "aspect-4/3 sm:aspect-2/1 min-h-[62vh] md:min-h-155 max-h-190")
     ]}
   >
 
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <!-- ETAPA INTERLUDIO: NOMBRE DE LA COLECCIÓN EN H1 GRADIENT DESTACADO   -->
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    {/* ETAPA INTERLUDIO OCULTA (Se evita el muro negro sólido para revelar la foto directamente estilo Derinkuyu) */}
     <div
-      class="triptico-layer-title-interlude absolute inset-0 flex flex-col items-center justify-center bg-[#070809] z-40 isolate pointer-events-none"
-      style="visibility: visible; opacity: 1; backface-visibility: hidden;"
+      class="triptico-layer-title-interlude hidden"
+      style="display: none;"
     >
-      <div class="interlude-title-box text-center px-6 max-w-4xl flex flex-col items-center gap-3">
-        <span class="font-mono text-[10px] md:text-xs uppercase tracking-[0.6em] text-rust-orange font-bold drop-shadow-md">
-          {isArchive ? 'HEMEROTECA' : 'COLECCIÓN TGP'}
-        </span>
-        <h1 class:list={[
-          "font-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl gradient-steel-titanium tracking-tight leading-[0.95] drop-shadow-2xl text-balance",
-          isArchive ? "font-gloock" : "font-cinzel"
-        ]}>
-          {headlinePart1 || headline}
-        </h1>
-        {headlinePart2 && (
-          <p class="font-serif italic text-white/60 text-base md:text-xl font-light mt-1">
-            {headlinePart2}
-          </p>
-        )}
-      </div>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════════ -->
@@ -192,18 +174,13 @@ if (headline.includes('.')) {
             <img
               src={hero.img}
               alt={cleanedHeroTitle}
-              loading="lazy"
+              loading="eager"
               decoding="async"
-              class={`hero-bg-img absolute inset-0 w-full h-full pointer-events-none brightness-95 contrast-[1.02] z-0 ${heroFitClass}`}
+              class={`hero-bg-img absolute inset-0 w-full h-full pointer-events-none brightness-100 contrast-[1.02] z-0 ${heroFitClass}`}
               style={`object-position: ${isHeroBust ? '50% 15%' : isHeroPortraitArt ? '50% 20%' : '50% 28%'};`}
             />
-            {/* Viñeta perimetral suave si isArchive */}
-            {isArchive && (
-              <div
-                class="absolute inset-0 pointer-events-none z-1"
-                style="background: radial-gradient(ellipse at center, transparent 48%, rgba(8,9,10,0.38) 74%, rgba(8,9,10,0.92) 100%);"
-              />
-            )}
+            {/* Scrim inferior limpio ceñido a la tipografía estilo Derinkuyu (sin viñeta perimetral negra) */}
+            <div class="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-black/85 via-black/35 to-transparent pointer-events-none z-1"></div>
           </div>
 
           {/* SUB-STAGE 1: MODO CINEMÁTICO DE PRESENTACIÓN H1 (FLANCO OPUESTO AL PANEO / CERO COLISIÓN) */}
@@ -416,7 +393,7 @@ if (headline.includes('.')) {
         return (
           <a
             href={post.href}
-            class="group relative overflow-hidden rounded-xl md:rounded-2xl border border-white/20 bg-[#161817] flex flex-col justify-end transition-all duration-500 hover:border-rust-orange/70 hover:shadow-[0_0_35px_rgba(224,122,95,0.25)] ring-1 ring-white/10"
+            class="group relative overflow-hidden rounded-xl md:rounded-2xl border border-white/10 bg-[#161817] flex flex-col justify-end transition-all duration-500 hover:border-rust-orange/50 hover:shadow-xl"
             style={`transition-delay:${i * 60}ms`}
           >
             {/* Imagen con encuadre inteligente */}
@@ -624,34 +601,13 @@ if (headline.includes('.')) {
           }
         });
 
-        // ── PASO 0: INTERLUDIO CINEMÁTICO NOMBRE DE LA COLECCIÓN (H1 GRADIENT) ──
-        if (isArchiveVariant) {
-          // En archivo saltamos directo al desfile dinámico acelerado de los 3 posts
-          gsap.set(titleInterludeLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
-          gsap.set(heroLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
-          gsap.set(spotlightLayer, { autoAlpha: 1, zIndex: 35, pointerEvents: 'auto' });
-          gsap.set(gridLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
-        } else if (titleInterludeLayer && interludeTitleBox) {
-          gsap.set(titleInterludeLayer, { autoAlpha: 1, zIndex: 40, pointerEvents: 'none' });
-          gsap.set(heroLayer, { autoAlpha: 0, zIndex: 10, pointerEvents: 'none' });
-          gsap.set(spotlightLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
-          gsap.set(gridLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
-
-          mainTl.fromTo(interludeTitleBox,
-            { autoAlpha: 0, scale: 0.94, y: 15 },
-            { autoAlpha: 1, scale: 1.02, y: 0, duration: 1.2, ease: 'power2.out' }
-          );
-          mainTl.to(interludeTitleBox,
-            { autoAlpha: 0, scale: 1.08, duration: 0.8, ease: 'power2.in' },
-            '+=0.6'
-          );
-          mainTl.to(titleInterludeLayer, { autoAlpha: 0, duration: 0.5, ease: 'power2.inOut' });
-          mainTl.set(titleInterludeLayer, { zIndex: 0 });
-        } else {
-          gsap.set(heroLayer, { autoAlpha: 1, zIndex: 30, pointerEvents: 'auto' });
-          gsap.set(spotlightLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
-          gsap.set(gridLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
+        // ── PASO 0: DESPLIEGUE DIRECTO DE LA PORTADA HERO SIN MURO NEGRO ──
+        if (titleInterludeLayer) {
+          gsap.set(titleInterludeLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none', display: 'none' });
         }
+        gsap.set(heroLayer, { autoAlpha: 1, zIndex: 30, pointerEvents: 'auto' });
+        gsap.set(spotlightLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
+        gsap.set(gridLayer, { autoAlpha: 0, zIndex: 0, pointerEvents: 'none' });
 
         spotlightCards.forEach(card => gsap.set(card, { autoAlpha: 0, zIndex: 10, pointerEvents: 'none' }));
 

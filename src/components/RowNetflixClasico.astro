@@ -259,17 +259,11 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     }
   }
 
-  /* Fade masks: difuminan el borde para que las tarjetas laterales se vean cortadas elegantemente */
+  /* Fade masks desactivadas para evitar enmascarar los bordes de las tarjetas */
   .gallery-fade-left,
   .gallery-fade-right {
-    pointer-events: none;
-    position: absolute;
-    top: 0; bottom: 0;
-    width: 12%;
-    z-index: 20;
+    display: none;
   }
-  .gallery-fade-left  { left:  0; background: linear-gradient(to right, var(--bg-main, #0f1110) 5%, transparent); }
-  .gallery-fade-right { right: 0; background: linear-gradient(to left,  var(--bg-main, #0f1110) 5%, transparent); }
 
   /* ── TRAY: contenedor de posición absoluta ── */
   .gallery-tray {
@@ -290,8 +284,7 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
     cursor: pointer;
     border-radius: 1rem;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     background: #141716;
 
     /* Estado inicial: GSAP gobierna íntegramente transform (xPercent, yPercent, scale), left, opacity, filter */

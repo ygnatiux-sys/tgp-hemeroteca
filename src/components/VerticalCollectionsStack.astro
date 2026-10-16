@@ -38,7 +38,7 @@ const epigraphMap: Record<string, string> = {
   </div>
 
   {/* Contenedor del visor (Univisium 2:1 Widescreen) */}
-  <div class="relative w-full aspect-4/3 sm:aspect-2/1 min-h-[62vh] max-h-190 flex justify-center items-center overflow-hidden rounded-2xl md:rounded-3xl border border-white/20 ring-1 ring-white/10 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.9)] bg-[#121415]">
+  <div class="relative w-full aspect-4/3 sm:aspect-2/1 min-h-[62vh] max-h-190 flex justify-center items-center overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 shadow-2xl bg-[#121415]">
     
     {/* Máscaras suaves superior e inferior para legibilidad de botones */}
     <div class="absolute top-0 left-0 right-0 h-20 bg-linear-to-b from-black/25 to-transparent z-40 pointer-events-none"></div>
@@ -95,9 +95,8 @@ const epigraphMap: Record<string, string> = {
               />
             </div>
 
-            {/* UI Normal (Título, Hero style limpio con viñeta perimetral y gradiente inferior acotado) */}
+            {/* UI Normal (Título, Hero style limpio con gradiente inferior acotado estilo Derinkuyu) */}
             <div class="normal-ui absolute inset-0 transition-opacity duration-1000 ease-in-out">
-              <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_46%,rgba(7,8,9,0.32)_75%,rgba(7,8,9,0.92)_100%)] z-10" />
               <div class="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-black/85 via-black/30 to-transparent pointer-events-none z-10" />
               <div class="relative z-20 p-8 md:p-14 lg:p-18 flex flex-col justify-end h-full pointer-events-auto select-text cursor-text">
                 <span class="font-mono text-xs sm:text-sm uppercase tracking-[0.35em] text-rust-orange font-bold mb-2 block">
