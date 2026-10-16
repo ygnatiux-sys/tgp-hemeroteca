@@ -25,6 +25,7 @@
     "db:query": "node scripts/db-tools/query_d1.js",
     "db:batch": "node scripts/db-tools/generate_d1_batches.js",
     "generar": "node scripts/generar-post.js",
+    "content:alt": "node scripts/generate-alternative-post.mjs",
     "audit": "node scripts/audit-content.mjs",
     "audit:todo": "node scripts/auditar-todo.mjs",
     "audit:r2": "node scripts/auditar-imagenes-r2.mjs",
