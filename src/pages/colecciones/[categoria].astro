@@ -4,7 +4,7 @@ import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Image from '../../components/SafeImage.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
-import CinematicGalleryEngine from '../../components/CinematicGalleryEngine.astro';
+import CinematicCollectionPrologue from '../../components/CinematicCollectionPrologue.astro';
 import Marquee from '../../components/Marquee.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import AguaNieve from '../../components/AguaNieve.astro';
@@ -102,24 +102,26 @@ const coverPosition =
   || (resolvedEssays[0]?.entry as any)?.imagePosition
   || 'center center';
 
-// Slides para el carrusel cinematográfico superior (hasta 8 imágenes destacadas)
+// Slides para el prólogo cinematográfico superior (hasta 10 investigaciones destacadas)
 const heroGallerySlides = resolvedEssays
   .filter((e: typeof resolvedEssays[0]) => e.img)
-  .slice(0, 8)
+  .slice(0, 10)
   .map((e: typeof resolvedEssays[0]) => {
     const isCine = (e as any).isCinematicGSAP || e.entry?.category === 'Ensayos Cinemáticos';
     const isNota = (e as any).isNota || (e.entry as any)?.isNota || e.entry?.category === 'Notas de Cuaderno';
     return {
       id:            e.slug,
       title:         e.entry.title || 'Sin Título',
-      subtitle:      e.entry.volanta || e.entry.dek || undefined,
+      subtitle:      e.entry.volanta || e.entry.dek || e.entry.excerpt || undefined,
       category:      formatCategory(e.entry.category || label),
       year:          formatYear(e.entry.date),
       link:          isNota ? `/notas/${e.slug}/` : isCine ? `/ensayos-cinematicos/${e.slug}/` : `/hemeroteca/${e.slug}/`,
       image:         sanitizeImageUrl((e.img as any)?.src ?? e.img),
       imagePosition: (e.entry as any)?.coverImagePosition ||
                      (e.entry as any)?.imagePosition ||
-                     'center center',
+                     '50% 30%',
+      excerpt:       e.entry.excerpt || (e.entry as any)?.generadorTexto || '',
+      badge:         e.entry.badge || formatCategory(e.entry.category || label),
     };
   });
 
@@ -159,13 +161,13 @@ const dustText = categoryDustTexts[key] ?? defaultDustText;
     {/* ── HERO: SEO H1 INVISIBLE ── */}
     <h1 class="sr-only">{label} | Colección Exclusiva TGP</h1>
 
-    {/* ── HERO CABECERA: GALLERY ENGINE CON IMÁGENES DE LA COLECCIÓN ── */}
+    {/* ── HERO CABECERA: PRÓLOGO CINEMÁTICO IMAX CON N POSTS Y BANDEJA INTERACTIVA ── */}
     {heroGallerySlides.length > 0 ? (
-      <div class="max-w-360 mx-auto px-4 md:px-8 lg:px-12 pt-4 md:pt-6">
-        <CinematicGalleryEngine
+      <div class="max-w-430 2xl:max-w-460 mx-auto px-4 md:px-8 lg:px-12 pt-4 md:pt-6">
+        <CinematicCollectionPrologue
           slides={heroGallerySlides}
-          heightClass="h-[70vh] min-h-[500px] md:h-[80vh] lg:h-[84vh]"
-          maxSlides={8}
+          collectionLabel={label}
+          autoPlayDuration={4.5}
         />
       </div>
     ) : (

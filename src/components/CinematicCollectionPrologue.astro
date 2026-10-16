@@ -1,0 +1,490 @@
+---
+/**
+ * CinematicCollectionPrologue.astro
+ *
+ * Cabecera monumental cinemática para páginas interiores de colección (/colecciones/[categoria]/).
+ * - Secuencia cinematográfica automática continua (recorre hasta 10 investigaciones con cadencia majestuosa).
+ * - Scrims de opacidad controlada (25%-50%) que permiten que las obras y fotografías resplandezcan.
+ * - Fase final de reposo IMAX: culmina en la obra cumbre de la colección.
+ * - Bandeja de Miniaturas Interactivas (Director's Rail) incrustada en el borde inferior del marco padre:
+ *   permite al visitante conmutar en tiempo real la pantalla IMAX hacia cualquiera de los posts.
+ */
+
+import { sanitizeImageUrl } from '../lib/content-filter';
+
+export interface PrologueSlide {
+  id: string;
+  title: string;
+  subtitle?: string;
+  category?: string;
+  year?: string;
+  link: string;
+  image: string;
+  imagePosition?: string;
+  excerpt?: string;
+  badge?: string;
+}
+
+interface Props {
+  slides: PrologueSlide[];
+  collectionLabel: string;
+  instanceId?: string;
+  autoPlayDuration?: number; // segundos por diapositiva en la secuencia
+}
+
+const {
+  slides = [],
+  collectionLabel,
+  instanceId = "prologue-" + Math.random().toString(36).substring(2, 8),
+  autoPlayDuration = 4.8,
+} = Astro.props;
+
+const safeSlides = slides.filter(s => s && s.image).slice(0, 10);
+const totalSlides = safeSlides.length;
+const primarySlide = safeSlides[0];
+---
+
+{totalSlides > 0 && (
+  <section
+    id={instanceId}
+    class="cinematic-prologue-root relative w-full overflow-hidden rounded-3xl md:rounded-[2rem] border border-white/10 shadow-2xl bg-[#0a0b0b] isolate select-none min-h-[580px] sm:min-h-[640px] md:min-h-[720px] lg:min-h-[780px] max-h-[86vh] flex flex-col justify-end"
+    data-total={totalSlides}
+    data-duration={autoPlayDuration}
+  >
+    {/* ── 1. ESCENARIO DE IMÁGENES DE FONDO (Pila de fondos IMAX) ── */}
+    <div class="prologue-bg-stage absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+      {safeSlides.map((slide, idx) => {
+        const safeSrc = sanitizeImageUrl(slide.image);
+        return (
+          <div
+            class:list={[
+              "prologue-bg-slide absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out",
+              idx === 0 ? "opacity-100 z-1 active-bg" : "opacity-0 z-0"
+            ]}
+            data-index={idx}
+          >
+            {safeSrc ? (
+              <img
+                src={safeSrc}
+                alt={slide.title}
+                loading={idx === 0 ? "eager" : "lazy"}
+                decoding="async"
+                class="prologue-img absolute inset-0 w-full h-full object-cover brightness-100 contrast-[1.02] transform will-change-transform"
+                style={`object-position: ${slide.imagePosition || '50% 30%'}; transform: scale(1.02);`}
+              />
+            ) : (
+              <div class="absolute inset-0 bg-stone-900" />
+            )}
+          </div>
+        );
+      })}
+
+      {/* Scrims de opacidad controlada (25%-50% para resplandor natural de la imagen) */}
+      <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 via-40% to-transparent z-10 pointer-events-none" />
+      <div class="absolute inset-0 bg-linear-to-r from-black/55 via-black/20 via-50% to-transparent z-10 pointer-events-none" />
+      <div class="absolute inset-x-0 top-0 h-28 bg-linear-to-b from-black/40 to-transparent z-10 pointer-events-none" />
+    </div>
+
+    {/* ── 2. BARRA DE PROGRESO CINEMÁTICA Y METADATOS SUPERIORES ── */}
+    <header class="absolute top-5 inset-x-5 sm:top-8 sm:inset-x-8 md:inset-x-12 z-20 flex items-center justify-between gap-4 pointer-events-none">
+      {/* Badge de la Colección */}
+      <div class="flex items-center gap-3">
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.35em] text-rust-orange font-bold drop-shadow-md">
+          <span class="w-1.5 h-1.5 rounded-full bg-rust-orange inline-block animate-pulse" />
+          {collectionLabel}
+        </span>
+        <span class="hidden sm:inline-block font-mono text-[9.5px] uppercase tracking-[0.25em] text-white/40">
+          Prólogo de Colección
+        </span>
+      </div>
+
+      {/* Indicador de Capítulos / Segmentos */}
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        {safeSlides.map((_, idx) => (
+          <div
+            class:list={[
+              "prologue-bar-segment h-1 rounded-full bg-white/20 transition-all duration-500 overflow-hidden",
+              idx === 0 ? "w-6 sm:w-8 bg-white/40 active-segment" : "w-3 sm:w-4"
+            ]}
+            data-index={idx}
+          >
+            <div class="prologue-bar-fill h-full w-0 bg-amber-200/90 rounded-full" />
+          </div>
+        ))}
+        <span class="prologue-counter font-mono text-[9px] sm:text-[10px] text-white/50 tracking-widest ml-2">
+          1/{totalSlides}
+        </span>
+      </div>
+    </header>
+
+    {/* ── 3. ESCENARIO DE CONTENIDO Y TIPOGRAFÍA EDITORIAL ── */}
+    <div class="relative z-20 w-full px-5 sm:px-8 md:px-12 lg:px-14 pb-28 sm:pb-32 md:pb-36 flex flex-col justify-end pointer-events-none">
+      <div class="prologue-content-box flex flex-col items-start gap-3 sm:gap-4 max-w-4xl pointer-events-auto">
+        
+        {/* Eyebrow de la obra actual */}
+        <div class="flex items-center gap-3">
+          <span class="prologue-badge font-mono text-[8.5px] sm:text-[9.5px] uppercase tracking-[0.45em] text-amber-200/90 font-bold drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
+            {primarySlide?.badge || primarySlide?.category || "INVESTIGACIÓN"}
+          </span>
+          {primarySlide?.year && (
+            <>
+              <span class="text-white/30 text-xs">•</span>
+              <span class="prologue-year font-mono text-[9px] text-white/60 tracking-widest">
+                {primarySlide.year}
+              </span>
+            </>
+          )}
+        </div>
+
+        {/* Título Monumental en Gloock con Steel Gradient */}
+        <h2 class="prologue-title font-gloock font-extrabold text-2xl sm:text-3xl md:text-5xl lg:text-[3.5rem] leading-[1.04] tracking-tight gradient-steel-titanium drop-shadow-[0_6px_35px_rgba(0,0,0,0.95)] max-w-4xl text-balance">
+          <a href={primarySlide?.link} class="prologue-link hover:brightness-110 transition-all">
+            {primarySlide?.title}
+          </a>
+        </h2>
+
+        {/* Subtítulo / Frase Litúrgica */}
+        <p class="prologue-subtitle font-serif text-sm sm:text-base md:text-lg lg:text-xl text-[#E3DDD3]/95 leading-relaxed tracking-wide font-light max-w-3xl line-clamp-2 drop-shadow-[0_2px_14px_rgba(0,0,0,0.95)]">
+          {primarySlide?.subtitle || primarySlide?.excerpt || ""}
+        </p>
+
+        {/* Botón CTA Cinemático de Entrada al Registro */}
+        <div class="pt-2 sm:pt-3">
+          <a
+            href={primarySlide?.link}
+            class="prologue-cta group inline-flex items-center gap-3 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-[#EFEBE3] hover:text-white backdrop-blur-md transition-all duration-300 shadow-xl cursor-pointer"
+          >
+            <span class="font-metadata text-[9px] sm:text-[10px] uppercase tracking-[0.3em] font-bold">
+              Leer Registro Documental
+            </span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="group-hover:translate-x-1 transition-transform duration-300"
+            >
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    {/* ── 4. BANDEJA DE MINIATURAS INTERACTIVAS (DIRECTOR'S RAIL EN EL SENO DEL PADRE) ── */}
+    <div class="prologue-tray-container absolute bottom-4 inset-x-4 sm:bottom-6 sm:inset-x-8 md:inset-x-12 z-30 pointer-events-auto">
+      <div class="w-full flex items-center justify-between gap-3 bg-black/45 backdrop-blur-md border border-white/10 rounded-2xl p-2 sm:p-2.5 shadow-2xl">
+        
+        {/* Label de la bandeja */}
+        <div class="hidden lg:flex flex-col pl-3 pr-2 shrink-0 border-r border-white/10">
+          <span class="font-mono text-[8px] uppercase tracking-[0.35em] text-rust-orange font-bold">
+            Acervo
+          </span>
+          <span class="font-metadata text-[9.5px] uppercase tracking-[0.15em] text-white/50">
+            {totalSlides} Obras
+          </span>
+        </div>
+
+        {/* Pista deslizable de miniaturas */}
+        <div class="prologue-thumbnails-track flex items-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar scroll-smooth flex-1 py-0.5">
+          {safeSlides.map((slide, idx) => {
+            const thumbImg = sanitizeImageUrl(slide.image);
+            return (
+              <button
+                type="button"
+                class:list={[
+                  "prologue-thumb-btn group relative shrink-0 w-24 sm:w-28 md:w-32 lg:w-36 h-13 sm:h-15 md:h-17 rounded-xl overflow-hidden border transition-all duration-300 text-left focus:outline-none cursor-pointer",
+                  idx === 0
+                    ? "border-amber-400/90 ring-1 ring-amber-400/60 scale-[1.03] shadow-[0_0_15px_rgba(251,191,36,0.25)] active-thumb"
+                    : "border-white/10 hover:border-white/35 opacity-70 hover:opacity-100"
+                ]}
+                data-index={idx}
+                data-title={slide.title}
+                data-subtitle={slide.subtitle || slide.excerpt || ""}
+                data-badge={slide.badge || slide.category || "INVESTIGACIÓN"}
+                data-year={slide.year || ""}
+                data-link={slide.link}
+                aria-label={`Ver diapositiva: ${slide.title}`}
+              >
+                {/* Imagen del thumbnail */}
+                {thumbImg ? (
+                  <img
+                    src={thumbImg}
+                    alt={slide.title}
+                    loading="lazy"
+                    decoding="async"
+                    class="w-full h-full object-cover object-center pointer-events-none group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div class="w-full h-full bg-stone-900" />
+                )}
+
+                {/* Scrim miniatura */}
+                <div class="absolute inset-0 bg-linear-to-t from-black/85 via-black/40 to-transparent pointer-events-none" />
+
+                {/* Texto dentro del thumbnail */}
+                <div class="absolute inset-x-1.5 bottom-1.5 pointer-events-none">
+                  <span class="font-mono text-[7px] text-amber-300/80 uppercase block tracking-wider truncate">
+                    0{idx + 1} · {slide.badge || "DOC"}
+                  </span>
+                  <p class="font-serif text-[9px] sm:text-[10px] text-white/90 line-clamp-1 leading-tight font-medium">
+                    {slide.title}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Botón de Pausa / Exploración Libre */}
+        <div class="shrink-0 pl-1 pr-1.5">
+          <button
+            type="button"
+            class="prologue-pause-toggle w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 hover:border-white/30 text-white/60 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer"
+            title="Pausar o reanudar recorrido"
+            aria-label="Pausar o reanudar recorrido"
+          >
+            <svg class="icon-pause w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" rx="1"/>
+              <rect x="14" y="4" width="4" height="16" rx="1"/>
+            </svg>
+            <svg class="icon-play w-3.5 h-3.5 hidden" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  /* Ocultar barra de scroll en navegadores */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+
+  function initPrologueEngine() {
+    const roots = document.querySelectorAll<HTMLElement>('.cinematic-prologue-root');
+
+    roots.forEach(root => {
+      if (root.dataset.initialized === 'true') return;
+      root.dataset.initialized = 'true';
+
+      const total = parseInt(root.dataset.total || '1', 10);
+      const slideDuration = parseFloat(root.dataset.duration || '4.8');
+      if (total <= 1) return;
+
+      const bgSlides = root.querySelectorAll<HTMLElement>('.prologue-bg-slide');
+      const segments = root.querySelectorAll<HTMLElement>('.prologue-bar-segment');
+      const thumbBtns = root.querySelectorAll<HTMLButtonElement>('.prologue-thumb-btn');
+      const counter = root.querySelector<HTMLElement>('.prologue-counter');
+      const pauseToggle = root.querySelector<HTMLButtonElement>('.prologue-pause-toggle');
+      const iconPause = root.querySelector<SVGElement>('.icon-pause');
+      const iconPlay = root.querySelector<SVGElement>('.icon-play');
+
+      // Elementos de contenido dinámico
+      const titleElem = root.querySelector<HTMLElement>('.prologue-title a');
+      const badgeElem = root.querySelector<HTMLElement>('.prologue-badge');
+      const yearElem = root.querySelector<HTMLElement>('.prologue-year');
+      const subtitleElem = root.querySelector<HTMLElement>('.prologue-subtitle');
+      const ctaLink = root.querySelector<HTMLAnchorElement>('.prologue-cta');
+
+      let currentIndex = 0;
+      let isPaused = false;
+      let hasCompletedFullLoop = false;
+      let currentTimeline: gsap.core.Timeline | null = null;
+
+      // Función para cambiar de diapositiva con fundido cinematográfico cruzado
+      function goToSlide(targetIndex: number, manualInteraction: boolean = false) {
+        if (targetIndex === currentIndex && !manualInteraction) return;
+
+        const prevIndex = currentIndex;
+        currentIndex = (targetIndex + total) % total;
+
+        // Si se hizo interacción manual por parte del usuario, entramos en modo reposo interactivo
+        if (manualInteraction) {
+          isPaused = true;
+          updatePlayPauseIcon();
+          if (currentTimeline) currentTimeline.pause();
+        }
+
+        // 1. Transición de Fondos
+        bgSlides.forEach((slide, idx) => {
+          if (idx === currentIndex) {
+            slide.classList.add('active-bg');
+            gsap.fromTo(slide, { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'power2.inOut' });
+            const img = slide.querySelector<HTMLElement>('.prologue-img');
+            if (img) {
+              gsap.fromTo(img, { scale: 1.05 }, { scale: 1.01, duration: 4.5, ease: 'power1.out' });
+            }
+          } else if (idx === prevIndex) {
+            gsap.to(slide, { opacity: 0, duration: 0.9, ease: 'power2.inOut', onComplete: () => {
+              slide.classList.remove('active-bg');
+            }});
+          } else {
+            gsap.set(slide, { opacity: 0 });
+            slide.classList.remove('active-bg');
+          }
+        });
+
+        // 2. Transición del Contenido Textual
+        const targetBtn = thumbBtns[currentIndex];
+        if (targetBtn) {
+          const newTitle = targetBtn.dataset.title || '';
+          const newSubtitle = targetBtn.dataset.subtitle || '';
+          const newBadge = targetBtn.dataset.badge || 'INVESTIGACIÓN';
+          const newYear = targetBtn.dataset.year || '';
+          const newLink = targetBtn.dataset.link || '';
+
+          // Fade out suave del texto actual y fade in con nuevos datos
+          gsap.to([titleElem, subtitleElem, badgeElem, yearElem], {
+            opacity: 0,
+            y: 6,
+            duration: 0.25,
+            ease: 'power2.in',
+            onComplete: () => {
+              if (titleElem) {
+                titleElem.textContent = newTitle;
+                titleElem.setAttribute('href', newLink);
+              }
+              if (subtitleElem) subtitleElem.textContent = newSubtitle;
+              if (badgeElem) badgeElem.textContent = newBadge;
+              if (yearElem) yearElem.textContent = newYear;
+              if (ctaLink) ctaLink.setAttribute('href', newLink);
+
+              gsap.fromTo([titleElem, subtitleElem, badgeElem, yearElem], 
+                { opacity: 0, y: -6 },
+                { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out', stagger: 0.05 }
+              );
+            }
+          });
+        }
+
+        // 3. Actualizar Thumbnails en la Bandeja
+        thumbBtns.forEach((btn, idx) => {
+          if (idx === currentIndex) {
+            btn.classList.add('border-amber-400/90', 'ring-1', 'ring-amber-400/60', 'scale-[1.03]', 'shadow-[0_0_15px_rgba(251,191,36,0.25)]', 'active-thumb');
+            btn.classList.remove('border-white/10', 'opacity-70');
+            // Auto scroll para mantener la miniatura visible en la pista
+            btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          } else {
+            btn.classList.remove('border-amber-400/90', 'ring-1', 'ring-amber-400/60', 'scale-[1.03]', 'shadow-[0_0_15px_rgba(251,191,36,0.25)]', 'active-thumb');
+            btn.classList.add('border-white/10', 'opacity-70');
+          }
+        });
+
+        // 4. Actualizar Barra de Progreso y Contador
+        segments.forEach((seg, idx) => {
+          const fill = seg.querySelector<HTMLElement>('.prologue-bar-fill');
+          if (idx === currentIndex) {
+            seg.classList.add('w-6', 'sm:w-8', 'bg-white/40', 'active-segment');
+            seg.classList.remove('w-3', 'sm:w-4');
+            if (fill) {
+              gsap.killTweensOf(fill);
+              gsap.set(fill, { width: '0%' });
+              if (!isPaused && !hasCompletedFullLoop) {
+                gsap.to(fill, { width: '100%', duration: slideDuration, ease: 'none' });
+              } else {
+                gsap.set(fill, { width: '100%' });
+              }
+            }
+          } else {
+            seg.classList.remove('w-6', 'sm:w-8', 'bg-white/40', 'active-segment');
+            seg.classList.add('w-3', 'sm:w-4');
+            if (fill) {
+              gsap.killTweensOf(fill);
+              gsap.set(fill, { width: idx < currentIndex ? '100%' : '0%' });
+            }
+          }
+        });
+
+        if (counter) {
+          counter.textContent = `${currentIndex + 1}/${total}`;
+        }
+      }
+
+      function updatePlayPauseIcon() {
+        if (!iconPause || !iconPlay) return;
+        if (isPaused) {
+          iconPause.classList.add('hidden');
+          iconPlay.classList.remove('hidden');
+        } else {
+          iconPause.classList.remove('hidden');
+          iconPlay.classList.add('hidden');
+        }
+      }
+
+      // Secuencia automática continua (Prólogo)
+      function startAutoSequence() {
+        if (currentTimeline) currentTimeline.kill();
+        currentTimeline = gsap.timeline({
+          repeat: -1,
+          onRepeat: () => {
+            // Cuando completa una vuelta completa a las N obras, reposa en la primaria (Fase Reposo)
+            hasCompletedFullLoop = true;
+            isPaused = true;
+            updatePlayPauseIcon();
+            goToSlide(0, false);
+            if (currentTimeline) currentTimeline.pause();
+          }
+        });
+
+        for (let i = 0; i < total; i++) {
+          currentTimeline.add(() => {
+            if (!isPaused) {
+              goToSlide(i, false);
+            }
+          }, `+=${i === 0 ? 0 : slideDuration}`);
+        }
+      }
+
+      // Clicks en Miniaturas
+      thumbBtns.forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = parseInt(btn.dataset.index || '0', 10);
+          goToSlide(target, true);
+        });
+      });
+
+      // Toggle Pausa / Reanudar
+      if (pauseToggle) {
+        pauseToggle.addEventListener('click', () => {
+          isPaused = !isPaused;
+          hasCompletedFullLoop = false;
+          updatePlayPauseIcon();
+          if (!isPaused) {
+            goToSlide((currentIndex + 1) % total, false);
+            startAutoSequence();
+          } else {
+            if (currentTimeline) currentTimeline.pause();
+          }
+        });
+      }
+
+      // Iniciar el prólogo
+      goToSlide(0, false);
+      startAutoSequence();
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initPrologueEngine);
+  document.addEventListener('astro:page-load', initPrologueEngine);
+</script>
