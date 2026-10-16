@@ -145,8 +145,8 @@ if (headline.includes('.')) {
   <div
     id={stageId}
     class:list={[
-      "relative w-full overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl bg-black",
-      isArchive ? "border-0" : "border border-white/10",
+      "relative w-full overflow-hidden rounded-2xl md:rounded-3xl shadow-[0_24px_60px_-15px_rgba(0,0,0,0.9)] bg-[#121415] border border-white/20 ring-1 ring-white/10",
+      isArchive ? "border-0 ring-0" : "",
       isArchive
         ? (isHeroBust ? "aspect-4/3 sm:aspect-19/10 min-h-[46vh] md:min-h-110 max-h-145" : "aspect-4/3 sm:aspect-2/1 min-h-[44vh] md:min-h-100 max-h-135")
         : (isHeroBust ? "aspect-4/3 sm:aspect-19/10 min-h-[64vh] md:min-h-165 max-h-200" : "aspect-4/3 sm:aspect-2/1 min-h-[62vh] md:min-h-155 max-h-190")
@@ -182,8 +182,8 @@ if (headline.includes('.')) {
     <!-- ETAPA 1: PORTADA CABEZA DE LA COLECCIÓN (HERO LÍMPIDA)              -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <div
-      class="triptico-layer-hero absolute inset-0 opacity-0 z-10 isolate pointer-events-none overflow-hidden"
-      style="visibility: hidden; backface-visibility: hidden;"
+      class="triptico-layer-hero absolute inset-0 opacity-100 z-10 isolate pointer-events-auto overflow-hidden"
+      style="visibility: visible; backface-visibility: hidden;"
     >
       {hero ? (
         <div class="relative w-full h-full overflow-hidden">
@@ -208,8 +208,8 @@ if (headline.includes('.')) {
 
           {/* SUB-STAGE 1: MODO CINEMÁTICO DE PRESENTACIÓN H1 (FLANCO OPUESTO AL PANEO / CERO COLISIÓN) */}
           <div 
-            class="hero-title-stage absolute inset-0 z-30 flex opacity-0 pointer-events-none"
-            style="visibility: hidden; backface-visibility: hidden;"
+            class="hero-title-stage absolute inset-0 z-30 flex opacity-100 pointer-events-none"
+            style="visibility: visible; backface-visibility: hidden;"
           >
             {/* Zona despejada 50% a la derecha para que el arte/sujeto se vea 100% libre */}
             <div class="hidden md:block w-1/2 h-full shrink-0 order-2"></div>
@@ -416,7 +416,7 @@ if (headline.includes('.')) {
         return (
           <a
             href={post.href}
-            class="group relative overflow-hidden rounded-xl md:rounded-2xl border border-white/10 bg-[#09090a] flex flex-col justify-end transition-all duration-500 hover:border-rust-orange/50 hover:shadow-[0_0_30px_rgba(217,119,6,0.18)]"
+            class="group relative overflow-hidden rounded-xl md:rounded-2xl border border-white/20 bg-[#161817] flex flex-col justify-end transition-all duration-500 hover:border-rust-orange/70 hover:shadow-[0_0_35px_rgba(224,122,95,0.25)] ring-1 ring-white/10"
             style={`transition-delay:${i * 60}ms`}
           >
             {/* Imagen con encuadre inteligente */}

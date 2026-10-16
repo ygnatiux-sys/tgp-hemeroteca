@@ -225,16 +225,13 @@ const epigraphMap: Record<string, string> = {
         marginClass="mt-0 mb-0"
         roundedClass="rounded-none"
         showSocialInTitle={true}
-        maskBottom={true}
+        maskBottom={false}
         fullWidth={true}
         disableParallax={true}
       />
 
-      {/* ── BANDEJA SPOTLIGHT MEDIA TRAY: JUSTO DEBAJO INMEDIATO AL PIE DE IMAGEN CON MASK BLACK A ANCHO TOTAL ── */}
-      <div class="relative z-20 -mt-24 sm:-mt-32 md:-mt-40 mb-16 md:mb-24 w-full overflow-x-clip">
-        {/* Scrim / Black Mask suave que difumina la transición del pie de imagen con el componente a ancho total */}
-        <div class="absolute -top-24 inset-x-0 bottom-0 bg-linear-to-b from-transparent via-black/85 via-40% to-(--bg-current) pointer-events-none -z-10"></div>
-
+      {/* ── BANDEJA SPOTLIGHT MEDIA TRAY: JUSTO DEBAJO INMEDIATO AL PIE DE IMAGEN ── */}
+      <div class="relative z-20 mt-4 sm:mt-6 mb-16 md:mb-24 w-full overflow-x-clip">
         <RowNetflixClasico 
           eyebrow="COLECCIONES DESTACADAS"
           title="COLECCIONES"
