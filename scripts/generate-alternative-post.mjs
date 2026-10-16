@@ -121,7 +121,53 @@ async function buscarEnWikimediaHQ(termino) {
   return null;
 }
 
-// ─── 2. GENERACIÓN SINTÉTICA DE CALIDAD (IMAGEN 3) SI NO HAY WIKI ─────────────
+// ─── 2. TRANSMUTACIÓN AUTOMÁTICA A R2 + D1 (TGP VAULT-RUN CLOUD RUN) ────────
+async function transmutarAR2Vault(imageUrl, titulo, tema) {
+  console.log(`\n[2/4] ⚡ Transmutando imagen a WebP vía tgp-vault-run (alojamiento CDN R2 + D1)...`);
+  
+  // Si ya es una URL alojada en nuestro CDN R2, reutilizar directamente
+  if (imageUrl.includes('storage.thegreatpuzzleproject.com')) {
+    console.log(`  ✓ Imagen ya alojada en R2 CDN: ${imageUrl}`);
+    return imageUrl;
+  }
+
+  const VAULT_IMAGE_URL = 'https://tgp-vault-run-713934653057.us-central1.run.app/image-ingest';
+  const PIN = (process.env.VAULT_PIN || process.env.TGP_MIND_TOKEN || '2771').trim();
+
+  try {
+    const res = await fetch(VAULT_IMAGE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${PIN}`
+      },
+      body: JSON.stringify({
+        url: imageUrl,
+        topic: tema,
+        title: titulo
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const r2Url = data.url || data.publicUrl || data.r2url;
+      if (r2Url) {
+        console.log(`  ✓ Transmutación exitosa a R2: ${r2Url}`);
+        console.log(`  ✓ Fila insertada en Cloudflare D1 con metadatos.`);
+        return r2Url;
+      }
+    } else {
+      console.warn(`  ⚠ tgp-vault-run respondió con status ${res.status}. Pasando a Plan B local.`);
+    }
+  } catch (e) {
+    console.warn('  ⚠ Error conectando con tgp-vault-run:', e.message);
+  }
+
+  // Fallback Plan B: Descarga local y compresión Sharp a WebP
+  return null;
+}
+
+// ─── 3. GENERACIÓN SINTÉTICA DE CALIDAD (IMAGEN 3) SI NO HAY WIKI ─────────────
 async function generarImagenSintetica(tema, slug) {
   console.log(`  🎨 Generando imagen sintética de alta resolución con Imagen 3...`);
   const API_KEY = process.env.GEMINI_API_KEY;
@@ -157,7 +203,7 @@ async function generarImagenSintetica(tema, slug) {
   return null;
 }
 
-// ─── 3. REDACCIÓN CON GEMINI GROUNDED ──────────────────────────────────────────
+// ─── 4. REDACCIÓN CON GEMINI GROUNDED ──────────────────────────────────────────
 async function forjarEnsayoConGemini(tema) {
   console.log(`\n[2/3] 🧠 Forjando ensayo erudito con ${modelName} (Grounded Search activo)...`);
   const API_KEY = process.env.GEMINI_API_KEY;
@@ -236,9 +282,9 @@ async function persistirEnsayo(ensayo, imageData, slug) {
     excerpt: ensayo.excerpt || '',
     dek: ensayo.dek || ensayo.subtitle || '',
     coverImage: coverUrl,
-    notasInvestigador: imageData?.title 
-      ? `Fotografía de archivo: ${imageData.title} (${imageData.width}x${imageData.height}px) | Licencia: ${imageData.license}`
-      : 'Generación / Materialización Arqueológica TGP'
+    notasInvestigador: imageData?.notas || (imageData?.title 
+      ? `Fotografía de archivo: ${imageData.title} | Licencia: ${imageData.license}`
+      : 'Generación / Materialización Arqueológica TGP')
   };
 
   // Escribir index.json
@@ -256,18 +302,76 @@ async function persistirEnsayo(ensayo, imageData, slug) {
     const slug = slugify(topic.split('(')[0]);
     console.log(`◈ Slug asignado: "${slug}"`);
 
-    // 1. Imagen HQ
+    // 1. Búsqueda de Imagen HQ en Wikimedia
     let imageObj = await buscarEnWikimediaHQ(topic);
-    if (!imageObj) {
-      const sinteticaPath = await generarImagenSintetica(topic, slug);
-      if (sinteticaPath) imageObj = { url: sinteticaPath, title: 'Imagen Sintética' };
+    let finalCoverUrl = '';
+    let notasImagen = '';
+
+    if (imageObj && imageObj.url) {
+      // PLAN A: Transmutación a WebP vía tgp-vault-run (Cloud Run -> R2 CDN + D1)
+      const r2Url = await transmutarAR2Vault(imageObj.url, imageObj.title, topic);
+      
+      if (r2Url) {
+        finalCoverUrl = r2Url;
+        notasImagen = `Alojado en CDN R2 (tgp-vault-run) · Archivo: ${imageObj.title} | Licencia: ${imageObj.license}`;
+      } else {
+        // PLAN B: Descarga local y optimización con Sharp a WebP
+        console.log(`\n  ⚙ [PLAN B] Descargando imagen original y optimizando a WebP local con Sharp...`);
+        try {
+          const sharp = (await import('sharp')).default;
+          const assetsDir = path.join(ROOT_DIR, 'src', 'assets', 'ensayos', slug);
+          if (!fs.existsSync(assetsDir)) fs.mkdirSync(assetsDir, { recursive: true });
+          
+          const resp = await fetch(imageObj.url, {
+            headers: { 'User-Agent': 'TGP-HemerotecaBot/2.0 (https://thegreatpuzzleproject.com; contact@thegreatpuzzleproject.com)' }
+          });
+          
+          if (resp.ok) {
+            const arrBuf = await resp.arrayBuffer();
+            const localFile = path.join(assetsDir, 'coverImage.webp');
+            await sharp(Buffer.from(arrBuf))
+              .resize(2400, undefined, { withoutEnlargement: true })
+              .webp({ quality: 88 })
+              .toFile(localFile);
+              
+            finalCoverUrl = `/src/assets/ensayos/${slug}/coverImage.webp`;
+            notasImagen = `Optimizada localmente a WebP 2400px desde ${imageObj.title} | Licencia: ${imageObj.license}`;
+            console.log(`  ✓ Imagen optimizada localmente: ${finalCoverUrl}`);
+          }
+        } catch (sharpErr) {
+          console.warn(`  ⚠ Error en Plan B local Sharp:`, sharpErr.message);
+        }
+      }
     }
 
-    // 2. Texto Erudito Grounded
+    // PLAN C: Generación sintética con Imagen 3 si no hubo imagen en Wiki o falló la descarga
+    if (!finalCoverUrl) {
+      console.log(`\n  🎨 [PLAN C] Activando síntesis arquitectónica con Imagen 3...`);
+      const sinteticaPath = await generarImagenSintetica(topic, slug);
+      if (sinteticaPath) {
+        finalCoverUrl = sinteticaPath;
+        notasImagen = `Imagen sintética generada con Imagen 3 (16:9, Dark Academia)`;
+      }
+    }
+
+    // Fallback absoluto de archivo
+    if (!finalCoverUrl) {
+      finalCoverUrl = 'https://storage.thegreatpuzzleproject.com/vault-media/1792044290145-53f05a9f.webp';
+      notasImagen = 'Archivo arqueológico de reserva TGP';
+    }
+
+    const imagePayload = {
+      url: finalCoverUrl,
+      title: imageObj?.title || 'Artefacto Visual TGP',
+      license: imageObj?.license || 'TGP License',
+      notas: notasImagen
+    };
+
+    // 2. Texto Erudito Grounded con Gemini
     const ensayo = await forjarEnsayoConGemini(topic);
 
-    // 3. Persistir
-    await persistirEnsayo(ensayo, imageObj, slug);
+    // 3. Persistir en Astro Content Layer
+    await persistirEnsayo(ensayo, imagePayload, slug);
 
     console.log('\n✅ ENSAYO MATERIALIZADO CON ÉXITO:');
     console.log(`   - Hemeroteca URL: http://localhost:4321/hemeroteca/${slug}/\n`);
