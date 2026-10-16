@@ -207,8 +207,8 @@ const uid = `row-${Math.random().toString(36).substring(2, 8)}`;
                 />
               </div>
 
-              {/* Scrim Localizado (Franja inferior para contraste sobre imagen cover) */}
-              <div class="absolute bottom-0 inset-x-0 w-full h-[55%] sm:h-[50%] bg-linear-to-t from-black/95 via-black/70 to-transparent pointer-events-none z-0"></div>
+              {/* Scrim Localizado (Franja inferior suave con opacidad controlada para contraste de texto) */}
+              <div class="absolute bottom-0 inset-x-0 w-full h-[55%] sm:h-[50%] bg-linear-to-t from-black/75 via-black/30 to-transparent pointer-events-none z-0"></div>
 
               {/* Contenedor del Texto (Z-Index) */}
               <div class="absolute bottom-0 left-0 p-4 sm:p-5 flex flex-col justify-end gap-1.5 z-10 w-full md:w-[90%] pointer-events-auto select-text cursor-text">

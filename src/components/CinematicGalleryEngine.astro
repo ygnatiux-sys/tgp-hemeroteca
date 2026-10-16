@@ -76,8 +76,8 @@ const safeSlides = (slides.length > 0 ? slides : []).slice(0, maxSlides);
                 ) : (
                   <div class="fallback-background absolute inset-0 bg-stone-900 pointer-events-none -z-10" />
                 )}
-                {/* Scrim cinematográfico inferior para contraste óptimo */}
-                <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/45 via-45% to-transparent pointer-events-none z-10" />
+                {/* Scrim cinematográfico con opacidad controlada (luminosidad preservada) */}
+                <div class="absolute inset-0 bg-linear-to-t from-black/75 via-black/25 via-45% to-transparent pointer-events-none z-10" />
               </div>
 
               {/* Contenido Editorial Alineado a la Izquierda (Estilo Img 2) */}

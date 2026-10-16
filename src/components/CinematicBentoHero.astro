@@ -70,15 +70,15 @@ const badgeFormatLabel = isBust
       </div>
     )}
 
-    {/* ── 2. GRADIENTES CINEMATOGRÁFICOS DE LECTURA Y PROFUNDIDAD ── */}
-    {/* Scrim lateral izquierdo para garantizar contraste absoluto del texto */}
+    {/* ── 2. GRADIENTES CINEMATOGRÁFICOS DE LECTURA Y PROFUNDIDAD (OPACIDAD CONTROLADA) ── */}
+    {/* Scrim lateral izquierdo suave para contraste de texto sin cegar el fondo */}
     <div
-      class="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,#060709_0%,rgba(6,7,9,0.92)_35%,rgba(6,7,9,0.55)_60%,rgba(6,7,9,0.15)_80%,transparent_100%)]"
+      class="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,rgba(6,7,9,0.70)_0%,rgba(6,7,9,0.45)_35%,rgba(6,7,9,0.20)_60%,transparent_85%)]"
     ></div>
 
     {/* Viñeta inferior y superior sutil */}
     <div
-      class="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(6,7,9,0.6)_0%,transparent_25%,transparent_70%,rgba(6,7,9,0.95)_100%)]"
+      class="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(6,7,9,0.45)_0%,transparent_25%,transparent_70%,rgba(6,7,9,0.65)_100%)]"
     ></div>
 
     {/* Glow atmosférico reactivo ámbar/dorado detrás de la figura */}

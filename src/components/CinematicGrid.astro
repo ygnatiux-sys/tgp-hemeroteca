@@ -100,8 +100,8 @@ const paddedTotal = totalRows < 10 ? `0${totalRows}` : `${totalRows}`;
                 />
               </div>
 
-              <!-- Scrim inferior (Solo cubre el texto para contraste WCAG, resto 0% oscuro) -->
-              <div class="absolute inset-x-0 bottom-0 h-[65%] bg-linear-to-t from-black/95 via-black/70 to-transparent pointer-events-none"></div>
+              <!-- Scrim inferior con opacidad controlada (luminosidad preservada) -->
+              <div class="absolute inset-x-0 bottom-0 h-[65%] bg-linear-to-t from-black/75 via-black/30 to-transparent pointer-events-none"></div>
 
               <!-- Borde superior sutil (detalle de cristal) -->
               <div class="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/10 to-transparent"></div>

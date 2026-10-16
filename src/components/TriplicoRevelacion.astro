@@ -180,7 +180,7 @@ if (headline.includes('.')) {
               style={`object-position: ${isHeroBust ? '50% 15%' : isHeroPortraitArt ? '50% 20%' : '50% 28%'};`}
             />
             {/* Scrim inferior limpio ceñido a la tipografía estilo Derinkuyu (sin viñeta perimetral negra) */}
-            <div class="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-black/85 via-black/35 to-transparent pointer-events-none z-1"></div>
+            <div class="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-black/70 via-black/20 to-transparent pointer-events-none z-1"></div>
           </div>
 
           {/* SUB-STAGE 1: MODO CINEMÁTICO DE PRESENTACIÓN H1 (FLANCO OPUESTO AL PANEO / CERO COLISIÓN) */}
@@ -216,7 +216,7 @@ if (headline.includes('.')) {
             {/* Zona despejada 50% para contemplar el paisaje/arte */}
             <div class="hidden md:block w-1/2 h-full shrink-0 order-2"></div>
             {/* Zona 50% degradada con la frase como protagonista */}
-            <div class="w-full md:w-1/2 h-full flex items-center justify-start p-8 md:p-14 lg:pl-20 lg:pr-6 order-1 bg-linear-to-r from-black/95 via-black/80 to-transparent">
+            <div class="w-full md:w-1/2 h-full flex items-center justify-start p-8 md:p-14 lg:pl-20 lg:pr-6 order-1 bg-linear-to-r from-black/50 via-black/25 to-transparent">
               <div class="hero-text-content flex flex-col items-start gap-4 max-w-[38ch]">
                 {/* Eyebrow */}
                 <span class="font-mono text-[9px] uppercase tracking-[0.55em] text-rust-orange font-bold drop-shadow-md block">
@@ -225,7 +225,7 @@ if (headline.includes('.')) {
 
                 {/* LA FRASE SOBERANA */}
                 <p 
-                  class="hero-phrase font-serif text-2xl md:text-3xl lg:text-[2.85rem] text-[#E3DDD3]/95 leading-[1.2] drop-shadow-2xl text-balance"
+                  class="hero-phrase font-serif text-2xl md:text-3xl lg:text-[2.85rem] text-[#E3DDD3] leading-[1.2] drop-shadow-[0_4px_28px_rgba(0,0,0,0.95)] text-balance"
                   data-phrase={cleanedHeroExcerpt || cleanedHeroTitle}
                 >
                   <span set:html={parseHeroPhrase(cleanedHeroExcerpt || cleanedHeroTitle)} />
@@ -337,8 +337,8 @@ if (headline.includes('.')) {
                 class:list={[
                   "w-full md:w-1/2 h-full flex items-center p-8 md:p-14 lg:p-20 transition-all duration-1000",
                   isRightAligned 
-                    ? "order-2 justify-end lg:pr-20 lg:pl-6 bg-linear-to-l from-black/95 via-black/80 to-transparent" 
-                    : "order-1 justify-start lg:pl-20 lg:pr-6 bg-linear-to-r from-black/95 via-black/80 to-transparent"
+                    ? "order-2 justify-end lg:pr-20 lg:pl-6 bg-linear-to-l from-black/50 via-black/25 to-transparent" 
+                    : "order-1 justify-start lg:pl-20 lg:pr-6 bg-linear-to-r from-black/50 via-black/25 to-transparent"
                 ]}
               >
                 <div class="spotlight-text-content flex flex-col items-start gap-4 max-w-[38ch]">
@@ -349,7 +349,7 @@ if (headline.includes('.')) {
 
                   {/* LA FRASE — protagónica y soberana, sin H3 que la aplaste */}
                   <p 
-                    class="spotlight-phrase font-serif text-2xl md:text-3xl lg:text-[2.85rem] text-[#E3DDD3]/95 leading-[1.2] drop-shadow-2xl text-balance"
+                    class="spotlight-phrase font-serif text-2xl md:text-3xl lg:text-[2.85rem] text-[#E3DDD3] leading-[1.2] drop-shadow-[0_4px_28px_rgba(0,0,0,0.95)] text-balance"
                     data-phrase={cleanedExcerpt || cleanedTitle}
                   >
                     <span set:html={parseHeroPhrase(cleanedExcerpt || cleanedTitle)} />
@@ -406,7 +406,7 @@ if (headline.includes('.')) {
                 class={`w-full h-full ${gridFitClass} transition-transform duration-700 group-hover:scale-[1.03]`}
               />
               {/* Scrim inferior sutil para contraste de texto sin apagar la imagen */}
-              <div class="absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-black/90 via-black/40 to-transparent pointer-events-none"></div>
+              <div class="absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-black/70 via-black/25 to-transparent pointer-events-none"></div>
             </div>
 
             {/* Contenido textual heredado de CinematicArchiveCard */}
