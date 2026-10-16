@@ -156,38 +156,104 @@ const georefPosts: TriplicoPost[] = publishableGeorefs
       badge: 'Georreferencias',
     };
   });
-// ─── COLECCIONES PARA SPOTLIGHT MEDIA TRAY (NORMALIZADO A HEREDADOS DE LA PÁGINA) ───
-const coleccionesTrayItems: TrayCollectionItem[] = collections
-  .filter(col => col.coverEssay?.img)
-  .map(col => {
-    const rawImg = col.coverEssay.img;
-    return {
-      slug: col.key,
-      title: col.label,
-      excerpt: col.coverEssay?.entry?.title || undefined,
-      coverImage: rawImg,
-      category: 'Colección TGP',
-      count: col.count,
-      link: `/colecciones/${col.key}/`,
-    };
-  });
+// ─── COLECCIONES CONTINENTALES EDITORIALES TGP ───
+const continentalCollections = [
+  {
+    slug: 'america-secrets',
+    title: 'América Secrets',
+    subtitle: 'Mecanizado Andino, Geometría Mesoamericana & Andesita Quirúrgica',
+    image: 'https://storage.thegreatpuzzleproject.com/vault-media/1792044290145-53f05a9f.webp',
+    link: '/colecciones/america-secrets/',
+    count: 29
+  },
+  {
+    slug: 'asia-secrets',
+    title: 'Asia Secrets',
+    subtitle: 'Sagrarios de la Ruta de la Seda, Ciclópeos del Pacífico & Georradar',
+    image: 'https://storage.thegreatpuzzleproject.com/vault-media/1791676137832-aca96ac9.webp',
+    link: '/colecciones/asia-secrets/',
+    count: 19
+  },
+  {
+    slug: 'misterios-del-africa',
+    title: 'Misterios del África',
+    subtitle: 'Pirámides Negras de Nubia, Esfinges Pluviales & Litología Primaria',
+    image: 'https://storage.thegreatpuzzleproject.com/vault-media/1791676164169-8beba1c3.webp',
+    link: '/colecciones/misterios-del-africa/',
+    count: 11
+  },
+  {
+    slug: 'europa-oculta',
+    title: 'Europa Oculta & Catacumbas',
+    subtitle: 'Megalitismo Atlántico, Cátaros, Herejías & Laberintos Subterráneos',
+    image: 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?q=80&w=1200&auto=format&fit=crop',
+    link: '/colecciones/europa-oculta/',
+    count: 35
+  },
+  {
+    slug: 'oceania-ancestral',
+    title: 'Oceanía & Polinesia Ancestral',
+    subtitle: 'Megaconstrucciones de Basalto en Arrecifes, Moais & Pueblos de las Olas',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Nan_Madol.jpg/1280px-Nan_Madol.jpg',
+    link: '/colecciones/oceania-ancestral/',
+    count: 3
+  }
+];
 
-// ─── ITEMS PARA COVERFLOW 3D (UN COVER DE CADA COLECCIÓN) ────────────────────
-const coverflowPosts: CoverflowPost[] = collections
-  .filter(col => col.coverEssay?.img)
-  .map(col => {
-    const rawImg = col.coverEssay.img;
-    const imgUrl = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : ''));
-    return {
-      id: col.key,
-      title: col.label,
-      subtitle: `${col.count} artículo${col.count > 1 ? 's' : ''} en esta colección`,
-      image: imgUrl || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop',
-      link: `/colecciones/${col.key}/`,
-      collectionLabel: 'Colección TGP',
-      date: col.coverEssay?.entry?.date ? formatYear(col.coverEssay.entry.date) : undefined,
-    };
-  });
+// ─── COLECCIONES PARA SPOTLIGHT MEDIA TRAY (CONTINENTALES PRIMERO, LUEGO CATEGORÍAS) ───
+const coleccionesTrayItems: TrayCollectionItem[] = [
+  ...continentalCollections.map(c => ({
+    slug: c.slug,
+    title: c.title,
+    excerpt: c.subtitle,
+    coverImage: c.image,
+    category: 'Colección Continental',
+    count: c.count,
+    link: c.link,
+  })),
+  ...collections
+    .filter(col => col.coverEssay?.img)
+    .map(col => {
+      const rawImg = col.coverEssay.img;
+      return {
+        slug: col.key,
+        title: col.label,
+        excerpt: col.coverEssay?.entry?.title || undefined,
+        coverImage: rawImg,
+        category: 'Colección Temática',
+        count: col.count,
+        link: `/colecciones/${col.key}/`,
+      };
+    })
+];
+
+// ─── ITEMS PARA COVERFLOW 3D ────────────────────
+const coverflowPosts: CoverflowPost[] = [
+  ...continentalCollections.map(c => ({
+    id: c.slug,
+    title: c.title,
+    subtitle: c.subtitle,
+    image: c.image,
+    link: c.link,
+    collectionLabel: 'Colección Continental',
+    date: '2026',
+  })),
+  ...collections
+    .filter(col => col.coverEssay?.img)
+    .map(col => {
+      const rawImg = col.coverEssay.img;
+      const imgUrl = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : ''));
+      return {
+        id: col.key,
+        title: col.label,
+        subtitle: `${col.count} artículo${col.count > 1 ? 's' : ''} en esta colección`,
+        image: imgUrl || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop',
+        link: `/colecciones/${col.key}/`,
+        collectionLabel: 'Colección Temática',
+        date: col.coverEssay?.entry?.date ? formatYear(col.coverEssay.entry.date) : undefined,
+      };
+    })
+];
 
 // ─── FRASES EVOCATIVAS POR COLECCIÓN ───────────────────────────────────────────
 const epigraphMap: Record<string, string> = {

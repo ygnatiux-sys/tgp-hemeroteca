@@ -1,0 +1,104 @@
+---
+/**
+ * src/pages/colecciones/oceania-ancestral/index.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * PÁGINA OFICIAL DE COLECCIÓN: OCEANÍA & POLINESIA ANCESTRAL
+ */
+export const prerender = true;
+
+import Layout from '../../../layouts/Layout.astro';
+import BackSlideButton from '../../../components/BackSlideButton.astro';
+import TectonicHero from '../../../components/TectonicHero.astro';
+import imgNanMadol from '../../../assets/alternativa/nan-madol.jpg';
+---
+
+<Layout title="Oceanía & Polinesia Ancestral · Colección Arqueosemiótica | TGP">
+  <main class="w-full bg-[#030908] text-[#cde6e1] min-h-screen">
+    
+    <div class="fixed top-5 left-6 z-40">
+      <BackSlideButton fallbackUrl="/colecciones/" />
+    </div>
+
+    <!-- HERO MONUMENTAL: NAN MADOL Y EL COLOSALISMO DEL PACÍFICO -->
+    <section class="w-full">
+      <TectonicHero
+        image={imgNanMadol}
+        imageScale={1.32}
+        imageFilter="saturate(0.85) contrast(1.15) brightness(0.65)"
+        overlay="linear-gradient(180deg, rgba(3,9,8,0.65) 0%, rgba(3,9,8,0.3) 50%, rgba(3,9,8,0.85) 100%)"
+        word="Oceanía Ancestral"
+        subtitle="Megaconstrucciones de basalto en arrecifes, moais & pueblos de las olas"
+        fontHref="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,900&display=swap"
+        fontFamily="'Bodoni Moda', serif"
+        fontWeight={900}
+        gradient="linear-gradient(180deg, #A6F3D8 0%, #4FC3A1 52%, #1F7A68 100%)"
+        glow="rgba(79,195,161,0.5)"
+        accent="#6FD1B5"
+        subColor="#CFE3DC"
+        size="clamp(3rem, 9.5vw, 9.5rem)"
+        tracking="0.01em"
+        align="center"
+      />
+    </section>
+
+    <!-- BANNER EDITORIAL DE CINTA -->
+    <div class="py-4 bg-[#020504] border-y border-[#4FC3A1]/25 overflow-hidden">
+      <div class="whitespace-nowrap font-mono text-xs uppercase tracking-[0.3em] text-[#4FC3A1] text-center animate-pulse">
+        OCEANÍA ANCESTRAL · NAN MADOL (POHNPEI) · MOAIS DE RAPA NUI · NAVEGACIÓN POLINESIA · BAJAU MARINOS
+      </div>
+    </div>
+
+    <!-- GRID DE CAPÍTULOS HIJOS -->
+    <section class="max-w-7xl mx-auto px-6 py-20">
+      <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 border-b border-white/10 pb-6">
+        <div>
+          <span class="font-mono text-xs uppercase tracking-[0.3em] text-[#4FC3A1]">Episodios & Expedientes Oceánicos</span>
+          <h2 class="font-serif text-3xl sm:text-5xl font-black uppercase tracking-tight text-white mt-2">
+            Hitos Megalíticos del Pacífico Sur
+          </h2>
+        </div>
+        <p class="font-mono text-xs uppercase tracking-widest text-stone-400 mt-4 md:mt-0 max-w-md">
+          Prismas de basalto ensamblados sobre arrecifes de coral y esculturas monolíticas en islas remotas.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- NAN MADOL -->
+        <a href="/test-nan-madol" class="group block rounded-2xl border border-white/10 bg-[#061210] p-7 hover:border-[#4FC3A1]/60 transition-all duration-300 shadow-xl">
+          <span class="font-mono text-[10px] uppercase text-[#4FC3A1]">Episodio I · Micronesia</span>
+          <h3 class="font-serif text-2xl font-bold uppercase text-white group-hover:text-[#4FC3A1] transition-colors mt-2">
+            Nan Madol
+          </h3>
+          <p class="font-sans text-xs text-stone-300 mt-2">
+            La ciudad flotante de 250 millones de toneladas de prismas de basalto columnar sobre el mar de Pohnpei.
+          </p>
+        </a>
+
+        <!-- MOAIS DE RAPA NUI -->
+        <a href="/colecciones/america-secrets/moai/" class="group block rounded-2xl border border-white/10 bg-[#061210] p-7 hover:border-[#4FC3A1]/60 transition-all duration-300 shadow-xl">
+          <span class="font-mono text-[10px] uppercase text-[#4FC3A1]">Episodio II · Rapa Nui</span>
+          <h3 class="font-serif text-2xl font-bold uppercase text-white group-hover:text-[#4FC3A1] transition-colors mt-2">
+            Moais de Pascua
+          </h3>
+          <p class="font-sans text-xs text-stone-300 mt-2">
+            Toba volcánica tallada en la cantera de Rano Raraku y transportada hacia las plataformas ceremoniales ahu.
+          </p>
+        </a>
+
+        <!-- GITANOS DEL MAR -->
+        <a href="/hemeroteca/los-gitanos-del-mar/" class="group block rounded-2xl border border-white/10 bg-[#061210] p-7 hover:border-[#4FC3A1]/60 transition-all duration-300 shadow-xl">
+          <span class="font-mono text-[10px] uppercase text-[#4FC3A1]">Episodio III · Etnografía</span>
+          <h3 class="font-serif text-2xl font-bold uppercase text-white group-hover:text-[#4FC3A1] transition-colors mt-2">
+            Los Gitanos del Mar
+          </h3>
+          <p class="font-sans text-xs text-stone-300 mt-2">
+            Los pueblos Bajau y la memoria biológica de comunidades que han habitado el océano durante milenios.
+          </p>
+        </a>
+
+      </div>
+    </section>
+
+  </main>
+</Layout>
