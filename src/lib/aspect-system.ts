@@ -17,7 +17,7 @@ export type ImmersiveVariant = 'monumental' | 'panoramico' | 'bento-ultra' | 'im
  * (bustos, retratos de filósofos, fauna, deidades, esfinges, monolitos).
  */
 const PORTRAIT_SUBJECT_REGEX =
-  /olmeca|cabeza|monolito|aguara|hegel|homero|saturno|busto|estatua|retrato|filosofia|moctezuma|gengis|tatu|rostro|portrait|escultura|venus|urano|arquetipo|personaje|fauna|animal|tero|perdiz|tapir|vaca|hunza|buda|platon|espartaco|marco aurelio|jung|esfinge|giza|sadhguru|sanson|orixa|orixas|puma|dioses|momia|faraon|catacumba/i;
+  /olmeca|cabeza|monolito|aguara|hegel|homero|saturno|busto|estatua|retrato|filosofia|moctezuma|gengis|tatu|rostro|portrait|escultura|venus|urano|arquetipo|personaje|fauna|animal|tero|perdiz|tapir|vaca|hunza|buda|platon|espartaco|marco aurelio|jung|esfinge|giza|sadhguru|sanson|orixa|orixas|puma|dioses|momia|faraon|catacumba|tarot|carta|diablo|manuscrito|codice|grabado|woodcut|tabla|glifo|documento|archivo|herramienta|voynich|kells|dresde/i;
 
 /**
  * Lista específica de bustos y esculturas que sufren recorte en proporciones bajas

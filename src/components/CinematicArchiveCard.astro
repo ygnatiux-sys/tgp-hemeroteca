@@ -85,12 +85,14 @@ if (entry.youtubeLink) {
 const isHero = variant === "hero";
 const isDuo40 = variant === "duo-40";
 
-// Detección canónica de sujeto (busto/monolito vs paisaje) para encuadre y aspect ratio
+// Detección canónica de sujeto (busto/monolito vs paisaje vs documento/tarot) para encuadre y aspect ratio
+const isDocumentOrTarot = /tarot|carta|diablo|manuscrito|codice|grabado|woodcut|tabla|glifo|documento|archivo|herramienta|voynich|kells|dresde/i.test(`${entry?.title || ''} ${slug || ''}`);
 const explicitPos = (entry as any)?.titlePosition || null;
 const immersiveVariant = resolveImmersiveVariant(entry, slug);
 const isPortraitArt = immersiveVariant === 'monumental' || immersiveVariant === 'imax-bust';
+const isFacePortrait = isPortraitArt && !isDocumentOrTarot;
 const isImaxBust = immersiveVariant === 'imax-bust';
-const titlePos = explicitPos || (isPortraitArt ? "top" : "bottom");
+const titlePos = explicitPos || (isFacePortrait ? "top" : "bottom");
 
 // Relación de aspecto inmersiva unificada (Sistema TGP):
 // - Monumental (16:10 / 1.60:1) para bustos, estatuas, fauna y retratos.
@@ -243,6 +245,8 @@ const fitClass =
   data-variant={variant}
   data-is-hero={isHero ? "true" : "false"}
   data-is-portrait={isPortraitArt ? "true" : "false"}
+  data-is-face={isFacePortrait ? "true" : "false"}
+  data-is-document={isDocumentOrTarot ? "true" : "false"}
   data-title-pos={titlePos}
   data-category={normalizeCategory(entry.category)}
   data-year={year}
@@ -288,7 +292,9 @@ const fitClass =
                 : isPortraitArt
                   ? "object-position: 50% 20%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
                   : "object-position: 50% 38%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
-              : undefined
+              : isPortraitArt
+                ? "object-position: 50% 20%;"
+                : undefined
           }
           data-flip-id={`card-image-${cardId}`}
         />
@@ -347,9 +353,9 @@ const fitClass =
       isHero && heroPhraseHTML && (
         <div
           class="cac-hero-cinematic-layer absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-1000 ease-in-out z-25 flex"
-          data-layout={isPortraitArt ? "portrait" : "bottom"}
+          data-layout={isFacePortrait ? "portrait" : "bottom"}
         >
-          {isPortraitArt ? (
+          {isFacePortrait ? (
             <>
               {/* 1. Modo Rostro / Retrato: Zona izquierda despejada para el sujeto (Hegel) */}
               <div class="hidden md:block w-[38%] lg:w-[40%] h-full shrink-0" />
@@ -365,9 +371,9 @@ const fitClass =
               </div>
             </>
           ) : (
-            /* 2. Modo Base 75/25: Frase acomodada en el borde inferior con franja mask suave, dejando 100% despejada la obra visual */
+            /* 2. Modo Base 75/25: Frase acomodada en el borde inferior ganado, dejando 100% despejada la carta y obra visual */
             <div class="w-full h-full flex justify-center items-end">
-              <div class="w-full bg-linear-to-t from-black/90 via-black/60 to-transparent pt-16 md:pt-24 pb-8 md:pb-12 px-6 sm:px-12 text-center">
+              <div class="w-full bg-linear-to-t from-black/90 via-black/60 to-transparent pt-12 md:pt-16 pb-6 md:pb-8 px-6 sm:px-12 text-center">
                 <p class="cac-hero-cinematic-text font-serif text-xl sm:text-2xl md:text-3xl lg:text-[2.5rem] text-[#E3DDD3]/95 leading-snug tracking-tight drop-shadow-2xl text-center max-w-[42ch] mx-auto">
                   <span
                     class="cac-hero-text-anim inline-block opacity-0"
@@ -801,6 +807,8 @@ const fitClass =
       // Ambos: Aparece la frase cinemática con tipografía serif y peso -> Retorno al centro -> Título fijado
       // ══════════════════════════════════════════════════════════════════
       const isPortrait = card.dataset.isPortrait === "true";
+      const isFace = card.dataset.isFace === "true";
+      const isDocument = card.dataset.isDocument === "true";
 
       // 1. Tags pulse sutil
       if (tags.length) {
@@ -818,19 +826,23 @@ const fitClass =
         ).to(tags, { opacity: 0.7, duration: 0.3 }, 0.5);
       }
 
-      // 2. Pausa contemplativa inicial (1.2s como en VerticalCollectionsStack)
-      tl.to({}, { duration: 1.2 });
+      // 2. Pausa contemplativa inicial (0.8s para agilizar arranque)
+      tl.to({}, { duration: 0.8 });
 
-      // 3. FASE 1: Movimiento de imagen según si es rostro o paisaje cinemático
+      // 3. FASE 1: Movimiento de imagen según si es rostro, documento/tarot o paisaje
       tl.add(() => {
         if (img) {
-          if (isPortrait) {
+          if (isFace) {
             // Rostro (ej. Hegel): se corre a la izquierda con suavidad
             img.style.objectPosition = "20% 50%";
             img.style.transform = "scale(1.045)";
+          } else if (isDocument) {
+            // Documento o Tarot: respeta encuadre superior (50% 20%) para que la carta y herramientas queden 100% visibles
+            img.style.objectPosition = "50% 20%";
+            img.style.transform = "scale(1.02)";
           } else {
             // Paisaje cinemático: mantiene encuadre centrado con leve respiro
-            img.style.objectPosition = "50% 50%";
+            img.style.objectPosition = "50% 38%";
             img.style.transform = "scale(1.025)";
           }
         }
@@ -839,7 +851,7 @@ const fitClass =
       if (normalUi) {
         tl.to(
           normalUi,
-          { opacity: 0, duration: 0.9, ease: "power2.inOut" },
+          { opacity: 0, duration: 0.7, ease: "power2.inOut" },
           "<",
         );
       }
@@ -847,39 +859,39 @@ const fitClass =
       if (cinematicLayer) {
         tl.to(
           cinematicLayer,
-          { opacity: 1, duration: 0.9, ease: "power2.inOut" },
+          { opacity: 1, duration: 0.7, ease: "power2.inOut" },
           "<",
         );
       }
 
-      // 4. FASE 2: Aparición de la frase cinemática en la zona derecha o centrada (ascenso + desenfoque progresivo)
+      // 4. FASE 2: Aparición de la frase cinemática (ascenso + desenfoque progresivo ágil)
       if (textAnim) {
         tl.fromTo(
           textAnim,
-          { opacity: 0, y: 18, scale: 0.98, filter: "blur(6px)" },
+          { opacity: 0, y: 16, scale: 0.98, filter: "blur(5px)" },
           {
             opacity: 1,
             y: 0,
             scale: 1,
             filter: "blur(0px)",
-            duration: 1.8,
+            duration: 1.1,
             ease: "cubic-bezier(0.25, 1, 0.5, 1)",
           },
-          "-=0.3",
+          "-=0.2",
         );
       }
 
-      // 5. FASE 3: Pausa contemplativa de lectura completa (5.5s para lectura cómoda)
-      tl.to({}, { duration: 5.5 });
+      // 5. FASE 3: Pausa contemplativa de lectura completa (3.6s para ritmo más fluido sin perder legibilidad)
+      tl.to({}, { duration: 3.6 });
 
       // 6. FASE 4: Retorno cinemático
       // La frase y la capa se disuelven suavemente
       if (textAnim) {
         tl.to(textAnim, {
           opacity: 0,
-          filter: "blur(6px)",
-          y: -10,
-          duration: 0.7,
+          filter: "blur(5px)",
+          y: -8,
+          duration: 0.5,
           ease: "power2.inOut",
         });
       }
@@ -887,15 +899,19 @@ const fitClass =
       if (cinematicLayer) {
         tl.to(
           cinematicLayer,
-          { opacity: 0, duration: 0.8, ease: "power2.inOut" },
-          "<0.2",
+          { opacity: 0, duration: 0.6, ease: "power2.inOut" },
+          "<0.1",
         );
       }
 
-      // La imagen regresa al centro con su transición suave de 3s
+      // La imagen regresa a su encuadre natural
       tl.add(() => {
         if (img) {
-          img.style.objectPosition = "50% 50%";
+          if (isDocument || isPortrait) {
+            img.style.objectPosition = "50% 20%";
+          } else {
+            img.style.objectPosition = "50% 38%";
+          }
           img.style.transform = "scale(1)";
         }
       });
@@ -906,7 +922,7 @@ const fitClass =
           normalUi,
           {
             opacity: 1,
-            duration: 1.2,
+            duration: 0.8,
             ease: "power2.out",
             onComplete: () => {
               gsap.set(normalUi, {
@@ -924,7 +940,7 @@ const fitClass =
               }
             },
           },
-          "-=0.4",
+          "-=0.3",
         );
       }
 
