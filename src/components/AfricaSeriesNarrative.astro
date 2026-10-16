@@ -45,12 +45,12 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
 
 <section
   id="africa-series-container"
-  class={`relative w-full h-[150vh] bg-transparent text-white select-none ${className}`}
+  class={`relative w-full h-[180vh] bg-transparent text-white select-none ${className}`}
   data-autoplay={autoplayDuration}
   aria-label="Serie Destacada: Misterios del África"
 >
-  <!-- Contenedor Sticky Enmarcado Editorial (Panorámica Univisium 2:1) -->
-  <div class="sticky top-6 sm:top-8 md:top-10 h-[78vh] min-h-140 max-h-210 w-full overflow-hidden bg-[#141210] rounded-3xl sm:rounded-4xl border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)]">
+  <!-- Contenedor Sticky Enmarcado Editorial IMAX MAX (88vh - 92vh, hasta 1040px) -->
+  <div class="sticky top-4 sm:top-6 md:top-8 h-[88vh] sm:h-[90vh] md:h-[92vh] min-h-165 sm:min-h-185 md:min-h-210 lg:min-h-225 max-h-260 w-full overflow-hidden bg-[#141210] rounded-3xl sm:rounded-4xl border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)]">
 
     <!-- ══════════════════════════════════════════════════════════════════════
          INTRO MONUMENTAL: 'MISTERIOS DEL ÁFRICA' — AMBIENT GLOW Y RITMO DE PERCUSIÓN
@@ -265,20 +265,9 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.95), 0 0 25px rgba(139, 90, 69, 0.35);
   }
 
-  /* Grano analógico A24 */
+  /* Grano analógico desactivado para pureza fotográfica */
   .afr-grain {
-    opacity: 0.18;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-    animation: afr-grain-anim 0.8s steps(5) infinite;
-  }
-
-  @keyframes afr-grain-anim {
-    0% { transform: translate(0, 0); }
-    25% { transform: translate(-2%, 1%); }
-    50% { transform: translate(1%, -2%); }
-    75% { transform: translate(-1%, 2%); }
-    100% { transform: translate(0, 0); }
+    display: none;
   }
 
   .afr-dust :global(span) {

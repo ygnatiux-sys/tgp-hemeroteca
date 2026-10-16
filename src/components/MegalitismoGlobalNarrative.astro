@@ -24,7 +24,7 @@ const { className = "", autoplayDuration = 8000 } = Astro.props;
 
 <section
   id="megalitismo-global-container"
-  class={`relative w-full h-[78vh] min-h-140 max-h-210 bg-[#050505] text-[#f7f5f8] select-none overflow-hidden rounded-3xl sm:rounded-4xl border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)] ${className}`}
+  class={`relative w-full h-[88vh] sm:h-[90vh] md:h-[92vh] min-h-165 sm:min-h-185 md:min-h-210 lg:min-h-225 max-h-260 bg-[#050505] text-[#f7f5f8] select-none overflow-hidden rounded-3xl sm:rounded-4xl border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)] ${className}`}
   data-autoplay={autoplayDuration}
   aria-label="Colección: Megalitismo Global — Haʻamonga ʻa Maui"
 >
@@ -187,7 +187,12 @@ const { className = "", autoplayDuration = 8000 } = Astro.props;
     background: linear-gradient(180deg, #ffffff 0%, #ff66b2 26%, #ff007f 56%, #b00055 82%, #42001e 100%);
     -webkit-background-clip: text;
     background-clip: text;
+    -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 25px 60px rgba(0, 0, 0, 0.98)) drop-shadow(0 0 50px rgba(255, 0, 127, 0.5));
+  }
+
+  .mega-grain {
+    display: none;
   }
 
   /* Textura de partículas orgánicas */
