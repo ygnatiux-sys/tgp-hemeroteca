@@ -81,399 +81,394 @@ const isAmerica = collection === "america";
     </header>
 
     {isAmerica ? (
-      <!-- ══════════════════════════════════════════════════════════════════════
-           RAMA: AMÉRICA SECRETS (CNC / ANDESITA / BASALTO / GEOMETRÍA)
-      ══════════════════════════════════════════════════════════════════════ -->
+      <>
+        {/* PASO 0: INTRO AMÉRICA SECRETS */}
+        <div class="imax-layer imax-layer-intro absolute inset-0 w-full h-full opacity-100 pointer-events-auto z-20 flex items-center justify-center overflow-hidden bg-[#050607]" data-layer-index="0">
+          <div class="imax-ambient-orb-1 absolute -top-[15%] -left-[10%] w-[75vw] h-[75vw] max-w-225 max-h-225 rounded-full bg-[radial-gradient(circle_at_center,rgba(78,242,210,0.28)_0%,rgba(69,123,119,0.16)_35%,rgba(20,40,38,0.06)_60%,transparent_75%)] blur-3xl pointer-events-none"></div>
+          <div class="imax-ambient-orb-2 absolute -bottom-[20%] -right-[15%] w-[60vw] h-[60vw] max-w-175 max-h-175 rounded-full bg-[radial-gradient(circle_at_center,rgba(217,119,6,0.18)_0%,rgba(146,64,14,0.08)_40%,transparent_70%)] blur-3xl pointer-events-none"></div>
+          <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_38%,rgba(5,6,7,0.75)_70%,#050607_100%)] pointer-events-none"></div>
+          <div class="imax-grid-cnc absolute inset-0 opacity-15 pointer-events-none"></div>
+          <div class="imax-grain absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay"></div>
 
-      <!-- PASO 0: INTRO AMÉRICA SECRETS -->
-      <div class="imax-layer imax-layer-intro absolute inset-0 w-full h-full opacity-100 pointer-events-auto z-20 flex items-center justify-center overflow-hidden bg-[#050607]" data-layer-index="0">
-        <div class="imax-ambient-orb-1 absolute -top-[15%] -left-[10%] w-[75vw] h-[75vw] max-w-225 max-h-225 rounded-full bg-[radial-gradient(circle_at_center,rgba(78,242,210,0.28)_0%,rgba(69,123,119,0.16)_35%,rgba(20,40,38,0.06)_60%,transparent_75%)] blur-3xl pointer-events-none"></div>
-        <div class="imax-ambient-orb-2 absolute -bottom-[20%] -right-[15%] w-[60vw] h-[60vw] max-w-175 max-h-175 rounded-full bg-[radial-gradient(circle_at_center,rgba(217,119,6,0.18)_0%,rgba(146,64,14,0.08)_40%,transparent_70%)] blur-3xl pointer-events-none"></div>
-        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_38%,rgba(5,6,7,0.75)_70%,#050607_100%)] pointer-events-none"></div>
-        <div class="imax-grid-cnc absolute inset-0 opacity-15 pointer-events-none"></div>
-        <div class="imax-grain absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay"></div>
+          <div class="relative z-20 flex flex-col items-center justify-center text-center px-4 max-w-6xl w-full select-none">
+            <h1 class="am-intro-title font-fraunces font-black uppercase text-[clamp(3.8rem,13vw,12.5rem)] leading-[0.84] tracking-[-0.035em] whitespace-nowrap opacity-0 will-change-transform">
+              AMÉRICA
+            </h1>
 
-        <div class="relative z-20 flex flex-col items-center justify-center text-center px-4 max-w-6xl w-full select-none">
-          <h1 class="am-intro-title font-fraunces font-black uppercase text-[clamp(3.8rem,13vw,12.5rem)] leading-[0.84] tracking-[-0.035em] whitespace-nowrap opacity-0 will-change-transform">
-            AMÉRICA
-          </h1>
-
-          <div class="am-cnc-wrap relative inline-block mt-3 overflow-visible">
-            <h2 class="am-secrets-word font-['Chivo_Mono'] font-bold uppercase text-[clamp(1.2rem,3.5vw,3rem)] tracking-[0.38em] text-[#4ef2d2] drop-shadow-[0_0_30px_rgba(78,242,210,0.45)] m-0">
-              SECRETS
-            </h2>
-            <div class="am-laser-line absolute top-0 bottom-0 w-0.5 bg-[#4ef2d2] shadow-[0_0_14px_#4ef2d2] pointer-events-none opacity-0">
-              <span class="am-laser-spark absolute top-1/2 -translate-y-1/2 -left-1.25 w-3 h-3 rounded-full bg-white shadow-[0_0_18px_#4ef2d2,0_0_30px_#ffffff]"></span>
-            </div>
-          </div>
-
-          <p class="am-intro-sub mt-6 font-mono text-[10px] sm:text-[12px] tracking-[0.35em] uppercase text-stone-300 opacity-0">
-            Mecanizado de precisión, colosalismo & geometría sagrada
-          </p>
-        </div>
-      </div>
-
-      <!-- PASO 1: PUMAPUNKU (Mecanizado Ancestral en Bloque H) -->
-      <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="1">
-        <div class="absolute inset-0 overflow-hidden">
-          <img
-            src={imgPumapunku.src}
-            alt="Bloque H de andesita con corte geométrico perfecto en Pumapunku"
-            class="imax-img absolute inset-0 w-full h-full object-cover object-[center_42%] filter brightness-105 contrast-102 will-change-transform"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-        <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_42%,rgba(5,6,7,0.35)_78%,rgba(5,6,7,0.85)_100%)]"></div>
-        <div class="imax-grid-cnc absolute inset-0 opacity-10 pointer-events-none"></div>
-        <div class="imax-grain absolute inset-0 pointer-events-none"></div>
-
-        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-20 px-4">
-          <div class="relative flex flex-col items-center justify-center text-center max-w-7xl">
-            <span class="imax-badge inline-flex items-center gap-2 mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#4ef2d2] py-0.5 px-3 rounded-full border border-white/10 bg-black/40 backdrop-blur-md opacity-0 drop-shadow-md">
-              <span class="w-1.5 h-1.5 rounded-full bg-[#4ef2d2] shadow-[0_0_8px_#4ef2d2]"></span>
-              Altiplano 3800m · Mecanizado Ancestral
-            </span>
-
-            <div class="am-pumapunku-cnc-box relative inline-block">
-              <h2 class="am-pp-title font-['Panchang'] font-black uppercase text-[clamp(3.4rem,12vw,11rem)] leading-[0.88] tracking-[0.03em] whitespace-nowrap text-transparent opacity-0">
-                Puma Punku
+            <div class="am-cnc-wrap relative inline-block mt-3 overflow-visible">
+              <h2 class="am-secrets-word font-['Chivo_Mono'] font-bold uppercase text-[clamp(1.2rem,3.5vw,3rem)] tracking-[0.38em] text-[#4ef2d2] drop-shadow-[0_0_30px_rgba(78,242,210,0.45)] m-0">
+                SECRETS
               </h2>
-              <div class="am-pp-laser absolute top-0 bottom-0 w-0.5 bg-[#4ef2d2] shadow-[0_0_15px_#4ef2d2] pointer-events-none opacity-0">
-                <span class="absolute top-1/2 -translate-y-1/2 -left-1.5 w-3.5 h-3.5 rounded-full bg-white shadow-[0_0_20px_#4ef2d2]"></span>
+              <div class="am-laser-line absolute top-0 bottom-0 w-0.5 bg-[#4ef2d2] shadow-[0_0_14px_#4ef2d2] pointer-events-none opacity-0">
+                <span class="am-laser-spark absolute top-1/2 -translate-y-1/2 -left-1.25 w-3 h-3 rounded-full bg-white shadow-[0_0_18px_#4ef2d2,0_0_30px_#ffffff]"></span>
               </div>
             </div>
 
-            <p class="am-pp-sub mt-4 font-['Chivo_Mono'] text-[clamp(0.8rem,1.8vw,1.35rem)] tracking-[0.28em] uppercase text-[#4ef2d2] opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
-              Mecanizado de precisión en el altiplano boliviano
+            <p class="am-intro-sub mt-6 font-mono text-[10px] sm:text-[12px] tracking-[0.35em] uppercase text-stone-300 opacity-0">
+              Mecanizado de precisión, colosalismo & geometría sagrada
             </p>
           </div>
         </div>
-      </div>
 
-      <!-- PASO 2: CABEZAS OLMECAS (Mesoamérica - Basalto Colosal) -->
-      <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="2">
-        <div class="absolute inset-0 overflow-hidden">
-          <img
-            src={imgOlmeca.src}
-            alt="Cabeza Colosal Olmeca tallada en basalto"
-            class="imax-img absolute inset-0 w-full h-full object-cover object-center filter brightness-105 contrast-105 will-change-transform"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-        <div class="absolute inset-0 pointer-events-none bg-linear-to-t from-black/80 via-black/30 to-black/60"></div>
-        <div class="imax-grain absolute inset-0 pointer-events-none"></div>
+        {/* PASO 1: PUMAPUNKU (Mecanizado Ancestral en Bloque H) */}
+        <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="1">
+          <div class="absolute inset-0 overflow-hidden">
+            <img
+              src={imgPumapunku.src}
+              alt="Bloque H de andesita con corte geométrico perfecto en Pumapunku"
+              class="imax-img absolute inset-0 w-full h-full object-cover object-[center_42%] filter brightness-105 contrast-102 will-change-transform"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_42%,rgba(5,6,7,0.35)_78%,rgba(5,6,7,0.85)_100%)]"></div>
+          <div class="imax-grid-cnc absolute inset-0 opacity-10 pointer-events-none"></div>
+          <div class="imax-grain absolute inset-0 pointer-events-none"></div>
 
-        <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none px-4">
-          <div class="relative flex flex-col items-center text-center max-w-6xl">
-            <span class="imax-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#F0C284] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0 drop-shadow-md">
-              Mesoamérica · San Lorenzo & La Venta
-            </span>
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-20 px-4">
+            <div class="relative flex flex-col items-center justify-center text-center max-w-7xl">
+              <span class="imax-badge inline-flex items-center gap-2 mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#4ef2d2] py-0.5 px-3 rounded-full border border-white/10 bg-black/40 backdrop-blur-md opacity-0 drop-shadow-md">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#4ef2d2] shadow-[0_0_8px_#4ef2d2]"></span>
+                Altiplano 3800m · Mecanizado Ancestral
+              </span>
 
-            <div class="am-olmeca-tectonic relative inline-block">
-              <h2 class="am-olmeca-h1 relative m-0 font-serif font-black uppercase whitespace-nowrap text-[clamp(3.8rem,15vw,14rem)] leading-[0.88] tracking-[-0.02em] opacity-0">
-                <span class="am-sizer block opacity-0" aria-hidden="true">Olmecas</span>
-                <span class="am-band absolute inset-x-0 top-1/2 h-0 -translate-y-1/2 pointer-events-none" aria-hidden="true"></span>
-                <span class="am-half am-top absolute inset-0 block text-transparent" aria-hidden="true">Olmecas</span>
-                <span class="am-half am-bot absolute inset-0 block text-transparent" aria-hidden="true">Olmecas</span>
-              </h2>
-              <p class="am-olmeca-sub absolute left-1 top-1/2 -translate-y-1/2 m-0 font-sans text-[clamp(0.8rem,1.8vw,1.3rem)] tracking-[0.28em] uppercase text-[#FDE5CA] opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
-                Monolitos de basalto esculpidos sin metal conocido
+              <div class="am-pumapunku-cnc-box relative inline-block">
+                <h2 class="am-pp-title font-['Panchang'] font-black uppercase text-[clamp(3.4rem,12vw,11rem)] leading-[0.88] tracking-[0.03em] whitespace-nowrap text-transparent opacity-0">
+                  Puma Punku
+                </h2>
+                <div class="am-pp-laser absolute top-0 bottom-0 w-0.5 bg-[#4ef2d2] shadow-[0_0_15px_#4ef2d2] pointer-events-none opacity-0">
+                  <span class="absolute top-1/2 -translate-y-1/2 -left-1.5 w-3.5 h-3.5 rounded-full bg-white shadow-[0_0_20px_#4ef2d2]"></span>
+                </div>
+              </div>
+
+              <p class="am-pp-sub mt-4 font-['Chivo_Mono'] text-[clamp(0.8rem,1.8vw,1.35rem)] tracking-[0.28em] uppercase text-[#4ef2d2] opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
+                Mecanizado de precisión en el altiplano boliviano
               </p>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- PASO 3: ESFERAS DEL DIQUÍS (Costa Rica - Geometría Sagrada) -->
-      <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="3">
-        <div class="absolute inset-0 overflow-hidden">
-          <img
-            src={imgDiquis.src}
-            alt="Esfera colosal de piedra en la selva de Diquís"
-            class="imax-img absolute inset-0 w-full h-full object-cover object-right sm:object-center filter brightness-105 contrast-105 saturate-100 will-change-transform"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-        <div class="absolute inset-0 pointer-events-none bg-linear-to-r from-black/65 via-black/20 to-transparent"></div>
-        <div class="imax-grain absolute inset-0 pointer-events-none"></div>
+        {/* PASO 2: CABEZAS OLMECAS (Mesoamérica - Basalto Colosal) */}
+        <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="2">
+          <div class="absolute inset-0 overflow-hidden">
+            <img
+              src={imgOlmeca.src}
+              alt="Cabeza Colosal Olmeca tallada en basalto"
+              class="imax-img absolute inset-0 w-full h-full object-cover object-center filter brightness-105 contrast-105 will-change-transform"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div class="absolute inset-0 pointer-events-none bg-linear-to-t from-black/80 via-black/30 to-black/60"></div>
+          <div class="imax-grain absolute inset-0 pointer-events-none"></div>
 
-        <div class="absolute inset-0 flex items-center justify-start z-20 pointer-events-none pl-6 sm:pl-14 md:pl-20 pr-6">
-          <div class="relative flex flex-col items-start text-left max-w-5xl">
-            <span class="imax-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#FF4D55] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0 drop-shadow-md">
-              Costa Rica · Delta del Diquís & Isla del Caño
-            </span>
+          <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none px-4">
+            <div class="relative flex flex-col items-center text-center max-w-6xl">
+              <span class="imax-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#F0C284] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0 drop-shadow-md">
+                Mesoamérica · San Lorenzo & La Venta
+              </span>
 
-            <div class="am-diquis-tectonic relative inline-block">
-              <h2 class="am-diquis-h1 relative m-0 font-serif font-black uppercase whitespace-nowrap text-[clamp(3.8rem,15vw,14rem)] leading-[0.88] tracking-[-0.02em] opacity-0">
-                <span class="am-sizer block opacity-0" aria-hidden="true">Diquís</span>
-                <span class="am-band absolute inset-x-0 top-1/2 h-0 -translate-y-1/2 pointer-events-none" aria-hidden="true"></span>
-                <span class="am-half am-top absolute inset-0 block text-transparent" aria-hidden="true">Diquís</span>
-                <span class="am-half am-bot absolute inset-0 block text-transparent" aria-hidden="true">Diquís</span>
-              </h2>
-              <p class="am-diquis-sub absolute left-1 top-1/2 -translate-y-1/2 m-0 font-sans text-[clamp(0.8rem,1.8vw,1.3rem)] tracking-[0.28em] uppercase text-[#F5D0D2] opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
-                Geometría y esfericidad perfecta en gabro
-              </p>
+              <div class="am-olmeca-tectonic relative inline-block">
+                <h2 class="am-olmeca-h1 relative m-0 font-serif font-black uppercase whitespace-nowrap text-[clamp(3.8rem,15vw,14rem)] leading-[0.88] tracking-[-0.02em] opacity-0">
+                  <span class="am-sizer block opacity-0" aria-hidden="true">Olmecas</span>
+                  <span class="am-band absolute inset-x-0 top-1/2 h-0 -translate-y-1/2 pointer-events-none" aria-hidden="true"></span>
+                  <span class="am-half am-top absolute inset-0 block text-transparent" aria-hidden="true">Olmecas</span>
+                  <span class="am-half am-bot absolute inset-0 block text-transparent" aria-hidden="true">Olmecas</span>
+                </h2>
+                <p class="am-olmeca-sub absolute left-1 top-1/2 -translate-y-1/2 m-0 font-sans text-[clamp(0.8rem,1.8vw,1.3rem)] tracking-[0.28em] uppercase text-[#FDE5CA] opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
+                  Monolitos de basalto esculpidos sin metal conocido
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- PASO 4: MOAIS DE RAPA NUI (Pacífico Sur + CTA Colección) -->
-      <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="4">
-        <div class="absolute inset-0 overflow-hidden">
-          <img
-            src={imgMoai.src}
-            alt="Moais monolíticos en Rapa Nui"
-            class="imax-img absolute inset-0 w-full h-full object-cover object-center filter brightness-105 contrast-105 will-change-transform"
-            loading="lazy"
-            decoding="async"
-          />
+        {/* PASO 3: ESFERAS DEL DIQUÍS (Costa Rica - Geometría Sagrada) */}
+        <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="3">
+          <div class="absolute inset-0 overflow-hidden">
+            <img
+              src={imgDiquis.src}
+              alt="Esfera colosal de piedra en la selva de Diquís"
+              class="imax-img absolute inset-0 w-full h-full object-cover object-right sm:object-center filter brightness-105 contrast-105 saturate-100 will-change-transform"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div class="absolute inset-0 pointer-events-none bg-linear-to-r from-black/65 via-black/20 to-transparent"></div>
+          <div class="imax-grain absolute inset-0 pointer-events-none"></div>
+
+          <div class="absolute inset-0 flex items-center justify-start z-20 pointer-events-none pl-6 sm:pl-14 md:pl-20 pr-6">
+            <div class="relative flex flex-col items-start text-left max-w-5xl">
+              <span class="imax-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#FF4D55] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0 drop-shadow-md">
+                Costa Rica · Delta del Diquís & Isla del Caño
+              </span>
+
+              <div class="am-diquis-tectonic relative inline-block">
+                <h2 class="am-diquis-h1 relative m-0 font-serif font-black uppercase whitespace-nowrap text-[clamp(3.8rem,15vw,14rem)] leading-[0.88] tracking-[-0.02em] opacity-0">
+                  <span class="am-sizer block opacity-0" aria-hidden="true">Diquís</span>
+                  <span class="am-band absolute inset-x-0 top-1/2 h-0 -translate-y-1/2 pointer-events-none" aria-hidden="true"></span>
+                  <span class="am-half am-top absolute inset-0 block text-transparent" aria-hidden="true">Diquís</span>
+                  <span class="am-half am-bot absolute inset-0 block text-transparent" aria-hidden="true">Diquís</span>
+                </h2>
+                <p class="am-diquis-sub absolute left-1 top-1/2 -translate-y-1/2 m-0 font-sans text-[clamp(0.8rem,1.8vw,1.3rem)] tracking-[0.28em] uppercase text-[#F5D0D2] opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
+                  Geometría y esfericidad perfecta en gabro
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-black/85 via-black/35 to-transparent pointer-events-none"></div>
-        <div class="imax-grain absolute inset-0 pointer-events-none"></div>
 
-        <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none px-4">
-          <div class="relative flex flex-col items-center text-center max-w-6xl">
-            <span class="imax-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#4ef2d2] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0 drop-shadow-md">
-              Isla de Pascua · Rano Raraku
-            </span>
+        {/* PASO 4: MOAIS DE RAPA NUI (Pacífico Sur + CTA Colección) */}
+        <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="4">
+          <div class="absolute inset-0 overflow-hidden">
+            <img
+              src={imgMoai.src}
+              alt="Moais monolíticos en Rapa Nui"
+              class="imax-img absolute inset-0 w-full h-full object-cover object-center filter brightness-105 contrast-105 will-change-transform"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div class="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-black/85 via-black/35 to-transparent pointer-events-none"></div>
+          <div class="imax-grain absolute inset-0 pointer-events-none"></div>
 
-            <h2 class="am-moai-h1 font-serif font-black uppercase whitespace-nowrap text-[clamp(3.8rem,14vw,13rem)] leading-[0.88] tracking-[-0.02em] text-transparent opacity-0">
-              Rapa Nui
-            </h2>
-            <p class="am-moai-sub mt-4 font-sans text-[clamp(0.8rem,1.8vw,1.3rem)] tracking-[0.28em] uppercase text-emerald-100/90 opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
-              La ingeniería de desplazamiento monolítico en el Pacífico Sur
-            </p>
+          <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none px-4">
+            <div class="relative flex flex-col items-center text-center max-w-6xl">
+              <span class="imax-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#4ef2d2] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0 drop-shadow-md">
+                Isla de Pascua · Rano Raraku
+              </span>
 
-            <!-- CTA de Entrada a Colección -->
-            <div class="imax-cta-wrap mt-8 pointer-events-auto opacity-0">
-              <a
-                href="/colecciones/america-secrets/"
-                class="group inline-flex items-center gap-3 px-7 py-3.5 rounded-full bg-white/10 hover:bg-[#4ef2d2]/20 border border-white/20 hover:border-[#4ef2d2]/40 text-[#EFEBE3] hover:text-[#4ef2d2] backdrop-blur-md transition-all duration-300 shadow-2xl cursor-pointer"
-              >
-                <span class="font-metadata text-[10px] sm:text-[11px] uppercase tracking-[0.3em] font-bold">
-                  Explorar Colección América Secrets
-                </span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="group-hover:translate-x-1.5 transition-transform duration-300"
+              <h2 class="am-moai-h1 font-serif font-black uppercase whitespace-nowrap text-[clamp(3.8rem,14vw,13rem)] leading-[0.88] tracking-[-0.02em] text-transparent opacity-0">
+                Rapa Nui
+              </h2>
+              <p class="am-moai-sub mt-4 font-sans text-[clamp(0.8rem,1.8vw,1.3rem)] tracking-[0.28em] uppercase text-emerald-100/90 opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
+                La ingeniería de desplazamiento monolítico en el Pacífico Sur
+              </p>
+
+              <div class="imax-cta-wrap mt-8 pointer-events-auto opacity-0">
+                <a
+                  href="/colecciones/america-secrets/"
+                  class="group inline-flex items-center gap-3 px-7 py-3.5 rounded-full bg-white/10 hover:bg-[#4ef2d2]/20 border border-white/20 hover:border-[#4ef2d2]/40 text-[#EFEBE3] hover:text-[#4ef2d2] backdrop-blur-md transition-all duration-300 shadow-2xl cursor-pointer"
                 >
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-              </a>
+                  <span class="font-metadata text-[10px] sm:text-[11px] uppercase tracking-[0.3em] font-bold">
+                    Explorar Colección América Secrets
+                  </span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="group-hover:translate-x-1.5 transition-transform duration-300"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </>
     ) : (
-      <!-- ══════════════════════════════════════════════════════════════════════
-           RAMA: ALTERNATIVE (DERINKUYU / BARABAR / DIQUÍS / OLMECAS)
-      ══════════════════════════════════════════════════════════════════════ -->
+      <>
+        {/* PASO 0: INTRO ALTERNATIVE */}
+        <div class="imax-layer imax-layer-intro absolute inset-0 w-full h-full opacity-100 pointer-events-auto z-20 flex items-center justify-center overflow-hidden bg-[#0a0a0a]" data-layer-index="0">
+          <div class="alt-ambient-orb-1 absolute -top-[15%] -right-[10%] w-[75vw] h-[75vw] max-w-225 max-h-225 rounded-full bg-[radial-gradient(circle_at_center,rgba(230,154,70,0.32)_0%,rgba(212,86,50,0.15)_35%,rgba(74,13,6,0.06)_60%,transparent_75%)] blur-3xl pointer-events-none"></div>
+          <div class="alt-ambient-orb-2 absolute -bottom-[20%] -left-[15%] w-[60vw] h-[60vw] max-w-175 max-h-175 rounded-full bg-[radial-gradient(circle_at_center,rgba(180,60,25,0.22)_0%,rgba(100,20,10,0.08)_40%,transparent_70%)] blur-3xl pointer-events-none"></div>
+          <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_38%,rgba(10,10,10,0.75)_70%,#0a0a0a_100%)] pointer-events-none"></div>
+          <div class="imax-grain absolute inset-0 pointer-events-none opacity-20 mix-blend-overlay"></div>
+          <div class="alt-intro-shockwave absolute w-28 h-28 rounded-full border-2 border-[#E69A46] pointer-events-none opacity-0 scale-50 z-15 shadow-[0_0_60px_#d45632]"></div>
 
-      <!-- PASO 0: INTRO ALTERNATIVE -->
-      <div class="imax-layer imax-layer-intro absolute inset-0 w-full h-full opacity-100 pointer-events-auto z-20 flex items-center justify-center overflow-hidden bg-[#0a0a0a]" data-layer-index="0">
-        <div class="alt-ambient-orb-1 absolute -top-[15%] -right-[10%] w-[75vw] h-[75vw] max-w-225 max-h-225 rounded-full bg-[radial-gradient(circle_at_center,rgba(230,154,70,0.32)_0%,rgba(212,86,50,0.15)_35%,rgba(74,13,6,0.06)_60%,transparent_75%)] blur-3xl pointer-events-none"></div>
-        <div class="alt-ambient-orb-2 absolute -bottom-[20%] -left-[15%] w-[60vw] h-[60vw] max-w-175 max-h-175 rounded-full bg-[radial-gradient(circle_at_center,rgba(180,60,25,0.22)_0%,rgba(100,20,10,0.08)_40%,transparent_70%)] blur-3xl pointer-events-none"></div>
-        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_38%,rgba(10,10,10,0.75)_70%,#0a0a0a_100%)] pointer-events-none"></div>
-        <div class="imax-grain absolute inset-0 pointer-events-none opacity-20 mix-blend-overlay"></div>
-        <div class="alt-intro-shockwave absolute w-28 h-28 rounded-full border-2 border-[#E69A46] pointer-events-none opacity-0 scale-50 z-15 shadow-[0_0_60px_#d45632]"></div>
+          <div class="relative z-20 flex flex-col items-center justify-center text-center px-4 max-w-6xl w-full select-none">
+            <div class="alt-intro-box relative flex flex-col items-center justify-center">
+              <h1 class="alt-intro-title font-fraunces font-black uppercase text-[clamp(3.5rem,12vw,12rem)] leading-[0.84] tracking-[-0.035em] whitespace-nowrap text-transparent opacity-0 will-change-transform">
+                ALTERNATIVE
+              </h1>
 
-        <div class="relative z-20 flex flex-col items-center justify-center text-center px-4 max-w-6xl w-full select-none">
-          <div class="alt-intro-box relative flex flex-col items-center justify-center">
-            <h1 class="alt-intro-title font-fraunces font-black uppercase text-[clamp(3.5rem,12vw,12rem)] leading-[0.84] tracking-[-0.035em] whitespace-nowrap text-transparent opacity-0 will-change-transform">
-              ALTERNATIVE
-            </h1>
-
-            <div class="alt-intro-h2-wrap relative inline-block mt-3 overflow-visible">
-              <h2 class="alt-intro-h2 font-mono font-bold uppercase text-[clamp(1.2rem,3.5vw,3rem)] tracking-[0.42em] text-[#E69A46] drop-shadow-[0_0_35px_rgba(230,154,70,0.55)] m-0 opacity-0 will-change-transform">
-                COLECCIÓN
-              </h2>
+              <div class="alt-intro-h2-wrap relative inline-block mt-3 overflow-visible">
+                <h2 class="alt-intro-h2 font-mono font-bold uppercase text-[clamp(1.2rem,3.5vw,3rem)] tracking-[0.42em] text-[#E69A46] drop-shadow-[0_0_35px_rgba(230,154,70,0.55)] m-0 opacity-0 will-change-transform">
+                  COLECCIÓN
+                </h2>
+              </div>
             </div>
-          </div>
 
-          <p class="alt-intro-sub mt-6 font-mono text-[10px] sm:text-[12px] tracking-[0.35em] uppercase text-stone-300 opacity-0">
-            Historia profunda · El archivo no oficial
-          </p>
-        </div>
-      </div>
-
-      <!-- PASO 1: DERINKUYU (Paralaje Z) -->
-      <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="1">
-        <div class="absolute inset-0 overflow-hidden">
-          <img
-            src={imgDerinkuyu.src}
-            alt="Túnel y rueda de molino de Derinkuyu"
-            class="imax-img absolute inset-0 w-full h-full object-cover object-center filter brightness-105 contrast-105 will-change-transform"
-            loading="eager"
-            decoding="async"
-          />
-        </div>
-        <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_50%_50%,transparent_45%,rgba(10,10,10,0.35)_75%,rgba(10,10,10,0.75)_100%)]"></div>
-        <div class="imax-grain absolute inset-0 pointer-events-none"></div>
-
-        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-20 px-4">
-          <div class="relative flex flex-col items-center justify-center text-center max-w-7xl">
-            <span class="imax-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#E69A46] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0 drop-shadow-md">
-              Anatolia Subterránea · Refugio Primordial
-            </span>
-            <h2 class="alt-derin-h1 text-[clamp(3.8rem,15vw,15rem)] font-bold leading-[0.86] tracking-[-0.035em] uppercase whitespace-nowrap text-transparent opacity-0">
-              Derinkuyu
-            </h2>
-            <p class="alt-derin-sub absolute top-1/2 -translate-y-1/2 font-sans text-[clamp(0.85rem,2.2vw,1.45rem)] tracking-[0.28em] uppercase text-[#f7ebe1] opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
-              <span class="text-[#E69A46] mr-1.5">—</span> El último refugio de la humanidad
+            <p class="alt-intro-sub mt-6 font-mono text-[10px] sm:text-[12px] tracking-[0.35em] uppercase text-stone-300 opacity-0">
+              Historia profunda · El archivo no oficial
             </p>
           </div>
         </div>
-      </div>
 
-      <!-- PASO 2: BARABAR (Resonancia Sónica y Glint de Espejo) -->
-      <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="2">
-        <div class="absolute inset-0 overflow-hidden">
-          <img
-            src={imgBarabar.src}
-            alt="Bóveda de granito pulido espejo de las Cuevas de Barabar"
-            class="imax-img absolute inset-0 w-full h-full object-cover object-[center_50%] filter brightness-105 contrast-105 will-change-transform"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-        <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_50%_50%,transparent_50%,rgba(6,7,8,0.25)_75%,rgba(6,7,8,0.65)_100%)]"></div>
-        <div class="imax-grain absolute inset-0 pointer-events-none"></div>
-
-        <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none px-4">
-          <div class="relative flex flex-col items-center text-center max-w-7xl">
-            <span class="imax-badge inline-flex items-center gap-2 mb-4 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#e5e5e5] py-1 px-3.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0 drop-shadow-md">
-              <span class="w-1.5 h-1.5 rounded-full bg-[#f39c12] shadow-[0_0_8px_#f39c12]"></span>
-              Cámara Subterránea de Bihar · Acústica de Granito
-            </span>
-
-            <div class="alt-barabar-stack relative inline-block">
-              <span class="alt-barabar-echo alt-echo-1 absolute inset-0 text-transparent font-black uppercase text-[clamp(3.6rem,15vw,14rem)] leading-[0.86] tracking-[-0.01em] opacity-0" aria-hidden="true">Barabar</span>
-              <span class="alt-barabar-echo alt-echo-2 absolute inset-0 text-transparent font-black uppercase text-[clamp(3.6rem,15vw,14rem)] leading-[0.86] tracking-[-0.01em] opacity-0" aria-hidden="true">Barabar</span>
-              <span class="alt-barabar-echo alt-echo-3 absolute inset-0 text-transparent font-black uppercase text-[clamp(3.6rem,15vw,14rem)] leading-[0.86] tracking-[-0.01em] opacity-0" aria-hidden="true">Barabar</span>
-              <span class="alt-barabar-echo alt-echo-4 absolute inset-0 text-transparent font-black uppercase text-[clamp(3.6rem,15vw,14rem)] leading-[0.86] tracking-[-0.01em] opacity-0" aria-hidden="true">Barabar</span>
-
-              <h2 class="alt-barabar-solid relative m-0 font-black uppercase whitespace-nowrap text-[clamp(3.6rem,15vw,14rem)] leading-[0.86] tracking-[-0.01em] text-transparent opacity-0 overflow-hidden">
-                Barabar
-                <span class="alt-barabar-glint absolute inset-0 pointer-events-none" aria-hidden="true"></span>
-              </h2>
-            </div>
-
-            <p class="alt-barabar-sub mt-6 font-sans text-[clamp(0.85rem,2.2vw,1.35rem)] tracking-[0.24em] uppercase text-transparent opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
-              <span class="inline-block w-6 h-[1.5px] bg-[#f39c12] mr-2 align-middle"></span>
-              El reflejo imposible de una tecnología perdida
-            </p>
+        {/* PASO 1: DERINKUYU (Paralaje Z) */}
+        <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="1">
+          <div class="absolute inset-0 overflow-hidden">
+            <img
+              src={imgDerinkuyu.src}
+              alt="Túnel y rueda de molino de Derinkuyu"
+              class="imax-img absolute inset-0 w-full h-full object-cover object-center filter brightness-105 contrast-105 will-change-transform"
+              loading="eager"
+              decoding="async"
+            />
           </div>
-        </div>
-      </div>
+          <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_50%_50%,transparent_45%,rgba(10,10,10,0.35)_75%,rgba(10,10,10,0.75)_100%)]"></div>
+          <div class="imax-grain absolute inset-0 pointer-events-none"></div>
 
-      <!-- PASO 3: DIQUÍS (Fractura Lateral) -->
-      <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="3">
-        <div class="absolute inset-0 overflow-hidden">
-          <img
-            src={imgDiquis.src}
-            alt="Esfera colosal de piedra en la selva de Diquís"
-            class="imax-img absolute inset-0 w-full h-full object-cover object-right sm:object-center filter brightness-105 contrast-105 saturate-100 will-change-transform"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-        <div class="absolute inset-0 pointer-events-none bg-linear-to-r from-black/65 via-black/20 to-transparent"></div>
-        <div class="imax-grain absolute inset-0 pointer-events-none"></div>
-
-        <div class="absolute inset-0 flex items-center justify-start z-20 pointer-events-none pl-6 sm:pl-14 md:pl-20 pr-6">
-          <div class="relative flex flex-col items-start text-left max-w-5xl">
-            <span class="imax-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#FF4D55] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0 drop-shadow-md">
-              Costa Rica · Geometría Esférica Sagrada
-            </span>
-
-            <div class="alt-diquis-tectonic relative inline-block">
-              <h2 class="alt-diquis-h1 relative m-0 font-serif font-black uppercase whitespace-nowrap text-[clamp(3.8rem,15vw,14rem)] leading-[0.88] tracking-[-0.02em] opacity-0">
-                <span class="alt-sizer block opacity-0" aria-hidden="true">Diquís</span>
-                <span class="alt-band absolute inset-x-0 top-1/2 h-0 -translate-y-1/2 pointer-events-none" aria-hidden="true"></span>
-                <span class="alt-half alt-top absolute inset-0 block text-transparent" aria-hidden="true">Diquís</span>
-                <span class="alt-half alt-bot absolute inset-0 block text-transparent" aria-hidden="true">Diquís</span>
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-20 px-4">
+            <div class="relative flex flex-col items-center justify-center text-center max-w-7xl">
+              <span class="imax-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#E69A46] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0 drop-shadow-md">
+                Anatolia Subterránea · Refugio Primordial
+              </span>
+              <h2 class="alt-derin-h1 text-[clamp(3.8rem,15vw,15rem)] font-bold leading-[0.86] tracking-[-0.035em] uppercase whitespace-nowrap text-transparent opacity-0">
+                Derinkuyu
               </h2>
-              <p class="alt-diquis-sub absolute left-1 top-1/2 -translate-y-1/2 m-0 font-sans text-[clamp(0.8rem,1.8vw,1.3rem)] tracking-[0.28em] uppercase text-[#F5D0D2] opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
-                El enigma lítico de la selva
+              <p class="alt-derin-sub absolute top-1/2 -translate-y-1/2 font-sans text-[clamp(0.85rem,2.2vw,1.45rem)] tracking-[0.28em] uppercase text-[#f7ebe1] opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
+                <span class="text-[#E69A46] mr-1.5">—</span> El último refugio de la humanidad
               </p>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- PASO 4: OLMECAS (Fractura Tectónica + CTA Colección) -->
-      <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="4">
-        <div class="absolute inset-0 overflow-hidden">
-          <img
-            src={imgOlmeca.src}
-            alt="Cabeza colosal Olmeca"
-            class="imax-img absolute inset-0 w-full h-full object-cover filter brightness-105 contrast-105 saturate-100 will-change-transform"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-        <div class="absolute inset-x-0 bottom-0 h-36 sm:h-48 bg-linear-to-t from-black/75 via-black/25 to-transparent pointer-events-none"></div>
-        <div class="imax-grain absolute inset-0 pointer-events-none"></div>
+        {/* PASO 2: BARABAR (Resonancia Sónica y Glint de Espejo) */}
+        <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="2">
+          <div class="absolute inset-0 overflow-hidden">
+            <img
+              src={imgBarabar.src}
+              alt="Bóveda de granito pulido espejo de las Cuevas de Barabar"
+              class="imax-img absolute inset-0 w-full h-full object-cover object-[center_50%] filter brightness-105 contrast-105 will-change-transform"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_50%_50%,transparent_50%,rgba(6,7,8,0.25)_75%,rgba(6,7,8,0.65)_100%)]"></div>
+          <div class="imax-grain absolute inset-0 pointer-events-none"></div>
 
-        <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none px-4">
-          <div class="relative flex flex-col items-center text-center max-w-6xl">
-            <span class="imax-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#F0C284] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0 drop-shadow-md">
-              Mesoamérica · Escultura Colosal de Basalto
-            </span>
+          <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none px-4">
+            <div class="relative flex flex-col items-center text-center max-w-7xl">
+              <span class="imax-badge inline-flex items-center gap-2 mb-4 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#e5e5e5] py-1 px-3.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0 drop-shadow-md">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#f39c12] shadow-[0_0_8px_#f39c12]"></span>
+                Cámara Subterránea de Bihar · Acústica de Granito
+              </span>
 
-            <div class="alt-olmeca-tectonic relative inline-block">
-              <h2 class="alt-olmeca-h1 relative m-0 font-serif font-black uppercase whitespace-nowrap text-[clamp(3.8rem,15vw,14rem)] leading-[0.88] tracking-[-0.02em] opacity-0">
-                <span class="alt-sizer block opacity-0" aria-hidden="true">Olmecas</span>
-                <span class="alt-band absolute inset-x-0 top-1/2 h-0 -translate-y-1/2 pointer-events-none" aria-hidden="true"></span>
-                <span class="alt-half alt-top absolute inset-0 block text-transparent" aria-hidden="true">Olmecas</span>
-                <span class="alt-half alt-bot absolute inset-0 block text-transparent" aria-hidden="true">Olmecas</span>
-              </h2>
-              <p class="alt-olmeca-sub absolute left-1 top-1/2 -translate-y-1/2 m-0 font-sans text-[clamp(0.8rem,1.8vw,1.3rem)] tracking-[0.28em] uppercase text-[#FDE5CA] opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
-                La fractura primigenia de Mesoamérica
+              <div class="alt-barabar-stack relative inline-block">
+                <span class="alt-barabar-echo alt-echo-1 absolute inset-0 text-transparent font-black uppercase text-[clamp(3.6rem,15vw,14rem)] leading-[0.86] tracking-[-0.01em] opacity-0" aria-hidden="true">Barabar</span>
+                <span class="alt-barabar-echo alt-echo-2 absolute inset-0 text-transparent font-black uppercase text-[clamp(3.6rem,15vw,14rem)] leading-[0.86] tracking-[-0.01em] opacity-0" aria-hidden="true">Barabar</span>
+                <span class="alt-barabar-echo alt-echo-3 absolute inset-0 text-transparent font-black uppercase text-[clamp(3.6rem,15vw,14rem)] leading-[0.86] tracking-[-0.01em] opacity-0" aria-hidden="true">Barabar</span>
+                <span class="alt-barabar-echo alt-echo-4 absolute inset-0 text-transparent font-black uppercase text-[clamp(3.6rem,15vw,14rem)] leading-[0.86] tracking-[-0.01em] opacity-0" aria-hidden="true">Barabar</span>
+
+                <h2 class="alt-barabar-solid relative m-0 font-black uppercase whitespace-nowrap text-[clamp(3.6rem,15vw,14rem)] leading-[0.86] tracking-[-0.01em] text-transparent opacity-0 overflow-hidden">
+                  Barabar
+                  <span class="alt-barabar-glint absolute inset-0 pointer-events-none" aria-hidden="true"></span>
+                </h2>
+              </div>
+
+              <p class="alt-barabar-sub mt-6 font-sans text-[clamp(0.85rem,2.2vw,1.35rem)] tracking-[0.24em] uppercase text-transparent opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
+                <span class="inline-block w-6 h-[1.5px] bg-[#f39c12] mr-2 align-middle"></span>
+                El reflejo imposible de una tecnología perdida
               </p>
             </div>
+          </div>
+        </div>
 
-            <div class="imax-cta-wrap mt-8 pointer-events-auto opacity-0">
-              <a
-                href="/colecciones/enigmas-subterraneos/"
-                class="group inline-flex items-center gap-3 px-7 py-3.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-[#EFEBE3] hover:text-white backdrop-blur-md transition-all duration-300 shadow-2xl cursor-pointer"
-              >
-                <span class="font-metadata text-[10px] sm:text-[11px] uppercase tracking-[0.3em] font-bold">
-                  Explorar Colección Completa
-                </span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="group-hover:translate-x-1.5 transition-transform duration-300"
+        {/* PASO 3: DIQUÍS (Fractura Lateral) */}
+        <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="3">
+          <div class="absolute inset-0 overflow-hidden">
+            <img
+              src={imgDiquis.src}
+              alt="Esfera colosal de piedra en la selva de Diquís"
+              class="imax-img absolute inset-0 w-full h-full object-cover object-right sm:object-center filter brightness-105 contrast-105 saturate-100 will-change-transform"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div class="absolute inset-0 pointer-events-none bg-linear-to-r from-black/65 via-black/20 to-transparent"></div>
+          <div class="imax-grain absolute inset-0 pointer-events-none"></div>
+
+          <div class="absolute inset-0 flex items-center justify-start z-20 pointer-events-none pl-6 sm:pl-14 md:pl-20 pr-6">
+            <div class="relative flex flex-col items-start text-left max-w-5xl">
+              <span class="imax-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#FF4D55] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0 drop-shadow-md">
+                Costa Rica · Geometría Esférica Sagrada
+              </span>
+
+              <div class="alt-diquis-tectonic relative inline-block">
+                <h2 class="alt-diquis-h1 relative m-0 font-serif font-black uppercase whitespace-nowrap text-[clamp(3.8rem,15vw,14rem)] leading-[0.88] tracking-[-0.02em] opacity-0">
+                  <span class="alt-sizer block opacity-0" aria-hidden="true">Diquís</span>
+                  <span class="alt-band absolute inset-x-0 top-1/2 h-0 -translate-y-1/2 pointer-events-none" aria-hidden="true"></span>
+                  <span class="alt-half alt-top absolute inset-0 block text-transparent" aria-hidden="true">Diquís</span>
+                  <span class="alt-half alt-bot absolute inset-0 block text-transparent" aria-hidden="true">Diquís</span>
+                </h2>
+                <p class="alt-diquis-sub absolute left-1 top-1/2 -translate-y-1/2 m-0 font-sans text-[clamp(0.8rem,1.8vw,1.3rem)] tracking-[0.28em] uppercase text-[#F5D0D2] opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
+                  El enigma lítico de la selva
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* PASO 4: OLMECAS (Fractura Tectónica + CTA Colección) */}
+        <div class="imax-layer absolute inset-0 w-full h-full opacity-0 pointer-events-none" data-layer-index="4">
+          <div class="absolute inset-0 overflow-hidden">
+            <img
+              src={imgOlmeca.src}
+              alt="Cabeza colosal Olmeca"
+              class="imax-img absolute inset-0 w-full h-full object-cover filter brightness-105 contrast-105 saturate-100 will-change-transform"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div class="absolute inset-x-0 bottom-0 h-36 sm:h-48 bg-linear-to-t from-black/75 via-black/25 to-transparent pointer-events-none"></div>
+          <div class="imax-grain absolute inset-0 pointer-events-none"></div>
+
+          <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none px-4">
+            <div class="relative flex flex-col items-center text-center max-w-6xl">
+              <span class="imax-badge inline-block mb-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#F0C284] py-0.5 px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md opacity-0 drop-shadow-md">
+                Mesoamérica · Escultura Colosal de Basalto
+              </span>
+
+              <div class="alt-olmeca-tectonic relative inline-block">
+                <h2 class="alt-olmeca-h1 relative m-0 font-serif font-black uppercase whitespace-nowrap text-[clamp(3.8rem,15vw,14rem)] leading-[0.88] tracking-[-0.02em] opacity-0">
+                  <span class="alt-sizer block opacity-0" aria-hidden="true">Olmecas</span>
+                  <span class="alt-band absolute inset-x-0 top-1/2 h-0 -translate-y-1/2 pointer-events-none" aria-hidden="true"></span>
+                  <span class="alt-half alt-top absolute inset-0 block text-transparent" aria-hidden="true">Olmecas</span>
+                  <span class="alt-half alt-bot absolute inset-0 block text-transparent" aria-hidden="true">Olmecas</span>
+                </h2>
+                <p class="alt-olmeca-sub absolute left-1 top-1/2 -translate-y-1/2 m-0 font-sans text-[clamp(0.8rem,1.8vw,1.3rem)] tracking-[0.28em] uppercase text-[#FDE5CA] opacity-0 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
+                  La fractura primigenia de Mesoamérica
+                </p>
+              </div>
+
+              <div class="imax-cta-wrap mt-8 pointer-events-auto opacity-0">
+                <a
+                  href="/colecciones/enigmas-subterraneos/"
+                  class="group inline-flex items-center gap-3 px-7 py-3.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-[#EFEBE3] hover:text-white backdrop-blur-md transition-all duration-300 shadow-2xl cursor-pointer"
                 >
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-              </a>
+                  <span class="font-metadata text-[10px] sm:text-[11px] uppercase tracking-[0.3em] font-bold">
+                    Explorar Colección Completa
+                  </span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="group-hover:translate-x-1.5 transition-transform duration-300"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </>
     )}
 
     <!-- ══════════════════════════════════════════════════════════════════════
