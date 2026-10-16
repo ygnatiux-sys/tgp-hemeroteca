@@ -1,0 +1,56 @@
+---
+/**
+ * src/pages/colecciones/asia-secrets/gunung-padang.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * DOSSIER OFICIAL: EXCAVACIÓN ESTRATIGRÁFICA DE GUNUNG PADANG
+ */
+export const prerender = true;
+import Layout from '../../../layouts/Layout.astro';
+import BackSlideButton from '../../../components/BackSlideButton.astro';
+import GunungPadangHero from '../../../components/GunungPadangHero.astro';
+---
+
+<Layout 
+  title="Gunung Padang · Georradar & Basalto Columnar · Asia Secrets"
+  description="Dossier estratigráfico oficial de Gunung Padang en Java Occidental. Prospección por georradar GPR y núcleos de perforación profunda."
+>
+  <main class="w-full bg-[#050607] text-[#c2c5cc] min-h-screen">
+    
+    <div class="fixed top-5 left-6 z-40">
+      <BackSlideButton fallbackUrl="/colecciones/asia-secrets/" />
+    </div>
+
+    <!-- HERO OFICIAL CON EXCAVACIÓN ESTRATIGRÁFICA Y GEORRADAR -->
+    <section class="w-full">
+      <GunungPadangHero showHud={false} align="center" />
+    </section>
+
+    <!-- DOSSIER TÉCNICO ESTRATIGRÁFICO -->
+    <section class="max-w-4xl mx-auto px-6 py-20 font-serif leading-relaxed text-stone-200">
+      <div class="border-l-2 border-[#10b981] pl-6 py-2 mb-10">
+        <p class="font-mono text-xs uppercase tracking-widest text-[#10b981]">Estratos Líticos #01 · Java Occidental</p>
+        <h2 class="text-3xl font-bold text-[#e0e3e1] uppercase mt-1">Georradar, Tomografía Eléctrica y Basalto Columnar</h2>
+      </div>
+
+      <p class="text-lg text-stone-300 mb-6">
+        Situado en Karyamukti, Cianjur (Java Occidental), Gunung Padang consiste en una colina escalonada cubierta por millares de prismas poligonales de basalto y andesita. Las campañas geofísicas han revelado anomalías concéntricas, cámaras rellenas y múltiples fases constructivas que se hunden bajo el estrato superficial del Holoceno.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 my-12 font-mono text-xs uppercase">
+        <div class="p-6 rounded-xl bg-[#090b0d] border border-[#10b981]/30">
+          <span class="text-[#10b981]">Morfología Lítica</span>
+          <p class="text-[#e0e3e1] text-base font-bold mt-2">Basalto Columnar</p>
+        </div>
+        <div class="p-6 rounded-xl bg-[#090b0d] border border-[#10b981]/30">
+          <span class="text-[#10b981]">Detección Subterránea</span>
+          <p class="text-[#e0e3e1] text-base font-bold mt-2">Georradar GPR & ERT</p>
+        </div>
+        <div class="p-6 rounded-xl bg-[#090b0d] border border-[#10b981]/30">
+          <span class="text-[#10b981]">Estratigrafía</span>
+          <p class="text-[#e0e3e1] text-base font-bold mt-2">5 Unidades Litológicas</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</Layout>

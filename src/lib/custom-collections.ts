@@ -166,7 +166,7 @@ export const customCollections: CustomCollectionGroup[] = [
     essays: [
       {
         slug: 'gunung-padang',
-        href: '/test-gunung-padang',
+        href: '/colecciones/asia-secrets/gunung-padang/',
         img: imgGunungPadang.src,
         entry: {
           title: 'Gunung Padang · Pirámide Oculta de Java',
