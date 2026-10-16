@@ -24,6 +24,13 @@ import {
   sanitizeImageUrl,
 } from '../../lib/content-filter';
 
+// Importación de portadas locales en alta resolución (HQ) para colecciones continentales
+import imgPumapunku from '../../assets/alternativa/pumapunku.jpg';
+import imgGunungPadang from '../../assets/alternativa/gunung-padang.jpg';
+import imgEsfinge from '../../assets/alternativa/esfinge-erosion.jpg';
+import imgDerinkuyu from '../../assets/alternativa/derinkuyu.jpg';
+import imgNanMadol from '../../assets/alternativa/nan-madol.jpg';
+
 // ─── CARGA Y FILTRADO ────────────────────────────────────────────────────────
 const allEssaysRaw = await getCollection('ensayos').catch(() => []);
 const allCinematicosRaw = await getCollection('ensayosCinematicos').catch(() => []);
@@ -162,7 +169,7 @@ const continentalCollections = [
     slug: 'america-secrets',
     title: 'América Secrets',
     subtitle: 'Mecanizado Andino, Geometría Mesoamericana & Andesita Quirúrgica',
-    image: 'https://storage.thegreatpuzzleproject.com/vault-media/1792044290145-53f05a9f.webp',
+    image: imgPumapunku.src,
     link: '/colecciones/america-secrets/',
     count: 29
   },
@@ -170,7 +177,7 @@ const continentalCollections = [
     slug: 'asia-secrets',
     title: 'Asia Secrets',
     subtitle: 'Sagrarios de la Ruta de la Seda, Ciclópeos del Pacífico & Georradar',
-    image: 'https://storage.thegreatpuzzleproject.com/vault-media/1791676137832-aca96ac9.webp',
+    image: imgGunungPadang.src,
     link: '/colecciones/asia-secrets/',
     count: 19
   },
@@ -178,7 +185,7 @@ const continentalCollections = [
     slug: 'misterios-del-africa',
     title: 'Misterios del África',
     subtitle: 'Pirámides Negras de Nubia, Esfinges Pluviales & Litología Primaria',
-    image: 'https://storage.thegreatpuzzleproject.com/vault-media/1791676164169-8beba1c3.webp',
+    image: imgEsfinge.src,
     link: '/colecciones/misterios-del-africa/',
     count: 11
   },
@@ -186,7 +193,7 @@ const continentalCollections = [
     slug: 'europa-oculta',
     title: 'Europa Oculta & Catacumbas',
     subtitle: 'Megalitismo Atlántico, Cátaros, Herejías & Laberintos Subterráneos',
-    image: 'https://storage.thegreatpuzzleproject.com/vault-media/1792135140987-0b819a89.webp',
+    image: imgDerinkuyu.src,
     link: '/colecciones/europa-oculta/',
     count: 35
   },
@@ -194,7 +201,7 @@ const continentalCollections = [
     slug: 'oceania-ancestral',
     title: 'Oceanía & Polinesia Ancestral',
     subtitle: 'Megaconstrucciones de Basalto en Arrecifes, Moais & Pueblos de las Olas',
-    image: 'https://storage.thegreatpuzzleproject.com/vault-media/1792135025298-ed545601.webp',
+    image: imgNanMadol.src,
     link: '/colecciones/oceania-ancestral/',
     count: 3
   }
