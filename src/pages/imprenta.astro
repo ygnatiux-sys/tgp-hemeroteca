@@ -1,0 +1,443 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Atelier de Imprenta & Loops Cinemáticos | TGP Scriptorium" bodyClass="bg-[#070b0a]">
+  <Fragment slot="head">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gloock&family=Literata:ital,opsz,wght@0,7..72,300..800;1,7..72,300..800&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Motor Flipbook 3D con física real de papel -->
+    <script is:inline src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
+  </Fragment>
+
+  <main class="min-h-screen text-[#d4d8d6] flex flex-col items-center p-4 sm:p-6 lg:p-8">
+    <!-- Header del Atelier -->
+    <header class="max-w-6xl w-full mb-8 text-center border-b border-[#212b29] pb-6">
+      <div class="flex items-center justify-center gap-2 mb-2">
+        <a href="/tgp-app" class="text-xs font-mono uppercase tracking-widest text-[#8a9a98] hover:text-amber-400 transition-colors">
+          ← Volver al Hub /tgp-app
+        </a>
+        <span class="text-[#3b4b49]">·</span>
+        <span class="text-xs uppercase tracking-widest text-amber-400 font-mono font-semibold">Atelier de Ediciones</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-['Gloock',serif] text-[#f4f6f5] tracking-tight">
+        Atelier de Imprenta &amp; Loops Cinemáticos
+      </h1>
+      <p class="max-w-2xl mx-auto text-sm sm:text-base text-[#95a4a2] font-['Literata',serif] italic mt-2">
+        Forja limpia de Revistas Fotográficas (Flipbooks interactivos en 3D) y Loops continuos para Hemeroteca y Alternative Web.
+      </p>
+
+      <!-- Barra de Configuración de Destino y Formato -->
+      <div class="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs font-mono">
+        <!-- Selector de Destino -->
+        <div class="bg-[#101615] border border-[#263533] p-1 rounded-lg flex items-center gap-1 shadow-inner">
+          <span class="text-[#657775] px-2 text-[10px] uppercase tracking-wider">Destino:</span>
+          <button
+            id="btn-dest-hemeroteca"
+            class="px-3 py-1.5 rounded-md font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 shadow-sm transition-all"
+          >
+            🏛️ Hemeroteca Main
+          </button>
+          <button
+            id="btn-dest-alternative"
+            class="px-3 py-1.5 rounded-md text-[#859895] hover:text-[#d4d8d6] transition-all"
+          >
+            🌌 Alternative Web
+          </button>
+        </div>
+
+        <!-- Selector de Formato -->
+        <div class="bg-[#101615] border border-[#263533] p-1 rounded-lg flex items-center gap-1 shadow-inner">
+          <span class="text-[#657775] px-2 text-[10px] uppercase tracking-wider">Formato:</span>
+          <button
+            id="btn-mode-flipbook"
+            class="px-3 py-1.5 rounded-md font-semibold bg-amber-950/80 text-amber-300 border border-amber-700/60 shadow-sm transition-all"
+          >
+            📖 Flipbook 3D
+          </button>
+          <button
+            id="btn-mode-loop"
+            class="px-3 py-1.5 rounded-md text-[#859895] hover:text-[#d4d8d6] transition-all"
+          >
+            🎬 Loop Remotion (4f)
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Escenario Principal: Visor Flipbook 3D -->
+    <section class="max-w-6xl w-full flex flex-col items-center">
+      <!-- Barra de Herramientas del Visor -->
+      <div class="w-full max-w-4xl flex items-center justify-between mb-4 px-2 text-xs font-mono">
+        <div class="flex items-center gap-2">
+          <button
+            id="btn-prev"
+            class="px-3 py-1.5 rounded border border-[#2e3e3b] bg-[#121918] hover:bg-[#1a2321] text-[#c4d0ce] transition-all active:scale-95"
+          >
+            ‹ Anterior
+          </button>
+          <button
+            id="btn-next"
+            class="px-3 py-1.5 rounded border border-[#2e3e3b] bg-[#121918] hover:bg-[#1a2321] text-[#c4d0ce] transition-all active:scale-95"
+          >
+            Siguiente ›
+          </button>
+          <span id="page-counter" class="text-[#758a87] ml-2">Pág. 1 de 6</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            id="btn-load-queue"
+            class="px-3 py-1.5 rounded border border-emerald-800/60 bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 transition-all"
+          >
+            📥 Cargar Cola de Scriptorium
+          </button>
+          <button
+            id="btn-fullscreen"
+            class="px-3 py-1.5 rounded border border-[#2e3e3b] bg-[#121918] hover:bg-[#1a2321] text-[#95a5a3] transition-all"
+          >
+            ⛶ Pantalla Completa
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenedor del Libro 3D -->
+      <div class="relative w-full max-w-4xl flex items-center justify-center p-4 bg-[#0a0f0e] border border-[#1e2a28] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden min-h-[580px] sm:min-h-[660px]">
+        
+        <!-- Indicador de arrastre táctil -->
+        <div class="absolute bottom-3 right-4 z-10 text-[10px] font-mono text-[#526462] pointer-events-none select-none">
+          ✦ Arrastra o haz clic en las esquinas para pasar de hoja
+        </div>
+
+        <!-- Elemento Contenedor Flipbook -->
+        <div id="flipbook" class="flipbook-container shadow-2xl">
+          
+          <!-- PÁGINA 1: Portada (Cover) -->
+          <div class="page page-cover bg-[#0f1514] text-[#ecefe0] p-6 sm:p-8 flex flex-col justify-between border-r border-[#1a2422] shadow-2xl" data-density="hard">
+            <div class="border border-amber-500/40 p-4 h-full flex flex-col justify-between bg-gradient-to-b from-[#131b19] to-[#0a0f0e] rounded">
+              <div>
+                <div class="flex items-center justify-between border-b border-amber-500/30 pb-2">
+                  <span class="text-[9px] font-mono uppercase tracking-widest text-amber-400">Edición Especial TGP</span>
+                  <span class="text-[9px] font-mono text-[#8a9a98]">VOL. I · 2026</span>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-['Gloock',serif] text-white mt-8 leading-tight">
+                  Estratigrafías del Silencio
+                </h2>
+                <p class="text-xs font-['Literata',serif] italic text-amber-200/80 mt-2">
+                  Monografía visual sobre arquitectura megalítica y memoria material.
+                </p>
+              </div>
+
+              <div class="my-auto py-4">
+                <img
+                  src="https://storage.thegreatpuzzleproject.com/portadas/hero-chichen-itza.webp"
+                  alt="Portada"
+                  class="w-full h-44 object-cover rounded border border-[#2a3a37] shadow-lg"
+                  onerror="this.src='https://storage.thegreatpuzzleproject.com/tgp-fallback.jpg'"
+                />
+              </div>
+
+              <div class="pt-2 border-t border-[#263533] flex items-center justify-between text-[10px] font-mono text-[#829390]">
+                <span>Xavier Benítez</span>
+                <span>The Great Puzzle Project</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PÁGINA 2: Manifiesto Editorial -->
+          <div class="page bg-[#121917] text-[#c4cecb] p-6 sm:p-8 flex flex-col justify-between border-l border-r border-[#1b2523]" data-density="soft">
+            <div>
+              <span class="text-[9px] font-mono uppercase tracking-widest text-emerald-400">01 // Manifiesto</span>
+              <h3 class="text-xl font-['Gloock',serif] text-white mt-2">La Piedra como Código</h3>
+              <p class="text-xs font-['Literata',serif] leading-relaxed mt-4 text-[#a3b3b0]">
+                Toda arquitectura ancestral opera como un dispositivo de registro temporal. No se trata únicamente de estética monumental, sino de resistencia frente al desgaste termodinámico de la memoria colectiva.
+              </p>
+              <blockquote class="border-l-2 border-amber-500/60 pl-3 my-4 text-[11px] font-['Literata',serif] italic text-[#8fa19e]">
+                "La estratigrafía no miente: bajo cada estrato de basalto yace una interrogación ontológica intacta."
+              </blockquote>
+            </div>
+            <div class="text-[9px] font-mono text-[#576865] flex justify-between border-t border-[#1e2a28] pt-2">
+              <span>Hemeroteca TGP</span>
+              <span>Pág. 01</span>
+            </div>
+          </div>
+
+          <!-- PÁGINA 3: Lámina Visual I -->
+          <div class="page bg-[#0d1211] text-[#c4cecb] p-6 sm:p-8 flex flex-col justify-between border-r border-[#1a2321]" data-density="soft">
+            <div>
+              <span class="text-[9px] font-mono uppercase tracking-widest text-[#728582]">02 // Placa Forense</span>
+              <div class="mt-3 overflow-hidden rounded border border-[#263533]">
+                <img
+                  src="https://storage.thegreatpuzzleproject.com/portadas/hero-tiwanaku.webp"
+                  alt="Lámina Tiwanaku"
+                  class="w-full h-56 object-cover"
+                  onerror="this.src='https://storage.thegreatpuzzleproject.com/tgp-fallback.jpg'"
+                />
+              </div>
+              <p class="text-[11px] font-['Literata',serif] italic text-[#95a5a3] mt-3">
+                Placa I: Puerta del Sol, Tiwanaku. Microfotografía de encastres andesíticos milimétricos.
+              </p>
+            </div>
+            <div class="text-[9px] font-mono text-[#576865] flex justify-between border-t border-[#1e2a28] pt-2">
+              <span>Archivo R2 CDN</span>
+              <span>Pág. 02</span>
+            </div>
+          </div>
+
+          <!-- PÁGINA 4: Vocabulario Panlingua D1 -->
+          <div class="page bg-[#121917] text-[#c4cecb] p-6 sm:p-8 flex flex-col justify-between border-l border-r border-[#1b2523]" data-density="soft">
+            <div>
+              <span class="text-[9px] font-mono uppercase tracking-widest text-emerald-400">03 // Lexicografía</span>
+              <h3 class="text-xl font-['Gloock',serif] text-white mt-2">Panlingua: Raíz *Peh₂-</h3>
+              <div class="mt-4 space-y-2 text-xs font-mono text-[#a3b3b0]">
+                <div class="p-2 bg-[#0b100f] rounded border border-[#1e2a28]">
+                  <span class="text-amber-400 font-semibold">Protoindoeuropeo:</span> *peh₂- (proteger, guardar)
+                </div>
+                <div class="p-2 bg-[#0b100f] rounded border border-[#1e2a28]">
+                  <span class="text-emerald-400 font-semibold">Latín:</span> pastor, panis (alimento, resguardo)
+                </div>
+                <div class="p-2 bg-[#0b100f] rounded border border-[#1e2a28]">
+                  <span class="text-cyan-400 font-semibold">Griego:</span> pateomai (alimentarse, custodiar)
+                </div>
+              </div>
+              <p class="text-[11px] font-['Literata',serif] text-[#8fa19e] mt-4">
+                Consulta federada directa a Cloudflare D1 sobre el léxico periférico de 314 lenguas.
+              </p>
+            </div>
+            <div class="text-[9px] font-mono text-[#576865] flex justify-between border-t border-[#1e2a28] pt-2">
+              <span>Base D1 Panlingua</span>
+              <span>Pág. 03</span>
+            </div>
+          </div>
+
+          <!-- PÁGINA 5: Lámina Visual II -->
+          <div class="page bg-[#0d1211] text-[#c4cecb] p-6 sm:p-8 flex flex-col justify-between border-r border-[#1a2321]" data-density="soft">
+            <div>
+              <span class="text-[9px] font-mono uppercase tracking-widest text-[#728582]">04 // Cartografía</span>
+              <div class="mt-3 overflow-hidden rounded border border-[#263533]">
+                <img
+                  src="https://storage.thegreatpuzzleproject.com/portadas/hero-ollantaytambo.webp"
+                  alt="Ollantaytambo"
+                  class="w-full h-56 object-cover"
+                  onerror="this.src='https://storage.thegreatpuzzleproject.com/tgp-fallback.jpg'"
+                />
+              </div>
+              <p class="text-[11px] font-['Literata',serif] italic text-[#95a5a3] mt-3">
+                Placa II: Templo del Sol, Ollantaytambo. Monolitos de pórfido rosa transportados a través del río Urubamba.
+              </p>
+            </div>
+            <div class="text-[9px] font-mono text-[#576865] flex justify-between border-t border-[#1e2a28] pt-2">
+              <span>Archivo R2 CDN</span>
+              <span>Pág. 04</span>
+            </div>
+          </div>
+
+          <!-- PÁGINA 6: Contraportada (Back Cover) -->
+          <div class="page page-cover bg-[#0f1514] text-[#ecefe0] p-6 sm:p-8 flex flex-col justify-between border-l border-[#1a2422] shadow-2xl" data-density="hard">
+            <div class="border border-[#2d3d3a] p-4 h-full flex flex-col justify-between bg-gradient-to-b from-[#131b19] to-[#0a0f0e] rounded text-center">
+              <div>
+                <span class="text-[9px] font-mono uppercase tracking-widest text-[#7a8d8a]">Resguardo Documental</span>
+                <h4 class="text-lg font-['Gloock',serif] text-white mt-4">The Great Puzzle Project</h4>
+                <p class="text-[11px] text-[#8fa09d] font-mono mt-1">Hemeroteca &amp; Archivo Epistémico</p>
+              </div>
+
+              <div class="my-auto text-xs font-mono text-[#a2b5b1] space-y-2 p-3 bg-[#080d0c] rounded border border-[#1b2624]">
+                <div>📦 SHA Commit GitOps: <span class="text-emerald-400">verificado</span></div>
+                <div>⚡ CDN: Cloudflare R2 Edge</div>
+                <div>🏛️ Base: Cloudflare D1</div>
+              </div>
+
+              <div class="text-[9px] font-mono text-[#667774] border-t border-[#22302e] pt-3">
+                thegreatpuzzleproject.com · 2026
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Panel de Acciones y Exportación -->
+      <div class="w-full max-w-4xl mt-6 p-5 bg-[#101615] border border-[#212c2a] rounded-xl shadow-xl flex flex-col gap-4">
+        <div class="flex items-center justify-between border-b border-[#212c2a] pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <h3 class="text-sm font-mono font-semibold text-[#f0f2f1]">Consola de Forja &amp; Exportación</h3>
+          </div>
+          <span id="target-badge" class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+            Destino: Hemeroteca
+          </span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button
+            id="btn-consolidate-r2"
+            class="px-4 py-2 bg-gradient-to-r from-emerald-800 to-teal-800 hover:from-emerald-700 hover:to-teal-700 text-white font-mono text-xs font-semibold rounded-lg shadow-md transition-all active:scale-95"
+          >
+            ⚡ Consolidar Imágenes a R2 WebP
+          </button>
+          <button
+            id="btn-generate-loop"
+            class="px-4 py-2 bg-[#17211f] hover:bg-[#1e2a27] border border-amber-600/50 hover:border-amber-500 text-amber-300 font-mono text-xs font-semibold rounded-lg shadow-md transition-all active:scale-95"
+          >
+            🎬 Generar Loop Remotion (4 Frames)
+          </button>
+          <button
+            id="btn-copy-markdoc"
+            class="px-4 py-2 bg-[#17211f] hover:bg-[#1e2a27] border border-[#2e3e3b] text-[#c4cecb] font-mono text-xs rounded-lg transition-all active:scale-95"
+          >
+            📋 Copiar Bloque Markdoc
+          </button>
+        </div>
+
+        <!-- Terminal de Estado / Log -->
+        <div id="status-terminal" class="bg-[#080d0c] border border-[#1a2523] rounded-lg p-3 font-mono text-xs text-[#899c99] min-h-[48px] flex items-center">
+          ✦ Listo para forjar. Selecciona el destino o arrastra las hojas para revisar la maqueta.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <style is:inline>
+    /* Dimensiones responsivas para el Flipbook */
+    .flipbook-container {
+      width: 100%;
+      max-width: 820px;
+      height: 520px;
+    }
+
+    @media (max-width: 640px) {
+      .flipbook-container {
+        height: 440px;
+      }
+    }
+
+    /* Sombras y acabados de página de libro real */
+    .page {
+      user-select: none;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+    }
+  </style>
+
+  <script is:inline>
+    // Inicialización del motor Flipbook 3D con St.PageFlip
+    document.addEventListener('DOMContentLoaded', () => {
+      const flipEl = document.getElementById('flipbook');
+      const counterEl = document.getElementById('page-counter');
+      const terminalEl = document.getElementById('status-terminal');
+      const targetBadge = document.getElementById('target-badge');
+
+      if (!flipEl || typeof St === 'undefined' || !St.PageFlip) {
+        console.warn('Motor PageFlip no disponible en el DOM');
+        return;
+      }
+
+      // Configuración de dimensiones y física de flexión de papel
+      const pageFlip = new St.PageFlip(flipEl, {
+        width: 390,
+        height: 520,
+        size: 'stretch',
+        minWidth: 280,
+        maxWidth: 550,
+        minHeight: 400,
+        maxHeight: 700,
+        maxShadowOpacity: 0.6,
+        showCover: true,
+        mobileScrollSupport: false,
+        usePortrait: true,
+        startPage: 0,
+      });
+
+      // Cargar páginas del DOM
+      const pages = flipEl.querySelectorAll('.page');
+      pageFlip.loadFromHTML(pages);
+
+      // Evento de paso de página
+      pageFlip.on('flip', (e) => {
+        const current = e.data + 1;
+        const total = pageFlip.getPageCount();
+        if (counterEl) {
+          counterEl.textContent = `Pág. ${current} de ${total}`;
+        }
+      });
+
+      // Botones de navegación
+      document.getElementById('btn-prev')?.addEventListener('click', () => pageFlip.flipPrev());
+      document.getElementById('btn-next')?.addEventListener('click', () => pageFlip.flipNext());
+
+      // Pantalla completa
+      document.getElementById('btn-fullscreen')?.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          flipEl.requestFullscreen?.().catch(() => {});
+        } else {
+          document.exitFullscreen?.().catch(() => {});
+        }
+      });
+
+      // Switch de Destino: Hemeroteca vs. Alternative
+      let currentDestination = 'hemeroteca';
+      const btnHeme = document.getElementById('btn-dest-hemeroteca');
+      const btnAlt = document.getElementById('btn-dest-alternative');
+
+      btnHeme?.addEventListener('click', () => {
+        currentDestination = 'hemeroteca';
+        btnHeme.className = 'px-3 py-1.5 rounded-md font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 shadow-sm transition-all';
+        btnAlt.className = 'px-3 py-1.5 rounded-md text-[#859895] hover:text-[#d4d8d6] transition-all';
+        if (targetBadge) {
+          targetBadge.textContent = 'Destino: Hemeroteca Main';
+          targetBadge.className = 'text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800';
+        }
+        if (terminalEl) terminalEl.innerHTML = '🏛️ Destino fijado: <strong>Hemeroteca (ygnatiux-sys/tgp-hemeroteca)</strong>';
+      });
+
+      btnAlt?.addEventListener('click', () => {
+        currentDestination = 'alternative';
+        btnAlt.className = 'px-3 py-1.5 rounded-md font-semibold bg-purple-950/80 text-purple-300 border border-purple-700/60 shadow-sm transition-all';
+        btnHeme.className = 'px-3 py-1.5 rounded-md text-[#859895] hover:text-[#d4d8d6] transition-all';
+        if (targetBadge) {
+          targetBadge.textContent = 'Destino: Alternative Web';
+          targetBadge.className = 'text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-purple-950 text-purple-400 border border-purple-800';
+        }
+        if (terminalEl) terminalEl.innerHTML = '🌌 Destino fijado: <strong>Alternative Web (ygnatiux-sys/tgp-webfinal2026)</strong>';
+      });
+
+      // Botón: Cargar cola de fotos desde Scriptorium (sessionStorage)
+      document.getElementById('btn-load-queue')?.addEventListener('click', () => {
+        const stored = sessionStorage.getItem('tgp_bookzine_queue');
+        if (stored) {
+          try {
+            const queue = JSON.parse(stored);
+            if (terminalEl) {
+              terminalEl.innerHTML = `✅ Cola cargada con éxito: <strong>${queue.length} imágenes</strong> encontradas en memoria.`;
+            }
+          } catch {
+            if (terminalEl) terminalEl.innerHTML = '⚠️ Error al leer la cola de fotos.';
+          }
+        } else {
+          if (terminalEl) {
+            terminalEl.innerHTML = 'ℹ️ No hay cola en memoria. Puedes cargar fotos desde <a href="/scriptorium" class="text-amber-400 underline">TGP Scriptorium</a> usando Google Photos Picker.';
+          }
+        }
+      });
+
+      // Botón: Copiar bloque Markdoc
+      document.getElementById('btn-copy-markdoc')?.addEventListener('click', () => {
+        const snippet = `{% flipbook title="Estratigrafías del Silencio" destino="${currentDestination}" %}
+{
+  "pages": 6,
+  "formato": "bookzine-3d",
+  "portada": "https://storage.thegreatpuzzleproject.com/portadas/hero-chichen-itza.webp"
+}
+{% /flipbook %}`;
+        navigator.clipboard?.writeText(snippet).then(() => {
+          if (terminalEl) {
+            terminalEl.innerHTML = '📋 ¡Bloque Markdoc copiado al portapapeles! Listo para pegar en Keystatic.';
+          }
+        });
+      });
+    });
+  </script>
+</Layout>
