@@ -264,6 +264,81 @@ app.post('/cx-tool-panlingua', async (c) => {
   }
 });
 
+// ── Google Chat & Dialogflow CX Webhook Unificado (Orquestador Autónomo) ─────
+import { runChatOrchestrator } from './src/chat/orchestrator.js';
+
+const handleChatWebhook = async (c: any) => {
+  try {
+    const body = await c.req.json().catch(() => ({}));
+
+    // 1. Detección flexible de payload: Dialogflow CX vs. Google Chat Directo vs. REST API
+    const rawText = body.text 
+      || body.transcript 
+      || body.message?.text 
+      || body.message 
+      || body.prompt 
+      || body.query
+      || '';
+
+    const userName = body.user?.displayName 
+      || body.message?.sender?.displayName 
+      || 'Director';
+
+    // Limpieza de menciones de bot en Google Chat (ej: "@TGP Scriptorium sube este post...")
+    const cleanText = String(rawText).replace(/^@\w+\s+/, '').trim();
+
+    if (!cleanText) {
+      const emptyMsg = '¡Hola! Soy el asistente orquestador de TGP Mind. Puedes pedirme en lenguaje natural subir posts, convertir imágenes a WebP en R2, consultar Panlingua D1 o generar portadas cinematográficas.';
+      if (body.intentInfo || body.fulfillmentInfo || body.sessionInfo) {
+        return c.json({ fulfillmentResponse: { messages: [{ text: { text: [emptyMsg] } }] } });
+      }
+      return c.json({ text: emptyMsg });
+    }
+
+    console.log(`[Chat Webhook] Recibido mensaje de ${userName}: "${cleanText.slice(0, 80)}"`);
+
+    // 2. Ejecución del bucle de herramientas en el orquestador
+    const orchestration = await runChatOrchestrator(cleanText, { user: userName, channel: 'google-chat' });
+    const responseText = orchestration.text;
+
+    // 3. Respuesta adaptativa según el emisor:
+    // A. Formato Dialogflow CX Webhook Fulfillment
+    if (body.intentInfo || body.fulfillmentInfo || body.sessionInfo) {
+      return c.json({
+        fulfillmentResponse: {
+          messages: [
+            {
+              text: {
+                text: [responseText],
+              },
+            },
+          ],
+        },
+      });
+    }
+
+    // B. Formato Google Chat Directo / REST
+    return c.json({
+      text: responseText,
+      success: true,
+      toolsExecuted: orchestration.toolsExecuted,
+      stepsCount: orchestration.stepsCount,
+    });
+  } catch (error: any) {
+    console.error('[Chat Webhook Error]:', error);
+    const errorText = `⚠️ Error al procesar tu solicitud: ${error?.message || 'Error interno'}`;
+    return c.json({
+      text: errorText,
+      fulfillmentResponse: {
+        messages: [{ text: { text: [errorText] } }],
+      },
+    }, 500);
+  }
+};
+
+app.post('/api/chat/webhook', handleChatWebhook);
+app.post('/webhook/chat', handleChatWebhook);
+
 // -- Google Photos Picker API -- CORS-safe, credenciales en server -----------
 import {
   createPickerSession,

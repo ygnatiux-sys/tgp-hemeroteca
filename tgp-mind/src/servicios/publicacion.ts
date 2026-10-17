@@ -183,3 +183,51 @@ export async function publicarEnGitHub(
   console.log(`[GitHub Commit Legacy] ${path} -> commit ${commitRes.data.commit?.sha}`);
   return commitRes.data.content?.html_url || `https://github.com/${owner}/${repo}/blob/${branch}/${path}`;
 }
+
+// ── Verificación de Existencia de Entrada en Keystatic ────────────────────────
+export async function existeEntradaKeystaticGitHub({
+  coleccion = 'ensayos',
+  slug,
+  token,
+  repoFull,
+}: {
+  coleccion?: ColeccionKeystatic;
+  slug: string;
+  token?: string;
+  repoFull?: string;
+}): Promise<{ exists: boolean; path: string; url?: string; title?: string }> {
+  const ghToken = token || process.env.GITHUB_TOKEN_HEMEROTECA || process.env.GITHUB_TOKEN || '';
+  const repo = repoFull || process.env.GITHUB_REPO_HEMEROTECA || 'ygnatiux-sys/tgp-hemeroteca';
+  const octokitDynamic = new Octokit({ auth: ghToken });
+  const parts = repo.includes('/') ? repo.split('/') : ['ygnatiux-sys', repo];
+  const owner = parts[0] || 'ygnatiux-sys';
+  const repoName = parts[1];
+  const branch = _GITHUB_BRANCH || 'main';
+  const path = `src/content/${coleccion}/${slug}/index.json`;
+
+  try {
+    const res: any = await octokitDynamic.repos.getContent({ owner, repo: repoName, path, ref: branch });
+    if (res.status === 200 && res.data) {
+      let title = '';
+      if (res.data.content) {
+        try {
+          const raw = Buffer.from(res.data.content, 'base64').toString('utf-8');
+          const parsed = JSON.parse(raw);
+          title = parsed.title || parsed.titulo || '';
+        } catch {}
+      }
+      return {
+        exists: true,
+        path,
+        title,
+        url: `https://github.com/${owner}/${repoName}/tree/${branch}/src/content/${coleccion}/${slug}`,
+      };
+    }
+  } catch (err: any) {
+    if (err.status !== 404) {
+      console.warn(`[GitHub Check] Consulta (${path}):`, err?.message || err);
+    }
+  }
+  return { exists: false, path };
+}
+
