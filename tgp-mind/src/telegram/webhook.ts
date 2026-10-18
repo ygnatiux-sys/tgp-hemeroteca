@@ -26,6 +26,8 @@ import {
   clearHITLState,
   registrarResguardoD1,
   generarYGuardarAudioTTS,
+  obtenerUltimosResguardosD1,
+  obtenerResguardoPorIdD1,
 } from '../storage/d1.js';
 import { processTelegramMessage, BotIdentity } from '../ia/agent.js';
 import { EruditoAgent } from '../core/agents/EruditoAgent.js';
@@ -247,6 +249,61 @@ function isDuplicateUpdate(updateId?: number): boolean {
   return false;
 }
 
+// ── Módulo Bóveda y Rescate de Posts de Cloudflare D1 ───────────────────────
+export async function handleRecuperarBoveda(
+  chatId: number,
+  botToken: string,
+  botIdentity: BotIdentity,
+): Promise<void> {
+  await sendTelegramMessage(chatId, botToken, '🗄️ *Buscando en la Bóveda de Resguardo Documental (Cloudflare D1)...*');
+
+  const registros = await obtenerUltimosResguardosD1(5);
+
+  if (!registros || registros.length === 0) {
+    await sendTelegramMessage(
+      chatId,
+      botToken,
+      '🗄️ *Bóveda vacía:* Todavía no hay publicaciones o ensayos archivados en Cloudflare D1.',
+    );
+    return;
+  }
+
+  const lineas: string[] = [
+    `🏛️ *BÓVEDA DOCUMENTAL TGP — RESGUARDO EN CLOUDFLARE D1*`,
+    `_Encontré los últimos ${registros.length} posteos preservados. Tocá los botones para ver el texto, reciclar para redes o escuchar el audio:_`,
+    ``,
+  ];
+
+  const teclado: InlineKeyboard = [];
+
+  for (let i = 0; i < registros.length; i++) {
+    const r = registros[i];
+    const num = i + 1;
+    const fecha = r.fecha_creacion ? r.fecha_creacion.slice(0, 10) : 'Reciente';
+    const titulo = r.tema || 'Ensayo sin título';
+    const destinoLabel = r.destino === 'alternative'
+      ? '📜 TGP Alternative'
+      : r.destino === 'hemeroteca'
+      ? '🏛️ TGP Hemeroteca'
+      : `🌐 ${r.destino}`;
+
+    lineas.push(`*${num}. ${titulo}*`);
+    lineas.push(`   • Destino: \`${destinoLabel}\` | Fecha: \`${fecha}\``);
+    if (r.imagen_r2_url) {
+      lineas.push(`   • 🖼️ [Ver Imagen en Storage R2](${r.imagen_r2_url})`);
+    }
+    lineas.push(``);
+
+    teclado.push([
+      { text: `📋 #${num} Ver Texto`, callback_data: `boveda:ver:${r.id}` },
+      { text: `🔁 #${num} Reciclar Redes`, callback_data: `boveda:redes:${r.id}` },
+      { text: `🎙️ #${num} Audio`, callback_data: `boveda:audio:${r.id}` },
+    ]);
+  }
+
+  await sendTelegramMessage(chatId, botToken, lineas.join('\n'), teclado);
+}
+
 // ── Handler principal ─────────────────────────────────────────────────────────
 export async function handleTelegramWebhook(
   update: any,
@@ -311,10 +368,98 @@ export async function handleTelegramWebhook(
       toastText = '🔄 Reiniciando sesión...';
     } else if (data.includes('modificar')) {
       toastText = '✏️ Ajustando parámetros...';
+    } else if (data.startsWith('boveda:ver:')) {
+      toastText = '📜 Recuperando texto de la Bóveda D1...';
+    } else if (data.startsWith('boveda:redes:')) {
+      toastText = '🔁 Preparando reciclado para redes...';
+    } else if (data.startsWith('boveda:audio:')) {
+      toastText = '🎙️ Sintetizando audio documental...';
     }
 
     // Enviar cartel Toast inmediato (< 10s requerido por Telegram)
     await answerCallbackQuery(botToken, cqId, toastText, false);
+
+    // ── GESTIÓN DE ACCIONES DE LA BÓVEDA DOCUMENTAL D1 ──────────────────────
+    if (data.startsWith('boveda:ver:')) {
+      const id = data.replace('boveda:ver:', '').trim();
+      const record = await obtenerResguardoPorIdD1(id);
+      if (!record || !record.texto_generado) {
+        await sendTelegramMessage(chatId, botToken, '⚠️ No se encontró el texto completo de este post en la Bóveda D1.');
+        return;
+      }
+
+      const msg = [
+        `📜 *${record.tema || 'Ensayo TGP'}*`,
+        `🏛️ *Destino:* \`${record.destino}\` | 📅 *Fecha:* \`${record.fecha_creacion ? record.fecha_creacion.slice(0, 10) : 'Reciente'}\``,
+        record.imagen_r2_url ? `🖼️ [Ver Imagen en Storage R2](${record.imagen_r2_url})` : '',
+        `\n${record.texto_generado}`,
+      ].filter(Boolean).join('\n');
+
+      const tecladoAcciones: InlineKeyboard = [
+        [
+          { text: '🔁 Reciclar para Redes', callback_data: `boveda:redes:${id}` },
+          { text: '🎙️ Sintetizar Audio', callback_data: `boveda:audio:${id}` },
+        ],
+      ];
+
+      await sendTelegramMessage(chatId, botToken, msg, tecladoAcciones);
+      return;
+    }
+
+    if (data.startsWith('boveda:redes:')) {
+      const id = data.replace('boveda:redes:', '').trim();
+      const record = await obtenerResguardoPorIdD1(id);
+      if (!record || !record.texto_generado) {
+        await sendTelegramMessage(chatId, botToken, '⚠️ No encontré el contenido del post para reciclar.');
+        return;
+      }
+
+      await sendTelegramMessage(chatId, botToken, `⏳ *Reciclando ensayo:* "${record.tema || 'Sin título'}" para redes sociales...`);
+
+      await updateWorkingState(chatId, botIdentity, {
+        lastDraft: record.texto_generado,
+        lastTitle: record.tema,
+        lastImageUrl: record.imagen_r2_url || '',
+        lastAction: 'reciclar_redes',
+      });
+
+      const promptReciclado = `Che, toma como base este ensayo previo de la Bóveda: "${record.tema}".
+Texto base:
+${record.texto_generado.slice(0, 2000)}
+
+Arma un copy de alto impacto para redes sociales (ritmo flash, gancho somático directo, sin clichés, doctrina Xavier Benítez).`;
+
+      const responseText = await processTelegramMessage(chatId, promptReciclado, 'redes');
+      await sendTelegramMessage(chatId, botToken, responseText, TECLADO_CONFIRMACION_REDES);
+      return;
+    }
+
+    if (data.startsWith('boveda:audio:')) {
+      const id = data.replace('boveda:audio:', '').trim();
+      const record = await obtenerResguardoPorIdD1(id);
+      if (!record || !record.texto_generado) {
+        await sendTelegramMessage(chatId, botToken, '⚠️ No se encontró el texto del ensayo para generar el audio.');
+        return;
+      }
+
+      const titulo = record.tema || 'Ensayo Documental TGP';
+      await sendTelegramMessage(chatId, botToken, `🎙️ *Sintetizando audio documental para:* "${titulo}"...`);
+
+      const audioRes = await generarAudioDocumentalR2(record.texto_generado, titulo, chatId);
+      if (audioRes.success && audioRes.audioUrl) {
+        await sendTelegramNativeAudio({
+          chatId,
+          botToken,
+          audioUrl: audioRes.audioUrl,
+          title: titulo,
+          performer: 'TGP Hemeroteca',
+          caption: `🎧 **${titulo}**\n\n🔊 Reproductor nativo TGP\n🔗 [Descargar MP3 en Storage R2](${audioRes.audioUrl})`,
+        });
+      } else {
+        await sendTelegramMessage(chatId, botToken, `⚠️ Error generando audio: ${audioRes.error || 'Desconocido'}`);
+      }
+      return;
+    }
 
     // ── GESTIÓN DE ACCIONES RÁPIDAS DE LA BOTONERA ACTION BENTO ─────────────
     if (data === 'action:audio') {
@@ -714,6 +859,17 @@ export async function handleTelegramWebhook(
   if (text.startsWith('/nuevo') || text.startsWith('/cancel') || text.startsWith('/reset')) {
     await clearChatHistory(chatId, botIdentity);
     await sendTelegramMessage(chatId, botToken, '🔄 Sesión reiniciada. ¿En qué te ayudo?');
+    return;
+  }
+
+  // ── Módulo Bóveda y Rescate de Posts (Comando y Lenguaje Natural) ──────────
+  const isRecuperarIntent =
+    /^\/(recuperar|historial|recientes|boveda)\b/i.test(text) ||
+    /(recuperar|rescatar|mostrar|ver)\s+(mis\s+)?(posts|posteos|ensayos|historial|boveda|publicaciones)/i.test(text) ||
+    /(que\s+posts\s+tengo|ultimos\s+posts|ultimos\s+ensayos)/i.test(text);
+
+  if (isRecuperarIntent) {
+    await handleRecuperarBoveda(chatId, botToken, botIdentity);
     return;
   }
 

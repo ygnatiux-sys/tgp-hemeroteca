@@ -193,6 +193,65 @@ export async function registrarResguardoD1(params: ResguardoDocumentalParams): P
   }
 }
 
+export interface ResguardoRecord {
+  id: string;
+  origen: string;
+  destino: string;
+  tema: string;
+  texto_generado: string;
+  metadatos?: string;
+  imagen_r2_url?: string;
+  chat_id?: string;
+  fecha_creacion: string;
+}
+
+/**
+ * Obtiene los últimos registros de resguardo documental almacenados en D1.
+ */
+export async function obtenerUltimosResguardosD1(limit = 5): Promise<ResguardoRecord[]> {
+  if (!_DATABASE_ID || !_API_TOKEN) return [];
+  try {
+    await asegurarTablaResguardoDocumental();
+    const res = await fetch(d1Url(), {
+      method: 'POST',
+      headers: d1Headers(),
+      body: JSON.stringify({
+        sql: 'SELECT id, origen, destino, tema, texto_generado, metadatos, imagen_r2_url, chat_id, fecha_creacion FROM resguardo_documental ORDER BY fecha_creacion DESC LIMIT ?',
+        params: [limit],
+      }),
+    });
+    const data: any = await res.json();
+    return data?.result?.[0]?.results || [];
+  } catch (err: any) {
+    console.error('[D1 Resguardo] Error al obtener últimos registros:', err?.message);
+    return [];
+  }
+}
+
+/**
+ * Obtiene un registro específico de resguardo documental por ID.
+ */
+export async function obtenerResguardoPorIdD1(id: string): Promise<ResguardoRecord | null> {
+  if (!_DATABASE_ID || !_API_TOKEN) return null;
+  try {
+    await asegurarTablaResguardoDocumental();
+    const res = await fetch(d1Url(), {
+      method: 'POST',
+      headers: d1Headers(),
+      body: JSON.stringify({
+        sql: 'SELECT id, origen, destino, tema, texto_generado, metadatos, imagen_r2_url, chat_id, fecha_creacion FROM resguardo_documental WHERE id = ? LIMIT 1',
+        params: [id],
+      }),
+    });
+    const data: any = await res.json();
+    const rows = data?.result?.[0]?.results;
+    return rows && rows.length > 0 ? rows[0] : null;
+  } catch (err: any) {
+    console.error('[D1 Resguardo] Error al obtener registro por ID:', err?.message);
+    return null;
+  }
+}
+
 export async function obtenerInformeD1(id: string): Promise<{ informe_osint: string; imagen_url: string; ensayo_premium?: string } | null> {
   if (!_DATABASE_ID || !_API_TOKEN) return null;
   const res = await fetch(d1Url(), {

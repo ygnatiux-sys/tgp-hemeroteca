@@ -10,7 +10,8 @@ export type BotIdentity = 'redes' | 'assistant' | 'omni' | 'liminal';
 // ── Tipos Telegram ────────────────────────────────────────────────────────────
 export interface InlineKeyboardButton {
   text: string;
-  callback_data: string;
+  callback_data?: string;
+  url?: string;
 }
 
 export type InlineKeyboard = InlineKeyboardButton[][];
