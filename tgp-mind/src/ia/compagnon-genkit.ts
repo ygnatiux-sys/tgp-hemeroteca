@@ -461,9 +461,10 @@ ${foundational.manifiesto_fundacional.slice(0, 1500)}`.trim();
   const configuredTools: any[] = [];
   if (toolsForBot.length > 0) {
     configuredTools.push({ functionDeclarations: toolsForBot });
+  } else {
+    // Grounding académico de Google Search para precisión fáctica en consultas generales
+    configuredTools.push({ googleSearch: {} });
   }
-  // Grounding académico de Google Search para precisión fáctica en arqueología y ciencia
-  configuredTools.push({ googleSearch: {} });
 
   try {
     response = await genai.models.generateContent({
@@ -473,11 +474,11 @@ ${foundational.manifiesto_fundacional.slice(0, 1500)}`.trim();
         systemInstruction: enrichedSystemInstruction,
         temperature: 0.25,
         maxOutputTokens: 16384,
-        tools: configuredTools,
+        tools: configuredTools.length > 0 ? configuredTools : undefined,
       },
     });
   } catch (toolCombErr: any) {
-    console.warn('[Compagnon Agent] Fallback seguro sin googleSearch simultáneo:', toolCombErr?.message);
+    console.warn('[Compagnon Agent] Fallback seguro tras error en tools:', toolCombErr?.message);
     response = await genai.models.generateContent({
       model: 'gemini-3.8-flash',
       contents: safeContents as any,

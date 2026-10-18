@@ -226,28 +226,42 @@ if (TELEGRAM_PREMIUM_TOKEN) {
 }
 app.post('/webhook/telegram-premium', handleWebhookRoute('liminal', TELEGRAM_PREMIUM_TOKEN));
 
-// ── Saneamiento de Telegram: Purgar cola atascada (drop_pending_updates=true) ─
+// ── Saneamiento de Telegram: Purgar cola atascada y REENGANCHAR WEBHOOKS ──────
 app.get('/api/telegram/drop-pending', async (c) => {
+  const baseUrl = 'https://tgp-mind-713934653057.us-central1.run.app';
   const bots = [
-    { name: 'omni', token: TELEGRAM_TOKEN },
-    { name: 'redes', token: TELEGRAM_SOCIAL_TOKEN },
-    { name: 'assistant', token: TELEGRAM_TGP_CLOUD_TOKEN },
-    { name: 'liminal', token: TELEGRAM_DEV_TOKEN },
-    { name: 'premium', token: TELEGRAM_PREMIUM_TOKEN },
+    { name: 'omni', token: TELEGRAM_TOKEN, path: '/telegram-webhook' },
+    { name: 'redes', token: TELEGRAM_SOCIAL_TOKEN, path: '/webhook/telegram-social' },
+    { name: 'assistant', token: TELEGRAM_TGP_CLOUD_TOKEN, path: '/webhook/telegram' },
+    { name: 'liminal', token: TELEGRAM_DEV_TOKEN, path: '/webhook-dev' },
+    { name: 'premium', token: TELEGRAM_PREMIUM_TOKEN, path: '/webhook/telegram-premium' },
   ];
 
   const results: any[] = [];
   for (const b of bots) {
     if (!b.token) continue;
     try {
+      // 1. Purgar actualizaciones viejas
       const res = await fetch(`https://api.telegram.org/bot${b.token}/deleteWebhook?drop_pending_updates=true`);
-      const data = await res.json().catch(() => ({}));
-      results.push({ bot: b.name, success: true, response: data });
+      const dropData = await res.json().catch(() => ({}));
+
+      // 2. Blindaje: Re-vincular inmediatamente la URL de Cloud Run (evita que el bot quede en blanco url: "")
+      const webhookUrl = baseUrl + b.path;
+      const setRes = await fetch(`https://api.telegram.org/bot${b.token}/setWebhook?url=${encodeURIComponent(webhookUrl)}`);
+      const setData = await setRes.json().catch(() => ({}));
+
+      results.push({
+        bot: b.name,
+        success: true,
+        purged: dropData,
+        reconnected: setData,
+        webhookUrl,
+      });
     } catch (err: any) {
       results.push({ bot: b.name, success: false, error: err?.message || err });
     }
   }
-  return c.json({ status: 'Saneamiento completado', results });
+  return c.json({ status: 'Saneamiento y reenganche de webhooks completado con éxito', results });
 });
 
 
