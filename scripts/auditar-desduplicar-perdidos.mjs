@@ -314,15 +314,118 @@ async function main() {
   });
   console.log('─────────────────────────────────────────────────────────────\n');
 
+  // ── 4. SELECCIÓN CURADA DE LOS 2 REELS IMAX MAX (10 POSTS CADA UNO) ──────
+  // Reel 1: Arqueología Lítica, Herejías & Enigmas Arcaicos
+  // Reel 2: Filosofía de la Conciencia, Gnosis & Tiempo Sagrado
+
+  const reel1Keys = [
+    'lepra', 'fascinum', 'assassin', 'templar', 'imperio buevo', 'qapaq nan',
+    'ishi no hoden', 'masuda no iwafune', 'atacama', 'teogonia'
+  ];
+
+  const reel2Keys = [
+    'carpocracianos', 'esenios', 'nestorianos', 'cartago', 'san agustin',
+    'suenos lucidos', 'silencio', 'borges y el tiempo ciclico', 'saber es recordar', 'sisifo'
+  ];
+
+  function findItem(keys) {
+    for (const key of keys) {
+      const match = uniqueLost.find(it => normalize(it.title).includes(key) || (it.slug && normalize(it.slug).includes(key)));
+      if (match) return match;
+    }
+    return null;
+  }
+
+  // Mapear con fallback seguro para que siempre haya 10 en cada reel
+  const finalReel1 = [];
+  const finalReel2 = [];
+  const usedIds = new Set();
+
+  for (const k of reel1Keys) {
+    const item = uniqueLost.find(it => !usedIds.has(it.id) && (normalize(it.title).includes(k) || (it.slug && normalize(it.slug).includes(k))));
+    if (item) {
+      usedIds.add(item.id);
+      finalReel1.push(item);
+    }
+  }
+
+  for (const k of reel2Keys) {
+    const item = uniqueLost.find(it => !usedIds.has(it.id) && (normalize(it.title).includes(k) || (it.slug && normalize(it.slug).includes(k))));
+    if (item) {
+      usedIds.add(item.id);
+      finalReel2.push(item);
+    }
+  }
+
+  // Rellenar si faltara alguno hasta 10
+  for (const it of uniqueLost) {
+    if (finalReel1.length < 10 && !usedIds.has(it.id)) {
+      usedIds.add(it.id);
+      finalReel1.push(it);
+    } else if (finalReel2.length < 10 && !usedIds.has(it.id)) {
+      usedIds.add(it.id);
+      finalReel2.push(it);
+    }
+  }
+
+  // Normalizar imágenes y títulos para la presentación cinematográfica
+  function formatForImax(item, reelNum, index) {
+    let cleanTitle = item.title.replace(/^\[|\]$/g, '').replace(/''/g, '"').trim();
+    if (cleanTitle.toLowerCase().includes('imperio buevo')) cleanTitle = 'El Imperio Nuevo Egipcio: Superpotencia y Ruptura de Aislamiento';
+    if (cleanTitle.toLowerCase().includes('lepra')) cleanTitle = 'La Lepra en el Oriente Próximo: ¿Una Enfermedad Divina?';
+    if (cleanTitle.toLowerCase().includes('fascinum')) cleanTitle = 'Fascinum Romano: El Conjuro Fálico contra el Mal de Ojo';
+    if (cleanTitle.toLowerCase().includes('assassin')) cleanTitle = 'Los Assassins de Alamut: ¿Sociedad Iniciática o Fraude Historiográfico?';
+    if (cleanTitle.toLowerCase().includes('templar')) cleanTitle = 'Los Templarios en la Historia: De la Pobreza a la Red Bancaria Sacra';
+    if (cleanTitle.toLowerCase().includes('cartago')) cleanTitle = 'La Caída de Cartago: Sal en la Herida y el Destino de lo Posible';
+    if (cleanTitle.toLowerCase().includes('esenios')) cleanTitle = 'Los Esenios: La Comunidad del Desierto y los Rollos de Qumrán';
+    if (cleanTitle.toLowerCase().includes('atacama')) cleanTitle = 'The Atacama Mummy: La Momificación Chinchorro del Desierto Árido';
+
+    let img = item.coverImage;
+    if (!img || img === '/placeholder-cinematic.jpg') {
+      if (cleanTitle.includes('Lepra')) img = 'https://storage.thegreatpuzzleproject.com/1789969923610-11d07e02.webp';
+      else if (cleanTitle.includes('Fascinum')) img = 'https://storage.thegreatpuzzleproject.com/Good_Shepherd_Catacomb_of_Priscilla_Rome.jpg';
+      else if (cleanTitle.includes('Assassins')) img = 'https://storage.thegreatpuzzleproject.com/vault-media/1789969923610-11d07e02.webp';
+      else if (cleanTitle.includes('Templarios')) img = 'https://storage.thegreatpuzzleproject.com/Nestorian_Priests_Palm_Sunday_Khocho.jpg';
+      else if (cleanTitle.includes('Imperio Nuevo')) img = 'https://storage.thegreatpuzzleproject.com/1790036463702-59643383.webp';
+      else img = '/images/bg-boveda.webp';
+    }
+
+    return {
+      id: item.id || `lost-${reelNum}-${index}`,
+      reel: reelNum,
+      index: index + 1,
+      title: cleanTitle,
+      category: item.category || (reelNum === 1 ? 'Arqueología & Lítica' : 'Filosofía & Conciencia'),
+      coverImage: img,
+      date: item.date || '2026-08-01',
+      excerpt: item.excerpt || 'Exploración documental profunda recuperada del pozo del archivo.',
+      fullText: item.fullText || item.body || item.excerpt,
+      source: item.source
+    };
+  }
+
+  const payload = {
+    generatedAt: new Date().toISOString(),
+    totalRecovered: finalReel1.length + finalReel2.length,
+    reel1_arqueologia_litica: finalReel1.map((it, i) => formatForImax(it, 1, i)),
+    reel2_filosofia_gnosis: finalReel2.map((it, i) => formatForImax(it, 2, i)),
+    allLostRaw: uniqueLost
+  };
+
   // Guardar archivo depurado
   const dataDir = path.resolve(ROOT_DIR, 'src/data');
   if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
   const targetFile = path.join(dataDir, 'lost-posts-curated.json');
 
-  fs.writeFileSync(targetFile, JSON.stringify(uniqueLost, null, 2), 'utf8');
+  fs.writeFileSync(targetFile, JSON.stringify(payload, null, 2), 'utf8');
   console.log(`💾 Archivo maestro de posts perdidos exportado con éxito en:`);
   console.log(`   ${targetFile}`);
-  console.log(`   Total de posts listos para los 2 visores IMAX MAX: ${uniqueLost.length}\n`);
+  console.log(`\n🎞️ REEL 1 (Arqueología Lítica & Herejías): ${payload.reel1_arqueologia_litica.length} posts`);
+  payload.reel1_arqueologia_litica.forEach(p => console.log(`   ${p.index}. ${p.title} · ${p.category}`));
+
+  console.log(`\n🎞️ REEL 2 (Filosofía & Gnosis Sagrada): ${payload.reel2_filosofia_gnosis.length} posts`);
+  payload.reel2_filosofia_gnosis.forEach(p => console.log(`   ${p.index}. ${p.title} · ${p.category}`));
+  console.log('\n─────────────────────────────────────────────────────────────\n');
 }
 
 main().catch(err => {
