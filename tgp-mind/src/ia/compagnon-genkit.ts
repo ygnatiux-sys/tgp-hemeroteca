@@ -18,6 +18,7 @@ import {
   appendCompanionTurn,
   updateWorkingState,
   sanitizeTurns,
+  getFoundationalContext,
   type WorkingState,
 } from '../storage/companion-memory.js';
 
@@ -341,7 +342,8 @@ async function ejecutarCompagnonTool(
 
     // 5. PANLINGUA D1
     if (name === 'query_panlingua') {
-      const res = await ejecutarQueryPanlingua({ ...args, chatId });
+      const intent = (args.intent || 'buscar_concepto') as any;
+      const res = await ejecutarQueryPanlingua({ ...args, intent, chatId });
       return { result: typeof res === 'string' ? res : JSON.stringify(res) };
     }
 
@@ -434,13 +436,27 @@ export async function processCompagnonMessage(
   console.log(`[Compagnon:${botIdentity}] Procesando mensaje con ${safeContents.length} turnos saneados...`);
 
   const toolsForBot = TOOLS_BY_BOT[botIdentity];
+  const foundational = await getFoundationalContext();
+
+  const enrichedSystemInstruction = `${PROMPTS_BY_BOT[botIdentity]}
+
+---
+[CÓDICE MAESTRO: ARQUITECTURA COGNITIVA, DOCTRINA Y ESTILO DE XAVIER BENÍTEZ (TGP)]:
+${foundational.doctrina_codice_maestro}
+
+---
+[CONTEXTO FUNDACIONAL Y PENSAMIENTO ARGENTINO (XAVIER BENÍTEZ)]:
+${foundational.pensamiento_filosofico}
+
+[DIRECTRICES ONTOLÓGICAS]:
+${foundational.manifiesto_fundacional.slice(0, 1500)}`.trim();
 
   // 4. Llamada a Gemini Flash/Pro con herramientas nativas
   const response = await genai.models.generateContent({
     model: 'gemini-3.8-flash',
     contents: safeContents as any,
     config: {
-      systemInstruction: PROMPTS_BY_BOT[botIdentity],
+      systemInstruction: enrichedSystemInstruction,
       temperature: 0.25,
       maxOutputTokens: 16384,
       tools: toolsForBot.length > 0 ? [{ functionDeclarations: toolsForBot }] : undefined,

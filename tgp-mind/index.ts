@@ -315,8 +315,13 @@ const handleChatWebhook = async (c: any) => {
       || body.message?.sender?.displayName 
       || 'Director';
 
-    // Limpieza de menciones de bot en Google Chat (ej: "@TGP Scriptorium sube este post...")
-    const cleanText = String(rawText).replace(/^@\w+\s+/, '').trim();
+    // Limpieza robusta de menciones de bot en Google Chat (soporta nombres con espacios y tags <users/...>)
+    const cleanText = String(rawText)
+      .replace(/<users\/[^>]+>\s*/g, '')
+      .replace(/^@tgp\s+mind\s+as[eé]sor\s+for\s+XB\s*/gi, '')
+      .replace(/^@[\w\s.-]+?\s+(?=(?:me|como|hace|hola|que|quien|cuando|che|por|sube|crea|publica|brief|[a-z0-9]))/i, '')
+      .replace(/^@\S+\s+/, '')
+      .trim();
 
     if (!cleanText) {
       const emptyMsg = '¡Hola! Soy el asistente orquestador de TGP Mind. Puedes pedirme en lenguaje natural subir posts, convertir imágenes a WebP en R2, consultar Panlingua D1 o generar portadas cinematográficas.';
@@ -326,10 +331,11 @@ const handleChatWebhook = async (c: any) => {
       return c.json({ text: emptyMsg });
     }
 
-    console.log(`[Chat Webhook] Recibido mensaje de ${userName}: "${cleanText.slice(0, 80)}"`);
+    const sessionId = body.space?.name || body.message?.thread?.name || body.sessionInfo?.session || 'googlechat_space';
+    console.log(`[Chat Webhook] Recibido mensaje de ${userName} (sesión ${sessionId}): "${cleanText.slice(0, 80)}"`);
 
-    // 2. Ejecución del bucle de herramientas en el orquestador
-    const orchestration = await runChatOrchestrator(cleanText, { user: userName, channel: 'google-chat' });
+    // 2. Ejecución del bucle de herramientas en el orquestador con memoria de sesión
+    const orchestration = await runChatOrchestrator(cleanText, { user: userName, channel: 'google-chat', sessionId });
     const responseText = orchestration.text;
 
     // 3. Respuesta adaptativa según el emisor:
@@ -357,18 +363,64 @@ const handleChatWebhook = async (c: any) => {
     });
   } catch (error: any) {
     console.error('[Chat Webhook Error]:', error);
-    const errorText = `⚠️ Error al procesar tu solicitud: ${error?.message || 'Error interno'}`;
-    return c.json({
+    const errorMsg = error?.message || 'Error interno de procesamiento';
+    const errorText = `⚠️ [ESTADO: FALLBACK DE CONEXIÓN]: No se pudo completar la solicitud (${errorMsg}). Probá reintentando con la instrucción directa.`;
+
+    // Tarjeta Bento visual nativa de Google Chat con badge de diagnóstico
+    const fallbackBentoCard = {
+      cardsV2: [
+        {
+          cardId: 'tgp-fallback-card',
+          card: {
+            header: {
+              title: '⚠️ ESTADO: FALLBACK / ERROR',
+              subtitle: 'TGP Mind — Diagnóstico en Vivo',
+              imageUrl: 'https://storage.thegreatpuzzleproject.com/tgp-fallback.jpg',
+              imageType: 'CIRCLE',
+            },
+            sections: [
+              {
+                header: 'Diagnóstico del Incidente',
+                widgets: [
+                  {
+                    decoratedText: {
+                      topLabel: 'Causa Detectada',
+                      text: `<b>Fallo en ejecución:</b> ${errorMsg}`,
+                      wrapText: true,
+                    },
+                  },
+                  {
+                    decoratedText: {
+                      topLabel: 'Acción de Recuperación',
+                      text: 'El orquestador preservó tu sesión. Reintentá con la orden directa o abrí chat 1:1 sin arroba.',
+                      wrapText: true,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ],
       text: errorText,
-      fulfillmentResponse: {
-        messages: [{ text: { text: [errorText] } }],
-      },
-    }, 500);
+    };
+
+    if (c.req.header('user-agent')?.includes('Google-Dialogflow') || (error as any)?.sessionInfo) {
+      return c.json({
+        fulfillmentResponse: {
+          messages: [{ text: { text: [errorText] } }],
+        },
+      }, 200);
+    }
+
+    return c.json(fallbackBentoCard, 200);
   }
 };
 
 app.post('/api/chat/webhook', handleChatWebhook);
 app.post('/webhook/chat', handleChatWebhook);
+app.post('/google-chat-webhook', handleChatWebhook);
+app.post('/webhook', handleChatWebhook);
 
 // -- Google Photos Picker API -- CORS-safe, credenciales en server -----------
 import {

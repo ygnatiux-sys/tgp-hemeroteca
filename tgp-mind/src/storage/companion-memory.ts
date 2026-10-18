@@ -28,7 +28,7 @@ export interface WorkingState {
 }
 
 export interface CompanionSession {
-  chatId: number;
+  chatId: number | string;
   botId: string;
   working_state: WorkingState;
   recent_turns: GeminiTurn[];
@@ -59,9 +59,11 @@ async function getFirestoreClient(): Promise<any> {
   }
 }
 
-function getSessionKey(chatId: number, botId: string): string {
-  return `${chatId}_${botId}`;
+function getSessionKey(chatId: number | string, botId: string): string {
+  const safeId = String(chatId).replace(/[^a-zA-Z0-9_-]/g, '_');
+  return `${safeId}_${botId}`;
 }
+
 
 // ── Auto-Sanación de Turnos (Anti-Cuelgues Gemini) ───────────────────────────
 export function sanitizeTurns(rawTurns: GeminiTurn[]): GeminiTurn[] {
@@ -129,7 +131,7 @@ export function sanitizeTurns(rawTurns: GeminiTurn[]): GeminiTurn[] {
 }
 
 // ── Cargar Sesión Completa ──────────────────────────────────────────────────
-export async function getCompanionSession(chatId: number, botId: string): Promise<CompanionSession> {
+export async function getCompanionSession(chatId: number | string, botId: string): Promise<CompanionSession> {
   const key = getSessionKey(chatId, botId);
 
   // 1. Intentar Firestore
@@ -161,8 +163,10 @@ export async function getCompanionSession(chatId: number, botId: string): Promis
     return cached;
   }
 
-  // 3. Fallback a D1 (recuperar historial previo de D1 si existe)
-  const d1Turns = await getConversationHistory(chatId, 12, botId).catch(() => []);
+  // 3. Fallback a D1 (recuperar historial previo de D1 si es numérico)
+  const d1Turns = typeof chatId === 'number'
+    ? await getConversationHistory(chatId, 12, botId).catch(() => [])
+    : [];
   const initialSession: CompanionSession = {
     chatId,
     botId,
@@ -178,7 +182,7 @@ export async function getCompanionSession(chatId: number, botId: string): Promis
 
 // ── Guardar o Actualizar working_state ───────────────────────────────────────
 export async function updateWorkingState(
-  chatId: number,
+  chatId: number | string,
   botId: string,
   partialState: Partial<WorkingState>,
 ): Promise<WorkingState> {
@@ -214,7 +218,7 @@ export async function updateWorkingState(
 
 // ── Agregar Turno Limpio al Historial ────────────────────────────────────────
 export async function appendCompanionTurn(
-  chatId: number,
+  chatId: number | string,
   botId: string,
   turn: GeminiTurn,
 ): Promise<void> {
@@ -241,16 +245,18 @@ export async function appendCompanionTurn(
     console.warn(`[Companion Memory] Error guardando turno en Firestore (${key}):`, err?.message);
   }
 
-  // Resguardo atómico simultáneo en Cloudflare D1
-  try {
-    await appendTurn(chatId, turn.role, turn.parts, botId);
-  } catch (d1Err: any) {
-    console.warn(`[Companion Memory] Error secundario D1 (${key}):`, d1Err?.message);
+  // Resguardo atómico simultáneo en Cloudflare D1 si chatId es numérico
+  if (typeof chatId === 'number') {
+    try {
+      await appendTurn(chatId, turn.role, turn.parts, botId);
+    } catch (d1Err: any) {
+      console.warn(`[Companion Memory] Error secundario D1 (${key}):`, d1Err?.message);
+    }
   }
 }
 
 // ── Reiniciar / Sanear Sesión (/reset, /nuevo, /sanear) ───────────────────────
-export async function resetCompanionSession(chatId: number, botId: string): Promise<void> {
+export async function resetCompanionSession(chatId: number | string, botId: string): Promise<void> {
   const key = getSessionKey(chatId, botId);
   sessionCache.delete(key);
 
@@ -263,7 +269,86 @@ export async function resetCompanionSession(chatId: number, botId: string): Prom
     console.warn(`[Companion Memory] Error borrando sesión en Firestore (${key}):`, err?.message);
   }
 
-  // Limpiar también en D1
-  await clearChatHistory(chatId, botId).catch(() => {});
+  // Limpiar también en D1 si es numérico
+  if (typeof chatId === 'number') {
+    await clearChatHistory(chatId, botId).catch(() => {});
+  }
   console.log(`[Companion Memory] Sesión reseteada completamente para ${key}`);
 }
+
+// ── Memoria Fundacional Antigravity (Caché en RAM de bajo costo) ─────────────
+export interface FoundationalMemory {
+  pensamiento_filosofico: string;
+  criterios_operativos: string;
+  manifiesto_fundacional: string;
+  doctrina_codice_maestro: string;
+}
+
+let cachedFoundationalMemory: FoundationalMemory | null = null;
+let lastFoundationalFetch = 0;
+const FOUNDATIONAL_TTL_MS = 60 * 60 * 1000; // 1 hora de TTL en memoria
+
+export async function getFoundationalContext(): Promise<FoundationalMemory> {
+  const now = Date.now();
+  if (cachedFoundationalMemory && (now - lastFoundationalFetch < FOUNDATIONAL_TTL_MS)) {
+    return cachedFoundationalMemory;
+  }
+
+  // Valores predeterminados seguros (Fallback local si no hay conexión)
+  const memory: FoundationalMemory = {
+    pensamiento_filosofico: `Eres el socio intelectual y compagnon de investigación de Xavier Benítez en The Great Puzzle Project (TGP).
+Tu tono es el de un ensayista argentino culto, lúcido, agudo y humano (en la línea de Borges y Bioy Casares), especializado en arqueología anómala, arquitectura megalítica, cronologías disidentes y el misterio del Holoceno.
+Escribes en prosa sobria, precisa, cinematográfica y sin condescendencia ni clichés sensacionalistas.`,
+    criterios_operativos: `REGLAS MAESTRAS DE ARQUITECTURA TGP (ZERO-FOOTPRINT):
+1. Ecosistema Multicanal: thegreatpuzzleproject.com, TGP Alternative (/ensayos), TGP Hemeroteca (/hemeroteca), TGP Ediciones (/magazine), Bóveda R2 Vault (storage.thegreatpuzzleproject.com).
+2. Seguridad de Credenciales: Jamás tocar ni alterar tokens de Telegram ni variables Cloudflare/Google en .env.
+3. Despliegues Cloud Run Eficientes: Cero CPU ociosa ($0 idle cost). No usar --no-cpu-throttling. Webhooks responden 200 OK inmediatamente.`,
+    manifiesto_fundacional: `DOCUMENTO FUNDACIONAL Y ONTOLÓGICO: THE GREAT PUZZLE PROJECT (TGP)
+Autor e Investigador Principal: Xavier Benítez.
+El Motor Cognitivo (tgp-mind): Socio dialéctico para extraer patrones de comportamiento y sentido de la historia, la arqueología y el pensamiento simbólico.`,
+    doctrina_codice_maestro: `CÓDICE MAESTRO DE XAVIER BENÍTEZ (TGP):
+1. Arquetipo Cognitivo: Arquitecto Antiescolástico. Rechazo a la escolástica académica y al misticismo ingenuo. Tercera vía: tecnologías somáticas y simbólicas de supervivencia cognitiva.
+2. Empatía Trágica: Humanismo somático. El mito y el rito como conjuros ante el abismo de la contingencia y el azar mudo.
+3. Glosario: Valor de Sentido como Vara de Oro; Memoria Viva vs. Memoria de Archivo; Los Vivenciales Triples (Nómade -> Sedentario -> Urbano); Estratigrafías Monádicas Arcaicas; Fósiles Performados.
+4. Protocolo de Ensayos en 7 Pasos: Apertura por anomalía material concreta -> Anclaje histórico riguroso -> Tesis de transformación/fricción -> Desglose estratigráfico -> Tensión historiográfica -> Puente TGP a la condición humana -> Cierre en destilación filosófica.`
+  };
+
+  try {
+    const db = await getFirestoreClient();
+    if (db) {
+      const col = db.collection('tgp_foundational_memory');
+      const [docFilosofia, docOperativo, docManifiesto, docCodice] = await Promise.all([
+        col.doc('pensamiento_filosofico').get().catch(() => null),
+        col.doc('criterios_operativos').get().catch(() => null),
+        col.doc('manifiesto_fundacional').get().catch(() => null),
+        col.doc('doctrina_codice_maestro_xavier_benitez').get().catch(() => null),
+      ]);
+
+      if (docFilosofia?.exists) {
+        const data = docFilosofia.data();
+        memory.pensamiento_filosofico = data?.nucleo || data?.contenido || memory.pensamiento_filosofico;
+      }
+      if (docOperativo?.exists) {
+        const data = docOperativo.data();
+        memory.criterios_operativos = data?.nucleo || data?.contenido || memory.criterios_operativos;
+      }
+      if (docManifiesto?.exists) {
+        const data = docManifiesto.data();
+        memory.manifiesto_fundacional = data?.contenido || memory.manifiesto_fundacional;
+      }
+      if (docCodice?.exists) {
+        const data = docCodice.data();
+        memory.doctrina_codice_maestro = data?.contenido || memory.doctrina_codice_maestro;
+      }
+      console.log('[Companion Memory] Memoria fundacional y Códice Maestro sincronizados desde Cloud Firestore');
+    }
+  } catch (err: any) {
+    console.warn('[Companion Memory] Usando memoria fundacional estática por error en Firestore:', err?.message);
+  }
+
+  cachedFoundationalMemory = memory;
+  lastFoundationalFetch = now;
+  return memory;
+}
+
+

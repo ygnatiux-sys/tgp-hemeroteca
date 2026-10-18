@@ -5,6 +5,12 @@
 
 import { genai } from '../ia/gemini.js';
 import { getChatToolDeclarations, executeChatTool } from './tool-registry.js';
+import {
+  getCompanionSession,
+  appendCompanionTurn,
+  updateWorkingState,
+  getFoundationalContext,
+} from '../storage/companion-memory.js';
 
 const SYSTEM_INSTRUCTION_ORQUESTADOR = `Eres el Asistente Orquestador Autónomo de TGP Mind, integrado con Google Chat y Dialogflow CX para asistir al director Xavier Benítez.
 Tu misión es interpretar instrucciones en lenguaje natural y ejecutar automáticamente las herramientas necesarias en el orden óptimo, sin que el usuario deba recordar nombres de comandos o scripts.
@@ -19,15 +25,16 @@ PRINCIPIOS OPERATIVOS:
    - Si solicitan fotos históricas o de patrimonio, usa "search_wikimedia".
 
 2. TONO Y PRESENTACIÓN:
-   - Tono: Dark Academia accesible, sobrio, preciso, ejecutivo y resolutivo.
+   - Tono: Dark Academia accesible, sobrio, preciso, ejecutivo y resolutivo con calidez argentina sutil.
    - En tu respuesta final, resume claramente qué acciones realizaste con viñetas concisas.
-   - SIEMPRE formatea enlaces como hipervínculos Markdown activos: [Texto Descriptivo](https://url). NUNCA dejes URLs crudas ni bloques de código planos para copiar y pegar.
+   - SIEMPRE formatea enlaces como hipervínculos Markdown activos: [Texto Descriptivo](https://url). NUNCA dejes URLs crudas ni bloques de código planos para copiar y pagar.
    - Cero etiquetas estructurales de pensamiento o XML en tu respuesta final.`.trim();
 
 export interface OrchestratorOptions {
   user?: string;
   channel?: string;
   maxSteps?: number;
+  sessionId?: string;
 }
 
 export interface OrchestrationResult {
@@ -38,7 +45,7 @@ export interface OrchestrationResult {
 
 /**
  * Procesa un mensaje en lenguaje natural resolviendo el ciclo agéntico de Function Calling
- * en memoria efímera sin acoplar estado en disco (Stateless / Cero Memoria).
+ * manteniendo memoria conversacional en Cloud Firestore para que Google Chat no pierda contexto.
  */
 export async function runChatOrchestrator(
   prompt: string,
@@ -46,18 +53,43 @@ export async function runChatOrchestrator(
 ): Promise<OrchestrationResult> {
   const maxSteps = options.maxSteps || 5;
   const userName = options.user || 'Director';
+  const sessionId = options.sessionId || 'googlechat_default';
   const toolsExecuted: string[] = [];
 
   const initialPrompt = options.user
     ? `[Usuario: ${userName}]: ${prompt}`
     : prompt;
 
-  const toolDeclarations = getChatToolDeclarations();
-  const contents: any[] = [
-    { role: 'user', parts: [{ text: initialPrompt }] },
-  ];
+  // 1. Cargar historial previo de Firestore / Memoria viva
+  const session = await getCompanionSession(sessionId, 'googlechat');
+  const cleanHistory = [...session.recent_turns];
 
-  console.log(`[Orchestrator] Nueva solicitud de ${userName}: "${prompt.slice(0, 120)}..."`);
+  // Registrar turno de usuario en la memoria
+  await appendCompanionTurn(sessionId, 'googlechat', {
+    role: 'user',
+    parts: [{ text: initialPrompt }],
+  });
+
+  const toolDeclarations = getChatToolDeclarations();
+  const contents: any[] = cleanHistory.length > 0
+    ? [...cleanHistory, { role: 'user', parts: [{ text: initialPrompt }] }]
+    : [{ role: 'user', parts: [{ text: initialPrompt }] }];
+
+  console.log(`[Orchestrator] Nueva solicitud de ${userName} (${sessionId}): "${prompt.slice(0, 120)}..." (historial: ${cleanHistory.length} turnos)`);
+
+  const foundational = await getFoundationalContext();
+  const enrichedSystemInstruction = `${SYSTEM_INSTRUCTION_ORQUESTADOR}
+
+---
+[CÓDICE MAESTRO: ARQUITECTURA COGNITIVA, DOCTRINA Y ESTILO DE XAVIER BENÍTEZ (TGP)]:
+${foundational.doctrina_codice_maestro}
+
+---
+[CONTEXTO FUNDACIONAL Y PENSAMIENTO ARGENTINO (XAVIER BENÍTEZ)]:
+${foundational.pensamiento_filosofico}
+
+[DIRECTRICES ONTOLÓGICAS]:
+${foundational.manifiesto_fundacional.slice(0, 1500)}`.trim();
 
   let currentStep = 0;
   let finalText = '';
@@ -70,7 +102,7 @@ export async function runChatOrchestrator(
       model: 'gemini-3.8-flash',
       contents: contents as any,
       config: {
-        systemInstruction: SYSTEM_INSTRUCTION_ORQUESTADOR,
+        systemInstruction: enrichedSystemInstruction,
         temperature: 0.2,
         maxOutputTokens: 16384,
         tools: toolDeclarations.length > 0 ? [{ functionDeclarations: toolDeclarations as any }] : undefined,
@@ -140,6 +172,14 @@ export async function runChatOrchestrator(
     }
   }
 
+  // Persistir la respuesta del modelo en la memoria viva para el próximo turno
+  if (finalText) {
+    await appendCompanionTurn(sessionId, 'googlechat', {
+      role: 'model',
+      parts: [{ text: finalText }],
+    }).catch(() => {});
+  }
+
   console.log(`[Orchestrator] Finalizado en ${currentStep} pasos. Tools: [${toolsExecuted.join(', ')}]`);
 
   return {
@@ -148,3 +188,4 @@ export async function runChatOrchestrator(
     stepsCount: currentStep,
   };
 }
+
