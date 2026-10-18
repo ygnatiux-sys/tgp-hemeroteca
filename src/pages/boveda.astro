@@ -1,0 +1,197 @@
+---
+/**
+ * src/pages/boveda.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * BÓVEDA DE ARCHIVO: POSTEOS RECUPERADOS
+ * Proyección Monumental en 2 Visores IMAX MAX (GSAP Timeline)
+ *
+ * Contiene los 20 ensayos y expedientes rescatados del pozo de Cloudflare D1
+ * y archivos no enlazados, rigurosamente desduplicados frente a las páginas activas.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+export const prerender = true;
+
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import PolvoDorado from '../components/PolvoDorado.astro';
+import ImaxMaxRecovered from '../components/ImaxMaxRecovered.astro';
+import curatedData from '../data/lost-posts-curated.json';
+
+const reel1 = curatedData.reel1_arqueologia_litica || [];
+const reel2 = curatedData.reel2_filosofia_gnosis || [];
+---
+
+<Layout
+  title="Bóveda de Archivo · Posteos Recuperados | The Great Puzzle Project"
+  description="Restitución monumental de 20 ensayos y expedientes históricos rescatados del archivo profundo en dos visores IMAX MAX."
+>
+  <Header />
+  <PolvoDorado />
+
+  <main class="min-h-screen bg-[#050706] text-[#EFEBE3] pt-24 sm:pt-28 pb-32 px-4 sm:px-6 md:px-10 lg:px-14 overflow-hidden relative">
+    
+    <!-- EFECTO AMBIENTAL DE FONDO -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+      <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[90vw] max-w-[1200px] h-[450px] bg-[radial-gradient(ellipse_at_center,rgba(78,242,210,0.08)_0%,rgba(6,10,8,0)_70%)] blur-3xl"></div>
+      <div class="absolute top-[45%] right-0 w-[60vw] max-w-[800px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(230,154,70,0.06)_0%,rgba(6,10,8,0)_70%)] blur-3xl"></div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════════
+         HERO PRINCIPAL: EL POZO DE LA MEMORIA RECUPERADA
+         ══════════════════════════════════════════════════════════════════════════ -->
+    <header class="relative z-10 max-w-6xl mx-auto text-center pt-8 pb-14 sm:pb-20">
+      
+      <!-- Badge de Bóveda -->
+      <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-6 shadow-xl">
+        <span class="w-2 h-2 rounded-full bg-[#4ef2d2] shadow-[0_0_8px_#4ef2d2] animate-pulse"></span>
+        <span class="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.35em] text-[#4ef2d2] font-bold">
+          EXPEDIENTES INÉDITOS Y RESTAURADOS
+        </span>
+      </div>
+
+      <!-- Título Monumental en Fraunces -->
+      <h1 class="font-fraunces font-black uppercase text-[clamp(2.5rem,7vw,5.8rem)] leading-[0.88] tracking-[-0.03em] text-[#F3EFE6] drop-shadow-[0_4px_30px_rgba(0,0,0,0.8)] mb-6">
+        BÓVEDA DE ARCHIVO
+      </h1>
+
+      <!-- Bajada Doctrinal Xavier Benítez -->
+      <p class="font-sans text-base sm:text-lg md:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed mb-10 font-normal">
+        El archivo no es una acumulación de datos muertos, sino una tecnología somática contra el olvido. 
+        En esta bóveda restituimos los <span class="text-[#4ef2d2] font-semibold">20 ensayos fundamentales</span> que permanecían 
+        dormidos en las capas profundas de Cloudflare D1 y el almacenamiento R2. 
+        Filtrados rigurosamente para <strong class="text-white">cero duplicidad</strong> y proyectados en formato monumental de 70mm.
+      </p>
+
+      <!-- Métricas Forenses de Restauración -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
+        <div class="p-3.5 sm:p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-center">
+          <div class="font-mono text-2xl sm:text-3xl font-black text-[#4ef2d2]">20</div>
+          <div class="font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-white/50 mt-1">Posts Rescatados</div>
+        </div>
+        <div class="p-3.5 sm:p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-center">
+          <div class="font-mono text-2xl sm:text-3xl font-black text-[#E69A46]">0</div>
+          <div class="font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-white/50 mt-1">Duplicados Activos</div>
+        </div>
+        <div class="p-3.5 sm:p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-center">
+          <div class="font-mono text-2xl sm:text-3xl font-black text-white">2</div>
+          <div class="font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-white/50 mt-1">Visores IMAX 70mm</div>
+        </div>
+        <div class="p-3.5 sm:p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-center">
+          <div class="font-mono text-2xl sm:text-3xl font-black text-emerald-400">100%</div>
+          <div class="font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-white/50 mt-1">Matriz Benítez</div>
+        </div>
+      </div>
+
+    </header>
+
+    <!-- ══════════════════════════════════════════════════════════════════════════
+         SECCIÓN 1: VISOR IMAX MAX (REEL 1 — LÍTICA & HEREJÍAS)
+         ══════════════════════════════════════════════════════════════════════════ -->
+    <section class="relative z-10 max-w-7xl mx-auto mb-20 sm:mb-28">
+      
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 px-2">
+        <div>
+          <div class="inline-flex items-center gap-2 mb-2 font-mono text-[11px] tracking-[0.3em] uppercase text-[#4ef2d2]">
+            <span>REEL I</span>
+            <span>•</span>
+            <span>ARQUEOLOGÍA FORENSE</span>
+          </div>
+          <h2 class="font-fraunces font-black uppercase text-2xl sm:text-3xl md:text-4xl text-[#F3EFE6] leading-none">
+            Estratigrafía Lítica & Herejías Arcaicas
+          </h2>
+        </div>
+        <p class="font-mono text-xs text-white/50 max-w-md sm:text-right">
+          De los falos apotropaicos en Pompeya a la columna andina del Qapaq Ñan y el monolito flotante de Takasago.
+        </p>
+      </div>
+
+      <!-- VISOR 1 -->
+      <ImaxMaxRecovered
+        reelId="imax-reel-1"
+        reelNumber={1}
+        reelTitle="Estratigrafía Lítica & Herejías Arcaicas"
+        badgeLabel="ARQUEOLOGÍA & HEREJÍAS"
+        accentColor="#4ef2d2"
+        posts={reel1}
+        autoplayDuration={6000}
+      />
+
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════════════════
+         INTERSTICIO FILOSÓFICO: CITA DE XAVIER BENÍTEZ
+         ══════════════════════════════════════════════════════════════════════════ -->
+    <div class="relative z-10 max-w-4xl mx-auto my-16 sm:my-24 text-center px-4">
+      <div class="w-12 h-px bg-[#d4af37]/40 mx-auto mb-6"></div>
+      <blockquote class="font-fraunces italic font-medium text-lg sm:text-2xl text-white/85 leading-snug mb-3">
+        “Atribuirle un sentido a la llaga o al monolito fue el artilugio trágico mediante el cual el ser humano intentó resistir al abismo de la contingencia.”
+      </blockquote>
+      <cite class="font-mono text-xs uppercase tracking-[0.25em] text-[#d4af37] not-italic">
+        — Xavier Benítez · De la Cueva al Cosmos
+      </cite>
+      <div class="w-12 h-px bg-[#d4af37]/40 mx-auto mt-6"></div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════════
+         SECCIÓN 2: VISOR IMAX MAX (REEL 2 — GNOSIS & CONCIENCIA)
+         ══════════════════════════════════════════════════════════════════════════ -->
+    <section class="relative z-10 max-w-7xl mx-auto mb-20 sm:mb-28">
+      
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 px-2">
+        <div>
+          <div class="inline-flex items-center gap-2 mb-2 font-mono text-[11px] tracking-[0.3em] uppercase text-[#E69A46]">
+            <span>REEL II</span>
+            <span>•</span>
+            <span>HERMENÉUTICA & FILOSOFÍA</span>
+          </div>
+          <h2 class="font-fraunces font-black uppercase text-2xl sm:text-3xl md:text-4xl text-[#F3EFE6] leading-none">
+            Gnosis, Conciencia & Tiempo Sagrado
+          </h2>
+        </div>
+        <p class="font-mono text-xs text-white/50 max-w-md sm:text-right">
+          De la transgresión gnóstica de Cárpocrates al silencio del cine y los laberintos circulares de Jorge Luis Borges.
+        </p>
+      </div>
+
+      <!-- VISOR 2 -->
+      <ImaxMaxRecovered
+        reelId="imax-reel-2"
+        reelNumber={2}
+        reelTitle="Gnosis, Conciencia & Tiempo Sagrado"
+        badgeLabel="GNOSIS & TIEMPO"
+        accentColor="#E69A46"
+        posts={reel2}
+        autoplayDuration={6000}
+      />
+
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════════════════
+         CALL TO ACTION: CONTINUAR LA INDAGACIÓN EN LA HEMEROTECA
+         ══════════════════════════════════════════════════════════════════════════ -->
+    <footer class="relative z-10 max-w-4xl mx-auto text-center pt-8 border-t border-white/10">
+      <h3 class="font-fraunces font-black uppercase text-xl sm:text-2xl text-[#F3EFE6] mb-3">
+        ¿Deseas profundizar en las colecciones maestras?
+      </h3>
+      <p class="font-sans text-sm sm:text-base text-white/60 mb-6 max-w-xl mx-auto">
+        Explora los dossiers cinemáticos interactivos, mapas arqueológicos y ensayos de gran porte en nuestras salas activas.
+      </p>
+      <div class="flex items-center justify-center gap-4 flex-wrap">
+        <a
+          href="/colecciones/"
+          class="px-5 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider font-bold bg-[#4ef2d2] text-black hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(78,242,210,0.3)]"
+        >
+          Ver Colecciones
+        </a>
+        <a
+          href="/archivo/"
+          class="px-5 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider font-semibold text-white/80 hover:text-white bg-white/5 hover:bg-white/10 border border-white/15 backdrop-blur-md transition-all"
+        >
+          Archivo General
+        </a>
+      </div>
+    </footer>
+
+  </main>
+</Layout>

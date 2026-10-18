@@ -1,0 +1,514 @@
+---
+/**
+ * src/components/ImaxMaxRecovered.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * VISOR CANÓNICO: 'IMAX MAX — POSTEOS RECUPERADOS'
+ * Arquitectura Monumental Full-Scale (70mm Aspect Ratio ~16:10 / 1.43:1).
+ *
+ * Desarrollado para los 2 Reels temáticos de 10 posts perdidos/dormidos cada uno:
+ * - Reel 1: Arqueología Lítica, Herejías & Enigmas Arcaicos
+ * - Reel 2: Filosofía de la Conciencia, Gnosis & Tiempo Sagrado
+ *
+ * Características:
+ * - GSAP Timeline por diapositiva con Ken Burns suave (1.0 -> 1.08).
+ * - Autoplay configurable (default: 6000ms) con pausa en hover.
+ * - Barra interactiva de 10 cápsulas numeradas con scrubbing manual.
+ * - Botonera de flechas Prev / Next y botón Play / Pause.
+ * - Modal Lector integrado para leer el ensayo íntegro sin abandonar la experiencia.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+interface RecoveredPost {
+  id: string;
+  reel: number;
+  index: number;
+  title: string;
+  category: string;
+  coverImage: string;
+  date: string;
+  excerpt: string;
+  fullText: string;
+  source: string;
+}
+
+interface Props {
+  reelId: string;
+  reelNumber: number;
+  reelTitle: string;
+  badgeLabel: string;
+  accentColor?: string; // hex (ej: #4ef2d2 o #E69A46)
+  posts: RecoveredPost[];
+  autoplayDuration?: number; // ms (default 6000)
+}
+
+const {
+  reelId,
+  reelNumber,
+  reelTitle,
+  badgeLabel,
+  accentColor = reelNumber === 1 ? "#4ef2d2" : "#E69A46",
+  posts = [],
+  autoplayDuration = 6000,
+} = Astro.props;
+
+const totalPosts = posts.length;
+---
+
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap"
+/>
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,900,0,0&family=Chivo+Mono:wght@400;600;700&display=swap"
+/>
+
+<section
+  id={reelId}
+  class="imax-recovered-container relative w-full h-[180vh] bg-transparent text-white select-none my-12"
+  data-reel-id={reelId}
+  data-autoplay={autoplayDuration}
+  data-accent={accentColor}
+  aria-label={`Bóveda de Archivo — ${reelTitle}`}
+>
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       CONTENEDOR STICKY IMAX MAX (PANTALLA MONUMENTAL)
+       ══════════════════════════════════════════════════════════════════════════ -->
+  <div class="sticky top-3 sm:top-5 h-[88vh] sm:h-[90vh] md:h-[92vh] min-h-[580px] sm:min-h-[660px] md:min-h-[720px] max-h-[94vh] 2xl:max-h-[960px] w-full overflow-hidden bg-[#060a08] rounded-3xl sm:rounded-4xl border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)] isolate">
+    
+    <!-- HEADER EDITORIAL FLOTANTE -->
+    <header class="absolute top-5 sm:top-7 inset-x-0 z-30 flex items-center justify-between px-6 sm:px-10 pointer-events-none">
+      <div class="flex items-center gap-3 bg-[#060a08]/70 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 shadow-lg">
+        <span class="w-2.5 h-2.5 rounded-full animate-pulse" style={`background-color: ${accentColor}; box-shadow: 0 0 10px ${accentColor};`}></span>
+        <span class="font-mono text-[10px] sm:text-[11px] tracking-[0.3em] uppercase font-bold text-white/90">
+          {badgeLabel}
+        </span>
+        <span class="w-px h-3 bg-white/20"></span>
+        <span class="font-mono text-[10px] sm:text-[11px] tracking-wider text-white/60">
+          REEL {reelNumber} · 10 POSTS RECUPERADOS
+        </span>
+      </div>
+
+      <!-- Badge de Estado de Bóveda -->
+      <div class="hidden sm:flex items-center gap-2 bg-[#060a08]/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+        <span class="font-mono text-[9px] tracking-[0.25em] uppercase text-white/50">ARCHIVO RESTAURADO</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+      </div>
+    </header>
+
+    <!-- ══════════════════════════════════════════════════════════════════════════
+         CAPAS DE SLIDES (10 POSTS RECUPERADOS)
+         ══════════════════════════════════════════════════════════════════════════ -->
+    <div class="imax-slides-wrapper relative w-full h-full">
+      {posts.map((post, index) => {
+        const isFirst = index === 0;
+        return (
+          <article
+            class={`imax-recovered-layer absolute inset-0 w-full h-full flex items-end justify-start overflow-hidden transition-opacity duration-700 ${
+              isFirst ? "opacity-100 pointer-events-auto z-20" : "opacity-0 pointer-events-none z-10"
+            }`}
+            data-layer-index={index}
+            data-post-id={post.id}
+          >
+            <!-- FOTO HERO CON EFECTO KEN BURNS (GSAP) -->
+            <div class="imax-bg-wrap absolute inset-0 w-full h-full overflow-hidden">
+              <img
+                src={post.coverImage}
+                alt={post.title}
+                loading={isFirst ? "eager" : "lazy"}
+                class="imax-recovered-img w-full h-full object-cover scale-100 will-change-transform filter brightness-[0.72] contrast-[1.08]"
+                onerror="this.src='/images/bg-boveda.webp'"
+              />
+              <!-- VIÑETA CINEMÁTICA Y GRADIENTES ESTRATIGRÁFICOS -->
+              <div class="absolute inset-0 bg-gradient-to-t from-[#060a08] via-[#060a08]/50 to-transparent pointer-events-none"></div>
+              <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(6,10,8,0.7)_75%,#060a08_100%)] pointer-events-none"></div>
+              <div class="absolute inset-0 bg-gradient-to-r from-[#060a08]/80 via-transparent to-[#060a08]/60 pointer-events-none"></div>
+            </div>
+
+            <!-- CONTENIDO EDITORIAL DE LA DIAPOSITIVA -->
+            <div class="relative z-20 flex flex-col items-start justify-end px-6 sm:px-12 md:px-16 pb-20 sm:pb-24 max-w-5xl select-none">
+              
+              <!-- Tag de Categoría e Índice -->
+              <div class="imax-meta-badge flex items-center gap-2.5 mb-2.5">
+                <span class="font-mono text-xs sm:text-sm font-bold tracking-widest px-2.5 py-0.5 rounded bg-black/60 backdrop-blur-md border border-white/15" style={`color: ${accentColor};`}>
+                  {String(index + 1).padStart(2, "0")} / {String(totalPosts).padStart(2, "0")}
+                </span>
+                <span class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-white/70 bg-black/40 px-2 py-0.5 rounded border border-white/10">
+                  {post.category}
+                </span>
+                <span class="hidden md:inline-block font-mono text-[10px] text-white/40">
+                  • {post.date}
+                </span>
+              </div>
+
+              <!-- Titular Monumental en Fraunces / Clash Grotesk -->
+              <h2 class="imax-recovered-title font-fraunces font-black uppercase text-[clamp(1.75rem,4.8vw,4.2rem)] leading-[0.92] tracking-[-0.025em] text-[#F3EFE6] drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] mb-3.5 max-w-4xl">
+                {post.title}
+              </h2>
+
+              <!-- Bajada Crítica / Excerpt Xavier Benítez -->
+              <p class="imax-recovered-excerpt font-sans text-xs sm:text-sm md:text-base text-white/80 line-clamp-2 sm:line-clamp-3 leading-relaxed max-w-3xl mb-5 drop-shadow-md">
+                {post.excerpt}
+              </p>
+
+              <!-- Botones de Acción Inmersiva -->
+              <div class="imax-action-row flex items-center gap-3">
+                <button
+                  type="button"
+                  class="btn-open-modal group inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-black transition-all duration-300 shadow-lg cursor-pointer hover:scale-105 active:scale-95"
+                  style={`background-color: ${accentColor}; box-shadow: 0 0 20px ${accentColor}40;`}
+                  data-post-idx={index}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-black group-hover:rotate-12 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                  </svg>
+                  <span>Leer Ensayo Rescatado</span>
+                </button>
+
+                <a
+                  href={post.coverImage}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl font-mono text-xs text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/15 backdrop-blur-md transition-all duration-200"
+                  title="Ver imagen original en alta definición"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                  <span class="hidden sm:inline">Imagen HD</span>
+                </a>
+              </div>
+
+            </div>
+          </article>
+        );
+      })}
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════════
+         BARRA DE SCRUBBING & TIMELINE INTERACTIVO (10 BOTONES)
+         ══════════════════════════════════════════════════════════════════════════ -->
+    <div class="absolute bottom-4 sm:bottom-6 inset-x-4 sm:inset-x-10 z-30 flex items-center justify-between gap-3 bg-[#060a08]/80 backdrop-blur-xl px-4 py-2.5 rounded-2xl border border-white/10 shadow-2xl">
+      
+      <!-- Flecha Prev -->
+      <button
+        type="button"
+        class="imax-btn-prev w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 flex items-center justify-center text-white/70 hover:text-white transition-all cursor-pointer shrink-0"
+        aria-label="Post anterior"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+
+      <!-- 10 Botones Numéricos de Cápsula -->
+      <nav class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5" aria-label="Navegación de diapositivas">
+        {posts.map((_, i) => (
+          <button
+            type="button"
+            class={`imax-step-btn relative px-2.5 sm:px-3 py-1 rounded-md font-mono text-[11px] sm:text-xs font-bold transition-all duration-300 cursor-pointer ${
+              i === 0
+                ? "is-active text-black"
+                : "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
+            }`}
+            style={i === 0 ? `background-color: ${accentColor}; box-shadow: 0 0 12px ${accentColor}60;` : ""}
+            data-step={i}
+            aria-label={`Ir al post ${i + 1}`}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </nav>
+
+      <!-- Controles de Reproducción y Flecha Next -->
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button
+          type="button"
+          class="imax-btn-toggle-play w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 flex items-center justify-center text-white/70 hover:text-white transition-all cursor-pointer"
+          title="Pausar / Reanudar pase automático"
+          aria-label="Pausar o reanudar"
+        >
+          <svg class="icon-pause w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          <svg class="icon-play w-3.5 h-3.5 hidden" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </button>
+
+        <button
+          type="button"
+          class="imax-btn-next w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 flex items-center justify-center text-white/70 hover:text-white transition-all cursor-pointer"
+          aria-label="Siguiente post"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       MODAL LECTOR DE ENSAYO RESCATADO (INMERSIVO & ACCESIBLE)
+       ══════════════════════════════════════════════════════════════════════════ -->
+  <dialog class="imax-modal-reader fixed inset-0 z-50 w-full h-full bg-black/85 backdrop-blur-xl p-4 sm:p-8 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="modal-card relative w-full max-w-4xl max-h-[88vh] bg-[#0c100d] rounded-2xl sm:rounded-3xl border border-white/15 p-6 sm:p-10 overflow-y-auto shadow-2xl text-white">
+      
+      <!-- Botón de Cierre -->
+      <button
+        type="button"
+        class="btn-close-modal absolute top-5 right-5 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white cursor-pointer transition-all"
+        aria-label="Cerrar modal"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <!-- Metadatos de Cabecera del Modal -->
+      <div class="flex items-center gap-3 mb-4">
+        <span class="modal-category font-mono text-xs uppercase tracking-widest px-3 py-1 rounded bg-white/10 border border-white/15" style={`color: ${accentColor};`}>
+          Categoría
+        </span>
+        <span class="modal-date font-mono text-xs text-white/50">Fecha</span>
+      </div>
+
+      <!-- Título en Fraunces -->
+      <h3 class="modal-title font-fraunces font-black uppercase text-2xl sm:text-4xl text-[#F3EFE6] leading-tight mb-6">
+        Título del Ensayo
+      </h3>
+
+      <div class="w-full h-px bg-white/10 mb-6"></div>
+
+      <!-- Cuerpo del Ensayo Formateado -->
+      <div class="modal-body font-sans text-sm sm:text-base text-white/85 leading-relaxed space-y-4 whitespace-pre-line">
+        Contenido del ensayo...
+      </div>
+
+      <!-- Pie de Autoría Xavier Benítez -->
+      <footer class="mt-8 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-white/50 font-mono">
+        <span>THE GREAT PUZZLE PROJECT · ARCHIVO RECUPERADO</span>
+        <span>AUTOR: XAVIER BENÍTEZ</span>
+      </footer>
+
+    </div>
+  </dialog>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     CLIENT SCRIPT: GSAP TIMELINE ENGINE + EVENT DISPATCHERS
+     ══════════════════════════════════════════════════════════════════════════ -->
+<script define:vars={{ reelId, posts, accentColor, autoplayDuration }}>
+  import gsap from "gsap";
+
+  function initRecoveredViewer() {
+    const container = document.getElementById(reelId);
+    if (!container || container.dataset.initialized === "true") return;
+    container.dataset.initialized = "true";
+
+    const layers = container.querySelectorAll(".imax-recovered-layer");
+    const stepBtns = container.querySelectorAll(".imax-step-btn");
+    const prevBtn = container.querySelector(".imax-btn-prev");
+    const nextBtn = container.querySelector(".imax-btn-next");
+    const togglePlayBtn = container.querySelector(".imax-btn-toggle-play");
+    const pauseIcon = container.querySelector(".icon-pause");
+    const playIcon = container.querySelector(".icon-play");
+    const modal = container.querySelector(".imax-modal-reader");
+    const modalCloseBtn = container.querySelector(".btn-close-modal");
+    const openModalBtns = container.querySelectorAll(".btn-open-modal");
+
+    const total = layers.length;
+    let currentIndex = 0;
+    let isPlaying = true;
+    let autoInterval = null;
+
+    // Animación de Ken Burns en slide activa
+    function playSlideAnimation(index) {
+      const activeLayer = layers[index];
+      if (!activeLayer) return;
+      const img = activeLayer.querySelector(".imax-recovered-img");
+      const title = activeLayer.querySelector(".imax-recovered-title");
+      const excerpt = activeLayer.querySelector(".imax-recovered-excerpt");
+
+      if (img) {
+        gsap.fromTo(img, { scale: 1.0 }, { scale: 1.08, duration: autoplayDuration / 1000, ease: "none" });
+      }
+      if (title) {
+        gsap.fromTo(title, { y: 15, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" });
+      }
+      if (excerpt) {
+        gsap.fromTo(excerpt, { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, delay: 0.15, ease: "power2.out" });
+      }
+    }
+
+    function goToSlide(targetIdx) {
+      if (targetIdx < 0) targetIdx = total - 1;
+      if (targetIdx >= total) targetIdx = 0;
+
+      const prevLayer = layers[currentIndex];
+      const nextLayer = layers[targetIdx];
+
+      // Actualizar botones
+      stepBtns.forEach((b, idx) => {
+        if (idx === targetIdx) {
+          b.classList.add("is-active", "text-black");
+          b.classList.remove("bg-white/10", "text-white/60");
+          b.style.backgroundColor = accentColor;
+          b.style.boxShadow = `0 0 12px ${accentColor}60`;
+        } else {
+          b.classList.remove("is-active", "text-black");
+          b.classList.add("bg-white/10", "text-white/60");
+          b.style.backgroundColor = "";
+          b.style.boxShadow = "";
+        }
+      });
+
+      if (prevLayer && prevLayer !== nextLayer) {
+        gsap.to(prevLayer, {
+          opacity: 0,
+          duration: 0.6,
+          ease: "power2.inOut",
+          onComplete: () => {
+            prevLayer.classList.remove("pointer-events-auto", "z-20");
+            prevLayer.classList.add("pointer-events-none", "z-10");
+          }
+        });
+      }
+
+      if (nextLayer) {
+        nextLayer.classList.remove("pointer-events-none", "z-10");
+        nextLayer.classList.add("pointer-events-auto", "z-20");
+        gsap.to(nextLayer, {
+          opacity: 1,
+          duration: 0.65,
+          ease: "power2.out",
+          onStart: () => {
+            playSlideAnimation(targetIdx);
+          }
+        });
+      }
+
+      currentIndex = targetIdx;
+    }
+
+    function startTimer() {
+      stopTimer();
+      if (!isPlaying) return;
+      autoInterval = setInterval(() => {
+        goToSlide(currentIndex + 1);
+      }, autoplayDuration);
+    }
+
+    function stopTimer() {
+      if (autoInterval) {
+        clearInterval(autoInterval);
+        autoInterval = null;
+      }
+    }
+
+    // Scrubbing interactivo en cápsulas
+    stepBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const idx = parseInt(btn.dataset.step || "0", 10);
+        goToSlide(idx);
+        startTimer();
+      });
+    });
+
+    if (prevBtn) {
+      prevBtn.addEventListener("click", () => {
+        goToSlide(currentIndex - 1);
+        startTimer();
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        goToSlide(currentIndex + 1);
+        startTimer();
+      });
+    }
+
+    // Toggle Play / Pause
+    if (togglePlayBtn) {
+      togglePlayBtn.addEventListener("click", () => {
+        isPlaying = !isPlaying;
+        if (isPlaying) {
+          pauseIcon?.classList.remove("hidden");
+          playIcon?.classList.add("hidden");
+          startTimer();
+        } else {
+          pauseIcon?.classList.add("hidden");
+          playIcon?.classList.remove("hidden");
+          stopTimer();
+        }
+      });
+    }
+
+    // Pausa en hover del visor
+    container.addEventListener("mouseenter", () => {
+      stopTimer();
+    });
+    container.addEventListener("mouseleave", () => {
+      if (isPlaying) startTimer();
+    });
+
+    // ── GESTIÓN DEL MODAL LECTOR ──────────────────────────────────────────────
+    openModalBtns.forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        stopTimer();
+        const pIdx = parseInt(btn.dataset.postIdx || "0", 10);
+        const postData = posts[pIdx];
+        if (!postData || !modal) return;
+
+        const titleEl = modal.querySelector(".modal-title");
+        const catEl = modal.querySelector(".modal-category");
+        const dateEl = modal.querySelector(".modal-date");
+        const bodyEl = modal.querySelector(".modal-body");
+
+        if (titleEl) titleEl.textContent = postData.title;
+        if (catEl) catEl.textContent = postData.category;
+        if (dateEl) dateEl.textContent = postData.date;
+        if (bodyEl) {
+          bodyEl.textContent = postData.fullText || postData.excerpt;
+        }
+
+        modal.classList.remove("opacity-0", "pointer-events-none");
+        modal.classList.add("opacity-100", "pointer-events-auto");
+      });
+    });
+
+    if (modalCloseBtn && modal) {
+      modalCloseBtn.addEventListener("click", () => {
+        modal.classList.remove("opacity-100", "pointer-events-auto");
+        modal.classList.add("opacity-0", "pointer-events-none");
+        if (isPlaying) startTimer();
+      });
+    }
+
+    if (modal) {
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          modal.classList.remove("opacity-100", "pointer-events-auto");
+          modal.classList.add("opacity-0", "pointer-events-none");
+          if (isPlaying) startTimer();
+        }
+      });
+    }
+
+    // Inicializar primer slide
+    playSlideAnimation(0);
+    startTimer();
+  }
+
+  document.addEventListener("DOMContentLoaded", initRecoveredViewer);
+  document.addEventListener("astro:page-load", initRecoveredViewer);
+  initRecoveredViewer();
+</script>
+
+<style>
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
