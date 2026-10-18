@@ -1,11 +1,8 @@
 {
-    "title":  "El Buda: anatomía del deseo y la disolución del yo",
-    "atmosfera":  {
-                      "discriminant":  "obsidiana"
-                  },
-    "coverImage":  "/src/assets/ensayos-cinematicos/el-buda-anatomia-del-deseo-y-la-disolucion-del-yo/coverImage.jpg",
-    "publicarConImagen":  true,
-    "draft":  false,
-    "date":  "2026-10-15",
-    "notasInvestigador":  "Portada HD Wikimedia Commons: File:Gal Vihara Polonnaruwa.jpg | Licencia: Dominio Publico / CC | Curada TGP Batch"
+  "title": "El Buda: anatomía del deseo y la disolución del yo",
+  "atmosfera": {
+    "discriminant": "obsidiana"
+  },
+  "coverImage": "/src/assets/ensayos-cinematicos/el-buda-anatomia-del-deseo-y-la-disolucion-del-yo/coverImage.jpg",
+  "date": "2026-10-15"
 }

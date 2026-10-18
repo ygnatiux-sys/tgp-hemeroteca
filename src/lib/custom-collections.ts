@@ -218,6 +218,21 @@ export const customCollections: CustomCollectionGroup[] = [
     entorno: 'Capadocia · Valle de Beqaa · Hipogeos de la India',
     essays: [
       {
+        slug: 'la-teogonia-de-hesiodo-el-abismo-primordial-y-el-t',
+        href: '/ensayos-cinematicos/la-teogonia-de-hesiodo-el-abismo-primordial-y-el-t/',
+        img: 'https://storage.thegreatpuzzleproject.com/vault-media/1792290262796-a9133c37.webp',
+        entry: {
+          title: 'La Teogonía de Hesíodo: El Abismo Primordial y el Tiempo de los Titanes',
+          category: 'Alternative · Enigmas Subterráneos',
+          coverImage: 'https://storage.thegreatpuzzleproject.com/vault-media/1792290262796-a9133c37.webp',
+          excerpt: 'Desde las entrañas de la nada hesiódica, la *Teogonía* emerge como un mapa estelar de la génesis cósmica. Este ensayo monumental se adentra en el abismo primordial del Caos y el Tártaro, trazando la violenta ascensión de los dioses a través de la castración de Urano y la épica Titanomaquia. Un viaje a la profundidad Z de la memoria arcaica, donde el mito forjó el orden desde el espasmo original.',
+          dek: 'Cosmogonía del Caos, la Mutilación de Urano y el Yunque del Tártaro',
+          date: '2026-10-18T02:24:47.332Z',
+          themeColor: 'abismo',
+          sitio: 'Monte Helicón & Beocia, Grecia',
+        },
+      },
+      {
         slug: 'derinkuyu',
         href: '/colecciones/enigmas-subterraneos/derinkuyu/',
         img: imgDerinkuyu.src,

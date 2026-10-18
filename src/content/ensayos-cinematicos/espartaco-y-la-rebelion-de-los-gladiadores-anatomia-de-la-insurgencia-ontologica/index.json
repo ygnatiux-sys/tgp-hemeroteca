@@ -1,12 +1,9 @@
 {
-    "generador":  "TGP Mind Agent v2",
-    "title":  "Espartaco y la rebelión de los gladiadores: Anatomía de la insurgencia ontológica",
-    "date":  "2026-09-22",
-    "atmosfera":  {
-                      "discriminant":  "obsidiana"
-                  },
-    "coverImage":  "/src/assets/ensayos-cinematicos/espartaco-y-la-rebelion-de-los-gladiadores-anatomia-de-la-insurgencia-ontologica/coverImage.jpg",
-    "publicarConImagen":  true,
-    "draft":  false,
-    "notasInvestigador":  "Portada HD Wikimedia Commons: File:Spartacus marble sculpture Louvre.jpg | Licencia: Dominio Publico / CC | Curada TGP Batch"
+  "generador": "TGP Mind Agent v2",
+  "title": "Espartaco y la rebelión de los gladiadores: Anatomía de la insurgencia ontológica",
+  "date": "2026-09-22",
+  "atmosfera": {
+    "discriminant": "obsidiana"
+  },
+  "coverImage": "/src/assets/ensayos-cinematicos/espartaco-y-la-rebelion-de-los-gladiadores-anatomia-de-la-insurgencia-ontologica/coverImage.jpg"
 }

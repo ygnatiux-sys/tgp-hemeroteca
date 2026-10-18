@@ -1,12 +1,9 @@
 {
-    "generador":  "TGP Mind Agent v2",
-    "title":  "La Ciudadela Interior: Anatomía Cinemática del Estoicismo Romano",
-    "date":  "2026-09-22",
-    "atmosfera":  {
-                      "discriminant":  "obsidiana"
-                  },
-    "coverImage":  "/src/assets/ensayos-cinematicos/la-ciudadela-interior-anatomia-cinematica-del-estoicismo-romano/coverImage.jpg",
-    "publicarConImagen":  true,
-    "draft":  false,
-    "notasInvestigador":  "Portada HD Wikimedia Commons: File:Marc Aurel Capitol Roma.jpg | Licencia: Dominio Publico / CC | Curada TGP Batch"
+  "generador": "TGP Mind Agent v2",
+  "title": "La Ciudadela Interior: Anatomía Cinemática del Estoicismo Romano",
+  "date": "2026-09-22",
+  "atmosfera": {
+    "discriminant": "obsidiana"
+  },
+  "coverImage": "/src/assets/ensayos-cinematicos/la-ciudadela-interior-anatomia-cinematica-del-estoicismo-romano/coverImage.jpg"
 }

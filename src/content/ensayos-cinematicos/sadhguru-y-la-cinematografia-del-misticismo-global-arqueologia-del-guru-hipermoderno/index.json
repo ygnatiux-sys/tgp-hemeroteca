@@ -1,12 +1,9 @@
 {
-    "generador":  "TGP Mind Agent v2",
-    "title":  "Sadhguru y la Cinematografía del Misticismo Global: Arqueología del Gurú Hipermoderno",
-    "date":  "2026-09-22",
-    "atmosfera":  {
-                      "discriminant":  "obsidiana"
-                  },
-    "coverImage":  "/src/assets/ensayos-cinematicos/sadhguru-y-la-cinematografia-del-misticismo-global-arqueologia-del-guru-hipermoderno/coverImage.jpg",
-    "publicarConImagen":  true,
-    "draft":  false,
-    "notasInvestigador":  "Portada HD Wikimedia Commons: File:Adiyogi Shiva steel burst 2018.jpg | Licencia: Dominio Publico / CC | Curada TGP Batch"
+  "generador": "TGP Mind Agent v2",
+  "title": "Sadhguru y la Cinematografía del Misticismo Global: Arqueología del Gurú Hipermoderno",
+  "date": "2026-09-22",
+  "atmosfera": {
+    "discriminant": "obsidiana"
+  },
+  "coverImage": "/src/assets/ensayos-cinematicos/sadhguru-y-la-cinematografia-del-misticismo-global-arqueologia-del-guru-hipermoderno/coverImage.jpg"
 }

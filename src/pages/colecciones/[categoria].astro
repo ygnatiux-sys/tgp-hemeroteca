@@ -33,19 +33,23 @@ export async function getStaticPaths() {
   const allNotasRaw = await getCollection('notas').catch(() => []);
 
   const isProd = import.meta.env.PROD;
-  const publishableCinematicos = allCinematicosRaw.map(item => ({
-    slug: item.id.replace(/\/index$/, ''),
-    isCinematicGSAP: true,
-    entry: {
-      title: item.data.title || 'Dossier Cinemático',
-      category: 'Ensayos Cinemáticos',
-      coverImage: item.data.coverImage || (Array.isArray(item.data.gallery) && item.data.gallery.length > 0 ? item.data.gallery[0] : null),
-      excerpt: 'Experiencia inmersiva GSAP a pantalla completa con diseño atmosférico.',
-      date: new Date().toISOString(),
-      themeColor: 'obsidiana',
+  const publishableCinematicos = allCinematicosRaw.map(item => {
+    const data = item.data as any;
+    const postDate = data.date ? new Date(data.date).toISOString() : new Date().toISOString();
+    return {
+      slug: item.id.replace(/\/index$/, ''),
       isCinematicGSAP: true,
-    }
-  }));
+      entry: {
+        title: data.title || 'Dossier Cinemático',
+        category: data.category || 'Ensayos Cinemáticos',
+        coverImage: data.coverImage || (Array.isArray(data.gallery) && data.gallery.length > 0 ? data.gallery[0] : null),
+        excerpt: data.excerpt || data.dek || 'Experiencia inmersiva GSAP a pantalla completa con diseño atmosférico.',
+        date: postDate,
+        themeColor: (typeof data.atmosfera === 'object' ? data.atmosfera?.discriminant : data.atmosfera) || 'obsidiana',
+        isCinematicGSAP: true,
+      }
+    };
+  });
 
   const publishableNotas = allNotasRaw.map(item => ({
     slug: item.id.replace(/\.(md|mdx)$/, ''),

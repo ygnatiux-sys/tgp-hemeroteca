@@ -1,16 +1,13 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// TGP MIND — Módulo de Teclados Inline de Telegram
+// TGP MIND — Módulo de Teclados Inline de Telegram (Botoneras WOW Nativas)
 //
-// Paradigma: Stateless/Semántico.
-// Los botones son ATAJOS que inyectan texto semántico al agente LLM.
-// NO hay máquina de estados: el callback_data es simplemente texto plano
-// que Gemini procesa igual que si el usuario lo hubiera escrito.
+// Paradigma: Stateless/Semántico + Acciones Rápidas Nativas (Action Bento).
+// Los botones son atajos táctiles directos con protección anti-doble clic.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { BotIdentity } from '../ia/agent.js';
+export type BotIdentity = 'redes' | 'assistant' | 'omni' | 'liminal';
 
 // ── Tipos Telegram ────────────────────────────────────────────────────────────
-
 export interface InlineKeyboardButton {
   text: string;
   callback_data: string;
@@ -19,8 +16,6 @@ export interface InlineKeyboardButton {
 export type InlineKeyboard = InlineKeyboardButton[][];
 
 // ── Detector de Ficha Visual ──────────────────────────────────────────────────
-// Evalúa si el texto de Gemini contiene la Ficha Visual para adjuntar atajos.
-// La ficha se detecta por la presencia de "¿Confirmamos?" y "Ficha TGP".
 export function esFichaVisual(text: string): boolean {
   return (
     text.includes('¿Confirmamos?') ||
@@ -29,83 +24,142 @@ export function esFichaVisual(text: string): boolean {
   );
 }
 
-// ── Teclado de Confirmación de Ficha ─────────────────────────────────────────
-// Se adjunta cuando Gemini imprime la Ficha Visual.
+// ── Detector de Ensayo Generado (para adjuntar Action Bento) ──────────────────
+export function esEnsayoGenerado(text: string): boolean {
+  return (
+    (text.includes('# ') || text.includes('## ')) &&
+    (text.length > 600 || text.includes('Hemeroteca') || text.includes('Ensayo'))
+  );
+}
+
+// ── Teclado de Confirmación de Ficha (Web y Social) ───────────────────────────
+export const TECLADO_CONFIRMACION_WEB: InlineKeyboard = [
+  [
+    { text: '🏛️ Confirmar Hemeroteca', callback_data: 'ok_hemeroteca' },
+    { text: '📜 Confirmar Alternative', callback_data: 'ok_alternative' },
+  ],
+  [
+    { text: '✏️ Modificar parámetros', callback_data: 'quiero modificar los parámetros' },
+    { text: '❌ Cancelar', callback_data: '/cancel' },
+  ],
+];
+
+export const TECLADO_CONFIRMACION_REDES: InlineKeyboard = [
+  [
+    { text: '📘 Publicar en Facebook', callback_data: 'ok_facebook' },
+    { text: '🎵 Publicar en TikTok', callback_data: 'ok_tiktok' },
+  ],
+  [
+    { text: '✏️ Modificar copy', callback_data: 'quiero ajustar el copy' },
+    { text: '❌ Cancelar', callback_data: '/cancel' },
+  ],
+];
+
+// Fallback genérico de confirmación
 export const TECLADO_CONFIRMACION: InlineKeyboard = [
   [
     { text: '✅ Confirmar', callback_data: 'ok' },
-    { text: '❌ Cancelar',  callback_data: '/cancel' },
+    { text: '❌ Cancelar', callback_data: '/cancel' },
   ],
   [
     { text: '✏️ Modificar parámetros', callback_data: 'quiero modificar los parámetros' },
   ],
 ];
 
-// ── Menú Dinámico por Bot ─────────────────────────────────────────────────────
-// El callback_data es texto semántico que Gemini lee como mensaje del usuario.
+// ── Action Bento: Botonera Interactiva Nativa para Ensayos Terminados ─────────
+export const BOTONERA_ACCIONES_ENSAYO: InlineKeyboard = [
+  [
+    { text: '🎧 Escuchar Ensayo', callback_data: 'action:audio' },
+    { text: '🎨 Portada Nano Banana', callback_data: 'action:nanobanana' },
+  ],
+  [
+    { text: '🏛️ Publicar en Hemeroteca', callback_data: 'action:publicar_hemeroteca' },
+    { text: '📜 Publicar en Alternative', callback_data: 'action:publicar_alternative' },
+  ],
+  [
+    { text: '🧹 Sanear Hilo', callback_data: '/nuevo' },
+  ],
+];
 
+// ── Action Bento: Botonera Interactiva Nativa para Posts de Redes Sociales ────
+export const BOTONERA_ACCIONES_REDES: InlineKeyboard = [
+  [
+    { text: '📘 Publicar en Facebook', callback_data: 'action:post_facebook' },
+    { text: '🎵 Publicar en TikTok', callback_data: 'action:post_tiktok' },
+  ],
+  [
+    { text: '🎧 Audio Resumen', callback_data: 'action:audio' },
+    { text: '🧹 Sanear Hilo', callback_data: '/nuevo' },
+  ],
+];
+
+// ── Menús Principales por Bot (/menu) ─────────────────────────────────────────
 const MENU_OMNI: InlineKeyboard = [
   [
-    { text: '🎬 Nuevo Ensayo (Hemeroteca)', callback_data: 'quiero crear un nuevo ensayo para la Hemeroteca' },
+    { text: '🏛️ Ensayo para Hemeroteca', callback_data: 'quiero crear un nuevo ensayo para la Hemeroteca' },
+    { text: '📜 Ensayo para Alternative', callback_data: 'quiero crear un ensayo para Historia Alternative' },
   ],
   [
-    { text: '📱 Post para Redes',           callback_data: 'quiero crear un post para redes sociales' },
-    { text: '🎥 Pipeline Cinemático',       callback_data: 'quiero generar un pipeline cinemático' },
+    { text: '📘 Post Facebook', callback_data: 'quiero crear un post para Facebook' },
+    { text: '🎵 Post TikTok', callback_data: 'quiero crear un post para TikTok' },
   ],
   [
-    { text: '🕸️ Extraer Grafo Neo4j',       callback_data: 'quiero extraer entidades para el grafo Neo4j' },
+    { text: '🎥 Pipeline Cinemático', callback_data: 'quiero generar un pipeline cinemático' },
+    { text: '🕸️ Extraer Grafo Neo4j', callback_data: 'quiero extraer entidades para el grafo Neo4j' },
   ],
   [
-    { text: '🔄 Reiniciar sesión',          callback_data: '/nuevo' },
+    { text: '🔄 Reiniciar sesión', callback_data: '/nuevo' },
   ],
 ];
 
 const MENU_REDES: InlineKeyboard = [
   [
-    { text: '📘 Post para Facebook',  callback_data: 'quiero crear un post para Facebook' },
-    { text: '🎵 Post para TikTok',    callback_data: 'quiero crear un post para TikTok' },
+    { text: '📘 Post para Facebook', callback_data: 'quiero crear un post para Facebook' },
+    { text: '🎵 Post para TikTok', callback_data: 'quiero crear un post para TikTok' },
   ],
   [
-    { text: '🔄 Reiniciar sesión',    callback_data: '/nuevo' },
+    { text: '🔄 Reiniciar sesión', callback_data: '/nuevo' },
   ],
 ];
 
 const MENU_ASSISTANT: InlineKeyboard = [
   [
-    { text: '📖 Nuevo Ensayo',        callback_data: 'quiero crear un nuevo ensayo para la Hemeroteca' },
-    { text: '🕸️ Extraer Grafo',       callback_data: 'quiero extraer entidades para el grafo Neo4j' },
+    { text: '📖 Nuevo Ensayo Histórico', callback_data: 'quiero crear un nuevo ensayo histórico' },
+    { text: '🕸️ Extraer Grafo Neo4j', callback_data: 'quiero extraer entidades para el grafo Neo4j' },
   ],
   [
-    { text: '🔄 Reiniciar sesión',    callback_data: '/nuevo' },
+    { text: '🔄 Reiniciar sesión', callback_data: '/nuevo' },
   ],
 ];
 
 const MENU_LIMINAL: InlineKeyboard = [
   [
-    { text: '🎬 Ensayo Cinemático',   callback_data: 'quiero crear un nuevo ensayo cinemático' },
-    { text: '🎥 Pipeline Visual',     callback_data: 'quiero generar un pipeline cinemático' },
+    { text: '🎬 Ensayo Cinemático', callback_data: 'quiero crear un nuevo ensayo cinemático' },
+    { text: '🗣️ Consulta Panlingua D1', callback_data: 'consultar la base lingüística Panlingua' },
   ],
   [
-    { text: '💬 Modo Libre',          callback_data: 'hablemos libremente sobre un tema filosófico' },
-    { text: '🔄 Reiniciar sesión',    callback_data: '/nuevo' },
+    { text: '🎨 Portada Artística', callback_data: 'generar una portada artística con Nano Banana' },
+    { text: '🎧 Audio Documental', callback_data: 'sintetizar el audio documental' },
+  ],
+  [
+    { text: '🔄 Reiniciar sesión', callback_data: '/nuevo' },
   ],
 ];
 
 export const MENUS_BY_BOT: Record<BotIdentity, InlineKeyboard> = {
-  omni:      MENU_OMNI,
-  redes:     MENU_REDES,
+  omni: MENU_OMNI,
+  redes: MENU_REDES,
   assistant: MENU_ASSISTANT,
-  liminal:   MENU_LIMINAL,
+  liminal: MENU_LIMINAL,
 };
 
-// ── Texto de bienvenida del /menu ─────────────────────────────────────────────
 const MENU_TITLES: Record<BotIdentity, string> = {
-  omni:      '⚡ **TGP Omni** — ¿Qué creamos hoy?',
-  redes:     '📱 **TGP Redes** — ¿Para qué red publicamos?',
-  assistant: '🔬 **TGP Assistant** — ¿Qué investigamos?',
-  liminal:   '🌒 **TGP Liminal** — ¿A dónde vamos?',
+  omni: '⚡ **TGP Omni** — ¿Qué creamos hoy, che? Seleccioná una acción rápida:',
+  redes: '📱 **TGP Redes** — ¿Para qué red publicamos el post?',
+  assistant: '🔬 **TGP Assistant** — ¿Qué línea histórica o grafo investigamos?',
+  liminal: '🌒 **TGP Liminal** — Exploradora lingüística y archivo vivo:',
 };
 
 export function getMenuTitle(botIdentity: BotIdentity): string {
-  return MENU_TITLES[botIdentity];
+  return MENU_TITLES[botIdentity] || '⚡ **TGP Mind** — ¿En qué avanzamos?';
 }

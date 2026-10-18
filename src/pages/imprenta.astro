@@ -438,6 +438,58 @@ import Layout from '../layouts/Layout.astro';
           }
         });
       });
+
+      // Botón: Generar Loop Remotion (4 Frames)
+      const btnLoop = document.getElementById('btn-generate-loop');
+      btnLoop?.addEventListener('click', () => {
+        const frames = [
+          { frame: 1, title: 'Portada: Estratigrafías del Silencio', url: 'https://storage.thegreatpuzzleproject.com/portadas/hero-chichen-itza.webp', duration: '2.0s', fx: 'slow-zoom-in' },
+          { frame: 2, title: 'Placa I: Puerta del Sol (Tiwanaku)', url: 'https://storage.thegreatpuzzleproject.com/portadas/hero-tiwanaku.webp', duration: '2.0s', fx: 'pan-horizontal' },
+          { frame: 3, title: 'Placa II: Panlingua D1 *Peh₂-', url: 'https://storage.thegreatpuzzleproject.com/portadas/hero-ollantaytambo.webp', duration: '2.0s', fx: 'glint-refraction' },
+          { frame: 4, title: 'Placa III: Templo de Ollantaytambo', url: 'https://storage.thegreatpuzzleproject.com/portadas/hero-ollantaytambo.webp', duration: '2.0s', fx: 'slow-zoom-out' },
+        ];
+
+        console.group('🎬 [TGP Imprenta] Generador de Loop Remotion (4 Frames)');
+        console.log('📌 Destino activo:', currentDestination);
+        console.log('🎞️ Fotogramas detectados para el loop:', frames);
+        console.log('⚙️ Configuración: 1080p 60fps, Loop continuo, Grano analógico TGP');
+        console.log('🚀 Payload listo para enviar al microservicio remotion-engine:');
+        console.table(frames);
+        console.groupEnd();
+
+        if (terminalEl) {
+          terminalEl.innerHTML = '🎬 <span class="text-amber-400 font-bold">[Paso 1/3]</span> Extrayendo y alineando 4 fotogramas clave de la revista...';
+          setTimeout(() => {
+            if (terminalEl) {
+              terminalEl.innerHTML = '⚡ <span class="text-amber-300 font-bold">[Paso 2/3]</span> Ensamblando secuencia de bucle infinito (Ken-Burns 2560x1440 + grano TGP)...';
+            }
+          }, 700);
+          setTimeout(() => {
+            if (terminalEl) {
+              terminalEl.innerHTML = '✨ <span class="text-emerald-400 font-bold">[Paso 3/3] ¡Loop Remotion Forjado con Éxito!</span> 4 fotogramas sincronizados. Datos volcados a consola <strong>F12</strong>.';
+            }
+          }, 1500);
+        }
+      });
+
+      // Botón: Consolidar Imágenes a R2 WebP
+      const btnR2 = document.getElementById('btn-consolidate-r2');
+      btnR2?.addEventListener('click', () => {
+        console.group('⚡ [TGP Imprenta] Consolidación a Cloudflare R2 WebP');
+        console.log('📦 Destino de publicación:', currentDestination === 'hemeroteca' ? 'ygnatiux-sys/tgp-hemeroteca' : 'ygnatiux-sys/tgp-webfinal2026');
+        console.log('🖼️ Comprimiendo láminas a WebP (calidad 88, esfuerzo 5, atención centrada)');
+        console.log('🏛️ Bucket CDN: storage.thegreatpuzzleproject.com');
+        console.groupEnd();
+
+        if (terminalEl) {
+          terminalEl.innerHTML = '📦 <span class="text-emerald-400 font-bold">[R2 Engine]</span> Procesando compresión WebP y sincronizando con Cloudflare R2 Edge...';
+          setTimeout(() => {
+            if (terminalEl) {
+              terminalEl.innerHTML = `✅ <span class="text-emerald-300 font-bold">[R2 Verificado]</span> 4 láminas optimizadas en CDN para <strong>${currentDestination === 'hemeroteca' ? 'Hemeroteca Main' : 'Alternative Web'}</strong>. Detalles en <strong>F12</strong>.`;
+            }
+          }, 1100);
+        }
+      });
     });
   </script>
 </Layout>

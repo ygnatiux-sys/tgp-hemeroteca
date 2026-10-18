@@ -33,12 +33,39 @@ import { wikimediaTool } from '../core/tools/wikimediaTool.js';
 import { nanoBananaTool } from '../core/tools/nanoBananaTool.js';
 import { generarMarkdoc, publicarEntradaKeystaticGitHub } from '../servicios/publicacion.js';
 import {
+  getCompanionSession,
+  updateWorkingState,
+  resetCompanionSession,
+} from '../storage/companion-memory.js';
+import {
+  generarAudioDocumentalR2,
+  sendTelegramNativeAudio,
+} from './telegram-tts.js';
+import { ejecutarPublishSocial } from '../ia/tools/tool-publish-social.js';
+import {
   esFichaVisual,
+  esEnsayoGenerado,
   TECLADO_CONFIRMACION,
+  TECLADO_CONFIRMACION_WEB,
+  TECLADO_CONFIRMACION_REDES,
+  BOTONERA_ACCIONES_ENSAYO,
+  BOTONERA_ACCIONES_REDES,
   MENUS_BY_BOT,
   getMenuTitle,
   type InlineKeyboard,
 } from './keyboards.js';
+
+// ── Indicador de escritura "Typing" no bloqueante ───────────────────────────
+export async function sendChatAction(chatId: number, token: string, action = 'typing'): Promise<void> {
+  try {
+    fetch(`https://api.telegram.org/bot${token}/sendChatAction`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, action }),
+    }).catch(() => {});
+  } catch {}
+}
+
 
 // ── Helpers de Telegram API ───────────────────────────────────────────────────
 
@@ -252,7 +279,19 @@ export async function handleTelegramWebhook(
 
     // 1. Determinar cartel Toast de devolución
     let toastText = '⚡ Procesando...';
-    if (data === 'ok') {
+    if (data.startsWith('action:audio')) {
+      toastText = '🎙️ Sintetizando audio documental...';
+    } else if (data.includes('publicar_hemeroteca') || data === 'ok_hemeroteca') {
+      toastText = '🏛️ Publicando en TGP Hemeroteca...';
+    } else if (data.includes('publicar_alternative') || data === 'ok_alternative') {
+      toastText = '📜 Publicando en TGP Alternative...';
+    } else if (data.includes('facebook') || data === 'ok_facebook') {
+      toastText = '📘 Publicando en Facebook vía Zernio...';
+    } else if (data.includes('tiktok') || data === 'ok_tiktok') {
+      toastText = '🎵 Publicando en TikTok vía Zernio...';
+    } else if (data.startsWith('action:nanobanana')) {
+      toastText = '🎨 Generando portada cinematográfica con Nano Banana...';
+    } else if (data === 'ok') {
       toastText = '⏳ ¡Confirmado! Generando ensayo y multimedia...';
     } else if (data === '/cancel' || data === 'cancel') {
       toastText = '❌ Operación cancelada.';
@@ -265,7 +304,282 @@ export async function handleTelegramWebhook(
     // Enviar cartel Toast inmediato (< 10s requerido por Telegram)
     await answerCallbackQuery(botToken, cqId, toastText, false);
 
-    // 2. Si pulsaron Confirmar, congelar el teclado del mensaje para evitar doble clic y errores
+    // ── GESTIÓN DE ACCIONES RÁPIDAS DE LA BOTONERA ACTION BENTO ─────────────
+    if (data === 'action:audio') {
+      if (messageId) {
+        await editMessageReplyMarkup(botToken, chatId, messageId, [
+          [{ text: '⏳ Sintetizando audio con voz neuronal...', callback_data: 'disabled' }],
+        ]);
+      }
+
+      const session = await getCompanionSession(chatId, botIdentity);
+      const essayContent = session.working_state.lastDraft ||
+        session.recent_turns.filter(t => t.role === 'model').pop()?.parts?.map((p: any) => p.text).join('\n') || '';
+      const essayTitle = session.working_state.lastTitle || 'Ensayo Documental TGP';
+
+      if (!essayContent) {
+        await sendTelegramMessage(chatId, botToken, '⚠️ No encontré un ensayo en la memoria reciente para sintetizar.');
+        return;
+      }
+
+      await sendTelegramMessage(chatId, botToken, '🎙️ *Iniciando síntesis documental con chunking y voz neuronal...*');
+      const audioRes = await generarAudioDocumentalR2(essayContent, essayTitle, chatId);
+
+      if (audioRes.success && audioRes.audioUrl) {
+        await sendTelegramNativeAudio({
+          chatId,
+          botToken,
+          audioUrl: audioRes.audioUrl,
+          title: essayTitle,
+          performer: 'TGP Hemeroteca',
+          caption: `🎧 **${essayTitle}**\n\n🔊 Reproductor nativo TGP\n🔗 [Descargar MP3 en Storage R2](${audioRes.audioUrl})`,
+        });
+
+        if (messageId) {
+          await editMessageReplyMarkup(botToken, chatId, messageId, [
+            [{ text: '🎧 Audio sintetizado con éxito', callback_data: 'disabled' }],
+          ]);
+        }
+      } else {
+        await sendTelegramMessage(chatId, botToken, `⚠️ Error generando audio: ${audioRes.error || 'Desconocido'}`);
+      }
+      return;
+    }
+
+    if (data === 'action:publicar_hemeroteca' || data === 'ok_hemeroteca') {
+      if (messageId) {
+        await editMessageReplyMarkup(botToken, chatId, messageId, [
+          [{ text: '⏳ Publicando en Hemeroteca...', callback_data: 'disabled' }],
+        ]);
+      }
+
+      const session = await getCompanionSession(chatId, botIdentity);
+      const essayContent = session.working_state.lastDraft ||
+        session.recent_turns.filter(t => t.role === 'model').pop()?.parts?.map((p: any) => p.text).join('\n') || '';
+      const titulo = session.working_state.lastTitle || 'Ensayo Cinemático TGP';
+      const coverUrl = session.working_state.lastImageUrl || 'https://storage.thegreatpuzzleproject.com/tgp-fallback.jpg';
+      const categoria = session.working_state.lastCollection || 'misterios-arqueologia';
+
+      if (!essayContent) {
+        await sendTelegramMessage(chatId, botToken, '⚠️ No encontré un ensayo para publicar.');
+        return;
+      }
+
+      const { slug, contenidoMdoc } = generarMarkdoc({
+        titulo,
+        secciones: [{ parrafo: essayContent }],
+      });
+
+      const ghToken = process.env.GITHUB_TOKEN_HEMEROTECA || process.env.GITHUB_TOKEN || '';
+      const ghRepo = process.env.GITHUB_REPO_HEMEROTECA || 'ygnatiux-sys/tgp-hemeroteca';
+
+      try {
+        const commitSha = await publicarEntradaKeystaticGitHub({
+          coleccion: 'ensayos-cinematicos',
+          slug,
+          indexJson: {
+            title: titulo,
+            coverImage: coverUrl,
+            category: categoria,
+            generadorTexto: JSON.stringify({ text: contenidoMdoc, image: coverUrl }),
+          },
+          contentMdoc: contenidoMdoc,
+          token: ghToken,
+          repoFull: ghRepo,
+          mensajeCommit: `docs(hemeroteca): publicar ensayo "${titulo}" vía Compagnon Telegram`,
+        });
+
+        const commitUrl = `https://github.com/${ghRepo}/commit/${commitSha}`;
+        const postUrl = `https://thegreatpuzzleproject.com/ensayos-cinematicos/${slug}`;
+        const coleccionUrl = `https://thegreatpuzzleproject.com/colecciones/${categoria}`;
+
+        const msgPublicado = [
+          `✅ *¡Publicado con éxito en TGP Hemeroteca!*`,
+          ``,
+          `🏛️ **Ensayo Web:** [Abrir Ensayo en Hemeroteca](${postUrl})`,
+          coverUrl ? `🖼️ **Storage R2:** [Ver Portada en Storage R2](${coverUrl})` : '',
+          `📂 **Colección Destacada:** [Ver Colección](${coleccionUrl})`,
+          `📦 **Commit GitHub:** [Ver Commit ${commitSha.slice(0, 7)}](${commitUrl})`,
+          `📁 **Ruta:** \`src/content/ensayos-cinematicos/${slug}\``,
+        ].filter(Boolean).join('\n');
+
+        await sendTelegramMessage(chatId, botToken, msgPublicado);
+
+        if (messageId) {
+          await editMessageReplyMarkup(botToken, chatId, messageId, [
+            [{ text: '✅ Publicado en Hemeroteca', callback_data: 'disabled' }],
+          ]);
+        }
+      } catch (pubErr: any) {
+        await sendTelegramMessage(chatId, botToken, `⚠️ Error en la publicación: ${pubErr?.message || pubErr}`);
+      }
+      return;
+    }
+
+    if (data === 'action:publicar_alternative' || data === 'ok_alternative') {
+      if (messageId) {
+        await editMessageReplyMarkup(botToken, chatId, messageId, [
+          [{ text: '⏳ Publicando en Alternative...', callback_data: 'disabled' }],
+        ]);
+      }
+
+      const session = await getCompanionSession(chatId, botIdentity);
+      const essayContent = session.working_state.lastDraft ||
+        session.recent_turns.filter(t => t.role === 'model').pop()?.parts?.map((p: any) => p.text).join('\n') || '';
+      const titulo = session.working_state.lastTitle || 'Ensayo Alternative TGP';
+      const coverUrl = session.working_state.lastImageUrl || 'https://storage.thegreatpuzzleproject.com/tgp-fallback.jpg';
+
+      if (!essayContent) {
+        await sendTelegramMessage(chatId, botToken, '⚠️ No encontré un ensayo para publicar.');
+        return;
+      }
+
+      const { slug, contenidoMdoc } = generarMarkdoc({
+        titulo,
+        secciones: [{ parrafo: essayContent }],
+      });
+
+      const ghToken = process.env.GITHUB_TOKEN_ALTERNATIVE || process.env.GITHUB_TOKEN || '';
+      const ghRepo = process.env.GITHUB_REPO || 'ygnatiux-sys/tgp-webfinal2026';
+
+      try {
+        const commitSha = await publicarEntradaKeystaticGitHub({
+          coleccion: 'ensayos',
+          slug,
+          indexJson: {
+            title: titulo,
+            coverImage: coverUrl,
+            category: 'historia-alternativa',
+            generadorTexto: JSON.stringify({ text: contenidoMdoc, image: coverUrl }),
+          },
+          contentMdoc: contenidoMdoc,
+          token: ghToken,
+          repoFull: ghRepo,
+          mensajeCommit: `docs(alternative): publicar ensayo "${titulo}" vía Compagnon Telegram`,
+        });
+
+        const commitUrl = `https://github.com/${ghRepo}/commit/${commitSha}`;
+        const postUrl = `https://alternative.thegreatpuzzleproject.com/ensayos/${slug}`;
+        const coleccionUrl = `https://thegreatpuzzleproject.com/historia-alternativa`;
+
+        const msgPublicado = [
+          `✅ *¡Publicado con éxito en TGP Alternative!*`,
+          ``,
+          `🏛️ **Ensayo Web:** [Abrir Ensayo en Alternative](${postUrl})`,
+          coverUrl ? `🖼️ **Storage R2:** [Ver Portada en Storage R2](${coverUrl})` : '',
+          `📂 **Colección Destacada:** [Ver Colección Alternative](${coleccionUrl})`,
+          `📦 **Commit GitHub:** [Ver Commit ${commitSha.slice(0, 7)}](${commitUrl})`,
+        ].filter(Boolean).join('\n');
+
+        await sendTelegramMessage(chatId, botToken, msgPublicado);
+
+        if (messageId) {
+          await editMessageReplyMarkup(botToken, chatId, messageId, [
+            [{ text: '✅ Publicado en Alternative', callback_data: 'disabled' }],
+          ]);
+        }
+      } catch (pubErr: any) {
+        await sendTelegramMessage(chatId, botToken, `⚠️ Error en la publicación: ${pubErr?.message || pubErr}`);
+      }
+      return;
+    }
+
+    if (data === 'action:post_facebook' || data === 'ok_facebook') {
+      if (messageId) {
+        await editMessageReplyMarkup(botToken, chatId, messageId, [
+          [{ text: '⏳ Publicando en Facebook...', callback_data: 'disabled' }],
+        ]);
+      }
+
+      const session = await getCompanionSession(chatId, botIdentity);
+      const postText = session.working_state.lastDraft ||
+        session.recent_turns.filter(t => t.role === 'model').pop()?.parts?.map((p: any) => p.text).join('\n') || '';
+      const coverUrl = session.working_state.lastImageUrl || '';
+
+      const resSocial = await ejecutarPublishSocial({
+        tema: postText,
+        red: 'facebook',
+        motor: 'flash',
+        url_imagen: coverUrl,
+        chatId,
+      });
+
+      await sendTelegramMessage(chatId, botToken, resSocial);
+      if (messageId) {
+        await editMessageReplyMarkup(botToken, chatId, messageId, [
+          [{ text: '✅ Publicado en Facebook', callback_data: 'disabled' }],
+        ]);
+      }
+      return;
+    }
+
+    if (data === 'action:post_tiktok' || data === 'ok_tiktok') {
+      if (messageId) {
+        await editMessageReplyMarkup(botToken, chatId, messageId, [
+          [{ text: '⏳ Publicando en TikTok...', callback_data: 'disabled' }],
+        ]);
+      }
+
+      const session = await getCompanionSession(chatId, botIdentity);
+      const postText = session.working_state.lastDraft ||
+        session.recent_turns.filter(t => t.role === 'model').pop()?.parts?.map((p: any) => p.text).join('\n') || '';
+      const coverUrl = session.working_state.lastImageUrl || '';
+
+      const resSocial = await ejecutarPublishSocial({
+        tema: postText,
+        red: 'tiktok',
+        motor: 'flash',
+        url_imagen: coverUrl,
+        chatId,
+      });
+
+      await sendTelegramMessage(chatId, botToken, resSocial);
+      if (messageId) {
+        await editMessageReplyMarkup(botToken, chatId, messageId, [
+          [{ text: '✅ Publicado en TikTok', callback_data: 'disabled' }],
+        ]);
+      }
+      return;
+    }
+
+    if (data === 'action:nanobanana') {
+      if (messageId) {
+        await editMessageReplyMarkup(botToken, chatId, messageId, [
+          [{ text: '⏳ Generando portada Nano Banana...', callback_data: 'disabled' }],
+        ]);
+      }
+
+      const session = await getCompanionSession(chatId, botIdentity);
+      const title = session.working_state.lastTitle || 'Ensayo Cinemático TGP';
+
+      try {
+        const nanoRes = await nanoBananaTool.execute({
+          title,
+          concept: title,
+          visualSensitivity: 'avant-garde',
+          narrativeMode: 'historical-epic',
+          historicalRigor: 'editorial',
+          visualRisk: 'bold',
+        });
+
+        if (nanoRes?.imageUrl) {
+          await updateWorkingState(chatId, botIdentity, { lastImageUrl: nanoRes.imageUrl });
+          await sendTelegramPhoto(chatId, botToken, nanoRes.imageUrl, `🎨 *Portada Cinematográfica TGP*\n🎬 *"${title}"*\n🖼️ **Storage R2:** [Ver en R2](${nanoRes.imageUrl})`);
+          if (messageId) {
+            await editMessageReplyMarkup(botToken, chatId, messageId, [
+              [{ text: '🎨 Portada generada', callback_data: 'disabled' }],
+            ]);
+          }
+        } else {
+          await sendTelegramMessage(chatId, botToken, '⚠️ No se pudo generar la imagen con Nano Banana.');
+        }
+      } catch (err: any) {
+        await sendTelegramMessage(chatId, botToken, `⚠️ Error en Nano Banana: ${err?.message || err}`);
+      }
+      return;
+    }
+
+    // 2. Si pulsaron Confirmar genérico, congelar teclado
     if (data === 'ok' && messageId) {
       await editMessageReplyMarkup(botToken, chatId, messageId, [
         [{ text: '⏳ Procesando publicación...', callback_data: 'disabled' }],
@@ -277,8 +591,8 @@ export async function handleTelegramWebhook(
       if (messageId) {
         await editMessageReplyMarkup(botToken, chatId, messageId);
       }
-      await clearChatHistory(chatId, botIdentity);
-      await sendTelegramMessage(chatId, botToken, '🔄 Sesión reiniciada. ¿En qué te ayudo?');
+      await resetCompanionSession(chatId, botIdentity);
+      await sendTelegramMessage(chatId, botToken, '🔄 Sesión reiniciada con éxito, che. ¿Qué investigamos o creamos hoy?');
       return;
     }
 
@@ -523,27 +837,20 @@ export async function handleTelegramWebhook(
           return;
         }
 
-        await sendTelegramMessage(chatId, botToken, '🎙️ Sintetizando audio documental con voz neuronal...');
+        await sendTelegramMessage(chatId, botToken, '🎙️ Sintetizando audio documental con voz neuronal y chunking...');
         try {
-          const audioId = `tgp-${chatId}-${Date.now()}`;
-          const audioUrl = await generarYGuardarAudioTTS(audioId, essayContent);
-          if (audioUrl) {
-            await sendTelegramMessage(
+          const audioRes = await generarAudioDocumentalR2(essayContent, 'Ensayo Documental TGP', chatId);
+          if (audioRes.success && audioRes.audioUrl) {
+            await sendTelegramNativeAudio({
               chatId,
               botToken,
-              `🎧 *Audio Documental Generado con Éxito*\n\n🔊 **Storage R2:** [Escuchar / Descargar Audio](${audioUrl})\n📁 **Key:** \`audios/${audioId}.mp3\``
-            );
-
-            await registrarResguardoD1({
-              origen: `telegram-${botIdentity}-audio`,
-              destino: 'datalake',
-              tema: 'Audio TTS Documental',
-              textoGenerado: essayContent.slice(0, 500),
-              metadatos: { audioUrl, audioId },
-              chatId: chatId,
+              audioUrl: audioRes.audioUrl,
+              title: 'Ensayo Documental TGP',
+              performer: 'TGP Hemeroteca',
+              caption: `🎧 **Ensayo Documental TGP**\n\n🔊 Reproductor nativo TGP\n🔗 [Descargar MP3 en Storage R2](${audioRes.audioUrl})`,
             });
           } else {
-            await sendTelegramMessage(chatId, botToken, '⚠️ No se pudo sintetizar el audio en este momento.');
+            await sendTelegramMessage(chatId, botToken, `⚠️ No se pudo sintetizar el audio: ${audioRes.error || 'Desconocido'}`);
           }
         } catch (audioErr: any) {
           console.error('[Audio Error]:', audioErr);
@@ -650,10 +957,10 @@ export async function handleTelegramWebhook(
         if (finalImageUrl) {
           trazaFooter.push(`🖼️ **Storage R2:** [Ver Imagen Original en Storage R2](${finalImageUrl})`);
         }
-        trazaFooter.push(`🏛️ **Hemeroteca:** Envía \`/publicar\` para comitear este ensayo a [TGP Hemeroteca](https://thegreatpuzzleproject.com)`);
+        trazaFooter.push(`🏛️ **Hemeroteca:** Usá la botonera de abajo para publicar o escuchar este ensayo.`);
         textToSend += trazaFooter.join('\n');
 
-        await sendTelegramMessage(chatId, botToken, textToSend);
+        await sendTelegramMessage(chatId, botToken, textToSend, BOTONERA_ACCIONES_ENSAYO);
         await appendTurn(chatId, 'model', [{ text: textToSend }], botIdentity);
 
         // Registro atómico de resguardo documental en Cloudflare D1
@@ -686,8 +993,12 @@ export async function handleTelegramWebhook(
     );
 
     if (responseText) {
-      // Detectar Ficha Visual → adjuntar teclado de confirmación
-      const keyboard = esFichaVisual(responseText) ? TECLADO_CONFIRMACION : undefined;
+      let keyboard: InlineKeyboard | undefined;
+      if (esFichaVisual(responseText)) {
+        keyboard = botIdentity === 'redes' ? TECLADO_CONFIRMACION_REDES : TECLADO_CONFIRMACION_WEB;
+      } else if (esEnsayoGenerado(responseText)) {
+        keyboard = botIdentity === 'redes' ? BOTONERA_ACCIONES_REDES : BOTONERA_ACCIONES_ENSAYO;
+      }
       await sendTelegramMessage(chatId, botToken, responseText, keyboard);
     }
   } catch (err: any) {

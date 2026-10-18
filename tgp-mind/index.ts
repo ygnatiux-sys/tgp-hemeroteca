@@ -19,7 +19,7 @@ import {
   buildDensityInstruction,
 } from './src/ia/gemini.js';
 // -- Telegram Webhook Unificado Multi-Bot (ver src/telegram/webhook.ts) --------
-import { handleTelegramWebhook } from './src/telegram/webhook.js';
+import { handleTelegramWebhook, sendChatAction } from './src/telegram/webhook.js';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 // -- Storage: R2 (ver src/storage/r2.ts) ----------------------------------------
 import {
@@ -171,20 +171,26 @@ app.use('*', cors({
 
 app.options('*', (c) => c.body(null, 204));
 
-// ── Rutas de Webhook Multi-Bot (Desacopladas / No Bloqueantes) ─────────────────
-// Devuelven HTTP 200 OK inmediatamente (<50ms) para evitar timeouts y retries de Telegram.
-// El procesamiento real corre en segundo plano (Background Execution).
+// ── Rutas de Webhook Multi-Bot (Desacopladas / No Bloqueantes / $0 CPU Ociosa) ──
+// Telegram recibe señal typing inmediata. El procesamiento corre dentro de try/catch/finally
+// garantizando HTTP 200 OK siempre para evitar retries de Telegram y apagar la CPU en el milisegundo final.
 function handleWebhookRoute(botType: 'redes' | 'omni' | 'assistant' | 'liminal', token: string) {
   return async (c: any) => {
     try {
-      const update = await c.req.json();
+      const update = await c.req.json().catch(() => ({}));
+      const chatId = update?.message?.chat?.id || update?.callback_query?.message?.chat?.id;
+      if (chatId && token) {
+        sendChatAction(chatId, token, 'typing').catch(() => {});
+      }
       await handleTelegramWebhook(update, botType, token);
     } catch (err: any) {
       console.error(`[Webhook Error - ${botType}]:`, err?.message || err);
+    } finally {
+      return c.text('OK', 200);
     }
-    return c.text('OK');
   };
 }
+
 
 // Endpoints específicos registrados en Telegram Bot API:
 app.post('/webhook/telegram-social', handleWebhookRoute('redes', TELEGRAM_SOCIAL_TOKEN));
@@ -214,6 +220,31 @@ if (TELEGRAM_PREMIUM_TOKEN) {
   app.post(`/bot${TELEGRAM_PREMIUM_TOKEN}`, handleWebhookRoute('liminal', TELEGRAM_PREMIUM_TOKEN));
 }
 app.post('/webhook/telegram-premium', handleWebhookRoute('liminal', TELEGRAM_PREMIUM_TOKEN));
+
+// ── Saneamiento de Telegram: Purgar cola atascada (drop_pending_updates=true) ─
+app.get('/api/telegram/drop-pending', async (c) => {
+  const bots = [
+    { name: 'omni', token: TELEGRAM_TOKEN },
+    { name: 'redes', token: TELEGRAM_SOCIAL_TOKEN },
+    { name: 'assistant', token: TELEGRAM_TGP_CLOUD_TOKEN },
+    { name: 'liminal', token: TELEGRAM_DEV_TOKEN },
+    { name: 'premium', token: TELEGRAM_PREMIUM_TOKEN },
+  ];
+
+  const results: any[] = [];
+  for (const b of bots) {
+    if (!b.token) continue;
+    try {
+      const res = await fetch(`https://api.telegram.org/bot${b.token}/deleteWebhook?drop_pending_updates=true`);
+      const data = await res.json().catch(() => ({}));
+      results.push({ bot: b.name, success: true, response: data });
+    } catch (err: any) {
+      results.push({ bot: b.name, success: false, error: err?.message || err });
+    }
+  }
+  return c.json({ status: 'Saneamiento completado', results });
+});
+
 
 // ── Dialogflow CX Custom Tool: Wikimedia Commons ─────────────────────────────
 app.post('/cx-tool-wikimedia', async (c) => {

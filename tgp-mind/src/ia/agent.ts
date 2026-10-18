@@ -18,6 +18,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { genai } from './gemini.js';
+import { processCompagnonMessage } from './compagnon-genkit.js';
 import {
   getConversationHistory,
   appendUserText,
@@ -225,93 +226,8 @@ export async function processTelegramMessage(
   botIdentity: BotIdentity,
   imageContextPrefix?: string,
 ): Promise<string> {
-  // ── Paso 1: Guardar turno del usuario en D1 ────────────────────────────────
-  // AISLAMIENTO: Se usa botIdentity como botId para que cada bot tenga su
-  // propia memoria. La clave en D1 es "{chatId}:{botIdentity}" (ej: "123:omni").
-  // Si userText está vacío, el webhook ya guardó el turno en D1 (foto+caption
-  // fusionados). No guardamos de nuevo para evitar un turno duplicado.
-  const textToSave = imageContextPrefix
-    ? `${imageContextPrefix}\n\nUsuario: ${userText}`.trim()
-    : userText.trim();
-
-  if (textToSave) {
-    console.log(`[Agent:${botIdentity}] Guardando turno usuario en D1 (${textToSave.length} chars) key="${chatId}:${botIdentity}"`);
-    await appendUserText(chatId, textToSave, botIdentity);
-  } else {
-    // turno ya existe en D1 (guardado por webhook al interceptar la foto)
-    console.log(`[Agent:${botIdentity}] Turno de usuario ya guardado en D1 por webhook. Saltando appendUserText.`);
-  }
-
-  // ── Paso 2: Cargar historial nativo de Gemini desde D1 ────────────────────────────────
-  // Solo carga el historial de ESTE bot (botIdentity). Aislamiento garantizado.
-  const history: GeminiTurn[] = await getConversationHistory(chatId, 12, botIdentity);
-
-  // GUARD: Si el historial está vacío (primera vez, o D1 falló) e igualmente
-  // textToSave fue vacío (foto interceptada por webhook), necesitamos al menos
-  // un turn para que Gemini no explote con 'contents are required'.
-  // Usamos userText como fallback de emergencia.
-  const safeContents: GeminiTurn[] = history.length > 0
-    ? history
-    : [{ role: 'user', parts: [{ text: userText || imageContextPrefix || 'Hola' }] }];
-
-  console.log(`[Agent:${botIdentity}] Preparing to send contents to Gemini:`, JSON.stringify(safeContents, null, 2));
-
-  // ── Paso 3: Llamar a Gemini ────────────────────────────────────────────────
-  const toolsForBot = TOOLS_BY_BOT[botIdentity];
-  const response = await genai.models.generateContent({
-    model: 'gemini-3.8-flash',
-    contents: safeContents as any,
-    config: {
-      systemInstruction: SYSTEM_PROMPTS[botIdentity],
-      temperature: 0.2,
-      maxOutputTokens: 16384,
-      tools: toolsForBot.length > 0 ? [{ functionDeclarations: toolsForBot }] : undefined,
-    },
-  });
-
-  // ── Paso 4a: Respuesta de texto ────────────────────────────────────────────────────
-  const functionCalls = response.functionCalls;
-  if (!functionCalls || functionCalls.length === 0) {
-    let text = (response.text || '').trim();
-    if (!text) {
-      console.warn(`[Agent:${botIdentity}] Respuesta vacía de Gemini sin functionCall.`);
-      text = '⚠️ No se pudo procesar la respuesta. Por favor, reenvía tu mensaje o escribe /menu.';
-    }
-    await appendModelText(chatId, text, botIdentity);
-    return text;
-  }
-
-  // ── Paso 4b: Tool Call — Ejecutar (la autorización ya ocurrió vía "ok") ───
-  const call = functionCalls[0];
-  const toolName = call.name || '';
-  const toolArgs = (call.args as Record<string, any>) || {};
-
-  console.log(`[Agent:${botIdentity}] Tool Call recibido: ${toolName}`, toolArgs);
-
-  // Guardar el functionCall emitido por el modelo (con aislamiento de bot)
-  await appendFunctionCall(chatId, toolName, toolArgs, botIdentity);
-
-  // Ejecutar la función localmente
-  const toolResult = await ejecutarTool(toolName, toolArgs, chatId);
-
-  // Guardar el functionResponse (con aislamiento de bot)
-  await appendFunctionResponse(chatId, toolName, toolResult, botIdentity);
-
-  // Devolver el resultado de la herramienta directamente sin una segunda llamada
-  // redundante a Gemini que puede fallar por falta de thought_signature o timeouts.
-  let finalText: string;
-  if (toolResult?.result) {
-    const rawResult = String(toolResult.result);
-    finalText = rawResult.startsWith('✅')
-      ? rawResult
-      : `✅ Publicado con éxito.\n\n${rawResult}`;
-  } else if (toolResult?.error) {
-    finalText = `⚠️ Error al ejecutar ${toolName}: ${toolResult.error}`;
-  } else {
-    finalText = `✅ ${toolName} ejecutado correctamente.`;
-  }
-
-  await appendModelText(chatId, finalText, botIdentity);
-  return finalText;
+  const result = await processCompagnonMessage(chatId, userText, botIdentity, imageContextPrefix);
+  return result.text;
 }
+
 

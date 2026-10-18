@@ -1,12 +1,9 @@
 {
-    "generador":  "TGP Mind Agent v2",
-    "title":  "Nichiren Daishonin: La Tempestad de la Dignidad y el Despertar de la Budeidad Soberana",
-    "date":  "2026-09-22",
-    "atmosfera":  {
-                      "discriminant":  "obsidiana"
-                  },
-    "coverImage":  "/src/assets/ensayos-cinematicos/nichiren-daishonin-la-tempestad-de-la-dignidad-y-el-despertar-de-la-budeidad-soberana/coverImage.jpg",
-    "publicarConImagen":  true,
-    "draft":  false,
-    "notasInvestigador":  "Portada HD Wikimedia Commons: File:Nichiren Kamakura portrait | Licencia: Dominio Publico / CC | Curada TGP Batch"
+  "generador": "TGP Mind Agent v2",
+  "title": "Nichiren Daishonin: La Tempestad de la Dignidad y el Despertar de la Budeidad Soberana",
+  "date": "2026-09-22",
+  "atmosfera": {
+    "discriminant": "obsidiana"
+  },
+  "coverImage": "/src/assets/ensayos-cinematicos/nichiren-daishonin-la-tempestad-de-la-dignidad-y-el-despertar-de-la-budeidad-soberana/coverImage.jpg"
 }
