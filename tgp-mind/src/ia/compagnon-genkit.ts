@@ -33,6 +33,7 @@ import { generarAudioDocumentalR2 } from '../telegram/telegram-tts.js';
 import { generarMarkdoc, publicarEntradaKeystaticGitHub } from '../servicios/publicacion.js';
 import { registrarResguardoD1 } from '../storage/d1.js';
 import type { BotIdentity } from '../telegram/keyboards.js';
+import { CODICE_XAVIER_BENITEZ, CATALOGO_TESIS_OBRA_XAVIER_BENITEZ } from './codice-xavier-benitez.js';
 
 // ── Herramienta Nativa: Síntesis de Audio Documental TTS ────────────────────
 const TOOL_GENERATE_AUDIO = {
@@ -442,7 +443,11 @@ export async function processCompagnonMessage(
 
 ---
 [CÓDICE MAESTRO: ARQUITECTURA COGNITIVA, DOCTRINA Y ESTILO DE XAVIER BENÍTEZ (TGP)]:
-${foundational.doctrina_codice_maestro}
+${foundational.doctrina_codice_maestro || CODICE_XAVIER_BENITEZ}
+
+---
+[CATÁLOGO DE TESIS, OBRAS TRONCALES Y METODOLOGÍA]:
+${CATALOGO_TESIS_OBRA_XAVIER_BENITEZ}
 
 ---
 [CONTEXTO FUNDACIONAL Y PENSAMIENTO ARGENTINO (XAVIER BENÍTEZ)]:
@@ -451,17 +456,39 @@ ${foundational.pensamiento_filosofico}
 [DIRECTRICES ONTOLÓGICAS]:
 ${foundational.manifiesto_fundacional.slice(0, 1500)}`.trim();
 
-  // 4. Llamada a Gemini Flash/Pro con herramientas nativas
-  const response = await genai.models.generateContent({
-    model: 'gemini-3.8-flash',
-    contents: safeContents as any,
-    config: {
-      systemInstruction: enrichedSystemInstruction,
-      temperature: 0.25,
-      maxOutputTokens: 16384,
-      tools: toolsForBot.length > 0 ? [{ functionDeclarations: toolsForBot }] : undefined,
-    },
-  });
+  // 4. Llamada a Gemini Flash con herramientas nativas + grounding académico
+  let response: any;
+  const configuredTools: any[] = [];
+  if (toolsForBot.length > 0) {
+    configuredTools.push({ functionDeclarations: toolsForBot });
+  }
+  // Grounding académico de Google Search para precisión fáctica en arqueología y ciencia
+  configuredTools.push({ googleSearch: {} });
+
+  try {
+    response = await genai.models.generateContent({
+      model: 'gemini-3.8-flash',
+      contents: safeContents as any,
+      config: {
+        systemInstruction: enrichedSystemInstruction,
+        temperature: 0.25,
+        maxOutputTokens: 16384,
+        tools: configuredTools,
+      },
+    });
+  } catch (toolCombErr: any) {
+    console.warn('[Compagnon Agent] Fallback seguro sin googleSearch simultáneo:', toolCombErr?.message);
+    response = await genai.models.generateContent({
+      model: 'gemini-3.8-flash',
+      contents: safeContents as any,
+      config: {
+        systemInstruction: enrichedSystemInstruction,
+        temperature: 0.25,
+        maxOutputTokens: 16384,
+        tools: toolsForBot.length > 0 ? [{ functionDeclarations: toolsForBot }] : undefined,
+      },
+    });
+  }
 
   // 5a. Si fue respuesta directa de texto
   const functionCalls = response.functionCalls;

@@ -54,6 +54,11 @@ import {
   getMenuTitle,
   type InlineKeyboard,
 } from './keyboards.js';
+import {
+  isAuthorizedChatId,
+  authorizeChatWithKey,
+  deleteTelegramMessage,
+} from '../security/master-auth.js';
 
 // ── Indicador de escritura "Typing" no bloqueante ───────────────────────────
 export async function sendChatAction(chatId: number, token: string, action = 'typing'): Promise<void> {
@@ -266,6 +271,13 @@ export async function handleTelegramWebhook(
 
     if (!chatId || !data) {
       await answerCallbackQuery(botToken, cqId);
+      return;
+    }
+
+    const userId = (cq.from?.id || chatId) as number;
+    if (!isAuthorizedChatId(userId)) {
+      console.warn(`[Webhook Seguridad] Callback de usuario no autorizado: ${userId}. Ignorado.`);
+      await answerCallbackQuery(botToken, cqId, '⛔ Acceso restringido.', true);
       return;
     }
 
@@ -657,6 +669,37 @@ export async function handleTelegramWebhook(
   const hasPhotos = Array.isArray(photos) && photos.length > 0;
 
   console.log(`[Webhook] chat_id=${chatId} bot=${botIdentity} src=${textSource} photo=${hasPhotos} text="${text.slice(0, 80)}"`);
+
+  // ── Candado de Seguridad de Xavier Benítez ───────────────────────────────
+  const userId: number = (msg.from?.id || chatId) as number;
+  if (!isAuthorizedChatId(userId)) {
+    // Si intenta autenticarse con la Clave Master Personal
+    if (text.startsWith('/auth')) {
+      const parts = text.split(/\s+/);
+      const keyAttempt = parts[1] || '';
+      const success = await authorizeChatWithKey(userId, keyAttempt);
+
+      // Borrar el mensaje que contiene la clave inmediatamente por seguridad
+      if (msg.message_id) {
+        await deleteTelegramMessage(botToken, chatId, msg.message_id);
+      }
+
+      if (success) {
+        await sendTelegramMessage(
+          chatId,
+          botToken,
+          `🛡️ *Identidad Confirmada.*\n\nChat ID \`${userId}\` registrado como único dueño autorizado de TGP Mind. Todos los sistemas y herramientas han sido desbloqueados para vos.`
+        );
+      } else {
+        console.warn(`[Webhook Seguridad] Intento fallido de /auth desde chat_id=${userId}`);
+      }
+      return;
+    }
+
+    // Usuario desconocido: ignorar silenciosamente en < 1ms para $0 costo y 0 llamadas a IA
+    console.warn(`[Webhook Seguridad] Mensaje de usuario no autorizado (${userId}). Ignorando silenciosamente.`);
+    return;
+  }
 
   // ── Comandos de control ──────────────────────────────────────────────────
   if (text === '/menu' || text === '/tools') {

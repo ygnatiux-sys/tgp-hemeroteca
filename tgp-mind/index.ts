@@ -20,6 +20,7 @@ import {
 } from './src/ia/gemini.js';
 // -- Telegram Webhook Unificado Multi-Bot (ver src/telegram/webhook.ts) --------
 import { handleTelegramWebhook, sendChatAction } from './src/telegram/webhook.js';
+import { masterAuthMiddleware, initAuthorizedChatIdsFromFirestore } from './src/security/master-auth.js';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 // -- Storage: R2 (ver src/storage/r2.ts) ----------------------------------------
 import {
@@ -162,7 +163,7 @@ app.use('*', cors({
     if (isAllowedOrigin(origin)) return origin;
     return null;
   },
-  allowHeaders: ['Content-Type', 'Authorization', 'x-api-key', 'X-Api-Key', 'X-Mini-App', 'x-mini-app'],
+  allowHeaders: ['Content-Type', 'Authorization', 'x-api-key', 'X-Api-Key', 'x-tgp-master-key', 'X-Tgp-Master-Key', 'X-Mini-App', 'x-mini-app'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   exposeHeaders: ['Content-Length'],
   maxAge: 86400,
@@ -170,6 +171,10 @@ app.use('*', cors({
 }));
 
 app.options('*', (c) => c.body(null, 204));
+
+// ── Candado de Seguridad TGP Mind (Clave Master en Endpoints HTTP) ───────────
+initAuthorizedChatIdsFromFirestore().catch(() => {});
+app.use('*', masterAuthMiddleware);
 
 // ── Rutas de Webhook Multi-Bot (Desacopladas / No Bloqueantes / $0 CPU Ociosa) ──
 // Telegram recibe señal typing inmediata. El procesamiento corre dentro de try/catch/finally
