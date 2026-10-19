@@ -1,0 +1,1193 @@
+---
+import { resolveMultivisionClass } from "../lib/multivision";
+import Image from "./SafeImage.astro";
+import ExpandableModal from "./ExpandableModal.astro";
+import {
+  getRelatedCategories,
+  formatYear,
+  normalizeCategory,
+  splitTitleKeyword,
+  sanitizeImageUrl,
+} from "../lib/content-filter";
+import { recommendMetallicGradient } from "../lib/metallic-gradients";
+import { resolveImmersiveVariant, IMMERSIVE_CLASSES } from "../lib/aspect-system";
+
+interface Props {
+  slug: string;
+  entry: any;
+  img?: ImageMetadata | string | null;
+  variant?: "hero" | "duo-60" | "duo-40" | "standard";
+  enableCinemagraph?: boolean;
+  isEager?: boolean;
+  href?: string;
+  isCinematicGSAP?: boolean;
+  hideExteriorTitle?: boolean;
+  centerCtaBelow?: boolean;
+  ctaLabel?: string;
+}
+
+const {
+  slug,
+  entry,
+  img,
+  variant = "standard",
+  enableCinemagraph = false,
+  isEager = false,
+  href: customHref,
+  isCinematicGSAP = false,
+  hideExteriorTitle = false,
+  centerCtaBelow = false,
+  ctaLabel,
+} = Astro.props;
+
+const safeImg = sanitizeImageUrl(img);
+const sitio = entry.sitioGeohistorico || null;
+const relatedTags = getRelatedCategories(entry.category, sitio, entry.title);
+const year = formatYear(entry.date);
+const dek = entry.dek || entry.excerpt || null;
+const cleanExcerpt = (entry.excerpt || entry.dek || "")
+  .replace(/\*\*/g, "")
+  .trim();
+
+const isCinematic =
+  isCinematicGSAP ||
+  (entry as any)?.isCinematicGSAP ||
+  entry.category === "Ensayos Cinemáticos" ||
+  entry.category === "ensayos-cinematicos" ||
+  normalizeCategory(entry.category) === "ensayos-cinematicos";
+const isNota =
+  (entry as any)?.isNota ||
+  entry.category === "Notas de Cuaderno" ||
+  normalizeCategory(entry.category) === "notas-de-cuaderno";
+const href =
+  customHref ||
+  (isNota ? `/notas/${slug}/` : isCinematic ? `/ensayos-cinematicos/${slug}/` : `/hemeroteca/${slug}/`);
+
+// Lógica de ruteo y CTA limpia
+let secondaryLabel = "VER REGISTRO";
+let secondaryHref = href;
+let isExternal = false;
+
+if (entry.youtubeLink) {
+  secondaryLabel = "WATCH TRAILER";
+  secondaryHref = entry.youtubeLink;
+  isExternal = true;
+} else if (entry.spotifyLink) {
+  secondaryLabel = "AUDIO PODCAST";
+  secondaryHref = entry.spotifyLink;
+  isExternal = true;
+} else if (sitio) {
+  secondaryLabel = sitio.toUpperCase();
+  secondaryHref = href;
+}
+
+// Configuración visual por variante
+const isHero = variant === "hero";
+const isDuo40 = variant === "duo-40";
+
+// Detección canónica de sujeto (busto/monolito vs paisaje vs documento/tarot) para encuadre y aspect ratio
+const isDocumentOrTarot = /tarot|carta|diablo|manuscrito|codice|grabado|woodcut|tabla|glifo|documento|archivo|herramienta|voynich|kells|dresde/i.test(`${entry?.title || ''} ${slug || ''}`);
+const explicitPos = (entry as any)?.titlePosition || null;
+const immersiveVariant = resolveImmersiveVariant(entry, slug);
+const isPortraitArt = immersiveVariant === 'monumental' || immersiveVariant === 'imax-bust';
+const isFacePortrait = isPortraitArt && !isDocumentOrTarot;
+const isImaxBust = immersiveVariant === 'imax-bust';
+const titlePos = explicitPos || (isFacePortrait ? "top" : "bottom");
+
+// Relación de aspecto inmersiva unificada (Sistema TGP):
+// - Monumental (16:10 / 1.60:1) para bustos, estatuas, fauna y retratos.
+// - Panorámico (19:10 / 1.90:1) para paisajes, arquitectura y vistas abiertas.
+const imageAspectClass = isHero
+  ? ((IMMERSIVE_CLASSES as any)[immersiveVariant]?.container || IMMERSIVE_CLASSES.monumental.container)
+  : isDuo40
+    ? "aspect-4/3 sm:aspect-16/10"
+    : "aspect-4/3 sm:aspect-video";
+
+// Tamaño tipográfico del H1 interior (+1px global para máxima presencia)
+const titleClass = isHero
+  ? "text-[1.85rem] sm:text-3xl md:text-4xl lg:text-5xl xl:text-[3.6rem] font-extrabold leading-[1.08] max-w-4xl mx-auto"
+  : isDuo40
+    ? "text-[1.35rem] sm:text-[1.55rem] md:text-[1.85rem] font-extrabold leading-[1.05]"
+    : "text-[1.5rem] sm:text-[1.85rem] md:text-[2.5rem] font-extrabold leading-[1.05]";
+
+const excerptClass = isHero
+  ? "text-base sm:text-lg md:text-xl text-white/90 line-clamp-3 max-w-3xl leading-relaxed"
+  : isDuo40
+    ? "text-xs sm:text-sm text-white/80 line-clamp-1 max-w-xl font-light"
+    : "text-sm sm:text-base text-white/85 line-clamp-2 max-w-2xl font-light";
+
+const { prefix: titlePrefix, keyword: titleKeyword } = splitTitleKeyword(
+  entry.title || "",
+);
+
+// Mapeo dinámico de acento según categoría / themeColor heredado
+const categoryAccentClass = (() => {
+  const t = (entry.themeColor || "").toLowerCase();
+  const c = (entry.category || "").toLowerCase();
+  if (t === "bordeaux" || c.includes("mitolog") || c.includes("simbol"))
+    return "text-[#df7a7e]";
+  if (
+    t === "british-green" ||
+    c.includes("historia antigua") ||
+    c.includes("prehistoria")
+  )
+    return "text-[#68b68f]";
+  if (t === "old-navy" || c.includes("filosof") || c.includes("gnos"))
+    return "text-[#8ab7e0]";
+  if (
+    t === "vintage-yellow" ||
+    c.includes("arte") ||
+    c.includes("arquitectura")
+  )
+    return "text-[#f0e2a8]";
+  if (
+    t === "rust-orange" ||
+    c.includes("arquetip") ||
+    c.includes("arqueosemi") ||
+    c.includes("georref")
+  )
+    return "text-rust-orange";
+  return "text-rust-orange";
+})();
+
+const cardId = `cac-${slug || "item"}-${Math.random().toString(36).substring(2, 7)}`;
+const imgUrl = safeImg || "";
+
+// ─── FRASES EVOCATIVAS POR COLECCIÓN (MODO TRAY VERTICAL) ───────────────────
+const epigraphMap: Record<string, string> = {
+  arqueosemiotica:
+    "Los [[signos]] sobreviven a los imperios. **Cada glifo,** un mensaje lanzado a la eternidad sin destinatario conocido.",
+  filosofia:
+    "El pensamiento como [[territorio.]] Las **ideas no mueren:** se transforman, se heredan, se contradicen.",
+  mitologia:
+    "Antes del dato, existió el [[mito.]] El relato que **une cielo y tierra** antes de que la ciencia los separara.",
+  historia:
+    "El [[tiempo]] no es lineal. Es una **red de causas** que la memoria humana teje y desteje sin cesar.",
+  "ensayos-cinematicos":
+    "Imágenes que **piensan.** El [[cine]] como forma de conocimiento antes de que el conocimiento fuera escrito.",
+  arquetipos:
+    "Figuras que reaparecen en cada cultura. Los [[arquetipos]] son la gramática **secreta del ser humano.**",
+  "arquetipos-globales":
+    "Figuras que reaparecen en cada cultura. Los [[arquetipos]] son la gramática **secreta del ser humano.**",
+  "historia-natural":
+    "La vida como **archivo.** Cada especie, un [[capítulo]] de una historia que empezó mucho antes que nosotros.",
+  "historia-antigua":
+    "Las [[civilizaciones]] no colapsan: **se transforman.** Sus ruinas son preguntas, no respuestas.",
+  "historia-medieval":
+    "Entre el [[fin del mundo]] romano y el alba del moderno, **siglos de invención** que el olvido llama oscuros.",
+  religion:
+    "Lo [[sagrado]] como necesidad primaria. **Cada fe,** un intento humano de darle nombre al misterio.",
+};
+
+const categoryKey = normalizeCategory(entry.category || "");
+const essayExcerpt =
+  entry.excerpt || entry.dek || (entry as any).generadorTexto || null;
+const heroPhraseRaw = essayExcerpt || epigraphMap[categoryKey] || null;
+
+function parseHeroPhrase(text: string) {
+  if (!text) return "";
+  const clean = text.replace(/^[#*`>\s]+/, "").trim();
+
+  if (clean.includes("[[") || clean.includes("**")) {
+    return clean
+      .replace(
+        /\*\*([^*]+)\*\*/g,
+        '<strong class="text-white font-bold md:font-black">$1</strong>',
+      )
+      .replace(
+        /\[\[([^\]]+)\]\]/g,
+        '<span class="italic text-amber-200/90 font-serif drop-shadow-[0_0_12px_rgba(245,158,11,0.5)]">$1</span>',
+      )
+      .replace(
+        /(^|[^*])\*([^*]+)\*([^*]|$)/g,
+        '$1<span class="italic text-white/95 font-serif">$2</span>$3',
+      );
+  }
+
+  // Estilizado suave para excerpts planos: resalta las primeras dos palabras con serif ámbar
+  const words = clean.split(" ");
+  if (words.length > 3) {
+    const firstTwo = words.slice(0, 2).join(" ");
+    const rest = words.slice(2).join(" ");
+    return `<span class="italic text-amber-200/90 font-serif">${firstTwo}</span> ${rest}`;
+  }
+
+  return clean;
+}
+
+const heroPhraseHTML = heroPhraseRaw ? parseHeroPhrase(heroPhraseRaw) : "";
+
+const explicitBgContrast = (entry as any)?.bgContrast || null;
+const bgContrast =
+  explicitBgContrast || (titlePos === "top" ? "light" : "dark");
+
+// Recomendación inteligente de gradiente metálico anodizado (Rojo Netflix / Azul Platinado / Titanio / Plata)
+const explicitGradient =
+  (entry as any)?.metallicGradient || (entry as any)?.gradientVariant || null;
+const { gradientClass: cardGradientClass, strokeClass } =
+  recommendMetallicGradient(
+    entry?.category || "",
+    entry?.title || "",
+    bgContrast,
+    explicitGradient,
+  );
+
+// Solo bustos o estatuas recortadas aisladas usan contain; paisajes y fauna usan cover cinematográfico
+const isStrictStatueOrBust = /busto|estatua|escultura|saturno/i.test(
+  `${entry?.title || ""} ${slug || ""}`,
+);
+const fitClass =
+  isHero && isStrictStatueOrBust ? "object-contain! bg-[#08090a]" : "object-cover";
+---
+
+<article
+  class={`cinematic-archive-card flex flex-col gap-4 group w-full h-full ${isHero ? "is-hero-card" : ""}`}
+  data-variant={variant}
+  data-is-hero={isHero ? "true" : "false"}
+  data-is-portrait={isPortraitArt ? "true" : "false"}
+  data-is-face={isFacePortrait ? "true" : "false"}
+  data-is-document={isDocumentOrTarot ? "true" : "false"}
+  data-title-pos={titlePos}
+  data-category={normalizeCategory(entry.category)}
+  data-year={year}
+  data-card-id={cardId}
+  data-title={entry.title || ""}
+  data-eyebrow={entry.category ? entry.category.toUpperCase() : "ARCHIVO"}
+  data-eyebrow-class={categoryAccentClass}
+  data-excerpt={cleanExcerpt || dek || ""}
+  data-image={imgUrl}
+  data-link={href}
+  data-flip-id={`card-container-${cardId}`}
+>
+  {
+    /* 1. IMAGEN SUPERIOR CON H1 INTERIOR (CON CINZEL STEEL GRADIENT + GSAP FADE IN) */
+  }
+  <a
+    href={href}
+    class={`relative w-full ${imageAspectClass} rounded-2xl md:rounded-3xl overflow-hidden block ${isHero && isStrictStatueOrBust ? "bg-[#08090a]" : "bg-stone-900/60"} ${isHero ? "border-0 shadow-2xl" : "border border-white/10 shadow-xl"} shrink-0 cac-modal-trigger`}
+  >
+    {
+      safeImg ? (
+        <Image
+          src={safeImg}
+          alt={entry.title || "Dossier del Archivo"}
+          inferSize={true}
+          format="webp"
+          widths={[400, 768, 1200, 1920]}
+          sizes="(max-width: 768px) 400px, (max-width: 1200px) 768px, 1200px"
+          loading={isEager ? "eager" : "lazy"}
+          fetchpriority={isEager ? "high" : undefined}
+          decoding="async"
+          class={`absolute inset-0 w-full h-full object-center cac-card-img ${
+            enableCinemagraph && !isHero
+              ? "cinemagraph-ken-burns"
+              : isHero
+                ? "transition-transform duration-1200 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.015]"
+                : "transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.02]"
+          } ${isHero ? "brightness-100 contrast-100" : "brightness-98 contrast-102 group-hover:brightness-100"} ${fitClass} ${resolveMultivisionClass(img)}`}
+          style={
+            isHero
+              ? isImaxBust
+                ? "object-position: 50% 15%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
+                : isPortraitArt
+                  ? "object-position: 50% 20%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
+                  : "object-position: 50% 38%; transition: object-position 3s cubic-bezier(0.25, 1, 0.5, 1), transform 3s cubic-bezier(0.25, 1, 0.5, 1);"
+              : isPortraitArt
+                ? "object-position: 50% 20%;"
+                : undefined
+          }
+          data-flip-id={`card-image-${cardId}`}
+        />
+      ) : (
+        <div class="w-full h-full bg-stone-900 flex items-center justify-center text-stone-600 font-metadata text-xs uppercase tracking-widest">
+          Sin imagen
+        </div>
+      )
+    }
+
+    {/* Dynamis overlay sutil */}
+    {
+      enableCinemagraph && !isHero && (
+        <div class="absolute inset-0 pointer-events-none cinemagraph-dynamis z-0" />
+      )
+    }
+
+    {
+      /* Scrim gradiente adaptativo — solo en tarjetas menores */
+    }
+    {
+      !isHero && (
+        <div
+          class="absolute inset-0 pointer-events-none z-10"
+          style={
+            titlePos === "top"
+              ? "background: linear-gradient(to bottom, rgba(14,16,15,0.85) 0%, rgba(14,16,15,0.35) 35%, transparent 68%);"
+              : "background: linear-gradient(to top, rgba(14,16,15,0.88) 0%, rgba(14,16,15,0.35) 35%, transparent 68%);"
+          }
+        ></div>
+      )
+    }
+
+    {
+      /* ✦ Viñeta perimetral suave para tarjetas Hero — Funde bordes sin costuras duras ("sin exagerar") */
+    }
+    {
+      isHero && (
+        <>
+          <div
+            class="absolute inset-0 pointer-events-none z-12"
+            style="background: radial-gradient(ellipse at center, transparent 65%, rgba(14,16,15,0.15) 85%, rgba(14,16,15,0.45) 100%);"
+          />
+          <div
+            class="absolute inset-0 pointer-events-none z-14"
+            style="background: linear-gradient(to top, rgba(14,16,15,0.55) 0%, rgba(14,16,15,0.15) 38%, transparent 68%);"
+          />
+        </>
+      )
+    }
+
+    {
+      /* ✦ CAPA CINEMÁTICA HERO (DIVISIÓN 40/60 PARA ROSTROS / MODO BASE 75/25 PARA OBRAS Y PAISAJES) */
+    }
+    {
+      isHero && heroPhraseHTML && (
+        <div
+          class="cac-hero-cinematic-layer absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-1000 ease-in-out z-25 flex"
+          data-layout={isFacePortrait ? "portrait" : "bottom"}
+        >
+          {isFacePortrait ? (
+            <>
+              {/* 1. Modo Rostro / Retrato: Zona izquierda despejada para el sujeto (Hegel) */}
+              <div class="hidden md:block w-[38%] lg:w-[40%] h-full shrink-0" />
+
+              {/* Zona derecha con scrim translúcido y frase con tipografía serif y peso cinematográfico */}
+              <div class="w-full md:w-[62%] lg:w-[60%] h-full bg-linear-to-t md:bg-linear-to-r from-black/45 md:from-transparent via-black/35 to-black/55 flex items-center justify-center p-6 sm:p-10 md:p-12 lg:p-16">
+                <p class="cac-hero-cinematic-text font-serif text-2xl sm:text-3xl md:text-4xl lg:text-[2.8rem] text-[#E3DDD3] leading-[1.15] tracking-tight drop-shadow-[0_4px_28px_rgba(0,0,0,0.95)] text-center md:text-left text-balance max-w-[34ch]">
+                  <span
+                    class="cac-hero-text-anim inline-block opacity-0"
+                    set:html={heroPhraseHTML}
+                  />
+                </p>
+              </div>
+            </>
+          ) : (
+            /* 2. Modo Base 75/25: Frase acomodada en el borde inferior ganado, dejando 100% despejada la carta y obra visual */
+            <div class="w-full h-full flex justify-center items-end">
+              <div class="w-full bg-linear-to-t from-black/65 via-black/30 to-transparent pt-12 md:pt-16 pb-6 md:pb-8 px-6 sm:px-12 text-center">
+                <p class="cac-hero-cinematic-text font-serif text-xl sm:text-2xl md:text-3xl lg:text-[2.5rem] text-[#E3DDD3] leading-snug tracking-tight drop-shadow-[0_4px_28px_rgba(0,0,0,0.95)] text-center max-w-[42ch] mx-auto">
+                  <span
+                    class="cac-hero-text-anim inline-block opacity-0"
+                    set:html={heroPhraseHTML}
+                  />
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )
+    }
+
+    {
+      /* ✦ H1 INTERIOR DENTRO DE LA CARD (Con Cinzel Steel Gradient + Posición Inteligente Arriba/Abajo) */
+    }
+    <div
+      class={`cac-normal-ui absolute inset-0 z-20 flex flex-col p-4 sm:p-6 md:p-8 pointer-events-none transition-opacity duration-1000 ease-in-out ${titlePos === "top" ? "justify-start pt-8 sm:pt-12 md:pt-14" : "justify-end pb-8 sm:pb-12"} ${hideExteriorTitle ? "items-center text-center" : "items-start text-left"}`}
+    >
+      {
+        !isHero && cleanExcerpt && (
+          <p
+            class={`leading-relaxed max-w-[66ch] tracking-wider mb-2 line-clamp-3 ch-excerpt-container opacity-0 font-sans ${hideExteriorTitle ? "text-center mx-auto" : "text-left"} ${excerptClass}`}
+          >
+            <span class="ch-excerpt-line inline-block">{cleanExcerpt}</span>
+          </p>
+        )
+      }
+
+      <h2
+        class={`tracking-tight drop-shadow-[0_4px_28px_rgba(0,0,0,0.95)] transition-all duration-300 ch-h1-container cac-card-title ${isHero ? "font-gloock" : "font-cinzel"} ${hideExteriorTitle ? "text-center w-full mx-auto" : ""} ${titleClass}`}
+        data-flip-id={`card-title-${cardId}`}
+      >
+        <span
+          class:list={[
+            cardGradientClass,
+            strokeClass,
+            "block",
+            hideExteriorTitle ? "text-center mx-auto" : "",
+          ]}
+        >
+          {titlePrefix}<span class="title-keyword-shine-fade"
+            >{titleKeyword}</span
+          >
+        </span>
+      </h2>
+    </div>
+  </a>
+
+  {
+    /* 2. BLOQUE DE TEXTO EDITORIAL EXTERIOR (ESTILO NAUTILUS / EDITORIAL COVER) */
+  }
+  <div
+    class={`flex flex-col w-full grow ${hideExteriorTitle ? "pt-6 sm:pt-8 items-center text-center" : "pt-1"}`}
+  >
+    {/* En modo normal: Categoría y Tags arriba */}
+    {
+      !hideExteriorTitle && (
+        <div class="flex flex-wrap items-center gap-2 mb-2 font-metadata text-xs md:text-sm uppercase tracking-[0.25em] text-stone-400">
+          <span class={`${categoryAccentClass} font-semibold`}>
+            {entry.category ? entry.category.toUpperCase() : "ARCHIVO"}
+          </span>
+          {sitio && (
+            <>
+              <span class="opacity-40">•</span>
+              <span class="text-stone-400">{sitio}</span>
+            </>
+          )}
+          {year && (
+            <>
+              <span class="opacity-40">•</span>
+              <span class="text-stone-500">{year}</span>
+            </>
+          )}
+        </div>
+      )
+    }
+
+    {
+      /* Fila: Título Exterior con Steel Gradient Heredado y CTA (Oculto si hideExteriorTitle) */
+    }
+    {
+      !hideExteriorTitle && (
+        <div class="flex flex-row justify-between items-start gap-4 mb-2 ch-h1-cta">
+          <a
+            href={href}
+            class="hover:opacity-80 transition-opacity block flex-1 cac-modal-trigger"
+          >
+            <h3
+              class={`font-extrabold text-lg sm:text-xl md:text-2xl tracking-tighter leading-snug cac-card-title ${isHero ? "font-gloock" : "font-cinzel"} ${cardGradientClass}`}
+            >
+              {titlePrefix}
+              <span class="title-keyword-shine-fade">{titleKeyword}</span>
+            </h3>
+          </a>
+
+          <div class="relative flex items-center shrink-0 ch-cta-container">
+            <a
+              href={secondaryHref}
+              target={isExternal ? "_blank" : undefined}
+              rel={isExternal ? "noopener noreferrer" : undefined}
+              class={`ch-cta-btn inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/5 border border-white/15 text-stone-300 font-metadata font-medium text-xs tracking-wider uppercase rounded-lg hover:bg-white/15 hover:border-white/30 hover:text-white transition-all duration-300 active:translate-y-0.5 whitespace-nowrap ${!isExternal ? "cac-modal-trigger" : ""}`}
+            >
+              <span>{secondaryLabel}</span>
+              <span class="text-[10px] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">
+                &#9656;
+              </span>
+            </a>
+          </div>
+        </div>
+      )
+    }
+
+    {/* Excerpt con estilo Cartelera de Cine */}
+    {
+      dek && (
+        <p
+          class={`card-dek ch-dek-container ${
+            hideExteriorTitle
+              ? `font-['Proza_Libre'] text-lg sm:text-xl md:text-2xl text-[#EFEBE3]/95 leading-relaxed tracking-[0.01em] max-w-4xl text-center mb-10 sm:mb-14 mx-auto drop-shadow-lg`
+              : "font-sans text-xs sm:text-sm md:text-base text-[#E3DDD3]/85 leading-relaxed tracking-normal mb-4 sm:mb-5 max-w-[56ch]"
+          }`}
+        >
+          {dek}
+        </p>
+      )
+    }
+
+    {
+      /* Tags de Categorías y Metadatos en color default — separación limpia respecto al excerpt en modo cinemático */
+    }
+    <div
+      class={`flex flex-wrap items-center gap-x-4 gap-y-1.5 ${isHero ? "font-['Proza_Libre']" : "font-metadata"} text-xs sm:text-sm uppercase tracking-[0.25em] text-white/50 w-full ${hideExteriorTitle ? "justify-center pt-6 sm:pt-8 border-t border-white/10 mx-auto max-w-xl" : "justify-start"}`}
+    >
+      {
+        entry.category && (
+          <span class="ch-tag">{entry.category.toUpperCase()}</span>
+        )
+      }
+      {
+        sitio && (
+          <>
+            <span class="font-bold opacity-40 ch-tag">•</span>
+            <span class="ch-tag">{sitio}</span>
+          </>
+        )
+      }
+      {
+        relatedTags.map((tag) => (
+          <>
+            <span class="font-bold opacity-40 ch-tag">•</span>
+            <span class="ch-tag">{tag}</span>
+          </>
+        ))
+      }
+      {
+        year && (
+          <>
+            <span class="font-bold opacity-40 ch-tag">•</span>
+            <span class="ch-tag text-white/40">{year}</span>
+          </>
+        )
+      }
+    </div>
+
+    {/* Botón CTA Grande Centrado "VER REGISTRO" / "VER MÁS" con amplio aire */}
+    {
+      centerCtaBelow && (
+        <div class="flex justify-center mt-14 sm:mt-20 md:mt-24 mb-32 sm:mb-40 md:mb-48">
+          <a
+            href={secondaryHref}
+            target={isExternal ? "_blank" : undefined}
+            rel={isExternal ? "noopener noreferrer" : undefined}
+            class={`group relative inline-flex items-center justify-center gap-6 px-20 sm:px-28 py-8 sm:py-10 rounded-full bg-transparent border border-[#E3DDD3]/25 text-[#EFEBE3] font-metadata font-bold text-lg sm:text-xl uppercase tracking-[0.35em] backdrop-blur-md shadow-[0_0_30px_-5px_rgba(255,255,255,0.05)] hover:bg-[#EFEBE3]/10 hover:border-[#EFEBE3]/50 hover:shadow-[0_0_40px_-5px_rgba(227,221,211,0.2)] hover:scale-[1.02] active:scale-95 transition-all duration-500 overflow-hidden ${!isExternal ? "cac-modal-trigger" : ""}`}
+          >
+            {/* Brillo interno cinematico */}
+            <div class="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none" />
+            <span class="relative z-10">{ctaLabel || secondaryLabel}</span>
+            <span class="relative z-10 text-base sm:text-lg transition-transform duration-500 group-hover:translate-x-2">
+              &#9656;
+            </span>
+          </a>
+        </div>
+      )
+    }
+  </div>
+  <ExpandableModal />
+</article>
+
+<style>
+  /* ─────────────────────────────────────────────────────────────
+   * DEK — Bajada Editorial
+   * ───────────────────────────────────────────────────────────── */
+  .card-dek {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity 300ms ease-out,
+      transform 300ms ease-out;
+  }
+
+  /* Shimmer sweep para el brillo del CTA cinemático */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-120%);
+    }
+    100% {
+      transform: translateX(120%);
+    }
+  }
+
+  /* Ken Burns para la imagen interna */
+  @keyframes kenBurnsAscent {
+    0% {
+      transform: scale(1.02) translateY(2.5%) translateZ(0);
+    }
+    50% {
+      transform: scale(1.08) translateY(0%) translateZ(0);
+    }
+    100% {
+      transform: scale(1.14) translateY(-3%) translateZ(0);
+    }
+  }
+
+  @keyframes dynamisLoop {
+    0% {
+      opacity: 0.18;
+      transform: scale(1) translateZ(0);
+      filter: brightness(1) saturate(1);
+    }
+    50% {
+      opacity: 0.45;
+      transform: scale(1.04) translateZ(0);
+      filter: brightness(1.12) saturate(1.18);
+    }
+    100% {
+      opacity: 0.22;
+      transform: scale(1.01) translateZ(0);
+      filter: brightness(1.02) saturate(1.05);
+    }
+  }
+
+  .cinemagraph-ken-burns {
+    animation: kenBurnsAscent 24s cubic-bezier(0.4, 0, 0.6, 1) infinite
+      alternate;
+    will-change: transform;
+    transform-origin: center center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .cinemagraph-dynamis {
+    background: radial-gradient(
+      circle at 45% 45%,
+      rgba(239, 235, 227, 0.25) 0%,
+      rgba(74, 59, 50, 0.12) 45%,
+      transparent 70%
+    );
+    mix-blend-mode: screen;
+    animation: dynamisLoop 16s ease-in-out infinite alternate;
+    will-change: transform, opacity, filter;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cinemagraph-ken-burns,
+    .cinemagraph-dynamis {
+      animation: none !important;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { Flip } from "gsap/Flip";
+  import { SplitText } from "gsap/SplitText";
+
+  gsap.registerPlugin(Flip, SplitText);
+
+  const runCardSequence = (card: HTMLElement): Promise<void> => {
+    return new Promise((resolve) => {
+      if (card.dataset.choreographyDone === "true") {
+        resolve();
+        return;
+      }
+      card.dataset.choreographyDone = "true";
+      card.classList.add("choreography-active");
+
+      const img = card.querySelector<HTMLElement>(".cac-card-img");
+      const normalUi = card.querySelector<HTMLElement>(".cac-normal-ui");
+      const cinematicLayer = card.querySelector<HTMLElement>(
+        ".cac-hero-cinematic-layer",
+      );
+      const textAnim = card.querySelector<HTMLElement>(".cac-hero-text-anim");
+      const h1Container = card.querySelector<HTMLElement>(".ch-h1-container");
+      const ctaBtn = card.querySelector<HTMLElement>(".ch-cta-btn");
+      const excerptContainer = card.querySelector<HTMLElement>(
+        ".ch-excerpt-container",
+      );
+      const dekContainer = card.querySelector<HTMLElement>(".ch-dek-container");
+      const tags = Array.from(card.querySelectorAll<HTMLElement>(".ch-tag"));
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          card.classList.add("card-settled");
+          resolve();
+        },
+      });
+
+      const isHeroCard =
+        card.dataset.isHero === "true" || card.dataset.variant === "hero";
+
+      // ══════════════════════════════════════════════════════════════════
+      // CASO 1: TARJETAS ESTÁNDAR / NO-HERO (Lógica original intacta)
+      // ══════════════════════════════════════════════════════════════════
+      if (!isHeroCard) {
+        // 1. Pase 1 del Metal Sweep (Inicio Rápido) + Tags pulse
+        if (ctaBtn) {
+          ctaBtn.classList.remove("sweep-fast", "sweep-slow");
+          void ctaBtn.offsetWidth;
+          ctaBtn.classList.add("sweep-fast");
+        }
+
+        if (tags.length) {
+          tl.fromTo(
+            tags,
+            { opacity: 0, filter: "blur(2px)" },
+            {
+              opacity: 1,
+              filter: "blur(0px)",
+              duration: 0.6,
+              stagger: 0.03,
+              ease: "power2.out",
+            },
+            0,
+          ).to(tags, { opacity: 0.7, duration: 0.4 }, 0.6);
+        }
+
+        // 2. H1 zoom-out para ceder el escenario al excerpt (suave y orgánico)
+        if (h1Container && excerptContainer) {
+          tl.to(
+            h1Container,
+            {
+              scale: 1.025,
+              y: -2,
+              filter: "blur(6px)",
+              opacity: 0,
+              duration: 1.1,
+              ease: "power2.inOut",
+              force3D: true,
+            },
+            0.4,
+          );
+        }
+
+        // 3. Excerpt escribe toda la línea a la vez
+        if (excerptContainer) {
+          tl.fromTo(
+            excerptContainer,
+            { opacity: 0, filter: "blur(12px)", y: 8 },
+            {
+              opacity: 1,
+              filter: "blur(0px)",
+              y: 0,
+              duration: 0.8,
+              ease: "power3.out",
+            },
+            0.8,
+          );
+
+          // 4. Pausa de lectura
+          tl.to({}, { duration: 2.8 });
+
+          // 5. Disolución fluida del excerpt
+          tl.to(excerptContainer, {
+            opacity: 0,
+            filter: "blur(10px)",
+            scale: 0.98,
+            y: -4,
+            duration: 0.8,
+            ease: "power2.inOut",
+          });
+        }
+
+        // 6. Re-materialización líquida del H1
+        if (h1Container) {
+          tl.fromTo(
+            h1Container,
+            { opacity: 0, filter: "blur(14px)", scale: 0.98, y: 6 },
+            {
+              opacity: 1,
+              filter: "blur(0px)",
+              scale: 1,
+              y: 0,
+              duration: 1.2,
+              ease: "power3.out",
+              force3D: true,
+            },
+            excerptContainer ? "-=0.2" : "0",
+          );
+        }
+
+        // 7. Dek exterior: revelado suave
+        if (dekContainer) {
+          tl.fromTo(
+            dekContainer,
+            { opacity: 0.7, y: 2 },
+            { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+            0.4,
+          );
+        }
+
+        // 8. Pase 2 del Metal Sweep
+        if (ctaBtn) {
+          tl.add(() => {
+            ctaBtn.classList.remove("sweep-fast", "sweep-slow");
+            void ctaBtn.offsetWidth;
+            ctaBtn.classList.add("sweep-slow");
+          }, "-=0.6");
+        }
+
+        tl.to({}, { duration: 2.5 });
+        return;
+      }
+
+      // ══════════════════════════════════════════════════════════════════
+      // CASO 2: HERO CARD CINEMÁTICO (Idéntico a Mode Tray Vertical)
+      // Si es rostro/portrait: Paneo lateral a la izq (20% 50%, scale 1.08) + zona 40/60
+      // Si es paisaje/escena cinemática: Mantiene 50% 50% + frase sobre fondo de la imagen con text-shadow
+      // Ambos: Aparece la frase cinemática con tipografía serif y peso -> Retorno al centro -> Título fijado
+      // ══════════════════════════════════════════════════════════════════
+      const isPortrait = card.dataset.isPortrait === "true";
+      const isFace = card.dataset.isFace === "true";
+      const isDocument = card.dataset.isDocument === "true";
+
+      // 1. Tags pulse sutil
+      if (tags.length) {
+        tl.fromTo(
+          tags,
+          { opacity: 0, filter: "blur(2px)" },
+          {
+            opacity: 1,
+            filter: "blur(0px)",
+            duration: 0.5,
+            stagger: 0.03,
+            ease: "power2.out",
+          },
+          0,
+        ).to(tags, { opacity: 0.7, duration: 0.3 }, 0.5);
+      }
+
+      // 2. Pausa contemplativa inicial (0.8s para agilizar arranque)
+      tl.to({}, { duration: 0.8 });
+
+      // 3. FASE 1: Movimiento de imagen según si es rostro, documento/tarot o paisaje
+      tl.add(() => {
+        if (img) {
+          if (isFace) {
+            // Rostro (ej. Hegel): se corre a la izquierda con suavidad
+            img.style.objectPosition = "20% 50%";
+            img.style.transform = "scale(1.045)";
+          } else if (isDocument) {
+            // Documento o Tarot: respeta encuadre superior (50% 20%) para que la carta y herramientas queden 100% visibles
+            img.style.objectPosition = "50% 20%";
+            img.style.transform = "scale(1.02)";
+          } else {
+            // Paisaje cinemático: mantiene encuadre centrado con leve respiro
+            img.style.objectPosition = "50% 38%";
+            img.style.transform = "scale(1.025)";
+          }
+        }
+      });
+
+      if (normalUi) {
+        tl.to(
+          normalUi,
+          { opacity: 0, duration: 0.7, ease: "power2.inOut" },
+          "<",
+        );
+      }
+
+      if (cinematicLayer) {
+        tl.to(
+          cinematicLayer,
+          { opacity: 1, duration: 0.7, ease: "power2.inOut" },
+          "<",
+        );
+      }
+
+      // 4. FASE 2: Aparición de la frase cinemática (ascenso + desenfoque progresivo ágil)
+      if (textAnim) {
+        tl.fromTo(
+          textAnim,
+          { opacity: 0, y: 16, scale: 0.98, filter: "blur(5px)" },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            filter: "blur(0px)",
+            duration: 1.1,
+            ease: "cubic-bezier(0.25, 1, 0.5, 1)",
+          },
+          "-=0.2",
+        );
+      }
+
+      // 5. FASE 3: Pausa contemplativa de lectura completa (3.6s para ritmo más fluido sin perder legibilidad)
+      tl.to({}, { duration: 3.6 });
+
+      // 6. FASE 4: Retorno cinemático
+      // La frase y la capa se disuelven suavemente
+      if (textAnim) {
+        tl.to(textAnim, {
+          opacity: 0,
+          filter: "blur(5px)",
+          y: -8,
+          duration: 0.5,
+          ease: "power2.inOut",
+        });
+      }
+
+      if (cinematicLayer) {
+        tl.to(
+          cinematicLayer,
+          { opacity: 0, duration: 0.6, ease: "power2.inOut" },
+          "<0.1",
+        );
+      }
+
+      // La imagen regresa a su encuadre natural
+      tl.add(() => {
+        if (img) {
+          if (isDocument || isPortrait) {
+            img.style.objectPosition = "50% 20%";
+          } else {
+            img.style.objectPosition = "50% 38%";
+          }
+          img.style.transform = "scale(1)";
+        }
+      });
+
+      // La UI normal reaparece y queda fijada permanentemente
+      if (normalUi) {
+        tl.to(
+          normalUi,
+          {
+            opacity: 1,
+            duration: 0.8,
+            ease: "power2.out",
+            onComplete: () => {
+              gsap.set(normalUi, {
+                opacity: 1,
+                clearProps: "filter,transform",
+              });
+              if (h1Container) {
+                gsap.set(h1Container, {
+                  opacity: 1,
+                  filter: "none",
+                  scale: 1,
+                  y: 0,
+                  clearProps: "filter,transform",
+                });
+              }
+            },
+          },
+          "-=0.3",
+        );
+      }
+
+      // 7. Dek exterior
+      if (dekContainer) {
+        tl.fromTo(
+          dekContainer,
+          { opacity: 0.7, y: 2 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+          0.4,
+        );
+      }
+
+      // 8. Pase del Metal Sweep
+      if (ctaBtn) {
+        tl.add(() => {
+          ctaBtn.classList.remove("sweep-fast", "sweep-slow");
+          void ctaBtn.offsetWidth;
+          ctaBtn.classList.add("sweep-slow");
+        }, "-=0.4");
+      }
+
+      tl.to({}, { duration: 1.5 });
+    });
+  };
+
+  const initChoreography = () => {
+    const cards = Array.from(
+      document.querySelectorAll<HTMLElement>(".cinematic-archive-card"),
+    );
+    if (cards.length === 0) return;
+
+    /* ── Aislamiento de GSAP con matchMedia (Solo Desktop: min-width: 768px) ── */
+    const mm = gsap.matchMedia();
+
+    mm.add("(min-width: 768px)", () => {
+      // Hover manual directo
+      cards.forEach((card) => {
+        card.addEventListener(
+          "mouseenter",
+          () => {
+            if (card.dataset.choreographyDone !== "true") {
+              runCardSequence(card);
+            }
+          },
+          { once: true },
+        );
+      });
+
+      // Observer secuencial
+      const queue: HTMLElement[] = [];
+      let isRunning = false;
+
+      const processNext = async () => {
+        if (isRunning || queue.length === 0) return;
+        isRunning = true;
+        const nextCard = queue.shift();
+        if (nextCard && nextCard.dataset.choreographyDone !== "true") {
+          await runCardSequence(nextCard);
+        }
+        isRunning = false;
+        processNext();
+      };
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const card = entry.target as HTMLElement;
+              if (
+                card.dataset.choreographyDone !== "true" &&
+                !queue.includes(card)
+              ) {
+                queue.push(card);
+                processNext();
+              }
+              observer.unobserve(card);
+            }
+          });
+        },
+        { threshold: 0.3 },
+      );
+
+      cards.forEach((card) => {
+        if (card.dataset.choreographyDone !== "true") {
+          observer.observe(card);
+        }
+      });
+
+      return () => {
+        observer.disconnect();
+      };
+    });
+  };
+
+  const initCardModals = () => {
+    const cards = Array.from(
+      document.querySelectorAll<HTMLElement>(".cinematic-archive-card"),
+    );
+
+    cards.forEach((card) => {
+      if (card.dataset.modalInit === "true") return;
+      card.dataset.modalInit = "true";
+
+      const triggers =
+        card.querySelectorAll<HTMLAnchorElement>(".cac-modal-trigger");
+      const modal = card.querySelector<HTMLDialogElement>(".expandable-modal");
+      if (!modal) return;
+
+      const closeBtn =
+        modal.querySelector<HTMLButtonElement>(".close-modal-btn");
+      const mContainer = modal.querySelector<HTMLElement>(".modal-container");
+      const mImage = modal.querySelector<HTMLImageElement>(".modal-image");
+      const mTitle = modal.querySelector<HTMLElement>(".modal-title");
+      const mEyebrow = modal.querySelector<HTMLElement>(".modal-eyebrow");
+      const mExcerpts = modal.querySelectorAll<HTMLElement>(".modal-excerpt");
+      const mCta = modal.querySelector<HTMLAnchorElement>(".modal-cta");
+
+      if (!mContainer || !mImage || !mTitle) return;
+
+      let currentFlipTween: gsap.core.Timeline | null = null;
+      let activeCard: HTMLElement | null = null;
+      let activeImg: HTMLElement | null = null;
+      let activeTitle: HTMLElement | null = null;
+
+      triggers.forEach((trigger) => {
+        trigger.addEventListener("click", (e) => {
+          if (
+            e.metaKey ||
+            e.ctrlKey ||
+            e.shiftKey ||
+            e.altKey ||
+            e.button !== 0
+          )
+            return;
+          if (trigger.getAttribute("target") === "_blank") return;
+
+          e.preventDefault();
+
+          const cardId = card.dataset.cardId || "";
+          const img = card.querySelector<HTMLElement>(".cac-card-img");
+          const title = card.querySelector<HTMLElement>(".cac-card-title");
+
+          activeCard = card;
+          activeImg = img;
+          activeTitle = title;
+
+          mImage.src = card.dataset.image || "";
+          mTitle.innerHTML = card.dataset.title || "";
+          if (mEyebrow) {
+            mEyebrow.innerHTML = card.dataset.eyebrow || "";
+            mEyebrow.className = `modal-eyebrow text-[10px] tracking-[0.3em] uppercase font-metadata font-bold mb-2 ${card.dataset.eyebrowClass || "text-rust-orange"}`;
+            mEyebrow.style.display = card.dataset.eyebrow ? "block" : "none";
+            mEyebrow.style.opacity = "1";
+          }
+          mExcerpts.forEach(
+            (el) => (el.innerHTML = card.dataset.excerpt || ""),
+          );
+          if (mCta) mCta.href = card.dataset.link || "#";
+
+          const extraContent = mContainer.querySelectorAll(
+            ".modal-excerpt, .modal-cta, .close-modal-btn, .modal-eyebrow",
+          );
+          gsap.set(extraContent, { clearProps: "all" });
+          gsap.set([mContainer, mImage, mTitle], { clearProps: "all" });
+
+          mContainer.dataset.flipId = `card-container-${cardId}`;
+          mImage.dataset.flipId = `card-image-${cardId}`;
+          mTitle.dataset.flipId = `card-title-${cardId}`;
+
+          const targetsToFlip = [card, img, title].filter(
+            (el): el is HTMLElement => el !== null,
+          );
+          const state = Flip.getState(targetsToFlip);
+
+          modal.showModal();
+
+          currentFlipTween = Flip.from(state, {
+            targets: [mContainer, mImage, mTitle],
+            duration: 0.5,
+            ease: "power3.inOut",
+            absolute: true,
+          });
+        });
+      });
+
+      const closeModal = () => {
+        if (!modal.open) return;
+
+        // Hide eyebrow immediately to prevent layout jumps during FLIP reverse
+        const eyebrow = mContainer.querySelector(
+          ".modal-eyebrow",
+        ) as HTMLElement | null;
+        if (eyebrow) eyebrow.style.display = "none";
+
+        const extraContent = mContainer.querySelectorAll(
+          ".modal-excerpt, .modal-cta, .close-modal-btn",
+        );
+        gsap.to(extraContent, { opacity: 0, duration: 0.15 });
+
+        if (currentFlipTween) {
+          currentFlipTween.timeScale(1.3).reverse();
+          currentFlipTween.eventCallback("onReverseComplete", () => {
+            modal.close();
+            gsap.set(
+              [mContainer, mImage, mTitle, ...Array.from(extraContent)],
+              { clearProps: "all" },
+            );
+            currentFlipTween = null;
+            activeCard = null;
+            activeImg = null;
+            activeTitle = null;
+          });
+        } else {
+          modal.close();
+        }
+      };
+
+      if (closeBtn) {
+        closeBtn.addEventListener("click", closeModal);
+      }
+
+      modal.addEventListener("cancel", (e) => {
+        e.preventDefault();
+        closeModal();
+      });
+
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+    });
+  };
+
+  const initAll = () => {
+    initChoreography();
+    initCardModals();
+  };
+
+  document.addEventListener("astro:page-load", initAll);
+  if (
+    document.readyState === "complete" ||
+    document.readyState === "interactive"
+  ) {
+    initAll();
+  } else {
+    document.addEventListener("DOMContentLoaded", initAll);
+  }
+</script>
