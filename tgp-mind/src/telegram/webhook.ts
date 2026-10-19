@@ -174,6 +174,10 @@ export async function sendTelegramMessage(
     for (let i = 0; i < chunks.length; i++) {
       const isLast = i === chunks.length - 1;
       await sendSingleTelegramMessage(chatId, token, chunks[i], isLast ? keyboard : undefined);
+      if (!isLast) {
+        // Pausa estricta de 100ms para asegurar el orden cronológico de entrega en los clientes de Telegram
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
     }
     return;
   }

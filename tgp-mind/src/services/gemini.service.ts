@@ -103,7 +103,8 @@ export async function generateProductionEssay(
   modoLibrePrompt = ''
 ): Promise<string> {
   const userPrompt = `Escribe un ensayo reflexivo, denso y profundo para Hemeroteca TGP sobre: "${topic.trim()}".
-Aplica estrictamente la arquitectura en 7 pasos y el anclaje material.${
+Aplica estrictamente la arquitectura en 7 pasos y el anclaje material.
+FORMATO MARKDOC (.mdoc): Utiliza exclusivamente Markdown puro sin etiquetas HTML (<div>, <p>, <span>, <br>).${
     modoLibrePrompt.trim() ? `\n\nDirectiva del autor:\n${modoLibrePrompt.trim()}` : ''
   }`;
 

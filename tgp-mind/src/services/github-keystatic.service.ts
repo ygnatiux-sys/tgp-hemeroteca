@@ -50,6 +50,18 @@ export interface KeystaticCommitResult {
 }
 
 /**
+ * Sanitiza el contenido Markdown para asegurar 100% compatibilidad con el parser Markdoc (.mdoc) de Keystatic.
+ * Elimina etiquetas HTML comunes no soportadas o mal formadas.
+ */
+export function sanitizarMarkdownParaMarkdoc(content: string): string {
+  if (!content) return '';
+  return content
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/?(div|span|p|section|article|header|footer|style|script)\b[^>]*>/gi, '')
+    .trim() + '\n';
+}
+
+/**
  * Genera y sube atómicamente un borrador (draft: true) a Keystatic vía GitHub API.
  */
 export async function crearBorradorKeystatic(params: {
@@ -125,7 +137,7 @@ export async function crearBorradorKeystatic(params: {
   }
 
   const indexJsonContent = JSON.stringify(frontmatter, null, 2);
-  const contentMdoc = contenido.trim() + '\n';
+  const contentMdoc = sanitizarMarkdownParaMarkdoc(contenido);
 
   const octokit = new Octokit({ auth: token });
 

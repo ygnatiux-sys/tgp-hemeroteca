@@ -48,6 +48,9 @@ DIRECTIVAS EDITORIALES DE PRODUCCIÓN:
    - 7. Cierre en destilación filosófica memorable.
 2. Tono: Ensayo rioplatense culto, denso y directo.
 3. Prohibido el cliché esotérico ("sabiduría ancestral", "tiempos inmemoriales") y la tibieza académica ("cabe destacar").
+4. Compatibilidad Estricta con Markdoc (.mdoc) para Keystatic:
+   - Usa EXCLUSIVAMENTE sintaxis Markdown estándar: encabezados con #, listas con -, negritas **, citas con >.
+   - PROHIBIDO TERMINANTEMENTE el uso de etiquetas HTML (<div>, <p>, <span>, <br>, <hr>, <style>, etc.). Todo formato debe ser Markdown nativo puro para no romper el parser Markdoc de Keystatic.
 `.trim();
 
 /**
