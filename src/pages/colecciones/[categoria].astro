@@ -125,7 +125,7 @@ const heroGallerySlides = resolvedEssays
                      (e.entry as any)?.imagePosition ||
                      '50% 30%',
       excerpt:       e.entry.excerpt || (e.entry as any)?.generadorTexto || '',
-      badge:         e.entry.badge || formatCategory(e.entry.category || label),
+      badge:         (typeof e.entry.badge === 'string' && e.entry.badge) ? e.entry.badge : formatCategory(e.entry.category || label),
     };
   });
 

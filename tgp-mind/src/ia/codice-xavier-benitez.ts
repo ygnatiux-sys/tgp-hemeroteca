@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// TGP MIND — Códice Maestro y Catálogo de Obra de Xavier Benítez
+// TGP MIND — Códice Maestro y Aislamiento de los 3 Silos Cognitivos
 // Autor: Xavier Benítez (The Great Puzzle Project)
 // Inyección directa de ADN doctrinal, epistemológico, estilístico y temático.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -83,6 +83,42 @@ export const CATALOGO_TESIS_OBRA_XAVIER_BENITEZ = `
 - El Cráneo Fracturado: Biopolítica, craneometría y eugenesia del laboratorio estatal a la distopía.
 - Hidrognosis: El agua como arquetipo del sentido fluido frente al dogma pétreo.
 `.trim();
+
+// ── AISLAMIENTO DE LOS 3 SILOS XML ──────────────────────────────────────────
+export interface SilosContextOptions {
+  bibliotecaAlternativa?: string;
+  cienciaGrounded?: string;
+  adnAutoral?: string;
+}
+
+/**
+ * Encapsula el conocimiento en etiquetas XML estrictas para evitar
+ * contaminación de contexto entre hipótesis heterodoxas, consenso académico y estilo autoral.
+ */
+export function buildSilosXML(options: SilosContextOptions = {}): string {
+  const {
+    bibliotecaAlternativa = '',
+    cienciaGrounded = '',
+    adnAutoral = getDoctrinaCompletaXavierBenitez(),
+  } = options;
+
+  return `
+<silo_biblioteca_alternativa>
+<!-- Hipótesis heterodoxas, anomalías empíricas, catastrofismo geológico, Tercera Vía TGP. CERO esoterismo barato o New Age sin sustento material. -->
+${bibliotecaAlternativa.trim() || 'Sin hipótesis heterodoxas adicionales para este contexto.'}
+</silo_biblioteca_alternativa>
+
+<silo_ciencia_grounded>
+<!-- Evidencia material verificable: estratigrafía, arqueometría, datación C14, contexto geológico y consenso académico forense. -->
+${cienciaGrounded.trim() || 'Foco material estricto: estratigrafía, manufactura y datación cruzada.'}
+</silo_ciencia_grounded>
+
+<silo_adn_autoral>
+<!-- Matriz cognitiva y de estilo de Xavier Benítez: arquitectura en 7 pasos, animal archivador, Homo Archivus, sobriedad rioplatense. PROHIBIDO forzar este estilo en consultas operativas o fichas técnicas. -->
+${adnAutoral.trim()}
+</silo_adn_autoral>
+`.trim();
+}
 
 export function getDoctrinaCompletaXavierBenitez(): string {
   return `

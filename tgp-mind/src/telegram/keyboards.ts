@@ -78,7 +78,25 @@ export const BOTONERA_ACCIONES_ENSAYO: InlineKeyboard = [
     { text: '📜 Publicar en Alternative', callback_data: 'action:publicar_alternative' },
   ],
   [
+    { text: '🏛️ Enviar a Taller Desk... ▾', callback_data: 'menu:taller_desk' },
+  ],
+  [
     { text: '🧹 Sanear Hilo', callback_data: '/nuevo' },
+  ],
+];
+
+// ── Submenú Desplegable Inline Arrows: Talleres TGP (thegreatpuzzleproject.com) ───
+export const SUBMENU_TALLER_DESK: InlineKeyboard = [
+  [
+    { text: '🏛️ Hemeroteca Desk', url: 'https://thegreatpuzzleproject.com/hemeroteca' },
+    { text: '🖋️ Scriptorium Desk', url: 'https://thegreatpuzzleproject.com/scriptorium' },
+  ],
+  [
+    { text: '🎨 Laboratorio Visual', url: 'https://thegreatpuzzleproject.com/laboratorio-visual' },
+    { text: '📜 Cartografía de Ideas', url: 'https://thegreatpuzzleproject.com/colecciones' },
+  ],
+  [
+    { text: '▴ Contraer menú', callback_data: 'menu:collapse_taller' },
   ],
 ];
 
@@ -90,6 +108,9 @@ export const BOTONERA_ACCIONES_REDES: InlineKeyboard = [
   ],
   [
     { text: '🎧 Audio Resumen', callback_data: 'action:audio' },
+    { text: '🏛️ Enviar a Taller Desk... ▾', callback_data: 'menu:taller_desk' },
+  ],
+  [
     { text: '🧹 Sanear Hilo', callback_data: '/nuevo' },
   ],
 ];

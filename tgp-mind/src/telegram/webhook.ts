@@ -17,6 +17,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { procesarFotoTelegramAR2 } from '../storage/r2.js';
+import { procesarFotoTelegramMultimodal, guardarRespaldoMarkdownEnR2 } from '../services/media.service.js';
 import {
   appendTurn,
   clearChatHistory,
@@ -52,6 +53,7 @@ import {
   TECLADO_CONFIRMACION_REDES,
   BOTONERA_ACCIONES_ENSAYO,
   BOTONERA_ACCIONES_REDES,
+  SUBMENU_TALLER_DESK,
   MENUS_BY_BOT,
   getMenuTitle,
   type InlineKeyboard,
@@ -378,6 +380,25 @@ export async function handleTelegramWebhook(
 
     // Enviar cartel Toast inmediato (< 10s requerido por Telegram)
     await answerCallbackQuery(botToken, cqId, toastText, false);
+
+    // ── SUBMENÚ DESPLEGABLE INLINE ARROWS (TALLER DESK) ─────────────────────
+    if (data === 'menu:taller_desk') {
+      await telegramPost(botToken, 'editMessageReplyMarkup', {
+        chat_id: chatId,
+        message_id: messageId,
+        reply_markup: { inline_keyboard: SUBMENU_TALLER_DESK },
+      });
+      return;
+    }
+    if (data === 'menu:collapse_taller') {
+      const defaultKeyboard = botIdentity === 'redes' ? BOTONERA_ACCIONES_REDES : BOTONERA_ACCIONES_ENSAYO;
+      await telegramPost(botToken, 'editMessageReplyMarkup', {
+        chat_id: chatId,
+        message_id: messageId,
+        reply_markup: { inline_keyboard: defaultKeyboard },
+      });
+      return;
+    }
 
     // ── GESTIÓN DE ACCIONES DE LA BÓVEDA DOCUMENTAL D1 ──────────────────────
     if (data.startsWith('boveda:ver:')) {
@@ -877,16 +898,20 @@ Arma un copy de alto impacto para redes sociales (ritmo flash, gancho somático 
   // Turno D1 fusionado: [contexto R2 URL] + [caption del usuario]
   let imageContextPrefix = '';
   let fotoGuardadaEnD1   = false;
+  let imageInlineData: { mimeType: string; data: string } | undefined;
 
   if (hasPhotos) {
     const bestPhoto = photos!.reduce((a, b) => (a.width > b.width ? a : b));
 
     try {
       console.log(`[Webhook R2] Subiendo foto file_id=${bestPhoto.file_id} (chat_id=${chatId})...`);
-      const { url: r2Url } = await procesarFotoTelegramAR2(bestPhoto.file_id, 'telegram', botToken);
+      const { url: r2Url, base64 } = await procesarFotoTelegramMultimodal(bestPhoto.file_id, 'telegram', botToken);
       console.log(`[Webhook R2] ✅ Imagen en R2: ${r2Url}`);
 
       imageContextPrefix = `[Sistema: Imagen recibida. URL permanente en R2: ${r2Url}. Usa esta URL como url_imagen en la Ficha Visual y en la Tool publish_social.]`;
+      if (base64) {
+        imageInlineData = { mimeType: 'image/webp', data: base64 };
+      }
 
       const partsD1: Array<{ text: string }> = [{ text: imageContextPrefix }];
       if (text) partsD1.push({ text: `Caption del usuario: ${text}` });
@@ -1177,6 +1202,14 @@ Arma un copy de alto impacto para redes sociales (ritmo flash, gancho somático 
           imagenR2Url: finalImageUrl || undefined,
           chatId: chatId,
         });
+
+        // Auto-respaldo .bak.md en Cloudflare R2
+        try {
+          const slugBackup = cleanPrompt ? cleanPrompt.slice(0, 40).replace(/[^a-z0-9]/gi, '-') : 'ensayo-tgp';
+          await guardarRespaldoMarkdownEnR2(slugBackup, textToSend);
+        } catch (bakErr: any) {
+          console.warn('[Auto-Respaldo R2] Aviso en backup .bak.md:', bakErr?.message);
+        }
       } else if (response.status === 'ERROR') {
         await sendTelegramMessage(chatId, botToken, `⚠️ Error en Erudito: ${response.error || 'Desconocido'}`);
       }
@@ -1197,6 +1230,8 @@ Arma un copy de alto impacto para redes sociales (ritmo flash, gancho somático 
         keyboard = botIdentity === 'redes' ? TECLADO_CONFIRMACION_REDES : TECLADO_CONFIRMACION_WEB;
       } else if (esEnsayoGenerado(responseText)) {
         keyboard = botIdentity === 'redes' ? BOTONERA_ACCIONES_REDES : BOTONERA_ACCIONES_ENSAYO;
+        const slugBackup = userTextForAgent ? userTextForAgent.slice(0, 40).replace(/[^a-z0-9]/gi, '-') : 'ensayo-tgp';
+        guardarRespaldoMarkdownEnR2(slugBackup, responseText).catch(() => {});
       }
       await sendTelegramMessage(chatId, botToken, responseText, keyboard);
     }
