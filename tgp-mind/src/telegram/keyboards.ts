@@ -68,37 +68,70 @@ export const TECLADO_CONFIRMACION: InlineKeyboard = [
 ];
 
 // ── Action Bento: Botonera Interactiva Nativa para Ensayos Terminados ─────────
-export const BOTONERA_ACCIONES_ENSAYO: InlineKeyboard = [
-  [
-    { text: '🎧 Escuchar Ensayo', callback_data: 'action:audio' },
-    { text: '🎨 Portada Nano Banana', callback_data: 'action:nanobanana' },
-  ],
-  [
-    { text: '🏛️ Publicar en Hemeroteca', callback_data: 'action:publicar_hemeroteca' },
-    { text: '📜 Publicar en Alternative', callback_data: 'action:publicar_alternative' },
-  ],
-  [
-    { text: '🏛️ Enviar a Taller Desk... ▾', callback_data: 'menu:taller_desk' },
-  ],
-  [
-    { text: '🧹 Sanear Hilo', callback_data: '/nuevo' },
-  ],
-];
+export function buildBotoneraAccionesEnsayo(backupId = 'reciente'): InlineKeyboard {
+  return [
+    [
+      { text: '🎧 Escuchar Ensayo', callback_data: 'action:audio' },
+      { text: '🎨 Portada Nano Banana', callback_data: 'action:nanobanana' },
+    ],
+    [
+      { text: '🏛️ Publicar en Hemeroteca', callback_data: 'action:publicar_hemeroteca' },
+      { text: '📜 Publicar en Alternative', callback_data: 'action:publicar_alternative' },
+    ],
+    [
+      { text: '🏛️ Enviar a Taller Desk... ▾', callback_data: `menu:taller_desk:${backupId}` },
+    ],
+    [
+      { text: '🧹 Sanear Hilo', callback_data: '/nuevo' },
+    ],
+  ];
+}
+
+export const BOTONERA_ACCIONES_ENSAYO: InlineKeyboard = buildBotoneraAccionesEnsayo('reciente');
+
+// ── Teclado Contextual de Peloteo Dialéctico ──────────────────────────────────
+export function buildPeloteoKeyboard(
+  backupId: string,
+  _context?: { tema?: string; tipo?: string },
+): InlineKeyboard {
+  const safeDraft = backupId || 'draft';
+  return [
+    [
+      { text: '📚 Cruzar con PDFs Firebase', callback_data: 'action:rag_firebase' },
+      { text: '🧠 Consolidar en 2.5 Pro', callback_data: 'action:escalate_pro' },
+    ],
+    [
+      { text: '📝 Guardar Borrador en Keystatic', callback_data: 'action:commit_keystatic' },
+    ],
+    [
+      { text: '🏛️ Enviar a Taller Desk... ▾', callback_data: `menu:taller_desk:${safeDraft}` },
+    ],
+    [
+      { text: '🧹 Sanear Hilo', callback_data: '/nuevo' },
+    ],
+  ];
+}
 
 // ── Submenú Desplegable Inline Arrows: Talleres TGP (thegreatpuzzleproject.com) ───
-export const SUBMENU_TALLER_DESK: InlineKeyboard = [
-  [
-    { text: '🏛️ Hemeroteca Desk', url: 'https://thegreatpuzzleproject.com/hemeroteca' },
-    { text: '🖋️ Scriptorium Desk', url: 'https://thegreatpuzzleproject.com/scriptorium' },
-  ],
-  [
-    { text: '🎨 Laboratorio Visual', url: 'https://thegreatpuzzleproject.com/laboratorio-visual' },
-    { text: '📜 Cartografía de Ideas', url: 'https://thegreatpuzzleproject.com/colecciones' },
-  ],
-  [
-    { text: '▴ Contraer menú', callback_data: 'menu:collapse_taller' },
-  ],
-];
+// Usa estrictamente la propiedad `url` de la API de Telegram para navegar a la web
+export function buildSubmenuTallerDesk(backupId: string): InlineKeyboard {
+  const safeDraft = backupId ? encodeURIComponent(backupId) : 'draft';
+  return [
+    [
+      { text: '🏛️ Hemeroteca Desk', url: `https://thegreatpuzzleproject.com/hemeroteca?draft=${safeDraft}` },
+      { text: '🖋️ Scriptorium Desk', url: `https://thegreatpuzzleproject.com/scriptorium?draft=${safeDraft}` },
+    ],
+    [
+      { text: '🎨 Laboratorio Visual', url: `https://thegreatpuzzleproject.com/laboratorio-visual?draft=${safeDraft}` },
+      { text: '📜 Cartografía de Ideas', url: `https://thegreatpuzzleproject.com/colecciones?draft=${safeDraft}` },
+    ],
+    [
+      { text: '▴ Contraer menú', callback_data: `menu:collapse_taller:${safeDraft}` },
+    ],
+  ];
+}
+
+export const SUBMENU_TALLER_DESK: InlineKeyboard = buildSubmenuTallerDesk('reciente');
 
 // ── Action Bento: Botonera Interactiva Nativa para Posts de Redes Sociales ────
 export const BOTONERA_ACCIONES_REDES: InlineKeyboard = [

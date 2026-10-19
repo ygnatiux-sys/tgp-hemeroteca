@@ -92,14 +92,18 @@ export async function procesarFotoTelegramMultimodal(
 export async function guardarRespaldoMarkdownEnR2(
   slug: string,
   markdownContent: string
-): Promise<{ url: string; key: string }> {
-  const safeSlug = slug.replace(/[^a-z0-9-_]/gi, '-').toLowerCase();
-  const key = `backups/${safeSlug}-${Date.now()}.bak.md`;
+): Promise<{ url: string; key: string; backupId: string }> {
+  const safeSlug = (slug || 'borrador-peloteo')
+    .replace(/[^a-z0-9-_]/gi, '-')
+    .toLowerCase()
+    .slice(0, 30) || 'draft';
+  const backupId = `${safeSlug}-${Date.now()}`;
+  const key = `backups/${backupId}.bak.md`;
   const buffer = Buffer.from(markdownContent, 'utf-8');
 
   const url = await subirBufferAR2(buffer, key, 'text/markdown; charset=utf-8');
-  console.log(`[R2 Auto-Respaldo] Guardado: ${url}`);
-  return { url, key };
+  console.log(`[R2 Auto-Respaldo] Guardado: ${url} (backupId: ${backupId})`);
+  return { url, key, backupId };
 }
 
 export {

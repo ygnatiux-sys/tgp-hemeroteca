@@ -56,8 +56,14 @@ import {
   SUBMENU_TALLER_DESK,
   MENUS_BY_BOT,
   getMenuTitle,
+  buildPeloteoKeyboard,
+  buildSubmenuTallerDesk,
+  buildBotoneraAccionesEnsayo,
   type InlineKeyboard,
 } from './keyboards.js';
+import { consultarSilosRAG } from '../services/archive-rag.service.js';
+import { crearBorradorKeystatic } from '../services/github-keystatic.service.js';
+import { generateProductionEssay } from '../services/gemini.service.js';
 import {
   isAuthorizedChatId,
   authorizeChatWithKey,
@@ -376,27 +382,182 @@ export async function handleTelegramWebhook(
       toastText = '🔁 Preparando reciclado para redes...';
     } else if (data.startsWith('boveda:audio:')) {
       toastText = '🎙️ Sintetizando audio documental...';
+    } else if (data.startsWith('action:rag_firebase')) {
+      toastText = '📚 Consultando Firestore RAG y biblioteca de archivo...';
+    } else if (data.startsWith('action:escalate_pro')) {
+      toastText = '🧠 Consolidando ensayo con Gemini 2.5 Pro...';
+    } else if (data.startsWith('action:commit_keystatic')) {
+      toastText = '📝 Creando borrador en Keystatic (GitHub GitOps)...';
     }
 
     // Enviar cartel Toast inmediato (< 10s requerido por Telegram)
     await answerCallbackQuery(botToken, cqId, toastText, false);
 
     // ── SUBMENÚ DESPLEGABLE INLINE ARROWS (TALLER DESK) ─────────────────────
-    if (data === 'menu:taller_desk') {
+    // Usa la propiedad `url` nativa de la API de Telegram para navegar a la web
+    if (data === 'menu:taller_desk' || data.startsWith('menu:taller_desk:')) {
+      const backupId = data.startsWith('menu:taller_desk:')
+        ? data.slice('menu:taller_desk:'.length)
+        : ((await getCompanionSession(chatId, botIdentity)).working_state?.lastBackupId || 'draft');
       await telegramPost(botToken, 'editMessageReplyMarkup', {
         chat_id: chatId,
         message_id: messageId,
-        reply_markup: { inline_keyboard: SUBMENU_TALLER_DESK },
+        reply_markup: { inline_keyboard: buildSubmenuTallerDesk(backupId) },
       });
       return;
     }
-    if (data === 'menu:collapse_taller') {
-      const defaultKeyboard = botIdentity === 'redes' ? BOTONERA_ACCIONES_REDES : BOTONERA_ACCIONES_ENSAYO;
+    if (data === 'menu:collapse_taller' || data.startsWith('menu:collapse_taller:')) {
+      const backupId = data.startsWith('menu:collapse_taller:')
+        ? data.slice('menu:collapse_taller:'.length)
+        : ((await getCompanionSession(chatId, botIdentity)).working_state?.lastBackupId || 'draft');
+      const keyboard = buildPeloteoKeyboard(backupId);
       await telegramPost(botToken, 'editMessageReplyMarkup', {
         chat_id: chatId,
         message_id: messageId,
-        reply_markup: { inline_keyboard: defaultKeyboard },
+        reply_markup: { inline_keyboard: keyboard },
       });
+      return;
+    }
+
+    // ── ACCIÓN 1: RAG DE FIREBASE Y BIBLIOTECA ALTERNATIVA ───────────────────
+    if (data === 'action:rag_firebase') {
+      if (messageId) {
+        await editMessageReplyMarkup(botToken, chatId, messageId, [
+          [{ text: '⏳ Cruzando fuentes con Firestore RAG y Biblioteca Alternativa...', callback_data: 'disabled' }],
+        ]);
+      }
+
+      const session = await getCompanionSession(chatId, botIdentity);
+      const query = session.working_state.lastTitle ||
+        session.working_state.lastDraft?.slice(0, 80) ||
+        'Arqueología Heterodoxa y Anomalías';
+
+      await sendTelegramMessage(chatId, botToken, `📚 *Crucero RAG en marcha:* Buscando en silos Firestore y biblioteca alternativa para "${query}"...`);
+
+      const ragRes = await consultarSilosRAG(query);
+      const ragPrompt = `Cruce RAG para enriquecer y confrontar la hipótesis:
+Tema: "${query}"
+Fuentes de archivo: ${ragRes.fuentes.join(', ')}
+
+[Silos de Archivo Consultados]:
+${ragRes.silosXML}
+
+Integra estos datos en el peloteo dialéctico con Xavier Benítez: contrasta la evidencia empírica con la hipótesis alternativa, manteniendo el filo analítico somático.`;
+
+      const responseText = await processTelegramMessage(chatId, ragPrompt, botIdentity);
+
+      let backupId = session.working_state.lastBackupId || 'draft';
+      try {
+        const slug = query.slice(0, 30).replace(/[^a-z0-9]/gi, '-');
+        const r2Res = await guardarRespaldoMarkdownEnR2(slug, responseText);
+        backupId = r2Res.backupId;
+        await updateWorkingState(chatId, botIdentity, {
+          lastDraft: responseText,
+          lastTitle: query,
+          lastBackupId: backupId,
+        });
+      } catch (err: any) {
+        console.warn('[R2 Peloteo] Error en respaldo efímero RAG:', err?.message);
+      }
+
+      await sendTelegramMessage(chatId, botToken, responseText, buildPeloteoKeyboard(backupId, { tema: query }));
+      return;
+    }
+
+    // ── ACCIÓN 2: ESCALAR A GEMINI 2.5 PRO (CONSOLIDACIÓN DE ENSAYO) ────────
+    if (data === 'action:escalate_pro') {
+      if (messageId) {
+        await editMessageReplyMarkup(botToken, chatId, messageId, [
+          [{ text: '⏳ Consolidando ensayo con Gemini 2.5 Pro (Razonamiento Profundo)...', callback_data: 'disabled' }],
+        ]);
+      }
+
+      const session = await getCompanionSession(chatId, botIdentity);
+      const draftBase = session.working_state.lastDraft ||
+        session.recent_turns.filter(t => t.role === 'model').pop()?.parts?.map((p: any) => p.text).join('\n') || '';
+      const titulo = session.working_state.lastTitle || 'Ensayo Pro TGP';
+
+      if (!draftBase) {
+        await sendTelegramMessage(chatId, botToken, '⚠️ No encontré un borrador o peloteo previo para consolidar.');
+        return;
+      }
+
+      await sendTelegramMessage(chatId, botToken, `🧠 *Consolidando ensayo en Gemini 2.5 Pro:* Procesando "${titulo}" con arquitectura en 7 pasos y rigor estratigráfico...`);
+
+      try {
+        const essayPro = await generateProductionEssay(
+          titulo,
+          `Consolida este peloteo dialéctico en un ensayo formal de alta divulgación para TGP Hemeroteca:\n\n${draftBase}`
+        );
+
+        // Guardar invisiblemente el estado en Cloudflare R2
+        const slug = titulo.slice(0, 30).replace(/[^a-z0-9]/gi, '-');
+        const { backupId, url: r2Url } = await guardarRespaldoMarkdownEnR2(slug, essayPro);
+
+        await updateWorkingState(chatId, botIdentity, {
+          lastDraft: essayPro,
+          lastTitle: titulo,
+          lastBackupId: backupId,
+        });
+
+        const footer = `\n\n---\n🏛️ **TGP Hemeroteca — Ensayo Consolidado 2.5 Pro**\n💾 **Respaldo R2:** [Ver .bak.md en R2](${r2Url})`;
+        const fullText = essayPro + footer;
+
+        // Envío con validación de Chunking Anti-Colapso (>4000 caracteres se divide por párrafos)
+        await sendTelegramMessage(chatId, botToken, fullText, buildBotoneraAccionesEnsayo(backupId));
+      } catch (proErr: any) {
+        console.error('[Escalate Pro Error]:', proErr);
+        await sendTelegramMessage(chatId, botToken, `⚠️ Error consolidando ensayo con 2.5 Pro: ${proErr?.message || proErr}`);
+      }
+      return;
+    }
+
+    // ── ACCIÓN 3: GUARDAR BORRADOR EN KEYSTATIC VIA GITOPS ──────────────────
+    if (data === 'action:commit_keystatic') {
+      if (messageId) {
+        await editMessageReplyMarkup(botToken, chatId, messageId, [
+          [{ text: '⏳ Creando borrador en Keystatic (GitHub GitOps)...', callback_data: 'disabled' }],
+        ]);
+      }
+
+      const session = await getCompanionSession(chatId, botIdentity);
+      const draftBase = session.working_state.lastDraft ||
+        session.recent_turns.filter(t => t.role === 'model').pop()?.parts?.map((p: any) => p.text).join('\n') || '';
+      const titulo = session.working_state.lastTitle || 'Borrador TGP ' + new Date().toISOString().slice(0, 10);
+      const coverUrl = session.working_state.lastImageUrl || null;
+
+      if (!draftBase) {
+        await sendTelegramMessage(chatId, botToken, '⚠️ No hay borrador en la memoria para enviar a Keystatic.');
+        return;
+      }
+
+      await sendTelegramMessage(chatId, botToken, `📝 *Creando borrador tipado para Keystatic en GitHub...*`);
+
+      try {
+        const commitRes = await crearBorradorKeystatic({
+          titulo,
+          contenido: draftBase,
+          categoria: session.working_state.lastCollection || 'Arqueosemiótica',
+          coverImage: coverUrl,
+          coleccion: 'ensayos',
+        });
+
+        const msgKeystatic = [
+          `✅ *¡Borrador guardado con éxito en Keystatic!*`,
+          ``,
+          `📝 **Título:** "${titulo}"`,
+          `📁 **Colección:** \`src/content/ensayos/${commitRes.slug}\``,
+          `📦 **Commit GitHub:** [Ver Commit ${commitRes.commitSha.slice(0, 7)}](${commitRes.commitUrl})`,
+          `🏛️ **CMS Keystatic:** [Abrir Borrador en Keystatic Admin](${commitRes.keystaticUrl})`,
+          ``,
+          `_El archivo fue tipado estrictamente (date: YYYY-MM-DD, draft: true) para que Keystatic lo cargue de inmediato._`,
+        ].join('\n');
+
+        await sendTelegramMessage(chatId, botToken, msgKeystatic);
+      } catch (ghErr: any) {
+        console.error('[Keystatic Commit Error]:', ghErr);
+        await sendTelegramMessage(chatId, botToken, `⚠️ Error al crear borrador en Keystatic: ${ghErr?.message || ghErr}`);
+      }
       return;
     }
 
@@ -1096,6 +1257,52 @@ Arma un copy de alto impacto para redes sociales (ritmo flash, gancho somático 
         .replace(/^\/(pro_breve|pro_medio|pro_premium|pro|flash)\s*/i, '')
         .trim();
 
+      if (!wantsPro) {
+        // ── MODO "PELOTEO" PREVIO DIALÉCTICO (Compagnon / Gemini 2.5 Flash @ 0.3) ──
+        // No dispara de inmediato una redacción final ni posteo. Conversa para afilar el enfoque.
+        await appendTurn(chatId, 'user', [{ text: userPrompt }], botIdentity);
+
+        const responseText = await processTelegramMessage(
+          chatId,
+          textParaAgente,
+          botIdentity,
+          fotoGuardadaEnD1 ? imageContextPrefix : undefined,
+        );
+
+        if (responseText) {
+          // ESTADO EFÍMERO EN CLOUDFLARE R2:
+          // Guardar de forma invisible en .bak.md en R2 ANTES de renderizar los botones
+          let backupId = 'draft';
+          try {
+            const slugBackup = cleanPrompt
+              ? cleanPrompt.slice(0, 30).replace(/[^a-z0-9]/gi, '-')
+              : 'peloteo';
+            const r2Res = await guardarRespaldoMarkdownEnR2(slugBackup, responseText);
+            backupId = r2Res.backupId;
+            await updateWorkingState(chatId, botIdentity, {
+              lastDraft: responseText,
+              lastTitle: cleanPrompt || 'Peloteo TGP',
+              lastBackupId: backupId,
+            });
+          } catch (bakErr: any) {
+            console.warn('[Auto-Respaldo R2] Aviso en backup efímero de peloteo:', bakErr?.message);
+          }
+
+          let keyboard: InlineKeyboard | undefined;
+          if (esFichaVisual(responseText)) {
+            keyboard = TECLADO_CONFIRMACION_WEB;
+          } else if (esEnsayoGenerado(responseText)) {
+            keyboard = buildBotoneraAccionesEnsayo(backupId);
+          } else {
+            // Panel de mando contextual con peloteo dialéctico y deep links nativos a talleres
+            keyboard = buildPeloteoKeyboard(backupId, { tema: cleanPrompt });
+          }
+
+          await sendTelegramMessage(chatId, botToken, responseText, keyboard);
+        }
+        return;
+      }
+
       // Guardar el turno del usuario en D1
       await appendTurn(chatId, 'user', [{ text: userPrompt }], botIdentity);
       const baseHistory = await getConversationHistory(chatId, 10, botIdentity);
@@ -1184,7 +1391,22 @@ Arma un copy de alto impacto para redes sociales (ritmo flash, gancho somático 
         trazaFooter.push(`🏛️ **Hemeroteca:** Usá la botonera de abajo para publicar o escuchar este ensayo.`);
         textToSend += trazaFooter.join('\n');
 
-        await sendTelegramMessage(chatId, botToken, textToSend, BOTONERA_ACCIONES_ENSAYO);
+        // Auto-respaldo .bak.md en Cloudflare R2
+        let backupId = 'ensayo-pro';
+        try {
+          const slugBackup = cleanPrompt ? cleanPrompt.slice(0, 40).replace(/[^a-z0-9]/gi, '-') : 'ensayo-tgp';
+          const r2Res = await guardarRespaldoMarkdownEnR2(slugBackup, textToSend);
+          backupId = r2Res.backupId;
+          await updateWorkingState(chatId, botIdentity, {
+            lastDraft: textToSend,
+            lastTitle: cleanPrompt,
+            lastBackupId: backupId,
+          });
+        } catch (bakErr: any) {
+          console.warn('[Auto-Respaldo R2] Aviso en backup .bak.md:', bakErr?.message);
+        }
+
+        await sendTelegramMessage(chatId, botToken, textToSend, buildBotoneraAccionesEnsayo(backupId));
         await appendTurn(chatId, 'model', [{ text: textToSend }], botIdentity);
 
         // Registro atómico de resguardo documental en Cloudflare D1
@@ -1202,14 +1424,6 @@ Arma un copy de alto impacto para redes sociales (ritmo flash, gancho somático 
           imagenR2Url: finalImageUrl || undefined,
           chatId: chatId,
         });
-
-        // Auto-respaldo .bak.md en Cloudflare R2
-        try {
-          const slugBackup = cleanPrompt ? cleanPrompt.slice(0, 40).replace(/[^a-z0-9]/gi, '-') : 'ensayo-tgp';
-          await guardarRespaldoMarkdownEnR2(slugBackup, textToSend);
-        } catch (bakErr: any) {
-          console.warn('[Auto-Respaldo R2] Aviso en backup .bak.md:', bakErr?.message);
-        }
       } else if (response.status === 'ERROR') {
         await sendTelegramMessage(chatId, botToken, `⚠️ Error en Erudito: ${response.error || 'Desconocido'}`);
       }
@@ -1225,13 +1439,31 @@ Arma un copy de alto impacto para redes sociales (ritmo flash, gancho somático 
     );
 
     if (responseText) {
+      // Estado Efímero en Cloudflare R2:
+      // Guardar de forma invisible en .bak.md en R2 ANTES de renderizar los botones
+      let backupId = 'draft';
+      try {
+        const slugBackup = userTextForAgent
+          ? userTextForAgent.slice(0, 30).replace(/[^a-z0-9]/gi, '-')
+          : 'peloteo';
+        const r2Res = await guardarRespaldoMarkdownEnR2(slugBackup, responseText);
+        backupId = r2Res.backupId;
+        await updateWorkingState(chatId, botIdentity, {
+          lastDraft: responseText,
+          lastTitle: userTextForAgent || 'Peloteo TGP',
+          lastBackupId: backupId,
+        });
+      } catch (bakErr: any) {
+        console.warn('[Auto-Respaldo R2] Aviso en backup efímero general:', bakErr?.message);
+      }
+
       let keyboard: InlineKeyboard | undefined;
       if (esFichaVisual(responseText)) {
         keyboard = botIdentity === 'redes' ? TECLADO_CONFIRMACION_REDES : TECLADO_CONFIRMACION_WEB;
       } else if (esEnsayoGenerado(responseText)) {
-        keyboard = botIdentity === 'redes' ? BOTONERA_ACCIONES_REDES : BOTONERA_ACCIONES_ENSAYO;
-        const slugBackup = userTextForAgent ? userTextForAgent.slice(0, 40).replace(/[^a-z0-9]/gi, '-') : 'ensayo-tgp';
-        guardarRespaldoMarkdownEnR2(slugBackup, responseText).catch(() => {});
+        keyboard = botIdentity === 'redes' ? BOTONERA_ACCIONES_REDES : buildBotoneraAccionesEnsayo(backupId);
+      } else {
+        keyboard = buildPeloteoKeyboard(backupId, { tema: userTextForAgent });
       }
       await sendTelegramMessage(chatId, botToken, responseText, keyboard);
     }

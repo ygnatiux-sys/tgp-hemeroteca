@@ -19,6 +19,7 @@ export interface WorkingState {
   lastDraft?: string;
   lastTitle?: string;
   lastSlug?: string;
+  lastBackupId?: string;
   lastCollection?: string;
   lastImageUrl?: string;
   lastAudioUrl?: string;
