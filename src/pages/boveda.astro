@@ -13,7 +13,6 @@
 export const prerender = true;
 
 import Layout from '../layouts/Layout.astro';
-import Header from '../components/Header.astro';
 import PolvoDorado from '../components/PolvoDorado.astro';
 import ImaxMaxRecovered from '../components/ImaxMaxRecovered.astro';
 import curatedData from '../data/lost-posts-curated.json';
@@ -26,7 +25,6 @@ const reel2 = curatedData.reel2_filosofia_gnosis || [];
   title="Bóveda de Archivo · Posteos Recuperados | The Great Puzzle Project"
   description="Restitución monumental de 20 ensayos y expedientes históricos rescatados del archivo profundo en dos visores IMAX MAX."
 >
-  <Header />
   <PolvoDorado />
 
   <main class="min-h-screen bg-[#050706] text-[#EFEBE3] pt-24 sm:pt-28 pb-32 px-4 sm:px-6 md:px-10 lg:px-14 overflow-hidden relative">

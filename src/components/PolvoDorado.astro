@@ -18,19 +18,19 @@
  */
 
 interface Props {
-  text: string;
+  text?: string;
   eyebrow?: string;
   id?: string;
 }
 
 const {
-  text,
+  text = "",
   eyebrow = "",
   id = "polvo-" + Math.random().toString(36).substring(2, 9),
 } = Astro.props;
 
-// Tokenizador en palabras para el efecto TypeMagic
-const rawWords = text.trim().split(/\s+/);
+// Tokenizador en palabras para el efecto TypeMagic (defensivo ante text opcional)
+const rawWords = (text || "").trim().split(/\s+/).filter(Boolean);
 const wordsData = rawWords.map((word, wordIdx) => {
   let type: 'normal' | 'glow' | 'accent' = 'normal';
   let cleanWord = word;
@@ -62,36 +62,37 @@ const wordsData = rawWords.map((word, wordIdx) => {
   {/* Respiración superior */}
   <div class="h-[8vh] md:h-[11vh]" aria-hidden="true"></div>
 
-  {/* Contenido textual centrado */}
-  <div class="relative z-10 max-w-2xl mx-auto px-6 md:px-12 text-center">
-
-    {/* Eyebrow — etiqueta de categoría */}
-    {eyebrow && (
-      <span class="polvo-eyebrow font-metadata text-[10px] uppercase tracking-[0.35em] text-[#C9A86C]/60 block mb-5">
-        {eyebrow}
-      </span>
-    )}
-
-    {/* Párrafo narrativo con efecto TypeMagic */}
-    <p class="polvo-headline leading-[1.9] tracking-wide" id={`${id}-text`}>
-      {wordsData.map((wd) => (
-        <span
-          class={[
-            "polvo-word",
-            wd.type === "glow"   ? "polvo-word--glow"   : "",
-            wd.type === "accent" ? "polvo-word--accent" : "",
-          ].filter(Boolean).join(" ")}
-          data-widx={wd.idx}
-        >
-          {wd.word}{" "}
+  {/* Contenido textual centrado — se renderiza solo si hay texto */}
+  {wordsData.length > 0 && (
+    <div class="relative z-10 max-w-2xl mx-auto px-6 md:px-12 text-center">
+      {/* Eyebrow — etiqueta de categoría */}
+      {eyebrow && (
+        <span class="polvo-eyebrow font-metadata text-[10px] uppercase tracking-[0.35em] text-[#C9A86C]/60 block mb-5">
+          {eyebrow}
         </span>
-      ))}
-      <span class="polvo-cursor" id={`${id}-cursor`} aria-hidden="true">|</span>
-    </p>
+      )}
 
-    {/* Línea divisoria dorada sutil — se expande al final */}
-    <div class="polvo-divider mt-8 mx-auto" id={`${id}-divider`} aria-hidden="true"></div>
-  </div>
+      {/* Párrafo narrativo con efecto TypeMagic */}
+      <p class="polvo-headline leading-[1.9] tracking-wide" id={`${id}-text`}>
+        {wordsData.map((wd) => (
+          <span
+            class={[
+              "polvo-word",
+              wd.type === "glow"   ? "polvo-word--glow"   : "",
+              wd.type === "accent" ? "polvo-word--accent" : "",
+            ].filter(Boolean).join(" ")}
+            data-widx={wd.idx}
+          >
+            {wd.word}{" "}
+          </span>
+        ))}
+        <span class="polvo-cursor" id={`${id}-cursor`} aria-hidden="true">|</span>
+      </p>
+
+      {/* Línea divisoria dorada sutil — se expande al final */}
+      <div class="polvo-divider mt-8 mx-auto" id={`${id}-divider`} aria-hidden="true"></div>
+    </div>
+  )}
 
   {/* Respiración inferior */}
   <div class="h-[8vh] md:h-[11vh]" aria-hidden="true"></div>
