@@ -5,6 +5,8 @@
 
 import { genai } from '../ia/gemini.js';
 import { getChatToolDeclarations, executeChatTool } from './tool-registry.js';
+import { sanitizeEditorialPrompt, type EditorialBriefSanitized } from '../ia/editorial-sanitizer.js';
+import { buildGoogleChatCardV2 } from './cards-v2-builder.js';
 import {
   getCompanionSession,
   appendCompanionTurn,
@@ -41,6 +43,8 @@ export interface OrchestrationResult {
   text: string;
   toolsExecuted: string[];
   stepsCount: number;
+  editorialBrief?: EditorialBriefSanitized;
+  cardV2?: any;
 }
 
 /**
@@ -56,9 +60,31 @@ export async function runChatOrchestrator(
   const sessionId = options.sessionId || 'googlechat_default';
   const toolsExecuted: string[] = [];
 
+  const isEditorialIntent = /brief|post|ensayo|articulo|publica|sube|nota|capitulo/i.test(prompt);
+  let editorialBrief: EditorialBriefSanitized | undefined;
+
+  if (isEditorialIntent) {
+    try {
+      editorialBrief = await sanitizeEditorialPrompt(prompt);
+      console.log(`[Orchestrator] Ficha editorial sanitizada: "${editorialBrief.cleanTitle}" [${editorialBrief.targetSilo}]`);
+    } catch (sanErr: any) {
+      console.warn('[Orchestrator] Aviso sanitizador:', sanErr?.message);
+    }
+  }
+
+  const editorialInjection = editorialBrief
+    ? `\n\n[DIRECTIVA EDITORIAL CANÓNICA TGP - APLICAR ESTOS DATOS Y NINGÚN CLICHÉ]:
+- Título Oficial: "${editorialBrief.cleanTitle}"
+- Subtítulo / Tesis: "${editorialBrief.subtitle}"
+- Silo Destino: "${editorialBrief.targetSilo}"
+- Slug Canónico: "${editorialBrief.slug}"
+- Instrucción Depurada: "${editorialBrief.cleanTopicPrompt}"
+- Veto: NUNCA uses la frase del usuario ("${prompt}") como título.`
+    : '';
+
   const initialPrompt = options.user
-    ? `[Usuario: ${userName}]: ${prompt}`
-    : prompt;
+    ? `[Usuario: ${userName}]: ${prompt}${editorialInjection}`
+    : `${prompt}${editorialInjection}`;
 
   // 1. Cargar historial previo de Firestore / Memoria viva
   const session = await getCompanionSession(sessionId, 'googlechat');
@@ -93,6 +119,13 @@ ${foundational.manifiesto_fundacional.slice(0, 1500)}`.trim();
 
   let currentStep = 0;
   let finalText = '';
+  const capturedMetadata: {
+    publicUrl?: string;
+    vaultUrl?: string;
+    r2Url?: string;
+    githubUrl?: string;
+    heroImageUrl?: string;
+  } = {};
 
   while (currentStep < maxSteps) {
     currentStep++;
@@ -135,8 +168,22 @@ ${foundational.manifiesto_fundacional.slice(0, 1500)}`.trim();
       const toolArgs = (call.args as Record<string, any>) || {};
       toolsExecuted.push(toolName);
 
+      // Si la tool es publish_keystatic_post y tenemos ficha editorial, inyectar silo y título si faltan
+      if (toolName === 'publish_keystatic_post' && editorialBrief) {
+        if (!toolArgs.titulo) toolArgs.titulo = editorialBrief.cleanTitle;
+        if (!toolArgs.slug) toolArgs.slug = editorialBrief.slug;
+        if (!toolArgs.silo) toolArgs.silo = editorialBrief.targetSilo;
+      }
+
       console.log(`[Orchestrator] Invocando tool: "${toolName}" con args:`, JSON.stringify(toolArgs).slice(0, 200));
       const toolResult = await executeChatTool(toolName, toolArgs);
+
+      if (toolResult?.publicUrl) capturedMetadata.publicUrl = toolResult.publicUrl;
+      if (toolResult?.vaultUrl) capturedMetadata.vaultUrl = toolResult.vaultUrl;
+      if (toolResult?.r2Url) capturedMetadata.r2Url = toolResult.r2Url;
+      if (toolResult?.githubUrl) capturedMetadata.githubUrl = toolResult.githubUrl;
+      if (toolResult?.imageUrl) capturedMetadata.heroImageUrl = toolResult.imageUrl;
+      if (toolResult?.uploaded?.[0]?.r2Url) capturedMetadata.r2Url = toolResult.uploaded[0].r2Url;
 
       functionResponseParts.push({
         functionResponse: { name: toolName, response: toolResult },
@@ -180,12 +227,35 @@ ${foundational.manifiesto_fundacional.slice(0, 1500)}`.trim();
     }).catch(() => {});
   }
 
+  let cardV2: any = null;
+  if (isEditorialIntent || toolsExecuted.includes('publish_keystatic_post') || toolsExecuted.includes('generate_essay_draft')) {
+    const silo = editorialBrief?.targetSilo || 'alternative';
+    const slug = editorialBrief?.slug || 'post-reciente';
+    const cleanTitle = editorialBrief?.cleanTitle || 'Entrega Editorial TGP';
+
+    cardV2 = buildGoogleChatCardV2({
+      status: 'published',
+      title: cleanTitle,
+      subtitle: editorialBrief?.subtitle || 'Tesis conceptual y arqueología de la memoria.',
+      silo,
+      excerpt: finalText.slice(0, 300),
+      slug,
+      publicUrl: capturedMetadata.publicUrl,
+      vaultUrl: capturedMetadata.vaultUrl,
+      r2Url: capturedMetadata.r2Url,
+      githubUrl: capturedMetadata.githubUrl,
+      heroImageUrl: capturedMetadata.heroImageUrl,
+    });
+  }
+
   console.log(`[Orchestrator] Finalizado en ${currentStep} pasos. Tools: [${toolsExecuted.join(', ')}]`);
 
   return {
     text: finalText,
     toolsExecuted,
     stepsCount: currentStep,
+    editorialBrief,
+    cardV2,
   };
 }
 

@@ -187,14 +187,15 @@ export async function generateImageWithGemini(
     // Si se especificó slug, guardamos la imagen en assets
     if (slug) {
       try {
+        const safeSlug = slug.toLowerCase().replace(/[/\\?%*:|"<>]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
         const buffer = Buffer.from(base64Image, 'base64');
-        const assetDir = path.join(process.cwd(), 'src', 'assets', 'ensayos', slug);
+        const assetDir = path.join(process.cwd(), 'src', 'assets', 'ensayos', safeSlug);
         if (!fs.existsSync(assetDir)) {
           fs.mkdirSync(assetDir, { recursive: true });
         }
         const imgFile = path.join(assetDir, 'coverImage.jpeg');
         fs.writeFileSync(imgFile, buffer);
-        coverImagePath = `/src/assets/ensayos/${slug}/coverImage.jpeg`;
+        coverImagePath = `/src/assets/ensayos/${safeSlug}/coverImage.jpeg`;
       } catch (saveErr: any) {
         console.warn('No se pudo guardar la imagen en assets:', saveErr.message);
       }

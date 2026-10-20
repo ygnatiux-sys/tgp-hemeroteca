@@ -34,7 +34,7 @@ function handleWebhookRoute(botType: 'redes' | 'omni' | 'assistant' | 'liminal',
   };
 }
 
-// ── Registro de Webhooks Oficiales ───────────────────────────────────────────
+// ── Registro de Webhooks Oficiales (POST) ───────────────────────────────────
 telegramRoutes.post('/webhook/telegram-social', handleWebhookRoute('redes', TELEGRAM_SOCIAL_TOKEN));
 telegramRoutes.post('/telegram-webhook', handleWebhookRoute('omni', TELEGRAM_TOKEN));
 telegramRoutes.post('/webhook/telegram-omni', handleWebhookRoute('omni', TELEGRAM_TOKEN));
@@ -42,21 +42,58 @@ telegramRoutes.post('/webhook/telegram', handleWebhookRoute('assistant', TELEGRA
 telegramRoutes.post('/webhook-dev', handleWebhookRoute('liminal', TELEGRAM_DEV_TOKEN));
 telegramRoutes.post('/webhook/telegram-premium', handleWebhookRoute('liminal', TELEGRAM_PREMIUM_TOKEN));
 
-// Rutas secundarias /bot<TOKEN> requeridas por Cloud Run
+// Ruta dinámica multi-bot /telegram/:botId
+telegramRoutes.post('/telegram/:botId', async (c) => {
+  const botId = c.req.param('botId')?.toLowerCase();
+  if (botId === 'redes' || botId === 'social') {
+    return handleWebhookRoute('redes', TELEGRAM_SOCIAL_TOKEN)(c);
+  }
+  if (botId === 'assistant' || botId === 'cloud') {
+    return handleWebhookRoute('assistant', TELEGRAM_TGP_CLOUD_TOKEN)(c);
+  }
+  if (botId === 'dev' || botId === 'liminal') {
+    return handleWebhookRoute('liminal', TELEGRAM_DEV_TOKEN)(c);
+  }
+  if (botId === 'premium') {
+    return handleWebhookRoute('liminal', TELEGRAM_PREMIUM_TOKEN)(c);
+  }
+  return handleWebhookRoute('omni', TELEGRAM_TOKEN)(c);
+});
+
+// ── Sondas de Salud y Verificación para Telegram / Monitores (GET) ───────────
+const healthProbe = (botName: string) => (c: any) =>
+  c.json({ status: 'TGP Mind Telegram Webhook activo', bot: botName, method: 'GET' });
+
+telegramRoutes.get('/webhook/telegram-social', healthProbe('redes'));
+telegramRoutes.get('/telegram-webhook', healthProbe('omni'));
+telegramRoutes.get('/webhook/telegram-omni', healthProbe('omni'));
+telegramRoutes.get('/webhook/telegram', healthProbe('assistant'));
+telegramRoutes.get('/webhook-dev', healthProbe('liminal'));
+telegramRoutes.get('/webhook/telegram-premium', healthProbe('premium'));
+telegramRoutes.get('/telegram/:botId', (c) =>
+  c.json({ status: 'TGP Mind Telegram Webhook activo', botId: c.req.param('botId'), method: 'GET' })
+);
+
+// Rutas secundarias /bot<TOKEN> requeridas por Telegram
 if (TELEGRAM_TOKEN) {
   telegramRoutes.post(`/bot${TELEGRAM_TOKEN}`, handleWebhookRoute('omni', TELEGRAM_TOKEN));
+  telegramRoutes.get(`/bot${TELEGRAM_TOKEN}`, healthProbe('omni'));
 }
 if (TELEGRAM_SOCIAL_TOKEN) {
   telegramRoutes.post(`/bot${TELEGRAM_SOCIAL_TOKEN}`, handleWebhookRoute('redes', TELEGRAM_SOCIAL_TOKEN));
+  telegramRoutes.get(`/bot${TELEGRAM_SOCIAL_TOKEN}`, healthProbe('redes'));
 }
 if (TELEGRAM_TGP_CLOUD_TOKEN) {
   telegramRoutes.post(`/bot${TELEGRAM_TGP_CLOUD_TOKEN}`, handleWebhookRoute('assistant', TELEGRAM_TGP_CLOUD_TOKEN));
+  telegramRoutes.get(`/bot${TELEGRAM_TGP_CLOUD_TOKEN}`, healthProbe('assistant'));
 }
 if (TELEGRAM_DEV_TOKEN) {
   telegramRoutes.post(`/bot${TELEGRAM_DEV_TOKEN}`, handleWebhookRoute('liminal', TELEGRAM_DEV_TOKEN));
+  telegramRoutes.get(`/bot${TELEGRAM_DEV_TOKEN}`, healthProbe('liminal'));
 }
 if (TELEGRAM_PREMIUM_TOKEN) {
   telegramRoutes.post(`/bot${TELEGRAM_PREMIUM_TOKEN}`, handleWebhookRoute('liminal', TELEGRAM_PREMIUM_TOKEN));
+  telegramRoutes.get(`/bot${TELEGRAM_PREMIUM_TOKEN}`, healthProbe('premium'));
 }
 
 // ── Saneamiento y Reenganche de Webhooks ─────────────────────────────────────

@@ -7,3 +7,6 @@ dist/
 .env.*
 deploy.ps1
 deploy.sh
+_legacy_archive/
+*.bak
+*.clean

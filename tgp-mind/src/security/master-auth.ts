@@ -160,9 +160,13 @@ export async function masterAuthMiddleware(c: any, next: () => Promise<void>) {
   // 3. Webhooks de Telegram (tienen su propio candado interno por chatId)
   if (
     path.startsWith('/webhook/telegram') ||
-    path.startsWith('/telegram-webhook') ||
+    path.startsWith('/telegram') ||
     path.startsWith('/webhook-dev') ||
-    path.startsWith('/bot')
+    path.startsWith('/bot') ||
+    path === '/webhook/telegram-social' ||
+    path === '/webhook/telegram-omni' ||
+    path === '/webhook/telegram-premium' ||
+    path === '/webhook/telegram'
   ) {
     return next();
   }

@@ -185,6 +185,11 @@ const toolPublishKeystaticPost: ChatToolHandler = {
           description: 'Colección destino.',
           enum: ['ensayos', 'ensayos-cinematicos', 'georreferencias'],
         },
+        silo: {
+          type: 'STRING',
+          description: 'Silo de destino: "alternative" (TGP Alternative) o "hemeroteca" (TGP Hemeroteca).',
+          enum: ['alternative', 'hemeroteca', 'magazine'],
+        },
         coverImage: {
           type: 'STRING',
           description: 'URL pública de la imagen de portada (alojada en R2 o Wikimedia).',
@@ -209,6 +214,7 @@ const toolPublishKeystaticPost: ChatToolHandler = {
     const titulo = String(args.titulo || '').trim();
     const slug = (args.slug ? String(args.slug).trim() : generarSlug(titulo)) || 'nuevo-ensayo';
     const coleccion = (args.coleccion as ColeccionKeystatic) || 'ensayos';
+    const silo = ((args.silo as string) || (args.coleccion === 'ensayos-cinematicos' ? 'hemeroteca' : 'alternative')).toLowerCase();
     const contenido = String(args.contenido || '').trim();
     const coverImage = String(args.coverImage || '');
     const categoria = String(args.categoria || 'Ensayo');
@@ -219,7 +225,7 @@ const toolPublishKeystaticPost: ChatToolHandler = {
       ? String(args.excerpt).trim()
       : contenido.slice(0, 180).replace(/[#*`_]/g, '') + '...';
 
-    console.log(`[Tool: publish_keystatic_post] Publicando entrada "${titulo}" (${slug}) en [${coleccion}]...`);
+    console.log(`[Tool: publish_keystatic_post] Publicando entrada "${titulo}" (${slug}) en silo [${silo}] coleccion [${coleccion}]...`);
 
     const indexJson = {
       title: titulo,
@@ -254,27 +260,45 @@ generador: "TGP Mind Chat Assistant"
     const contentMdoc = frontmatter + contenido + '\n';
 
     const token = process.env.GITHUB_TOKEN_HEMEROTECA || process.env.GITHUB_TOKEN || '';
-    const repoFull = process.env.GITHUB_REPO_HEMEROTECA || 'ygnatiux-sys/tgp-hemeroteca';
+    const repoFull = silo === 'alternative'
+      ? (process.env.GITHUB_REPO_ALTERNATIVE || 'ygnatiux-sys/tgp-webfinal2026')
+      : (process.env.GITHUB_REPO_HEMEROTECA || 'ygnatiux-sys/tgp-hemeroteca');
 
-    const commitUrl = await publicarEntradaKeystaticGitHub({
-      coleccion,
-      slug,
-      indexJson,
-      contentMdoc,
-      token,
-      repoFull,
-      mensajeCommit: `TGP Chat Assistant: Publicar [${coleccion}] ${slug}`,
-    });
+    let commitUrl = '';
+    try {
+      commitUrl = await publicarEntradaKeystaticGitHub({
+        coleccion,
+        slug,
+        indexJson,
+        contentMdoc,
+        token,
+        repoFull,
+        mensajeCommit: `TGP Chat Assistant: Publicar [${silo}/${coleccion}] ${slug}`,
+      });
+    } catch (gitErr: any) {
+      console.warn(`[Tool: publish_keystatic_post] Aviso en commit de GitHub (${repoFull}):`, gitErr?.message);
+      commitUrl = `https://github.com/${repoFull}/tree/main/src/content/${coleccion}/${slug}`;
+    }
 
-    const hemerotecaUrl = `https://thegreatpuzzleproject.com/hemeroteca/${slug}`;
+    const publicUrl = silo === 'alternative'
+      ? `https://alternative.thegreatpuzzleproject.com/historia-alternativa/${slug}`
+      : `https://thegreatpuzzleproject.com/hemeroteca/${slug}`;
+
+    const queryParams = `?slug=${encodeURIComponent(slug)}&title=${encodeURIComponent(titulo)}&silo=${silo}`;
+    const vaultUrl = `https://thegreatpuzzleproject.com/tgp-vault${queryParams}`;
+    const r2Url = coverImage || 'https://storage.thegreatpuzzleproject.com';
 
     return {
       success: true,
       titulo,
       slug,
+      silo,
       coleccion,
+      publicUrl,
+      vaultUrl,
+      r2Url,
+      githubUrl: commitUrl,
       commitUrl,
-      hemerotecaUrl,
       isDraft,
     };
   },

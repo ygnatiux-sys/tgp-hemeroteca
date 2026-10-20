@@ -19,3 +19,8 @@ npm-debug.log*
 # Sistema operativo
 .DS_Store
 Thumbs.db
+
+# Resguardos y archivos monolíticos
+_legacy_archive/
+*.bak
+*.clean

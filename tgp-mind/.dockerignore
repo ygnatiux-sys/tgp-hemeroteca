@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.git
+.gitignore
+.gcloudignore
+.dockerignore
+.env
+.env.*
+*.log
+_legacy_archive/
+*.bak
+*.clean
+scratch/
+deploy.ps1
+deploy.sh

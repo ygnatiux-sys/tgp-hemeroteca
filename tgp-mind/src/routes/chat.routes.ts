@@ -4,6 +4,7 @@
 import { Hono } from 'hono';
 import { wikimediaTool } from '../core/tools/wikimediaTool.js';
 import { runChatOrchestrator } from '../chat/orchestrator.js';
+import { buildGoogleChatCardV2 } from '../chat/cards-v2-builder.js';
 
 export const chatRoutes = new Hono();
 
@@ -54,6 +55,9 @@ chatRoutes.post('/cx-tool-panlingua', async (c) => {
 
 // ── Handler de Webhook Google Chat & Dialogflow CX ───────────────────────────
 const handleChatWebhook = async (c: any) => {
+  let cleanText = '';
+  let userName = 'Director';
+
   try {
     const body = await c.req.json().catch(() => ({}));
 
@@ -66,12 +70,12 @@ const handleChatWebhook = async (c: any) => {
       body.query ||
       '';
 
-    const userName =
+    userName =
       body.user?.displayName ||
       body.message?.sender?.displayName ||
       'Director';
 
-    const cleanText = String(rawText)
+    cleanText = String(rawText)
       .replace(/<users\/[^>]+>\s*/g, '')
       .replace(/^@tgp\s+mind\s+as[eé]sor\s+for\s+XB\s*/gi, '')
       .replace(/^@[\w\s.-]+?\s+(?=(?:me|como|hace|hola|que|quien|cuando|che|por|sube|crea|publica|brief|[a-z0-9]))/i, '')
@@ -80,7 +84,7 @@ const handleChatWebhook = async (c: any) => {
 
     if (!cleanText) {
       const emptyMsg =
-        '¡Hola! Soy el asistente orquestador de TGP Mind. Puedes pedirme en lenguaje natural subir posts, convertir imágenes a WebP en R2, consultar Panlingua D1 o generar portadas cinematográficas.';
+        '¡Hola, Xavier! Soy el asistente orquestador de TGP Mind. Puedes pedirme en lenguaje natural briefs sobre arqueología alternativa, procesar imágenes a WebP en R2 o redactar publicaciones para Alternative o Hemeroteca.';
       if (body.intentInfo || body.fulfillmentInfo || body.sessionInfo) {
         return c.json({ fulfillmentResponse: { messages: [{ text: { text: [emptyMsg] } }] } });
       }
@@ -102,6 +106,25 @@ const handleChatWebhook = async (c: any) => {
     });
     const responseText = orchestration.text;
 
+    // Si el orquestador generó una Card V2 (brief/post/acción editorial con batch de URLs)
+    if (orchestration.cardV2) {
+      if (body.intentInfo || body.fulfillmentInfo || body.sessionInfo) {
+        return c.json({
+          fulfillmentResponse: {
+            messages: [
+              { text: { text: [responseText] } },
+              { payload: orchestration.cardV2 },
+            ],
+          },
+        });
+      }
+      return c.json({
+        text: responseText,
+        cardsV2: orchestration.cardV2.cardsV2,
+      });
+    }
+
+    // Respuesta conversacional estándar sin Card V2
     if (body.intentInfo || body.fulfillmentInfo || body.sessionInfo) {
       return c.json({
         fulfillmentResponse: {
@@ -113,7 +136,19 @@ const handleChatWebhook = async (c: any) => {
     return c.json({ text: responseText });
   } catch (err: any) {
     console.error('[Chat Webhook Error]:', err);
-    return c.json({ text: `⚠️ Error procesando el mensaje: ${err?.message || err}` }, 500);
+
+    // En caso de error, Google Chat recibe una Card V2 diagnóstica para NUNCA quedar en silencio
+    const errorCard = buildGoogleChatCardV2({
+      status: 'error',
+      title: 'Incidencia en Proceso Editorial',
+      subtitle: cleanText ? `Prompt: "${cleanText.slice(0, 60)}..."` : 'Solicitud no procesada',
+      errorMessage: err?.message || 'Error inesperado durante la ejecución en TGP Mind.',
+    });
+
+    return c.json({
+      text: `⚠️ Ocurrió una incidencia al procesar tu solicitud: ${err?.message || err}`,
+      cardsV2: errorCard.cardsV2,
+    });
   }
 };
 

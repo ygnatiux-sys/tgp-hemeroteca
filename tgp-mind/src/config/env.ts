@@ -5,13 +5,13 @@ import 'dotenv/config';
 
 export const PORT = parseInt(process.env.PORT || '3001', 10);
 
-// Tokens de Telegram (sin mutar nombres originales para Cloud Run)
+// Tokens de Telegram (unificación de alias con fallback total para Cloud Run)
 export const TELEGRAM_TOKEN = (process.env.OMNI_TOKEN || process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_TOKEN || '').replace(/['"]/g, '').trim();
 export const TELEGRAM_BOT_NAME = (process.env.TELEGRAM_BOT_NAME || 'Analista_IMG_bot').replace(/['"]/g, '').trim();
-export const TELEGRAM_SOCIAL_TOKEN = (process.env.REDES_TOKEN || process.env.TELEGRAM_SOCIAL_TOKEN || '').replace(/['"]/g, '').trim();
-export const TELEGRAM_TGP_CLOUD_TOKEN = (process.env.ASSISTANT_TOKEN || process.env.TELEGRAM_TGP_CLOUD_TOKEN || '').replace(/['"]/g, '').trim();
-export const TELEGRAM_DEV_TOKEN = (process.env.TELEGRAM_DEV_BOT_TOKEN || process.env.LIMINAL_TOKEN || '').replace(/['"]/g, '').trim();
-export const TELEGRAM_PREMIUM_TOKEN = (process.env.TELEGRAM_BOT_TOKEN_PREMIUM || '').replace(/['"]/g, '').trim();
+export const TELEGRAM_SOCIAL_TOKEN = (process.env.REDES_TOKEN || process.env.TELEGRAM_SOCIAL_TOKEN || process.env.TELEGRAM_BOT_TOKEN_SOCIAL || '').replace(/['"]/g, '').trim();
+export const TELEGRAM_TGP_CLOUD_TOKEN = (process.env.ASSISTANT_TOKEN || process.env.TELEGRAM_TGP_CLOUD_TOKEN || process.env.TELEGRAM_BOT_TOKEN_ASSISTANT || '').replace(/['"]/g, '').trim();
+export const TELEGRAM_DEV_TOKEN = (process.env.TELEGRAM_DEV_TOKEN || process.env.TELEGRAM_DEV_BOT_TOKEN || process.env.LIMINAL_TOKEN || '').replace(/['"]/g, '').trim();
+export const TELEGRAM_PREMIUM_TOKEN = (process.env.TELEGRAM_PREMIUM_TOKEN || process.env.TELEGRAM_BOT_TOKEN_PREMIUM || '').replace(/['"]/g, '').trim();
 
 // APIs y Autenticación
 export const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || '').replace(/['"]/g, '').trim();
