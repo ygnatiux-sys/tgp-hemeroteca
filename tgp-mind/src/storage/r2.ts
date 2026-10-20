@@ -87,7 +87,14 @@ export async function estandarizarYSubirImagenAR2(input: Buffer | string, prefix
   const webpBuffer = await convertirAWebP(rawBuffer);
   let fileKey: string;
   if (customFilename) {
-    const cleanName = customFilename.replace(/\.[^/.]+$/, '').replace(/[^a-z0-9\-_]/gi, '-');
+    const cleanName = customFilename
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\.[^/.]+$/, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9\-_]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
     fileKey = `${prefix}/${cleanName}.webp`;
   } else {
     const uid = crypto.randomUUID().slice(0, 8);

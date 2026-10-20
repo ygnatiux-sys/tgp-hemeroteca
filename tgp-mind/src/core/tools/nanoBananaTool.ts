@@ -69,10 +69,14 @@ export const nanoBananaTool: TgpTool = {
         apiKey
       });
 
+      const safeSlug = args.title
+        ? args.title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+        : undefined;
+
       const imageResult = await generateImageWithGemini({
         prompt: finalPrompt,
         aspectRatio: resolvedDirection.providerAspectRatio,
-        slug: args.title.toLowerCase().replace(/\s+/g, '-'),
+        slug: safeSlug,
         apiKey
       });
 
@@ -85,8 +89,7 @@ export const nanoBananaTool: TgpTool = {
         if (imageResult.image?.startsWith('data:image/')) {
           const base64Data = imageResult.image.split(',')[1];
           const buf = Buffer.from(base64Data, 'base64');
-          const slug = args.title ? args.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : undefined;
-          finalImageUrl = await estandarizarYSubirImagenAR2(buf, 'portadas', slug);
+          finalImageUrl = await estandarizarYSubirImagenAR2(buf, 'portadas', safeSlug);
         }
       } catch (uploadErr: any) {
         console.warn('[NanoBananaTool] No se pudo subir imagen a R2, usando fallback original:', uploadErr?.message);

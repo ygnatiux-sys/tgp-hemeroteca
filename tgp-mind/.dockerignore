@@ -13,3 +13,4 @@ _legacy_archive/
 scratch/
 deploy.ps1
 deploy.sh
+test-*.ts
