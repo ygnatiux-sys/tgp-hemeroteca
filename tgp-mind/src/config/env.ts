@@ -39,6 +39,10 @@ export const TWILIO_AUTH_TOKEN = (process.env.TWILIO_AUTH_TOKEN || '').replace(/
 export const TWILIO_ACCOUNT_SID = (process.env.TWILIO_ACCOUNT_SID || '').replace(/['"]/g, '').trim();
 export const TWILIO_PHONE_NUMBER = (process.env.TWILIO_PHONE_NUMBER || '').replace(/['"]/g, '').trim();
 
+// Google Chat Webhooks y Espacios
+export const CHAT_SPACE_TECNICO = process.env.CHAT_SPACE_TECNICO || 'spaces/AAQAkHxZYn0';
+export const CHAT_VIGIA_WEBHOOK_URL = process.env.CHAT_VIGIA_WEBHOOK_URL || process.env.GOOGLE_CHAT_WEBHOOK_URL || '';
+
 // Helper de Orígenes Permitidos
 export function isAllowedOrigin(origin: string): boolean {
   if (!origin) return true;
