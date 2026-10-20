@@ -37,6 +37,7 @@ export interface OrchestratorOptions {
   channel?: string;
   maxSteps?: number;
   sessionId?: string;
+  attachedImageUrl?: string;
 }
 
 export interface OrchestrationResult {
@@ -89,9 +90,15 @@ export async function runChatOrchestrator(
 - Veto: NUNCA uses la frase del usuario ("${prompt}") como título.`
     : '';
 
+  const attachedImageInjection = options.attachedImageUrl
+    ? `\n\n[IMAGEN ADJUNTA POR EL USUARIO - PORTADA DEFINITIVA EN R2]:
+- URL Oficial de la Portada: "${options.attachedImageUrl}"
+- REGLA CRÍTICA DE VELOCIDAD: El usuario ya proporcionó su propia imagen de portada. NO llames a "generate_ai_cover" ni a "search_wikimedia". Usa obligatoriamente esta URL ("${options.attachedImageUrl}") como "coverImage" en "publish_keystatic_post".`
+    : '';
+
   const initialPrompt = options.user
-    ? `[Usuario: ${userName}]: ${prompt}${editorialInjection}`
-    : `${prompt}${editorialInjection}`;
+    ? `[Usuario: ${userName}]: ${prompt}${editorialInjection}${attachedImageInjection}`
+    : `${prompt}${editorialInjection}${attachedImageInjection}`;
 
   // 1. Cargar historial previo de Firestore / Memoria viva
   const session = await getCompanionSession(sessionId, 'googlechat');
@@ -103,7 +110,14 @@ export async function runChatOrchestrator(
     parts: [{ text: initialPrompt }],
   });
 
-  const toolDeclarations = getChatToolDeclarations();
+  let toolDeclarations = getChatToolDeclarations();
+  if (options.attachedImageUrl) {
+    // Optimización anti-timeout: retirar tools de generación/búsqueda de imagen para responder en <7s
+    toolDeclarations = toolDeclarations.filter(
+      (td) => td.name !== 'generate_ai_cover' && td.name !== 'search_wikimedia'
+    );
+  }
+
   const contents: any[] = cleanHistory.length > 0
     ? [...cleanHistory, { role: 'user', parts: [{ text: initialPrompt }] }]
     : [{ role: 'user', parts: [{ text: initialPrompt }] }];
@@ -132,7 +146,10 @@ ${foundational.manifiesto_fundacional.slice(0, 1500)}`.trim();
     r2Url?: string;
     githubUrl?: string;
     heroImageUrl?: string;
-  } = {};
+  } = {
+    heroImageUrl: options.attachedImageUrl,
+    r2Url: options.attachedImageUrl,
+  };
 
   while (currentStep < maxSteps) {
     currentStep++;
@@ -175,11 +192,16 @@ ${foundational.manifiesto_fundacional.slice(0, 1500)}`.trim();
       const toolArgs = (call.args as Record<string, any>) || {};
       toolsExecuted.push(toolName);
 
-      // Si la tool es publish_keystatic_post y tenemos ficha editorial, inyectar silo y título si faltan
-      if (toolName === 'publish_keystatic_post' && editorialBrief) {
-        if (!toolArgs.titulo) toolArgs.titulo = editorialBrief.cleanTitle;
-        if (!toolArgs.slug) toolArgs.slug = editorialBrief.slug;
-        if (!toolArgs.silo) toolArgs.silo = editorialBrief.targetSilo;
+      // Si la tool es publish_keystatic_post, inyectar imagen adjunta y ficha editorial
+      if (toolName === 'publish_keystatic_post') {
+        if (options.attachedImageUrl && !toolArgs.coverImage) {
+          toolArgs.coverImage = options.attachedImageUrl;
+        }
+        if (editorialBrief) {
+          if (!toolArgs.titulo) toolArgs.titulo = editorialBrief.cleanTitle;
+          if (!toolArgs.slug) toolArgs.slug = editorialBrief.slug;
+          if (!toolArgs.silo) toolArgs.silo = editorialBrief.targetSilo;
+        }
       }
 
       console.log(`[Orchestrator] Invocando tool: "${toolName}" con args:`, JSON.stringify(toolArgs).slice(0, 200));

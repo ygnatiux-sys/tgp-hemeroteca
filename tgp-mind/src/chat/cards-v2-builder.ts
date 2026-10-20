@@ -49,7 +49,7 @@ export function buildGoogleChatCardV2(options: CardV2Options) {
   const publicUrl =
     options.publicUrl ||
     (silo === 'alternative'
-      ? `https://alternative.thegreatpuzzleproject.com/historia-alternativa/${slug}`
+      ? `https://alternative.thegreatpuzzleproject.com/ensayos/${slug}`
       : `https://thegreatpuzzleproject.com/hemeroteca/${slug}`);
 
   const queryParams = `?slug=${encodeURIComponent(slug)}&title=${encodeURIComponent(title)}&silo=${silo}`;
@@ -136,6 +136,17 @@ export function buildGoogleChatCardV2(options: CardV2Options) {
         },
       });
     }
+  }
+
+  if (isSuccess) {
+    widgets.push({
+      decoratedText: {
+        topLabel: 'ESTADO DE SINCRONIZACIÓN',
+        text: '⚡ <b>Ingesta activa en Vault & R2</b><br>⏳ <i>Build en Cloudflare Pages en curso (~60s)</i>',
+        startIcon: { knownIcon: 'CLOCK' },
+        wrapText: true,
+      },
+    });
   }
 
   widgets.push({

@@ -5,6 +5,8 @@ import { Hono } from 'hono';
 import { wikimediaTool } from '../core/tools/wikimediaTool.js';
 import { runChatOrchestrator } from '../chat/orchestrator.js';
 import { buildGoogleChatCardV2 } from '../chat/cards-v2-builder.js';
+import { detectarAdjuntoImagen, procesarImagenGoogleChatAR2 } from '../chat/chat-attachment-service.js';
+import { sendAsyncGoogleChatCard } from '../chat/async-chat-notifier.js';
 
 export const chatRoutes = new Hono();
 
@@ -62,12 +64,15 @@ const handleChatWebhook = async (c: any) => {
     const body = await c.req.json().catch(() => ({}));
 
     const rawText =
+      body.tema ||
+      body.texto ||
+      body.comando ||
+      body.prompt ||
+      body.query ||
       body.text ||
       body.transcript ||
       body.message?.text ||
       body.message ||
-      body.prompt ||
-      body.query ||
       '';
 
     userName =
@@ -91,49 +96,80 @@ const handleChatWebhook = async (c: any) => {
       return c.json({ text: emptyMsg });
     }
 
+    // 1. Detección y procesamiento de imágenes adjuntas en Google Chat
+    const adjuntoDetectado = detectarAdjuntoImagen(body, String(rawText));
+    let attachedImageUrl: string | undefined;
+
+    if (adjuntoDetectado.tipo) {
+      console.log(`[Chat Webhook] Imagen adjunta detectada (${adjuntoDetectado.tipo}). Procesando a R2...`);
+      try {
+        const r2Url = await procesarImagenGoogleChatAR2(adjuntoDetectado, cleanText || 'post-cover');
+        if (r2Url) {
+          attachedImageUrl = r2Url;
+          console.log(`[Chat Webhook] ✅ Portada adjunta subida a R2: ${attachedImageUrl}`);
+        }
+      } catch (attErr: any) {
+        console.warn('[Chat Webhook] Error procesando imagen adjunta a R2:', attErr?.message);
+      }
+    }
+
     const sessionId =
       body.space?.name ||
       body.message?.thread?.name ||
       body.sessionInfo?.session ||
       'googlechat_space';
 
+    const spaceName = body.space?.name || body.message?.space?.name;
+    const threadName = body.message?.thread?.name;
+
     console.log(`[Chat Webhook] Recibido mensaje de ${userName} (${sessionId}): "${cleanText.slice(0, 80)}"`);
 
+    // 2. Ejecutar el orquestador (con la portada adjunta inyectada para omitir tools lentas de IA)
     const orchestration = await runChatOrchestrator(cleanText, {
       user: userName,
       channel: 'google-chat',
       sessionId,
+      attachedImageUrl,
     });
     const responseText = orchestration.text;
 
-    // Si el orquestador generó una Card V2 (brief/post/acción editorial con batch de URLs)
+    // 3. Respaldo asíncrono anti-timeout: enviar la Card V2 vía REST API en background
+    if (spaceName && orchestration.cardV2) {
+      sendAsyncGoogleChatCard({
+        spaceName,
+        threadName,
+        cardV2: orchestration.cardV2,
+        fallbackText: responseText,
+      }).catch((asyncErr) => console.warn('[AsyncNotifier] Aviso en respaldo asíncrono:', asyncErr?.message));
+    }
+
+    // 4. Construir respuesta unificada (Google Chat + Dialogflow CX Fulfillment + OpenAPI Tool)
+    const unifiedResponse: any = {
+      ok: true,
+      titulo: orchestration.editorialBrief?.cleanTitle || 'Entrega TGP Mind',
+      url: orchestration.metadata?.publicUrl || '',
+      imageUrl: orchestration.metadata?.heroImageUrl || attachedImageUrl || '',
+      imageSource: attachedImageUrl ? 'adjunto_usuario' : 'generada_ia',
+      githubUrl: orchestration.metadata?.githubUrl || '',
+      mensaje: responseText,
+      text: responseText,
+    };
+
     if (orchestration.cardV2) {
-      if (body.intentInfo || body.fulfillmentInfo || body.sessionInfo) {
-        return c.json({
-          fulfillmentResponse: {
-            messages: [
-              { text: { text: [responseText] } },
-              { payload: orchestration.cardV2 },
-            ],
-          },
-        });
-      }
-      return c.json({
-        text: responseText,
-        cardsV2: orchestration.cardV2.cardsV2,
-      });
+      unifiedResponse.cardsV2 = orchestration.cardV2.cardsV2;
+      unifiedResponse.fulfillmentResponse = {
+        messages: [
+          { text: { text: [responseText] } },
+          { payload: orchestration.cardV2 },
+        ],
+      };
+    } else {
+      unifiedResponse.fulfillmentResponse = {
+        messages: [{ text: { text: [responseText] } }],
+      };
     }
 
-    // Respuesta conversacional estándar sin Card V2
-    if (body.intentInfo || body.fulfillmentInfo || body.sessionInfo) {
-      return c.json({
-        fulfillmentResponse: {
-          messages: [{ text: { text: [responseText] } }],
-        },
-      });
-    }
-
-    return c.json({ text: responseText });
+    return c.json(unifiedResponse);
   } catch (err: any) {
     console.error('[Chat Webhook Error]:', err);
 
@@ -145,9 +181,18 @@ const handleChatWebhook = async (c: any) => {
       errorMessage: err?.message || 'Error inesperado durante la ejecución en TGP Mind.',
     });
 
+    const errorMsg = `⚠️ Ocurrió una incidencia al procesar tu solicitud: ${err?.message || err}`;
     return c.json({
-      text: `⚠️ Ocurrió una incidencia al procesar tu solicitud: ${err?.message || err}`,
+      ok: false,
+      mensaje: errorMsg,
+      text: errorMsg,
       cardsV2: errorCard.cardsV2,
+      fulfillmentResponse: {
+        messages: [
+          { text: { text: [errorMsg] } },
+          { payload: errorCard },
+        ],
+      },
     });
   }
 };

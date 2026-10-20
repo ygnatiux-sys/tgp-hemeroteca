@@ -105,8 +105,8 @@ export async function publicarEntradaKeystaticGitHub({
   // 2. Ruta exacta según el sistema de colecciones Keystatic
   const basePath = `src/content/${coleccion}/${slug}`;
 
-  // 3. Crear árbol atómico con index.json y content.mdoc
-  const treeEntries = [
+  // 3. Crear árbol atómico con index.json y content.mdoc (+ .mdx para Alternative)
+  const treeEntries: any[] = [
     {
       path:    `${basePath}/index.json`,
       mode:    '100644' as const,
@@ -120,6 +120,15 @@ export async function publicarEntradaKeystaticGitHub({
       content: contentMdoc,
     },
   ];
+
+  if (repo.includes('tgp-webfinal2026') || repo.includes('alternative')) {
+    treeEntries.push({
+      path:    `src/content/${coleccion}/${slug}.mdx`,
+      mode:    '100644' as const,
+      type:    'blob' as const,
+      content: contentMdoc,
+    });
+  }
 
   const newTree = await octokitDynamic.git.createTree({
     owner, repo,

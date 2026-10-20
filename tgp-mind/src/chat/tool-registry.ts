@@ -281,7 +281,7 @@ generador: "TGP Mind Chat Assistant"
     }
 
     const publicUrl = silo === 'alternative'
-      ? `https://alternative.thegreatpuzzleproject.com/historia-alternativa/${slug}`
+      ? `https://alternative.thegreatpuzzleproject.com/ensayos/${slug}`
       : `https://thegreatpuzzleproject.com/hemeroteca/${slug}`;
 
     const queryParams = `?slug=${encodeURIComponent(slug)}&title=${encodeURIComponent(titulo)}&silo=${silo}`;
