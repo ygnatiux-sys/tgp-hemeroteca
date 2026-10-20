@@ -34,6 +34,11 @@ export const R2_PUBLIC_DOMAIN = (process.env.R2_PUBLIC_DOMAIN || 'https://storag
 export const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
 export const TELEGRAM_SOCIAL_API = `https://api.telegram.org/bot${TELEGRAM_SOCIAL_TOKEN}`;
 
+// Twilio WhatsApp (Fase 3)
+export const TWILIO_AUTH_TOKEN = (process.env.TWILIO_AUTH_TOKEN || '').replace(/['"]/g, '').trim();
+export const TWILIO_ACCOUNT_SID = (process.env.TWILIO_ACCOUNT_SID || '').replace(/['"]/g, '').trim();
+export const TWILIO_PHONE_NUMBER = (process.env.TWILIO_PHONE_NUMBER || '').replace(/['"]/g, '').trim();
+
 // Helper de Orígenes Permitidos
 export function isAllowedOrigin(origin: string): boolean {
   if (!origin) return true;

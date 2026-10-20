@@ -45,6 +45,13 @@ export interface OrchestrationResult {
   stepsCount: number;
   editorialBrief?: EditorialBriefSanitized;
   cardV2?: any;
+  metadata?: {
+    publicUrl?: string;
+    vaultUrl?: string;
+    r2Url?: string;
+    githubUrl?: string;
+    heroImageUrl?: string;
+  };
 }
 
 /**
@@ -256,6 +263,7 @@ ${foundational.manifiesto_fundacional.slice(0, 1500)}`.trim();
     stepsCount: currentStep,
     editorialBrief,
     cardV2,
+    metadata: capturedMetadata,
   };
 }
 

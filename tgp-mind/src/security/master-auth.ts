@@ -171,6 +171,14 @@ export async function masterAuthMiddleware(c: any, next: () => Promise<void>) {
     return next();
   }
 
+  // 4. Webhooks de Twilio WhatsApp (tienen validación criptográfica X-Twilio-Signature)
+  if (
+    path === '/twilio-webhook' ||
+    path.startsWith('/twilio')
+  ) {
+    return next();
+  }
+
   // Para cualquier otro endpoint sensible (/tools/*, /api/*, /api/telegram/drop-pending):
   if (!verifyHttpMasterKey(c)) {
     return c.json({

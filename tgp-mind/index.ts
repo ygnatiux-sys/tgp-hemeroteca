@@ -37,6 +37,10 @@ if (ROLE === 'all' || ROLE === 'core' || ROLE === 'cognitive') {
   app.route('/', cognitiveRoutes);
   app.route('/', pickerRoutes);
 }
+if (ROLE === 'all' || ROLE === 'twilio') {
+  const { twilioRoutes } = await import('./src/routes/twilio.routes.js');
+  app.route('/', twilioRoutes);
+}
 
 // 4. Arranque del Servidor (omitido en tests para app.fetch directo)
 if (process.env.NODE_ENV !== 'test' && !process.env.NO_SERVE) {
