@@ -55,15 +55,46 @@ chatRoutes.post('/cx-tool-panlingua', async (c) => {
   }
 });
 
+// ── Helper de formateo estricto para Google Workspace Add-ons (DataActions) ──
+const formatGSuiteAddonResponse = (text: string, cardsV2?: any[]) => ({
+  hostAppDataAction: {
+    chatDataAction: {
+      createMessageAction: {
+        message: {
+          text,
+          ...(cardsV2 && cardsV2.length > 0 ? { cardsV2 } : {}),
+        },
+      },
+    },
+  },
+});
+
 // ── Handler de Webhook Google Chat & Dialogflow CX ───────────────────────────
 const handleChatWebhook = async (c: any) => {
   let cleanText = '';
   let userName = 'Director';
+  let isGSuiteAddon = false;
+  let isGoogleChat = false;
 
   try {
     const body = await c.req.json().catch(() => ({}));
+    const userAgent = String(c.req.header('user-agent') || '');
+
+    // Detección precisa del cliente emisor
+    isGSuiteAddon =
+      userAgent.includes('Google-gsuiteaddons') ||
+      !!body.commonEventObject ||
+      !!body.chat;
+
+    isGoogleChat =
+      isGSuiteAddon ||
+      userAgent.includes('Google-Chat') ||
+      !!c.req.header('x-goog-chat-app-id') ||
+      !!body.space ||
+      !!body.message;
 
     const rawText =
+      body.chat?.messagePayload?.message?.text ||
       body.tema ||
       body.texto ||
       body.comando ||
@@ -76,6 +107,7 @@ const handleChatWebhook = async (c: any) => {
       '';
 
     userName =
+      body.chat?.messagePayload?.message?.sender?.displayName ||
       body.user?.displayName ||
       body.message?.sender?.displayName ||
       'Director';
@@ -92,6 +124,9 @@ const handleChatWebhook = async (c: any) => {
         '¡Hola, Xavier! Soy el asistente orquestador de TGP Mind. Puedes pedirme en lenguaje natural briefs sobre arqueología alternativa, procesar imágenes a WebP en R2 o redactar publicaciones para Alternative o Hemeroteca.';
       if (body.intentInfo || body.fulfillmentInfo || body.sessionInfo) {
         return c.json({ fulfillmentResponse: { messages: [{ text: { text: [emptyMsg] } }] } });
+      }
+      if (isGSuiteAddon) {
+        return c.json(formatGSuiteAddonResponse(emptyMsg));
       }
       return c.json({ text: emptyMsg });
     }
@@ -114,13 +149,21 @@ const handleChatWebhook = async (c: any) => {
     }
 
     const sessionId =
+      body.chat?.messagePayload?.message?.space?.name ||
       body.space?.name ||
+      body.chat?.messagePayload?.message?.thread?.name ||
       body.message?.thread?.name ||
       body.sessionInfo?.session ||
       'googlechat_space';
 
-    const spaceName = body.space?.name || body.message?.space?.name;
-    const threadName = body.message?.thread?.name;
+    const spaceName =
+      body.chat?.messagePayload?.message?.space?.name ||
+      body.space?.name ||
+      body.message?.space?.name;
+
+    const threadName =
+      body.chat?.messagePayload?.message?.thread?.name ||
+      body.message?.thread?.name;
 
     console.log(`[Chat Webhook] Recibido mensaje de ${userName} (${sessionId}): "${cleanText.slice(0, 80)}"`);
 
@@ -144,14 +187,12 @@ const handleChatWebhook = async (c: any) => {
     }
 
     // 4. Formato de respuesta estricto según el cliente emisor:
-    const userAgent = String(c.req.header('user-agent') || '');
-    const isGoogleChat =
-      userAgent.includes('Google-gsuiteaddons') ||
-      userAgent.includes('Google-Chat') ||
-      !!body.space ||
-      !!body.message;
+    // A. Para Google Workspace Add-ons (estricto DataActions para Protobuf)
+    if (isGSuiteAddon) {
+      return c.json(formatGSuiteAddonResponse(responseText, orchestration.cardV2?.cardsV2));
+    }
 
-    // A. Para Google Chat directo (Google Workspace Add-on): solo campos oficiales de la Chat API
+    // B. Para Google Chat directo clásico (sin wrapper de Add-on)
     if (isGoogleChat) {
       const chatResponse: any = {
         text: responseText,
@@ -162,7 +203,7 @@ const handleChatWebhook = async (c: any) => {
       return c.json(chatResponse);
     }
 
-    // B. Para Dialogflow CX (OpenAPI Tool + Fulfillment):
+    // C. Para Dialogflow CX (OpenAPI Tool + Fulfillment):
     const dfResponse: any = {
       ok: true,
       titulo: orchestration.editorialBrief?.cleanTitle || 'Entrega TGP Mind',
@@ -200,11 +241,10 @@ const handleChatWebhook = async (c: any) => {
     });
 
     const errorMsg = `⚠️ Ocurrió una incidencia al procesar tu solicitud: ${err?.message || err}`;
-    const userAgent = String(c.req.header('user-agent') || '');
-    const isGoogleChat =
-      userAgent.includes('Google-gsuiteaddons') ||
-      userAgent.includes('Google-Chat') ||
-      !!c.req.header('x-goog-chat-app-id');
+
+    if (isGSuiteAddon) {
+      return c.json(formatGSuiteAddonResponse(errorMsg, errorCard.cardsV2));
+    }
 
     if (isGoogleChat) {
       return c.json({
