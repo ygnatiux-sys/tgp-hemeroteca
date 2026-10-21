@@ -12,7 +12,6 @@ import { estandarizarYSubirImagenAR2 } from '../storage/r2.js';
 import {
   generarSlug,
   publicarEntradaKeystaticGitHub,
-  type ColeccionKeystatic,
 } from '../servicios/publicacion.js';
 
 export const chatRoutes = new Hono();
@@ -308,7 +307,9 @@ const handleCxSubmitDraft = async (c: any) => {
 
     const postTitle = title || 'Ensayo TGP sin título';
     const slug = generarSlug(postTitle);
-    const silo = (targetProject.toLowerCase().includes('hemeroteca') ? 'hemeroteca' : 'alternative') as ColeccionKeystatic;
+    const silo: 'alternative' | 'hemeroteca' = targetProject.toLowerCase().includes('hemeroteca')
+      ? 'hemeroteca'
+      : 'alternative';
 
     console.log(`[CX Submit Draft] Ingesta recibida: "${postTitle}" por ${author} (Destino: ${silo})`);
 
