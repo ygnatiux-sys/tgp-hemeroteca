@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.git
+.gitignore
+*.log
+.env
+.env.*
+deploy.ps1
+deploy-alt-telegram.ps1
+deploy.sh
+_legacy_archive/
+*.bak
+*.clean
