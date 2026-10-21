@@ -143,8 +143,27 @@ const handleChatWebhook = async (c: any) => {
       }).catch((asyncErr) => console.warn('[AsyncNotifier] Aviso en respaldo asíncrono:', asyncErr?.message));
     }
 
-    // 4. Construir respuesta unificada (Google Chat + Dialogflow CX Fulfillment + OpenAPI Tool)
-    const unifiedResponse: any = {
+    // 4. Formato de respuesta estricto según el cliente emisor:
+    const userAgent = String(c.req.header('user-agent') || '');
+    const isGoogleChat =
+      userAgent.includes('Google-gsuiteaddons') ||
+      userAgent.includes('Google-Chat') ||
+      !!body.space ||
+      !!body.message;
+
+    // A. Para Google Chat directo (Google Workspace Add-on): solo campos oficiales de la Chat API
+    if (isGoogleChat) {
+      const chatResponse: any = {
+        text: responseText,
+      };
+      if (orchestration.cardV2?.cardsV2) {
+        chatResponse.cardsV2 = orchestration.cardV2.cardsV2;
+      }
+      return c.json(chatResponse);
+    }
+
+    // B. Para Dialogflow CX (OpenAPI Tool + Fulfillment):
+    const dfResponse: any = {
       ok: true,
       titulo: orchestration.editorialBrief?.cleanTitle || 'Entrega TGP Mind',
       url: orchestration.metadata?.publicUrl || '',
@@ -156,20 +175,19 @@ const handleChatWebhook = async (c: any) => {
     };
 
     if (orchestration.cardV2) {
-      unifiedResponse.cardsV2 = orchestration.cardV2.cardsV2;
-      unifiedResponse.fulfillmentResponse = {
+      dfResponse.fulfillmentResponse = {
         messages: [
           { text: { text: [responseText] } },
           { payload: orchestration.cardV2 },
         ],
       };
     } else {
-      unifiedResponse.fulfillmentResponse = {
+      dfResponse.fulfillmentResponse = {
         messages: [{ text: { text: [responseText] } }],
       };
     }
 
-    return c.json(unifiedResponse);
+    return c.json(dfResponse);
   } catch (err: any) {
     console.error('[Chat Webhook Error]:', err);
 
@@ -182,6 +200,19 @@ const handleChatWebhook = async (c: any) => {
     });
 
     const errorMsg = `⚠️ Ocurrió una incidencia al procesar tu solicitud: ${err?.message || err}`;
+    const userAgent = String(c.req.header('user-agent') || '');
+    const isGoogleChat =
+      userAgent.includes('Google-gsuiteaddons') ||
+      userAgent.includes('Google-Chat') ||
+      !!c.req.header('x-goog-chat-app-id');
+
+    if (isGoogleChat) {
+      return c.json({
+        text: errorMsg,
+        cardsV2: errorCard.cardsV2,
+      });
+    }
+
     return c.json({
       ok: false,
       mensaje: errorMsg,
