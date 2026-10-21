@@ -1,0 +1,78 @@
+---
+interface Props {
+  /** ID del proyecto en Google Cloud */
+  projectId?: string;
+  /** ID del agente de Dialogflow CX (reemplazar por el tuyo) */
+  agentId?: string;
+  /** Región del agente (ej. us-central1) */
+  location?: string;
+  /** Código de idioma */
+  languageCode?: string;
+  /** Título visible en el encabezado del chat */
+  chatTitle?: string;
+  /** Texto del placeholder del input */
+  placeholderText?: string;
+  /** Ancho del panel para lectura de ensayos (ej. 550px, 600px) */
+  width?: string;
+  /** Índice Z para superposición */
+  zIndex?: number;
+}
+
+const {
+  projectId = "tgp-paralelo-alternativo",
+  agentId = "PEGA_TU_AGENT_ID_AQUI",
+  location = "us-central1",
+  languageCode = "es",
+  chatTitle = "TGP Mind Messenger",
+  placeholderText = "Escribe tu idea o tema a pelotear...",
+  width = "550px",
+  zIndex = 9999,
+} = Astro.props;
+---
+
+<!-- Dependencias oficiales de Dialogflow Messenger v1 -->
+<link
+  rel="stylesheet"
+  href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css"
+/>
+<script
+  src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"
+  is:inline
+></script>
+
+<!-- Widget Dialogflow Messenger en modo Side Panel: TGP-mssgr -->
+<df-messenger
+  location={location}
+  project-id={projectId}
+  agent-id={agentId}
+  language-code={languageCode}
+  max-query-length="-1"
+>
+  <df-messenger-chat-bubble
+    chat-title={chatTitle}
+    placeholder-text={placeholderText}
+  >
+  </df-messenger-chat-bubble>
+</df-messenger>
+
+<!-- Estilos optimizados para lectura cómoda de ensayos largos y tarjetas Bento -->
+<style is:global define:vars={{ panelWidth: width, panelZIndex: zIndex }}>
+  df-messenger {
+    z-index: var(--panelZIndex, 9999);
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    top: 0;
+    --df-messenger-width: var(--panelWidth, 550px);
+    --df-messenger-height: 100vh;
+    --df-messenger-window-border-radius: 0px;
+    --df-messenger-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* Adaptabilidad móvil: si la pantalla es menor a 640px, ocupa el ancho completo */
+  @media (max-width: 640px) {
+    df-messenger {
+      --df-messenger-width: 100vw;
+    }
+  }
+</style>
