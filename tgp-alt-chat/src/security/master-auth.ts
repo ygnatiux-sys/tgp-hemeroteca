@@ -113,21 +113,23 @@ export async function deleteTelegramMessage(botToken: string, chatId: number, me
 export function verifyHttpMasterKey(c: any): boolean {
   const masterKey = getMasterApiKey();
 
-  // 1. Cabeceras directas x-tgp-master-key o x-api-key
+  // 1. Cabeceras directas x-tgp-master-key, x-api-key o x-tgp-bridge-key
   const headerKey = (
+    c.req.header('x-tgp-bridge-key') ||
     c.req.header('x-tgp-master-key') ||
     c.req.header('x-api-key') ||
     c.req.header('X-Api-Key') ||
     ''
   ).trim();
 
-  if (headerKey && headerKey === masterKey) return true;
+  const bridgeKey = (process.env.TGP_BRIDGE_KEY || 'tgp-bridge-secret').trim();
+  if (headerKey && (headerKey === masterKey || headerKey === bridgeKey)) return true;
 
   // 2. Cabecera Authorization: Bearer <KEY>
   const authHeader = (c.req.header('authorization') || c.req.header('Authorization') || '').trim();
   if (authHeader.startsWith('Bearer ')) {
     const bearerToken = authHeader.slice(7).trim();
-    if (bearerToken === masterKey) return true;
+    if (bearerToken === masterKey || bearerToken === bridgeKey) return true;
   }
 
   return false;
@@ -149,6 +151,7 @@ export async function masterAuthMiddleware(c: any, next: () => Promise<void>) {
     path === '/webhook' ||
     path === '/webhook/chat' ||
     path === '/api/chat/webhook' ||
+    path === '/api/cx/submit-draft' ||
     path === '/cx-tool-wikimedia' ||
     path === '/cx-tool-panlingua' ||
     path.startsWith('/api/picker/') ||
