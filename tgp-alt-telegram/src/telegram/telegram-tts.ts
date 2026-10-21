@@ -149,9 +149,14 @@ export async function generarAudioDocumentalR2(
   titulo = 'Ensayo Erudito TGP',
   chatId?: number,
 ): Promise<GenerarAudioResult> {
-  const apiKey = (process.env.GEMINI_API_KEY || '').replace(/['"]/g, '').trim();
+  const apiKey = (
+    process.env.GOOGLE_CLOUD_TTS_KEY ||
+    process.env.PUBLIC_GOOGLE_PICKER_API_KEY ||
+    process.env.GEMINI_API_KEY ||
+    ''
+  ).replace(/['"]/g, '').trim();
   if (!apiKey) {
-    return { success: false, error: 'GEMINI_API_KEY no configurada.' };
+    return { success: false, error: 'Clave de Google Cloud TTS no configurada.' };
   }
 
   const textoLimpio = limpiarTextoParaTTS(texto);
