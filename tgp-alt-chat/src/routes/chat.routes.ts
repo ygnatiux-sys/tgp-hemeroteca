@@ -280,6 +280,22 @@ chatRoutes.post('/webhook/chat', handleChatWebhook);
 chatRoutes.post('/google-chat-webhook', handleChatWebhook);
 chatRoutes.post('/webhook', handleChatWebhook);
 
+// Respuestas GET para navegadores e inspección de salud
+const handleGetHealth = (c: any) =>
+  c.json({
+    status: 'online',
+    service: 'tgp-alt-chat',
+    role: 'Google Workspace Add-on Webhook (TGP-Alternative)',
+    methodExpected: 'POST',
+    description: 'Endpoint receptor de eventos y tarjetas interactivas de Google Chat.',
+    ts: new Date().toISOString(),
+  });
+
+chatRoutes.get('/webhook', handleGetHealth);
+chatRoutes.get('/webhook/chat', handleGetHealth);
+chatRoutes.get('/google-chat-webhook', handleGetHealth);
+chatRoutes.get('/api/chat/webhook', handleGetHealth);
+
 // ── Handler de Ingesta desde Dialogflow CX Messenger (Mesa de Redacción) ─────
 const handleCxSubmitDraft = async (c: any) => {
   try {
@@ -387,4 +403,26 @@ const handleCxSubmitDraft = async (c: any) => {
 
 chatRoutes.post('/api/cx/submit-draft', handleCxSubmitDraft);
 chatRoutes.post('/cx/submit-draft', handleCxSubmitDraft);
+
+const handleGetCxHealth = (c: any) =>
+  c.json({
+    status: 'online',
+    service: 'tgp-alt-chat',
+    endpoint: '/api/cx/submit-draft',
+    methodExpected: 'POST',
+    description: 'Puente de Ingesta Dialogflow CX -> TGP Alt Chat -> Google Chat (Cards V2)',
+    requiredHeaders: ['x-tgp-bridge-key'],
+    payloadExample: {
+      title: 'Misterio de los Moáis',
+      content: 'Texto largo en markdown del ensayo...',
+      author: 'Xavier Benítez',
+      target_project: 'tgp-paralelo-alternativo',
+      query_imagen: 'Moai Rapa Nui',
+    },
+    ts: new Date().toISOString(),
+  });
+
+chatRoutes.get('/api/cx/submit-draft', handleGetCxHealth);
+chatRoutes.get('/cx/submit-draft', handleGetCxHealth);
+
 
