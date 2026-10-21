@@ -9,6 +9,10 @@ import { PORT } from './src/config/env.js';
 import { corsMiddleware } from './src/middleware/cors.js';
 import { masterAuthMiddleware } from './src/middleware/auth.js';
 import { chatRoutes } from './src/routes/chat.routes.js';
+import { autoInitR2 } from './src/storage/r2.js';
+
+// Inicialización de Storage R2
+autoInitR2();
 
 const app = new Hono();
 

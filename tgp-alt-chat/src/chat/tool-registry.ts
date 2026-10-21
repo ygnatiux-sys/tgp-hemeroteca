@@ -265,6 +265,7 @@ generador: "TGP Mind Chat Assistant"
       : (process.env.GITHUB_REPO_HEMEROTECA || 'ygnatiux-sys/tgp-hemeroteca');
 
     let commitUrl = '';
+    let gitError: string | null = null;
     try {
       commitUrl = await publicarEntradaKeystaticGitHub({
         coleccion,
@@ -276,8 +277,19 @@ generador: "TGP Mind Chat Assistant"
         mensajeCommit: `TGP Chat Assistant: Publicar [${silo}/${coleccion}] ${slug}`,
       });
     } catch (gitErr: any) {
-      console.warn(`[Tool: publish_keystatic_post] Aviso en commit de GitHub (${repoFull}):`, gitErr?.message);
-      commitUrl = `https://github.com/${repoFull}/tree/main/src/content/${coleccion}/${slug}`;
+      console.error(`[Tool: publish_keystatic_post] Error en commit de GitHub (${repoFull}):`, gitErr?.message);
+      gitError = gitErr?.message || String(gitErr);
+    }
+
+    if (gitError) {
+      return {
+        success: false,
+        error: `Error al publicar en GitHub (${repoFull}): ${gitError}`,
+        titulo,
+        slug,
+        silo,
+        coleccion,
+      };
     }
 
     const publicUrl = silo === 'alternative'
@@ -285,7 +297,7 @@ generador: "TGP Mind Chat Assistant"
       : `https://thegreatpuzzleproject.com/hemeroteca/${slug}`;
 
     const queryParams = `?slug=${encodeURIComponent(slug)}&title=${encodeURIComponent(titulo)}&silo=${silo}`;
-    const vaultUrl = `https://thegreatpuzzleproject.com/tgp-vault${queryParams}`;
+    const vaultUrl = `https://tgp-webfinal2026.pages.dev/tgp-vault${queryParams}`;
     const r2Url = coverImage || 'https://storage.thegreatpuzzleproject.com';
 
     return {

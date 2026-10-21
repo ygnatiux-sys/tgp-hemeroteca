@@ -57,7 +57,7 @@ export function buildGoogleChatCardV2(options: CardV2Options) {
       : `https://thegreatpuzzleproject.com/hemeroteca/${slug}`);
 
   const queryParams = `?slug=${encodeURIComponent(slug)}&title=${encodeURIComponent(title)}&silo=${silo}`;
-  const vaultUrl = options.vaultUrl || `https://thegreatpuzzleproject.com/tgp-vault${queryParams}`;
+  const vaultUrl = options.vaultUrl || `https://tgp-webfinal2026.pages.dev/tgp-vault${queryParams}`;
   const r2Url = options.r2Url || heroImageUrl || 'https://storage.thegreatpuzzleproject.com';
   const githubRepo = silo === 'alternative' ? 'tgp-webfinal2026' : 'tgp-hemeroteca';
   const githubUrl = options.githubUrl || `https://github.com/ygnatiux-sys/${githubRepo}`;

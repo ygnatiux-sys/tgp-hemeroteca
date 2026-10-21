@@ -16,6 +16,18 @@ export interface AsyncCardOptions {
   fallbackText?: string;
 }
 
+let _lastKnownChatSpace = '';
+
+export function setLastKnownChatSpace(space: string) {
+  if (space && space.startsWith('spaces/')) {
+    _lastKnownChatSpace = space;
+  }
+}
+
+export function getLastKnownChatSpace(): string {
+  return _lastKnownChatSpace;
+}
+
 /**
  * Envía una Card V2 directamente al espacio/hilo de Google Chat de forma asíncrona.
  * Respaldo garantizado si el webhook síncrono supera el umbral de 25 segundos.
@@ -23,8 +35,8 @@ export interface AsyncCardOptions {
 export async function sendAsyncGoogleChatCard(options: AsyncCardOptions): Promise<boolean> {
   const { spaceName, threadName, cardV2, fallbackText } = options;
 
-  // 1. Si no hay espacio definido, intentar el espacio técnico por defecto
-  const targetSpace = spaceName || CHAT_SPACE_TECNICO || 'spaces/AAQAkHxZYn0';
+  // 1. Si no hay espacio definido, intentar espacio activo conocido o espacio por defecto
+  const targetSpace = spaceName || _lastKnownChatSpace || CHAT_SPACE_TECNICO || 'spaces/zQLnFqAAAAE';
 
   try {
     const client = await auth.getClient();

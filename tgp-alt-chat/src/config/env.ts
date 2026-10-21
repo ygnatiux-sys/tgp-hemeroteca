@@ -28,7 +28,7 @@ export const TELEGRAM_API = '';
 export const TELEGRAM_SOCIAL_API = '';
 
 // Google Chat Webhooks y Espacios
-export const CHAT_SPACE_TECNICO = process.env.CHAT_SPACE_TECNICO || 'spaces/AAQAkHxZYn0';
+export const CHAT_SPACE_TECNICO = process.env.CHAT_SPACE_TECNICO || 'spaces/zQLnFqAAAAE';
 export const CHAT_VIGIA_WEBHOOK_URL = process.env.CHAT_VIGIA_WEBHOOK_URL || process.env.GOOGLE_CHAT_WEBHOOK_URL || '';
 
 // Helper de Orígenes Permitidos

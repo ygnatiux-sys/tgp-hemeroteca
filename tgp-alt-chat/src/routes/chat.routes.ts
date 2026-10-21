@@ -6,7 +6,7 @@ import { Hono } from 'hono';
 import { runChatOrchestrator } from '../chat/orchestrator.js';
 import { buildGoogleChatCardV2 } from '../chat/cards-v2-builder.js';
 import { detectarAdjuntoImagen, procesarImagenGoogleChatAR2 } from '../chat/chat-attachment-service.js';
-import { sendAsyncGoogleChatCard } from '../chat/async-chat-notifier.js';
+import { sendAsyncGoogleChatCard, setLastKnownChatSpace } from '../chat/async-chat-notifier.js';
 import { wikimediaTool } from '../core/tools/wikimediaTool.js';
 import { estandarizarYSubirImagenAR2 } from '../storage/r2.js';
 import {
@@ -214,6 +214,10 @@ ${pHero ? `![${pTitle}](${pHero})\n\n` : ''}${pContent}
       body.chat?.messagePayload?.message?.space?.name ||
       body.space?.name ||
       body.message?.space?.name;
+
+    if (spaceName) {
+      setLastKnownChatSpace(spaceName);
+    }
 
     const threadName =
       body.chat?.messagePayload?.message?.thread?.name ||

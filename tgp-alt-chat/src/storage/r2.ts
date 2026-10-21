@@ -43,9 +43,37 @@ export function initR2(cfg: R2InitConfig) {
   _TELEGRAM_API     = cfg.telegramApi;
 }
 
+export function autoInitR2(): boolean {
+  if (_r2Client) return true;
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID || process.env.R2_ACCOUNT_ID || '';
+  const accessKeyId = process.env.R2_ACCESS_KEY_ID || '';
+  const secretKey = process.env.R2_SECRET_ACCESS_KEY || '';
+  const bucketName = process.env.R2_BUCKET_NAME || 'tgp-storage';
+  const publicDomain = (process.env.R2_PUBLIC_DOMAIN || 'https://storage.thegreatpuzzleproject.com').replace(/\/$/, '');
+
+  if (accountId && accessKeyId && secretKey) {
+    initR2({
+      accountId,
+      accessKeyId,
+      secretKey,
+      bucketName,
+      publicDomain,
+      telegramToken: '',
+      telegramApi: '',
+    });
+    console.log('[R2] ✅ Auto-inicializado con credenciales de entorno.');
+    return true;
+  }
+  return false;
+}
+
 function getClient(): S3Client {
-  if (!_r2Client) throw new Error('[R2] initR2() no fue llamado antes de usar el módulo.');
-  return _r2Client;
+  if (!_r2Client) {
+    if (!autoInitR2()) {
+      throw new Error('[R2] initR2() no fue llamado y faltan credenciales R2 en el entorno.');
+    }
+  }
+  return _r2Client!;
 }
 
 // ── Pipeline de Conversión y Estandarización WebP ────────────────────────────
