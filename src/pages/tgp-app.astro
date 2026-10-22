@@ -2,6 +2,7 @@
 export const prerender = true;
 import Layout from '../layouts/Layout.astro';
 import ScriptoriumCapture from '../components/ScriptoriumCapture.svelte';
+import TgpMssgr from '../components/TgpMssgr.astro';
 ---
 
 <Layout title="TGP Scriptorium | Panel de Control">
@@ -85,16 +86,31 @@ import ScriptoriumCapture from '../components/ScriptoriumCapture.svelte';
         </a>
 
         <a 
-          href="https://tgp-mind-713934653057.us-central1.run.app" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="block p-4 border border-[#263231] hover:border-emerald-500/50 bg-[#161d1c] hover:bg-[#1a2420] transition-all rounded group"
+          href="/tgp-mind" 
+          class="block p-4 border border-[rgba(224,122,95,0.35)] hover:border-[#e07a5f] bg-[#161d1c] hover:bg-[#1a1816] hover:shadow-[0_0_25px_rgba(224,122,95,0.15)] transition-all rounded group"
         >
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-serif text-[#f0f2f1] group-hover:text-white">TGP Mind (Orquestador)</h2>
-            <span class="text-[10px] uppercase font-mono tracking-widest text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full">Chat & CX</span>
+            <h2 class="text-lg font-serif text-[#f0f2f1] group-hover:text-[#ffb499]">TGP Mind (Atanor Cognitivo)</h2>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="text-[10px] uppercase font-mono tracking-widest text-[#ffb499] bg-[#e07a5f]/20 border border-[#e07a5f]/40 px-2 py-0.5 rounded-full">Fullscreen</span>
+              <span class="text-[10px] uppercase font-mono tracking-widest text-amber-400 bg-amber-950/60 border border-amber-800/60 px-2 py-0.5 rounded-full">Gemini</span>
+            </div>
           </div>
-          <p class="text-sm text-[#8a9a98] mt-1">Conexión con Google Chat y Dialogflow CX. Automatización de publicaciones, R2, D1 y portadas por lenguaje natural.</p>
+          <p class="text-sm text-[#8a9a98] mt-1">Brainstorming sin filtro, consultas ontológicas, pedidos de código y diálogo privado con Gemini Pro.</p>
+        </a>
+
+        <a 
+          href="/mesa-redaccion" 
+          class="block p-4 border border-blue-500/40 hover:border-blue-400 bg-[#161d1c] hover:bg-[#131d25] hover:shadow-[0_0_25px_rgba(56,139,253,0.15)] transition-all rounded group"
+        >
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-serif text-[#f0f2f1] group-hover:text-blue-200">Mesa de Redacción (Dialogflow)</h2>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="text-[10px] uppercase font-mono tracking-widest text-blue-400 bg-blue-950/60 border border-blue-800/60 px-2 py-0.5 rounded-full">Cards V2</span>
+              <span class="text-[10px] uppercase font-mono tracking-widest text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full">R2 + Wiki</span>
+            </div>
+          </div>
+          <p class="text-sm text-[#8a9a98] mt-1">Forja agéntica de posts. Ingesta, búsqueda en Wikimedia, portadas WebP a R2 y tarjetas interactivas de Google Chat.</p>
         </a>
 
         <a
@@ -121,4 +137,7 @@ import ScriptoriumCapture from '../components/ScriptoriumCapture.svelte';
       </footer>
     </div>
   </main>
+
+  {/* Widget Flotante Thumbnail 1x1 Dialogflow Messenger */}
+  <TgpMssgr />
 </Layout>

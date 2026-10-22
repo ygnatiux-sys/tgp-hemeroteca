@@ -2,7 +2,7 @@
 interface Props {
   /** ID del proyecto en Google Cloud */
   projectId?: string;
-  /** ID del agente de Dialogflow CX (reemplazar por el tuyo) */
+  /** ID del agente de Dialogflow CX */
   agentId?: string;
   /** Región del agente (ej. us-central1) */
   location?: string;
@@ -12,22 +12,33 @@ interface Props {
   chatTitle?: string;
   /** Texto del placeholder del input */
   placeholderText?: string;
-  /** Ancho del panel para lectura de ensayos (ej. 550px, 600px) */
+  /** Icono o avatar de la burbuja y encabezado */
+  iconUrl?: string;
+  /** Modo de visualización: sidepanel (550px) o fullscreen (pantalla completa) */
+  mode?: "sidepanel" | "fullscreen";
+  /** Ancho del panel en modo sidepanel (ej. 550px, 600px) */
   width?: string;
   /** Índice Z para superposición */
   zIndex?: number;
+  /** Mostrar botón flotante de acceso a pantalla completa */
+  showFullscreenButton?: boolean;
 }
 
 const {
-  projectId = "tgp-paralelo-alternativo",
-  agentId = "PEGA_TU_AGENT_ID_AQUI",
+  projectId = "tgp-mind",
+  agentId = "7cf1a08f-1b45-48f4-be5f-155eb3ee2848",
   location = "us-central1",
   languageCode = "es",
-  chatTitle = "TGP Mind Messenger",
-  placeholderText = "Escribe tu idea o tema a pelotear...",
+  chatTitle = "Mesa de Redacción TGP",
+  placeholderText = "Pelotea tu tema o propuesta de ensayo...",
+  iconUrl = "/perfil.webp",
+  mode = "sidepanel",
   width = "550px",
   zIndex = 9999,
+  showFullscreenButton = true,
 } = Astro.props;
+
+const isFullscreen = mode === "fullscreen";
 ---
 
 <!-- Dependencias oficiales de Dialogflow Messenger v1 -->
@@ -40,24 +51,43 @@ const {
   is:inline
 ></script>
 
-<!-- Widget Dialogflow Messenger en modo Side Panel: TGP-mssgr -->
-<df-messenger
-  location={location}
-  project-id={projectId}
-  agent-id={agentId}
-  language-code={languageCode}
-  max-query-length="-1"
->
-  <df-messenger-chat-bubble
-    chat-title={chatTitle}
-    placeholder-text={placeholderText}
-  >
-  </df-messenger-chat-bubble>
-</df-messenger>
+<!-- Widget Dialogflow Messenger: TGP-mssgr -->
+<div class={`tgp-df-wrapper ${isFullscreen ? 'mode-fullscreen' : 'mode-sidepanel'}`}>
+  {mode === "sidepanel" && showFullscreenButton && (
+    <a
+      href="/mesa-redaccion"
+      class="tgp-df-fullscreen-badge"
+      title="Abrir Mesa de Redacción a Pantalla Completa"
+      aria-label="Pantalla Completa"
+    >
+      <span class="pulse-dot"></span>
+      <span class="label">Mesa Redacción · Fullscreen</span>
+      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+      </svg>
+    </a>
+  )}
 
-<!-- Estilos optimizados para lectura cómoda de ensayos largos y tarjetas Bento -->
+  <df-messenger
+    location={location}
+    project-id={projectId}
+    agent-id={agentId}
+    language-code={languageCode}
+    max-query-length="-1"
+  >
+    <df-messenger-chat-bubble
+      chat-title={chatTitle}
+      chat-title-icon={iconUrl}
+      placeholder-text={placeholderText}
+    >
+    </df-messenger-chat-bubble>
+  </df-messenger>
+</div>
+
+<!-- Estilos Dark TGP adaptados para Side Panel y Fullscreen -->
 <style is:global define:vars={{ panelWidth: width, panelZIndex: zIndex }}>
-  df-messenger {
+  /* Contenedor Sidepanel Flotante */
+  .tgp-df-wrapper.mode-sidepanel df-messenger {
     z-index: var(--panelZIndex, 9999);
     position: fixed;
     bottom: 0;
@@ -66,13 +96,86 @@ const {
     --df-messenger-width: var(--panelWidth, 550px);
     --df-messenger-height: 100vh;
     --df-messenger-window-border-radius: 0px;
-    --df-messenger-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
-  /* Adaptabilidad móvil: si la pantalla es menor a 640px, ocupa el ancho completo */
+  /* Badge para saltar a pantalla completa */
+  .tgp-df-fullscreen-badge {
+    position: fixed;
+    bottom: 90px;
+    right: 24px;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #111716;
+    border: 1px solid rgba(56, 139, 253, 0.4);
+    color: #93c5fd;
+    padding: 7px 13px;
+    border-radius: 9999px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-decoration: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 12px rgba(56, 139, 253, 0.25);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .tgp-df-fullscreen-badge:hover {
+    background: #162220;
+    border-color: #60a5fa;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.8), 0 0 18px rgba(56, 139, 253, 0.45);
+  }
+  .tgp-df-fullscreen-badge .pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #388bfd;
+    box-shadow: 0 0 8px #388bfd;
+    animation: df-pulse 2s infinite ease-in-out;
+  }
+  @keyframes df-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.5; }
+  }
+
+  /* Modo Pantalla Completa (Fullscreen) */
+  .tgp-df-wrapper.mode-fullscreen {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  .tgp-df-wrapper.mode-fullscreen df-messenger {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    --df-messenger-width: 100%;
+    --df-messenger-height: 100%;
+    --df-messenger-window-border-radius: 12px;
+  }
+
+  /* Paleta cromática oficial TGP Dark */
+  df-messenger {
+    --df-messenger-primary-color: #388bfd;
+    --df-messenger-titlebar-background: #111716;
+    --df-messenger-titlebar-title-color: #f0f2f1;
+    --df-messenger-chat-bubble-background: #161d1c;
+    --df-messenger-chat-bubble-icon-color: #388bfd;
+    --df-messenger-user-message: #1b2826;
+    --df-messenger-bot-message: #141b1a;
+    --df-messenger-input-box-color: #0b0f0e;
+    --df-messenger-input-placeholder-font-color: #62706e;
+    --df-messenger-input-font-color: #f0f2f1;
+    --df-messenger-send-icon: #388bfd;
+    --df-messenger-font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* Adaptabilidad móvil */
   @media (max-width: 640px) {
-    df-messenger {
+    .tgp-df-wrapper.mode-sidepanel df-messenger {
       --df-messenger-width: 100vw;
+    }
+    .tgp-df-fullscreen-badge {
+      display: none;
     }
   }
 </style>

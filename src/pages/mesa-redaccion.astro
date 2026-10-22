@@ -1,0 +1,61 @@
+---
+export const prerender = false;
+import Layout from '../layouts/Layout.astro';
+import TgpMssgr from '../components/TgpMssgr.astro';
+---
+
+<Layout title="Mesa de Redacción · TGP Dialogflow CX" hideHeader={true} footerVariant="minimal" bodyClass="bg-[#0b0f0e]">
+  <div class="min-h-screen flex flex-col bg-[#0b0f0e] text-[#d4d4d2]">
+    <!-- Barra Superior de Navegación Operativa -->
+    <header class="border-b border-[#263231] bg-[#111716]/90 backdrop-blur-md px-4 sm:px-8 py-3.5 flex items-center justify-between z-50">
+      <div class="flex items-center gap-4">
+        <a
+          href="/tgp-app"
+          class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#263231] hover:border-[#4a5a58] bg-[#161d1c] hover:bg-[#1c2423] text-xs font-mono text-[#8a9a98] hover:text-[#f0f2f1] transition-all"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Scriptorium
+        </a>
+        <div class="h-4 w-px bg-[#263231]"></div>
+        <div>
+          <h1 class="text-sm font-serif tracking-wide text-[#f0f2f1] flex items-center gap-2.5">
+            <span>Mesa de Redacción</span>
+            <span class="text-[10px] uppercase font-mono tracking-widest text-[#60a5fa] bg-blue-950/60 border border-blue-800/60 px-2 py-0.5 rounded-full">
+              Dialogflow CX
+            </span>
+          </h1>
+          <p class="text-[11px] text-[#62706e] font-mono mt-0.5">Ingesta natural ➔ Wikimedia R2 ➔ Cards V2 ➔ Google Chat</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-[#8a9a98]">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Nodo: tgp-mind (us-central1)</span>
+        </div>
+        <a
+          href="https://tgp-mind-713934653057.us-central1.run.app/health"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-[10px] font-mono text-[#8a9a98] hover:text-emerald-400 bg-[#161d1c] border border-[#263231] hover:border-emerald-500/50 px-2.5 py-1 rounded transition-colors"
+        >
+          Health Check
+        </a>
+      </div>
+    </header>
+
+    <!-- Contenedor Principal Fullscreen -->
+    <main class="grow p-2 sm:p-6 flex flex-col justify-center items-center">
+      <div class="w-full max-w-5xl h-[calc(100vh-100px)] border border-[#263231] rounded-2xl bg-[#111716] overflow-hidden shadow-2xl relative">
+        <TgpMssgr
+          mode="fullscreen"
+          showFullscreenButton={false}
+          chatTitle="Mesa de Redacción Dialogflow CX"
+          placeholderText="Escribe el título, contenido o tema para forjar el post..."
+        />
+      </div>
+    </main>
+  </div>
+</Layout>

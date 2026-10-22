@@ -43,12 +43,17 @@ function renderTgpContent(raw: string): string {
 // ─────────────────────────────────────────────────────────────────────────────
 // Componente principal
 // ─────────────────────────────────────────────────────────────────────────────
-const TgpMindSidebar: FC = () => {
-  const [isOpen, setIsOpen]       = useState(false);
+interface TgpMindSidebarProps {
+  mode?: 'sidebar' | 'fullscreen';
+}
+
+const TgpMindSidebar: FC<TgpMindSidebarProps> = ({ mode = 'sidebar' }) => {
+  const isFullscreen = mode === 'fullscreen';
+  const [isOpen, setIsOpen]       = useState(isFullscreen);
   const [messages, setMessages]   = useState<Message[]>([]);
   const [input, setInput]         = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionId]               = useState(() => `sidebar-${Date.now()}`);
+  const [sessionId]               = useState(() => `mind-${Date.now()}`);
   const messagesEndRef            = useRef<HTMLDivElement>(null);
   const inputRef                  = useRef<HTMLTextAreaElement>(null);
 
@@ -162,6 +167,18 @@ const TgpMindSidebar: FC = () => {
         }
         .tgp-mind-sidebar.open {
           transform: translateX(0);
+        }
+        .tgp-mind-sidebar.fullscreen-mode {
+          position: relative;
+          top: 0;
+          right: 0;
+          width: 100%;
+          max-width: 100%;
+          height: 100%;
+          transform: none !important;
+          border-left: none;
+          box-shadow: none;
+          border-radius: 12px;
         }
 
         /* Toggle button */
@@ -504,20 +521,22 @@ const TgpMindSidebar: FC = () => {
         }
       `}</style>
 
-      {/* ── Toggle button ─────────────────────────────────────────────────── */}
-      <button
-        className="tgp-mind-toggle"
-        onClick={() => setIsOpen(prev => !prev)}
-        title="TGP Mind — Asistente IA"
-        aria-label="Abrir TGP Mind"
-        style={{ right: isOpen ? '440px' : '0', transition: 'right 0.38s cubic-bezier(0.16, 1, 0.3, 1)' }}
-      >
-        <div className="tgp-mind-toggle-dot" />
-        <span className="tgp-mind-toggle-label">TGP Mind</span>
-      </button>
+      {/* ── Toggle button (solo si no es fullscreen) ─────────────────────── */}
+      {!isFullscreen && (
+        <button
+          className="tgp-mind-toggle"
+          onClick={() => setIsOpen(prev => !prev)}
+          title="TGP Mind — Asistente IA"
+          aria-label="Abrir TGP Mind"
+          style={{ right: isOpen ? '440px' : '0', transition: 'right 0.38s cubic-bezier(0.16, 1, 0.3, 1)' }}
+        >
+          <div className="tgp-mind-toggle-dot" />
+          <span className="tgp-mind-toggle-label">TGP Mind</span>
+        </button>
+      )}
 
-      {/* ── Panel lateral ─────────────────────────────────────────────────── */}
-      <aside className={`tgp-mind-sidebar ${isOpen ? 'open' : ''}`} aria-hidden={!isOpen}>
+      {/* ── Panel lateral o Pantalla Completa ──────────────────────────────── */}
+      <aside className={`tgp-mind-sidebar ${isOpen ? 'open' : ''} ${isFullscreen ? 'fullscreen-mode' : ''}`} aria-hidden={!isOpen}>
         
         {/* Header */}
         <div className="tgp-mind-header">
@@ -527,11 +546,13 @@ const TgpMindSidebar: FC = () => {
           </div>
           <div className="tgp-mind-header-actions">
             <button className="tgp-mind-btn-icon" onClick={clearHistory} title="Limpiar historial">
-              ⌫
+              ⌫ Limpiar
             </button>
-            <button className="tgp-mind-btn-icon" onClick={() => setIsOpen(false)} title="Cerrar">
-              ✕
-            </button>
+            {!isFullscreen && (
+              <button className="tgp-mind-btn-icon" onClick={() => setIsOpen(false)} title="Cerrar">
+                ✕
+              </button>
+            )}
           </div>
         </div>
 
