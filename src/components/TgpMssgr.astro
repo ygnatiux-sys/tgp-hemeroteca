@@ -30,7 +30,7 @@ const {
   location = "us-central1",
   languageCode = "es",
   chatTitle = "Mesa de Redacción TGP",
-  placeholderText = "Pelotea tu tema o propuesta de ensayo...",
+  placeholderText = "Escribe tu idea, título o tema de ensayo...",
   iconUrl = "/perfil.webp",
   mode = "sidepanel",
   width = "550px",
@@ -83,6 +83,33 @@ const isFullscreen = mode === "fullscreen";
     </df-messenger-chat-bubble>
   </df-messenger>
 </div>
+
+<!-- Script de auto-apertura inmediata en modo fullscreen -->
+<script is:inline define:vars={{ isFullscreen }}>
+  if (isFullscreen) {
+    const triggerOpen = () => {
+      const df = document.querySelector('.mode-fullscreen df-messenger');
+      if (!df) return;
+      try {
+        const root = df.shadowRoot;
+        if (root) {
+          const btn = root.querySelector('button#widgetIcon') || 
+                      root.querySelector('.chat-wrapper') ||
+                      root.querySelector('button');
+          if (btn && !df.hasAttribute('opened')) {
+            btn.click();
+          }
+        }
+      } catch (e) {
+        console.warn('[df-messenger] Auto-open:', e);
+      }
+    };
+    setTimeout(triggerOpen, 150);
+    setTimeout(triggerOpen, 500);
+    setTimeout(triggerOpen, 1200);
+    setTimeout(triggerOpen, 2500);
+  }
+</script>
 
 <!-- Estilos Dark TGP adaptados para Side Panel y Fullscreen -->
 <style is:global define:vars={{ panelWidth: width, panelZIndex: zIndex }}>
@@ -143,6 +170,8 @@ const isFullscreen = mode === "fullscreen";
     width: 100%;
     height: 100%;
     position: relative;
+    display: flex;
+    flex-direction: column;
   }
   .tgp-df-wrapper.mode-fullscreen df-messenger {
     position: relative;
@@ -150,6 +179,8 @@ const isFullscreen = mode === "fullscreen";
     height: 100%;
     --df-messenger-width: 100%;
     --df-messenger-height: 100%;
+    --df-messenger-chat-window-height: 100%;
+    --df-messenger-chat-window-width: 100%;
     --df-messenger-window-border-radius: 12px;
   }
 

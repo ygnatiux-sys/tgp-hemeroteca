@@ -4,10 +4,10 @@ import Layout from '../layouts/Layout.astro';
 import TgpMssgr from '../components/TgpMssgr.astro';
 ---
 
-<Layout title="Mesa de Redacción · TGP Dialogflow CX" hideHeader={true} footerVariant="minimal" bodyClass="bg-[#0b0f0e]">
+<Layout title="Mesa de Redacción · Forja & Ingesta TGP" hideHeader={true} footerVariant="minimal" bodyClass="bg-[#0b0f0e]">
   <div class="min-h-screen flex flex-col bg-[#0b0f0e] text-[#d4d4d2]">
     <!-- Barra Superior de Navegación Operativa -->
-    <header class="border-b border-[#263231] bg-[#111716]/90 backdrop-blur-md px-4 sm:px-8 py-3.5 flex items-center justify-between z-50">
+    <header class="border-b border-[#263231] bg-[#111716]/95 backdrop-blur-md px-4 sm:px-8 py-3.5 flex items-center justify-between z-50">
       <div class="flex items-center gap-4">
         <a
           href="/tgp-app"
@@ -23,39 +23,288 @@ import TgpMssgr from '../components/TgpMssgr.astro';
           <h1 class="text-sm font-serif tracking-wide text-[#f0f2f1] flex items-center gap-2.5">
             <span>Mesa de Redacción</span>
             <span class="text-[10px] uppercase font-mono tracking-widest text-[#60a5fa] bg-blue-950/60 border border-blue-800/60 px-2 py-0.5 rounded-full">
-              Dialogflow CX
+              Atelier &amp; CX
             </span>
           </h1>
-          <p class="text-[11px] text-[#62706e] font-mono mt-0.5">Ingesta natural ➔ Wikimedia R2 ➔ Cards V2 ➔ Google Chat</p>
+          <p class="text-[11px] text-[#62706e] font-mono mt-0.5">Ingesta natural ➔ Wikimedia WebP ➔ Cloudflare R2 ➔ Google Chat Cards V2</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-[#8a9a98]">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>Nodo: tgp-mind (us-central1)</span>
-        </div>
-        <a
-          href="https://tgp-mind-713934653057.us-central1.run.app/health"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-[10px] font-mono text-[#8a9a98] hover:text-emerald-400 bg-[#161d1c] border border-[#263231] hover:border-emerald-500/50 px-2.5 py-1 rounded transition-colors"
+      <!-- Selector de Modo / Pestañas -->
+      <div class="flex items-center gap-2 bg-[#161d1c] p-1 border border-[#263231] rounded-xl text-xs font-mono">
+        <button
+          id="btn-tab-ingesta"
+          class="px-3 py-1.5 rounded-lg transition-all text-[#f0f2f1] bg-[#222b2a] border border-[#3b4745] font-semibold"
         >
-          Health Check
+          ⚡ Consola de Ingesta
+        </button>
+        <button
+          id="btn-tab-dialogflow"
+          class="px-3 py-1.5 rounded-lg transition-all text-[#8a9a98] hover:text-[#f0f2f1]"
+        >
+          💬 Chat Dialogflow CX
+        </button>
+      </div>
+
+      <div class="hidden md:flex items-center gap-3">
+        <a
+          href="/tgp-mind"
+          class="text-[10px] font-mono text-[#ffb499] hover:text-[#ffd1c2] bg-[#1a1514] border border-[#e07a5f]/40 hover:border-[#e07a5f] px-2.5 py-1 rounded transition-colors"
+        >
+          Atanor Gemini ➔
         </a>
       </div>
     </header>
 
-    <!-- Contenedor Principal Fullscreen -->
-    <main class="grow p-2 sm:p-6 flex flex-col justify-center items-center">
-      <div class="w-full max-w-5xl h-[calc(100vh-100px)] border border-[#263231] rounded-2xl bg-[#111716] overflow-hidden shadow-2xl relative">
-        <TgpMssgr
-          mode="fullscreen"
-          showFullscreenButton={false}
-          chatTitle="Mesa de Redacción Dialogflow CX"
-          placeholderText="Escribe el título, contenido o tema para forjar el post..."
-        />
+    <!-- Área Principal de Trabajo -->
+    <main class="grow p-3 sm:p-6 flex flex-col justify-center items-center">
+      <div class="w-full max-w-5xl min-h-[calc(100vh-120px)] border border-[#263231] rounded-2xl bg-[#111716] overflow-hidden shadow-2xl relative flex flex-col">
+        
+        <!-- VISTA 1: Consola de Ingesta Directa -->
+        <section id="view-ingesta" class="p-6 sm:p-8 flex flex-col gap-6 grow">
+          <div class="border-b border-[#263231] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h2 class="text-xl font-serif text-[#f0f2f1] font-light">Forja y Despacho de Ensayos</h2>
+              <p class="text-xs text-[#8a9a98] font-mono mt-1">Escribe o pega el borrador: el pipeline buscará la imagen en Wikimedia, la procesará a WebP en R2 y te enviará la Card interactiva a Google Chat.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-mono uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2.5 py-1 rounded-full">
+                Cloud Run Activo
+              </span>
+            </div>
+          </div>
+
+          <form id="form-ingesta" class="flex flex-col gap-5 grow">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+              <!-- Título -->
+              <div class="md:col-span-8 flex flex-col gap-1.5">
+                <label for="post-title" class="text-xs font-mono text-[#8a9a98] uppercase tracking-wider">Título del Ensayo / Post</label>
+                <input
+                  type="text"
+                  id="post-title"
+                  required
+                  placeholder="Ej: La Cronometría Etrusca: Anomalías y Sincronismos"
+                  class="bg-[#161d1c] border border-[#263231] focus:border-[#388bfd] rounded-lg px-3.5 py-2.5 text-sm text-[#f0f2f1] placeholder-[#505f5d] outline-none font-sans transition-colors"
+                />
+              </div>
+
+              <!-- Destino Silo -->
+              <div class="md:col-span-4 flex flex-col gap-1.5">
+                <label for="post-silo" class="text-xs font-mono text-[#8a9a98] uppercase tracking-wider">Destino del Silo</label>
+                <select
+                  id="post-silo"
+                  class="bg-[#161d1c] border border-[#263231] focus:border-[#388bfd] rounded-lg px-3.5 py-2.5 text-sm text-[#f0f2f1] outline-none font-mono transition-colors"
+                >
+                  <option value="hemeroteca">Hemeroteca (Principal)</option>
+                  <option value="alternative">Alternative (Liminal)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Búsqueda Wikimedia & Autor -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+              <div class="md:col-span-8 flex flex-col gap-1.5">
+                <label for="post-query-img" class="text-xs font-mono text-[#8a9a98] uppercase tracking-wider">
+                  Búsqueda de Portada en Wikimedia <span class="text-[#505f5d]">(opcional)</span>
+                </label>
+                <input
+                  type="text"
+                  id="post-query-img"
+                  placeholder="Ej: Altar of Hermes Delos / Barabar caves / Moai Easter Island"
+                  class="bg-[#161d1c] border border-[#263231] focus:border-[#388bfd] rounded-lg px-3.5 py-2 text-sm text-[#f0f2f1] placeholder-[#505f5d] outline-none font-sans transition-colors"
+                />
+              </div>
+
+              <div class="md:col-span-4 flex flex-col gap-1.5">
+                <label for="post-author" class="text-xs font-mono text-[#8a9a98] uppercase tracking-wider">Firma de Autor</label>
+                <input
+                  type="text"
+                  id="post-author"
+                  value="Xavier Benítez"
+                  class="bg-[#161d1c] border border-[#263231] focus:border-[#388bfd] rounded-lg px-3.5 py-2 text-sm text-[#f0f2f1] outline-none font-sans transition-colors"
+                />
+              </div>
+            </div>
+
+            <!-- Contenido / Texto del Ensayo -->
+            <div class="flex flex-col gap-1.5 grow">
+              <div class="flex items-center justify-between">
+                <label for="post-content" class="text-xs font-mono text-[#8a9a98] uppercase tracking-wider">Cuerpo del Ensayo (Markdown)</label>
+                <span id="char-counter" class="text-[11px] font-mono text-[#62706e]">0 palabras · 0 caracteres</span>
+              </div>
+              <textarea
+                id="post-content"
+                required
+                rows="10"
+                placeholder="Escribe o pega aquí el contenido completo del post o ensayo..."
+                class="grow min-h-[220px] bg-[#161d1c] border border-[#263231] focus:border-[#388bfd] rounded-xl p-4 text-sm text-[#f0f2f1] placeholder-[#505f5d] outline-none font-sans leading-relaxed transition-colors resize-y"
+              ></textarea>
+            </div>
+
+            <!-- Botón de Envío y Estado -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-[#263231]">
+              <div id="status-box" class="text-xs font-mono text-[#8a9a98]">
+                Listo para procesar e ingestar.
+              </div>
+              <button
+                type="submit"
+                id="btn-submit"
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-mono text-xs uppercase tracking-wider font-semibold shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+              >
+                <span>🏛️ Forjar Post &amp; Despachar Card</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Tarjeta de Resultado en Vivo (Oculta por defecto) -->
+          <div id="result-card" class="hidden p-5 border border-emerald-500/40 bg-[#121c19] rounded-xl flex flex-col sm:flex-row gap-5 items-center">
+            <img
+              id="result-img"
+              src=""
+              alt="Portada generada"
+              class="w-32 h-20 object-cover rounded-lg border border-[#263231] shrink-0 bg-[#0b0f0e]"
+            />
+            <div class="grow">
+              <span class="text-[10px] uppercase font-mono tracking-widest text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-800/80">
+                ¡Ingesta Exitosa!
+              </span>
+              <h3 id="result-title" class="text-base font-serif text-[#f0f2f1] mt-1.5 font-bold"></h3>
+              <p id="result-msg" class="text-xs text-[#8a9a98] font-mono mt-1"></p>
+              <div class="flex items-center gap-3 mt-2.5">
+                <a
+                  id="result-r2-link"
+                  href=""
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-[11px] font-mono text-blue-400 hover:underline flex items-center gap-1"
+                >
+                  Ver Portada R2 ↗
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VISTA 2: Chat Dialogflow CX Auto-Expandido -->
+        <section id="view-dialogflow" class="hidden grow w-full h-[calc(100vh-140px)] relative">
+          <TgpMssgr
+            mode="fullscreen"
+            showFullscreenButton={false}
+            chatTitle="Mesa de Redacción Dialogflow CX"
+            placeholderText="Escribe tu idea o tema a pelotear con el agente..."
+          />
+        </section>
+
       </div>
     </main>
   </div>
+
+  <!-- Lógica de Pestañas y Despacho en Vivo -->
+  <script is:inline>
+    // 1. Selector de Pestañas
+    const btnTabIngesta = document.getElementById('btn-tab-ingesta');
+    const btnTabDf = document.getElementById('btn-tab-dialogflow');
+    const viewIngesta = document.getElementById('view-ingesta');
+    const viewDf = document.getElementById('view-dialogflow');
+
+    btnTabIngesta.addEventListener('click', () => {
+      btnTabIngesta.classList.add('bg-[#222b2a]', 'border-[#3b4745]', 'text-[#f0f2f1]', 'font-semibold');
+      btnTabIngesta.classList.remove('text-[#8a9a98]');
+      btnTabDf.classList.remove('bg-[#222b2a]', 'border-[#3b4745]', 'text-[#f0f2f1]', 'font-semibold');
+      btnTabDf.classList.add('text-[#8a9a98]');
+      viewIngesta.classList.remove('hidden');
+      viewDf.classList.add('hidden');
+    });
+
+    btnTabDf.addEventListener('click', () => {
+      btnTabDf.classList.add('bg-[#222b2a]', 'border-[#3b4745]', 'text-[#f0f2f1]', 'font-semibold');
+      btnTabDf.classList.remove('text-[#8a9a98]');
+      btnTabIngesta.classList.remove('bg-[#222b2a]', 'border-[#3b4745]', 'text-[#f0f2f1]', 'font-semibold');
+      btnTabIngesta.classList.add('text-[#8a9a98]');
+      viewDf.classList.remove('hidden');
+      viewIngesta.classList.add('hidden');
+
+      // Disparar auto-apertura del chat al conmutar a la pestaña Dialogflow
+      setTimeout(() => {
+        const df = document.querySelector('df-messenger');
+        const trigger = df?.shadowRoot?.querySelector('#widgetIcon') || df?.shadowRoot?.querySelector('button');
+        if (trigger && !df?.hasAttribute('opened')) {
+          trigger.click();
+        }
+      }, 100);
+    });
+
+    // 2. Contador de Caracteres y Palabras
+    const contentInput = document.getElementById('post-content');
+    const charCounter = document.getElementById('char-counter');
+    contentInput.addEventListener('input', () => {
+      const text = contentInput.value.trim();
+      const words = text ? text.split(/\s+/).length : 0;
+      charCounter.textContent = `${words} palabras · ${contentInput.value.length} caracteres`;
+    });
+
+    // 3. Envío al endpoint Cloud Run /api/cx/submit-draft
+    const form = document.getElementById('form-ingesta');
+    const btnSubmit = document.getElementById('btn-submit');
+    const statusBox = document.getElementById('status-box');
+    const resultCard = document.getElementById('result-card');
+    const resultTitle = document.getElementById('result-title');
+    const resultMsg = document.getElementById('result-msg');
+    const resultImg = document.getElementById('result-img');
+    const resultR2Link = document.getElementById('result-r2-link');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('post-title').value.trim();
+      const content = contentInput.value.trim();
+      const silo = document.getElementById('post-silo').value;
+      const queryImg = document.getElementById('post-query-img').value.trim() || title;
+      const author = document.getElementById('post-author').value.trim() || 'Xavier Benítez';
+
+      if (!title || !content) return;
+
+      btnSubmit.disabled = true;
+      statusBox.innerHTML = '<span class="text-amber-400 animate-pulse">⏳ Conectando con Cloud Run: buscando en Wikimedia, forjando WebP a R2 y creando Card V2...</span>';
+      resultCard.classList.add('hidden');
+
+      try {
+        const res = await fetch('https://tgp-mind-713934653057.us-central1.run.app/api/cx/submit-draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title,
+            content,
+            author,
+            query_imagen: queryImg,
+            target_project: silo,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          statusBox.innerHTML = '<span class="text-emerald-400">✅ ¡Despacho exitoso! Revisa tu Google Chat para autorizar el post.</span>';
+          resultTitle.textContent = data.title;
+          resultMsg.textContent = data.message;
+          if (data.heroImageUrl) {
+            resultImg.src = data.heroImageUrl;
+            resultR2Link.href = data.heroImageUrl;
+            resultR2Link.classList.remove('hidden');
+          } else {
+            resultImg.src = '/images/placeholder-cover.png';
+            resultR2Link.classList.add('hidden');
+          }
+          resultCard.classList.remove('hidden');
+          form.reset();
+          charCounter.textContent = '0 palabras · 0 caracteres';
+        } else {
+          statusBox.innerHTML = `<span class="text-red-400">❌ Error: ${data.error || 'No se pudo procesar'}</span>`;
+        }
+      } catch (err) {
+        statusBox.innerHTML = `<span class="text-red-400">❌ Error de conexión: ${err.message}</span>`;
+      } finally {
+        btnSubmit.disabled = false;
+      }
+    });
+  </script>
 </Layout>
