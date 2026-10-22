@@ -217,8 +217,9 @@ ${foundational.manifiesto_fundacional.slice(0, 1500)}`.trim();
       if (toolResult?.publicUrl) capturedMetadata.publicUrl = toolResult.publicUrl;
       if (toolResult?.vaultUrl) capturedMetadata.vaultUrl = toolResult.vaultUrl;
       if (toolResult?.r2Url) capturedMetadata.r2Url = toolResult.r2Url;
-      if (toolResult?.githubUrl) capturedMetadata.githubUrl = toolResult.githubUrl;
       if (toolResult?.imageUrl) capturedMetadata.heroImageUrl = toolResult.imageUrl;
+      if (toolResult?.coverImage) capturedMetadata.heroImageUrl = toolResult.coverImage;
+      if (toolResult?.heroUrl) capturedMetadata.heroImageUrl = toolResult.heroUrl;
       if (toolResult?.uploaded?.[0]?.r2Url) capturedMetadata.r2Url = toolResult.uploaded[0].r2Url;
 
       functionResponseParts.push({
@@ -281,6 +282,8 @@ ${foundational.manifiesto_fundacional.slice(0, 1500)}`.trim();
       r2Url: capturedMetadata.r2Url,
       githubUrl: capturedMetadata.githubUrl,
       heroImageUrl: capturedMetadata.heroImageUrl,
+      coverImage: capturedMetadata.heroImageUrl,
+      heroUrl: capturedMetadata.heroImageUrl,
     });
   }
 

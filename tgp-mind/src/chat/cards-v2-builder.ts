@@ -12,6 +12,8 @@ export interface CardV2Options {
   silo?: 'alternative' | 'hemeroteca' | 'magazine';
   excerpt?: string;
   heroImageUrl?: string;
+  heroUrl?: string;
+  coverImage?: string;
   slug?: string;
   publicUrl?: string;
   vaultUrl?: string;
@@ -21,6 +23,37 @@ export interface CardV2Options {
   rawContent?: string;
 }
 
+/**
+ * Validador estricto para evitar strings vacíos, URLs inválidas o raíces de bucket
+ * que rompen la interfaz gráfica de Google Chat renderizando íconos rotos.
+ */
+function isValidImageUrl(url?: string | null): boolean {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  if (
+    trimmed === '' ||
+    trimmed === 'undefined' ||
+    trimmed === 'null' ||
+    trimmed === 'none' ||
+    trimmed === 'false' ||
+    trimmed.includes(' ')
+  ) {
+    return false;
+  }
+  if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+    return false;
+  }
+  // Descartar si solo apunta a la raíz de almacenamiento o a fallbacks 404
+  if (
+    trimmed === 'https://storage.thegreatpuzzleproject.com' ||
+    trimmed === 'https://storage.thegreatpuzzleproject.com/' ||
+    trimmed.includes('vault-media/tgp-error-stamp.webp')
+  ) {
+    return false;
+  }
+  return true;
+}
+
 export function buildGoogleChatCardV2(options: CardV2Options) {
   const {
     status,
@@ -28,7 +61,6 @@ export function buildGoogleChatCardV2(options: CardV2Options) {
     subtitle = '',
     silo = 'alternative',
     excerpt = '',
-    heroImageUrl,
     slug = 'post-reciente',
     errorMessage,
   } = options;
@@ -48,10 +80,18 @@ export function buildGoogleChatCardV2(options: CardV2Options) {
         : '🟡 EN PROCESO DE FORJA';
 
   const headerSubtitle = `${siloLabel} • ${statusBadge}`;
-  const defaultHero = 'https://storage.thegreatpuzzleproject.com/vault-media/1792224263352-03d6d25b.webp';
-  const previewImage = heroImageUrl || defaultHero;
 
-  // URLs por defecto si no vienen explícitas
+  // 1. Resolución y saneamiento estricto de imagen
+  const candidateImage = (
+    options.heroImageUrl ||
+    options.heroUrl ||
+    options.coverImage ||
+    ''
+  ).trim();
+
+  const previewImage = isValidImageUrl(candidateImage) ? candidateImage : undefined;
+
+  // 2. URLs por defecto si no vienen explícitas
   const publicUrl =
     options.publicUrl ||
     (silo === 'alternative'
@@ -59,8 +99,15 @@ export function buildGoogleChatCardV2(options: CardV2Options) {
       : `https://thegreatpuzzleproject.com/hemeroteca/${slug}`);
 
   const queryParams = `?slug=${encodeURIComponent(slug)}&title=${encodeURIComponent(title)}&silo=${silo}`;
-  const vaultUrl = options.vaultUrl || `https://thegreatpuzzleproject.com/tgp-vault${queryParams}`;
-  const r2Url = options.r2Url || heroImageUrl || 'https://storage.thegreatpuzzleproject.com';
+  const vaultBase = silo === 'alternative'
+    ? 'https://alternative.thegreatpuzzleproject.com/tgp-vault'
+    : 'https://thegreatpuzzleproject.com/tgp-vault';
+  const vaultUrl = options.vaultUrl || `${vaultBase}${queryParams}`;
+
+  // Resolver r2Url asegurando que sea un enlace a un archivo real
+  const candidateR2Url = (options.r2Url || previewImage || '').trim();
+  const validR2Url = isValidImageUrl(candidateR2Url) ? candidateR2Url : undefined;
+
   const isAlt = silo === 'alternative' || IS_ALTERNATIVE;
   const githubRepo = isAlt
     ? (IS_ALTERNATIVE ? GITHUB_REPO : (process.env.GITHUB_REPO_ALTERNATIVE || 'ygnatiux-sys/tgp-webfinal2026'))
@@ -81,7 +128,7 @@ export function buildGoogleChatCardV2(options: CardV2Options) {
             { key: 'slug', value: slug },
             { key: 'title', value: title },
             { key: 'silo', value: silo },
-            { key: 'heroImageUrl', value: previewImage },
+            { key: 'heroImageUrl', value: previewImage || '' },
             { key: 'content', value: (options.rawContent || excerpt).slice(0, 3500) },
           ],
         },
@@ -92,6 +139,13 @@ export function buildGoogleChatCardV2(options: CardV2Options) {
       icon: { knownIcon: 'DESCRIPTION' },
       onClick: { openLink: { url: vaultUrl } },
     });
+    if (validR2Url) {
+      buttons.push({
+        text: '🗄️ ASSET EN STORAGE (R2)',
+        icon: { knownIcon: 'FLIGHT_DEPARTURE' },
+        onClick: { openLink: { url: validR2Url } },
+      });
+    }
   } else if (!isError) {
     buttons.push({
       text: '🌐 VER PUBLICACIÓN',
@@ -103,11 +157,11 @@ export function buildGoogleChatCardV2(options: CardV2Options) {
       icon: { knownIcon: 'DESCRIPTION' },
       onClick: { openLink: { url: vaultUrl } },
     });
-    if (r2Url) {
+    if (validR2Url) {
       buttons.push({
         text: '🗄️ ASSET EN STORAGE (R2)',
         icon: { knownIcon: 'FLIGHT_DEPARTURE' },
-        onClick: { openLink: { url: r2Url } },
+        onClick: { openLink: { url: validR2Url } },
       });
     }
     buttons.push({
@@ -160,6 +214,7 @@ export function buildGoogleChatCardV2(options: CardV2Options) {
       });
     }
 
+    // SOLO inyectar widget de imagen si previewImage es una URL HTTP/HTTPS válida
     if (previewImage) {
       widgets.push({
         image: {
@@ -187,19 +242,23 @@ export function buildGoogleChatCardV2(options: CardV2Options) {
     },
   });
 
+  // Header limpio: solo incluye imageUrl si previewImage es válida
+  const cardHeader: Record<string, any> = {
+    title: title.length > 55 ? title.slice(0, 52) + '...' : title,
+    subtitle: headerSubtitle,
+  };
+
+  if (previewImage) {
+    cardHeader.imageUrl = previewImage;
+    cardHeader.imageType = 'SQUARE';
+  }
+
   return {
     cardsV2: [
       {
         cardId: `tgp-card-${Date.now()}`,
         card: {
-          header: {
-            title: title.length > 55 ? title.slice(0, 52) + '...' : title,
-            subtitle: headerSubtitle,
-            imageUrl: isError
-              ? 'https://storage.thegreatpuzzleproject.com/vault-media/tgp-error-stamp.webp'
-              : previewImage,
-            imageType: 'SQUARE',
-          },
+          header: cardHeader,
           sections: [
             {
               header: isError ? 'REPORTE DE INCIDENCIA' : 'TRAZABILIDAD Y ACCIONES GITOPS',
