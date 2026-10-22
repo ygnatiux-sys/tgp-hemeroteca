@@ -595,3 +595,17 @@ Todos los bots han sido re-apuntados y certificados en vivo con `getWebhookInfo`
 - **Google Chat Webhook (@TGP-Alternative):** Enrutado a [https://tgp-mind-alternative-uzhmxe53dq-uc.a.run.app/api/chat/webhook](https://tgp-mind-alternative-uzhmxe53dq-uc.a.run.app/api/chat/webhook) con exención de autenticación 401 en `master-auth.ts`. Probado y validado en vivo en Google Workspace con respuestas interactivas.
 - **Dialogflow CX:** Mapeados endpoints de redacción (`/api/cx/submit-draft`), Wikimedia (`/cx-tool-wikimedia`) y Panlingua D1 (`/cx-tool-panlingua`).
 - **Protección de Código Heredado:** Los servicios `tgp-alt-chat` y `tgp-alt-telegram` en `tgp-paralelo-alternativo` se mantienen intactos y operativos por resguardo operativo.
+
+### 5.5 Fase 3.8: Blindaje DevSecOps Final y Corrección de Imágenes Sintéticas
+- **Resolución de Placeholder en Alternative:**
+  - Se corrigió `src/pages/ensayos/[slug].astro` en `tgp-webfinal2026`: ahora `explicitCovers` captura `data.coverImage`, `data.heroUrl` y `data.gallery`, eliminando el salto falso al placeholder `1792044290145-53f05a9f.webp`.
+  - Se actualizó el backend (`tool-registry.ts`) para incluir explícitamente `gallery: [coverImage]` y `heroUrl: coverImage` en `index.json` y el frontmatter.
+  - Se parametrizó `siloPrefix` en R2 (`r2.ts`, `nanoBananaTool.ts`, `compagnon-genkit.ts`) para asegurar que el almacenamiento respete estrictamente `alternative/` vs `hemeroteca/`.
+- **Tolerancia de Intents en Panlingua (`tool-panlingua.ts`):**
+  - Soporte nativo para intents `'search'`, `'etymology'` y captura de concepto desde `(args as any).query`.
+- **Blindaje Secret Manager (0% Secretos en Texto Plano):**
+  - Creados y sincronizados 6 secretos en Secret Manager (`TGP_MASTER_KEY`, `VAULT_PIN`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, `ZERNIO_API_KEY`, `PUBLIC_GOOGLE_PICKER_API_KEY`).
+  - Variables de entorno en Cloud Run (`tgp-mind` y `tgp-mind-alternative`) depuradas: 100% de secretos mapeados desde Secret Manager (`valueFrom.secretKeyRef`).
+  - Servicios activos y certificados en vivo:
+    - **Hemeroteca:** [https://tgp-mind-uzhmxe53dq-uc.a.run.app/health](https://tgp-mind-uzhmxe53dq-uc.a.run.app/health) (Revisión: `tgp-mind-00165-56c`).
+    - **Alternative:** [https://tgp-mind-alternative-uzhmxe53dq-uc.a.run.app/health](https://tgp-mind-alternative-uzhmxe53dq-uc.a.run.app/health) (Revisión: `tgp-mind-alternative-00018-hnr`).
