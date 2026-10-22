@@ -607,5 +607,12 @@ Todos los bots han sido re-apuntados y certificados en vivo con `getWebhookInfo`
   - Creados y sincronizados 6 secretos en Secret Manager (`TGP_MASTER_KEY`, `VAULT_PIN`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, `ZERNIO_API_KEY`, `PUBLIC_GOOGLE_PICKER_API_KEY`).
   - Variables de entorno en Cloud Run (`tgp-mind` y `tgp-mind-alternative`) depuradas: 100% de secretos mapeados desde Secret Manager (`valueFrom.secretKeyRef`).
   - Servicios activos y certificados en vivo:
-    - **Hemeroteca:** [https://tgp-mind-uzhmxe53dq-uc.a.run.app/health](https://tgp-mind-uzhmxe53dq-uc.a.run.app/health) (Revisión: `tgp-mind-00165-56c`).
-    - **Alternative:** [https://tgp-mind-alternative-uzhmxe53dq-uc.a.run.app/health](https://tgp-mind-alternative-uzhmxe53dq-uc.a.run.app/health) (Revisión: `tgp-mind-alternative-00018-hnr`).
+    - **Hemeroteca:** [https://tgp-mind-uzhmxe53dq-uc.a.run.app/health](https://tgp-mind-uzhmxe53dq-uc.a.run.app/health) (Revisión: `tgp-mind-00166-rjk`).
+    - **Alternative:** [https://tgp-mind-alternative-uzhmxe53dq-uc.a.run.app/health](https://tgp-mind-alternative-uzhmxe53dq-uc.a.run.app/health) (Revisión: `tgp-mind-alternative-00019-vbv`).
+
+### 5.6 Fase 4: Cloud Workflows como Capataz de Backend (Certificación Final 10/10)
+- **Rol Arquitectónico:** Workflows NO intercepta webhooks directos de chat para no sumar latencia al front-end. Actúa exclusivamente como orquestador asíncrono para tropilla de microservicios pesados (`remotion-engine`, `tgp-neo-grafo`, `tgp-vault-run`) y reporte desacoplado.
+- **Workflow Canónico:** [backend-orchestrator.yaml](file:///c:/Users/ygnat/tgp-hemeroteca/tgp-mind/workflows/backend-orchestrator.yaml) desplegado y activo en `us-central1` (Revisión: `000001-810`).
+- **Pruebas de Humo:** Ejecuciones `render-video` y `graph-sync` certificadas en vivo con estado `SUCCEEDED`.
+- **Blindaje IAM:** Otorgado rol `roles/workflows.invoker` a `713934653057-compute@developer.gserviceaccount.com` para permitir la invocación sin 403 Forbidden desde el runtime de Cloud Run.
+- **Despliegue Canónico:** Compilada imagen `tgp-mind-core:latest` (`sha256:bf5c62e3242f...`) y desplegada en ambas instancias con 100% de secretos mapeados desde Secret Manager y 0% en texto plano.
