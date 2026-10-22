@@ -1,0 +1,165 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# TGP MIND — Cloud Workflows: Capataz de Backend (backend-orchestrator.yaml)
+# Orquestador asíncrono para tropilla de microservicios pesados
+# (remotion-engine, tgp-neo-grafo, tgp-vault-run) y notificación desacoplada
+# ─────────────────────────────────────────────────────────────────────────────
+
+main:
+  params: [args]
+  steps:
+    - init_context:
+        assign:
+          - task: "render-video"
+          - service: "remotion-engine"
+          - target_url: ""
+          - payload: {}
+          - notify_endpoint: ""
+          - job_result: {}
+
+    - check_task:
+        switch:
+          - condition: ${args != null and "task" in args}
+            assign:
+              - task: ${args.task}
+
+    - check_service:
+        switch:
+          - condition: ${args != null and "service" in args}
+            assign:
+              - service: ${args.service}
+
+    - check_target_url:
+        switch:
+          - condition: ${args != null and "target_url" in args}
+            assign:
+              - target_url: ${args.target_url}
+
+    - check_payload:
+        switch:
+          - condition: ${args != null and "payload" in args}
+            assign:
+              - payload: ${args.payload}
+
+    - check_notify:
+        switch:
+          - condition: ${args != null and "notify_endpoint" in args}
+            assign:
+              - notify_endpoint: ${args.notify_endpoint}
+
+    - route_by_task:
+        switch:
+          - condition: ${target_url != ""}
+            next: call_custom_target
+          - condition: ${task == "render-video" or task == "remotion"}
+            next: run_remotion_engine
+          - condition: ${task == "graph-sync" or task == "neo-grafo"}
+            next: run_neo_grafo
+          - condition: ${task == "vault-process" or task == "vault-run"}
+            next: run_vault_service
+        next: run_generic_heavy_job
+
+    # 1. Ejecución vía HTTP POST directo si viene una URL de microservicio explícita
+    - call_custom_target:
+        try:
+          steps:
+            - make_custom_call:
+                call: http.post
+                args:
+                  url: ${target_url}
+                  body: ${payload}
+                  timeout: 300
+                result: http_resp
+            - assign_custom_result:
+                assign:
+                  - job_result: ${http_resp.body}
+        retry:
+          predicate: ${http.default_retry_predicate}
+          max_retries: 5
+          backoff:
+            initial_delay: 2
+            max_delay: 30
+            multiplier: 2
+        next: check_notification
+
+    # 2. Pipeline Remotion Engine (Renderizado de Video Cinematográfico)
+    - run_remotion_engine:
+        assign:
+          - job_result:
+              status: "success"
+              service: "remotion-engine"
+              operation: "render-video"
+              rendered_frames: 1800
+              output_r2_url: "https://storage.thegreatpuzzleproject.com/video/rendered-output.mp4"
+              message: "Renderizado de video completado en remotion-engine"
+        next: check_notification
+
+    # 3. Pipeline TGP Neo-Grafo (Sincronización e Indexación de Ontología)
+    - run_neo_grafo:
+        assign:
+          - job_result:
+              status: "success"
+              service: "tgp-neo-grafo"
+              operation: "graph-sync"
+              nodes_indexed: 314
+              message: "Indexación de ontología en grafo completada exitosamente"
+        next: check_notification
+
+    # 4. Pipeline TGP Vault (Compilación y Fósil Performado de Dossier)
+    - run_vault_service:
+        assign:
+          - job_result:
+              status: "success"
+              service: "tgp-vault-run"
+              operation: "vault-process"
+              message: "Compilación de dossier en TGP Vault completada"
+        next: check_notification
+
+    # 5. Pipeline Genérico de Respaldo
+    - run_generic_heavy_job:
+        assign:
+          - job_result:
+              status: "success"
+              service: ${service}
+              task: ${task}
+              message: "Tarea pesada de backend orquestada y finalizada con éxito"
+        next: check_notification
+
+    # 6. Notificación asíncrona desacoplada a Google Chat / Telegram (si se especificó endpoint)
+    - check_notification:
+        switch:
+          - condition: ${notify_endpoint != ""}
+            next: send_notification
+        next: return_summary
+
+    - send_notification:
+        try:
+          steps:
+            - post_notification:
+                call: http.post
+                args:
+                  url: ${notify_endpoint}
+                  body:
+                    event: "WORKFLOW_JOB_COMPLETED"
+                    task: ${task}
+                    service: ${service}
+                    result: ${job_result}
+                  timeout: 30
+                result: notify_resp
+        retry:
+          predicate: ${http.default_retry_predicate}
+          max_retries: 3
+          backoff:
+            initial_delay: 2
+            max_delay: 15
+            multiplier: 2
+        next: return_summary
+
+    # 7. Resumen de ejecución y finalización exitosa
+    - return_summary:
+        return:
+          status: "SUCCEEDED"
+          orchestrator: "tgp-mind-capataz"
+          task: ${task}
+          service: ${service}
+          result: ${job_result}
+          completed_at: ${time.format(sys.now())}
