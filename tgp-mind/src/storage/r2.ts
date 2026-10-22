@@ -10,6 +10,19 @@
 import { S3Client, PutObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
 import crypto from 'node:crypto';
+import { R2_PREFIX } from '../config/site.js';
+
+/**
+ * Asegura que cualquier key de almacenamiento en R2 tenga el prefijo de silo forzado (hemeroteca/ o alternative/)
+ */
+export function scopeKeyWithPrefix(key: string, siloPrefix?: string): string {
+  const cleanKey = key.replace(/^\/+/, '');
+  if (cleanKey.startsWith('hemeroteca/') || cleanKey.startsWith('alternative/')) {
+    return cleanKey;
+  }
+  const prefix = siloPrefix ? (siloPrefix.endsWith('/') ? siloPrefix : `${siloPrefix}/`) : R2_PREFIX;
+  return `${prefix}${cleanKey}`;
+}
 
 // ── Config inyectada ──────────────────────────────────────────────────────────
 let _r2Client: S3Client | null = null;
@@ -68,7 +81,7 @@ export async function convertirAWebP(inputBuffer: Buffer, quality = 85): Promise
  * Normaliza y almacena cualquier imagen (URL remota o Buffer binario) como WebP permanente en R2.
  * Origen de la verdad universal para todas las imágenes del ecosistema.
  */
-export async function estandarizarYSubirImagenAR2(input: Buffer | string, prefix = 'media', customFilename?: string): Promise<string> {
+export async function estandarizarYSubirImagenAR2(input: Buffer | string, prefix = 'media', customFilename?: string, siloPrefix?: string): Promise<string> {
   let rawBuffer: Buffer;
 
   if (typeof input === 'string') {
@@ -85,6 +98,7 @@ export async function estandarizarYSubirImagenAR2(input: Buffer | string, prefix
   }
 
   const webpBuffer = await convertirAWebP(rawBuffer);
+  const scopedPrefix = scopeKeyWithPrefix(prefix, siloPrefix);
   let fileKey: string;
   if (customFilename) {
     const cleanName = customFilename
@@ -95,10 +109,10 @@ export async function estandarizarYSubirImagenAR2(input: Buffer | string, prefix
       .replace(/[^a-z0-9\-_]/g, '-')
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '');
-    fileKey = `${prefix}/${cleanName}.webp`;
+    fileKey = `${scopedPrefix}/${cleanName}.webp`;
   } else {
     const uid = crypto.randomUUID().slice(0, 8);
-    fileKey = `${prefix}/${Date.now()}-${uid}.webp`;
+    fileKey = `${scopedPrefix}/${Date.now()}-${uid}.webp`;
   }
 
   await getClient().send(new PutObjectCommand({
@@ -116,14 +130,15 @@ export async function estandarizarYSubirImagenAR2(input: Buffer | string, prefix
 
 // ── Funciones públicas retrocompatibles ───────────────────────────────────────
 
-export async function subirBufferAR2(buffer: Buffer, key: string, contentType = 'image/jpeg'): Promise<string> {
+export async function subirBufferAR2(buffer: Buffer, key: string, contentType = 'image/jpeg', siloPrefix?: string): Promise<string> {
+  const scopedKey = scopeKeyWithPrefix(key, siloPrefix);
   await getClient().send(new PutObjectCommand({
     Bucket:      _R2_BUCKET_NAME,
-    Key:         key,
+    Key:         scopedKey,
     Body:        buffer,
     ContentType: contentType,
   }));
-  const publicUrl = `${_R2_PUBLIC_DOMAIN}/${key}`;
+  const publicUrl = `${_R2_PUBLIC_DOMAIN}/${scopedKey}`;
   console.log(`[R2] Buffer subido exitosamente: ${publicUrl}`);
   return publicUrl;
 }
@@ -131,7 +146,7 @@ export async function subirBufferAR2(buffer: Buffer, key: string, contentType = 
 export async function subirBufferOsintAR2(imageBuffer: Buffer, id: string, mimeType = 'image/webp'): Promise<string> {
   // Asegurar que el buffer OSINT esté realmente en formato WebP
   const webpBuffer = await convertirAWebP(imageBuffer);
-  const fileKey = `osint/${id}.webp`;
+  const fileKey = scopeKeyWithPrefix(`osint/${id}.webp`);
   await getClient().send(new PutObjectCommand({
     Bucket:       _R2_BUCKET_NAME,
     Key:          fileKey,
@@ -179,9 +194,18 @@ export async function listarImagenesRecientesR2(limit = 30): Promise<Array<{ id:
   try {
     const res = await getClient().send(new ListObjectsV2Command({
       Bucket: _R2_BUCKET_NAME,
+      Prefix: R2_PREFIX,
       MaxKeys: 100,
     }));
-    const items = (res.Contents || [])
+    let contents = res.Contents || [];
+    if (contents.length === 0) {
+      const fallbackRes = await getClient().send(new ListObjectsV2Command({
+        Bucket: _R2_BUCKET_NAME,
+        MaxKeys: 100,
+      }));
+      contents = fallbackRes.Contents || [];
+    }
+    const items = contents
       .filter(c => c.Key && /\.(jpe?g|png|webp|avif)$/i.test(c.Key))
       .sort((a, b) => (b.LastModified?.getTime() || 0) - (a.LastModified?.getTime() || 0))
       .slice(0, limit);

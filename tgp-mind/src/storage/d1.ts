@@ -15,12 +15,25 @@
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { getR2Client, getR2BucketName, getR2PublicDomain } from './r2.js';
 import crypto from 'node:crypto';
+import {
+  CLOUDFLARE_ACCOUNT_ID,
+  GEMINI_API_KEY,
+} from '../config/env.js';
+import { CLOUDFLARE_D1_DATABASE_ID, SITE_ID, D1_NAMESPACE_PREFIX } from '../config/site.js';
 
-// ── Config inyectada ──────────────────────────────────────────────────────────
-let _ACCOUNT_ID    = '';
-let _DATABASE_ID   = '';
-let _API_TOKEN     = '';
-let _GEMINI_KEY    = '';  // reutilizado para Google TTS endpoint
+function makeD1Key(chatId: number | string, contextOrBot: string): string {
+  return `${D1_NAMESPACE_PREFIX}${chatId}:${contextOrBot}`;
+}
+
+function legacyD1Key(chatId: number | string, contextOrBot: string): string {
+  return `${chatId}:${contextOrBot}`;
+}
+
+// ── Config inyectada con Auto-Inicialización Segura ─────────────────────────
+let _ACCOUNT_ID    = (process.env.CLOUDFLARE_ACCOUNT_ID || CLOUDFLARE_ACCOUNT_ID || '').trim();
+let _DATABASE_ID   = (CLOUDFLARE_D1_DATABASE_ID || process.env.CLOUDFLARE_D1_DATABASE_ID || process.env.D1_DATABASE_ID || '').trim();
+let _API_TOKEN     = (process.env.CLOUDFLARE_API_TOKEN || process.env.CLOUDFLARE_D1_TOKEN || '').trim();
+let _GEMINI_KEY    = (GEMINI_API_KEY || process.env.GEMINI_API_KEY || '').trim();
 
 export interface D1InitConfig {
   accountId:    string;
@@ -34,6 +47,10 @@ export function initD1(cfg: D1InitConfig) {
   _DATABASE_ID = cfg.databaseId;
   _API_TOKEN   = cfg.apiToken;
   _GEMINI_KEY  = cfg.geminiApiKey;
+}
+
+export function getD1DatabaseId(): string {
+  return _DATABASE_ID;
 }
 
 function d1Url(): string {
@@ -159,6 +176,7 @@ export async function registrarResguardoD1(params: ResguardoDocumentalParams): P
   const id = params.id || crypto.randomUUID();
   try {
     await asegurarTablaResguardoDocumental();
+    const destinoFinal = params.destino || SITE_ID;
     const query = `
       INSERT INTO resguardo_documental (id, origen, destino, tema, texto_generado, metadatos, imagen_r2_url, chat_id, fecha_creacion)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -171,7 +189,7 @@ export async function registrarResguardoD1(params: ResguardoDocumentalParams): P
         params: [
           id,
           params.origen,
-          params.destino,
+          destinoFinal,
           params.tema || '',
           params.textoGenerado,
           JSON.stringify(params.metadatos || {}),
@@ -185,7 +203,7 @@ export async function registrarResguardoD1(params: ResguardoDocumentalParams): P
       console.warn('[D1 Resguardo Warning]:', await res.text());
       return null;
     }
-    console.log(`[D1 Resguardo Documental] Registro ${id} guardado con éxito (${params.origen} -> ${params.destino})`);
+    console.log(`[D1 Resguardo Documental] Registro ${id} guardado con éxito (${params.origen} -> ${destinoFinal})`);
     return id;
   } catch (err: any) {
     console.error('[D1 Resguardo Exception]:', err?.message);
@@ -208,17 +226,18 @@ export interface ResguardoRecord {
 /**
  * Obtiene los últimos registros de resguardo documental almacenados en D1.
  */
-export async function obtenerUltimosResguardosD1(limit = 5): Promise<ResguardoRecord[]> {
+export async function obtenerUltimosResguardosD1(limit = 5, destino?: string): Promise<ResguardoRecord[]> {
   if (!_DATABASE_ID || !_API_TOKEN) return [];
   try {
     await asegurarTablaResguardoDocumental();
+    const sql = destino
+      ? 'SELECT id, origen, destino, tema, texto_generado, metadatos, imagen_r2_url, chat_id, fecha_creacion FROM resguardo_documental WHERE destino = ? ORDER BY fecha_creacion DESC LIMIT ?'
+      : 'SELECT id, origen, destino, tema, texto_generado, metadatos, imagen_r2_url, chat_id, fecha_creacion FROM resguardo_documental ORDER BY fecha_creacion DESC LIMIT ?';
+    const params = destino ? [destino, limit] : [limit];
     const res = await fetch(d1Url(), {
       method: 'POST',
       headers: d1Headers(),
-      body: JSON.stringify({
-        sql: 'SELECT id, origen, destino, tema, texto_generado, metadatos, imagen_r2_url, chat_id, fecha_creacion FROM resguardo_documental ORDER BY fecha_creacion DESC LIMIT ?',
-        params: [limit],
-      }),
+      body: JSON.stringify({ sql, params }),
     });
     const data: any = await res.json();
     return data?.result?.[0]?.results || [];
@@ -358,14 +377,15 @@ async function ensureHITLTable(): Promise<void> {
 
 export async function getHITLState(chatId: number, botContext: string = 'default'): Promise<HITLState | null> {
   if (!_DATABASE_ID || !_API_TOKEN) return null;
-  const key = `${chatId}:${botContext}`;
+  const siteKey = makeD1Key(chatId, botContext);
+  const legacyKey = legacyD1Key(chatId, botContext);
   try {
     const res = await fetch(d1Url(), {
       method: 'POST',
       headers: d1Headers(),
       body: JSON.stringify({
-        sql: `SELECT state, updated_at FROM hitl_sessions WHERE chat_id = ? LIMIT 1`,
-        params: [key],
+        sql: `SELECT state, updated_at FROM hitl_sessions WHERE chat_id = ? OR chat_id = ? ORDER BY updated_at DESC LIMIT 1`,
+        params: [siteKey, legacyKey],
       }),
     });
     const data: any = await res.json();
@@ -380,7 +400,7 @@ export async function getHITLState(chatId: number, botContext: string = 'default
 
 export async function setHITLState(chatId: number, state: HITLState, botContext: string = 'default'): Promise<void> {
   if (!_DATABASE_ID || !_API_TOKEN) return;
-  const key = `${chatId}:${botContext}`;
+  const key = makeD1Key(chatId, botContext);
   try {
     await ensureHITLTable();
     await fetch(d1Url(), {
@@ -399,13 +419,14 @@ export async function clearHITLState(chatId: number, botContext?: string): Promi
   if (!_DATABASE_ID || !_API_TOKEN) return;
   try {
     if (botContext) {
-      const key = `${chatId}:${botContext}`;
+      const siteKey = makeD1Key(chatId, botContext);
+      const legacyKey = legacyD1Key(chatId, botContext);
       await fetch(d1Url(), {
         method: 'POST',
         headers: d1Headers(),
         body: JSON.stringify({
-          sql: 'DELETE FROM hitl_sessions WHERE chat_id = ?',
-          params: [key],
+          sql: 'DELETE FROM hitl_sessions WHERE chat_id = ? OR chat_id = ?',
+          params: [siteKey, legacyKey],
         }),
       });
     } else {
@@ -413,8 +434,8 @@ export async function clearHITLState(chatId: number, botContext?: string): Promi
         method: 'POST',
         headers: d1Headers(),
         body: JSON.stringify({
-          sql: 'DELETE FROM hitl_sessions WHERE chat_id = ? OR chat_id LIKE ?',
-          params: [String(chatId), `${chatId}:%`],
+          sql: 'DELETE FROM hitl_sessions WHERE chat_id = ? OR chat_id LIKE ? OR chat_id LIKE ?',
+          params: [String(chatId), `${chatId}:%`, `${D1_NAMESPACE_PREFIX}${chatId}:%`],
         }),
       });
     }
@@ -493,14 +514,15 @@ export async function asegurarTablaMessages(): Promise<void> {
 export async function getConversationHistory(chatId: number, limit = 12, botId = 'default'): Promise<GeminiTurn[]> {
   if (!_DATABASE_ID || !_API_TOKEN) return [];
   // Clave compuesta para aislamiento: el mismo patrón que usa HITLState
-  const key = `${chatId}:${botId}`;
+  const siteKey = makeD1Key(chatId, botId);
+  const legacyKey = legacyD1Key(chatId, botId);
   try {
     const res = await fetch(d1Url(), {
       method: 'POST',
       headers: d1Headers(),
       body: JSON.stringify({
-        sql: `SELECT role, content_json FROM messages WHERE chat_id = ? ORDER BY created_at DESC LIMIT ?`,
-        params: [key, limit],
+        sql: `SELECT role, content_json FROM messages WHERE chat_id = ? OR chat_id = ? ORDER BY created_at DESC LIMIT ?`,
+        params: [siteKey, legacyKey, limit],
       }),
     });
     const data: any = await res.json();
@@ -576,7 +598,7 @@ export async function getConversationHistory(chatId: number, limit = 12, botId =
  */
 export async function appendTurn(chatId: number, role: GeminiRole, parts: GeminiPart[], botId = 'default'): Promise<void> {
   if (!_DATABASE_ID || !_API_TOKEN) return;
-  const key = `${chatId}:${botId}`;
+  const key = makeD1Key(chatId, botId);
   try {
     await asegurarTablaMessages();
     const id = crypto.randomUUID();
@@ -619,24 +641,25 @@ export async function clearChatHistory(chatId: number, botId?: string): Promise<
   try {
     if (botId) {
       // Borrar solo el historial de este bot
-      const key = `${chatId}:${botId}`;
+      const siteKey = makeD1Key(chatId, botId);
+      const legacyKey = legacyD1Key(chatId, botId);
       await fetch(d1Url(), {
         method: 'POST',
         headers: d1Headers(),
         body: JSON.stringify({
-          sql: 'DELETE FROM messages WHERE chat_id = ?',
-          params: [key],
+          sql: 'DELETE FROM messages WHERE chat_id = ? OR chat_id = ?',
+          params: [siteKey, legacyKey],
         }),
       });
-      console.log(`[D1 Messages] Historial borrado para ${key}`);
+      console.log(`[D1 Messages] Historial borrado para ${siteKey}`);
     } else {
       // Borrar todos los bots del mismo usuario
       await fetch(d1Url(), {
         method: 'POST',
         headers: d1Headers(),
         body: JSON.stringify({
-          sql: 'DELETE FROM messages WHERE chat_id = ? OR chat_id LIKE ?',
-          params: [String(chatId), `${chatId}:%`],
+          sql: 'DELETE FROM messages WHERE chat_id = ? OR chat_id LIKE ? OR chat_id LIKE ?',
+          params: [String(chatId), `${chatId}:%`, `${D1_NAMESPACE_PREFIX}${chatId}:%`],
         }),
       });
       console.log(`[D1 Messages] Historial borrado para todos los bots de chat_id: ${chatId}`);

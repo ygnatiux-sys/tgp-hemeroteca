@@ -9,6 +9,7 @@ import {
   TELEGRAM_DEV_TOKEN,
   TELEGRAM_PREMIUM_TOKEN,
   TGP_MIND_API_KEY,
+  PUBLIC_BASE_URL,
 } from '../config/env.js';
 import { handleTelegramWebhook, sendChatAction } from '../telegram/webhook.js';
 import { procesarFotoTelegramMultimodal } from '../services/media.service.js';
@@ -42,23 +43,35 @@ telegramRoutes.post('/webhook/telegram', handleWebhookRoute('assistant', TELEGRA
 telegramRoutes.post('/webhook-dev', handleWebhookRoute('liminal', TELEGRAM_DEV_TOKEN));
 telegramRoutes.post('/webhook/telegram-premium', handleWebhookRoute('liminal', TELEGRAM_PREMIUM_TOKEN));
 
-// Ruta dinámica multi-bot /telegram/:botId
-telegramRoutes.post('/telegram/:botId', async (c) => {
-  const botId = c.req.param('botId')?.toLowerCase();
-  if (botId === 'redes' || botId === 'social') {
-    return handleWebhookRoute('redes', TELEGRAM_SOCIAL_TOKEN)(c);
+// ── Helper de Resolución Dinámica Multi-Bot (Pre-Fase 3) ───────────────────
+function resolveDynamicBot(botId: string): { botType: 'redes' | 'omni' | 'assistant' | 'liminal'; token: string } {
+  const id = (botId || '').toLowerCase().trim();
+  if (id === 'redes' || id === 'social') {
+    return { botType: 'redes', token: TELEGRAM_SOCIAL_TOKEN };
   }
-  if (botId === 'assistant' || botId === 'cloud') {
-    return handleWebhookRoute('assistant', TELEGRAM_TGP_CLOUD_TOKEN)(c);
+  if (id === 'assistant' || id === 'cloud') {
+    return { botType: 'assistant', token: TELEGRAM_TGP_CLOUD_TOKEN };
   }
-  if (botId === 'dev' || botId === 'liminal') {
-    return handleWebhookRoute('liminal', TELEGRAM_DEV_TOKEN)(c);
+  if (id === 'dev' || id === 'liminal') {
+    return { botType: 'liminal', token: TELEGRAM_DEV_TOKEN };
   }
-  if (botId === 'premium') {
-    return handleWebhookRoute('liminal', TELEGRAM_PREMIUM_TOKEN)(c);
+  if (id === 'premium' || id === 'erudito') {
+    return { botType: 'liminal', token: TELEGRAM_PREMIUM_TOKEN };
   }
-  return handleWebhookRoute('omni', TELEGRAM_TOKEN)(c);
-});
+  return { botType: 'omni', token: TELEGRAM_TOKEN };
+}
+
+const dynamicBotHandler = (c: any) => {
+  const { botType, token } = resolveDynamicBot(c.req.param('botId'));
+  return handleWebhookRoute(botType, token)(c);
+};
+
+// Rutas dinámicas multi-bot separadas
+telegramRoutes.post('/telegram/:botId', dynamicBotHandler);
+telegramRoutes.post('/telegram/:botId/webhook', dynamicBotHandler);
+telegramRoutes.post('/api/telegram/:botId', dynamicBotHandler);
+telegramRoutes.post('/api/telegram/:botId/webhook', dynamicBotHandler);
+telegramRoutes.post('/webhook/:botId', dynamicBotHandler);
 
 // ── Sondas de Salud y Verificación para Telegram / Monitores (GET) ───────────
 const healthProbe = (botName: string) => (c: any) =>
@@ -70,9 +83,15 @@ telegramRoutes.get('/webhook/telegram-omni', healthProbe('omni'));
 telegramRoutes.get('/webhook/telegram', healthProbe('assistant'));
 telegramRoutes.get('/webhook-dev', healthProbe('liminal'));
 telegramRoutes.get('/webhook/telegram-premium', healthProbe('premium'));
-telegramRoutes.get('/telegram/:botId', (c) =>
-  c.json({ status: 'TGP Mind Telegram Webhook activo', botId: c.req.param('botId'), method: 'GET' })
-);
+
+const dynamicHealthProbe = (c: any) =>
+  c.json({ status: 'TGP Mind Telegram Webhook activo', botId: c.req.param('botId'), method: 'GET' });
+
+telegramRoutes.get('/telegram/:botId', dynamicHealthProbe);
+telegramRoutes.get('/telegram/:botId/webhook', dynamicHealthProbe);
+telegramRoutes.get('/api/telegram/:botId', dynamicHealthProbe);
+telegramRoutes.get('/api/telegram/:botId/webhook', dynamicHealthProbe);
+telegramRoutes.get('/webhook/:botId', dynamicHealthProbe);
 
 // Rutas secundarias /bot<TOKEN> requeridas por Telegram
 if (TELEGRAM_TOKEN) {
@@ -98,7 +117,7 @@ if (TELEGRAM_PREMIUM_TOKEN) {
 
 // ── Saneamiento y Reenganche de Webhooks ─────────────────────────────────────
 telegramRoutes.get('/api/telegram/drop-pending', async (c) => {
-  const baseUrl = 'https://tgp-mind-713934653057.us-central1.run.app';
+  const baseUrl = PUBLIC_BASE_URL;
   const bots = [
     { name: 'omni', token: TELEGRAM_TOKEN, path: '/telegram-webhook' },
     { name: 'redes', token: TELEGRAM_SOCIAL_TOKEN, path: '/webhook/telegram-social' },

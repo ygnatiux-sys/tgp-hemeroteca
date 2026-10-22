@@ -6,7 +6,10 @@ import { wikimediaTool } from '../core/tools/wikimediaTool.js';
 import { runChatOrchestrator } from '../chat/orchestrator.js';
 import { buildGoogleChatCardV2 } from '../chat/cards-v2-builder.js';
 import { detectarAdjuntoImagen, procesarImagenGoogleChatAR2 } from '../chat/chat-attachment-service.js';
-import { sendAsyncGoogleChatCard } from '../chat/async-chat-notifier.js';
+import { sendAsyncGoogleChatCard, setLastKnownChatSpace } from '../chat/async-chat-notifier.js';
+import { estandarizarYSubirImagenAR2 } from '../storage/r2.js';
+import { generarSlug, publicarEntradaKeystaticGitHub } from '../servicios/publicacion.js';
+import { SITE_ID, IS_ALTERNATIVE, GITHUB_REPO, GITHUB_TOKEN, SITE_DOMAIN } from '../config/site.js';
 
 export const chatRoutes = new Hono();
 
@@ -93,6 +96,102 @@ const handleChatWebhook = async (c: any) => {
       !!body.space ||
       !!body.message;
 
+    // 0. Detección de acción interactiva de botones en Google Chat (Cards V2 DataActions)
+    const invokedFunction =
+      body.commonEventObject?.invokedFunction ||
+      body.action?.actionMethodName ||
+      '';
+
+    if (invokedFunction === 'publish_draft_now') {
+      const rawParams = body.commonEventObject?.parameters || body.action?.parameters || {};
+      const params: Record<string, string> = {};
+      if (Array.isArray(rawParams)) {
+        for (const p of rawParams) {
+          if (p.key) params[p.key] = p.value;
+        }
+      } else if (typeof rawParams === 'object') {
+        Object.assign(params, rawParams);
+      }
+
+      const pTitle = params.title || 'Ensayo TGP';
+      const pSlug = params.slug || generarSlug(pTitle);
+      const pSilo: 'alternative' | 'hemeroteca' = params.silo === 'hemeroteca' ? 'hemeroteca' : (IS_ALTERNATIVE ? 'alternative' : 'hemeroteca');
+      const pHero = params.heroImageUrl || '';
+      const pContent = params.content || 'Ensayo forjado desde Dialogflow / Google Chat.';
+
+      console.log(`[Chat Action] 🚀 Confirmada publicación interactiva para "${pTitle}" (${pSilo})...`);
+
+      const isAlt = pSilo === 'alternative' || IS_ALTERNATIVE;
+      const targetRepo = isAlt
+        ? (IS_ALTERNATIVE ? GITHUB_REPO : (process.env.GITHUB_REPO_ALTERNATIVE || 'ygnatiux-sys/tgp-webfinal2026'))
+        : GITHUB_REPO;
+
+      const githubToken = isAlt
+        ? (process.env.GITHUB_TOKEN_ALTERNATIVE || GITHUB_TOKEN)
+        : GITHUB_TOKEN;
+
+      const fechaHoy = new Date().toISOString().split('T')[0];
+      const indexJson = {
+        title: pTitle,
+        date: fechaHoy,
+        coverImage: pHero,
+        excerpt: pContent.slice(0, 200),
+        author: 'Xavier Benítez',
+      };
+
+      const contentMdoc = `---
+title: "${pTitle.replace(/"/g, '\\"')}"
+date: "${fechaHoy}"
+coverImage: "${pHero}"
+excerpt: "${pContent.slice(0, 200).replace(/"/g, '\\"')}"
+---
+
+${pHero ? `![${pTitle}](${pHero})\n\n` : ''}${pContent}
+`;
+
+      let commitUrl = '';
+      let pubError = '';
+      try {
+        commitUrl = await publicarEntradaKeystaticGitHub({
+          coleccion: isAlt ? 'ensayos' : 'ensayos-cinematicos',
+          slug: pSlug,
+          indexJson,
+          contentMdoc,
+          token: githubToken,
+          repoFull: targetRepo,
+          mensajeCommit: `TGP Mind: Entrada ${pTitle} aprobada desde Google Chat`,
+        });
+      } catch (e: any) {
+        pubError = e?.message || String(e);
+      }
+
+      const isPublished = !!commitUrl && !pubError;
+      const successCard = buildGoogleChatCardV2({
+        status: isPublished ? 'published' : 'error',
+        title: pTitle,
+        subtitle: `Publicación confirmada por Xavier en ${pSilo.toUpperCase()}`,
+        silo: pSilo,
+        excerpt: pContent.slice(0, 280),
+        heroImageUrl: pHero,
+        slug: pSlug,
+        publicUrl: isAlt
+          ? `https://alternative.thegreatpuzzleproject.com/ensayos/${pSlug}`
+          : `https://thegreatpuzzleproject.com/hemeroteca/${pSlug}`,
+        r2Url: pHero,
+        githubUrl: commitUrl || `https://github.com/${targetRepo}`,
+        errorMessage: pubError || undefined,
+      });
+
+      const ackText = isPublished
+        ? `✅ ¡Publicado con éxito en ${pSilo.toUpperCase()}!`
+        : `❌ Error al publicar: ${pubError}`;
+
+      if (isGSuiteAddon) {
+        return c.json(formatGSuiteAddonResponse(ackText, successCard.cardsV2));
+      }
+      return c.json({ text: ackText, cardsV2: successCard.cardsV2 });
+    }
+
     const rawText =
       body.chat?.messagePayload?.message?.text ||
       body.tema ||
@@ -160,6 +259,10 @@ const handleChatWebhook = async (c: any) => {
       body.chat?.messagePayload?.message?.space?.name ||
       body.space?.name ||
       body.message?.space?.name;
+
+    if (spaceName) {
+      setLastKnownChatSpace(spaceName);
+    }
 
     const threadName =
       body.chat?.messagePayload?.message?.thread?.name ||
@@ -272,3 +375,140 @@ chatRoutes.post('/api/chat/webhook', handleChatWebhook);
 chatRoutes.post('/webhook/chat', handleChatWebhook);
 chatRoutes.post('/google-chat-webhook', handleChatWebhook);
 chatRoutes.post('/webhook', handleChatWebhook);
+
+// Respuestas GET para inspección de salud
+const handleGetHealth = (c: any) =>
+  c.json({
+    status: 'online',
+    service: 'tgp-mind-chat',
+    siteId: SITE_ID,
+    role: 'Google Workspace Add-on & Chat Webhook',
+    methodExpected: 'POST',
+    description: 'Endpoint receptor de eventos y tarjetas interactivas de Google Chat.',
+    ts: new Date().toISOString(),
+  });
+
+chatRoutes.get('/webhook', handleGetHealth);
+chatRoutes.get('/webhook/chat', handleGetHealth);
+chatRoutes.get('/google-chat-webhook', handleGetHealth);
+chatRoutes.get('/api/chat/webhook', handleGetHealth);
+
+// ── Ingesta desde Dialogflow CX Messenger (Mesa de Redacción) ─────────────────
+const handleCxSubmitDraft = async (c: any) => {
+  try {
+    const body = await c.req.json().catch(() => ({}));
+    const isCxWebhook = !!body.sessionInfo || !!body.fulfillmentInfo;
+
+    const params = body.sessionInfo?.parameters || {};
+    const title = String(params.title || params.titulo || body.title || body.titulo || '').trim();
+    const content = String(params.content || params.contenido || params.texto || body.content || body.contenido || body.texto || '').trim();
+    const author = String(params.author || params.autor || body.author || body.autor || 'Xavier Benítez').trim();
+    const targetProject = String(params.target_project || params.proyecto || body.target_project || body.targetProject || '').trim();
+    const queryImagen = String(params.query_imagen || params.imagen || body.query_imagen || body.queryImagen || title).trim();
+
+    if (!title && !content) {
+      const errTxt = 'Faltan campos requeridos (title y content) para procesar el ensayo.';
+      if (isCxWebhook) {
+        return c.json({
+          fulfillmentResponse: {
+            messages: [{ text: { text: [errTxt] } }],
+          },
+        });
+      }
+      return c.json({ error: errTxt }, 400);
+    }
+
+    const postTitle = title || 'Ensayo TGP sin título';
+    const slug = generarSlug(postTitle);
+    const isAlt = targetProject.toLowerCase().includes('alternative') || IS_ALTERNATIVE;
+    const silo: 'alternative' | 'hemeroteca' = isAlt ? 'alternative' : 'hemeroteca';
+
+    console.log(`[CX Submit Draft] Ingesta recibida: "${postTitle}" por ${author} (Destino: ${silo})`);
+
+    // 1. Buscar imagen en Wikimedia Commons y subirla en WebP a Cloudflare R2
+    let heroImageUrl: string | undefined;
+    if (queryImagen) {
+      try {
+        console.log(`[CX Submit Draft] Buscando imagen en Wikimedia para "${queryImagen}"...`);
+        const wikiRes = await wikimediaTool.execute({ query: queryImagen });
+        if (wikiRes.success && Array.isArray(wikiRes.results) && wikiRes.results.length > 0) {
+          const wikiUrl = wikiRes.results[0].url;
+          console.log(`[CX Submit Draft] Imagen encontrada en Wikimedia: ${wikiUrl}. Subiendo a R2...`);
+          heroImageUrl = await estandarizarYSubirImagenAR2(wikiUrl, `portadas/${slug}`);
+          console.log(`[CX Submit Draft] ✅ Portada WebP lista en R2: ${heroImageUrl}`);
+        }
+      } catch (imgErr: any) {
+        console.warn('[CX Submit Draft] Aviso al buscar/subir imagen de Wikimedia:', imgErr?.message);
+      }
+    }
+
+    // 2. Construir la tarjeta Card V2 interactiva de confirmación
+    const cardV2 = buildGoogleChatCardV2({
+      status: 'draft_proposal',
+      title: postTitle,
+      subtitle: `Mesa de Redacción Dialogflow • Autor: ${author}`,
+      silo,
+      excerpt: content.slice(0, 320),
+      heroImageUrl,
+      slug,
+      r2Url: heroImageUrl,
+      rawContent: content,
+    });
+
+    // 3. Notificación asíncrona a Google Chat
+    const alertText = `🏛️ **Mesa de Redacción TGP:** Xavier, ha llegado una propuesta de ensayo: "${postTitle}". ¿Deseas publicarlo en ${silo.toUpperCase()}?`;
+    await sendAsyncGoogleChatCard({
+      cardV2,
+      fallbackText: alertText,
+    });
+
+    // 4. Devolver confirmación a Dialogflow CX
+    const confirmMessage = `¡Listo, Xavier! Recibí el ensayo "${postTitle}". ${
+      heroImageUrl ? 'Busqué una imagen en Wikimedia y la procesé en WebP a Cloudflare R2.' : 'Generé la ficha editorial.'
+    } Te envié la tarjeta interactiva a tu Google Chat para que confirmes la publicación en ${silo.toUpperCase()} con un solo clic.`;
+
+    if (isCxWebhook) {
+      return c.json({
+        fulfillmentResponse: {
+          messages: [{ text: { text: [confirmMessage] } }],
+        },
+        sessionInfo: {
+          parameters: {
+            draft_status: 'notified_chat',
+            draft_title: postTitle,
+            draft_slug: slug,
+            hero_image_url: heroImageUrl || '',
+          },
+        },
+      });
+    }
+
+    return c.json({
+      success: true,
+      title: postTitle,
+      slug,
+      silo,
+      heroImageUrl,
+      message: confirmMessage,
+    });
+  } catch (err: any) {
+    console.error('[CX Submit Draft Error]:', err);
+    return c.json({ success: false, error: err?.message || String(err) }, 500);
+  }
+};
+
+chatRoutes.post('/api/cx/submit-draft', handleCxSubmitDraft);
+chatRoutes.post('/cx/submit-draft', handleCxSubmitDraft);
+
+const handleGetCxHealth = (c: any) =>
+  c.json({
+    status: 'online',
+    service: 'tgp-mind-chat',
+    endpoint: '/api/cx/submit-draft',
+    methodExpected: 'POST',
+    description: 'Puente de Ingesta Dialogflow CX -> TGP Mind -> Google Chat (Cards V2)',
+    ts: new Date().toISOString(),
+  });
+
+chatRoutes.get('/api/cx/submit-draft', handleGetCxHealth);
+chatRoutes.get('/cx/submit-draft', handleGetCxHealth);

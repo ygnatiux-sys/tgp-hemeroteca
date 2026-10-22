@@ -36,6 +36,7 @@ import { ejecutarPublishSocial } from '../../ia/tools/tool-publish-social.js';
 import { nanoBananaTool } from '../../core/tools/nanoBananaTool.js';
 import { processTelegramMessage, type BotIdentity } from '../../ia/agent.js';
 import { isAuthorizedChatId } from '../../security/master-auth.js';
+import { SITE_ID, IS_ALTERNATIVE, GITHUB_REPO, GITHUB_TOKEN } from '../../config/site.js';
 
 export async function handleCallbackQuery(
   cq: any,
@@ -422,8 +423,8 @@ Arma un copy de alto impacto para redes sociales (ritmo flash, gancho somático 
       secciones: [{ parrafo: essayContent }],
     });
 
-    const ghToken = process.env.GITHUB_TOKEN_HEMEROTECA || process.env.GITHUB_TOKEN || '';
-    const ghRepo = process.env.GITHUB_REPO_HEMEROTECA || 'ygnatiux-sys/tgp-hemeroteca';
+    const ghToken = GITHUB_TOKEN;
+    const ghRepo = GITHUB_REPO;
 
     try {
       const commitSha = await publicarEntradaKeystaticGitHub({
@@ -491,8 +492,16 @@ Arma un copy de alto impacto para redes sociales (ritmo flash, gancho somático 
       secciones: [{ parrafo: essayContent }],
     });
 
-    const ghToken = process.env.GITHUB_TOKEN_ALTERNATIVE || process.env.GITHUB_TOKEN || '';
-    const ghRepo = process.env.GITHUB_REPO || 'ygnatiux-sys/tgp-webfinal2026';
+    const ghToken = IS_ALTERNATIVE
+      ? GITHUB_TOKEN
+      : (process.env.GITHUB_TOKEN_ALTERNATIVE || process.env.GITHUB_TOKEN || '');
+    const ghRepo = IS_ALTERNATIVE
+      ? GITHUB_REPO
+      : (process.env.GITHUB_REPO_ALTERNATIVE || process.env.GITHUB_REPO || 'ygnatiux-sys/tgp-webfinal2026');
+
+    if (!ghToken && process.env.NODE_ENV === 'production') {
+      throw new Error('[DevSecOps Fail-Fast] Publicación en Alternative sin token configurado. Prohibido usar credenciales de Hemeroteca.');
+    }
 
     try {
       const commitSha = await publicarEntradaKeystaticGitHub({

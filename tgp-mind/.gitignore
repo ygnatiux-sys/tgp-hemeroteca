@@ -10,6 +10,8 @@ dist/
 .env.*
 !.env.example
 *.pem
+env.*.yaml
+*.env.yaml
 
 # Logs
 logs

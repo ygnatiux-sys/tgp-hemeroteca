@@ -54,3 +54,7 @@ export function isAllowedOrigin(origin: string): boolean {
     origin.endsWith('.pages.dev')
   );
 }
+
+// Re-exportación canónica de variables de identidad por SITE_ID
+export * from './site.js';
+

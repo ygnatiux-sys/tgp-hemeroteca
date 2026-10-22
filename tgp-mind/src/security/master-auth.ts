@@ -139,7 +139,7 @@ export async function masterAuthMiddleware(c: any, next: () => Promise<void>) {
 
   // Rutas exentas de candado HTTP:
   // 1. Health check y CORS
-  if (path === '/' || c.req.method === 'OPTIONS') {
+  if (path === '/' || path === '/health' || c.req.method === 'OPTIONS') {
     return next();
   }
 
@@ -161,8 +161,11 @@ export async function masterAuthMiddleware(c: any, next: () => Promise<void>) {
   if (
     path.startsWith('/webhook/telegram') ||
     path.startsWith('/telegram') ||
+    path.startsWith('/api/telegram') ||
+    path.startsWith('/webhook/') ||
     path.startsWith('/webhook-dev') ||
     path.startsWith('/bot') ||
+    path === '/telegram-webhook' ||
     path === '/webhook/telegram-social' ||
     path === '/webhook/telegram-omni' ||
     path === '/webhook/telegram-premium' ||

@@ -21,6 +21,7 @@ import {
 import { type BotIdentity } from '../../ia/agent.js';
 import { generarMarkdoc, publicarEntradaKeystaticGitHub } from '../../servicios/publicacion.js';
 import { generarAudioDocumentalR2, sendTelegramNativeAudio } from '../telegram-tts.js';
+import { GITHUB_TOKEN, GITHUB_REPO } from '../../config/site.js';
 
 // ── Módulo Bóveda y Rescate de Posts de Cloudflare D1 ───────────────────────
 export async function handleRecuperarBoveda(
@@ -159,8 +160,8 @@ export async function handleCommand(
 
       await sendTelegramMessage(chatId, botToken, '⏳ Publicando ensayo en GitHub Keystatic...');
       try {
-        const ghToken = process.env.GITHUB_TOKEN_HEMEROTECA || process.env.GITHUB_TOKEN || '';
-        const ghRepo  = process.env.GITHUB_REPO_HEMEROTECA || 'ygnatiux-sys/tgp-hemeroteca';
+        const ghToken = GITHUB_TOKEN;
+        const ghRepo  = GITHUB_REPO;
         const tituloMatch = essayContent.match(/^#+\s*(.+)$/m);
         const titulo = tituloMatch ? tituloMatch[1].replace(/[*_#]/g, '').trim() : 'Ensayo Erudito TGP';
         const { slug, contenidoMdoc } = generarMarkdoc({

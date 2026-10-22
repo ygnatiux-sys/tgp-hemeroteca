@@ -7,10 +7,12 @@
 // Columnas: Language, Glottocode, Macroarea, Latitude, Longitude, Concept, Tribal_Word
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { PANLINGUA_D1_ID } from '../../config/site.js';
+
 // ── Configuración D1 REST API ─────────────────────────────────────────────────
 const CF_ACCOUNT_ID   = (process.env.CLOUDFLARE_ACCOUNT_ID || '').trim();
 const CF_API_TOKEN    = (process.env.CLOUDFLARE_API_TOKEN  || '').trim();
-const PANLINGUA_DB_ID = (process.env.PANLINGUA_D1_ID || 'a4c11340-cec3-4273-b6d0-5691a100f09a').trim();
+const PANLINGUA_DB_ID = PANLINGUA_D1_ID;
 const D1_API_BASE     = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${PANLINGUA_DB_ID}/query`;
 
 // ── Schema para Gemini Function Calling ──────────────────────────────────────
@@ -121,12 +123,12 @@ export async function ejecutarQueryPanlingua(args: PanlingualArgs): Promise<stri
   let normalizedIntent: string = intent;
   if (['stats', 'contar', 'count', 'contar_entradas'].includes(intent)) normalizedIntent = 'contar_entradas';
   else if (['by_language', 'buscar_idioma', 'idioma', 'language'].includes(intent)) normalizedIntent = 'buscar_idioma';
-  else if (['search_word', 'buscar_palabra', 'buscar_concepto', 'semantic_search', 'concept'].includes(intent)) normalizedIntent = 'buscar_concepto';
+  else if (['search_word', 'buscar_palabra', 'buscar_concepto', 'semantic_search', 'concept', 'search', 'etymology'].includes(intent)) normalizedIntent = 'buscar_concepto';
   else if (['compare_languages', 'comparar', 'comparar_conceptos'].includes(intent)) normalizedIntent = 'comparar_conceptos';
   else if (['list_languages', 'listar', 'listar_idiomas'].includes(intent)) normalizedIntent = 'listar_idiomas';
   else if (['buscar_macroarea', 'macroarea'].includes(intent)) normalizedIntent = 'buscar_macroarea';
 
-  const targetConcept = concept || (args as any).term || (args as any).word || (args as any).concepto;
+  const targetConcept = concept || (args as any).query || (args as any).term || (args as any).word || (args as any).concepto;
   const targetLanguage = language || (args as any).lang || (args as any).idioma;
 
   try {

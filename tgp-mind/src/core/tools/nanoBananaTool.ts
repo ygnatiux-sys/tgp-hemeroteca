@@ -89,7 +89,11 @@ export const nanoBananaTool: TgpTool = {
         if (imageResult.image?.startsWith('data:image/')) {
           const base64Data = imageResult.image.split(',')[1];
           const buf = Buffer.from(base64Data, 'base64');
-          finalImageUrl = await estandarizarYSubirImagenAR2(buf, 'portadas', safeSlug);
+          const targetSilo = String(args.silo || '').toLowerCase();
+          const siloPrefix = targetSilo === 'alternative'
+            ? 'alternative/'
+            : (targetSilo === 'hemeroteca' ? 'hemeroteca/' : undefined);
+          finalImageUrl = await estandarizarYSubirImagenAR2(buf, 'portadas', safeSlug, siloPrefix);
         }
       } catch (uploadErr: any) {
         console.warn('[NanoBananaTool] No se pudo subir imagen a R2, usando fallback original:', uploadErr?.message);

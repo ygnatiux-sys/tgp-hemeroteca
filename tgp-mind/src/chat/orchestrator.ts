@@ -192,6 +192,13 @@ ${foundational.manifiesto_fundacional.slice(0, 1500)}`.trim();
       const toolArgs = (call.args as Record<string, any>) || {};
       toolsExecuted.push(toolName);
 
+      // Si la tool es generate_ai_cover, inyectar el silo de destino para almacenamiento en R2
+      if (toolName === 'generate_ai_cover') {
+        if (editorialBrief && !toolArgs.silo) {
+          toolArgs.silo = editorialBrief.targetSilo;
+        }
+      }
+
       // Si la tool es publish_keystatic_post, inyectar imagen adjunta y ficha editorial
       if (toolName === 'publish_keystatic_post') {
         if (options.attachedImageUrl && !toolArgs.coverImage) {

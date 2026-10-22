@@ -16,6 +16,7 @@ import { ejecutarQueryPanlingua } from '../ia/tools/tool-panlingua.js';
 import { nanoBananaTool } from '../core/tools/nanoBananaTool.js';
 import { wikimediaTool } from '../core/tools/wikimediaTool.js';
 import { callGemini, TGP_SYSTEM_PROMPT, buildDensityInstruction } from '../ia/gemini.js';
+import { SITE_ID, IS_ALTERNATIVE, GITHUB_REPO, GITHUB_TOKEN } from '../config/site.js';
 import crypto from 'node:crypto';
 
 // ── Tipos y Contratos de Herramientas ─────────────────────────────────────────
@@ -145,8 +146,8 @@ const toolCheckKeystaticPost: ChatToolHandler = {
     const checkResult = await existeEntradaKeystaticGitHub({
       coleccion,
       slug,
-      token: process.env.GITHUB_TOKEN_HEMEROTECA || process.env.GITHUB_TOKEN,
-      repoFull: process.env.GITHUB_REPO_HEMEROTECA || 'ygnatiux-sys/tgp-hemeroteca',
+      token: GITHUB_TOKEN,
+      repoFull: GITHUB_REPO,
     });
 
     return {
@@ -235,6 +236,8 @@ const toolPublishKeystaticPost: ChatToolHandler = {
       themeColor: 'british-green',
       draft: isDraft,
       coverImage: coverImage || null,
+      heroUrl: coverImage || null,
+      gallery: coverImage ? [coverImage] : [],
       videoBg: null,
       excerpt,
       generador: 'TGP Mind Chat Assistant (Google Chat / Dialogflow CX)',
@@ -250,7 +253,8 @@ title: "${titulo.replace(/"/g, '\\"')}"
 date: "${fechaHoy}"
 category: "${categoria}"
 coverImage: "${coverImage}"
-draft: ${isDraft}
+heroUrl: "${coverImage}"
+${coverImage ? `gallery:\n  - "${coverImage}"\n` : ''}draft: ${isDraft}
 excerpt: "${excerpt.replace(/"/g, '\\"')}"
 generador: "TGP Mind Chat Assistant"
 ---
@@ -259,10 +263,17 @@ generador: "TGP Mind Chat Assistant"
 
     const contentMdoc = frontmatter + contenido + '\n';
 
-    const token = process.env.GITHUB_TOKEN_HEMEROTECA || process.env.GITHUB_TOKEN || '';
-    const repoFull = silo === 'alternative'
-      ? (process.env.GITHUB_REPO_ALTERNATIVE || 'ygnatiux-sys/tgp-webfinal2026')
-      : (process.env.GITHUB_REPO_HEMEROTECA || 'ygnatiux-sys/tgp-hemeroteca');
+    const isAlt = silo === 'alternative' || IS_ALTERNATIVE;
+    const token = isAlt
+      ? (process.env.GITHUB_TOKEN_ALTERNATIVE || GITHUB_TOKEN)
+      : GITHUB_TOKEN;
+    const repoFull = isAlt
+      ? (IS_ALTERNATIVE ? GITHUB_REPO : (process.env.GITHUB_REPO_ALTERNATIVE || 'ygnatiux-sys/tgp-webfinal2026'))
+      : GITHUB_REPO;
+
+    if (isAlt && !token && process.env.NODE_ENV === 'production') {
+      throw new Error('[DevSecOps Fail-Fast] Publicación en Alternative sin token configurado. Prohibido usar credenciales de Hemeroteca.');
+    }
 
     let commitUrl = '';
     try {
@@ -363,12 +374,17 @@ const toolGenerateAiCover: ChatToolHandler = {
           enum: ['restrained', 'balanced', 'bold', 'experimental'],
           description: 'Grado de audacia visual.',
         },
+        silo: {
+          type: 'STRING',
+          enum: ['hemeroteca', 'alternative'],
+          description: 'Silo o destino de la publicación para almacenamiento en R2.',
+        },
       },
       required: ['title', 'concept'],
     },
   },
   execute: async (args) => {
-    console.log(`[Tool: generate_ai_cover] Creando portada para: "${args.title}"...`);
+    console.log(`[Tool: generate_ai_cover] Creando portada para: "${args.title}" [silo: ${args.silo || 'auto'}]...`);
     const result = await nanoBananaTool.execute({
       title: args.title,
       concept: args.concept,
@@ -376,6 +392,7 @@ const toolGenerateAiCover: ChatToolHandler = {
       narrativeMode: args.narrativeMode || 'auto',
       historicalRigor: 'documented-interpretive',
       visualRisk: args.visualRisk || 'balanced',
+      silo: args.silo,
     });
     return result;
   },

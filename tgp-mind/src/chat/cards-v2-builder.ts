@@ -3,8 +3,10 @@
 // Estructura oficial de Google Workspace Chat API
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { SITE_ID, IS_ALTERNATIVE, GITHUB_REPO } from '../config/site.js';
+
 export interface CardV2Options {
-  status: 'published' | 'in_progress' | 'error';
+  status: 'published' | 'in_progress' | 'error' | 'draft_proposal';
   title: string;
   subtitle?: string;
   silo?: 'alternative' | 'hemeroteca' | 'magazine';
@@ -16,6 +18,7 @@ export interface CardV2Options {
   r2Url?: string;
   githubUrl?: string;
   errorMessage?: string;
+  rawContent?: string;
 }
 
 export function buildGoogleChatCardV2(options: CardV2Options) {
@@ -33,13 +36,16 @@ export function buildGoogleChatCardV2(options: CardV2Options) {
   const siloLabel = silo.toUpperCase();
   const isError = status === 'error';
   const isSuccess = status === 'published';
+  const isDraftProposal = status === 'draft_proposal';
 
   // Badges e iconos
   const statusBadge = isSuccess
     ? '🟢 PUBLICADO CON ÉXITO'
-    : isError
-      ? '🔴 ERROR CON DIAGNÓSTICO'
-      : '🟡 EN PROCESO DE FORJA';
+    : isDraftProposal
+      ? '🟡 PROPUESTA DESDE MESA DE REDACCIÓN (DIALOGFLOW)'
+      : isError
+        ? '🔴 ERROR CON DIAGNÓSTICO'
+        : '🟡 EN PROCESO DE FORJA';
 
   const headerSubtitle = `${siloLabel} • ${statusBadge}`;
   const defaultHero = 'https://storage.thegreatpuzzleproject.com/vault-media/1792224263352-03d6d25b.webp';
@@ -55,12 +61,38 @@ export function buildGoogleChatCardV2(options: CardV2Options) {
   const queryParams = `?slug=${encodeURIComponent(slug)}&title=${encodeURIComponent(title)}&silo=${silo}`;
   const vaultUrl = options.vaultUrl || `https://thegreatpuzzleproject.com/tgp-vault${queryParams}`;
   const r2Url = options.r2Url || heroImageUrl || 'https://storage.thegreatpuzzleproject.com';
-  const githubRepo = silo === 'alternative' ? 'tgp-webfinal2026' : 'tgp-hemeroteca';
-  const githubUrl = options.githubUrl || `https://github.com/ygnatiux-sys/${githubRepo}`;
+  const isAlt = silo === 'alternative' || IS_ALTERNATIVE;
+  const githubRepo = isAlt
+    ? (IS_ALTERNATIVE ? GITHUB_REPO : (process.env.GITHUB_REPO_ALTERNATIVE || 'ygnatiux-sys/tgp-webfinal2026'))
+    : GITHUB_REPO;
+  const cleanRepo = githubRepo.replace(/^https?:\/\/github\.com\//, '');
+  const githubUrl = options.githubUrl || `https://github.com/${cleanRepo}`;
 
   const buttons: any[] = [];
 
-  if (!isError) {
+  if (isDraftProposal) {
+    buttons.push({
+      text: '🚀 PUBLICAR EN EL REPOSITORIO',
+      icon: { knownIcon: 'STAR' },
+      onClick: {
+        action: {
+          function: 'publish_draft_now',
+          parameters: [
+            { key: 'slug', value: slug },
+            { key: 'title', value: title },
+            { key: 'silo', value: silo },
+            { key: 'heroImageUrl', value: previewImage },
+            { key: 'content', value: (options.rawContent || excerpt).slice(0, 3500) },
+          ],
+        },
+      },
+    });
+    buttons.push({
+      text: '🛠️ ABRIR EN WORKBENCH / VAULT',
+      icon: { knownIcon: 'DESCRIPTION' },
+      onClick: { openLink: { url: vaultUrl } },
+    });
+  } else if (!isError) {
     buttons.push({
       text: '🌐 VER PUBLICACIÓN',
       icon: { knownIcon: 'BOOKMARK' },

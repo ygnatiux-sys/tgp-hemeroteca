@@ -2,6 +2,7 @@ import { registrarResguardoD1 } from '../../storage/d1.js';
 import { crearModeloEnsayo, buildDensityInstruction } from '../gemini.js';
 import { generarMarkdoc, publicarEntradaKeystaticGitHub } from '../../servicios/publicacion.js';
 import { procesarImagen } from '../../vision/wikimedia.js';
+import { SITE_ID, IS_ALTERNATIVE, GITHUB_TOKEN, GITHUB_REPO, SITE_DOMAIN } from '../../config/site.js';
 
 // ── SCHEMA DE LA TOOL ─────────────────────────────────────────────────────────
 // FIX: origen_fotos removido de 'required'. Gemini puede no pasarlo si el
@@ -179,7 +180,8 @@ Para cada sección, incluye una búsqueda de Wikimedia precisa en inglés o espa
       title: ensayoJSON.titulo,
       generadorTexto: JSON.stringify({ text: contenidoMdoc, image: coverUrl }),
       atmosfera: { discriminant: 'obsidiana' },
-      gallery: [],
+      gallery: coverUrl ? [coverUrl] : [],
+      heroUrl: coverUrl,
       dek,
       coverImage: coverUrl,
       date: fechaHoy,
@@ -189,14 +191,16 @@ Para cada sección, incluye una búsqueda de Wikimedia precisa en inglés o espa
     console.log(`[Tool:generar_ensayo] Paso 8 OK — slug: "${slug}" coverImage: "${coverUrl}"`);
 
     // PASO 9 — Publicar en GitHub via Keystatic
-    const githubToken = process.env.GITHUB_TOKEN_HEMEROTECA || process.env.GITHUB_TOKEN || '';
-    const githubRepo  = process.env.GITHUB_REPO_HEMEROTECA || process.env.GITHUB_REPO || 'ygnatiux-sys/tgp-hemeroteca';
+    const githubToken = GITHUB_TOKEN;
+    const githubRepo  = GITHUB_REPO;
 
-    if (!githubToken) throw new Error('GITHUB_TOKEN no configurado en las variables de entorno.');
+    if (!githubToken) throw new Error(`[DevSecOps Fail-Fast] GITHUB_TOKEN no configurado para ${SITE_ID}.`);
 
     console.log(`[Tool:generar_ensayo] Paso 9 — Publicando en GitHub (${githubRepo})...`);
 
+    const coleccionKeystatic = IS_ALTERNATIVE ? 'ensayos' : 'ensayos-cinematicos';
     const urlCommit = await publicarEntradaKeystaticGitHub({
+      coleccion: coleccionKeystatic,
       slug,
       indexJson,
       contentMdoc: contenidoMdoc,
@@ -204,7 +208,7 @@ Para cada sección, incluye una búsqueda de Wikimedia precisa en inglés o espa
       repoFull: githubRepo,
     });
 
-    const urlWeb = `https://thegreatpuzzleproject.com/ensayos-cinematicos/${slug}`;
+    const urlWeb = `https://${SITE_DOMAIN}/${coleccionKeystatic}/${slug}`;
     console.log(`[Tool:generar_ensayo] ÉXITO — "${ensayoJSON.titulo}" publicado: ${urlCommit}`);
 
     let respuestaFinal = `Ensayo **"${ensayoJSON.titulo}"** publicado en la Hemeroteca.\n\n`;

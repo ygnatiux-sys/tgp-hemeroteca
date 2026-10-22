@@ -13,6 +13,10 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { appendTurn, getConversationHistory, clearChatHistory, type GeminiTurn, type GeminiPart } from './d1.js';
+import { FIREBASE_COLLECTION_PREFIX } from '../config/site.js';
+
+const SESSIONS_COLLECTION = `${FIREBASE_COLLECTION_PREFIX}companion_sessions`;
+const FOUNDATIONAL_COLLECTION = `${FIREBASE_COLLECTION_PREFIX}foundational_memory`;
 
 export interface WorkingState {
   topic?: string;
@@ -139,7 +143,7 @@ export async function getCompanionSession(chatId: number | string, botId: string
   try {
     const db = await getFirestoreClient();
     if (db) {
-      const docRef = db.collection('tgp_companion_sessions').doc(key);
+      const docRef = db.collection(SESSIONS_COLLECTION).doc(key);
       const snapshot = await docRef.get();
       if (snapshot.exists) {
         const data = snapshot.data();
@@ -202,7 +206,7 @@ export async function updateWorkingState(
   try {
     const db = await getFirestoreClient();
     if (db) {
-      await db.collection('tgp_companion_sessions').doc(key).set({
+      await db.collection(SESSIONS_COLLECTION).doc(key).set({
         chatId,
         botId,
         working_state: updatedWorkingState,
@@ -234,7 +238,7 @@ export async function appendCompanionTurn(
   try {
     const db = await getFirestoreClient();
     if (db) {
-      await db.collection('tgp_companion_sessions').doc(key).set({
+      await db.collection(SESSIONS_COLLECTION).doc(key).set({
         chatId,
         botId,
         working_state: session.working_state,
@@ -264,7 +268,7 @@ export async function resetCompanionSession(chatId: number | string, botId: stri
   try {
     const db = await getFirestoreClient();
     if (db) {
-      await db.collection('tgp_companion_sessions').doc(key).delete();
+      await db.collection(SESSIONS_COLLECTION).doc(key).delete();
     }
   } catch (err: any) {
     console.warn(`[Companion Memory] Error borrando sesión en Firestore (${key}):`, err?.message);
@@ -317,7 +321,7 @@ El Motor Cognitivo (tgp-mind): Socio dialéctico para extraer patrones de compor
   try {
     const db = await getFirestoreClient();
     if (db) {
-      const col = db.collection('tgp_foundational_memory');
+      const col = db.collection(FOUNDATIONAL_COLLECTION);
       const [docFilosofia, docOperativo, docManifiesto, docCodice] = await Promise.all([
         col.doc('pensamiento_filosofico').get().catch(() => null),
         col.doc('criterios_operativos').get().catch(() => null),

@@ -3,6 +3,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { Octokit } from '@octokit/rest';
 import { generarSlug } from '../servicios/publicacion.js';
+import { SITE_ID, GITHUB_TOKEN, GITHUB_REPO } from '../config/site.js';
 
 export type KeystaticThemeColor =
   | 'british-green'
@@ -96,12 +97,12 @@ export async function crearBorradorKeystatic(params: {
     ? params.fecha
     : hoyISO;
 
-  const token = params.token || process.env.GITHUB_TOKEN_HEMEROTECA || process.env.GITHUB_TOKEN || '';
-  const repoFull = params.repoFull || process.env.GITHUB_REPO_HEMEROTECA || 'ygnatiux-sys/tgp-hemeroteca';
+  const token = params.token || GITHUB_TOKEN;
+  const repoFull = params.repoFull || GITHUB_REPO;
   const branch = process.env.GITHUB_BRANCH || 'main';
 
   if (!token) {
-    throw new Error('Falta el token de GitHub (GITHUB_TOKEN_HEMEROTECA) para publicar en Keystatic.');
+    throw new Error(`[DevSecOps Fail-Fast] Falta el token de GitHub para el sitio activo (${SITE_ID}) para publicar en Keystatic.`);
   }
 
   const parts = repoFull.includes('/') ? repoFull.split('/') : ['ygnatiux-sys', repoFull];

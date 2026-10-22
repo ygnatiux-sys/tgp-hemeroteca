@@ -34,6 +34,7 @@ import { generarMarkdoc, publicarEntradaKeystaticGitHub } from '../servicios/pub
 import { registrarResguardoD1 } from '../storage/d1.js';
 import type { BotIdentity } from '../telegram/keyboards.js';
 import { CODICE_XAVIER_BENITEZ, CATALOGO_TESIS_OBRA_XAVIER_BENITEZ } from './codice-xavier-benitez.js';
+import { SITE_ID, IS_ALTERNATIVE, GITHUB_REPO, GITHUB_TOKEN } from '../config/site.js';
 
 // ── Herramienta Nativa: Síntesis de Audio Documental TTS ────────────────────
 const TOOL_GENERATE_AUDIO = {
@@ -119,7 +120,17 @@ export const TOOL_REQUEST_HUMAN_ACTION = {
 // ── Asignación de Herramientas por Identidad ─────────────────────────────────
 const TOOLS_BY_BOT: Record<BotIdentity, object[]> = {
   redes: [TOOL_PUBLISH_SOCIAL, TOOL_GENERATE_AUDIO, TOOL_REQUEST_HUMAN_ACTION],
-  assistant: [TOOL_GENERAR_ENSAYO, TOOL_PUBLICAR_KEYSTATIC, TOOL_GENERATE_AUDIO, TOOL_NEO4J, TOOL_REQUEST_HUMAN_ACTION],
+  assistant: [
+    TOOL_GENERAR_ENSAYO,
+    TOOL_PUBLICAR_KEYSTATIC,
+    TOOL_GENERATE_AUDIO,
+    TOOL_WIKIMEDIA,
+    TOOL_NANO_BANANA,
+    TOOL_CINEMATIC,
+    TOOL_QUERY_PANLINGUA,
+    TOOL_NEO4J,
+    TOOL_REQUEST_HUMAN_ACTION,
+  ],
   omni: [
     TOOL_GENERAR_ENSAYO,
     TOOL_PUBLICAR_KEYSTATIC,
@@ -292,12 +303,19 @@ async function ejecutarCompagnonTool(
         secciones: [{ parrafo: texto }],
       });
 
-      const ghToken = process.env.GITHUB_TOKEN_HEMEROTECA || process.env.GITHUB_TOKEN || '';
-      const ghRepo = destino === 'alternative'
-        ? (process.env.GITHUB_REPO || 'ygnatiux-sys/tgp-webfinal2026')
-        : (process.env.GITHUB_REPO_HEMEROTECA || 'ygnatiux-sys/tgp-hemeroteca');
+      const isAltTarget = destino === 'alternative' || IS_ALTERNATIVE;
+      const ghToken = isAltTarget
+        ? (process.env.GITHUB_TOKEN_ALTERNATIVE || GITHUB_TOKEN)
+        : GITHUB_TOKEN;
+      const ghRepo = isAltTarget
+        ? (IS_ALTERNATIVE ? GITHUB_REPO : (process.env.GITHUB_REPO_ALTERNATIVE || 'ygnatiux-sys/tgp-webfinal2026'))
+        : GITHUB_REPO;
 
-      const coleccionFolder = destino === 'alternative' ? 'ensayos' : 'ensayos-cinematicos';
+      if (isAltTarget && !ghToken && process.env.NODE_ENV === 'production') {
+        throw new Error('[DevSecOps Fail-Fast] Intento de publicación en Alternative sin token configurado. Prohibido usar credenciales de Hemeroteca.');
+      }
+
+      const coleccionFolder = isAltTarget ? 'ensayos' : 'ensayos-cinematicos';
 
       const commitSha = await publicarEntradaKeystaticGitHub({
         coleccion: coleccionFolder,
@@ -362,7 +380,8 @@ async function ejecutarCompagnonTool(
 
     // 7. NANO BANANA COVER
     if (name === 'generate_nano_banana_cover') {
-      const nanoRes = await nanoBananaTool.execute(args);
+      const targetSilo = args.silo || (IS_ALTERNATIVE ? 'alternative' : 'hemeroteca');
+      const nanoRes = await nanoBananaTool.execute({ ...args, silo: targetSilo });
       const imgUrl = nanoRes?.imageUrl;
       return {
         result: imgUrl

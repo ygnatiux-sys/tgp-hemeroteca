@@ -10,6 +10,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { Octokit } from '@octokit/rest';
+import { GITHUB_TOKEN, GITHUB_REPO } from '../config/site.js';
 
 // ── Init ─────────────────────────────────────────────────────────────────────
 let _GITHUB_BRANCH = 'main';
@@ -53,7 +54,8 @@ title: "${ensayo.titulo.replace(/"/g, '\\"')}"
 date: "${fechaHoy}"
 atmosfera: "obsidiana"
 coverImage: "${coverImage}"
-excerpt: "${excerpt.replace(/"/g, '\\"')}"
+heroUrl: "${coverImage}"
+${coverImage ? `gallery:\n  - "${coverImage}"\n` : ''}excerpt: "${excerpt.replace(/"/g, '\\"')}"
 generador: "TGP Mind (Gemini + R2 + GitOps)"
 ---
 
@@ -205,8 +207,8 @@ export async function existeEntradaKeystaticGitHub({
   token?: string;
   repoFull?: string;
 }): Promise<{ exists: boolean; path: string; url?: string; title?: string }> {
-  const ghToken = token || process.env.GITHUB_TOKEN_HEMEROTECA || process.env.GITHUB_TOKEN || '';
-  const repo = repoFull || process.env.GITHUB_REPO_HEMEROTECA || 'ygnatiux-sys/tgp-hemeroteca';
+  const ghToken = token || GITHUB_TOKEN;
+  const repo = repoFull || GITHUB_REPO;
   const octokitDynamic = new Octokit({ auth: ghToken });
   const parts = repo.includes('/') ? repo.split('/') : ['ygnatiux-sys', repo];
   const owner = parts[0] || 'ygnatiux-sys';

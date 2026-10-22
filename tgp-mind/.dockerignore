@@ -6,6 +6,8 @@ dist/
 .dockerignore
 .env
 .env.*
+env.*.yaml
+*.env.yaml
 *.log
 _legacy_archive/
 *.bak

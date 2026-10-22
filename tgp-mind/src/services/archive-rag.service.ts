@@ -3,6 +3,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { getFoundationalContext } from '../storage/companion-memory.js';
 import { buildSilosXML } from '../ia/codice-xavier-benitez.js';
+import { FIREBASE_COLLECTION_PREFIX } from '../config/site.js';
 
 export interface RAGQueryResult {
   bibliotecaAlternativa: string;
@@ -34,9 +35,16 @@ export async function consultarSilosRAG(
     const projectId = process.env.DIALOGFLOW_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT || 'tgp-mind';
     const db = new Firestore({ projectId });
 
-    // Consulta en colección de chunks o dossiers si existe
-    const dossierRef = db.collection('tgp_dossiers_alternative');
-    const snapshot = await dossierRef.limit(5).get().catch(() => null);
+    // Consulta en colección de chunks o dossiers con partición dinámica por SITE_ID
+    const colName = `${FIREBASE_COLLECTION_PREFIX}dossiers`;
+    let dossierRef = db.collection(colName);
+    let snapshot = await dossierRef.limit(5).get().catch(() => null);
+
+    // Fallback retrocompatible con colección histórica si la nueva aún no tiene documentos
+    if ((!snapshot || snapshot.empty) && colName !== 'tgp_dossiers_alternative') {
+      dossierRef = db.collection('tgp_dossiers_alternative');
+      snapshot = await dossierRef.limit(5).get().catch(() => null);
+    }
 
     if (snapshot && !snapshot.empty) {
       const chunks: string[] = [];
