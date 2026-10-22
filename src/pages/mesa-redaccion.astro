@@ -137,7 +137,7 @@ import TgpMssgr from '../components/TgpMssgr.astro';
                 required
                 rows="10"
                 placeholder="Escribe o pega aquí el contenido completo del post o ensayo..."
-                class="grow min-h-[220px] bg-[#161d1c] border border-[#263231] focus:border-[#388bfd] rounded-xl p-4 text-sm text-[#f0f2f1] placeholder-[#505f5d] outline-none font-sans leading-relaxed transition-colors resize-y"
+                class="grow min-h-55 bg-[#161d1c] border border-[#263231] focus:border-[#388bfd] rounded-xl p-4 text-sm text-[#f0f2f1] placeholder-[#505f5d] outline-none font-sans leading-relaxed transition-colors resize-y"
               ></textarea>
             </div>
 
@@ -149,7 +149,7 @@ import TgpMssgr from '../components/TgpMssgr.astro';
               <button
                 type="submit"
                 id="btn-submit"
-                class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-mono text-xs uppercase tracking-wider font-semibold shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-mono text-xs uppercase tracking-wider font-semibold shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
               >
                 <span>🏛️ Forjar Post &amp; Despachar Card</span>
               </button>
@@ -157,7 +157,7 @@ import TgpMssgr from '../components/TgpMssgr.astro';
           </form>
 
           <!-- Tarjeta de Resultado en Vivo (Oculta por defecto) -->
-          <div id="result-card" class="hidden p-5 border border-emerald-500/40 bg-[#121c19] rounded-xl flex flex-col sm:flex-row gap-5 items-center">
+          <div id="result-card" style="display: none;" class="p-5 border border-emerald-500/40 bg-[#121c19] rounded-xl flex flex-col sm:flex-row gap-5 items-center">
             <img
               id="result-img"
               src=""
@@ -265,7 +265,7 @@ import TgpMssgr from '../components/TgpMssgr.astro';
 
       btnSubmit.disabled = true;
       statusBox.innerHTML = '<span class="text-amber-400 animate-pulse">⏳ Conectando con Cloud Run: buscando en Wikimedia, forjando WebP a R2 y creando Card V2...</span>';
-      resultCard.classList.add('hidden');
+      resultCard.style.display = 'none';
 
       try {
         const res = await fetch('https://tgp-mind-713934653057.us-central1.run.app/api/cx/submit-draft', {
@@ -294,7 +294,7 @@ import TgpMssgr from '../components/TgpMssgr.astro';
             resultImg.src = '/images/placeholder-cover.png';
             resultR2Link.classList.add('hidden');
           }
-          resultCard.classList.remove('hidden');
+          resultCard.style.display = 'flex';
           form.reset();
           charCounter.textContent = '0 palabras · 0 caracteres';
         } else {
