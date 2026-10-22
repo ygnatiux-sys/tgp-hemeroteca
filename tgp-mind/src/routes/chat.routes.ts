@@ -429,11 +429,20 @@ const handleCxSubmitDraft = async (c: any) => {
     let heroImageUrl: string | undefined;
     if (queryImagen) {
       try {
-        console.log(`[CX Submit Draft] Buscando imagen en Wikimedia para "${queryImagen}"...`);
-        const wikiRes = await wikimediaTool.execute({ query: queryImagen });
-        if (wikiRes.success && Array.isArray(wikiRes.results) && wikiRes.results.length > 0) {
-          const wikiUrl = wikiRes.results[0].url;
-          console.log(`[CX Submit Draft] Imagen encontrada en Wikimedia: ${wikiUrl}. Subiendo a R2...`);
+        let wikiUrl: string | undefined;
+        if (queryImagen.startsWith('http://') || queryImagen.startsWith('https://')) {
+          wikiUrl = queryImagen;
+          console.log(`[CX Submit Draft] URL de imagen provista directamente: ${wikiUrl}. Subiendo a R2...`);
+        } else {
+          console.log(`[CX Submit Draft] Buscando imagen en Wikimedia para "${queryImagen}"...`);
+          const wikiRes = await wikimediaTool.execute({ query: queryImagen });
+          if (wikiRes.success && Array.isArray(wikiRes.results) && wikiRes.results.length > 0) {
+            wikiUrl = wikiRes.results[0].url;
+            console.log(`[CX Submit Draft] Imagen encontrada en Wikimedia: ${wikiUrl}. Subiendo a R2...`);
+          }
+        }
+
+        if (wikiUrl) {
           heroImageUrl = await estandarizarYSubirImagenAR2(wikiUrl, `portadas/${slug}`);
           console.log(`[CX Submit Draft] ✅ Portada WebP lista en R2: ${heroImageUrl}`);
         }

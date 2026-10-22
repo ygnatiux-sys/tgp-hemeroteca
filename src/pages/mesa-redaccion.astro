@@ -104,15 +104,33 @@ import TgpMssgr from '../components/TgpMssgr.astro';
             <!-- Búsqueda Wikimedia & Autor -->
             <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
               <div class="md:col-span-8 flex flex-col gap-1.5">
-                <label for="post-query-img" class="text-xs font-mono text-[#8a9a98] uppercase tracking-wider">
-                  Búsqueda de Portada en Wikimedia <span class="text-[#505f5d]">(opcional)</span>
-                </label>
-                <input
-                  type="text"
-                  id="post-query-img"
-                  placeholder="Ej: Altar of Hermes Delos / Barabar caves / Moai Easter Island"
-                  class="bg-[#161d1c] border border-[#263231] focus:border-[#388bfd] rounded-lg px-3.5 py-2 text-sm text-[#f0f2f1] placeholder-[#505f5d] outline-none font-sans transition-colors"
-                />
+                <div class="flex items-center justify-between">
+                  <label for="post-query-img" class="text-xs font-mono text-[#8a9a98] uppercase tracking-wider">
+                    Búsqueda de Portada en Wikimedia <span class="text-[#505f5d]">(opcional)</span>
+                  </label>
+                  <button
+                    type="button"
+                    id="btn-search-wiki"
+                    class="text-[11px] font-mono text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    <span>🔍 Explorar Candidatas</span>
+                  </button>
+                </div>
+                <div class="flex gap-2">
+                  <input
+                    type="text"
+                    id="post-query-img"
+                    placeholder="Ej: Altar of Hermes Delos / Barabar caves / Moai Easter Island"
+                    class="grow bg-[#161d1c] border border-[#263231] focus:border-[#388bfd] rounded-lg px-3.5 py-2 text-sm text-[#f0f2f1] placeholder-[#505f5d] outline-none font-sans transition-colors"
+                  />
+                  <button
+                    type="button"
+                    id="btn-trigger-wiki"
+                    class="px-3.5 py-2 rounded-lg bg-[#222b2a] hover:bg-[#2c3735] border border-[#3b4745] text-xs font-mono text-[#f0f2f1] transition-colors shrink-0 cursor-pointer"
+                  >
+                    Buscar 5
+                  </button>
+                </div>
               </div>
 
               <div class="md:col-span-4 flex flex-col gap-1.5">
@@ -123,6 +141,36 @@ import TgpMssgr from '../components/TgpMssgr.astro';
                   value="Xavier Benítez"
                   class="bg-[#161d1c] border border-[#263231] focus:border-[#388bfd] rounded-lg px-3.5 py-2 text-sm text-[#f0f2f1] outline-none font-sans transition-colors"
                 />
+              </div>
+            </div>
+
+            <!-- Bandeja Visual de Candidatas de Wikimedia (5 fotos + Lightbox) -->
+            <div id="wiki-tray" style="display: none;" class="flex flex-col gap-3 p-4 bg-[#0d1211] border border-[#263231] rounded-xl transition-all">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-mono uppercase tracking-wider text-blue-400 font-semibold flex items-center gap-1.5">
+                    <span>🖼️ Candidatas de Wikimedia</span>
+                    <span id="wiki-count" class="text-[10px] bg-blue-950 px-1.5 py-0.5 rounded text-blue-300 border border-blue-800">5</span>
+                  </span>
+                  <span class="text-[11px] font-mono text-[#62706e] hidden sm:inline">· Clic en la foto para Lightbox · Clic en el botón para fijar portada</span>
+                </div>
+                <button
+                  type="button"
+                  id="btn-close-wiki-tray"
+                  class="text-xs text-[#62706e] hover:text-[#f0f2f1] font-mono cursor-pointer"
+                >
+                  ✕ Ocultar
+                </button>
+              </div>
+
+              <!-- Spinner de búsqueda de candidatas -->
+              <div id="wiki-loading" style="display: none;" class="py-6 text-center text-xs font-mono text-amber-400 animate-pulse">
+                ⏳ Consultando Wikimedia Commons a través de Gemini Flash en Cloud Run...
+              </div>
+
+              <!-- Grid de 5 tarjetas -->
+              <div id="wiki-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+                <!-- Se llena dinámicamente con JavaScript -->
               </div>
             </div>
 
@@ -149,7 +197,7 @@ import TgpMssgr from '../components/TgpMssgr.astro';
               <button
                 type="submit"
                 id="btn-submit"
-                class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-mono text-xs uppercase tracking-wider font-semibold shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-mono text-xs uppercase tracking-wider font-semibold shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
               >
                 <span>🏛️ Forjar Post &amp; Despachar Card</span>
               </button>
@@ -199,9 +247,52 @@ import TgpMssgr from '../components/TgpMssgr.astro';
     </main>
   </div>
 
-  <!-- Lógica de Pestañas y Despacho en Vivo -->
+  <!-- Modal Lightbox Inmersivo para Previsualización de Wikimedia -->
+  <div
+    id="wiki-lightbox-modal"
+    style="display: none;"
+    class="fixed inset-0 z-99999 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-4 select-none"
+  >
+    <button
+      id="btn-close-lightbox"
+      type="button"
+      class="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-lg transition-colors z-50 cursor-pointer"
+      aria-label="Cerrar visor"
+    >
+      ✕
+    </button>
+
+    <div class="max-w-4xl max-h-[75vh] relative flex items-center justify-center overflow-hidden rounded-xl shadow-2xl">
+      <img id="wiki-lightbox-img" src="" alt="" class="max-h-[75vh] max-w-full object-contain rounded-xl" />
+    </div>
+
+    <div class="mt-4 text-center max-w-xl flex flex-col items-center gap-2">
+      <h4 id="wiki-lightbox-title" class="text-sm font-serif text-[#f0f2f1]"></h4>
+      <p id="wiki-lightbox-meta" class="text-xs font-mono text-[#8a9a98]"></p>
+      <div class="flex items-center gap-3 mt-1">
+        <button
+          type="button"
+          id="btn-select-from-lightbox"
+          class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono uppercase tracking-wider font-semibold transition-colors cursor-pointer"
+        >
+          ⭐ Elegir esta como Portada
+        </button>
+        <a
+          id="wiki-lightbox-source"
+          href=""
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-xs font-mono text-blue-400 hover:underline"
+        >
+          Ver en Wikimedia ↗
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lógica de Pestañas, Búsqueda de Candidatas, Lightbox y Despacho en Vivo -->
   <script is:inline>
-    // 1. Selector de Pestañas
+    // ── 1. Selector de Pestañas ──────────────────────────────────────────────
     const btnTabIngesta = document.getElementById('btn-tab-ingesta');
     const btnTabDf = document.getElementById('btn-tab-dialogflow');
     const viewIngesta = document.getElementById('view-ingesta');
@@ -224,7 +315,6 @@ import TgpMssgr from '../components/TgpMssgr.astro';
       viewDf.classList.remove('hidden');
       viewIngesta.classList.add('hidden');
 
-      // Disparar auto-apertura del chat al conmutar a la pestaña Dialogflow
       setTimeout(() => {
         const df = document.querySelector('df-messenger');
         const trigger = df?.shadowRoot?.querySelector('#widgetIcon') || df?.shadowRoot?.querySelector('button');
@@ -234,7 +324,7 @@ import TgpMssgr from '../components/TgpMssgr.astro';
       }, 100);
     });
 
-    // 2. Contador de Caracteres y Palabras
+    // ── 2. Contador de Caracteres y Palabras ──────────────────────────────────
     const contentInput = document.getElementById('post-content');
     const charCounter = document.getElementById('char-counter');
     contentInput.addEventListener('input', () => {
@@ -243,7 +333,162 @@ import TgpMssgr from '../components/TgpMssgr.astro';
       charCounter.textContent = `${words} palabras · ${contentInput.value.length} caracteres`;
     });
 
-    // 3. Envío al endpoint Cloud Run /api/cx/submit-draft
+    // ── 3. Bandeja de Candidatas Wikimedia y Lightbox ────────────────────────
+    const queryImgInput = document.getElementById('post-query-img');
+    const titleInput = document.getElementById('post-title');
+    const btnSearchWiki = document.getElementById('btn-search-wiki');
+    const btnTriggerWiki = document.getElementById('btn-trigger-wiki');
+    const wikiTray = document.getElementById('wiki-tray');
+    const wikiCount = document.getElementById('wiki-count');
+    const wikiLoading = document.getElementById('wiki-loading');
+    const wikiCardsGrid = document.getElementById('wiki-cards-grid');
+    const btnCloseWikiTray = document.getElementById('btn-close-wiki-tray');
+
+    // Lightbox modal elements
+    const lightboxModal = document.getElementById('wiki-lightbox-modal');
+    const lightboxImg = document.getElementById('wiki-lightbox-img');
+    const lightboxTitle = document.getElementById('wiki-lightbox-title');
+    const lightboxMeta = document.getElementById('wiki-lightbox-meta');
+    const lightboxSource = document.getElementById('wiki-lightbox-source');
+    const btnCloseLightbox = document.getElementById('btn-close-lightbox');
+    const btnSelectFromLightbox = document.getElementById('btn-select-from-lightbox');
+
+    let currentCandidateImages = [];
+    let selectedCandidateUrl = '';
+    let currentLightboxItem = null;
+
+    btnCloseWikiTray.addEventListener('click', () => {
+      wikiTray.style.display = 'none';
+    });
+
+    btnCloseLightbox.addEventListener('click', () => {
+      lightboxModal.style.display = 'none';
+    });
+    lightboxModal.addEventListener('click', (e) => {
+      if (e.target === lightboxModal) lightboxModal.style.display = 'none';
+    });
+
+    btnSelectFromLightbox.addEventListener('click', () => {
+      if (currentLightboxItem) {
+        selectCandidate(currentLightboxItem.url);
+        lightboxModal.style.display = 'none';
+      }
+    });
+
+    function openLightboxForCandidate(item) {
+      currentLightboxItem = item;
+      lightboxImg.src = item.url;
+      lightboxTitle.textContent = item.title.replace(/^File:/, '').replace(/\.[^.]+$/, '');
+      lightboxMeta.textContent = `${item.author || 'Autor desconocido'} · ${item.license || 'Licencia Wikimedia'}`;
+      lightboxSource.href = item.url;
+      lightboxModal.style.display = 'flex';
+    }
+
+    function selectCandidate(url) {
+      selectedCandidateUrl = url;
+      // Actualizar estilos en tarjetas
+      document.querySelectorAll('.wiki-candidate-card').forEach((card) => {
+        const cardUrl = card.getAttribute('data-url');
+        const badge = card.querySelector('.selected-badge');
+        const btn = card.querySelector('.select-btn');
+        if (cardUrl === url) {
+          card.classList.add('border-emerald-500', 'bg-emerald-950/20');
+          card.classList.remove('border-[#263231]', 'bg-[#161d1c]');
+          if (badge) badge.style.display = 'inline-flex';
+          if (btn) btn.textContent = '✅ Portada Elegida';
+        } else {
+          card.classList.remove('border-emerald-500', 'bg-emerald-950/20');
+          card.classList.add('border-[#263231]', 'bg-[#161d1c]');
+          if (badge) badge.style.display = 'none';
+          if (btn) btn.textContent = '⭐ Elegir esta';
+        }
+      });
+    }
+
+    async function buscarCandidatasWikimedia() {
+      const q = queryImgInput.value.trim() || titleInput.value.trim();
+      if (!q) {
+        alert('Escribe un tema o título primero para buscar en Wikimedia Commons.');
+        return;
+      }
+
+      wikiTray.style.display = 'flex';
+      wikiLoading.style.display = 'block';
+      wikiCardsGrid.innerHTML = '';
+
+      try {
+        const res = await fetch('https://tgp-mind-713934653057.us-central1.run.app/cx-tool-wikimedia', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: q }),
+        });
+        const data = await res.json();
+        wikiLoading.style.display = 'none';
+
+        if (res.ok && Array.isArray(data.images) && data.images.length > 0) {
+          currentCandidateImages = data.images;
+          wikiCount.textContent = data.images.length;
+          // Seleccionar por defecto la primera
+          selectedCandidateUrl = data.images[0].url;
+
+          data.images.forEach((item, idx) => {
+            const isFirst = idx === 0;
+            const card = document.createElement('div');
+            card.className = `wiki-candidate-card border ${isFirst ? 'border-emerald-500 bg-emerald-950/20' : 'border-[#263231] bg-[#161d1c]'} rounded-xl p-2.5 flex flex-col gap-2 transition-all group`;
+            card.setAttribute('data-url', item.url);
+
+            const cleanTitle = (item.title || '').replace(/^File:/, '').replace(/\.[^.]+$/, '');
+            const author = (item.author || 'Autor').replace(/<[^>]+>/g, '').slice(0, 25);
+            const license = item.license || 'CC';
+
+            card.innerHTML = `
+              <div class="relative overflow-hidden rounded-lg aspect-4/3 bg-[#0b0f0e] cursor-pointer group-hover:scale-[1.02] transition-transform">
+                <img src="${item.url}" alt="${cleanTitle}" class="w-full h-full object-cover" loading="lazy" />
+                <span class="selected-badge text-[9px] uppercase font-mono tracking-widest text-emerald-300 bg-emerald-950/90 border border-emerald-700/80 px-1.5 py-0.5 rounded absolute top-1.5 left-1.5" style="display: ${isFirst ? 'inline-flex' : 'none'};">
+                  Portada
+                </span>
+                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-mono">
+                  👁️ Lightbox
+                </div>
+              </div>
+              <div class="grow flex flex-col justify-between gap-1">
+                <h5 class="text-[11px] font-serif text-[#f0f2f1] line-clamp-1" title="${cleanTitle}">${cleanTitle}</h5>
+                <p class="text-[10px] font-mono text-[#8a9a98] line-clamp-1">${author} · ${license}</p>
+                <button
+                  type="button"
+                  class="select-btn mt-1 w-full py-1 rounded text-[10px] font-mono uppercase tracking-wider text-center border border-[#3b4745] hover:border-emerald-500 bg-[#222b2a] hover:bg-emerald-950/40 text-[#d4d4d2] hover:text-emerald-300 transition-colors cursor-pointer"
+                >
+                  ${isFirst ? '✅ Portada Elegida' : '⭐ Elegir esta'}
+                </button>
+              </div>
+            `;
+
+            // Clic en la imagen abre lightbox
+            card.querySelector('img').parentElement.addEventListener('click', () => {
+              openLightboxForCandidate(item);
+            });
+
+            // Clic en botón "Elegir esta"
+            card.querySelector('.select-btn').addEventListener('click', (e) => {
+              e.stopPropagation();
+              selectCandidate(item.url);
+            });
+
+            wikiCardsGrid.appendChild(card);
+          });
+        } else {
+          wikiCardsGrid.innerHTML = '<div class="col-span-full py-4 text-center text-xs font-mono text-[#8a9a98]">No se encontraron fotos en Wikimedia para este término. Prueba con otro concepto en inglés o español.</div>';
+        }
+      } catch (err) {
+        wikiLoading.style.display = 'none';
+        wikiCardsGrid.innerHTML = `<div class="col-span-full py-4 text-center text-xs font-mono text-red-400">Error al consultar Wikimedia: ${err.message}</div>`;
+      }
+    }
+
+    btnSearchWiki.addEventListener('click', buscarCandidatasWikimedia);
+    btnTriggerWiki.addEventListener('click', buscarCandidatasWikimedia);
+
+    // ── 4. Envío al endpoint Cloud Run /api/cx/submit-draft ───────────────────
     const form = document.getElementById('form-ingesta');
     const btnSubmit = document.getElementById('btn-submit');
     const statusBox = document.getElementById('status-box');
@@ -255,17 +500,20 @@ import TgpMssgr from '../components/TgpMssgr.astro';
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const title = document.getElementById('post-title').value.trim();
+      const title = titleInput.value.trim();
       const content = contentInput.value.trim();
       const silo = document.getElementById('post-silo').value;
-      const queryImg = document.getElementById('post-query-img').value.trim() || title;
+      const queryImg = queryImgInput.value.trim() || title;
       const author = document.getElementById('post-author').value.trim() || 'Xavier Benítez';
 
       if (!title || !content) return;
 
       btnSubmit.disabled = true;
-      statusBox.innerHTML = '<span class="text-amber-400 animate-pulse">⏳ Conectando con Cloud Run: buscando en Wikimedia, forjando WebP a R2 y creando Card V2...</span>';
+      statusBox.innerHTML = '<span class="text-amber-400 animate-pulse">⏳ Conectando con Cloud Run: procesando WebP en R2 y creando Card V2...</span>';
       resultCard.style.display = 'none';
+
+      // Si el usuario seleccionó una imagen puntual de las 5, se envía su URL directa
+      const finalImgQuery = selectedCandidateUrl || queryImg;
 
       try {
         const res = await fetch('https://tgp-mind-713934653057.us-central1.run.app/api/cx/submit-draft', {
@@ -275,7 +523,7 @@ import TgpMssgr from '../components/TgpMssgr.astro';
             title,
             content,
             author,
-            query_imagen: queryImg,
+            query_imagen: finalImgQuery,
             target_project: silo,
           }),
         });
@@ -297,6 +545,8 @@ import TgpMssgr from '../components/TgpMssgr.astro';
           resultCard.style.display = 'flex';
           form.reset();
           charCounter.textContent = '0 palabras · 0 caracteres';
+          selectedCandidateUrl = '';
+          wikiTray.style.display = 'none';
         } else {
           statusBox.innerHTML = `<span class="text-red-400">❌ Error: ${data.error || 'No se pudo procesar'}</span>`;
         }
