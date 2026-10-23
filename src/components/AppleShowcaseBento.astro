@@ -39,14 +39,14 @@ const totalSlides = 1 + featuredPosts.length;
 <section class="w-full px-4 sm:px-6 md:px-10 py-10 md:py-16 bg-transparent">
   <div
     id="tgp-apple-bento"
-    class="relative w-full max-w-400 h-100 md:h-107.5 mx-auto rounded-[28px] overflow-hidden bg-black border border-white/10 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.85)] group/bento select-none"
+    class="relative w-full max-w-[1680px] min-h-[520px] md:min-h-[580px] lg:min-h-[620px] mx-auto rounded-[32px] overflow-hidden bg-black border border-white/10 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.9)] group/bento select-none"
   >
     {/* ── 1. CAPA DE IMÁGENES / SÁBANAS (DERECHA) ── */}
-    <div class="relative w-full h-full overflow-hidden">
+    <div class="relative w-full h-full min-h-[520px] md:min-h-[580px] lg:min-h-[620px] overflow-hidden">
       
       {/* SLIDE 0: Muestreo Base (La sábana inclinada a -9° de portadas de Historia) */}
       <div class="showcase-slide absolute inset-0 w-full h-full opacity-100" data-slide-index="0">
-        <div class="showcase-grid-sheet pointer-events-none absolute right-[-6%] sm:right-[-4%] md:right-[-2%] top-[-26%] w-[72%] sm:w-[68%] md:w-[65%] h-[155%] grid grid-cols-4 gap-3 md:gap-3.5 -rotate-[9deg] opacity-90 transition-transform duration-700">
+        <div class="showcase-grid-sheet pointer-events-none absolute right-[-4%] sm:right-[-2%] md:right-0 top-[-22%] w-[72%] sm:w-[68%] md:w-[62%] h-[155%] grid grid-cols-4 gap-3 md:gap-4 -rotate-[9deg] opacity-90 transition-transform duration-700">
           {sheetPosts.map((post, idx) => (
             <div
               class={`relative w-full aspect-4/5 rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-stone-900 ${
@@ -71,7 +71,7 @@ const totalSlides = 1 + featuredPosts.length;
           class="showcase-slide absolute inset-0 w-full h-full opacity-0 pointer-events-none"
           data-slide-index={idx + 1}
         >
-          <div class="absolute right-0 top-0 w-[70%] sm:w-[68%] h-full overflow-hidden">
+          <div class="absolute right-0 top-0 w-[72%] sm:w-[68%] lg:w-[65%] h-full overflow-hidden">
             <img
               src={post.img}
               alt={post.title}
@@ -85,99 +85,105 @@ const totalSlides = 1 + featuredPosts.length;
     </div>
 
     {/* ── 2. MÁSCARA DE FUSIÓN + AMBIENT GLOW COBRIZO (Fijos sobre las imágenes) ── */}
-    {/* Fundido negro de izquierda a derecha estilo Apple TV */}
+    {/* Fundido negro cinematográfico ampliado de izquierda a derecha estilo Apple TV */}
     <div
-      class="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,#000000_0%,#000000_34%,rgba(0,0,0,0.82)_48%,rgba(0,0,0,0)_68%)]"
+      class="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,#000000_0%,#000000_38%,rgba(0,0,0,0.85)_54%,rgba(0,0,0,0)_76%)]"
     ></div>
 
     {/* Ambient Glow Cobrizo TGP en el vértice superior izquierdo */}
     <div
-      class="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_0%_0%,rgba(190,90,55,0.38)_0%,transparent_50%)]"
+      class="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_0%_0%,rgba(190,90,55,0.38)_0%,transparent_52%)]"
     ></div>
 
-    {/* ── 3. CONTENIDO EDITORIAL IZQUIERDO ESTILO APPLE TV+ ── */}
-    <div class="absolute inset-y-0 left-0 z-20 w-full md:w-[50%] lg:w-[46%] pl-6 sm:pl-10 md:pl-14 pr-6 flex flex-col justify-center pointer-events-none">
-      
-      {/* TEXTO SLIDE 0 (Base / Colección Historia) */}
-      <div class="showcase-content absolute max-w-lg pointer-events-auto" data-content-index="0">
-        <!-- Brand Header Apple TV Style -->
-        <div class="flex items-center gap-2 mb-2.5">
-          <div class="flex items-baseline gap-1.5">
-            <span class="text-white/60 font-['Newsreader',serif] italic text-xs tracking-wider">the great puzzle project</span>
-            <span class="text-white/30 text-[10px]">·</span>
-            <span class="font-['Syne',sans-serif] font-black text-[11px] tracking-widest uppercase text-rust-orange">COLECCIÓN HISTORIA</span>
-          </div>
-          <span class="px-1.5 py-0.5 rounded text-[9px] font-mono tracking-wider bg-white/10 text-white/70 border border-white/10">IMAX 70MM</span>
-        </div>
-
-        <h2
-          class="text-xl sm:text-2xl md:text-3xl font-bold font-['Syne',sans-serif] text-white leading-[1.15] tracking-tight mb-2.5 drop-shadow-md"
-          set:html={collectionTitle}
-        />
-        <p class="text-xs sm:text-sm text-white/75 font-light mb-5 leading-relaxed line-clamp-2 max-w-sm sm:max-w-md">
-          {collectionDesc}
-        </p>
-        <div class="flex items-center gap-2.5 flex-wrap">
-          <a
-            href={collectionHref}
-            class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-white hover:bg-white/90 text-black text-xs font-bold tracking-wide transition shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-          >
-            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            Explorar Colección
-          </a>
-          <a
-            href="/archivo/"
-            class="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-white/90 text-xs font-medium backdrop-blur-md transition hover:scale-[1.02] active:scale-[0.98]"
-          >
-            Ver Archivo
-          </a>
-        </div>
-        <p class="text-[10px] text-white/40 font-mono tracking-wide mt-3.5">Archivo digital TGP · Acceso abierto e inmediato</p>
-      </div>
-
-      {/* TEXTO SLIDES 1+: Posts Individuales */}
-      {featuredPosts.map((post, idx) => (
+    {/* ── 3. CONTENIDO EDITORIAL IZQUIERDO ESTILO APPLE TV+ (CSS GRID STACKING) ── */}
+    <div class="absolute inset-y-0 left-0 z-20 w-full md:w-[56%] lg:w-[52%] xl:w-[48%] pl-6 sm:pl-10 md:pl-14 lg:pl-16 pr-6 flex flex-col justify-center pointer-events-none">
+      <div class="relative w-full grid grid-cols-1 grid-rows-1 items-center">
+        
+        {/* TEXTO SLIDE 0 (Base / Colección Historia) */}
         <div
-          class="showcase-content absolute max-w-lg opacity-0 pointer-events-none"
-          data-content-index={idx + 1}
-          style="display: none;"
+          class="showcase-content col-start-1 row-start-1 w-full max-w-xl md:max-w-2xl pointer-events-auto"
+          data-content-index="0"
         >
           <!-- Brand Header Apple TV Style -->
-          <div class="flex items-center gap-2 mb-2.5">
+          <div class="flex items-center gap-2 mb-3">
             <div class="flex items-baseline gap-1.5">
-              <span class="text-white/60 font-['Newsreader',serif] italic text-xs tracking-wider">the great puzzle project</span>
-              <span class="text-white/30 text-[10px]">·</span>
-              <span class="font-['Syne',sans-serif] font-black text-[11px] tracking-widest uppercase text-rust-orange">IMAX DOSSIER</span>
+              <span class="text-white/60 font-['Newsreader',serif] italic text-xs md:text-sm tracking-wider">the great puzzle project</span>
+              <span class="text-white/30 text-xs">·</span>
+              <span class="font-['Syne',sans-serif] font-black text-[11px] md:text-xs tracking-widest uppercase text-rust-orange">COLECCIÓN HISTORIA</span>
             </div>
-            <span class="px-1.5 py-0.5 rounded text-[9px] font-mono tracking-wider bg-white/10 text-white/70 border border-white/10">
-              {post.category || 'HISTORIA'}
-            </span>
+            <span class="px-2 py-0.5 rounded text-[9px] font-mono tracking-wider bg-white/10 text-white/70 border border-white/10">IMAX 70MM</span>
           </div>
 
-          <h2 class="text-xl sm:text-2xl md:text-3xl font-bold font-['Syne',sans-serif] text-white leading-[1.15] tracking-tight mb-2.5 line-clamp-2 drop-shadow-md">
-            {post.title}
-          </h2>
-          <p class="text-xs sm:text-sm text-white/75 font-light mb-5 leading-relaxed line-clamp-2 max-w-sm sm:max-w-md">
-            {post.subtitle || 'Investigación histórica, arqueológica y documental resguardada en el archivo TGP.'}
+          <h2
+            class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold font-['Syne',sans-serif] text-white leading-[1.08] tracking-tight mb-3.5 drop-shadow-md"
+            set:html={collectionTitle}
+          />
+          <p class="text-xs sm:text-sm md:text-base text-white/80 font-light mb-6 leading-relaxed max-w-lg sm:max-w-xl">
+            {collectionDesc}
           </p>
-          <div class="flex items-center gap-2.5 flex-wrap">
-            <a
-              href={post.href}
-              class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-white hover:bg-white/90 text-black text-xs font-bold tracking-wide transition shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              Leer Dossier
-            </a>
+          <div class="flex items-center gap-3 flex-wrap">
             <a
               href={collectionHref}
-              class="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-white/90 text-xs font-medium backdrop-blur-md transition hover:scale-[1.02] active:scale-[0.98]"
+              class="inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-full bg-white hover:bg-white/90 text-black text-xs sm:text-sm font-bold tracking-wide transition shadow-xl hover:scale-[1.02] active:scale-[0.98]"
             >
-              Colección Historia
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Explorar Colección
+            </a>
+            <a
+              href="/archivo/"
+              class="px-5 py-3 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-white/90 text-xs sm:text-sm font-medium backdrop-blur-md transition hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Ver Archivo
             </a>
           </div>
-          <p class="text-[10px] text-white/40 font-mono tracking-wide mt-3.5">Investigación abierta · Resguardo documental permanente</p>
+          <p class="text-[10px] md:text-[11px] text-white/40 font-mono tracking-wide mt-4">Archivo digital TGP · Acceso abierto e inmediato</p>
         </div>
-      ))}
+
+        {/* TEXTO SLIDES 1+: Posts Individuales */}
+        {featuredPosts.map((post, idx) => (
+          <div
+            class="showcase-content col-start-1 row-start-1 w-full max-w-xl md:max-w-2xl opacity-0 pointer-events-none"
+            data-content-index={idx + 1}
+            style="display: none;"
+          >
+            <!-- Brand Header Apple TV Style -->
+            <div class="flex items-center gap-2 mb-3">
+              <div class="flex items-baseline gap-1.5">
+                <span class="text-white/60 font-['Newsreader',serif] italic text-xs md:text-sm tracking-wider">the great puzzle project</span>
+                <span class="text-white/30 text-xs">·</span>
+                <span class="font-['Syne',sans-serif] font-black text-[11px] md:text-xs tracking-widest uppercase text-rust-orange">IMAX DOSSIER</span>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[9px] font-mono tracking-wider bg-white/10 text-white/70 border border-white/10">
+                {post.category || 'HISTORIA'}
+              </span>
+            </div>
+
+            <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold font-['Syne',sans-serif] text-white leading-[1.08] tracking-tight mb-3.5 line-clamp-2 drop-shadow-md">
+              {post.title}
+            </h2>
+            <p class="text-xs sm:text-sm md:text-base text-white/80 font-light mb-6 leading-relaxed line-clamp-3 max-w-lg sm:max-w-xl">
+              {post.subtitle || 'Investigación histórica, arqueológica y documental resguardada en el archivo TGP.'}
+            </p>
+            <div class="flex items-center gap-3 flex-wrap">
+              <a
+                href={post.href}
+                class="inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-full bg-white hover:bg-white/90 text-black text-xs sm:text-sm font-bold tracking-wide transition shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                Leer Dossier
+              </a>
+              <a
+                href={collectionHref}
+                class="px-5 py-3 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-white/90 text-xs sm:text-sm font-medium backdrop-blur-md transition hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Colección Historia
+              </a>
+            </div>
+            <p class="text-[10px] md:text-[11px] text-white/40 font-mono tracking-wide mt-4">Investigación abierta · Resguardo documental permanente</p>
+          </div>
+        ))}
+
+      </div>
     </div>
 
     {/* ── 4. CONTROLADORES DISCRETOS (Píldoras de Navegación estilo Apple TV) ── */}
@@ -217,10 +223,16 @@ const totalSlides = 1 + featuredPosts.length;
     let currentIndex = 0;
     let isTransitioning = false;
     let autoInterval: any = null;
+    let activeTimeline: gsap.core.Timeline | null = null;
 
     // Estado inicial atómico: forzar que SOLO el índice 0 esté visible
     slides.forEach((s, idx) => {
-      gsap.set(s, { opacity: idx === 0 ? 1 : 0, scale: 1, x: 0, pointerEvents: idx === 0 ? 'auto' : 'none' });
+      gsap.set(s, {
+        opacity: idx === 0 ? 1 : 0,
+        scale: 1,
+        x: 0,
+        pointerEvents: idx === 0 ? 'auto' : 'none'
+      });
     });
     contents.forEach((c, idx) => {
       gsap.set(c, {
@@ -244,7 +256,14 @@ const totalSlides = 1 + featuredPosts.length;
     }
 
     function goToSlide(nextIndex: number) {
-      if (nextIndex === currentIndex || isTransitioning) return;
+      if (nextIndex === currentIndex) return;
+
+      // Si hay una transición en curso, cancelarla de raíz
+      if (activeTimeline) {
+        activeTimeline.kill();
+        activeTimeline = null;
+      }
+
       isTransitioning = true;
 
       const currentSlide = slides[currentIndex];
@@ -252,10 +271,19 @@ const totalSlides = 1 + featuredPosts.length;
       const currentContent = contents[currentIndex];
       const nextContent = contents[nextIndex];
 
-      // Cancelar tweens en curso para evitar superposiciones
-      gsap.killTweensOf([currentSlide, nextSlide, currentContent, nextContent]);
+      // Exclusión mutua estricta inmediata: apagar todo excepto origen y destino
+      contents.forEach((c, idx) => {
+        if (idx !== currentIndex && idx !== nextIndex) {
+          gsap.set(c, { opacity: 0, display: 'none', pointerEvents: 'none' });
+        }
+      });
+      slides.forEach((s, idx) => {
+        if (idx !== currentIndex && idx !== nextIndex) {
+          gsap.set(s, { opacity: 0, pointerEvents: 'none' });
+        }
+      });
 
-      // Habilitar display del siguiente antes de que entre
+      // Habilitar display del destino
       if (nextContent) {
         gsap.set(nextContent, { display: 'block', pointerEvents: 'auto' });
       }
@@ -263,30 +291,35 @@ const totalSlides = 1 + featuredPosts.length;
         gsap.set(nextSlide, { pointerEvents: 'auto' });
       }
 
-      const tl = gsap.timeline({
+      activeTimeline = gsap.timeline({
         defaults: { ease: 'power3.out' },
         onComplete: () => {
-          // Bloqueo atómico: Apagar absolutamente todos los que no sean el activo
+          // Bloqueo atómico final: solo el destino queda visible
           contents.forEach((c, idx) => {
             if (idx !== nextIndex) {
               gsap.set(c, { opacity: 0, display: 'none', pointerEvents: 'none' });
+            } else {
+              gsap.set(c, { opacity: 1, display: 'block', pointerEvents: 'auto' });
             }
           });
           slides.forEach((s, idx) => {
             if (idx !== nextIndex) {
               gsap.set(s, { opacity: 0, pointerEvents: 'none' });
+            } else {
+              gsap.set(s, { opacity: 1, pointerEvents: 'auto' });
             }
           });
           currentIndex = nextIndex;
           isTransitioning = false;
+          activeTimeline = null;
         }
       });
 
       // 1. Salida rápida del texto anterior
       if (currentContent) {
-        tl.to(currentContent, {
+        activeTimeline.to(currentContent, {
           opacity: 0,
-          y: -8,
+          y: -10,
           duration: 0.22,
           ease: 'power2.in',
           onComplete: () => {
@@ -297,11 +330,11 @@ const totalSlides = 1 + featuredPosts.length;
 
       // 2. Salida de la foto anterior
       if (currentSlide) {
-        tl.to(currentSlide, {
+        activeTimeline.to(currentSlide, {
           opacity: 0,
           scale: 0.98,
           x: -20,
-          duration: 0.4,
+          duration: 0.35,
           onComplete: () => {
             gsap.set(currentSlide, { pointerEvents: 'none' });
           }
@@ -310,7 +343,7 @@ const totalSlides = 1 + featuredPosts.length;
 
       // 3. Entrada de la foto nueva
       if (nextSlide) {
-        tl.fromTo(nextSlide,
+        activeTimeline.fromTo(nextSlide,
           { opacity: 0, scale: 1.04, x: 25 },
           { opacity: 1, scale: 1, x: 0, duration: 0.5 },
           0.06
@@ -319,8 +352,8 @@ const totalSlides = 1 + featuredPosts.length;
 
       // 4. Entrada limpia del texto nuevo
       if (nextContent) {
-        tl.fromTo(nextContent,
-          { opacity: 0, y: 12 },
+        activeTimeline.fromTo(nextContent,
+          { opacity: 0, y: 14 },
           { opacity: 1, y: 0, duration: 0.45 },
           0.12
         );
@@ -334,7 +367,7 @@ const totalSlides = 1 + featuredPosts.length;
       autoInterval = setInterval(() => {
         const next = (currentIndex + 1) % total;
         goToSlide(next);
-      }, 5000);
+      }, 5500);
     }
 
     function stopAutoLoop() {
@@ -347,7 +380,7 @@ const totalSlides = 1 + featuredPosts.length;
     const onDotClick = (e: Event) => {
       const btn = (e.currentTarget as HTMLButtonElement);
       const idx = Number(btn.dataset.dotIndex);
-      if (!isNaN(idx)) {
+      if (!isNaN(idx) && idx !== currentIndex) {
         goToSlide(idx);
         startAutoLoop();
       }
@@ -358,6 +391,10 @@ const totalSlides = 1 + featuredPosts.length;
     container.addEventListener('mouseleave', startAutoLoop);
 
     (container as any)._cleanupBento = () => {
+      if (activeTimeline) {
+        activeTimeline.kill();
+        activeTimeline = null;
+      }
       stopAutoLoop();
       dots.forEach(dot => dot.removeEventListener('click', onDotClick));
       container.removeEventListener('mouseenter', stopAutoLoop);
@@ -367,6 +404,11 @@ const totalSlides = 1 + featuredPosts.length;
     startAutoLoop();
   }
 
+  // Prevenir inicializaciones dobles concurrentes
   document.addEventListener('astro:page-load', initAppleBento);
-  document.addEventListener('DOMContentLoaded', initAppleBento);
+  if (document.readyState !== 'loading') {
+    initAppleBento();
+  } else {
+    document.addEventListener('DOMContentLoaded', initAppleBento);
+  }
 </script>
