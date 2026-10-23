@@ -166,6 +166,23 @@ const triplicoPosts: TriplicoPost[] = mubiCinematicItems.slice(0, 3).map(item =>
 const triplicoHero: TriplicoPost | undefined = mubiCinematicItems.slice(3).find(item => !!item.img)
   ? { ...mubiCinematicItems.slice(3).find(item => !!item.img)! }
   : triplicoPosts[0];
+
+// ── 4 Posts para el Cinema Max Showcase + 4 Bento Cards (Apple TV+ style) ──
+const cinemaShowcasePosts = publishable
+  .map(e => {
+    const rawImg = resolveEssayImage(e.entry, e.slug);
+    const imgUrl = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : ''));
+    return {
+      title: (e.entry.title || e.slug) as string,
+      excerpt: (e.entry.dek || e.entry.excerpt || '') as string,
+      category: formatCategory(e.entry.category),
+      img: imgUrl,
+      href: `/hemeroteca/${e.slug}/`,
+      readingTime: "48 min",
+    };
+  })
+  .filter(p => typeof p.img === 'string' && p.img.length > 4 && isValidImageSrc(p.img))
+  .slice(0, 4);
 ---
 
 <Layout
@@ -536,9 +553,9 @@ const triplicoHero: TriplicoPost | undefined = mubiCinematicItems.slice(3).find(
     ctaLabel="Explorar las 14 colecciones"
   />
 
-  {/* ── TRÍPTICO EDITORIAL ASIMÉTRICO ESTILO APPLE TV+ (FULL WIDTH CONTAINER) ── */}
+  {/* ── CINEMA MAX SHOWCASE + 4 BENTO CARDS ESTILO APPLE TV+ (MATERIA OSCURA) ── */}
   <section class="w-full max-w-360 mx-auto px-4 md:px-8 my-16">
-    <TgpHeroTriptych />
+    <TgpHeroTriptych posts={cinemaShowcasePosts} />
   </section>
 
   {/* ── TIMELINE CINEMÁTICO GSAP: INVESTIGACIÓN ARQUEOLÓGICA WIKIMEDIA ── */}

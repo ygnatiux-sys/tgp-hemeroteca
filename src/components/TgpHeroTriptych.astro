@@ -2,9 +2,25 @@
 /**
  * src/components/TgpHeroTriptych.astro
  *
- * Showcase Cinemático estilo Apple TV+.
- * Muestra 3 posts en formato cuadrado por diapositiva y avanza en secuencias de 3 en 3.
- * Transición fluida con GSAP, indicadores dinámicos, soporte para interacción táctil y pausa en hover.
+ * Cinema Max Showcase + 4 Bento Cards Row (Estilo Apple TV+ / Materia Oscura)
+ *
+ * Características principales:
+ * 1. Hero Cinema Max Superior Widescreen:
+ *    - Portada panorámica monumental (2.4:1 a 16:9) con viñeta cinematográfica.
+ *    - Título monumental con fuentes Extrabold e Impact por Slide:
+ *        * Slide 1: League Spartan Black 900 + Inter
+ *        * Slide 2: Oswald Bold 700 + Space Mono
+ *        * Slide 3: Syne ExtraBold 800 + IBM Plex Mono
+ *        * Slide 4: Cinzel Black 900 + Plus Jakarta Sans
+ *    - Ficha técnica completa de emisión: [4K UHD] [IMAX 70MM] [COLOR RAW] [CC] [AUDIO DISERTACIÓN]
+ *    - Botonera Apple TV+: Botón blanco ("Leer Investigación"), Botón cristal ("▶ Modo Cine"), Botón circular ("+").
+ *    - Ficha de autor a la derecha: Xavier Benítez · The Great Puzzle Project.
+ *
+ * 2. Fila Inferior de 4 Bento Cards (Array de Capítulos / Dossiers de la Temporada):
+ *    - Fondo ambient glow (#090a0d base con degradé radial en #1c263c / rgba(28,38,56,0.45)).
+ *    - 4 Bento Cards horizontales con aspect ratio 16:10 y bordes redondeados (rounded-2xl).
+ *    - Metadatos por tarjeta: DOSSIER 01..04, duración, extracto y botón •••.
+ *    - Animación secuencial con GSAP (staggered fade) y selector activo sincronizado al Hero.
  */
 import { sanitizeImageUrl, isValidImageSrc } from '../lib/content-filter';
 
@@ -15,452 +31,582 @@ export interface TriptychPost {
   img: string;
   href: string;
   date?: string;
+  readingTime?: string;
 }
 
-export interface Panel {
-  image: string;
-  alt: string;
-  title?: string;
-  href?: string;
-  category?: string;
-  objectPosition?: string;
-}
-
-export interface SlideItem {
+export interface ShowcaseSlide {
   kicker: string;
   title: string;
   tagLabel: string;
+  categoryBadge: string;
   subtitle: string;
   ctaText: string;
   ctaHref: string;
-  panels: [Panel, Panel, Panel];
+  image: string;
+  alt: string;
+  fontH1: string;
+  fontH2: string;
+  accentColor: string;
+  techSpecs: string[];
+  dossierNumber: string;
+  duration: string;
 }
 
 interface Props {
   posts?: TriptychPost[];
-  slides?: SlideItem[];
-  kicker?: string;
-  title?: string;
-  tagLabel?: string;
-  subtitle?: string;
-  ctaText?: string;
-  ctaHref?: string;
-  panels?: [Panel, Panel, Panel];
+  slides?: ShowcaseSlide[];
 }
 
-const {
-  posts,
-  slides,
-  kicker,
-  title,
-  tagLabel,
-  subtitle,
-  ctaText,
-  ctaHref,
-  panels
-} = Astro.props;
+const { posts, slides } = Astro.props;
 
-// Construcción dinámica de Slides a partir de Posts Reales en bloques de 3 en 3
-let computedSlides: SlideItem[] = [];
-
-if (posts && posts.length >= 3) {
-  for (let i = 0; i < posts.length; i += 3) {
-    const chunk = posts.slice(i, i + 3);
-    if (chunk.length < 3) break;
-    const p1 = chunk[0];
-    const p2 = chunk[1];
-    const p3 = chunk[2];
-    const slideNumber = String(Math.floor(i / 3) + 1).padStart(2, '0');
-
-    computedSlides.push({
-      kicker: `${(p1.category || 'ARCHIVO TGP').toUpperCase()} // DOSSIER ${slideNumber}`,
-      title: p1.title,
-      tagLabel: p1.category || 'Investigación',
-      subtitle: p1.excerpt ? p1.excerpt.replace(/[#*_`]/g, '').slice(0, 150) + '…' : 'Investigación profunda y análisis documental del acervo.',
-      ctaText: 'Ver investigación',
-      ctaHref: p1.href,
-      panels: [
-        {
-          image: p1.img,
-          alt: p1.title,
-          title: p1.title,
-          href: p1.href,
-          category: p1.category,
-          objectPosition: 'center 20%'
-        },
-        {
-          image: p2.img,
-          alt: p2.title,
-          title: p2.title,
-          href: p2.href,
-          category: p2.category,
-          objectPosition: 'center 25%'
-        },
-        {
-          image: p3.img,
-          alt: p3.title,
-          title: p3.title,
-          href: p3.href,
-          category: p3.category,
-          objectPosition: 'center 20%'
-        }
-      ]
-    });
-  }
-}
-
-// Fallback de respaldo con imágenes temáticas de historia/arqueología si no se pasan posts ni slides
-const defaultSlides: SlideItem[] = [
+// Cuatro configuraciones tipográficas exactas solicitadas por el usuario:
+const FONT_PRESETS = [
   {
-    kicker: "ARCHAEOSEMIOTICS // DOSSIER 01",
-    title: "LA ARQUITECTURA DEL TIEMPO",
-    tagLabel: "Memoria Material",
-    subtitle: "Estratos líticos y signos rituales donde la civilización humana codificó el tiempo antes de la escritura.",
-    ctaText: "Ver investigación",
-    ctaHref: "/archivo/",
-    panels: [
-      {
-        image: "/src/assets/remotas/stepped-pyramid-of-djoser-at-saqqara.webp",
-        alt: "Pirámide Escalonada de Saqqara",
-        title: "Pirámide de Saqqara",
-        category: "Arqueosemiótica",
-        objectPosition: "center 20%"
-      },
-      {
-        image: "https://storage.thegreatpuzzleproject.com/wikimedia/1790166100412-8c88f7a9.webp",
-        alt: "La Pirámide Roja en Dahshur",
-        title: "Pirámide Roja",
-        category: "Ensayos Cinemáticos",
-        objectPosition: "center 25%"
-      },
-      {
-        image: "https://storage.thegreatpuzzleproject.com/wikimedia/1791676137832-aca96ac9.webp",
-        alt: "Terrazas Megalíticas de Gunung Padang",
-        title: "Gunung Padang",
-        category: "Prehistoria",
-        objectPosition: "center 20%"
-      }
-    ]
+    fontH1: "font-['League_Spartan',sans-serif] font-black tracking-tighter uppercase",
+    fontH2: "font-['Inter',sans-serif]",
+    accentColor: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10",
+    glowColor: "rgba(16, 185, 129, 0.35)",
+  },
+  {
+    fontH1: "font-['Oswald',sans-serif] font-bold tracking-tight uppercase",
+    fontH2: "font-['Space_Mono',monospace]",
+    accentColor: "text-amber-300 border-amber-400/30 bg-amber-400/10",
+    glowColor: "rgba(245, 158, 11, 0.35)",
+  },
+  {
+    fontH1: "font-['Syne',sans-serif] font-extrabold tracking-tight uppercase",
+    fontH2: "font-['IBM_Plex_Mono',monospace]",
+    accentColor: "text-sky-300 border-sky-400/30 bg-sky-400/10",
+    glowColor: "rgba(56, 189, 248, 0.35)",
+  },
+  {
+    fontH1: "font-['Cinzel',serif] font-black tracking-normal uppercase",
+    fontH2: "font-['Plus_Jakarta_Sans',sans-serif]",
+    accentColor: "text-stone-200 border-stone-400/30 bg-stone-400/10",
+    glowColor: "rgba(229, 231, 235, 0.35)",
   }
 ];
 
-const allSlides: SlideItem[] = computedSlides.length > 0
-  ? computedSlides
-  : (slides && slides.length > 0 
-      ? slides 
-      : (title && panels 
-          ? [{
-              kicker: kicker || defaultSlides[0].kicker,
-              title: title,
-              tagLabel: tagLabel || defaultSlides[0].tagLabel,
-              subtitle: subtitle || defaultSlides[0].subtitle,
-              ctaText: ctaText || defaultSlides[0].ctaText,
-              ctaHref: ctaHref || defaultSlides[0].ctaHref,
-              panels: panels
-            }]
-          : defaultSlides));
+// Fallback de respaldo curado en caso de que no existan suficientes posts en la llamada
+const DEFAULT_CURATED_SLIDES: ShowcaseSlide[] = [
+  {
+    kicker: "ESTRENO EXCLUSIVO // DOSSIER 01",
+    title: "LA ARQUITECTURA DEL TIEMPO",
+    tagLabel: "Arqueosemiótica",
+    categoryBadge: "Investigación TGP · Arqueosemiótica · Epigrafía +16",
+    subtitle: "Estratos líticos y signos rituales donde la civilización humana codificó el tiempo antes del surgimiento de la escritura fonética.",
+    ctaText: "Leer Investigación",
+    ctaHref: "/hemeroteca/la-arquitectura-del-tiempo/",
+    image: "/src/assets/remotas/stepped-pyramid-of-djoser-at-saqqara.webp",
+    alt: "Pirámide Escalonada de Saqqara",
+    fontH1: FONT_PRESETS[0].fontH1,
+    fontH2: FONT_PRESETS[0].fontH2,
+    accentColor: FONT_PRESETS[0].accentColor,
+    techSpecs: ["4K UHD", "IMAX 70MM", "COLOR RAW", "AUDIO ENSAYO"],
+    dossierNumber: "01",
+    duration: "46 min"
+  },
+  {
+    kicker: "ARCHIVUS // DOSSIER 02",
+    title: "LA CÁMARA SILENCIOSA DE DAHSHUR",
+    tagLabel: "Acústica Sagrada",
+    categoryBadge: "Investigación TGP · Resonancia Lítica · Ensayos +16",
+    subtitle: "El eco sónico del granito pulido en el interior de las cámaras herméticas como transductor del estado perceptivo sacerdotal.",
+    ctaText: "Leer Investigación",
+    ctaHref: "/hemeroteca/dahshur-acustica-sagrada/",
+    image: "https://storage.thegreatpuzzleproject.com/wikimedia/1790166100412-8c88f7a9.webp",
+    alt: "Pirámide Roja de Dahshur",
+    fontH1: FONT_PRESETS[1].fontH1,
+    fontH2: FONT_PRESETS[1].fontH2,
+    accentColor: FONT_PRESETS[1].accentColor,
+    techSpecs: ["4K UHD", "DOLBY ATMOS", "RESONANCIA 432HZ", "CC"],
+    dossierNumber: "02",
+    duration: "54 min"
+  },
+  {
+    kicker: "TERRAZAS MEGALÍTICAS // DOSSIER 03",
+    title: "GUNUNG PADANG Y EL SUELO OCULTO",
+    tagLabel: "Georradar & Estratos",
+    categoryBadge: "Investigación TGP · Tomografía Eléctrica · Prehistoria +16",
+    subtitle: "Columnas basálticas pentagonales y cámaras selladas en la colina indonesia: la discrepancia entre datación orgánica y lítica.",
+    ctaText: "Leer Investigación",
+    ctaHref: "/hemeroteca/gunung-padang-georradar/",
+    image: "https://storage.thegreatpuzzleproject.com/wikimedia/1791676137832-aca96ac9.webp",
+    alt: "Gunung Padang Terrazas",
+    fontH1: FONT_PRESETS[2].fontH1,
+    fontH2: FONT_PRESETS[2].fontH2,
+    accentColor: FONT_PRESETS[2].accentColor,
+    techSpecs: ["4K UHD", "GPR SCANNER", "ESTRATIGRAFÍA 3D", "SDH"],
+    dossierNumber: "03",
+    duration: "50 min"
+  },
+  {
+    kicker: "CANTERAS IMPOSIBLES // DOSSIER 04",
+    title: "LOS MONOLITOS DE YANGSHAN",
+    tagLabel: "Corte Mecanizado",
+    categoryBadge: "Investigación TGP · Megalitos de Asia · Ingeniería +16",
+    subtitle: "Millones de toneladas de piedra caliza desprendidas de la montaña: la desmesura dinástica que jamás llegó a erigirse.",
+    ctaText: "Leer Investigación",
+    ctaHref: "/hemeroteca/monolitos-yangshan/",
+    image: "https://storage.thegreatpuzzleproject.com/remotas/yangshan-stele-quarry.webp",
+    alt: "Cantera Imperial de Yangshan",
+    fontH1: FONT_PRESETS[3].fontH1,
+    fontH2: FONT_PRESETS[3].fontH2,
+    accentColor: FONT_PRESETS[3].accentColor,
+    techSpecs: ["4K UHD", "IMAX 70MM", "TOPOGRAFÍA LIDAR", "AD"],
+    dossierNumber: "04",
+    duration: "1 h 02 min"
+  }
+];
+
+// Construir array dinámico de 4 ítems respetando fuentes y metadatos
+let finalSlides: ShowcaseSlide[] = [];
+
+if (slides && slides.length >= 4) {
+  finalSlides = slides.slice(0, 4);
+} else if (posts && posts.length >= 4) {
+  finalSlides = posts.slice(0, 4).map((p, idx) => {
+    const preset = FONT_PRESETS[idx % FONT_PRESETS.length];
+    const dossierNum = String(idx + 1).padStart(2, '0');
+    return {
+      kicker: `NUEVO DOSSIER // TEMPORADA 2026`,
+      title: p.title,
+      tagLabel: p.category || "Hemeroteca",
+      categoryBadge: `Investigación TGP · ${p.category || 'Arqueosemiótica'} · Dossier #${dossierNum}`,
+      subtitle: p.excerpt ? p.excerpt.replace(/[#*_`]/g, '').slice(0, 160) + '…' : 'Investigación documental y análisis estratigráfico del acervo TGP.',
+      ctaText: "Leer Investigación",
+      ctaHref: p.href,
+      image: p.img,
+      alt: p.title,
+      fontH1: preset.fontH1,
+      fontH2: preset.fontH2,
+      accentColor: preset.accentColor,
+      techSpecs: ["4K UHD", "IMAX 70MM", "COLOR RAW", "AUDIO DISERTACIÓN"],
+      dossierNumber: dossierNum,
+      duration: p.readingTime || (idx === 0 ? "46 min" : idx === 1 ? "54 min" : idx === 2 ? "50 min" : "1 h")
+    };
+  });
+} else {
+  finalSlides = DEFAULT_CURATED_SLIDES;
+}
 ---
 
-<section class="tgp-hero-triptych-container relative w-full h-[76vh] min-h-135 max-h-195 bg-[#08090c] text-white overflow-hidden rounded-2xl md:rounded-3xl select-none shadow-[0_30px_70px_-15px_rgba(0,0,0,0.95)] border border-white/10">
+<!-- Importación directa de respaldo por si el layout no ha recargado fuentes -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;800;900&family=Oswald:wght@600;700&family=Syne:wght@700;800&family=Cinzel:wght@700;800;900&display=swap" rel="stylesheet">
+
+<div class="cinema-max-wrapper relative w-full my-12 font-sans select-none" data-active-index="0">
   
-  <!-- CONTENEDOR DE SLIDES SUPERPUESTOS CON 3 POSTS EN FORMATO CUADRADO -->
-  <div class="absolute inset-0 w-full h-full z-0 overflow-hidden">
-    {allSlides.map((slide, sIdx) => (
-      <div 
-        class={`showcase-slide absolute inset-0 w-full h-full flex items-center justify-between px-6 sm:px-10 md:px-14 lg:px-16 ${sIdx === 0 ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
-        data-slide-index={sIdx}
-      >
-        <!-- FONDO ATMOSFÉRICO EXPANDIDO (BOKEH CINEMÁTICO SUAVE DEL POST PRINCIPAL) -->
-        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-          <img 
-            src={slide.panels[0].image} 
-            alt="" 
-            aria-hidden="true"
-            class="w-full h-full object-cover scale-125 blur-3xl opacity-30 brightness-75 saturate-125"
-          />
-          <div class="absolute inset-0 bg-linear-to-r from-[#08090c] via-[#08090c]/85 via-50% to-transparent z-1"></div>
-        </div>
-
-        <!-- ESPACIO IZQUIERDO RESERVADO PARA EL BLOQUE EDITORIAL (SHOWCASE-CONTENT) -->
-        <div class="w-full md:w-[44%] lg:w-[40%] h-full shrink-0"></div>
-
-        <!-- CONTENEDOR DERECHO: 3 POSTS EN FORMATO CUADRADO PROPORCIONADO -->
-        <div class="relative z-10 w-full md:w-[56%] lg:w-[60%] flex items-center justify-end gap-3 sm:gap-4 md:gap-5 overflow-hidden py-6">
-          {slide.panels.map((panel, pIdx) => {
-            const isMainPanel = pIdx === 0;
-            return (
-              <a
-                href={panel.href || slide.ctaHref}
-                class={`group/card relative block aspect-square rounded-2xl overflow-hidden border border-white/15 bg-black/60 shadow-2xl transition-all duration-500 hover:border-amber-400/60 hover:scale-[1.03] hover:shadow-[0_15px_35px_rgba(217,119,6,0.25)] ${
-                  isMainPanel
-                    ? 'w-[42%] sm:w-[38%] md:w-[36%] z-20'
-                    : pIdx === 1
-                      ? 'w-[34%] sm:w-[32%] md:w-[32%] z-15'
-                      : 'hidden sm:block sm:w-[28%] md:w-[28%] z-10'
-                }`}
-              >
-                <!-- Imagen en formato cuadrado -->
-                <img
-                  src={panel.image}
-                  alt={panel.alt || panel.title || ''}
-                  loading={sIdx === 0 ? "eager" : "lazy"}
-                  decoding="async"
-                  class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-105"
-                  style={`object-position: ${panel.objectPosition || 'center 25%'};`}
-                />
-
-                <!-- Scrim inferior con opacidad controlada para rotulado -->
-                <div class="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/75 via-black/25 to-transparent pointer-events-none"></div>
-
-                <!-- Rotulado del post -->
-                <div class="absolute inset-x-0 bottom-0 p-3 sm:p-4 flex flex-col gap-1 pointer-events-none">
-                  {panel.category && (
-                    <span class="text-[8px] sm:text-[9px] uppercase tracking-[0.2em] font-mono text-amber-300/90 font-bold line-clamp-1">
-                      {panel.category}
-                    </span>
-                  )}
-                  {panel.title && (
-                    <h3 class="font-sans font-bold text-xs sm:text-sm text-white line-clamp-2 leading-tight drop-shadow-md group-hover/card:text-amber-200 transition-colors">
-                      {panel.title}
-                    </h3>
-                  )}
-                </div>
-
-                <!-- Badge de orden sutil -->
-                <div class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-black/55 backdrop-blur-md border border-white/10 text-[9px] font-mono text-white/70">
-                  0{pIdx + 1}
-                </div>
-              </a>
-            );
-          })}
-        </div>
-
-      </div>
-    ))}
-  </div>
-
-  <!-- VIÑETA LATERAL IZQUIERDA PARA EL TEXTO -->
-  <div class="absolute bottom-0 left-0 w-full md:w-[46%] h-full bg-linear-to-r from-[#08090c] via-[#08090c]/80 to-transparent z-15 pointer-events-none"></div>
-
-  <!-- BLOQUE EDITORIAL SUPERPUESTO (FÍSICA APPLE TV+) -->
-  <div class="relative z-20 w-full h-full flex flex-col justify-center items-start p-7 md:p-14 lg:p-16 pointer-events-none">
-    {allSlides.map((slide, sIdx) => (
-      <div 
-        class={`showcase-content absolute inset-y-0 left-7 md:left-14 lg:left-16 flex flex-col justify-center items-start max-w-sm sm:max-w-md md:max-w-lg font-sans ${sIdx === 0 ? 'opacity-100 pointer-events-auto z-30' : 'opacity-0 pointer-events-none z-0'}`}
-        data-content-index={sIdx}
-      >
-        <span class="block text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.25em] text-amber-300/90 mb-2 font-bold">
-          {slide.kicker}
-        </span>
-
-        <h2 class="font-sans text-2xl sm:text-3xl md:text-[34px] font-black tracking-tight uppercase leading-[1.08] text-white mb-3">
-          {slide.title}
-        </h2>
-
-        <div class="flex items-center gap-2 mb-3">
-          <span class="px-2 py-0.5 text-[10px] font-bold bg-white/10 backdrop-blur-md rounded-full text-white border border-white/15 font-mono">
-            TGP
-          </span>
-          <span class="text-xs font-semibold text-white/90">
-            {slide.tagLabel}
-          </span>
-        </div>
-
-        <p class="text-xs sm:text-sm text-white/75 leading-relaxed mb-6 font-normal max-w-md">
-          {slide.subtitle}
-        </p>
-
-        <a 
-          href={slide.ctaHref} 
-          class="showcase-cta group inline-flex items-center justify-center gap-2.5 px-7 py-3 bg-white text-zinc-950 rounded-full font-semibold text-xs sm:text-sm hover:bg-zinc-200 transition-all duration-200 shadow-xl pointer-events-auto cursor-pointer relative z-30 hover:scale-[1.03] active:scale-[0.98]"
+  <!-- ═══════════════════════════════════════════════════════════════════
+       1. HERO CINEMA MAX WIDESCREEN SUPERIOR (ESTILO APPLE TV+ MATERIA OSCURA)
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="cinema-hero-stage relative w-full min-h-135 md:min-h-155 lg:min-h-165 rounded-3xl overflow-hidden bg-[#07080a] border border-white/10 shadow-[0_30px_90px_rgba(0,0,0,0.95)]">
+    
+    <!-- CONTENEDOR DE FONDOS PANORÁMICOS EN DISOLUCIÓN GSAP -->
+    <div class="absolute inset-0 w-full h-full overflow-hidden z-0">
+      {finalSlides.map((slide, sIdx) => (
+        <div 
+          class={`cinema-hero-bg absolute inset-0 w-full h-full transition-none ${sIdx === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+          data-bg-index={sIdx}
+          style={sIdx === 0 ? 'display: block;' : 'display: none;'}
         >
-          <svg class="w-3.5 h-3.5 fill-current transition-transform duration-200 group-hover:translate-x-0.5" viewBox="0 0 24 24">
-            <path d="M8 5v14l11-7z" />
-          </svg>
-          <span>{slide.ctaText}</span>
-        </a>
-      </div>
-    ))}
-  </div>
-
-  <!-- INDICADORES INFERIORES CENTRALES DINÁMICOS -->
-  {allSlides.length > 1 && (
-    <div class="showcase-indicators absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/55 backdrop-blur-md border border-white/15">
-      {allSlides.map((_, i) => (
-        <button 
-          type="button" 
-          class={`showcase-dot transition-all duration-300 rounded-full cursor-pointer ${i === 0 ? 'w-5 h-2 bg-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.7)]' : 'w-2 h-2 bg-white/35 hover:bg-white/60'}`}
-          data-dot-index={i}
-          aria-label={`Ir al trío de posts ${i + 1}`}
-        ></button>
+          <!-- Imagen de fondo cinematográfica con zoom tenue -->
+          <img 
+            src={slide.image} 
+            alt={slide.alt}
+            loading={sIdx === 0 ? "eager" : "lazy"}
+            decoding="async"
+            class="cinema-bg-img w-full h-full object-cover object-center scale-100 brightness-[0.78] contrast-[1.08] saturate-[1.1]"
+          />
+          <!-- Degradé vertical y lateral Apple TV+: viñeta oscura que protege la legibilidad -->
+          <div class="absolute inset-0 bg-linear-to-t from-[#07080a] via-[#07080a]/60 via-45% to-transparent pointer-events-none z-1"></div>
+          <div class="absolute inset-0 bg-linear-to-r from-[#07080a] via-[#07080a]/85 via-45% md:via-35% to-transparent pointer-events-none z-1"></div>
+          <div class="absolute inset-x-0 top-0 h-28 bg-linear-to-b from-black/60 to-transparent pointer-events-none z-1"></div>
+        </div>
       ))}
     </div>
-  )}
 
-</section>
+    <!-- CONTENEDOR DE CONTENIDOS TEXTUALES EDITORIALES (H1, FICHA, BOTONERA) -->
+    <div class="relative z-20 w-full h-full min-h-135 md:min-h-155 lg:min-h-165 flex flex-col justify-end p-6 sm:p-10 md:p-14 lg:p-16 pointer-events-none">
+      
+      {finalSlides.map((slide, sIdx) => (
+        <div 
+          class={`cinema-hero-content absolute left-6 sm:left-10 md:left-14 lg:left-16 bottom-6 sm:bottom-10 md:bottom-14 lg:bottom-16 right-6 sm:right-10 md:right-14 max-w-2xl lg:max-w-3xl flex flex-col items-start gap-3.5 transition-none ${sIdx === 0 ? 'opacity-100 z-30 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
+          data-hero-index={sIdx}
+          style={sIdx === 0 ? 'display: flex;' : 'display: none;'}
+        >
+          <!-- Píldora de estreno superior estilo Apple TV -->
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/15 shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-[10px] sm:text-[11px] font-mono tracking-widest uppercase text-white/90 font-bold">
+              {slide.kicker}
+            </span>
+          </div>
 
+          <!-- TÍTULO MONUMENTAL H1 CON FONT EXTRABOLD / IMPACT ESPECÍFICA -->
+          <h1 class={`cinema-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white leading-[0.95] drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)] max-w-3xl ${slide.fontH1}`}>
+            {slide.title}
+          </h1>
+
+          <!-- CATEGORÍA Y ETIQUETAS ESTILO APPLE TV -->
+          <div class="flex flex-wrap items-center gap-2.5 text-xs sm:text-sm text-white/90">
+            <span class="inline-flex items-center gap-1.5 font-semibold text-white/95">
+              <svg class="w-4 h-4 fill-current text-white/70" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/>
+              </svg>
+              <span>{slide.categoryBadge}</span>
+            </span>
+          </div>
+
+          <!-- SINOPSIS NARRATIVA / EXTRACTO -->
+          <p class={`cinema-subtitle text-xs sm:text-sm md:text-base text-zinc-300 leading-relaxed max-w-xl font-normal drop-shadow-md line-clamp-3 ${slide.fontH2}`}>
+            {slide.subtitle}
+          </p>
+
+          <!-- ESPECIFICACIONES TÉCNICAS (BADGES TIPO APPLE TV) -->
+          <div class="flex flex-wrap items-center gap-2 text-[10px] sm:text-[11px] font-mono text-zinc-400 pt-1">
+            <span class="font-bold text-white/80">2026 · {slide.duration}</span>
+            {slide.techSpecs.map(spec => (
+              <span class="px-1.5 py-0.5 rounded bg-white/10 backdrop-blur-sm border border-white/15 text-white/80 font-bold">
+                {spec}
+              </span>
+            ))}
+          </div>
+
+          <!-- BOTONERA APPLE TV+ DE 3 ACCIONES DIRECTAS -->
+          <div class="flex flex-wrap items-center gap-3 pt-3">
+            <!-- Botón Blanco Principal ("Aceptar prueba" / "Leer Investigación") -->
+            <a 
+              href={slide.ctaHref}
+              class="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 rounded-full bg-white text-zinc-950 font-bold text-xs sm:text-sm shadow-[0_10px_25px_rgba(255,255,255,0.2)] hover:bg-zinc-200 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 cursor-pointer pointer-events-auto"
+            >
+              <span>{slide.ctaText}</span>
+            </a>
+
+            <!-- Botón Vidrio Secundario ("▶ Reproducir" / "Modo Cine") -->
+            <a 
+              href={slide.ctaHref}
+              class="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 rounded-full bg-white/15 hover:bg-white/25 text-white font-semibold text-xs sm:text-sm backdrop-blur-md border border-white/20 transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] cursor-pointer pointer-events-auto shadow-md"
+            >
+              <svg class="w-3.5 h-3.5 fill-current text-white" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              <span>Modo Cine</span>
+            </a>
+
+            <!-- Botón Circular Guardar / Añadir (+) -->
+            <button 
+              type="button"
+              aria-label="Guardar dossier"
+              class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer pointer-events-auto"
+              title="Guardar en biblioteca"
+            >
+              <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
+          </div>
+
+        </div>
+      ))}
+
+      <!-- CRÉDITO DISCRETO AL MARGEN DERECHO (HOMENAJE A LA FICHA DE REPARTO DE APPLE TV) -->
+      <div class="hidden lg:block absolute bottom-10 right-12 text-right pointer-events-none max-w-xs z-20">
+        <span class="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 font-bold mb-1">
+          Investigador Principal
+        </span>
+        <p class="text-xs font-semibold text-zinc-300 leading-tight">
+          Xavier Benítez
+        </p>
+        <span class="text-[10px] text-zinc-500">The Great Puzzle Project</span>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       2. FILA INFERIOR DE 4 BENTO CARDS CON MAIN BG GRADIENT GLOW APPLE TV+
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="cinema-bento-ambient relative w-full mt-6 p-6 sm:p-8 rounded-3xl overflow-hidden border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
+    
+    <!-- MAIN BG GRADIENT GLOW DE SAMPLE (HEX #090a0d base con glow radial azulado en #1c263c) -->
+    <div class="absolute inset-0 bg-[#090a0d] z-0 pointer-events-none"></div>
+    <div 
+      class="absolute inset-0 pointer-events-none z-1 opacity-70"
+      style="background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(28, 38, 56, 0.45) 0%, rgba(9, 10, 13, 0.98) 100%);"
+    ></div>
+
+    <!-- ENCABEZADO DE LA SECCIÓN DE EPISODIOS / DOSSIERS -->
+    <div class="relative z-10 flex items-center justify-between mb-5">
+      <div class="flex items-center gap-2.5">
+        <h2 class="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
+          <span>Dossiers de la Temporada</span>
+          <svg class="w-4 h-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </h2>
+        <span class="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-white/10 text-zinc-300 border border-white/10">
+          4 Investigaciones
+        </span>
+      </div>
+
+      <!-- Indicador visual de rotación / interactividad -->
+      <div class="text-[11px] font-mono text-zinc-400 flex items-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+        <span>Haz clic para enfocar</span>
+      </div>
+    </div>
+
+    <!-- ARRAY DE 4 BENTO CARDS EN GRID DE 4 COLUMNAS CON ASPECT RATIO 16:10 -->
+    <div class="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {finalSlides.map((slide, bIdx) => (
+        <button
+          type="button"
+          class={`bento-card-btn group/bento text-left relative flex flex-col rounded-2xl overflow-hidden border transition-all duration-300 cursor-pointer ${
+            bIdx === 0 
+              ? 'border-white/30 bg-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.6)] ring-2 ring-white/20' 
+              : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
+          }`}
+          data-bento-index={bIdx}
+          aria-label={`Ver dossier ${slide.dossierNumber}: ${slide.title}`}
+        >
+          <!-- Thumbnail en proporción 16:10 como en Apple TV -->
+          <div class="relative w-full aspect-16/10 overflow-hidden bg-black/60 rounded-t-xl">
+            <img 
+              src={slide.image} 
+              alt={slide.alt}
+              loading="lazy"
+              decoding="async"
+              class="bento-card-img w-full h-full object-cover transition-transform duration-500 ease-out group-hover/bento:scale-105"
+            />
+            
+            <!-- Scrim gradual inferior sobre la imagen -->
+            <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
+
+            <!-- Badge del dossier superior izquierdo (ej. "EPISODIO 1" -> "DOSSIER 01") -->
+            <div class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded bg-black/70 backdrop-blur-md border border-white/15 text-[9px] font-mono font-bold tracking-wider text-zinc-300 uppercase">
+              DOSSIER {slide.dossierNumber}
+            </div>
+
+            <!-- Título sobreimpreso en la base de la tarjeta como en el sample -->
+            <div class="absolute inset-x-0 bottom-0 p-3 pointer-events-none">
+              <span class="block text-[10px] font-mono text-amber-300/90 font-bold uppercase tracking-wider mb-0.5 line-clamp-1">
+                {slide.tagLabel}
+              </span>
+              <h3 class="text-xs sm:text-sm font-bold text-white leading-tight line-clamp-1 group-hover/bento:text-amber-200 transition-colors">
+                {slide.title}
+              </h3>
+            </div>
+          </div>
+
+          <!-- Cuerpo inferior de la tarjeta (extracto, duración y botón de opciones •••) -->
+          <div class="p-3.5 flex flex-col justify-between flex-1 gap-2 bg-[#0d0e12]/80 backdrop-blur-md">
+            <p class="text-[11px] text-zinc-400 leading-snug line-clamp-2 font-normal">
+              {slide.subtitle}
+            </p>
+
+            <div class="flex items-center justify-between pt-1 border-t border-white/5 text-[10px] font-mono text-zinc-400">
+              <span class="flex items-center gap-1 font-semibold text-zinc-300">
+                <svg class="w-3 h-3 fill-current text-white/70" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                <span>{slide.duration}</span>
+              </span>
+
+              <!-- Icono de opciones ••• estilo Apple TV -->
+              <span class="p-1 rounded hover:bg-white/10 text-zinc-400 hover:text-white transition-colors" title="Opciones">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <circle cx="5" cy="12" r="2" />
+                  <circle cx="12" cy="12" r="2" />
+                  <circle cx="19" cy="12" r="2" />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </button>
+      ))}
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     3. SCRIPT GSAP: SECUENCIA DE DIFUMINADO EN SERIE Y SELECTOR ACTIVO
+     ═══════════════════════════════════════════════════════════════════ -->
 <script>
   import { gsap } from 'gsap';
 
-  function initShowcaseMotion() {
-    const container = document.querySelector('.tgp-hero-triptych-container') as HTMLElement | null;
-    if (!container || container.dataset.showcaseInit === 'true') return;
-    container.dataset.showcaseInit = 'true';
+  function initCinemaMaxShowcase() {
+    const wrapper = document.querySelector('.cinema-max-wrapper') as HTMLElement | null;
+    if (!wrapper || wrapper.dataset.cinemaInit === 'true') return;
+    wrapper.dataset.cinemaInit = 'true';
 
-    const slides = gsap.utils.toArray<HTMLElement>('.showcase-slide');
-    const contents = gsap.utils.toArray<HTMLElement>('.showcase-content');
-    const dots = gsap.utils.toArray<HTMLButtonElement>('.showcase-dot');
-    if (slides.length <= 1) return;
+    const heroBgs = gsap.utils.toArray<HTMLElement>('.cinema-hero-bg');
+    const heroContents = gsap.utils.toArray<HTMLElement>('.cinema-hero-content');
+    const bentoCards = gsap.utils.toArray<HTMLButtonElement>('.bento-card-btn');
+
+    if (heroBgs.length <= 1) return;
 
     let currentIndex = 0;
-    let isAnimating = false;
-    let loopCall: gsap.core.Tween | null = null;
-    let isHovered = false;
+    let isTransitioning = false;
+    let autoRotateTimer: gsap.core.Tween | null = null;
+    let isUserHovering = false;
 
-    function updateDots(index: number) {
-      dots.forEach((dot, idx) => {
-        if (idx === index) {
-          dot.className = 'showcase-dot transition-all duration-300 rounded-full cursor-pointer w-5 h-2 bg-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.7)]';
+    // Actualizar estilos activos de las 4 Bento Cards
+    function updateBentoHighlight(targetIdx: number) {
+      bentoCards.forEach((card, idx) => {
+        if (idx === targetIdx) {
+          card.classList.remove('border-white/10', 'bg-white/5');
+          card.classList.add('border-white/30', 'bg-white/10', 'shadow-[0_10px_30px_rgba(0,0,0,0.6)]', 'ring-2', 'ring-white/20');
         } else {
-          dot.className = 'showcase-dot transition-all duration-300 rounded-full cursor-pointer w-2 h-2 bg-white/35 hover:bg-white/60';
+          card.classList.remove('border-white/30', 'bg-white/10', 'shadow-[0_10px_30px_rgba(0,0,0,0.6)]', 'ring-2', 'ring-white/20');
+          card.classList.add('border-white/10', 'bg-white/5');
         }
       });
     }
 
-    function goToSlide(nextIndex: number) {
-      if (nextIndex === currentIndex || isAnimating) return;
-      isAnimating = true;
+    // Transición atómica limpia de GSAP (cero solapamientos, display:none estricto)
+    function switchCinemaSlide(nextIdx: number) {
+      if (nextIdx === currentIndex || isTransitioning) return;
+      isTransitioning = true;
 
-      const currentSlide = slides[currentIndex];
-      const nextSlide = slides[nextIndex];
-      const currentContent = contents[currentIndex];
-      const nextContent = contents[nextIndex];
+      const currentBg = heroBgs[currentIndex];
+      const nextBg = heroBgs[nextIdx];
+      const currentContent = heroContents[currentIndex];
+      const nextContent = heroContents[nextIdx];
 
       const tl = gsap.timeline({
         onComplete: () => {
-          isAnimating = false;
+          isTransitioning = false;
         }
       });
 
-      tl.to(
-        currentSlide,
-        {
-          opacity: 0,
-          scale: 0.98,
-          duration: 0.7,
-          ease: 'power3.inOut',
-          onComplete: () => {
-            currentSlide.style.zIndex = '0';
-            currentSlide.style.pointerEvents = 'none';
-          }
-        },
-        0
-      );
-
+      // 1. Desvanecer contenido y fondo actual
       tl.to(
         currentContent,
         {
           opacity: 0,
-          y: -12,
-          duration: 0.5,
+          y: -15,
+          duration: 0.4,
           ease: 'power2.in',
           onComplete: () => {
-            currentContent.style.zIndex = '0';
+            currentContent.style.display = 'none';
             currentContent.style.pointerEvents = 'none';
+            currentContent.style.zIndex = '0';
           }
         },
         0
       );
 
+      tl.to(
+        currentBg,
+        {
+          opacity: 0,
+          duration: 0.65,
+          ease: 'power2.inOut',
+          onComplete: () => {
+            currentBg.style.display = 'none';
+            currentBg.style.zIndex = '0';
+          }
+        },
+        0
+      );
+
+      // 2. Encender nuevo fondo con leve zoom out inmersivo
+      tl.set(nextBg, { display: 'block', zIndex: '10' }, 0.2);
       tl.fromTo(
-        nextSlide,
-        { opacity: 0, scale: 1.02 },
+        nextBg,
+        { opacity: 0, scale: 1.05 },
         {
           opacity: 1,
           scale: 1,
-          duration: 0.8,
-          ease: 'power3.out',
-          onStart: () => {
-            nextSlide.style.zIndex = '10';
-            nextSlide.style.pointerEvents = 'auto';
-          }
-        },
-        0.15
-      );
-
-      tl.fromTo(
-        nextContent,
-        { opacity: 0, y: 15 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.65,
-          ease: 'power2.out',
-          onStart: () => {
-            nextContent.style.zIndex = '30';
-            nextContent.style.pointerEvents = 'auto';
-          }
+          duration: 0.85,
+          ease: 'power3.out'
         },
         0.2
       );
 
-      currentIndex = nextIndex;
-      updateDots(currentIndex);
+      // 3. Encender nuevo contenido con stagger elegante
+      tl.set(nextContent, { display: 'flex', zIndex: '30', pointerEvents: 'auto' }, 0.35);
+      tl.fromTo(
+        nextContent,
+        { opacity: 0, y: 25 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: 'power3.out'
+        },
+        0.35
+      );
+
+      currentIndex = nextIdx;
+      wrapper.dataset.activeIndex = String(currentIndex);
+      updateBentoHighlight(currentIndex);
     }
 
-    function scheduleNext() {
-      if (loopCall) loopCall.kill();
-      loopCall = gsap.delayedCall(4.5, () => {
-        if (!isHovered) {
-          const next = (currentIndex + 1) % slides.length;
-          goToSlide(next);
-          scheduleNext();
+    // Temporizador de rotación continua
+    function scheduleAutoRotation() {
+      if (autoRotateTimer) autoRotateTimer.kill();
+      autoRotateTimer = gsap.delayedCall(5.5, () => {
+        if (!isUserHovering) {
+          const next = (currentIndex + 1) % heroBgs.length;
+          switchCinemaSlide(next);
+          scheduleAutoRotation();
         }
       });
     }
 
-    function pauseLoop() {
-      isHovered = true;
-      if (loopCall) loopCall.pause();
-    }
-
-    function resumeLoop() {
-      isHovered = false;
-      if (loopCall) {
-        loopCall.resume();
-      } else {
-        scheduleNext();
-      }
-    }
-
-    dots.forEach((dot, idx) => {
-      dot.addEventListener('click', (e) => {
-        e.stopPropagation();
-        goToSlide(idx);
-        scheduleNext();
+    // Eventos en Bento Cards para selección interactiva
+    bentoCards.forEach((card, idx) => {
+      card.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchCinemaSlide(idx);
+        scheduleAutoRotation();
       });
     });
 
-    container.addEventListener('mouseenter', pauseLoop);
-    container.addEventListener('mouseleave', resumeLoop);
-    container.addEventListener('touchstart', pauseLoop, { passive: true });
-    container.addEventListener('touchend', resumeLoop, { passive: true });
+    // Pausar rotación en hover / touch para no entorpecer la lectura
+    wrapper.addEventListener('mouseenter', () => {
+      isUserHovering = true;
+      if (autoRotateTimer) autoRotateTimer.pause();
+    });
 
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        pauseLoop();
+    wrapper.addEventListener('mouseleave', () => {
+      isUserHovering = false;
+      if (autoRotateTimer) {
+        autoRotateTimer.resume();
       } else {
-        resumeLoop();
+        scheduleAutoRotation();
       }
     });
 
-    scheduleNext();
+    // Animación inicial en serie (staggered fade) de las 4 Bento Cards al cargar
+    gsap.fromTo(
+      bentoCards,
+      { opacity: 0, y: 20 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.12,
+        ease: 'power2.out',
+        delay: 0.2
+      }
+    );
+
+    // Iniciar el ciclo
+    scheduleAutoRotation();
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initShowcaseMotion);
+    document.addEventListener('DOMContentLoaded', initCinemaMaxShowcase);
   } else {
-    initShowcaseMotion();
+    initCinemaMaxShowcase();
   }
-  document.addEventListener('astro:page-load', initShowcaseMotion);
+  document.addEventListener('astro:page-load', initCinemaMaxShowcase);
 </script>
