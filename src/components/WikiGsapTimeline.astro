@@ -64,7 +64,7 @@ const { title, subtitle, images = [], className = "" } = Astro.props;
   <!-- UI y Tipografía Cinemática -->
   <div class="relative z-10 w-full p-6 sm:p-10 md:p-16 text-white font-sans max-w-7xl mx-auto">
     <!-- Bloque Dinámico de Títulos por Diapositiva -->
-    <div class="titles-container relative min-h-[140px] sm:min-h-[180px] md:min-h-[220px]">
+    <div class="titles-container relative min-h-35 sm:min-h-45 md:min-h-55">
       {images.map((img, index) => (
         <div class={`slide-title-block absolute inset-0 flex flex-col justify-end pointer-events-none ${index === 0 ? 'opacity-100' : 'opacity-0'}`}>
           <!-- H2 Sans -->
