@@ -16,11 +16,34 @@ import ToboganPosts from '../components/ToboganPosts.astro';
 import AppleShowcaseBento, { type BentoHistoryItem } from '../components/AppleShowcaseBento.astro';
 import AppleBentoArchetypes from '../components/AppleBentoArchetypes.astro';
 import TgpHeroTriptych from '../components/TgpHeroTriptych.astro';
+import WikiGsapTimeline, { type WikiImage } from '../components/WikiGsapTimeline.astro';
 import { sanitizeImageUrl, getPublishableEssays, resolveEssayImage, isValidImageSrc, formatCategory, normalizeCategory } from '../lib/content-filter';
 
 // Portada Hero Cinemática (Monjes Novicios Leyendo en el Templo - Wikimedia Commons)
 const ABOUT_WIKI_COVER = '/src/assets/remotas/monks-1822569-1280.webp';
 const aboutCoverUrl = sanitizeImageUrl(ABOUT_WIKI_COVER);
+
+// ── Galería Arqueológica: Investigación Tikal (Wikimedia Commons) ──
+const tikalWikiImages: WikiImage[] = [
+  {
+    url: "/src/assets/remotas/tikal-temple-i-detail-01.webp",
+    author: "Simon Burchell",
+    license: "CC BY-SA 3.0",
+    description: "Tikal Temple I Detail"
+  },
+  {
+    url: "/src/assets/remotas/tikal-guatemala-laslovarga62.webp",
+    author: "Laslovarga",
+    license: "CC BY-SA 3.0",
+    description: "Tikal, Guatemala"
+  },
+  {
+    url: "/src/assets/remotas/tikal-temple-vi-temple-of-the-inscriptions.webp",
+    author: "Gary Todd",
+    license: "CC0",
+    description: "Tikal Temple VI (Temple of the Inscriptions)"
+  }
+];
 
 // ── 5 posts reales para el Mazo de Cartas ──
 const allRaw = await getCollection('ensayos').catch(() => []);
@@ -501,6 +524,15 @@ const triplicoHero: TriplicoPost | undefined = mubiCinematicItems.slice(3).find(
   {/* ── TRÍPTICO EDITORIAL ASIMÉTRICO ESTILO APPLE TV+ (FULL WIDTH CONTAINER) ── */}
   <section class="w-full max-w-360 mx-auto px-4 md:px-8 my-16">
     <TgpHeroTriptych />
+  </section>
+
+  {/* ── TIMELINE CINEMÁTICO GSAP: INVESTIGACIÓN ARQUEOLÓGICA WIKIMEDIA ── */}
+  <section class="w-full max-w-360 mx-auto px-4 md:px-8 my-16">
+    <WikiGsapTimeline 
+      title="La Pirámide de Tikal" 
+      subtitle="Mesoamérica • Patrimonio de la Humanidad"
+      images={tikalWikiImages}
+    />
   </section>
 
 </Layout>

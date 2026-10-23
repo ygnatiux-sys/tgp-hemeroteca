@@ -37,7 +37,7 @@ const DIRS_TO_SCAN = [
 // Regex para detectar URLs de imágenes externas que queremos capturar.
 // Por ahora configurado para Wikimedia Commons, pero puede expandirse.
 // Excluimos \s " ' ` y \\ para no romper escapes en archivos JSON.
-const URL_REGEX = /https:\/\/upload\.wikimedia\.org\/[^\s"'`\\]+/g;
+const URL_REGEX = /https:\/\/(?:upload|thumb)\.wikimedia\.org\/[^\s"'`\\]+/g;
 
 // Extensiones de archivos a escanear
 const ALLOWED_EXTS = /\.(astro|md|mdx|json|ts|js|tsx|jsx)$/;

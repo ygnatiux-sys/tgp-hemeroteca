@@ -1,0 +1,156 @@
+---
+/**
+ * src/components/WikiGsapTimeline.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * TIMELINE CINEMÁTICO GSAP — INVESTIGACIONES ARQUEOLÓGICAS (WIKIMEDIA COMMONS)
+ *
+ * Características:
+ * - Zoom continuo Ken Burns elegante (1.0 -> 1.08)
+ * - Transición Fade-to-Black veloz (0.35s)
+ * - Tipografía H1 Syne ExtraBold + H2 Inter Sans
+ * - Lower-Third semitransparente con atribución y licencia
+ * - Compatible con Astro ViewTransitions y reinicialización limpia
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+import { sanitizeImageUrl } from '../lib/content-filter';
+
+export interface WikiImage {
+  url: string;
+  author: string;
+  license: string;
+  description: string;
+}
+
+interface Props {
+  title: string;
+  subtitle: string;
+  images: WikiImage[];
+  className?: string;
+}
+
+const { title, subtitle, images = [], className = "" } = Astro.props;
+---
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Syne:wght@800;900&family=Inter:wght@300;400;600&display=swap"
+/>
+
+<section class={`wiki-gsap-container relative w-full h-[75vh] sm:h-[85vh] md:h-screen bg-black overflow-hidden flex items-end select-none rounded-3xl sm:rounded-4xl border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)] ${className}`}>
+  
+  <!-- Lote de Imágenes de Fondo -->
+  {images.map((img, index) => {
+    const resolvedUrl = sanitizeImageUrl(img.url) || img.url;
+    return (
+      <div class={`slide-bg absolute inset-0 z-0 ${index === 0 ? 'opacity-100' : 'opacity-0'}`}>
+        <img 
+          src={resolvedUrl} 
+          alt={img.description || title} 
+          class="w-full h-full object-cover origin-center zoom-target will-change-transform"
+          crossorigin="anonymous" 
+          loading={index === 0 ? "eager" : "lazy"}
+        />
+        <!-- Franja Lower-Third oscura semitransparente (Tailwind v4 bg-linear) -->
+        <div class="absolute inset-0 bg-linear-to-t from-black via-black/70 to-transparent h-full pointer-events-none"></div>
+      </div>
+    );
+  })}
+
+  <!-- UI y Tipografía Cinemática -->
+  <div class="relative z-10 w-full p-6 sm:p-10 md:p-16 text-white font-sans max-w-7xl mx-auto">
+    <!-- H2 Sans -->
+    <h2 class="font-['Inter',sans-serif] text-xs sm:text-sm md:text-lg font-light text-gray-300 uppercase tracking-[0.3em] mb-2 sm:mb-3">
+      {subtitle}
+    </h2>
+    <!-- H1 Extra Bold -->
+    <h1 class="font-['Syne',sans-serif] font-extrabold text-4xl sm:text-6xl md:text-8xl uppercase tracking-tighter leading-none mb-4 sm:mb-6 drop-shadow-lg">
+      {title}
+    </h1>
+
+    <!-- Ficha técnica iterativa (Autor y Licencia) -->
+    <div class="attribution-container relative h-6">
+      {images.map((img, index) => (
+        <p class={`attr-text font-mono text-[11px] sm:text-xs md:text-sm text-gray-400 absolute inset-0 transition-opacity duration-300 ${index === 0 ? 'opacity-100' : 'opacity-0'}`}>
+          <span class="text-white/80 font-bold">FOTOGRAFÍA:</span> {img.author || 'Wikimedia Commons'} &nbsp;|&nbsp; 
+          <span class="text-white/80 font-bold">LICENCIA:</span> {img.license}
+        </p>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from "gsap";
+
+  const initWikiTimelines = () => {
+    const containers = document.querySelectorAll<HTMLElement>('.wiki-gsap-container');
+
+    containers.forEach((container) => {
+      // Limpiar animación previa si existe en el elemento
+      if ((container as any)._wikiTimeline) {
+        (container as any)._wikiTimeline.kill();
+      }
+
+      const slides = container.querySelectorAll<HTMLElement>('.slide-bg');
+      const attrs = container.querySelectorAll<HTMLElement>('.attr-text');
+      const zoomTargets = container.querySelectorAll<HTMLElement>('.zoom-target');
+
+      if (slides.length <= 1) return; // Se requiere más de 1 imagen para el loop
+
+      // Asegurar que el zoom arranque en escala 1 y reseteo inicial
+      gsap.set(zoomTargets, { scale: 1 });
+      slides.forEach((s, idx) => {
+        gsap.set(s, { opacity: idx === 0 ? 1 : 0 });
+      });
+      attrs.forEach((a, idx) => {
+        gsap.set(a, { opacity: idx === 0 ? 1 : 0 });
+      });
+
+      const tl = gsap.timeline({ repeat: -1 });
+      (container as any)._wikiTimeline = tl;
+
+      slides.forEach((slide, index) => {
+        const nextIndex = (index + 1) % slides.length;
+
+        // 1. Zoom in continuo (Ken Burns lento) durante la exposición de la imagen (4 segs)
+        tl.to(zoomTargets[index], {
+          scale: 1.08,
+          duration: 4,
+          ease: "none"
+        }, "+=0");
+
+        // 2. Fade to black veloz (transición de salida)
+        tl.to(slide, {
+          opacity: 0,
+          duration: 0.35,
+          ease: "power3.inOut"
+        }, "-=0.35");
+
+        tl.to(attrs[index], {
+          opacity: 0,
+          duration: 0.35,
+          ease: "power3.inOut"
+        }, "<");
+
+        // 3. Fade in veloz de la siguiente foto desde el fondo negro
+        tl.to(slides[nextIndex], {
+          opacity: 1,
+          duration: 0.35,
+          ease: "power3.inOut"
+        }, ">");
+
+        tl.to(attrs[nextIndex], {
+          opacity: 1,
+          duration: 0.35,
+          ease: "power3.inOut"
+        }, "<"); 
+      });
+    });
+  };
+
+  document.addEventListener('astro:page-load', initWikiTimelines);
+  document.addEventListener('DOMContentLoaded', initWikiTimelines);
+</script>
