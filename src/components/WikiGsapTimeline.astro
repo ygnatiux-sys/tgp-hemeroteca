@@ -22,6 +22,9 @@ export interface WikiImage {
   description: string;
   title?: string;
   subtitle?: string;
+  fontTitle?: string;
+  fontSubtitle?: string;
+  accentColor?: string;
 }
 
 interface Props {
@@ -55,8 +58,8 @@ const { title, subtitle, images = [], className = "" } = Astro.props;
           crossorigin="anonymous" 
           loading={index === 0 ? "eager" : "lazy"}
         />
-        <!-- Franja Lower-Third oscura semitransparente (Tailwind v4 bg-linear) -->
-        <div class="absolute inset-0 bg-linear-to-t from-black via-black/70 to-transparent h-full pointer-events-none"></div>
+        <!-- Franja Lower-Third limpia: 100% limpia arriba, oscurece suavemente hacia la base -->
+        <div class="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/95 via-black/50 via-25% to-transparent pointer-events-none"></div>
       </div>
     );
   })}
@@ -67,12 +70,12 @@ const { title, subtitle, images = [], className = "" } = Astro.props;
     <div class="titles-container relative min-h-35 sm:min-h-45 md:min-h-55">
       {images.map((img, index) => (
         <div class={`slide-title-block absolute inset-0 flex flex-col justify-end pointer-events-none ${index === 0 ? 'opacity-100' : 'opacity-0'}`}>
-          <!-- H2 Sans -->
-          <h2 class="font-['Inter',sans-serif] text-xs sm:text-sm md:text-lg font-light text-gray-300 uppercase tracking-[0.3em] mb-2 sm:mb-3">
+          <!-- H2 Subtitle / Volanta con color y tipografía calibrada -->
+          <h2 class={`${img.fontSubtitle || "font-['Inter',sans-serif]"} ${img.accentColor || "text-gray-300"} text-xs sm:text-sm md:text-base font-semibold uppercase tracking-[0.25em] mb-2 drop-shadow-md`}>
             {img.subtitle || subtitle}
           </h2>
-          <!-- H1 Extra Bold -->
-          <h1 class="font-['Syne',sans-serif] font-extrabold text-3xl sm:text-5xl md:text-7xl lg:text-8xl uppercase tracking-tighter leading-none mb-4 sm:mb-6 drop-shadow-lg">
+          <!-- H1 Monumental con tipografía específica y escala UX balanceada -->
+          <h1 class={`${img.fontTitle || "font-['Syne',sans-serif]"} text-white font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl uppercase tracking-tighter leading-none mb-3 sm:mb-5 drop-shadow-[0_4px_24px_rgba(0,0,0,0.92)]`}>
             {img.title || title}
           </h1>
         </div>
