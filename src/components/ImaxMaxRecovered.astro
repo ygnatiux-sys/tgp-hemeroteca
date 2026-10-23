@@ -120,7 +120,7 @@ const totalPosts = posts.length;
                 alt={post.title}
                 loading={isFirst ? "eager" : "lazy"}
                 class="imax-recovered-img w-full h-full object-cover scale-100 will-change-transform filter brightness-[0.72] contrast-[1.08]"
-                onerror="this.src='/images/bg-boveda.webp'"
+                onerror="this.onerror=null; this.src='/images/placeholder-cover.png'"
               />
               <!-- VIÑETA CINEMÁTICA Y GRADIENTES ESTRATIGRÁFICOS -->
               <div class="absolute inset-0 bg-gradient-to-t from-[#060a08] via-[#060a08]/50 to-transparent pointer-events-none"></div>
