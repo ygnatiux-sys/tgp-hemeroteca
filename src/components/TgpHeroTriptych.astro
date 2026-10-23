@@ -272,7 +272,7 @@ const allSlides: SlideItem[] = computedSlides.length > 0
           aria-hidden="true"
           class="w-full h-full object-cover scale-125 blur-3xl opacity-35 brightness-75 saturate-125"
         />
-        <!-- Viñeta multidireccional Apple TV: Fundido suave de izquierda a derecha y base oscura -->
+        {/* Viñeta multidireccional Apple TV: Fundido suave de izquierda a derecha y base oscura */}
         <div class="absolute inset-0 bg-linear-to-r from-[#07080a] via-[#07080a]/80 via-45% to-transparent z-1"></div>
         <div class="absolute inset-0 bg-linear-to-t from-[#07080a] via-transparent to-transparent z-1"></div>
         {/* Glow cobrizo sutil superior */}
@@ -291,10 +291,10 @@ const allSlides: SlideItem[] = computedSlides.length > 0
         data-cards-slide={sIdx}
         style={sIdx === 0 ? 'display: flex;' : 'display: none;'}
       >
-        <!-- Espacio izquierdo transparente para dejar paso libre al texto editorial -->
+        {/* Espacio izquierdo transparente para dejar paso libre al texto editorial */}
         <div class="hidden md:block w-[42%] lg:w-[40%] h-full shrink-0"></div>
 
-        <!-- Fila de 3 paneles cuadrados escalonados -->
+        {/* Fila de 3 paneles cuadrados escalonados */}
         <div class="relative w-full md:w-[58%] lg:w-[60%] flex items-center justify-end gap-3.5 sm:gap-4 md:gap-5 overflow-hidden py-8">
           {slide.panels.map((panel, pIdx) => {
             const isMainPanel = pIdx === 0;
@@ -309,7 +309,7 @@ const allSlides: SlideItem[] = computedSlides.length > 0
                       : 'hidden sm:block sm:w-[28%] md:w-[28%] z-10'
                 }`}
               >
-                <!-- Imagen en formato cuadrado -->
+                {/* Imagen en formato cuadrado */}
                 <img
                   src={panel.image}
                   alt={panel.alt || panel.title || ''}
@@ -319,10 +319,10 @@ const allSlides: SlideItem[] = computedSlides.length > 0
                   style={`object-position: ${panel.objectPosition || 'center 25%'};`}
                 />
 
-                <!-- Scrim gradual inferior sobre la imagen -->
+                {/* Scrim gradual inferior sobre la imagen */}
                 <div class="absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-black/85 via-black/35 to-transparent pointer-events-none"></div>
 
-                <!-- Rotulado del post con jerarquía limpia -->
+                {/* Rotulado del post con jerarquía limpia */}
                 <div class="absolute inset-x-0 bottom-0 p-3.5 sm:p-4 flex flex-col gap-1 pointer-events-none">
                   {panel.category && (
                     <span class="text-[8px] sm:text-[9px] uppercase tracking-[0.25em] font-mono text-amber-300 font-bold line-clamp-1 drop-shadow-sm">
@@ -336,7 +336,7 @@ const allSlides: SlideItem[] = computedSlides.length > 0
                   )}
                 </div>
 
-                <!-- Badge de orden estilo cápsula de vidrio Apple TV -->
+                {/* Badge de orden estilo cápsula de vidrio Apple TV */}
                 <div class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-[9px] font-mono text-white/80 font-bold shadow-sm">
                   0{pIdx + 1}
                 </div>
@@ -358,7 +358,7 @@ const allSlides: SlideItem[] = computedSlides.length > 0
         data-content-index={sIdx}
         style={sIdx === 0 ? 'display: flex;' : 'display: none;'}
       >
-        <!-- Brand Header Apple TV Style (Newsreader cursiva + Kicker + Badge IMAX) -->
+        {/* Brand Header Apple TV Style (Newsreader cursiva + Kicker + Badge IMAX) */}
         <div class="flex items-center gap-2 mb-3 flex-wrap">
           <div class="flex items-baseline gap-1.5">
             <span class="text-white/60 font-['Newsreader',serif] italic text-xs tracking-wider">the great puzzle project</span>
@@ -372,12 +372,12 @@ const allSlides: SlideItem[] = computedSlides.length > 0
           </span>
         </div>
 
-        <!-- TÍTULO MONUMENTAL H1 CON FONT EXTRABOLD / IMPACT ESPECÍFICA -->
+        {/* TÍTULO MONUMENTAL H1 CON FONT EXTRABOLD / IMPACT ESPECÍFICA */}
         <h1 class={`showcase-title text-2xl sm:text-3xl md:text-4xl lg:text-[42px] text-white leading-[1.02] tracking-tight drop-shadow-[0_4px_25px_rgba(0,0,0,0.9)] mb-3 ${slide.fontH1}`}>
           {slide.title}
         </h1>
 
-        <!-- ETIQUETA DE ESPECIFICACIÓN Y CATEGORÍA -->
+        {/* ETIQUETA DE ESPECIFICACIÓN Y CATEGORÍA */}
         <div class="flex items-center gap-2 mb-3">
           <span class="px-2 py-0.5 text-[10px] font-bold bg-white/10 backdrop-blur-md rounded-full text-white border border-white/15 font-mono">
             TGP
@@ -391,12 +391,12 @@ const allSlides: SlideItem[] = computedSlides.length > 0
           </span>
         </div>
 
-        <!-- SINOPSIS EDITORIAL (H2 STYLED) -->
+        {/* SINOPSIS EDITORIAL (H2 STYLED) */}
         <p class={`showcase-subtitle text-xs sm:text-sm text-zinc-300 leading-relaxed mb-4 font-normal max-w-md drop-shadow-sm ${slide.fontH2}`}>
           {slide.subtitle}
         </p>
 
-        <!-- ESPECIFICACIONES TÉCNICAS (BADGES APPLE TV) -->
+        {/* ESPECIFICACIONES TÉCNICAS (BADGES APPLE TV) */}
         <div class="flex flex-wrap items-center gap-1.5 text-[9.5px] font-mono text-zinc-400 mb-6">
           <span class="font-bold text-white/70">2026 ·</span>
           {slide.techSpecs.map(spec => (
@@ -406,9 +406,9 @@ const allSlides: SlideItem[] = computedSlides.length > 0
           ))}
         </div>
 
-        <!-- BOTONERA APPLE TV+ DE 3 ACCIONES -->
+        {/* BOTONERA APPLE TV+ DE 3 ACCIONES */}
         <div class="flex items-center gap-3 flex-wrap">
-          <!-- Botón Blanco de Lectura Principal -->
+          {/* Botón Blanco de Lectura Principal */}
           <a 
             href={slide.ctaHref} 
             class="showcase-cta group inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3 bg-white text-zinc-950 rounded-full font-bold text-xs sm:text-sm hover:bg-zinc-200 transition-all duration-200 shadow-xl pointer-events-auto cursor-pointer relative z-30 hover:scale-[1.03] active:scale-[0.98]"
@@ -419,7 +419,7 @@ const allSlides: SlideItem[] = computedSlides.length > 0
             <span>{slide.ctaText}</span>
           </a>
 
-          <!-- Botón Cristal Secundario ("Modo Cine") -->
+          {/* Botón Cristal Secundario ("Modo Cine") */}
           <a 
             href={slide.ctaHref} 
             class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-white/15 hover:bg-white/25 text-white font-semibold text-xs sm:text-sm backdrop-blur-md border border-white/20 transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] pointer-events-auto cursor-pointer shadow-md"
@@ -427,7 +427,7 @@ const allSlides: SlideItem[] = computedSlides.length > 0
             <span>Modo Cine</span>
           </a>
 
-          <!-- Botón Circular Guardar (+) -->
+          {/* Botón Circular Guardar (+) */}
           <button 
             type="button"
             aria-label="Guardar dossier"
