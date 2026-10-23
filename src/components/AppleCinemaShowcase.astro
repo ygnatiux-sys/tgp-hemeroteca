@@ -1,0 +1,559 @@
+---
+/**
+ * src/components/AppleCinemaShowcase.astro
+ *
+ * Showcase Cinemático Apple TV+ (Estilo "Mayday" & "Reparto / Cómo ver").
+ * 
+ * 1. HERO SUPERIOR PANORÁMICO:
+ *    - Portada panorámica inmersiva a pantalla completa o widescreen (min-h-[540px] md:min-h-[620px]).
+ *    - Disposición estricta: bloque editorial concentrado en el cuadrante inferior-centro-izquierdo.
+ *    - Rotación de fuentes de impacto (League Spartan, Oswald, Syne, Cinzel, Gloock).
+ *    - Píldora de categoría, badges técnicos [4K] [IMAX] [DOLBY VISION] [CC] [SDH] [AD].
+ *    - Botonera Apple TV: Botón blanco "Aceptar prueba gratuita / Leer Investigación" + Botón circular "+".
+ *    - Ficha de autor en el flanco inferior derecho.
+ *
+ * 2. SECCIÓN INFERIOR AMBIENT GLOW:
+ *    - Fondo idéntico al sample (#090a0d con glow radial #1c263c).
+ *    - "Reparto y equipo >" -> Fila de frames redondos (rounded-full aspect-square) con autores,
+ *      arquetipos y personajes de las colecciones.
+ *    - "Cómo ver" -> Card oscuro con logo TGP Project en tracking espaciado "C I N E M A T I C A".
+ */
+import { sanitizeImageUrl, isValidImageSrc } from '../lib/content-filter';
+
+export interface CinemaShowcaseItem {
+  title: string;
+  subtitle: string;
+  category: string;
+  image: string;
+  href: string;
+  fontH1: string;
+  fontH2: string;
+  accentBadge: string;
+  techSpecs: string[];
+  duration: string;
+  author: string;
+  director: string;
+}
+
+export interface RoundFrameItem {
+  name: string;
+  role: string;
+  image?: string;
+  initials?: string;
+  href?: string;
+}
+
+interface Props {
+  items?: CinemaShowcaseItem[];
+  frames?: RoundFrameItem[];
+  collectionTitle?: string;
+}
+
+const { items, frames, collectionTitle = "Colecciones Cinemáticas" } = Astro.props;
+
+// Presets tipográficos de alto impacto
+const IMPACT_FONT_PRESETS = [
+  {
+    fontH1: "font-['League_Spartan',sans-serif] font-black tracking-tighter uppercase",
+    fontH2: "font-['Inter',sans-serif]",
+    accentBadge: "Colección · Arqueosemiótica · Historia +13",
+    techSpecs: ["4K", "IMAX 70MM", "DOLBY VISION", "CC", "SDH", "AD"]
+  },
+  {
+    fontH1: "font-['Oswald',sans-serif] font-bold tracking-tight uppercase",
+    fontH2: "font-['Space_Mono',monospace]",
+    accentBadge: "Dossier · Epigrafía · Resonancia Lítica +13",
+    techSpecs: ["4K", "DOLBY ATMOS", "RESONANCIA 432HZ", "CC", "AD"]
+  },
+  {
+    fontH1: "font-['Syne',sans-serif] font-extrabold tracking-tight uppercase",
+    fontH2: "font-['IBM_Plex_Mono',monospace]",
+    accentBadge: "Investigación · Georradar · Prehistoria +16",
+    techSpecs: ["4K", "GPR SCANNER", "TOPOGRAFÍA 3D", "SDH"]
+  },
+  {
+    fontH1: "font-['Cinzel',serif] font-black tracking-normal uppercase",
+    fontH2: "font-['Plus_Jakarta_Sans',sans-serif]",
+    accentBadge: "Monumento · Megalitos de Asia · Ingeniería +13",
+    techSpecs: ["4K", "IMAX 70MM", "COLOR RAW", "CC", "AD"]
+  }
+];
+
+// Fallback curado para los slides del Hero
+const DEFAULT_HERO_ITEMS: CinemaShowcaseItem[] = [
+  {
+    title: "MAYDAY DEL TIEMPO",
+    subtitle: "Cuando la civilización humana quedó atrapada tras las líneas del olvido milenario en una misión por descifrar los cimientos perdidos de la Tierra.",
+    category: "Arqueosemiótica",
+    image: "/src/assets/remotas/stepped-pyramid-of-djoser-at-saqqara.webp",
+    href: "/hemeroteca/la-arquitectura-del-tiempo/",
+    fontH1: IMPACT_FONT_PRESETS[0].fontH1,
+    fontH2: IMPACT_FONT_PRESETS[0].fontH2,
+    accentBadge: IMPACT_FONT_PRESETS[0].accentBadge,
+    techSpecs: IMPACT_FONT_PRESETS[0].techSpecs,
+    duration: "1h 50m",
+    author: "Xavier Benítez",
+    director: "The Great Puzzle Project"
+  },
+  {
+    title: "LA CÁMARA SILENCIOSA",
+    subtitle: "En el corazón acústico de Dahshur, el granito pulido devuelve los ecos de una frecuencia litúrgica olvidada por la historiografía oficial.",
+    category: "Acústica Sagrada",
+    image: "https://storage.thegreatpuzzleproject.com/wikimedia/1790166100412-8c88f7a9.webp",
+    href: "/colecciones/ensayos-cinematicos/",
+    fontH1: IMPACT_FONT_PRESETS[1].fontH1,
+    fontH2: IMPACT_FONT_PRESETS[1].fontH2,
+    accentBadge: IMPACT_FONT_PRESETS[1].accentBadge,
+    techSpecs: IMPACT_FONT_PRESETS[1].techSpecs,
+    duration: "2h 15m",
+    author: "Xavier Benítez, Imhotep",
+    director: "Acervo Lítico TGP"
+  },
+  {
+    title: "GUNUNG PADANG PROFUNDO",
+    subtitle: "Una colina megalítica en Java Occidental donde el georradar y los estratos de basalto columnar desafían las líneas cronológicas establecidas.",
+    category: "Prehistoria",
+    image: "https://storage.thegreatpuzzleproject.com/wikimedia/1791676137832-aca96ac9.webp",
+    href: "/colecciones/arqueosemiotica/",
+    fontH1: IMPACT_FONT_PRESETS[2].fontH1,
+    fontH2: IMPACT_FONT_PRESETS[2].fontH2,
+    accentBadge: IMPACT_FONT_PRESETS[2].accentBadge,
+    techSpecs: IMPACT_FONT_PRESETS[2].techSpecs,
+    duration: "1h 42m",
+    author: "Danny Hilman, Xavier Benítez",
+    director: "Cartografía Geohistórica"
+  },
+  {
+    title: "CANTERAS IMPERIALES",
+    subtitle: "Los monolitos inconclusos de Yangshan: millones de toneladas de piedra desprendidas de la roca madre en un acto de ingeniería ciclópea desmesurada.",
+    category: "Megalitismo",
+    image: "https://storage.thegreatpuzzleproject.com/remotas/yangshan-stele-quarry.webp",
+    href: "/colecciones/historia/",
+    fontH1: IMPACT_FONT_PRESETS[3].fontH1,
+    fontH2: IMPACT_FONT_PRESETS[3].fontH2,
+    accentBadge: IMPACT_FONT_PRESETS[3].accentBadge,
+    techSpecs: IMPACT_FONT_PRESETS[3].techSpecs,
+    duration: "1h 58m",
+    author: "Dinastía Ming, Xavier Benítez",
+    director: "Arqueología de Asia"
+  }
+];
+
+const finalHeroItems = items && items.length > 0 ? items : DEFAULT_HERO_ITEMS;
+
+// Frames redondos estilo Reparto y equipo (Autores / Arquetipos de las Colecciones)
+const DEFAULT_ROUND_FRAMES: RoundFrameItem[] = [
+  {
+    name: "Xavier Benítez",
+    role: "Investigador & Autor",
+    image: "https://storage.thegreatpuzzleproject.com/busts/busto-hegel.webp"
+  },
+  {
+    name: "Imhotep",
+    role: "Arquitecto de Saqqara",
+    image: "/src/assets/remotas/stepped-pyramid-of-djoser-at-saqqara.webp"
+  },
+  {
+    name: "Djoser",
+    role: "Faraón Dinastía III",
+    image: "https://storage.thegreatpuzzleproject.com/wikimedia/1790166100412-8c88f7a9.webp"
+  },
+  {
+    name: "Venus Clásica",
+    role: "Arquetipo Universal",
+    image: "https://storage.thegreatpuzzleproject.com/busts/busto-venus.webp"
+  },
+  {
+    name: "Cabeza Olmeca",
+    role: "Megalito de La Venta",
+    image: "https://storage.thegreatpuzzleproject.com/busts/busto-olmeca.webp"
+  },
+  {
+    name: "Pazuzu",
+    role: "Bronce Asirio",
+    image: "https://storage.thegreatpuzzleproject.com/busts/busto-pazuzu.webp"
+  },
+  {
+    name: "XB",
+    role: "Curaduría General",
+    initials: "XB"
+  },
+  {
+    name: "TGP Mind",
+    role: "Producción Epistémica",
+    initials: "TGP"
+  }
+];
+
+const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FRAMES;
+---
+
+<!-- Carga de fuentes requeridas -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;800;900&family=Oswald:wght@600;700&family=Syne:wght@700;800&family=Cinzel:wght@700;800;900&display=swap" rel="stylesheet">
+
+<div class="apple-cinema-showcase-wrapper relative w-full my-12 select-none font-sans" data-active-slide="0">
+  
+  <!-- ═══════════════════════════════════════════════════════════════════
+       1. HERO SHOWCASE ESTILO "MAYDAY" (PROPORCIÓN Y DISPOSICIÓN EXACTA)
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="cinema-mayday-hero relative w-full h-[76vh] min-h-140 max-h-195 rounded-3xl overflow-hidden bg-[#07080a] border border-white/10 shadow-[0_30px_90px_rgba(0,0,0,0.95)]">
+    
+    <!-- CONTENEDOR DE FONDOS PANORÁMICOS CON ZOOM DISCRETO -->
+    <div class="absolute inset-0 w-full h-full overflow-hidden z-0">
+      {finalHeroItems.map((item, sIdx) => (
+        <div 
+          class={`mayday-bg-slide absolute inset-0 w-full h-full transition-none ${sIdx === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+          data-mayday-bg={sIdx}
+          style={sIdx === 0 ? 'display: block;' : 'display: none;'}
+        >
+          <img 
+            src={item.image} 
+            alt={item.title}
+            loading={sIdx === 0 ? "eager" : "lazy"}
+            decoding="async"
+            class="w-full h-full object-cover object-center scale-100 brightness-[0.82] contrast-[1.06]"
+          />
+          <!-- Degradé vertical y viñeta lateral Apple TV para proteger el texto -->
+          <div class="absolute inset-0 bg-linear-to-t from-[#07080a] via-[#07080a]/50 via-40% to-transparent pointer-events-none z-1"></div>
+          <div class="absolute inset-0 bg-linear-to-r from-[#07080a] via-[#07080a]/80 via-45% to-transparent pointer-events-none z-1"></div>
+          <div class="absolute inset-x-0 top-0 h-28 bg-linear-to-b from-black/50 to-transparent pointer-events-none z-1"></div>
+        </div>
+      ))}
+    </div>
+
+    <!-- CONTENEDOR DE TEXTO: ESTRICTAMENTE CUADRANTE INFERIOR-CENTRO-IZQUIERDO -->
+    <div class="relative z-20 w-full h-full flex flex-col justify-end p-6 sm:p-10 md:p-14 lg:p-16 pointer-events-none">
+      
+      {finalHeroItems.map((item, sIdx) => (
+        <div 
+          class={`mayday-content-slide absolute left-6 sm:left-10 md:left-14 lg:left-16 bottom-6 sm:bottom-10 md:bottom-14 lg:bottom-16 right-6 sm:right-10 md:right-14 max-w-xl lg:max-w-2xl flex flex-col items-start gap-3 transition-none ${sIdx === 0 ? 'opacity-100 z-30 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
+          data-mayday-content={sIdx}
+          style={sIdx === 0 ? 'display: flex;' : 'display: none;'}
+        >
+          <!-- TÍTULO MONUMENTAL H1 EN FUENTE IMPACT / EXTRABOLD ROTATIVA -->
+          <h1 class={`mayday-title text-4xl sm:text-5xl md:text-6xl lg:text-[68px] text-white leading-[0.92] drop-shadow-[0_4px_25px_rgba(0,0,0,0.95)] max-w-2xl ${item.fontH1}`}>
+            {item.title}
+          </h1>
+
+          <!-- PÍLDORA Y CATEGORÍA ESTILO APPLE TV (como el logo TV + Película · Acción · Comedia +13) -->
+          <div class="flex items-center gap-2 text-xs sm:text-sm text-white/90 pt-1">
+            <span class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[9px] font-bold">
+              
+            </span>
+            <span class="font-semibold text-white/95">
+              {item.accentBadge}
+            </span>
+          </div>
+
+          <!-- SINOPSIS DESCRIPTIVA CON BOTÓN 'MÁS' INTEGRADO -->
+          <div class="relative max-w-lg">
+            <p class={`mayday-desc text-xs sm:text-sm md:text-base text-zinc-300 leading-relaxed font-normal drop-shadow-md line-clamp-2 ${item.fontH2}`}>
+              {item.subtitle}
+            </p>
+            <a 
+              href={item.href}
+              class="inline-block px-1.5 py-0.5 rounded bg-white/20 hover:bg-white/30 text-white font-mono text-[9px] font-bold mt-1 tracking-wider uppercase transition-colors pointer-events-auto"
+            >
+              MÁS
+            </a>
+          </div>
+
+          <!-- ESPECIFICACIONES TÉCNICAS BADGES (2026 · 1h 50m [4K] [IMAX] [CC] [SDH] [AD]) -->
+          <div class="flex flex-wrap items-center gap-1.5 text-[10px] font-mono text-zinc-400 pt-1">
+            <span class="font-bold text-white/80">2026 · {item.duration}</span>
+            {item.techSpecs.map(spec => (
+              <span class="px-1.5 py-0.5 rounded bg-white/10 backdrop-blur-sm border border-white/15 text-white/80 font-bold">
+                {spec}
+              </span>
+            ))}
+          </div>
+
+          <!-- BOTONERA APPLE TV+: BOTÓN BLANCO + BOTÓN CIRCULAR (+) -->
+          <div class="flex items-center gap-3 pt-3">
+            <!-- Botón Blanco Principal ("Aceptar prueba gratuita" / "Leer Investigación") -->
+            <a 
+              href={item.href}
+              class="inline-flex items-center justify-center gap-2 px-7 sm:px-8 py-3 rounded-full bg-white text-zinc-950 font-bold text-xs sm:text-sm shadow-[0_10px_25px_rgba(255,255,255,0.2)] hover:bg-zinc-200 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 cursor-pointer pointer-events-auto"
+            >
+              <span>Acceder a la Investigación</span>
+            </a>
+
+            <!-- Botón Circular Guardar (+) -->
+            <button 
+              type="button"
+              aria-label="Guardar en acervo"
+              class="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer pointer-events-auto shadow-md"
+              title="Guardar en biblioteca"
+            >
+              <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
+          </div>
+
+          <p class="text-[10px] text-zinc-400 font-mono pt-1">
+            Archivo TGP abierto · Acceso libre e inmediato
+          </p>
+
+        </div>
+      ))}
+
+      <!-- CRÉDITO DEL REPARTO AL MARGEN INFERIOR DERECHO -->
+      <div class="hidden lg:block absolute bottom-10 right-12 text-right pointer-events-none max-w-xs z-20">
+        <span class="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 font-bold mb-1">
+          Investigador
+        </span>
+        <p class="text-xs font-semibold text-zinc-300 leading-tight">
+          Xavier Benítez
+        </p>
+        <span class="text-[10px] font-mono text-zinc-500">Dirección: The Great Puzzle Project</span>
+      </div>
+
+    </div>
+
+    <!-- PUNTOS INDICADORES DE CAMBIO DE HERO -->
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15">
+      {finalHeroItems.map((_, i) => (
+        <button 
+          type="button" 
+          class={`mayday-dot transition-all duration-300 rounded-full cursor-pointer ${i === 0 ? 'w-6 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/35 hover:bg-white/60'}`}
+          data-dot-idx={i}
+          aria-label={`Ir al slide ${i + 1}`}
+        ></button>
+      ))}
+    </div>
+
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       2. SECCIÓN INFERIOR: REPARTO Y EQUIPO (FRAMES REDONDOS) + CÓMO VER
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="cinema-bottom-section relative w-full mt-8 p-6 sm:p-10 rounded-3xl overflow-hidden border border-white/10 shadow-[0_20px_70px_rgba(0,0,0,0.85)]">
+    
+    <!-- MAIN BG GRADIENT GLOW EXACTO DE APPLE TV (HEX #090a0d base con glow radial #1c263c) -->
+    <div class="absolute inset-0 bg-[#090a0d] z-0 pointer-events-none"></div>
+    <div 
+      class="absolute inset-0 pointer-events-none z-1 opacity-75"
+      style="background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(28, 38, 56, 0.45) 0%, rgba(9, 10, 13, 0.98) 100%);"
+    ></div>
+
+    <!-- ── BLOQUE A: REPARTO Y EQUIPO (FRAMES REDONDOS) ── -->
+    <div class="relative z-10 mb-10">
+      <div class="flex items-center gap-2 mb-6">
+        <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-1.5">
+          <span>Reparto y autores del acervo</span>
+          <svg class="w-4 h-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </h2>
+      </div>
+
+      <!-- Fila horizontal scrolleable con los frames redondos -->
+      <div class="flex items-center gap-5 sm:gap-6 md:gap-8 overflow-x-auto pb-4 scrollbar-none">
+        {finalRoundFrames.map((frame) => (
+          <div class="group/frame flex flex-col items-center text-center shrink-0 w-22 sm:w-24 md:w-28 cursor-pointer">
+            <!-- Frame Redondo Perfecto (rounded-full aspect-square) -->
+            <div class="relative w-20 h-20 sm:w-24 sm:h-24 md:w-26 md:h-26 rounded-full overflow-hidden border border-white/15 bg-zinc-900 shadow-xl transition-all duration-300 group-hover/frame:scale-105 group-hover/frame:border-amber-400/80 group-hover/frame:shadow-[0_0_20px_rgba(245,158,11,0.3)] mb-2.5">
+              {frame.image ? (
+                <img 
+                  src={frame.image} 
+                  alt={frame.name}
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-full object-cover object-center transition-transform duration-500 group-hover/frame:scale-110"
+                />
+              ) : (
+                <div class="w-full h-full flex items-center justify-center bg-zinc-800 text-white font-mono font-bold text-lg">
+                  {frame.initials || "TGP"}
+                </div>
+              )}
+            </div>
+
+            <!-- Nombre y Rol con jerarquía Apple TV -->
+            <h3 class="text-xs sm:text-sm font-bold text-white leading-tight group-hover/frame:text-amber-200 transition-colors line-clamp-1">
+              {frame.name}
+            </h3>
+            <span class="text-[10px] sm:text-[11px] text-zinc-400 font-normal leading-tight line-clamp-1 mt-0.5">
+              {frame.role}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- ── BLOQUE B: CÓMO VER (CARD OSCURO TIPO TGP PROJECT C I N E M A T I C A) ── -->
+    <div class="relative z-10 pt-4 border-t border-white/10">
+      <h2 class="text-base sm:text-lg font-bold text-white tracking-tight mb-4">
+        Cómo explorar
+      </h2>
+
+      <!-- Card oscuro estilo Apple TV con branding espaciado -->
+      <div class="max-w-md p-5 rounded-2xl bg-black/60 backdrop-blur-md border border-white/15 shadow-xl flex flex-col gap-2">
+        <div class="flex items-center gap-3">
+          <!-- Logo / Ícono estilo tv pero con TGP PROJECT C I N E M A T I C A -->
+          <div class="px-3 py-1.5 rounded-lg bg-white/10 border border-white/10 flex items-center gap-1.5 text-white">
+            <span class="font-bold text-sm tracking-widest font-mono">TGP</span>
+            <span class="text-[10px] font-sans font-light tracking-[0.25em] uppercase text-zinc-300">
+              c i n e m a
+            </span>
+          </div>
+          <span class="text-sm font-bold text-white tracking-wide">
+            Acceso libre e inmediato
+          </span>
+        </div>
+
+        <p class="text-[11px] text-zinc-400 font-mono pl-1">
+          Investigaciones completas, acervo visual y dossiers sin suscripción comercial.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     3. SCRIPT GSAP: ROTACIÓN Y CONTROL DEL SHOWCASE
+     ═══════════════════════════════════════════════════════════════════ -->
+<script>
+  import { gsap } from 'gsap';
+
+  function initMaydayShowcase() {
+    const wrapper = document.querySelector('.apple-cinema-showcase-wrapper') as HTMLElement | null;
+    if (!wrapper || wrapper.dataset.showcaseReady === 'true') return;
+    wrapper.dataset.showcaseReady = 'true';
+
+    const bgs = gsap.utils.toArray<HTMLElement>('.mayday-bg-slide');
+    const contents = gsap.utils.toArray<HTMLElement>('.mayday-content-slide');
+    const dots = gsap.utils.toArray<HTMLButtonElement>('.mayday-dot');
+
+    if (contents.length <= 1) return;
+
+    let currentIndex = 0;
+    let isTransitioning = false;
+    let autoTimer: gsap.core.Tween | null = null;
+    let isHovering = false;
+
+    function updateDots(targetIdx: number) {
+      dots.forEach((dot, idx) => {
+        if (idx === targetIdx) {
+          dot.className = 'mayday-dot transition-all duration-300 rounded-full cursor-pointer w-6 h-1.5 bg-white';
+        } else {
+          dot.className = 'mayday-dot transition-all duration-300 rounded-full cursor-pointer w-1.5 h-1.5 bg-white/35 hover:bg-white/60';
+        }
+      });
+    }
+
+    function goToSlide(nextIdx: number) {
+      if (nextIdx === currentIndex || isTransitioning) return;
+      isTransitioning = true;
+
+      const currentBg = bgs[currentIndex];
+      const nextBg = bgs[nextIdx];
+      const currentContent = contents[currentIndex];
+      const nextContent = contents[nextIdx];
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          isTransitioning = false;
+        }
+      });
+
+      // 1. Apagar contenido y fondo actual
+      tl.to(
+        currentContent,
+        {
+          opacity: 0,
+          y: -12,
+          duration: 0.4,
+          ease: 'power2.in',
+          onComplete: () => {
+            currentContent.style.display = 'none';
+            currentContent.style.pointerEvents = 'none';
+          }
+        },
+        0
+      );
+
+      tl.to(
+        currentBg,
+        {
+          opacity: 0,
+          duration: 0.6,
+          ease: 'power2.inOut',
+          onComplete: () => {
+            currentBg.style.display = 'none';
+          }
+        },
+        0
+      );
+
+      // 2. Encender nuevo fondo con leve scale out
+      tl.set(nextBg, { display: 'block', zIndex: '10' }, 0.2);
+      tl.fromTo(
+        nextBg,
+        { opacity: 0, scale: 1.04 },
+        { opacity: 1, scale: 1, duration: 0.8, ease: 'power3.out' },
+        0.2
+      );
+
+      // 3. Encender nuevo contenido con stagger
+      tl.set(nextContent, { display: 'flex', zIndex: '30', pointerEvents: 'auto' }, 0.3);
+      tl.fromTo(
+        nextContent,
+        { opacity: 0, y: 18 },
+        { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' },
+        0.3
+      );
+
+      currentIndex = nextIdx;
+      wrapper.dataset.activeSlide = String(currentIndex);
+      updateDots(currentIndex);
+    }
+
+    function scheduleTimer() {
+      if (autoTimer) autoTimer.kill();
+      autoTimer = gsap.delayedCall(5.5, () => {
+        if (!isHovering) {
+          const next = (currentIndex + 1) % contents.length;
+          goToSlide(next);
+          scheduleTimer();
+        }
+      });
+    }
+
+    dots.forEach((dot, idx) => {
+      dot.addEventListener('click', (e) => {
+        e.preventDefault();
+        goToSlide(idx);
+        scheduleTimer();
+      });
+    });
+
+    wrapper.addEventListener('mouseenter', () => {
+      isHovering = true;
+      if (autoTimer) autoTimer.pause();
+    });
+
+    wrapper.addEventListener('mouseleave', () => {
+      isHovering = false;
+      if (autoTimer) {
+        autoTimer.resume();
+      } else {
+        scheduleTimer();
+      }
+    });
+
+    scheduleTimer();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMaydayShowcase);
+  } else {
+    initMaydayShowcase();
+  }
+  document.addEventListener('astro:page-load', initMaydayShowcase);
+</script>
