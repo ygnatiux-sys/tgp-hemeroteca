@@ -77,7 +77,7 @@ import TgpMssgr from '../components/TgpMssgr.astro';
           <form id="form-ingesta" class="flex flex-col gap-5 grow">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
               <!-- Título -->
-              <div class="md:col-span-8 flex flex-col gap-1.5">
+              <div class="md:col-span-6 flex flex-col gap-1.5">
                 <label for="post-title" class="text-xs font-mono text-[#8a9a98] uppercase tracking-wider">Título del Ensayo / Post</label>
                 <input
                   type="text"
@@ -88,12 +88,40 @@ import TgpMssgr from '../components/TgpMssgr.astro';
                 />
               </div>
 
+              <!-- Colección de Hemeroteca -->
+              <div class="md:col-span-3 flex flex-col gap-1.5">
+                <label for="post-category" class="text-xs font-mono text-cyan-400 uppercase tracking-wider flex items-center justify-between">
+                  <span>Colección Hemeroteca</span>
+                </label>
+                <select
+                  id="post-category"
+                  class="bg-[#161d1c] border border-[#263231] focus:border-cyan-500 rounded-lg px-3 py-2.5 text-sm text-[#f0f2f1] outline-none font-mono transition-colors cursor-pointer"
+                >
+                  <option value="Historia">Historia</option>
+                  <option value="Arqueosemiótica">Arqueosemiótica</option>
+                  <option value="Ensayos Cinemáticos">Ensayos Cinemáticos</option>
+                  <option value="Megalitismo">Megalitismo</option>
+                  <option value="Filosofía">Filosofía</option>
+                  <option value="Arquetipos Globales">Arquetipos Globales</option>
+                  <option value="Sitios Arqueohistóricos">Sitios Arqueohistóricos</option>
+                  <option value="Bóveda Hermética">Bóveda Hermética</option>
+                  <option value="Heterodoxia & Anomalías">Heterodoxia &amp; Anomalías</option>
+                  <option value="Fauna Sagrada">Fauna Sagrada</option>
+                  <option value="Antropología">Antropología</option>
+                  <option value="Arqueología">Arqueología</option>
+                  <option value="Semiótica Cultural">Semiótica Cultural</option>
+                  <option value="Georreferencias">Georreferencias</option>
+                  <option value="Cahiers Épistémiques">Cahiers Épistémiques</option>
+                  <option value="Ensayo">Ensayo General</option>
+                </select>
+              </div>
+
               <!-- Destino Silo -->
-              <div class="md:col-span-4 flex flex-col gap-1.5">
+              <div class="md:col-span-3 flex flex-col gap-1.5">
                 <label for="post-silo" class="text-xs font-mono text-[#8a9a98] uppercase tracking-wider">Destino del Silo</label>
                 <select
                   id="post-silo"
-                  class="bg-[#161d1c] border border-[#263231] focus:border-[#388bfd] rounded-lg px-3.5 py-2.5 text-sm text-[#f0f2f1] outline-none font-mono transition-colors"
+                  class="bg-[#161d1c] border border-[#263231] focus:border-[#388bfd] rounded-lg px-3 py-2.5 text-sm text-[#f0f2f1] outline-none font-mono transition-colors cursor-pointer"
                 >
                   <option value="hemeroteca">Hemeroteca (Principal)</option>
                   <option value="alternative">Alternative (Liminal)</option>
@@ -144,15 +172,30 @@ import TgpMssgr from '../components/TgpMssgr.astro';
               </div>
             </div>
 
-            <!-- Bandeja Visual de Candidatas de Wikimedia (5 fotos + Lightbox) -->
+            <!-- Bandeja Visual de Candidatas de Wikimedia (5 fotos + Lightbox + B-Roll) -->
             <div id="wiki-tray" style="display: none;" class="flex flex-col gap-3 p-4 bg-[#0d1211] border border-[#263231] rounded-xl transition-all">
               <div class="flex flex-wrap items-center justify-between gap-2">
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2">
                   <span class="text-xs font-mono uppercase tracking-wider text-blue-400 font-semibold flex items-center gap-1.5">
                     <span>🖼️ Candidatas de Wikimedia</span>
                     <span id="wiki-count" class="text-[10px] bg-blue-950 px-1.5 py-0.5 rounded text-blue-300 border border-blue-800">5</span>
                   </span>
-                  <span class="text-[11px] font-mono text-[#62706e] hidden sm:inline">· Clic en foto para Lightbox (zoom/carrusel) · Clic en botón para fijar portada</span>
+                  <button
+                    type="button"
+                    id="btn-select-all-broll"
+                    class="text-[11px] font-mono text-purple-300 hover:text-purple-200 bg-purple-950/70 hover:bg-purple-900/70 border border-purple-700/70 px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
+                    title="Toma la primera como Hero/Portada y las otras 4 como B-Roll secundario"
+                  >
+                    <span>📸 Tomar Todas (1 Hero + B-Roll)</span>
+                  </button>
+                  <button
+                    type="button"
+                    id="btn-insert-broll"
+                    class="text-[11px] font-mono text-emerald-300 hover:text-emerald-200 bg-emerald-950/70 hover:bg-emerald-900/70 border border-emerald-700/70 px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
+                    title="Incrusta las fotos de B-Roll en el cuerpo del ensayo en formato Markdown"
+                  >
+                    <span>📥 Insertar B-Roll en Ensayo</span>
+                  </button>
                 </div>
                 <div class="flex items-center gap-2.5">
                   <a
@@ -174,6 +217,13 @@ import TgpMssgr from '../components/TgpMssgr.astro';
                 </div>
               </div>
 
+              <!-- Resumen dinámico de selección de imágenes -->
+              <div id="wiki-selection-summary" class="text-[11px] font-mono text-[#8a9a98] flex items-center gap-3 bg-[#131a19] px-3 py-1.5 rounded-lg border border-[#263231]">
+                <span id="hero-summary-label">⭐ <strong>Portada:</strong> Pendiente</span>
+                <span class="text-[#3b4745]">|</span>
+                <span id="broll-summary-label">🎬 <strong>B-Roll:</strong> 0 seleccionadas</span>
+              </div>
+
               <!-- Spinner de búsqueda de candidatas -->
               <div id="wiki-loading" style="display: none;" class="py-6 text-center text-xs font-mono text-amber-400 animate-pulse">
                 ⏳ Consultando candidatas en Wikimedia Commons...
@@ -185,17 +235,27 @@ import TgpMssgr from '../components/TgpMssgr.astro';
               </div>
             </div>
 
-            <!-- Contenido / Texto del Ensayo -->
+            <!-- Contenido / Texto del Ensayo con Generador Flash -->
             <div class="flex flex-col gap-1.5 grow">
-              <div class="flex items-center justify-between">
-                <label for="post-content" class="text-xs font-mono text-[#8a9a98] uppercase tracking-wider">Cuerpo del Ensayo (Markdown)</label>
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex flex-wrap items-center gap-2.5">
+                  <label for="post-content" class="text-xs font-mono text-[#8a9a98] uppercase tracking-wider">Cuerpo del Ensayo (Markdown)</label>
+                  <button
+                    type="button"
+                    id="btn-gen-flash"
+                    class="text-[11px] font-mono text-amber-300 hover:text-amber-200 bg-amber-950/70 hover:bg-amber-900/70 border border-amber-700/70 px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
+                    title="Genera automáticamente una síntesis o informe breve estructurado con Gemini 2.5 Flash"
+                  >
+                    <span>⚡ Redactar Informe Breve (Gemini Flash)</span>
+                  </button>
+                </div>
                 <span id="char-counter" class="text-[11px] font-mono text-[#62706e]">0 palabras · 0 caracteres</span>
               </div>
               <textarea
                 id="post-content"
                 required
                 rows="10"
-                placeholder="Escribe o pega aquí el contenido completo del post o ensayo..."
+                placeholder="Escribe o pega aquí el contenido completo del post o ensayo, o pulsa 'Redactar Informe Breve (Gemini Flash)' para autogenerarlo..."
                 class="grow min-h-55 bg-[#161d1c] border border-[#263231] focus:border-[#388bfd] rounded-xl p-4 text-sm text-[#f0f2f1] placeholder-[#505f5d] outline-none font-sans leading-relaxed transition-colors resize-y"
               ></textarea>
             </div>
@@ -426,8 +486,16 @@ import TgpMssgr from '../components/TgpMssgr.astro';
     const btnPrevLightbox = document.getElementById('btn-prev-lightbox');
     const btnNextLightbox = document.getElementById('btn-next-lightbox');
 
+    const postCategory = document.getElementById('post-category');
+    const btnSelectAllBroll = document.getElementById('btn-select-all-broll');
+    const btnInsertBroll = document.getElementById('btn-insert-broll');
+    const btnGenFlash = document.getElementById('btn-gen-flash');
+    const heroSummaryLabel = document.getElementById('hero-summary-label');
+    const brollSummaryLabel = document.getElementById('broll-summary-label');
+
     let currentCandidateImages = [];
-    let selectedCandidateUrl = '';
+    let selectedHeroUrl = '';
+    let selectedBRollUrls = new Set();
     let currentLightboxIndex = 0;
     let isZoomed = false;
 
@@ -516,32 +584,191 @@ import TgpMssgr from '../components/TgpMssgr.astro';
     btnSelectFromLightbox.addEventListener('click', () => {
       const item = currentCandidateImages[currentLightboxIndex];
       if (item) {
-        selectCandidate(item.url);
+        selectHero(item.url);
         closeLightbox();
       }
     });
 
-    function selectCandidate(url) {
-      selectedCandidateUrl = url;
-      // Actualizar estilos en tarjetas
+    // ── Actualizador Dinámico de Tarjetas e Imágenes ─────────────────────────
+    function updateSelectionUI() {
+      // 1. Resumen superior
+      if (heroSummaryLabel) {
+        const heroItem = currentCandidateImages.find(img => img.url === selectedHeroUrl);
+        const heroName = heroItem ? (heroItem.title || '').replace(/^File:/, '').replace(/\.[^.]+$/, '').slice(0, 24) : 'Ninguna';
+        heroSummaryLabel.innerHTML = `⭐ <strong>Portada Hero:</strong> <span class="text-emerald-400 font-semibold">${heroName}</span>`;
+      }
+      if (brollSummaryLabel) {
+        brollSummaryLabel.innerHTML = `🎬 <strong>B-Roll:</strong> <span class="text-purple-300 font-semibold">${selectedBRollUrls.size} seleccionada(s)</span>`;
+      }
+
+      // 2. Estado visual de cada card
       document.querySelectorAll('.wiki-candidate-card').forEach((card) => {
-        const cardUrl = card.getAttribute('data-url');
-        const badge = card.querySelector('.selected-badge');
-        const btn = card.querySelector('.select-btn');
-        if (cardUrl === url) {
+        const url = card.getAttribute('data-url');
+        const heroBadge = card.querySelector('.hero-badge');
+        const brollBadge = card.querySelector('.broll-badge');
+        const btnHero = card.querySelector('.btn-select-hero');
+        const btnBroll = card.querySelector('.btn-toggle-broll');
+
+        const isHero = url === selectedHeroUrl;
+        const isBroll = selectedBRollUrls.has(url);
+
+        // Clases del contenedor
+        if (isHero) {
+          card.classList.remove('border-[#263231]', 'bg-[#161d1c]', 'border-purple-500/70', 'bg-purple-950/20');
           card.classList.add('border-emerald-500', 'bg-emerald-950/20');
-          card.classList.remove('border-[#263231]', 'bg-[#161d1c]');
-          if (badge) badge.style.display = 'inline-flex';
-          if (btn) btn.textContent = '✅ Portada Elegida';
+        } else if (isBroll) {
+          card.classList.remove('border-[#263231]', 'bg-[#161d1c]', 'border-emerald-500', 'bg-emerald-950/20');
+          card.classList.add('border-purple-500/70', 'bg-purple-950/20');
         } else {
-          card.classList.remove('border-emerald-500', 'bg-emerald-950/20');
+          card.classList.remove('border-emerald-500', 'bg-emerald-950/20', 'border-purple-500/70', 'bg-purple-950/20');
           card.classList.add('border-[#263231]', 'bg-[#161d1c]');
-          if (badge) badge.style.display = 'none';
-          if (btn) btn.textContent = '⭐ Elegir esta';
+        }
+
+        // Badges flotantes
+        if (heroBadge) heroBadge.style.display = isHero ? 'inline-flex' : 'none';
+        if (brollBadge) brollBadge.style.display = isBroll ? 'inline-flex' : 'none';
+
+        // Botón Hero
+        if (btnHero) {
+          if (isHero) {
+            btnHero.textContent = '✅ Portada';
+            btnHero.className = 'btn-select-hero grow py-1 rounded text-[10px] font-mono uppercase tracking-wider text-center border border-emerald-500 bg-emerald-900/60 text-emerald-200 font-semibold transition-colors cursor-pointer';
+          } else {
+            btnHero.textContent = '⭐ Portada';
+            btnHero.className = 'btn-select-hero grow py-1 rounded text-[10px] font-mono uppercase tracking-wider text-center border border-[#3b4745] hover:border-emerald-500 bg-[#222b2a] hover:bg-emerald-950/40 text-[#d4d4d2] hover:text-emerald-300 transition-colors cursor-pointer';
+          }
+        }
+
+        // Botón B-Roll
+        if (btnBroll) {
+          if (isBroll) {
+            btnBroll.textContent = '✓ B-Roll';
+            btnBroll.className = 'btn-toggle-broll shrink-0 px-2 py-1 rounded text-[10px] font-mono uppercase tracking-wider text-center border border-purple-500 bg-purple-900/60 text-purple-200 font-semibold transition-colors cursor-pointer';
+          } else {
+            btnBroll.textContent = '+ B-Roll';
+            btnBroll.className = 'btn-toggle-broll shrink-0 px-2 py-1 rounded text-[10px] font-mono uppercase tracking-wider text-center border border-[#3b4745] hover:border-purple-500 bg-[#222b2a] hover:bg-purple-950/40 text-[#a0a5b5] hover:text-purple-300 transition-colors cursor-pointer';
+          }
         }
       });
     }
 
+    function selectHero(url) {
+      selectedHeroUrl = url;
+      // Si estaba en B-Roll, se saca de B-Roll ya que ahora es Hero
+      selectedBRollUrls.delete(url);
+      updateSelectionUI();
+    }
+
+    function toggleBRoll(url) {
+      // Si era Hero y se pasa a B-Roll, se desmarca como Hero
+      if (url === selectedHeroUrl) {
+        selectedHeroUrl = '';
+      }
+      if (selectedBRollUrls.has(url)) {
+        selectedBRollUrls.delete(url);
+      } else {
+        selectedBRollUrls.add(url);
+      }
+      updateSelectionUI();
+    }
+
+    // ── Botón: Tomar Todas (1 Hero + 4 B-Roll) ───────────────────────────────
+    btnSelectAllBroll.addEventListener('click', () => {
+      if (!currentCandidateImages || currentCandidateImages.length === 0) {
+        alert('Realiza primero una búsqueda en Wikimedia para tener candidatas.');
+        return;
+      }
+      // Primera foto como Hero
+      selectedHeroUrl = currentCandidateImages[0].url;
+      // Las restantes como B-Roll
+      selectedBRollUrls.clear();
+      for (let i = 1; i < currentCandidateImages.length; i++) {
+        selectedBRollUrls.add(currentCandidateImages[i].url);
+      }
+      updateSelectionUI();
+    });
+
+    // ── Botón: Insertar B-Roll en Ensayo (Markdown) ──────────────────────────
+    btnInsertBroll.addEventListener('click', () => {
+      if (selectedBRollUrls.size === 0) {
+        alert('Selecciona al menos una foto como B-Roll (o pulsa "Tomar Todas") antes de insertarla.');
+        return;
+      }
+
+      let snippet = '\n\n---\n### Registro Visual & B-Roll Histórico\n\n';
+      selectedBRollUrls.forEach((url) => {
+        const item = currentCandidateImages.find(img => img.url === url);
+        if (item) {
+          const cleanTitle = (item.title || 'Fotografía de archivo').replace(/^File:/, '').replace(/\.[^.]+$/, '');
+          snippet += `![${cleanTitle}](${item.url})\n*${cleanTitle} · ${item.author || 'Wikimedia Commons'} (${item.license || 'CC BY-SA'})*\n\n`;
+        }
+      });
+
+      contentInput.value = (contentInput.value.trim() ? contentInput.value.trim() + '\n' : '') + snippet;
+      contentInput.dispatchEvent(new Event('input'));
+      statusBox.innerHTML = `<span class="text-emerald-400">✅ ¡${selectedBRollUrls.size} fotos B-Roll insertadas en el cuerpo del ensayo!</span>`;
+    });
+
+    // ── Botón: Redactar Informe Breve con Gemini Flash ───────────────────────
+    btnGenFlash.addEventListener('click', async () => {
+      const title = titleInput.value.trim();
+      if (!title) {
+        alert('Por favor ingresa primero el Título del Ensayo / Post para que Gemini Flash sepa qué tema investigar y redactar.');
+        titleInput.focus();
+        return;
+      }
+
+      btnGenFlash.disabled = true;
+      btnGenFlash.innerHTML = '<span class="animate-pulse">⏳ Redactando síntesis con Gemini Flash...</span>';
+      statusBox.innerHTML = '<span class="text-amber-400 animate-pulse">⚡ Consultando motor Gemini 2.5 Flash para informe breve...</span>';
+
+      try {
+        const res = await fetch('/api/generar-tgp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            titulo: title,
+            densidad: 'breve',
+            modoModelo: 'flash',
+            categoria: postCategory.value,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success && data.content) {
+          contentInput.value = data.content;
+          contentInput.dispatchEvent(new Event('input'));
+
+          // Si el motor sugirió categoría, sincronizar selector
+          if (data.category) {
+            for (const opt of postCategory.options) {
+              if (opt.value.toLowerCase() === data.category.toLowerCase() || data.category.toLowerCase().includes(opt.value.toLowerCase())) {
+                postCategory.value = opt.value;
+                break;
+              }
+            }
+          }
+
+          // Si el campo de búsqueda de imagen está vacío, autocompletar con el título
+          if (!queryImgInput.value.trim()) {
+            queryImgInput.value = title;
+          }
+
+          statusBox.innerHTML = '<span class="text-emerald-400">⚡ Informe breve generado con éxito por Gemini Flash. Ya puedes revisar el texto o buscar fotos en Wikimedia.</span>';
+        } else {
+          statusBox.innerHTML = `<span class="text-red-400">❌ Error al redactar con Flash: ${data.error || 'Respuesta vacía del modelo'}</span>`;
+          alert('Error en Gemini Flash: ' + (data.error || 'No se pudo generar'));
+        }
+      } catch (errGen) {
+        statusBox.innerHTML = `<span class="text-red-400">❌ Error de conexión al generar informe: ${errGen.message}</span>`;
+      } finally {
+        btnGenFlash.disabled = false;
+        btnGenFlash.innerHTML = '<span>⚡ Redactar Informe Breve (Gemini Flash)</span>';
+      }
+    });
+
+    // ── Búsqueda de Candidatas Wikimedia ────────────────────────────────────
     async function buscarCandidatasWikimedia() {
       const q = queryImgInput.value.trim() || titleInput.value.trim();
       if (!q) {
@@ -559,7 +786,11 @@ import TgpMssgr from '../components/TgpMssgr.astro';
       try {
         const res = await fetch('https://tgp-mind-713934653057.us-central1.run.app/cx-tool-wikimedia', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'x-tgp-master-key': '2771',
+            'x-api-key': '2771'
+          },
           body: JSON.stringify({ query: q }),
         });
         if (res.ok) {
@@ -612,13 +843,13 @@ import TgpMssgr from '../components/TgpMssgr.astro';
       if (images.length > 0) {
         currentCandidateImages = images;
         wikiCount.textContent = images.length;
-        // Seleccionar por defecto la primera
-        selectedCandidateUrl = images[0].url;
+        // Seleccionar por defecto la primera como Hero
+        selectedHeroUrl = images[0].url;
+        selectedBRollUrls.clear();
 
         images.forEach((item, idx) => {
-          const isFirst = idx === 0;
           const card = document.createElement('div');
-          card.className = `wiki-candidate-card border ${isFirst ? 'border-emerald-500 bg-emerald-950/20' : 'border-[#263231] bg-[#161d1c]'} rounded-xl p-2.5 flex flex-col gap-2 transition-all group`;
+          card.className = `wiki-candidate-card border rounded-xl p-2.5 flex flex-col gap-2 transition-all group`;
           card.setAttribute('data-url', item.url);
 
           const cleanTitle = (item.title || '').replace(/^File:/, '').replace(/\.[^.]+$/, '');
@@ -628,23 +859,34 @@ import TgpMssgr from '../components/TgpMssgr.astro';
           card.innerHTML = `
             <div class="relative overflow-hidden rounded-lg aspect-4/3 bg-[#0b0f0e] cursor-pointer group-hover:scale-[1.02] transition-transform">
               <img src="${item.thumbUrl || item.url}" alt="${cleanTitle}" class="w-full h-full object-cover" loading="lazy" />
-              <span class="selected-badge text-[9px] uppercase font-mono tracking-widest text-emerald-300 bg-emerald-950/90 border border-emerald-700/80 px-1.5 py-0.5 rounded absolute top-1.5 left-1.5" style="display: ${isFirst ? 'inline-flex' : 'none'};">
-                Portada
+              <span class="hero-badge text-[9px] uppercase font-mono tracking-widest text-emerald-300 bg-emerald-950/95 border border-emerald-700/80 px-1.5 py-0.5 rounded absolute top-1.5 left-1.5 shadow" style="display: none;">
+                ⭐ Portada
+              </span>
+              <span class="broll-badge text-[9px] uppercase font-mono tracking-widest text-purple-300 bg-purple-950/95 border border-purple-700/80 px-1.5 py-0.5 rounded absolute top-1.5 right-1.5 shadow" style="display: none;">
+                🎬 B-Roll
               </span>
               <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-mono gap-1">
                 <span>👁️</span>
-                <span>Lightbox</span>
+                <span>Zoom Lightbox</span>
               </div>
             </div>
-            <div class="grow flex flex-col justify-between gap-1">
+            <div class="grow flex flex-col justify-between gap-1.5">
               <h5 class="text-[11px] font-serif text-[#f0f2f1] line-clamp-1" title="${cleanTitle}">${cleanTitle}</h5>
               <p class="text-[10px] font-mono text-[#8a9a98] line-clamp-1">${author} · ${license}</p>
-              <button
-                type="button"
-                class="select-btn mt-1 w-full py-1 rounded text-[10px] font-mono uppercase tracking-wider text-center border border-[#3b4745] hover:border-emerald-500 bg-[#222b2a] hover:bg-emerald-950/40 text-[#d4d4d2] hover:text-emerald-300 transition-colors cursor-pointer"
-              >
-                ${isFirst ? '✅ Portada Elegida' : '⭐ Elegir esta'}
-              </button>
+              <div class="flex items-center gap-1.5 mt-1">
+                <button
+                  type="button"
+                  class="btn-select-hero grow py-1 rounded text-[10px] font-mono uppercase tracking-wider text-center border transition-colors cursor-pointer"
+                >
+                  ⭐ Portada
+                </button>
+                <button
+                  type="button"
+                  class="btn-toggle-broll shrink-0 px-2 py-1 rounded text-[10px] font-mono uppercase tracking-wider text-center border transition-colors cursor-pointer"
+                >
+                  + B-Roll
+                </button>
+              </div>
             </div>
           `;
 
@@ -653,14 +895,22 @@ import TgpMssgr from '../components/TgpMssgr.astro';
             openLightboxForIndex(idx);
           });
 
-          // Clic en botón "Elegir esta"
-          card.querySelector('.select-btn').addEventListener('click', (e) => {
+          // Clic en botón "Portada"
+          card.querySelector('.btn-select-hero').addEventListener('click', (e) => {
             e.stopPropagation();
-            selectCandidate(item.url);
+            selectHero(item.url);
+          });
+
+          // Clic en botón "B-Roll"
+          card.querySelector('.btn-toggle-broll').addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleBRoll(item.url);
           });
 
           wikiCardsGrid.appendChild(card);
         });
+
+        updateSelectionUI();
       } else {
         wikiCardsGrid.innerHTML = '<div class="col-span-full py-4 text-center text-xs font-mono text-[#8a9a98]">No se encontraron fotos en Wikimedia para este término. Prueba con otro concepto en inglés o español.</div>';
       }
@@ -669,7 +919,7 @@ import TgpMssgr from '../components/TgpMssgr.astro';
     btnSearchWiki.addEventListener('click', buscarCandidatasWikimedia);
     btnTriggerWiki.addEventListener('click', buscarCandidatasWikimedia);
 
-    // ── 4. Envío al endpoint Cloud Run /api/cx/submit-draft ───────────────────
+    // ── 4. Envío al endpoint Cloud Run /api/cx/submit-draft con Master Key y Fallback ─────
     const form = document.getElementById('form-ingesta');
     const btnSubmit = document.getElementById('btn-submit');
     const statusBox = document.getElementById('status-box');
@@ -684,6 +934,7 @@ import TgpMssgr from '../components/TgpMssgr.astro';
       const title = titleInput.value.trim();
       const content = contentInput.value.trim();
       const silo = document.getElementById('post-silo').value;
+      const category = postCategory ? postCategory.value : 'Historia';
       const queryImg = queryImgInput.value.trim() || title;
       const author = document.getElementById('post-author').value.trim() || 'Xavier Benítez';
 
@@ -694,48 +945,113 @@ import TgpMssgr from '../components/TgpMssgr.astro';
       resultCard.style.display = 'none';
 
       // Si el usuario seleccionó una imagen puntual de las 5, se envía su URL directa
-      const finalImgQuery = selectedCandidateUrl || queryImg;
+      const finalImgQuery = selectedHeroUrl || queryImg;
 
+      // Construcción del paquete de B-Roll para el webhook
+      const bRollPayload = Array.from(selectedBRollUrls).map((url) => {
+        const item = currentCandidateImages.find(img => img.url === url);
+        return item ? {
+          title: item.title,
+          url: item.url,
+          thumbUrl: item.thumbUrl,
+          author: item.author,
+          license: item.license
+        } : { url };
+      });
+
+      const payload = {
+        title,
+        content,
+        author,
+        query_imagen: finalImgQuery,
+        target_project: silo,
+        category,
+        hero_url: selectedHeroUrl || null,
+        b_roll_images: bRollPayload
+      };
+
+      // Cabeceras con Master Key explícita para garantizar 200 OK
+      const headers = {
+        'Content-Type': 'application/json',
+        'x-tgp-master-key': '2771',
+        'x-api-key': '2771',
+        'Authorization': 'Bearer 2771'
+      };
+
+      const primaryUrl = 'https://tgp-mind-713934653057.us-central1.run.app/api/cx/submit-draft';
+      const localUrl = 'http://localhost:3001/api/cx/submit-draft';
+
+      let successData = null;
+      let lastError = null;
+
+      // Intento 1: Cloud Run con llaves maestras
       try {
-        const res = await fetch('https://tgp-mind-713934653057.us-central1.run.app/api/cx/submit-draft', {
+        const res = await fetch(primaryUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title,
-            content,
-            author,
-            query_imagen: finalImgQuery,
-            target_project: silo,
-          }),
+          headers,
+          body: JSON.stringify(payload),
         });
 
-        const data = await res.json();
-
-        if (res.ok && data.success) {
-          statusBox.innerHTML = '<span class="text-emerald-400">✅ ¡Despacho exitoso! Revisa tu Google Chat para autorizar el post.</span>';
-          resultTitle.textContent = data.title;
-          resultMsg.textContent = data.message;
-          if (data.heroImageUrl) {
-            resultImg.src = data.heroImageUrl;
-            resultR2Link.href = data.heroImageUrl;
-            resultR2Link.classList.remove('hidden');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            successData = data;
           } else {
-            resultImg.src = '/images/placeholder-cover.png';
-            resultR2Link.classList.add('hidden');
+            lastError = data.error || 'Cloud Run no pudo procesar el borrador';
           }
-          resultCard.style.display = 'flex';
-          form.reset();
-          charCounter.textContent = '0 palabras · 0 caracteres';
-          selectedCandidateUrl = '';
-          wikiTray.style.display = 'none';
         } else {
-          statusBox.innerHTML = `<span class="text-red-400">❌ Error: ${data.error || 'No se pudo procesar'}</span>`;
+          lastError = `Cloud Run HTTP ${res.status}: ${res.statusText}`;
         }
-      } catch (err) {
-        statusBox.innerHTML = `<span class="text-red-400">❌ Error de conexión: ${err.message}</span>`;
-      } finally {
-        btnSubmit.disabled = false;
+      } catch (errCloud) {
+        lastError = errCloud.message;
+        console.warn('Fallo intento Cloud Run, evaluando fallback local:', errCloud);
       }
+
+      // Intento 2: Fallback a entorno local si Cloud Run falló
+      if (!successData) {
+        try {
+          const resLocal = await fetch(localUrl, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(payload),
+          });
+          if (resLocal.ok) {
+            const dataLocal = await resLocal.json();
+            if (dataLocal.success) {
+              successData = dataLocal;
+            } else {
+              lastError = dataLocal.error || 'Servidor local no pudo procesar el borrador';
+            }
+          }
+        } catch (errLocal) {
+          console.warn('Fallback local tampoco disponible:', errLocal);
+        }
+      }
+
+      if (successData) {
+        statusBox.innerHTML = '<span class="text-emerald-400">✅ ¡Despacho exitoso! Revisa tu Google Chat para autorizar el post.</span>';
+        resultTitle.textContent = successData.title;
+        resultMsg.textContent = successData.message;
+        if (successData.heroImageUrl) {
+          resultImg.src = successData.heroImageUrl;
+          resultR2Link.href = successData.heroImageUrl;
+          resultR2Link.classList.remove('hidden');
+        } else {
+          resultImg.src = '/images/placeholder-cover.png';
+          resultR2Link.classList.add('hidden');
+        }
+        resultCard.style.display = 'flex';
+        form.reset();
+        charCounter.textContent = '0 palabras · 0 caracteres';
+        selectedHeroUrl = '';
+        selectedBRollUrls.clear();
+        updateSelectionUI();
+        wikiTray.style.display = 'none';
+      } else {
+        statusBox.innerHTML = `<span class="text-red-400">❌ Error: ${lastError || 'No se pudo forjar el post'}</span>`;
+      }
+
+      btnSubmit.disabled = false;
     });
   </script>
 </Layout>

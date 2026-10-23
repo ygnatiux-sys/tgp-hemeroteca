@@ -403,6 +403,7 @@ const handleCxSubmitDraft = async (c: any) => {
     const title = String(params.title || params.titulo || body.title || body.titulo || '').trim();
     const content = String(params.content || params.contenido || params.texto || body.content || body.contenido || body.texto || '').trim();
     const author = String(params.author || params.autor || body.author || body.autor || 'Xavier Benítez').trim();
+    const category = String(params.category || params.categoria || body.category || body.categoria || 'Historia').trim();
     const targetProject = String(params.target_project || params.proyecto || body.target_project || body.targetProject || '').trim();
     const queryImagen = String(params.query_imagen || params.imagen || body.query_imagen || body.queryImagen || title).trim();
 
@@ -423,7 +424,7 @@ const handleCxSubmitDraft = async (c: any) => {
     const isAlt = targetProject.toLowerCase().includes('alternative') || IS_ALTERNATIVE;
     const silo: 'alternative' | 'hemeroteca' = isAlt ? 'alternative' : 'hemeroteca';
 
-    console.log(`[CX Submit Draft] Ingesta recibida: "${postTitle}" por ${author} (Destino: ${silo})`);
+    console.log(`[CX Submit Draft] Ingesta recibida: "${postTitle}" por ${author} (Colección: ${category}, Destino: ${silo})`);
 
     // 1. Buscar imagen en Wikimedia Commons y subirla en WebP a Cloudflare R2
     let heroImageUrl: string | undefined;
@@ -455,7 +456,7 @@ const handleCxSubmitDraft = async (c: any) => {
     const cardV2 = buildGoogleChatCardV2({
       status: 'draft_proposal',
       title: postTitle,
-      subtitle: `Mesa de Redacción Dialogflow • Autor: ${author}`,
+      subtitle: `Mesa de Redacción • Autor: ${author} • Colección: ${category}`,
       silo,
       excerpt: content.slice(0, 320),
       heroImageUrl,

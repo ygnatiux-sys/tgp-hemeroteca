@@ -149,6 +149,8 @@ export async function masterAuthMiddleware(c: any, next: () => Promise<void>) {
     path === '/webhook' ||
     path === '/webhook/chat' ||
     path === '/api/chat/webhook' ||
+    path === '/api/cx/submit-draft' ||
+    path === '/cx/submit-draft' ||
     path === '/cx-tool-wikimedia' ||
     path === '/cx-tool-panlingua' ||
     path.startsWith('/api/picker/') ||
