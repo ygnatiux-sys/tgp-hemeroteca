@@ -77,7 +77,7 @@ const totalPosts = posts.length;
   <!-- ══════════════════════════════════════════════════════════════════════════
        CONTENEDOR STICKY IMAX MAX (PANTALLA MONUMENTAL)
        ══════════════════════════════════════════════════════════════════════════ -->
-  <div class="sticky top-3 sm:top-5 h-[88vh] sm:h-[90vh] md:h-[92vh] min-h-[580px] sm:min-h-[660px] md:min-h-[720px] max-h-[94vh] 2xl:max-h-[960px] w-full overflow-hidden bg-[#060a08] rounded-3xl sm:rounded-4xl border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)] isolate">
+  <div class="sticky top-3 sm:top-5 h-[88vh] sm:h-[90vh] md:h-[92vh] min-h-145 sm:min-h-165 md:min-h-180 max-h-[94vh] 2xl:max-h-240 w-full overflow-hidden bg-[#060a08] rounded-3xl sm:rounded-4xl border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)] isolate">
     
     <!-- HEADER EDITORIAL FLOTANTE -->
     <header class="absolute top-5 sm:top-7 inset-x-0 z-30 flex items-center justify-between px-6 sm:px-10 pointer-events-none">
@@ -123,9 +123,9 @@ const totalPosts = posts.length;
                 onerror="this.onerror=null; this.src='/images/placeholder-cover.png'"
               />
               <!-- VIÑETA CINEMÁTICA Y GRADIENTES ESTRATIGRÁFICOS -->
-              <div class="absolute inset-0 bg-gradient-to-t from-[#060a08] via-[#060a08]/50 to-transparent pointer-events-none"></div>
+              <div class="absolute inset-0 bg-linear-to-t from-[#060a08] via-[#060a08]/50 to-transparent pointer-events-none"></div>
               <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(6,10,8,0.7)_75%,#060a08_100%)] pointer-events-none"></div>
-              <div class="absolute inset-0 bg-gradient-to-r from-[#060a08]/80 via-transparent to-[#060a08]/60 pointer-events-none"></div>
+              <div class="absolute inset-0 bg-linear-to-r from-[#060a08]/80 via-transparent to-[#060a08]/60 pointer-events-none"></div>
             </div>
 
             <!-- CONTENIDO EDITORIAL DE LA DIAPOSITIVA -->
