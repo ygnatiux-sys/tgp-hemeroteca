@@ -23,21 +23,14 @@ export interface TriptychPost {
   img: string;
   href: string;
   date?: string;
+  readingTime?: string;
 }
 
-export interface Panel {
-  image: string;
-  alt: string;
-  title?: string;
-  href?: string;
-  category?: string;
-  objectPosition?: string;
-}
-
-export interface SlideItem {
+export interface ShowcaseSlide {
   kicker: string;
   title: string;
   tagLabel: string;
+  categoryBadge: string;
   subtitle: string;
   ctaText: string;
   ctaHref: string;
@@ -50,27 +43,10 @@ export interface SlideItem {
 
 interface Props {
   posts?: TriptychPost[];
-  slides?: SlideItem[];
-  kicker?: string;
-  title?: string;
-  tagLabel?: string;
-  subtitle?: string;
-  ctaText?: string;
-  ctaHref?: string;
-  panels?: [Panel, Panel, Panel];
+  slides?: ShowcaseSlide[];
 }
 
-const {
-  posts,
-  slides,
-  kicker,
-  title,
-  tagLabel,
-  subtitle,
-  ctaText,
-  ctaHref,
-  panels
-} = Astro.props;
+const { posts, slides } = Astro.props;
 
 // Cuatro combinaciones tipográficas exactas solicitadas para cada slide hero:
 const FONT_PRESETS = [
@@ -457,9 +433,23 @@ const allSlides: SlideItem[] = computedSlides.length > 0
         ></button>
       ))}
     </div>
-  )}
 
-</section>
+    <!-- CONTENEDOR DE CONTENIDOS TEXTUALES EDITORIALES (H1, FICHA, BOTONERA) -->
+    <div class="relative z-20 w-full h-full min-h-135 md:min-h-155 lg:min-h-165 flex flex-col justify-end p-6 sm:p-10 md:p-14 lg:p-16 pointer-events-none">
+      
+      {finalSlides.map((slide, sIdx) => (
+        <div 
+          class={`cinema-hero-content absolute left-6 sm:left-10 md:left-14 lg:left-16 bottom-6 sm:bottom-10 md:bottom-14 lg:bottom-16 right-6 sm:right-10 md:right-14 max-w-2xl lg:max-w-3xl flex flex-col items-start gap-3.5 transition-none ${sIdx === 0 ? 'opacity-100 z-30 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
+          data-hero-index={sIdx}
+          style={sIdx === 0 ? 'display: flex;' : 'display: none;'}
+        >
+          <!-- Píldora de estreno superior estilo Apple TV -->
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/15 shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-[10px] sm:text-[11px] font-mono tracking-widest uppercase text-white/90 font-bold">
+              {slide.kicker}
+            </span>
+          </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
      5. SCRIPT GSAP: TRANSICIÓN ATÓMICA Y CONTROL DE LIFECYCLE
@@ -467,10 +457,10 @@ const allSlides: SlideItem[] = computedSlides.length > 0
 <script>
   import { gsap } from 'gsap';
 
-  function initShowcaseMotion() {
-    const container = document.querySelector('.tgp-hero-triptych-container') as HTMLElement | null;
-    if (!container || container.dataset.showcaseInit === 'true') return;
-    container.dataset.showcaseInit = 'true';
+  function initCinemaMaxShowcase() {
+    const wrapper = document.querySelector('.cinema-max-wrapper') as HTMLElement | null;
+    if (!wrapper || wrapper.dataset.cinemaInit === 'true') return;
+    wrapper.dataset.cinemaInit = 'true';
 
     const bgSlides = gsap.utils.toArray<HTMLElement>('.triptych-bg-slide');
     const cardsSlides = gsap.utils.toArray<HTMLElement>('.triptych-cards-slide');
@@ -479,23 +469,25 @@ const allSlides: SlideItem[] = computedSlides.length > 0
     if (contents.length <= 1) return;
 
     let currentIndex = 0;
-    let isAnimating = false;
-    let loopCall: gsap.core.Tween | null = null;
-    let isHovered = false;
+    let isTransitioning = false;
+    let autoRotateTimer: gsap.core.Tween | null = null;
+    let isUserHovering = false;
 
     function updateDots(index: number) {
       dots.forEach((dot, idx) => {
         if (idx === index) {
           dot.className = 'showcase-dot transition-all duration-300 rounded-full cursor-pointer w-6 h-2 bg-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.8)]';
         } else {
-          dot.className = 'showcase-dot transition-all duration-300 rounded-full cursor-pointer w-2 h-2 bg-white/35 hover:bg-white/60';
+          card.classList.remove('border-white/30', 'bg-white/10', 'shadow-[0_10px_30px_rgba(0,0,0,0.6)]', 'ring-2', 'ring-white/20');
+          card.classList.add('border-white/10', 'bg-white/5');
         }
       });
     }
 
-    function goToSlide(nextIndex: number) {
-      if (nextIndex === currentIndex || isAnimating) return;
-      isAnimating = true;
+    // Transición atómica limpia de GSAP (cero solapamientos, display:none estricto)
+    function switchCinemaSlide(nextIdx: number) {
+      if (nextIdx === currentIndex || isTransitioning) return;
+      isTransitioning = true;
 
       const currentBg = bgSlides[currentIndex];
       const nextBg = bgSlides[nextIndex];
@@ -506,7 +498,7 @@ const allSlides: SlideItem[] = computedSlides.length > 0
 
       const tl = gsap.timeline({
         onComplete: () => {
-          isAnimating = false;
+          isTransitioning = false;
         }
       });
 
@@ -522,6 +514,7 @@ const allSlides: SlideItem[] = computedSlides.length > 0
             currentContent.style.display = 'none';
             currentContent.style.zIndex = '0';
             currentContent.style.pointerEvents = 'none';
+            currentContent.style.zIndex = '0';
           }
         },
         0
@@ -598,48 +591,52 @@ const allSlides: SlideItem[] = computedSlides.length > 0
       });
     }
 
-    function pauseLoop() {
-      isHovered = true;
-      if (loopCall) loopCall.pause();
-    }
-
-    function resumeLoop() {
-      isHovered = false;
-      if (loopCall) {
-        loopCall.resume();
-      } else {
-        scheduleNext();
-      }
-    }
-
-    dots.forEach((dot, idx) => {
-      dot.addEventListener('click', (e) => {
-        e.stopPropagation();
-        goToSlide(idx);
-        scheduleNext();
+    // Eventos en Bento Cards para selección interactiva
+    bentoCards.forEach((card, idx) => {
+      card.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchCinemaSlide(idx);
+        scheduleAutoRotation();
       });
     });
 
-    container.addEventListener('mouseenter', pauseLoop);
-    container.addEventListener('mouseleave', resumeLoop);
-    container.addEventListener('touchstart', pauseLoop, { passive: true });
-    container.addEventListener('touchend', resumeLoop, { passive: true });
+    // Pausar rotación en hover / touch para no entorpecer la lectura
+    wrapper.addEventListener('mouseenter', () => {
+      isUserHovering = true;
+      if (autoRotateTimer) autoRotateTimer.pause();
+    });
 
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        pauseLoop();
+    wrapper.addEventListener('mouseleave', () => {
+      isUserHovering = false;
+      if (autoRotateTimer) {
+        autoRotateTimer.resume();
       } else {
-        resumeLoop();
+        scheduleAutoRotation();
       }
     });
 
-    scheduleNext();
+    // Animación inicial en serie (staggered fade) de las 4 Bento Cards al cargar
+    gsap.fromTo(
+      bentoCards,
+      { opacity: 0, y: 20 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.12,
+        ease: 'power2.out',
+        delay: 0.2
+      }
+    );
+
+    // Iniciar el ciclo
+    scheduleAutoRotation();
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initShowcaseMotion);
+    document.addEventListener('DOMContentLoaded', initCinemaMaxShowcase);
   } else {
-    initShowcaseMotion();
+    initCinemaMaxShowcase();
   }
-  document.addEventListener('astro:page-load', initShowcaseMotion);
+  document.addEventListener('astro:page-load', initCinemaMaxShowcase);
 </script>
