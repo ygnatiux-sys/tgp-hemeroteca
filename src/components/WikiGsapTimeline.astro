@@ -20,6 +20,8 @@ export interface WikiImage {
   author: string;
   license: string;
   description: string;
+  title?: string;
+  subtitle?: string;
 }
 
 interface Props {
@@ -61,14 +63,21 @@ const { title, subtitle, images = [], className = "" } = Astro.props;
 
   <!-- UI y Tipografía Cinemática -->
   <div class="relative z-10 w-full p-6 sm:p-10 md:p-16 text-white font-sans max-w-7xl mx-auto">
-    <!-- H2 Sans -->
-    <h2 class="font-['Inter',sans-serif] text-xs sm:text-sm md:text-lg font-light text-gray-300 uppercase tracking-[0.3em] mb-2 sm:mb-3">
-      {subtitle}
-    </h2>
-    <!-- H1 Extra Bold -->
-    <h1 class="font-['Syne',sans-serif] font-extrabold text-4xl sm:text-6xl md:text-8xl uppercase tracking-tighter leading-none mb-4 sm:mb-6 drop-shadow-lg">
-      {title}
-    </h1>
+    <!-- Bloque Dinámico de Títulos por Diapositiva -->
+    <div class="titles-container relative min-h-[140px] sm:min-h-[180px] md:min-h-[220px]">
+      {images.map((img, index) => (
+        <div class={`slide-title-block absolute inset-0 flex flex-col justify-end pointer-events-none ${index === 0 ? 'opacity-100' : 'opacity-0'}`}>
+          <!-- H2 Sans -->
+          <h2 class="font-['Inter',sans-serif] text-xs sm:text-sm md:text-lg font-light text-gray-300 uppercase tracking-[0.3em] mb-2 sm:mb-3">
+            {img.subtitle || subtitle}
+          </h2>
+          <!-- H1 Extra Bold -->
+          <h1 class="font-['Syne',sans-serif] font-extrabold text-3xl sm:text-5xl md:text-7xl lg:text-8xl uppercase tracking-tighter leading-none mb-4 sm:mb-6 drop-shadow-lg">
+            {img.title || title}
+          </h1>
+        </div>
+      ))}
+    </div>
 
     <!-- Ficha técnica iterativa (Autor y Licencia) -->
     <div class="attribution-container relative h-6">
@@ -95,6 +104,7 @@ const { title, subtitle, images = [], className = "" } = Astro.props;
       }
 
       const slides = container.querySelectorAll<HTMLElement>('.slide-bg');
+      const titleBlocks = container.querySelectorAll<HTMLElement>('.slide-title-block');
       const attrs = container.querySelectorAll<HTMLElement>('.attr-text');
       const zoomTargets = container.querySelectorAll<HTMLElement>('.zoom-target');
 
@@ -104,6 +114,9 @@ const { title, subtitle, images = [], className = "" } = Astro.props;
       gsap.set(zoomTargets, { scale: 1 });
       slides.forEach((s, idx) => {
         gsap.set(s, { opacity: idx === 0 ? 1 : 0 });
+      });
+      titleBlocks.forEach((t, idx) => {
+        gsap.set(t, { opacity: idx === 0 ? 1 : 0, y: idx === 0 ? 0 : 15 });
       });
       attrs.forEach((a, idx) => {
         gsap.set(a, { opacity: idx === 0 ? 1 : 0 });
@@ -129,6 +142,13 @@ const { title, subtitle, images = [], className = "" } = Astro.props;
           ease: "power3.inOut"
         }, "-=0.35");
 
+        tl.to(titleBlocks[index], {
+          opacity: 0,
+          y: -10,
+          duration: 0.35,
+          ease: "power3.inOut"
+        }, "<");
+
         tl.to(attrs[index], {
           opacity: 0,
           duration: 0.35,
@@ -141,6 +161,12 @@ const { title, subtitle, images = [], className = "" } = Astro.props;
           duration: 0.35,
           ease: "power3.inOut"
         }, ">");
+
+        tl.fromTo(titleBlocks[nextIndex], 
+          { opacity: 0, y: 15 },
+          { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" },
+          "<"
+        );
 
         tl.to(attrs[nextIndex], {
           opacity: 1,
