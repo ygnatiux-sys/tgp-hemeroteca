@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
+    "outDir": "./dist/cloud",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "include": [
+    "src/core/**/*",
+    "src/lib/curator/**/*",
+    "src/cloud/**/*"
+  ],
+  "exclude": [
+    "src/desk-heavy/**/*",
+    "src/pages/**/*",
+    "src/components/**/*",
+    "node_modules",
+    "dist"
+  ]
+}

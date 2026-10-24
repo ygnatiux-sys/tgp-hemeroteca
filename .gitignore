@@ -43,6 +43,8 @@ tgp-scraper/node_modules/
 scripts/*.ps1
 scripts/*temp*
 scripts/*tmp*
+scripts/*test*
+scripts/*verify*
 scripts/scratch/
 convertir.js
 make_audio.js
@@ -57,4 +59,10 @@ panlingua_chunks/
 panlingua_batches/
 dump.sql
 test_*.sql
+
+# Binarios editoriales generados (previene bloqueos de hooks de git/husky)
+*.pdf
+*.epub
+dossiers/
+
 

@@ -1,6 +1,7 @@
 ---
 // src/pages/tgp-app/soma-test.astro
-// Vista de prueba cruda y aislada para SOMA Wiki Engine en Cloud Run / Local
+// Motor de Curaduría Visual Patrimonial SOMA v1.0
+// Backend fijo automático en /api/soma/search + Exportador WebP con Sharp en .ZIP
 export const prerender = false;
 ---
 
@@ -9,7 +10,7 @@ export const prerender = false;
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TGP SOMA Engine · Cloud Test Lab</title>
+  <title>TGP SOMA Visual Engine · Curaduría Patrimonial</title>
   <style>
     :root {
       --bg: #090c0a;
@@ -20,6 +21,7 @@ export const prerender = false;
       --text: #e5e7eb;
       --text-muted: #9ca3af;
       --hero-accent: #f59e0b;
+      --zip-accent: #38bdf8;
     }
     * {
       box-sizing: border-box;
@@ -40,7 +42,12 @@ export const prerender = false;
     header {
       border-bottom: 1px solid var(--card-border);
       padding-bottom: 1.5rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
     h1 {
       font-size: 1.6rem;
@@ -59,12 +66,32 @@ export const prerender = false;
       font-family: monospace;
       text-transform: uppercase;
     }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #141f17;
+      border: 1px solid #233428;
+      color: #86efac;
+      padding: 0.45rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-family: monospace;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .back-btn:hover {
+      background: #1b2e21;
+      border-color: #22c55e;
+      color: #fff;
+    }
     .control-panel {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 8px;
       padding: 1.25rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
       display: flex;
       flex-direction: column;
       gap: 1rem;
@@ -72,6 +99,7 @@ export const prerender = false;
     .input-row {
       display: flex;
       gap: 0.75rem;
+      align-items: flex-end;
       flex-wrap: wrap;
     }
     .field-group {
@@ -79,7 +107,7 @@ export const prerender = false;
       flex-direction: column;
       gap: 0.35rem;
       flex: 1;
-      min-width: 260px;
+      min-width: 280px;
     }
     label {
       font-size: 0.8rem;
@@ -98,6 +126,7 @@ export const prerender = false;
       font-family: inherit;
       outline: none;
       transition: border-color 0.15s;
+      width: 100%;
     }
     input[type="text"]:focus {
       border-color: var(--accent);
@@ -110,9 +139,9 @@ export const prerender = false;
       padding: 0.75rem 1.75rem;
       border-radius: 6px;
       cursor: pointer;
-      align-self: flex-end;
       font-size: 0.95rem;
       transition: background 0.15s, transform 0.05s;
+      white-space: nowrap;
     }
     .btn-search:hover {
       background: #4ade80;
@@ -125,26 +154,32 @@ export const prerender = false;
       color: #71717a;
       cursor: not-allowed;
     }
-    .preset-btn {
-      background: #18221b;
-      border: 1px solid #28372d;
-      color: #9ca3af;
-      padding: 0.25rem 0.6rem;
-      border-radius: 4px;
-      font-size: 0.78rem;
+    .btn-zip {
+      background: #0369a1;
+      color: #f0f9ff;
+      border: 1px solid #0284c7;
+      font-weight: 700;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
       cursor: pointer;
-      font-family: inherit;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
       transition: all 0.15s;
+      white-space: nowrap;
     }
-    .preset-btn:hover {
-      background: #233428;
-      color: #e5e7eb;
+    .btn-zip:hover {
+      background: #0284c7;
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
     }
-    .preset-btn.active {
-      background: #064e3b;
-      border-color: var(--accent);
-      color: #a7f3d0;
-      font-weight: 600;
+    .btn-zip:disabled {
+      background: #1e293b;
+      border-color: #334155;
+      color: #64748b;
+      cursor: not-allowed;
+      box-shadow: none;
     }
     .status-bar {
       font-family: monospace;
@@ -159,6 +194,14 @@ export const prerender = false;
       align-items: center;
       flex-wrap: wrap;
       gap: 0.5rem;
+    }
+    .backend-tag {
+      font-size: 0.75rem;
+      color: #4ade80;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: monospace;
     }
     .section-title {
       font-size: 1.2rem;
@@ -303,48 +346,46 @@ export const prerender = false;
 <body>
   <div class="container">
     <header>
-      <h1>
-        SOMA Engine · Cloud Test Lab
-        <span class="badge">Isolated Test Bench</span>
-      </h1>
-      <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">
-        Banco de pruebas para validar respuestas en vivo de Cloud Run (Wikimedia Commons + Europeana + Hero Top 3).
-      </p>
+      <div>
+        <h1>
+          SOMA Visual Engine
+          <span class="badge">Ecosistema TGP</span>
+        </h1>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">
+          Motor de Búsqueda Patrimonial, Curaduría Editorial de Resoluciones y Exportación WebP.
+        </p>
+      </div>
+      <a href="/scriptorium" class="back-btn" title="Volver a TGP Scriptorium">
+        ← Volver a Scriptorium
+      </a>
     </header>
 
     <div class="control-panel">
-      <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap;">
-        <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">PRESETS DE CONEXIÓN:</span>
-        <button type="button" id="btnPresetLocal" class="preset-btn active">🟢 Local (/api/soma/search)</button>
-        <button type="button" id="btnPresetCloudRun" class="preset-btn">☁️ Cloud Run (tgp-app)</button>
-        <button type="button" id="btnPresetCustom" class="preset-btn">✏️ URL Manual</button>
-      </div>
-
       <div class="input-row">
-        <div class="field-group" style="flex: 2;">
-          <label for="endpointUrl">Endpoint URL a consultar</label>
-          <input
-            type="text"
-            id="endpointUrl"
-            value="/api/soma/search"
-            placeholder="/api/soma/search o https://tu-servicio-uc.a.run.app/api/soma/search"
-          />
-        </div>
-        <div class="field-group" style="flex: 2;">
+        <div class="field-group">
           <label for="queryInput">Consulta Arqueológica / Patrimonial</label>
           <input
             type="text"
             id="queryInput"
             value="Pyramid of Giza"
-            placeholder="Ej: Pyramid of Giza, Saqqara, Ollantaytambo..."
+            placeholder="Ej: Pyramid of Giza, Saqqara, Ollantaytambo, Persepolis..."
           />
         </div>
         <button id="searchBtn" class="btn-search">Buscar en SOMA</button>
+        <button id="downloadZipBtn" class="btn-zip" style="display: none;">
+          <span>📦</span> Descargar Lote (.ZIP WebP)
+        </button>
       </div>
 
       <div class="status-bar" id="statusBar">
         <span id="statusText">Listo para consultar</span>
-        <span id="statsText">Esperando solicitud</span>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+          <span class="backend-tag">
+            <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#22c55e;"></span>
+            Backend Fijo: /api/soma/search
+          </span>
+          <span id="statsText">Esperando solicitud</span>
+        </div>
       </div>
     </div>
 
@@ -365,24 +406,32 @@ export const prerender = false;
     </section>
 
     <div id="emptyState" class="empty-state">
-      Introduce un término de búsqueda patrimonial o modifica el Endpoint de Cloud Run para comenzar la prueba.
+      Introduce un término de búsqueda patrimonial y presiona <strong>"Buscar en SOMA"</strong>.
     </div>
   </div>
 
   <script>
-    const searchBtn = document.getElementById('searchBtn');
-    const endpointInput = document.getElementById('endpointUrl');
-    const queryInput = document.getElementById('queryInput');
-    const statusText = document.getElementById('statusText');
-    const statsText = document.getElementById('statsText');
-    const errorBox = document.getElementById('errorBox');
-    const heroSection = document.getElementById('heroSection');
-    const heroGrid = document.getElementById('heroGrid');
-    const batchSection = document.getElementById('batchSection');
-    const batchGrid = document.getElementById('batchGrid');
-    const emptyState = document.getElementById('emptyState');
+    // ── Backend Fijo Automático ──────────────────────────────────────────────
+    const FIXED_SEARCH_ENDPOINT = '/api/soma/search';
+    const FIXED_ZIP_ENDPOINT = '/api/soma/export-zip';
 
-    function renderCard(item, isHero = false) {
+    const searchBtn = document.getElementById('searchBtn') as HTMLButtonElement | null;
+    const downloadZipBtn = document.getElementById('downloadZipBtn') as HTMLButtonElement | null;
+    const queryInput = document.getElementById('queryInput') as HTMLInputElement | null;
+    const statusText = document.getElementById('statusText') as HTMLElement | null;
+    const statsText = document.getElementById('statsText') as HTMLElement | null;
+    const errorBox = document.getElementById('errorBox') as HTMLElement | null;
+    const heroSection = document.getElementById('heroSection') as HTMLElement | null;
+    const heroGrid = document.getElementById('heroGrid') as HTMLElement | null;
+    const batchSection = document.getElementById('batchSection') as HTMLElement | null;
+    const batchGrid = document.getElementById('batchGrid') as HTMLElement | null;
+    const emptyState = document.getElementById('emptyState') as HTMLElement | null;
+
+    // Estado en memoria de las imágenes encontradas
+    let currentBatch: any[] = [];
+    let currentQuery = '';
+
+    function renderCard(item: any, isHero = false): HTMLElement {
       const card = document.createElement('div');
       card.className = `card ${isHero ? 'is-hero' : ''}`;
 
@@ -422,7 +471,7 @@ export const prerender = false;
     }
 
     async function doSearch() {
-      const endpoint = endpointInput.value.trim();
+      if (!queryInput || !searchBtn) return;
       const query = queryInput.value.trim();
 
       if (!query) {
@@ -430,16 +479,20 @@ export const prerender = false;
         return;
       }
 
+      currentQuery = query;
       searchBtn.disabled = true;
       searchBtn.textContent = 'Buscando...';
-      errorBox.style.display = 'none';
-      errorBox.textContent = '';
-      statusText.textContent = `Consultando "${query}" en ${endpoint}...`;
-      statsText.textContent = 'Esperando respuesta...';
+      if (downloadZipBtn) downloadZipBtn.style.display = 'none';
+      if (errorBox) {
+        errorBox.style.display = 'none';
+        errorBox.textContent = '';
+      }
+      if (statusText) statusText.textContent = `Consultando "${query}" en SOMA Wiki Engine...`;
+      if (statsText) statsText.textContent = 'Curando imágenes patrimoniales...';
 
       try {
         const startTime = performance.now();
-        const res = await fetch(endpoint, {
+        const res = await fetch(FIXED_SEARCH_ENDPOINT, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -463,73 +516,125 @@ export const prerender = false;
         const data = await res.json();
 
         // Renderizado
-        heroGrid.innerHTML = '';
-        batchGrid.innerHTML = '';
+        if (heroGrid) heroGrid.innerHTML = '';
+        if (batchGrid) batchGrid.innerHTML = '';
 
-        const heroTop3 = data.heroTop3 || [];
-        const curatedBatch = data.curatedBatch || [];
+        const heroTop3: any[] = data.heroTop3 || [];
+        const curatedBatch: any[] = data.curatedBatch || [];
+
+        // Guardamos lote combinado único para la descarga en ZIP
+        const seenIds = new Set();
+        currentBatch = [...heroTop3, ...curatedBatch].filter((item: any) => {
+          if (seenIds.has(item.id)) return false;
+          seenIds.add(item.id);
+          return true;
+        });
 
         if (heroTop3.length > 0) {
-          heroSection.style.display = 'block';
-          heroTop3.forEach((item) => heroGrid.appendChild(renderCard(item, true)));
+          if (heroSection) heroSection.style.display = 'block';
+          heroTop3.forEach((item: any) => heroGrid?.appendChild(renderCard(item, true)));
         } else {
-          heroSection.style.display = 'none';
+          if (heroSection) heroSection.style.display = 'none';
         }
 
         if (curatedBatch.length > 0) {
-          batchSection.style.display = 'block';
-          curatedBatch.forEach((item) => batchGrid.appendChild(renderCard(item, false)));
+          if (batchSection) batchSection.style.display = 'block';
+          curatedBatch.forEach((item: any) => batchGrid?.appendChild(renderCard(item, false)));
         } else {
-          batchSection.style.display = 'none';
+          if (batchSection) batchSection.style.display = 'none';
         }
 
-        emptyState.style.display = (heroTop3.length === 0 && curatedBatch.length === 0) ? 'block' : 'none';
+        const hasImages = (heroTop3.length > 0 || curatedBatch.length > 0);
+        if (emptyState) emptyState.style.display = hasImages ? 'none' : 'block';
+
+        if (hasImages && downloadZipBtn) {
+          downloadZipBtn.style.display = 'inline-flex';
+          downloadZipBtn.innerHTML = `<span>📦</span> Descargar Lote (${currentBatch.length} WebP en .ZIP)`;
+        }
 
         const stats = data.stats || {};
-        statusText.textContent = `✓ OK (${elapsed}ms) · Canónico: "${data.queryCanonical || data.queryOriginal}"`;
-        statsText.textContent = `Total: ${stats.total || curatedBatch.length} | Wikimedia: ${stats.wikimediaCount || 0} | Europeana: ${stats.europeanaCount || 0} | Landscape: ${stats.landscapeCount || 0} | PD/CC0: ${stats.cc0OrPdCount || 0}`;
+        if (statusText) statusText.textContent = `✓ OK (${elapsed}ms) · Canónico: "${data.queryCanonical || data.queryOriginal}"`;
+        if (statsText) statsText.textContent = `Total: ${currentBatch.length} | Wikimedia: ${stats.wikimediaCount || 0} | Europeana: ${stats.europeanaCount || 0} | Landscape: ${stats.landscapeCount || 0} | PD/CC0: ${stats.cc0OrPdCount || 0}`;
 
-      } catch (err) {
-        errorBox.style.display = 'block';
-        errorBox.innerHTML = `<strong>Error de conexión o ejecución:</strong><br/>${err.message}<br/><br/>
-        <em>Tip:</em> Si estás probando localmente antes de Cloud Run, cambia el Endpoint a <code>/api/soma/search</code>.<br/>
-        Si Cloud Run está desplegado, asegúrate de que la URL termine en <code>/api/soma/search</code> y que permita invocaciones públicas o tenga CORS habilitado.`;
-        statusText.textContent = '✕ Error en la consulta';
-        statsText.textContent = 'Falló la conexión';
+      } catch (err: any) {
+        if (errorBox) {
+          errorBox.style.display = 'block';
+          errorBox.innerHTML = `<strong>Error en la consulta:</strong><br/>${err.message || 'Error desconocido'}`;
+        }
+        if (statusText) statusText.textContent = '✕ Error en la consulta';
+        if (statsText) statsText.textContent = 'Falló la conexión';
       } finally {
         searchBtn.disabled = false;
         searchBtn.textContent = 'Buscar en SOMA';
       }
     }
 
-    const btnPresetLocal = document.getElementById('btnPresetLocal');
-    const btnPresetCloudRun = document.getElementById('btnPresetCloudRun');
-    const btnPresetCustom = document.getElementById('btnPresetCustom');
+    async function downloadZip() {
+      if (!currentBatch || currentBatch.length === 0) {
+        alert('No hay imágenes para descargar.');
+        return;
+      }
 
-    btnPresetLocal.addEventListener('click', () => {
-      endpointInput.value = '/api/soma/search';
-      btnPresetLocal.classList.add('active');
-      btnPresetCloudRun.classList.remove('active');
-      btnPresetCustom.classList.remove('active');
-    });
+      if (downloadZipBtn) {
+        downloadZipBtn.disabled = true;
+        downloadZipBtn.innerHTML = `<span>⏳</span> Convirtiendo con Sharp y Empaquetando ZIP...`;
+      }
+      if (statusText) statusText.textContent = `Procesando ${currentBatch.length} imágenes a WebP en el servidor local...`;
 
-    btnPresetCloudRun.addEventListener('click', () => {
-      endpointInput.value = 'https://tgp-app-uzhmxe53dq-uc.a.run.app/api/soma/search';
-      btnPresetCloudRun.classList.add('active');
-      btnPresetLocal.classList.remove('active');
-      btnPresetCustom.classList.remove('active');
-    });
+      try {
+        const res = await fetch(FIXED_ZIP_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            collectionName: currentQuery || 'soma-curated',
+            images: currentBatch,
+          }),
+        });
 
-    btnPresetCustom.addEventListener('click', () => {
-      endpointInput.focus();
-      endpointInput.select();
-      btnPresetCustom.classList.add('active');
-      btnPresetLocal.classList.remove('active');
-      btnPresetCloudRun.classList.remove('active');
-    });
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || `HTTP ${res.status}: Error al exportar ZIP`);
+        }
 
-    searchBtn.addEventListener('click', doSearch);
-    queryInput.addEventListener('keydown', (e) => {
+        // Descarga nativa directa
+        const blob = await res.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const filename = `${(currentQuery || 'soma').toLowerCase().replace(/[^a-z0-9_-]/g, '_')}-webp-collection.zip`;
+
+        a.href = downloadUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(downloadUrl);
+
+        if (statusText) statusText.textContent = `✓ ¡ZIP descargado con éxito (${(blob.size / (1024 * 1024)).toFixed(2)} MB)!`;
+        if (downloadZipBtn) {
+          downloadZipBtn.innerHTML = `<span>✓</span> ¡ZIP Descargado!`;
+          setTimeout(() => {
+            if (downloadZipBtn) {
+              downloadZipBtn.disabled = false;
+              downloadZipBtn.innerHTML = `<span>📦</span> Descargar Lote (${currentBatch.length} WebP en .ZIP)`;
+            }
+          }, 3000);
+        }
+
+      } catch (err: any) {
+        alert(`Error al generar el ZIP: ${err.message || 'Error desconocido'}`);
+        if (statusText) statusText.textContent = `✕ Error exportando ZIP: ${err.message || ''}`;
+        if (downloadZipBtn) {
+          downloadZipBtn.disabled = false;
+          downloadZipBtn.innerHTML = `<span>📦</span> Descargar Lote (.ZIP WebP)`;
+        }
+      }
+    }
+
+    searchBtn?.addEventListener('click', doSearch);
+    downloadZipBtn?.addEventListener('click', downloadZip);
+    queryInput?.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.key === 'Enter') doSearch();
     });
   </script>

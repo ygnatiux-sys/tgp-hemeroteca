@@ -1,0 +1,34 @@
+# .dockerignore - Aislamiento estricto para Cloud Run (SOMA + ARGON Light)
+node_modules
+dist
+.astro
+.git
+.github
+.vscode
+.agents
+.history
+.husky
+.wrangler
+.env*
+*.pdf
+*.wav
+*.bat
+*.sql
+*.sqlite
+panlingua*
+scratch*
+dump.sql
+intro*
+outro*
+
+# Exclusión de componentes y páginas exclusivas de frontend/desktop
+src/desk-heavy
+src/pages
+src/components
+public
+cloudrun-magazine-export
+tgp-alt-chat
+tgp-alt-telegram
+tgp-chrome-ext
+tgp-mind
+tgp-scraper

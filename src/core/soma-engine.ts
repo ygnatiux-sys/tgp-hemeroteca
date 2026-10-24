@@ -1,46 +1,83 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// SOMA WIKI ENGINE v1.0 · Motor de Curaduría Visual Patrimonial (TGP Ecosystem)
-// Fuentes: Wikimedia Commons + Europeana + Stub Smithsonian
-// 0 Dependencias externas: fetch nativo de Node 20+
-// ─────────────────────────────────────────────────────────────────────────────
+/**
+ * ============================================================================
+ * SOMA WIKI ENGINE v1.2 (GOLDEN EDITION) — Motor de Extracción y Preparación
+ * ============================================================================
+ * Blindado contra crasheos de memoria (TIFFs) y con Tipado estructural 
+ * preparado para el Smart Curator IA (Fase 1.5).
+ */
 
-export interface SomaCuratedItem {
-  id: string;
-  source: 'wikimedia' | 'europeana' | 'smithsonian';
-  title: string;
-  cleanTitle: string;
-  url: string;
-  thumbUrl: string;
-  description: string;
-  author: string;
-  date: string;
-  license: string;
-  licenseShortName: string;
-  isCC0OrPublicDomain: boolean;
+export type SomaArchiveSource = 'wikimedia' | 'europeana' | 'smithsonian';
+export type SomaOrientation = 'landscape' | 'portrait' | 'square' | 'any';
+
+export interface SomaGeometry {
   width: number;
   height: number;
   aspectRatio: number;
-  isLandscape: boolean;
-  is16x9Plus: boolean;
-  score?: number;
+  orientation: 'landscape' | 'portrait' | 'square';
+  scaleToFitCanvas: number;
+}
+
+export interface SomaLicenseInfo {
+  shortName: string;
+  usageTerms: string;
+  isPublicDomainOrCC0: boolean;
+  attributionRequired: boolean;
+  attributionHtml: string;
+  attributionPlainText: string;
+}
+
+// NUEVO: Capa preparatoria para inyección de Gemini (Fase 1.5)
+export interface SomaEditorialMetadata {
+  isStarGuest: boolean;
+  secuenciaNarrativa?: 1 | 2 | 3 | 4;
+  aiBrief?: string;
+  cleanTitle?: string;
+}
+
+export interface SomaAsset {
+  id: string;
+  sourceArchive: SomaArchiveSource;
+  title: string;
+  canonicalQueryUsed: string;
+  cdnUrl: string;
+  rawUrl: string;
+  recordUrl: string;
+  mime: string;
+  author: string;
+  description: string;
+  dateCreated: string;
+  geometry: SomaGeometry;
+  license: SomaLicenseInfo;
+  somaScore: number;
+  editorial?: SomaEditorialMetadata; // Se llenará en Fase 1.5
 }
 
 export interface SomaSearchOptions {
-  query: string;
-  limit?: number; // default: 40
-  sources?: ('wikimedia' | 'europeana' | 'smithsonian')[];
+  limit?: number;
+  overfetchPool?: number;
+  cdnThumbWidth?: number;
+  minWidth?: number;
+  minHeight?: number;
+  orientation?: SomaOrientation;
+  onlyCC0OrPublicDomain?: boolean;
+  sources?: SomaArchiveSource[];
+  targetCanvas?: { width: number; height: number };
   geminiApiKey?: string;
   europeanaApiKey?: string;
-  useGeminiAgent?: boolean;
+  smithsonianApiKey?: string;
+  timeoutMs?: number;
+  userAgent?: string;
+  useGeminiAgent?: boolean; // Compatibilidad retroactiva
 }
 
 export interface SomaSearchResult {
-  queryOriginal: string;
-  queryCanonical: string;
-  rationale?: string;
-  curatedBatch: SomaCuratedItem[];
-  heroTop3: SomaCuratedItem[];
-  stats: {
+  originalQuery: string;
+  canonicalQuery: string;
+  totalCandidatesScanned: number;
+  curatedBatch: SomaAsset[];
+  heroTop3: SomaAsset[];
+  warnings: string[]; // NUEVO: Registro forense de archivos peligrosos esquivados
+  stats?: {           // Compatibilidad retroactiva
     total: number;
     wikimediaCount: number;
     europeanaCount: number;
@@ -50,333 +87,190 @@ export interface SomaSearchResult {
   };
 }
 
-function stripHtml(input: string = ''): string {
-  return input
-    .replace(/<[^>]*>?/gm, '')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .trim();
+const SOMA_PROMPTS = {
+  DOCUMENTALISTA_ONTOLOGICO: `
+Eres un bibliotecario experto de Wikimedia Commons, Europeana y Smithsonian.
+Tu único trabajo es tomar la idea de búsqueda del usuario (en cualquier idioma) y devolver el TÉRMINO DE BÚSQUEDA EXACTO Y CANÓNICO en inglés enciclopédico.
+Ejemplo: 'piramide sarcofago en roma' -> 'Pyramid of Cestius'
+DEVUELVE ÚNICAMENTE EL TÉRMINO EN INGLÉS.`.trim()
+};
+
+const GARBAGE_TITLE_REGEX = /\b(flag|coat of arms|escudo|bandera|locator|blank map|icon|symbol|logo|signature|stamp|seal|coin|pdf|djvu|svg|user:|talk:|template:)\b/i;
+
+// REGLA DE ORO ANTI-OOM: Exclusión absoluta de TIFFs
+const ALLOWED_MIMES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+function stripHtmlAndClean(raw?: string): string {
+  if (!raw) return '';
+  return raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-function classifyLicense(licenseStr: string = '', licenseShort: string = ''): {
-  isCC0OrPublicDomain: boolean;
-} {
-  const text = `${licenseStr} ${licenseShort}`.toLowerCase();
-  const isCC0 = text.includes('cc0') || text.includes('zero') || text.includes('no rights reserved') || text.includes('publicdomain');
-  const isPD = text.includes('pd') || text.includes('public domain') || text.includes('dominio público') || text.includes('pd-old') || text.includes('pd-art');
-  return { isCC0OrPublicDomain: isCC0 || isPD };
+function computeGeometry(width: number, height: number, targetCanvas = { width: 1920, height: 1080 }): SomaGeometry {
+  const safeW = Math.max(1, width);
+  const safeH = Math.max(1, height);
+  const aspectRatio = Number((safeW / safeH).toFixed(4));
+  let orientation: 'landscape' | 'portrait' | 'square' = 'square';
+  if (aspectRatio >= 1.15) orientation = 'landscape';
+  else if (aspectRatio <= 0.88) orientation = 'portrait';
+  const scaleToFitCanvas = Number(Math.min(targetCanvas.width / safeW, targetCanvas.height / safeH).toFixed(4));
+  return { width: safeW, height: safeH, aspectRatio, orientation, scaleToFitCanvas };
 }
 
-/**
- * Agente de traducción canónica arqueológica/patrimonial con Gemini Flash vía fetch nativo REST
- */
-async function getCanonicalTermGemini(
-  query: string,
-  apiKey?: string
-): Promise<{ englishTerm: string; rationale?: string }> {
-  if (!apiKey) {
-    return { englishTerm: query.replace(/[¿?¡!]/g, '').trim().replace(/\s+/g, ' ') };
-  }
-
-  const prompt = `Actúa como Agente Documentalista Visual y Archivista Experto para The Great Puzzle Project (TGP SOMA Engine).
-Traduce la siguiente consulta patrimonial o arqueológica en español al término canónico en inglés más efectivo para buscadores de patrimonio (Wikimedia Commons CirrusSearch y Europeana).
-Evita adjetivos vacíos o términos coloquiales. Utiliza terminología documental y arquitectónica sobria (ej: "relief", "façade", "excavation", "architecture", "ruins", "monolith").
-
-Devuelve ÚNICAMENTE un JSON válido sin markdown:
-{
-  "englishTerm": "término exacto en inglés",
-  "rationale": "breve justificación"
+function classifyLicense(shortNameRaw: string, usageTermsRaw: string, artistClean: string, titleClean: string): SomaLicenseInfo {
+  const shortName = stripHtmlAndClean(shortNameRaw) || 'CC Archive';
+  const usageTerms = stripHtmlAndClean(usageTermsRaw) || shortName;
+  const isPublicDomainOrCC0 = /\b(cc0|public domain|pd|pdm|no restrictions)\b/i.test(`${shortName} ${usageTerms}`.toLowerCase());
+  const safeAuthor = artistClean || 'Archivo Patrimonial';
+  return {
+    shortName, usageTerms, isPublicDomainOrCC0, attributionRequired: !isPublicDomainOrCC0,
+    attributionPlainText: `${titleClean} — Foto: ${safeAuthor} (${shortName})`,
+    attributionHtml: `<span><strong>${safeAuthor}</strong> · <em>${shortName}</em></span>`
+  };
 }
 
-CONSULTA: ${query}`;
+function computeEditorialScore(asset: Omit<SomaAsset, 'somaScore'>): number {
+  let score = 50;
+  if (asset.geometry.width >= 2500) score += 20;
+  else if (asset.geometry.width >= 1600) score += 14;
+  if (asset.geometry.aspectRatio >= 1.33 && asset.geometry.aspectRatio <= 2.4) score += 15;
+  if (asset.description.length > 40) score += 8;
+  if (asset.license.isPublicDomainOrCC0) score += 5;
+  return Math.max(0, Math.min(100, score));
+}
 
+export async function translateToCanonicalQuery(rawQuery: string, geminiApiKey?: string, timeoutMs = 5000): Promise<string> {
+  const cleanQuery = rawQuery.trim();
+  if (!geminiApiKey || !cleanQuery) return cleanQuery;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
       body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.2 },
-      }),
-      signal: AbortSignal.timeout(10000),
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-      const cleanJson = rawText.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
-      const parsed = JSON.parse(cleanJson);
-      if (parsed.englishTerm && typeof parsed.englishTerm === 'string') {
-        return {
-          englishTerm: parsed.englishTerm.trim(),
-          rationale: parsed.rationale || undefined,
-        };
-      }
-    }
-  } catch (err) {
-    // Fallback silencioso y seguro a sanitización manual
-  }
-
-  return { englishTerm: query.replace(/[¿?¡!]/g, '').trim().replace(/\s+/g, ' ') };
-}
-
-/**
- * Adaptador Wikimedia Commons (CirrusSearch + API imageinfo)
- */
-async function searchWikimedia(
-  englishTerm: string,
-  limit: number
-): Promise<SomaCuratedItem[]> {
-  const cirrusQuery = `${englishTerm} filetype:bitmap fileres:>1000 -intitle:map -intitle:svg -intitle:diagram`;
-  const params = new URLSearchParams({
-    action: 'query',
-    format: 'json',
-    generator: 'search',
-    gsrsearch: cirrusQuery,
-    gsrnamespace: '6',
-    gsrlimit: String(Math.min(limit, 50)),
-    prop: 'imageinfo',
-    iiprop: 'url|size|extmetadata',
-    iiurlwidth: '1600',
-    origin: '*',
-  });
-
-  const targetUrl = `https://commons.wikimedia.org/w/api.php?${params.toString()}`;
-
-  const res = await fetch(targetUrl, {
-    headers: {
-      'User-Agent': 'SomaWikiEngine/1.0 (contact@thegreatpuzzleproject.com; SOMA Visual Core)',
-    },
-    signal: AbortSignal.timeout(15000),
-  });
-
-  if (!res.ok) return [];
-
-  const data = await res.json();
-  if (!data?.query?.pages) return [];
-
-  const pages = Object.values(data.query.pages) as any[];
-
-  return pages
-    .map((page): SomaCuratedItem | null => {
-      const info = page.imageinfo?.[0];
-      if (!info || !info.url) return null;
-
-      const rawUrl = info.url as string;
-      if (!/\.(jpe?g|png|webp|tiff?)(\?.*)?$/i.test(rawUrl)) return null;
-
-      const width = Number(info.width) || 1600;
-      const height = Number(info.height) || 900;
-      const aspectRatio = Number((width / height).toFixed(3));
-      const isLandscape = aspectRatio >= 1.3;
-      const is16x9Plus = aspectRatio >= 1.7;
-
-      const extmeta = info.extmetadata || {};
-      const author = stripHtml(extmeta.Artist?.value || '') || 'Autor en Wikimedia Commons';
-      const description = stripHtml(extmeta.ImageDescription?.value || '') || '';
-      const date = stripHtml(extmeta.DateTimeOriginal?.value || extmeta.DateTime?.value || '') || '';
-      const licenseShortName = stripHtml(extmeta.LicenseShortName?.value || extmeta.UsageTerms?.value || 'Dominio Público');
-      const license = stripHtml(extmeta.License?.value || 'pd');
-
-      const { isCC0OrPublicDomain } = classifyLicense(license, licenseShortName);
-
-      const cleanTitle = (page.title || '')
-        .replace(/^File:/i, '')
-        .replace(/_/g, ' ')
-        .replace(/\.[^/.]+$/, '');
-
-      return {
-        id: `wiki-${page.pageid}`,
-        source: 'wikimedia',
-        title: page.title || '',
-        cleanTitle,
-        url: rawUrl,
-        thumbUrl: info.thumburl || rawUrl,
-        description,
-        author,
-        date,
-        license,
-        licenseShortName,
-        isCC0OrPublicDomain,
-        width,
-        height,
-        aspectRatio,
-        isLandscape,
-        is16x9Plus,
-      };
-    })
-    .filter((item): item is SomaCuratedItem => item !== null);
-}
-
-/**
- * Adaptador Europeana (REST API v2)
- */
-async function searchEuropeana(
-  query: string,
-  limit: number,
-  apiKey?: string
-): Promise<SomaCuratedItem[]> {
-  if (!apiKey) return [];
-
-  try {
-    const params = new URLSearchParams({
-      wskey: apiKey,
-      query: `${query} AND TYPE:IMAGE`,
-      rows: String(Math.min(limit, 30)),
-      profile: 'standard',
-      media: 'true',
-    });
-
-    const res = await fetch(`https://api.europeana.eu/record/v2/search.json?${params.toString()}`, {
-      signal: AbortSignal.timeout(15000),
-    });
-
-    if (!res.ok) return [];
-
-    const data = await res.json();
-    if (!Array.isArray(data?.items)) return [];
-
-    return data.items
-      .map((item: any): SomaCuratedItem | null => {
-        const url = item.edmPreview?.[0] || item.edmIsShownBy?.[0];
-        if (!url) return null;
-
-        const title = Array.isArray(item.title) ? item.title[0] : item.title || 'Registro Europeana';
-        const author = Array.isArray(item.dcCreator) ? item.dcCreator[0] : item.dcCreator || 'Europeana Heritage';
-        const license = item.rights?.[0] || 'Europeana';
-        const isCC0 = license.toLowerCase().includes('publicdomain') || license.toLowerCase().includes('zero');
-
-        return {
-          id: `europeana-${item.id?.replace(/[^a-zA-Z0-9_-]/g, '_') || Math.random().toString(36).substring(7)}`,
-          source: 'europeana',
-          title,
-          cleanTitle: title,
-          url,
-          thumbUrl: url,
-          description: Array.isArray(item.dcDescription) ? item.dcDescription[0] : 'Acervo Europeana Heritage',
-          author,
-          date: Array.isArray(item.year) ? String(item.year[0]) : '',
-          license,
-          licenseShortName: isCC0 ? 'CC0' : 'Europeana Rights',
-          isCC0OrPublicDomain: isCC0,
-          width: 1600,
-          height: 1200,
-          aspectRatio: 1.333,
-          isLandscape: true,
-          is16x9Plus: false,
-        };
+        systemInstruction: { parts: [{ text: SOMA_PROMPTS.DOCUMENTALISTA_ONTOLOGICO }] },
+        contents: [{ role: 'user', parts: [{ text: cleanQuery }] }],
+        generationConfig: { temperature: 0.15, maxOutputTokens: 40 }
       })
-      .filter((item): item is SomaCuratedItem => item !== null);
-  } catch {
-    return [];
-  }
+    });
+    if (!res.ok) return cleanQuery;
+    const data = await res.json();
+    const translated = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    return translated ? translated.replace(/^["']|["']$/g, '') : cleanQuery;
+  } catch { return cleanQuery; } finally { clearTimeout(timer); }
 }
 
-/**
- * Stub Smithsonian Open Access API (devuelve [] de forma segura para no romper tipos)
- */
-async function searchSmithsonian(
-  _query: string,
-  _limit: number
-): Promise<SomaCuratedItem[]> {
-  return [];
-}
-
-/**
- * Algoritmo de Curaduría Editorial SOMA: Selecciona el Top 3 Hero
- * Prioriza: 1) Alta resolución panorámica (>= 1.5), 2) Licencia abierta CC0/PD, 3) Densidad visual
- */
-function selectTop3Hero(items: SomaCuratedItem[]): SomaCuratedItem[] {
-  const scored = items.map((item) => {
-    let score = 0;
-    if (item.is16x9Plus) score += 30;
-    else if (item.isLandscape) score += 20;
-
-    if (item.isCC0OrPublicDomain) score += 25;
-    if (item.width >= 2000) score += 20;
-    else if (item.width >= 1400) score += 10;
-
-    if (item.description && item.description.length > 50) score += 15;
-    if (item.author && !item.author.toLowerCase().includes('desconocido')) score += 10;
-
-    return { ...item, score };
+async function fetchFromWikimedia(
+  canonicalQuery: string,
+  opts: Required<Pick<SomaSearchOptions, 'overfetchPool' | 'cdnThumbWidth' | 'minWidth' | 'minHeight' | 'orientation' | 'targetCanvas' | 'timeoutMs' | 'userAgent'>>,
+  warnings: string[] // Se inyecta array por referencia
+): Promise<SomaAsset[]> {
+  const cirrusQuery = `${canonicalQuery} filetype:bitmap fileres:>900 -intitle:map -intitle:svg`;
+  const params = new URLSearchParams({
+    action: 'query', format: 'json', origin: '*', generator: 'search', gsrnamespace: '6',
+    gsrsearch: cirrusQuery, gsrlimit: String(Math.min(50, opts.overfetchPool)),
+    prop: 'imageinfo', iiprop: 'url|size|mime|extmetadata', iiurlwidth: String(opts.cdnThumbWidth)
   });
 
-  scored.sort((a, b) => (b.score || 0) - (a.score || 0));
-  return scored.slice(0, 3);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), opts.timeoutMs);
+  try {
+    const res = await fetch(`https://commons.wikimedia.org/w/api.php?${params.toString()}`, {
+      headers: { 'User-Agent': opts.userAgent, 'Api-User-Agent': opts.userAgent }, signal: controller.signal
+    });
+    if (!res.ok) throw new Error(`Wikimedia HTTP ${res.status}`);
+    const pages = (await res.json())?.query?.pages;
+    if (!pages) return [];
+
+    const results: SomaAsset[] = [];
+    for (const page of Object.values<any>(pages)) {
+      const info = page?.imageinfo?.[0];
+      if (!info) continue;
+
+      const rawTitle = String(page.title || '').replace(/^File:/i, '');
+      const mime = String(info.mime || '').toLowerCase();
+
+      if (!ALLOWED_MIMES.has(mime)) {
+        warnings.push(`[MIME Denegado] ${rawTitle} (${mime}) omitido para evitar OOM.`);
+        continue;
+      }
+      if (GARBAGE_TITLE_REGEX.test(rawTitle)) continue;
+
+      const geometry = computeGeometry(Number(info.width || 0), Number(info.height || 0), opts.targetCanvas);
+      if (geometry.width < opts.minWidth || geometry.height < opts.minHeight) continue;
+
+      const ext = info.extmetadata || {};
+      const partialAsset: Omit<SomaAsset, 'somaScore'> = {
+        id: `wiki-${page.pageid}`, sourceArchive: 'wikimedia',
+        title: rawTitle.replace(/\.[a-z0-9]{3,4}$/i, '').replace(/_/g, ' '),
+        canonicalQueryUsed: canonicalQuery,
+        cdnUrl: info.thumburl || info.url, rawUrl: info.url,
+        recordUrl: info.descriptionurl || `https://commons.wikimedia.org/?curid=${page.pageid}`,
+        mime,
+        author: stripHtmlAndClean(ext.Artist?.value) || 'Wikimedia',
+        description: stripHtmlAndClean(ext.ImageDescription?.value),
+        dateCreated: stripHtmlAndClean(ext.DateTimeOriginal?.value),
+        geometry,
+        license: classifyLicense(ext.LicenseShortName?.value, ext.UsageTerms?.value, stripHtmlAndClean(ext.Artist?.value), rawTitle)
+      };
+      results.push({ ...partialAsset, somaScore: computeEditorialScore(partialAsset) });
+    }
+    return results;
+  } finally { clearTimeout(timer); }
 }
 
-/**
- * MOTOR PRINCIPAL: SOMA WIKI ENGINE v1.0
- */
-export async function executeSomaEngine(
-  options: SomaSearchOptions
-): Promise<SomaSearchResult> {
-  const {
-    query,
-    limit = 40,
-    sources = ['wikimedia', 'europeana', 'smithsonian'],
-    geminiApiKey,
-    europeanaApiKey,
-    useGeminiAgent = true,
-  } = options;
+export async function somaSearch(query: string, options: SomaSearchOptions = {}): Promise<SomaSearchResult> {
+  const cfg = {
+    limit: options.limit ?? 12, overfetchPool: options.overfetchPool ?? 40,
+    cdnThumbWidth: options.cdnThumbWidth ?? 1600, minWidth: options.minWidth ?? 1000,
+    minHeight: options.minHeight ?? 650, orientation: options.orientation ?? 'landscape',
+    onlyCC0OrPublicDomain: options.onlyCC0OrPublicDomain ?? false,
+    sources: options.sources ?? ['wikimedia'], targetCanvas: options.targetCanvas ?? { width: 1920, height: 1080 },
+    timeoutMs: options.timeoutMs ?? 10000,
+    userAgent: options.userAgent ?? 'TGP-Engine/1.2 (research@thegreatpuzzle.org)'
+  };
 
-  let queryCanonical = query;
-  let rationale: string | undefined = undefined;
+  const canonicalQuery = await translateToCanonicalQuery(query, options.geminiApiKey);
+  const tasks: Promise<SomaAsset[]>[] = [];
+  const warnings: string[] = []; // Nuevo registro forense global
 
-  if (useGeminiAgent) {
-    const translation = await getCanonicalTermGemini(query, geminiApiKey);
-    queryCanonical = translation.englishTerm;
-    rationale = translation.rationale;
-  }
+  if (cfg.sources.includes('wikimedia')) tasks.push(fetchFromWikimedia(canonicalQuery, cfg, warnings));
+  
+  // Protección robusta con allSettled para no abortar si una API externa cae
+  const settled = await Promise.allSettled(tasks);
+  const allCandidates = settled.flatMap(res => res.status === 'fulfilled' ? res.value : []);
 
-  const tasks: Promise<SomaCuratedItem[]>[] = [];
+  const uniqueRanked = Array.from(new Map(allCandidates.map(item => [item.rawUrl.split('?')[0].toLowerCase(), item])).values())
+    .sort((a, b) => b.somaScore - a.somaScore);
 
-  if (sources.includes('wikimedia')) {
-    tasks.push(searchWikimedia(queryCanonical, limit));
-  }
-  if (sources.includes('europeana')) {
-    tasks.push(searchEuropeana(queryCanonical, Math.round(limit / 2), europeanaApiKey));
-  }
-  if (sources.includes('smithsonian')) {
-    tasks.push(searchSmithsonian(queryCanonical, limit));
-  }
-
-  const resultsNested = await Promise.all(tasks);
-  const curatedBatch = resultsNested.flat().slice(0, limit);
-  const heroTop3 = selectTop3Hero(curatedBatch);
+  const curatedBatch = uniqueRanked.slice(0, cfg.limit);
+  const heroTop3 = uniqueRanked.filter(img => img.geometry.aspectRatio >= 1.33).slice(0, 3);
 
   let cc0OrPdCount = 0;
   let landscapeCount = 0;
-  let wikimediaCount = 0;
-  let europeanaCount = 0;
-  let smithsonianCount = 0;
-
-  curatedBatch.forEach((item) => {
-    if (item.isCC0OrPublicDomain) cc0OrPdCount++;
-    if (item.isLandscape) landscapeCount++;
-    if (item.source === 'wikimedia') wikimediaCount++;
-    if (item.source === 'europeana') europeanaCount++;
-    if (item.source === 'smithsonian') smithsonianCount++;
+  curatedBatch.forEach(img => {
+    if (img.license.isPublicDomainOrCC0) cc0OrPdCount++;
+    if (img.geometry.orientation === 'landscape') landscapeCount++;
   });
 
   return {
-    queryOriginal: query,
-    queryCanonical,
-    rationale,
+    originalQuery: query,
+    canonicalQuery,
+    totalCandidatesScanned: allCandidates.length,
     curatedBatch,
     heroTop3,
+    warnings,
     stats: {
       total: curatedBatch.length,
-      wikimediaCount,
-      europeanaCount,
-      smithsonianCount,
+      wikimediaCount: curatedBatch.length,
+      europeanaCount: 0,
+      smithsonianCount: 0,
       cc0OrPdCount,
       landscapeCount,
-    },
+    }
   };
+}
+
+// ── Alias de compatibilidad retroactiva para rutas y tests ──────────────────
+export async function executeSomaEngine(options: SomaSearchOptions & { query: string }): Promise<SomaSearchResult> {
+  return somaSearch(options.query, options);
 }

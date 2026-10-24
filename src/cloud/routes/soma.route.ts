@@ -5,9 +5,30 @@
  */
 import { executeSomaEngine, type SomaSearchOptions, type SomaSearchResult } from '../../core/soma-engine.ts';
 
+function validateSecuritySecret(headers?: any): boolean {
+  const expected = process.env.TGP_RUN_SECRET;
+  if (!expected) return true; // En desarrollo local libre si no está definido
+
+  let incoming: string | null = null;
+  if (headers && typeof headers.get === 'function') {
+    incoming = headers.get('x-tgp-secret');
+  } else if (headers) {
+    incoming = headers['x-tgp-secret'] || headers['X-TGP-SECRET'];
+  }
+  return incoming === expected;
+}
+
 export async function handleSomaSearch(
-  payload: { query?: string; options?: Partial<SomaSearchOptions> }
+  payload: { query?: string; options?: Partial<SomaSearchOptions> },
+  headers?: any
 ): Promise<{ status: number; body: SomaSearchResult | { error: string } }> {
+  if (!validateSecuritySecret(headers)) {
+    return {
+      status: 401,
+      body: { error: 'No autorizado. Header x-tgp-secret requerido o inválido.' },
+    };
+  }
+
   const query = payload.query?.trim();
   if (!query) {
     return {
@@ -46,7 +67,7 @@ export async function handleSomaSearch(
  * Handler de ruta para servidores Express / Connect
  */
 export async function somaExpressRoute(req: any, res: any) {
-  const { status, body } = await handleSomaSearch(req.body || {});
+  const { status, body } = await handleSomaSearch(req.body || {}, req.headers);
   return res.status(status).json(body);
 }
 
@@ -61,7 +82,7 @@ export async function somaAstroHandler(request: Request): Promise<Response> {
     payload = {};
   }
 
-  const { status, body } = await handleSomaSearch(payload);
+  const { status, body } = await handleSomaSearch(payload, request.headers);
   return new Response(JSON.stringify(body), {
     status,
     headers: {
