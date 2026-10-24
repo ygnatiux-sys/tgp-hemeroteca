@@ -43,6 +43,8 @@
 - [x] **FASE 1:** Ingesta de SOMA Engine y endpoint de curaduría (`src/core/soma-engine.ts`, `src/cloud/routes/soma.route.ts`).
 - [x] **FASE 1.5:** Módulo independiente de curaduría inteligente (`src/lib/curator/wiki-smart-curator.ts`).
 - [x] **FASE 2:** Motor de maquetación PDFKit editorial (`layout-simple.ts`, `pdfkit-builder.ts`, test Uxmal exitoso en 139.8 MB RSS).
-- [ ] **FASE 3 (EN CURSO):** Endpoints Cloud/Astro con validación `x-tgp-secret` y esqueleto local `src/desk-heavy/puppeteer-renderer.ts`.
-- [ ] **FASE 4:** Dockerfile multistage `node:22-slim` + `.dockerignore`.
-- [ ] **FASE 5:** Despliegue en Cloud Run (`--memory 1Gi`, `--timeout 300s`).
+- [x] **FASE 3:** Endpoints Cloud/Astro con validación `x-tgp-secret` y esqueleto local `src/desk-heavy/puppeteer-renderer.ts` (0 imports en nube).
+- [x] **FASE 4:** Dockerfile multistage `node:22-slim` + `.dockerignore` + Módulo de Doble Subida (Drive + R2 Multi-Bucket).
+- [x] **FASE 5:** Despliegue en Cloud Run (`soma-argon-light`, 1Gi, us-central1).
+  - **Service URL:** `https://soma-argon-light-713934653057.us-central1.run.app`
+  - **Healthcheck:** `https://soma-argon-light-713934653057.us-central1.run.app/health`
