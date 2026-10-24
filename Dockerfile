@@ -31,9 +31,9 @@ ENV NODE_ENV=production
 ENV PORT=8080
 ENV HUSKY=0
 
-# Instalamos únicamente dependencias de producción
+# Instalamos únicamente dependencias de producción (eliminamos hook prepare para evitar fallo por ausencia de husky)
 COPY package*.json ./
-RUN npm ci --omit=dev --ignore-scripts=false
+RUN npm pkg delete scripts.prepare && npm ci --omit=dev
 
 # Copiamos el bundle compilado desde el stage builder
 COPY --from=builder /app/dist/cloud ./dist/cloud
