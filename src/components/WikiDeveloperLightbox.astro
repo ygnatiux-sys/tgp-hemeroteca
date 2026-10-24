@@ -169,16 +169,19 @@ const {
     {initialBatch.map((img, idx) => {
       const isCC0 = /cc0|public domain|pd/i.test(img.license || '') || Boolean(img.isCC0OrPublicDomain);
       const ratio = (img.width && img.height) ? (img.width / img.height).toFixed(2) : '1.50';
+      // Ritmo editorial por fila: Fila 0, 2 (pares) = 3:4, Fila 1, 3 (impares) = 4:5
+      const aspectClass = Math.floor(idx / 4) % 2 === 0 ? 'aspect-3/4' : 'aspect-4/5';
       return (
         <article 
           class="wb-card group relative bg-zinc-900 border border-zinc-800 hover:border-amber-400/60 rounded-xl overflow-hidden flex flex-col transition"
           data-id={img.id}
+          data-index={idx}
           data-cc0={isCC0 ? 'true' : 'false'}
           data-landscape={Number(ratio) >= 1.3 ? 'true' : 'false'}
           data-json={JSON.stringify(img)}
         >
-          <!-- Miniatura + Checkbox individual + Botón Zoom Lightbox -->
-          <div class="relative aspect-16/10 w-full bg-black overflow-hidden">
+          <!-- Miniatura con Ritmo Editorial + Checkbox individual + Botón Zoom Lightbox -->
+          <div class={`relative ${aspectClass} w-full bg-black overflow-hidden`}>
             <img 
               src={img.thumbUrl || img.url} 
               alt={img.title}
@@ -237,39 +240,77 @@ const {
     })}
   </div>
 
-  <!-- 4. MODAL LIGHTBOX / FANCYBOX NATIVO DE INSPECCIÓN PROFUNDA -->
+  <!-- 4. MODAL LIGHTBOX / VISOR CENTRADO DE ALTA FIDELIDAD -->
   <dialog 
     id="wb-lightbox-modal" 
-    class="backdrop:bg-black/90 bg-zinc-950 text-white border border-zinc-700 rounded-2xl max-w-5xl w-[92vw] p-0 overflow-hidden shadow-2xl"
+    class="backdrop:bg-black/95 backdrop:backdrop-blur-md bg-transparent text-white border-none max-w-7xl w-[96vw] max-h-[96vh] p-0 overflow-hidden shadow-2xl focus:outline-none"
   >
-    <div class="grid grid-cols-1 lg:grid-cols-3 min-h-130">
-      <div class="lg:col-span-2 bg-black flex items-center justify-center p-4 relative">
-        <img id="lb-modal-img" src="" alt="" class="max-h-[75vh] w-auto object-contain rounded" />
+    <div class="relative w-full h-[92vh] max-h-[92vh] bg-zinc-950/95 border border-zinc-800 rounded-2xl flex flex-col lg:flex-row overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.9)]">
+      
+      <!-- Zona Principal de Imagen (88vh máx, object-contain, zonas de clic invisibles) -->
+      <div class="relative flex-1 bg-black flex items-center justify-center p-2 sm:p-6 select-none overflow-hidden group/modal-stage">
+        <img 
+          id="lb-modal-img" 
+          src="" 
+          alt="" 
+          class="max-h-[85vh] sm:max-h-[88vh] max-w-full w-auto object-contain rounded-lg shadow-2xl transition-opacity duration-200" 
+        />
+
+        <!-- Zona de Clic Izquierda (Foto Anterior) -->
+        <div 
+          id="lb-nav-prev" 
+          class="absolute inset-y-0 left-0 w-1/2 cursor-w-resize flex items-center justify-start pl-4 group/prev z-10"
+          title="Foto anterior (o flecha izquierda)"
+        >
+          <div class="w-10 h-10 rounded-full bg-black/60 border border-white/20 text-white flex items-center justify-center opacity-0 group-hover/prev:opacity-100 transition shadow-lg backdrop-blur-sm pointer-events-none text-xl font-bold">
+            ‹
+          </div>
+        </div>
+
+        <!-- Zona de Clic Derecha (Foto Siguiente) -->
+        <div 
+          id="lb-nav-next" 
+          class="absolute inset-y-0 right-0 w-1/2 cursor-e-resize flex items-center justify-end pr-4 group/next z-10"
+          title="Foto siguiente (o flecha derecha)"
+        >
+          <div class="w-10 h-10 rounded-full bg-black/60 border border-white/20 text-white flex items-center justify-center opacity-0 group-hover/next:opacity-100 transition shadow-lg backdrop-blur-sm pointer-events-none text-xl font-bold">
+            ›
+          </div>
+        </div>
+
+        <!-- Badge de Posición en el Modal -->
+        <div class="absolute top-4 left-4 z-20 px-3 py-1 rounded-full bg-black/75 border border-white/15 text-[11px] font-mono text-zinc-300 backdrop-blur-sm">
+          <span id="lb-modal-counter">01 / 40</span>
+        </div>
       </div>
-      <div class="p-6 flex flex-col justify-between bg-zinc-900 border-l border-zinc-800">
-        <div class="space-y-4">
+
+      <!-- Panel Lateral de Metadatos y Selección -->
+      <div class="w-full lg:w-80 p-5 sm:p-6 flex flex-col justify-between bg-zinc-900/95 border-t lg:border-t-0 lg:border-l border-zinc-800 shrink-0">
+        <div class="space-y-4 overflow-y-auto pr-1">
           <div class="flex items-center justify-between">
             <span id="lb-modal-license" class="px-2.5 py-1 rounded-full text-xs font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
               CC0
             </span>
-            <button id="lb-modal-close" class="text-zinc-400 hover:text-white font-mono text-sm cursor-pointer">
-              ✕ ESC
+            <button id="lb-modal-close" class="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white font-mono text-xs cursor-pointer border border-zinc-700 transition">
+              ✕ Cerrar (ESC)
             </button>
           </div>
-          <h3 id="lb-modal-title" class="font-bold text-lg text-white wrap-break-word"></h3>
-          <p id="lb-modal-desc" class="text-xs text-zinc-400 leading-relaxed max-h-40 overflow-y-auto"></p>
-          <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 font-mono text-xs space-y-1 text-zinc-300">
+          <h3 id="lb-modal-title" class="font-bold text-base sm:text-lg text-white wrap-break-word leading-snug"></h3>
+          <p id="lb-modal-desc" class="text-xs text-zinc-400 leading-relaxed max-h-36 overflow-y-auto"></p>
+          <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 font-mono text-xs space-y-1.5 text-zinc-300">
             <div>Autor: <strong id="lb-modal-author" class="text-white"></strong></div>
             <div>Resolución: <strong id="lb-modal-dims" class="text-amber-300"></strong></div>
+            <div class="text-[11px] text-zinc-500 pt-1 border-t border-zinc-800/80">Navega con clic a los lados o flechas ← →</div>
           </div>
         </div>
 
         <div class="pt-4 border-t border-zinc-800 flex flex-col gap-2">
-          <button id="lb-modal-toggle-select" type="button" class="w-full py-2.5 rounded-xl bg-amber-400 text-black font-bold text-xs uppercase cursor-pointer">
+          <button id="lb-modal-toggle-select" type="button" class="w-full py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-bold text-xs uppercase cursor-pointer transition">
             Alternar Selección en Lote
           </button>
         </div>
       </div>
+
     </div>
   </dialog>
 </section>
@@ -402,21 +443,23 @@ const {
             pill.classList.remove("hidden");
           }
 
-          // Re-renderizar las tarjetas en la grilla
+          // Re-renderizar las tarjetas en la grilla con ritmo editorial 3:4 y 4:5
           const grid = document.getElementById("wb-grid-viewport");
           if (grid) {
             grid.innerHTML = data.images.map((img: any, idx: number) => {
               const isCC0 = /cc0|public domain|pd/i.test(img.licenseShortName || img.license || '') || Boolean(img.isCC0OrPublicDomain);
               const ratio = (img.width && img.height) ? (img.width / img.height).toFixed(2) : '1.50';
+              const aspectClass = Math.floor(idx / 4) % 2 === 0 ? 'aspect-3/4' : 'aspect-4/5';
               return `
                 <article 
                   class="wb-card group relative bg-zinc-900 border border-zinc-800 hover:border-amber-400/60 rounded-xl overflow-hidden flex flex-col transition"
                   data-id="${img.id}"
+                  data-index="${idx}"
                   data-cc0="${isCC0 ? 'true' : 'false'}"
                   data-landscape="${Number(ratio) >= 1.3 ? 'true' : 'false'}"
                   data-json='${JSON.stringify(img).replace(/'/g, "&apos;")}'
                 >
-                  <div class="relative aspect-16/10 w-full bg-black overflow-hidden">
+                  <div class="relative ${aspectClass} w-full bg-black overflow-hidden">
                     <img 
                       src="${img.thumbUrl || img.url}" 
                       alt="${img.cleanTitle || img.title}"
@@ -594,40 +637,112 @@ ${selected.map(img => `  - url: "${img.url}"\n    titulo: "${(img.cleanTitle || 
       });
     });
 
-    // Lightbox Modal de Inspección
+    // Lightbox Modal de Inspección Secuencial (Máxima Fidelidad + Clics en Mitades)
     const modal = document.getElementById("wb-lightbox-modal") as HTMLDialogElement;
     let activeCardCheckbox: HTMLInputElement | null = null;
+    let currentModalIndex = 0;
+
+    function getVisibleCardsData() {
+      const visibleCards = cards().filter((c) => c.style.display !== "none");
+      return visibleCards.map((card) => {
+        const raw = card.getAttribute("data-json");
+        return {
+          card,
+          data: raw ? JSON.parse(raw) : {}
+        };
+      });
+    }
+
+    function renderModalSlide(index: number) {
+      const list = getVisibleCardsData();
+      if (!list.length) return;
+      currentModalIndex = (index + list.length) % list.length;
+      const { card, data } = list[currentModalIndex];
+      activeCardCheckbox = card.querySelector<HTMLInputElement>(".wb-card-checkbox");
+
+      const imgEl = document.getElementById("lb-modal-img") as HTMLImageElement;
+      if (imgEl) {
+        imgEl.style.opacity = "0.4";
+        imgEl.src = data.url || data.thumbUrl;
+        imgEl.onload = () => { imgEl.style.opacity = "1"; };
+      }
+
+      const counterEl = document.getElementById("lb-modal-counter");
+      if (counterEl) {
+        counterEl.textContent = `${String(currentModalIndex + 1).padStart(2, '0')} / ${String(list.length).padStart(2, '0')}`;
+      }
+
+      const titleEl = document.getElementById("lb-modal-title");
+      if (titleEl) titleEl.textContent = data.cleanTitle || data.title?.replace(/^File:/i, "") || "";
+
+      const descEl = document.getElementById("lb-modal-desc");
+      if (descEl) descEl.textContent = data.description || "Sin descripción adicional.";
+
+      const authorEl = document.getElementById("lb-modal-author");
+      if (authorEl) authorEl.textContent = data.author || "Wikimedia Commons";
+
+      const dimsEl = document.getElementById("lb-modal-dims");
+      if (dimsEl) dimsEl.textContent = `${data.width} × ${data.height} px`;
+
+      const licenseEl = document.getElementById("lb-modal-license");
+      if (licenseEl) {
+        licenseEl.textContent = data.licenseShortName || data.license || "CC";
+      }
+
+      const toggleBtn = document.getElementById("lb-modal-toggle-select");
+      if (toggleBtn && activeCardCheckbox) {
+        toggleBtn.textContent = activeCardCheckbox.checked ? "✓ Seleccionada (Clic para desmarcar)" : "+ Seleccionar para Lote";
+        toggleBtn.className = activeCardCheckbox.checked
+          ? "w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-xs uppercase cursor-pointer transition"
+          : "w-full py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-bold text-xs uppercase cursor-pointer transition";
+      }
+    }
 
     function bindCardEvents() {
       root?.querySelectorAll<HTMLElement>(".wb-open-lightbox").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
+        btn.onclick = (e) => {
           const card = (e.currentTarget as HTMLElement).closest(".wb-card") as HTMLElement;
           if (!card || !modal) return;
-          const raw = card.getAttribute("data-json");
-          const data = raw ? JSON.parse(raw) : {};
-          activeCardCheckbox = card.querySelector<HTMLInputElement>(".wb-card-checkbox");
-
-          (document.getElementById("lb-modal-img") as HTMLImageElement).src = data.url || data.thumbUrl;
-          document.getElementById("lb-modal-title")!.textContent = data.cleanTitle || data.title?.replace(/^File:/i, "") || "";
-          document.getElementById("lb-modal-desc")!.textContent = data.description || "Sin descripción adicional.";
-          document.getElementById("lb-modal-author")!.textContent = data.author || "Wikimedia Commons";
-          document.getElementById("lb-modal-dims")!.textContent = `${data.width} × ${data.height} px`;
-          document.getElementById("lb-modal-license")!.textContent = data.licenseShortName || data.license || "CC";
-
+          const list = getVisibleCardsData();
+          const foundIdx = list.findIndex(item => item.card === card);
+          renderModalSlide(foundIdx >= 0 ? foundIdx : 0);
           modal.showModal();
-        });
+        };
       });
     }
 
     bindCardEvents();
+
+    // Navegación por mitades clicables
+    document.getElementById("lb-nav-prev")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      renderModalSlide(currentModalIndex - 1);
+    });
+
+    document.getElementById("lb-nav-next")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      renderModalSlide(currentModalIndex + 1);
+    });
+
+    // Navegación por teclado (Flechas ← → y Escape)
+    window.addEventListener("keydown", (e) => {
+      if (!modal?.open) return;
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        renderModalSlide(currentModalIndex - 1);
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        renderModalSlide(currentModalIndex + 1);
+      }
+    });
 
     document.getElementById("lb-modal-close")?.addEventListener("click", () => modal?.close());
     document.getElementById("lb-modal-toggle-select")?.addEventListener("click", () => {
       if (activeCardCheckbox) {
         activeCardCheckbox.checked = !activeCardCheckbox.checked;
         updateCounters();
+        renderModalSlide(currentModalIndex);
       }
-      modal?.close();
     });
 
     modal?.addEventListener("click", (e) => {
