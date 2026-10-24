@@ -45,7 +45,7 @@ const totalSlides = 1 + featuredPosts.length;
     <div class="relative w-full h-full min-h-130 md:min-h-145 lg:min-h-155 overflow-hidden">
       
       {/* SLIDE 0: Muestreo Base (La sábana inclinada a -9° de portadas de Historia) */}
-      <div class="showcase-slide absolute inset-0 w-full h-full opacity-100" data-slide-index="0">
+      <div class="bento-showcase-slide absolute inset-0 w-full h-full opacity-100" data-slide-index="0">
         <div class="showcase-grid-sheet pointer-events-none absolute right-[-4%] sm:right-[-2%] md:right-0 top-[-22%] w-[72%] sm:w-[68%] md:w-[62%] h-[155%] grid grid-cols-4 gap-3 md:gap-4 -rotate-[9deg] opacity-90 transition-transform duration-700">
           {sheetPosts.map((post, idx) => (
             <div
@@ -68,7 +68,7 @@ const totalSlides = 1 + featuredPosts.length;
       {/* SLIDES 1+: Posts Individuales Destacados */}
       {featuredPosts.map((post, idx) => (
         <div
-          class="showcase-slide absolute inset-0 w-full h-full opacity-0 pointer-events-none"
+          class="bento-showcase-slide absolute inset-0 w-full h-full opacity-0 pointer-events-none"
           data-slide-index={idx + 1}
         >
           <div class="absolute right-0 top-0 w-[72%] sm:w-[68%] lg:w-[65%] h-full overflow-hidden">
@@ -101,7 +101,7 @@ const totalSlides = 1 + featuredPosts.length;
         
         {/* TEXTO SLIDE 0 (Base / Colección Historia) */}
         <div
-          class="showcase-content col-start-1 row-start-1 w-full max-w-xl md:max-w-2xl pointer-events-auto"
+          class="bento-showcase-content col-start-1 row-start-1 w-full max-w-xl md:max-w-2xl pointer-events-auto"
           data-content-index="0"
         >
           <!-- Brand Header Apple TV Style -->
@@ -142,7 +142,7 @@ const totalSlides = 1 + featuredPosts.length;
         {/* TEXTO SLIDES 1+: Posts Individuales */}
         {featuredPosts.map((post, idx) => (
           <div
-            class="showcase-content col-start-1 row-start-1 w-full max-w-xl md:max-w-2xl opacity-0 pointer-events-none"
+            class="bento-showcase-content col-start-1 row-start-1 w-full max-w-xl md:max-w-2xl opacity-0 pointer-events-none"
             data-content-index={idx + 1}
             style="display: none;"
           >
@@ -191,7 +191,7 @@ const totalSlides = 1 + featuredPosts.length;
       {Array.from({ length: totalSlides }).map((_, idx) => (
         <button
           type="button"
-          class={`showcase-dot transition-all duration-300 rounded-full cursor-pointer ${
+          class={`bento-showcase-dot transition-all duration-300 rounded-full cursor-pointer ${
             idx === 0 ? 'w-6 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/30 hover:bg-white/60'
           }`}
           data-dot-index={idx}
@@ -214,9 +214,9 @@ const totalSlides = 1 + featuredPosts.length;
       (container as any)._cleanupBento();
     }
 
-    const slides = container.querySelectorAll<HTMLElement>('.showcase-slide');
-    const contents = container.querySelectorAll<HTMLElement>('.showcase-content');
-    const dots = container.querySelectorAll<HTMLButtonElement>('.showcase-dot');
+    const slides = container.querySelectorAll<HTMLElement>('.bento-showcase-slide');
+    const contents = container.querySelectorAll<HTMLElement>('.bento-showcase-content');
+    const dots = container.querySelectorAll<HTMLButtonElement>('.bento-showcase-dot');
     const total = slides.length;
     if (total === 0) return;
 
@@ -256,7 +256,7 @@ const totalSlides = 1 + featuredPosts.length;
     }
 
     function goToSlide(nextIndex: number) {
-      if (nextIndex === currentIndex) return;
+      if (nextIndex === currentIndex || isTransitioning) return;
 
       // Si hay una transición en curso, cancelarla de raíz
       if (activeTimeline) {
@@ -283,10 +283,6 @@ const totalSlides = 1 + featuredPosts.length;
         }
       });
 
-      // Habilitar display del destino
-      if (nextContent) {
-        gsap.set(nextContent, { display: 'block', pointerEvents: 'auto' });
-      }
       if (nextSlide) {
         gsap.set(nextSlide, { pointerEvents: 'auto' });
       }
@@ -315,12 +311,12 @@ const totalSlides = 1 + featuredPosts.length;
         }
       });
 
-      // 1. Salida rápida del texto anterior
+      // 1. Salida rápida y limpia del texto anterior
       if (currentContent) {
         activeTimeline.to(currentContent, {
           opacity: 0,
-          y: -10,
-          duration: 0.22,
+          y: -8,
+          duration: 0.2,
           ease: 'power2.in',
           onComplete: () => {
             gsap.set(currentContent, { display: 'none', pointerEvents: 'none' });
@@ -333,7 +329,7 @@ const totalSlides = 1 + featuredPosts.length;
         activeTimeline.to(currentSlide, {
           opacity: 0,
           scale: 0.98,
-          x: -20,
+          x: -16,
           duration: 0.35,
           onComplete: () => {
             gsap.set(currentSlide, { pointerEvents: 'none' });
@@ -344,19 +340,21 @@ const totalSlides = 1 + featuredPosts.length;
       // 3. Entrada de la foto nueva
       if (nextSlide) {
         activeTimeline.fromTo(nextSlide,
-          { opacity: 0, scale: 1.04, x: 25 },
-          { opacity: 1, scale: 1, x: 0, duration: 0.5 },
-          0.06
+          { opacity: 0, scale: 1.04, x: 20 },
+          { opacity: 1, scale: 1, x: 0, duration: 0.45, ease: 'power2.out' },
+          0.08
         );
       }
 
-      // 4. Entrada limpia del texto nuevo
+      // 4. Entrada limpia del texto nuevo: SOLO cuando el anterior ya hizo display: none
       if (nextContent) {
-        activeTimeline.fromTo(nextContent,
-          { opacity: 0, y: 14 },
-          { opacity: 1, y: 0, duration: 0.45 },
-          0.12
-        );
+        activeTimeline.set(nextContent, { display: 'block', pointerEvents: 'auto', opacity: 0, y: 12 }, 0.22);
+        activeTimeline.to(nextContent, {
+          opacity: 1,
+          y: 0,
+          duration: 0.38,
+          ease: 'power3.out'
+        }, 0.22);
       }
 
       updateDots(nextIndex);

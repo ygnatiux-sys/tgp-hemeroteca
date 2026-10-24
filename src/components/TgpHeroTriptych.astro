@@ -354,7 +354,7 @@ const allSlides: SlideItem[] = computedSlides.length > 0
   <div class="relative z-20 w-full h-full flex flex-col justify-center items-start p-6 sm:p-10 md:p-14 lg:p-16 pointer-events-none">
     {allSlides.map((slide, sIdx) => (
       <div 
-        class={`showcase-content absolute inset-y-0 left-6 sm:left-10 md:left-14 lg:left-16 flex flex-col justify-center items-start max-w-sm sm:max-w-md md:max-w-lg transition-none ${sIdx === 0 ? 'opacity-100 pointer-events-auto z-30' : 'opacity-0 pointer-events-none z-0'}`}
+        class={`triptych-content absolute inset-y-0 left-6 sm:left-10 md:left-14 lg:left-16 flex flex-col justify-center items-start max-w-sm sm:max-w-md md:max-w-lg transition-none ${sIdx === 0 ? 'opacity-100 pointer-events-auto z-30' : 'opacity-0 pointer-events-none z-0'}`}
         data-content-index={sIdx}
         style={sIdx === 0 ? 'display: flex;' : 'display: none;'}
       >
@@ -447,11 +447,11 @@ const allSlides: SlideItem[] = computedSlides.length > 0
        4. INDICADORES INFERIORES DINÁMICOS
        ═══════════════════════════════════════════════════════════════════ -->
   {allSlides.length > 1 && (
-    <div class="showcase-indicators absolute bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15">
+    <div class="triptych-indicators absolute bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15">
       {allSlides.map((_, i) => (
         <button 
           type="button" 
-          class={`showcase-dot transition-all duration-300 rounded-full cursor-pointer ${i === 0 ? 'w-6 h-2 bg-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.8)]' : 'w-2 h-2 bg-white/35 hover:bg-white/60'}`}
+          class={`triptych-dot transition-all duration-300 rounded-full cursor-pointer ${i === 0 ? 'w-6 h-2 bg-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.8)]' : 'w-2 h-2 bg-white/35 hover:bg-white/60'}`}
           data-dot-index={i}
           aria-label={`Ir al trío de posts ${i + 1}`}
         ></button>
@@ -472,10 +472,10 @@ const allSlides: SlideItem[] = computedSlides.length > 0
     if (!container || container.dataset.showcaseInit === 'true') return;
     container.dataset.showcaseInit = 'true';
 
-    const bgSlides = gsap.utils.toArray<HTMLElement>('.triptych-bg-slide');
-    const cardsSlides = gsap.utils.toArray<HTMLElement>('.triptych-cards-slide');
-    const contents = gsap.utils.toArray<HTMLElement>('.showcase-content');
-    const dots = gsap.utils.toArray<HTMLButtonElement>('.showcase-dot');
+    const bgSlides = Array.from(container.querySelectorAll<HTMLElement>('.triptych-bg-slide'));
+    const cardsSlides = Array.from(container.querySelectorAll<HTMLElement>('.triptych-cards-slide'));
+    const contents = Array.from(container.querySelectorAll<HTMLElement>('.triptych-content'));
+    const dots = Array.from(container.querySelectorAll<HTMLButtonElement>('.triptych-dot'));
     if (contents.length <= 1) return;
 
     let currentIndex = 0;
@@ -486,9 +486,9 @@ const allSlides: SlideItem[] = computedSlides.length > 0
     function updateDots(index: number) {
       dots.forEach((dot, idx) => {
         if (idx === index) {
-          dot.className = 'showcase-dot transition-all duration-300 rounded-full cursor-pointer w-6 h-2 bg-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.8)]';
+          dot.className = 'triptych-dot transition-all duration-300 rounded-full cursor-pointer w-6 h-2 bg-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.8)]';
         } else {
-          dot.className = 'showcase-dot transition-all duration-300 rounded-full cursor-pointer w-2 h-2 bg-white/35 hover:bg-white/60';
+          dot.className = 'triptych-dot transition-all duration-300 rounded-full cursor-pointer w-2 h-2 bg-white/35 hover:bg-white/60';
         }
       });
     }
