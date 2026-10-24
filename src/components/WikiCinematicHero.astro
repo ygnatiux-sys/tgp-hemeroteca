@@ -32,7 +32,7 @@ const {
 
 <section 
   id="tgp-apple-visor" 
-  class="relative w-full max-w-full m-0 p-0 bg-black select-none border-b border-zinc-800/80"
+  class="relative w-full max-w-full m-0 p-0 bg-black select-none border-none"
 >
   <!-- 1. VISOR PRINCIPAL (85vh): Efecto IMAX MAX e Inmersión Absoluta Apple Showcase -->
   <div 
@@ -54,7 +54,7 @@ const {
       </div>
     </div>
 
-    <!-- Escenario de Imágenes Nativas: Frame Congelado (absolute, object-fit: cover, object-position: center) -->
+    <!-- Escenario de Imágenes Nativas: Frame Congelado y Centrado (sin transformaciones ni Ken Burns) -->
     <div id="hero-stage" class="absolute inset-0 z-0 bg-black overflow-hidden">
       {images.map((img, idx) => (
         <div 
@@ -65,15 +65,15 @@ const {
             src={img.thumbUrl || img.url}
             alt={img.description || img.title}
             crossorigin="anonymous"
-            class="hero-zoom-img absolute top-0 left-0 w-full h-full object-cover object-center will-change-transform"
+            class="hero-zoom-img absolute top-0 left-0 w-full h-full object-cover object-center"
           />
-          <!-- Gradiente Focalizado Apple: Solo en el 40% inferior para contraste de letras, dejando el 60% superior 100% puro y brillante -->
-          <div 
-            class="hero-focal-overlay absolute inset-0 pointer-events-none"
-            style="background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 15%, rgba(0, 0, 0, 0) 40%);"
-          ></div>
         </div>
       ))}
+      <!-- Un único gradiente estático exterior: protege la legibilidad sin cortes, sin flicker y sin z-fighting -->
+      <div 
+        class="absolute inset-0 pointer-events-none z-5"
+        style="background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.35) 20%, transparent 45%);"
+      ></div>
     </div>
 
     <!-- Posicionamiento de Tipografía Apple: z-index: 10, flex column justify-end, misma altura exacta del Hero -->
@@ -120,10 +120,10 @@ const {
     </div>
   </div>
 
-  <!-- 2. EL EFECTO "INSET" DEL CARRUSEL (Array de imágenes sobre fondo #1c1c1e) -->
+  <!-- 2. EL EFECTO "INSET" DEL CARRUSEL (Array de imágenes sobre fondo #1c1c1e limpio sin bordes duros) -->
   <div 
     id="tgp-apple-carousel-strip" 
-    class="w-full bg-[#1c1c1e] py-3.5 border-t border-white/10"
+    class="w-full bg-[#1c1c1e] py-3.5 border-none"
   >
     <div class="px-6 sm:px-10 pb-2 flex items-center justify-between text-xs font-mono text-zinc-400">
       <div class="flex items-center gap-2">
@@ -190,8 +190,7 @@ const {
       return {
         hold: 5.5,
         fade: 1.25,
-        scale: 1.05,
-        ease: "sine.inOut",
+        ease: "power2.inOut",
         label: `MODO CONTEMPLATIVO (${count} FOTOS • FADE 1.25s)`
       };
     }
@@ -199,7 +198,6 @@ const {
       return {
         hold: 3.6,
         fade: 0.65,
-        scale: 1.06,
         ease: "power2.inOut",
         label: `MODO EDITORIAL (${count} FOTOS • FADE 0.65s)`
       };
@@ -207,8 +205,7 @@ const {
     return {
       hold: 2.5,
       fade: 0.35,
-      scale: 1.08,
-      ease: "power3.inOut",
+      ease: "power2.inOut",
       label: `MODO SECUENCIA ÁGIL (${count} FOTOS • FADE 0.35s)`
     };
   }
@@ -276,7 +273,6 @@ const {
     if (!container) return;
 
     const slides = container.querySelectorAll<HTMLElement>(".hero-slide");
-    const imgs = container.querySelectorAll<HTMLElement>(".hero-zoom-img");
     const attrs = container.querySelectorAll<HTMLElement>(".hero-attr-item");
     const badge = document.getElementById("hero-cadence-badge");
     const counter = document.getElementById("hero-counter");
@@ -289,14 +285,15 @@ const {
     if (badge) badge.textContent = cfg.label;
 
     if (total === 1) {
-      gsap.fromTo(imgs[0], { scale: 1 }, { scale: cfg.scale, duration: 10, yoyo: true, repeat: -1, ease: "sine.inOut" });
+      slides.forEach((s) => gsap.set(s, { opacity: 1 }));
+      attrs.forEach((a) => gsap.set(a, { opacity: 1 }));
+      highlightThumbCard(0);
       return;
     }
 
-    // Configuración inicial respetando el índice inicial
+    // Configuración inicial limpia respetando el índice inicial (sin escala / transform)
     slides.forEach((s, i) => gsap.set(s, { opacity: i === startIndex ? 1 : 0 }));
     attrs.forEach((a, i) => gsap.set(a, { opacity: i === startIndex ? 1 : 0 }));
-    imgs.forEach(img => gsap.set(img, { scale: 1 }));
     highlightThumbCard(startIndex);
 
     const tl = gsap.timeline({ repeat: -1 });
@@ -318,24 +315,21 @@ const {
         tl.fromTo(progressBar, { width: "0%" }, { width: "100%", duration: cfg.hold, ease: "none" });
       }
 
-      tl.fromTo(
-        imgs[i],
-        { scale: 1 },
-        { scale: cfg.scale, duration: cfg.hold + cfg.fade, ease: "none" },
-        `<`
-      );
+      // Tiempo de permanencia estática
+      tl.to({}, { duration: Math.max(0.1, cfg.hold - cfg.fade) });
 
+      // Transición limpia de pura opacidad (sin transformaciones Ken Burns ni reescalados)
       tl.to([slides[i], attrs[i]], {
         opacity: 0,
         duration: cfg.fade,
         ease: cfg.ease
-      }, `-=${cfg.fade}`);
+      });
 
       tl.to([slides[next], attrs[next]], {
         opacity: 1,
         duration: cfg.fade,
         ease: cfg.ease
-      }, total <= 4 ? `-=${cfg.fade * 0.45}` : `>`);
+      }, `<`);
     }
   }
 
@@ -372,13 +366,14 @@ const {
     if (!stage || !attrStage || !thumbCarousel || !images?.length) return;
     if (titleEl && queryTitle) titleEl.textContent = queryTitle;
 
-    // 1. Reconstruir Visor Principal (Frame Congelado y Gradiente Focalizado Apple)
+    // 1. Reconstruir Visor Principal (Limpio, centrado y sin gradientes duplicados)
     stage.innerHTML = images.map((img: any, idx: number) => `
       <div class="hero-slide absolute inset-0 w-full h-full overflow-hidden ${idx === 0 ? 'opacity-100' : 'opacity-0'}" data-index="${idx}">
-        <img src="${img.thumbUrl || img.url}" alt="${img.title}" crossorigin="anonymous" class="hero-zoom-img absolute top-0 left-0 w-full h-full object-cover object-center will-change-transform" />
-        <div class="hero-focal-overlay absolute inset-0 pointer-events-none" style="background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 15%, rgba(0, 0, 0, 0) 40%);"></div>
+        <img src="${img.thumbUrl || img.url}" alt="${img.title}" crossorigin="anonymous" class="hero-zoom-img absolute top-0 left-0 w-full h-full object-cover object-center" />
       </div>
-    `).join("");
+    `).join("") + `
+      <div class="absolute inset-0 pointer-events-none z-5" style="background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.35) 20%, transparent 45%);"></div>
+    `;
 
     attrStage.innerHTML = images.map((img: any, idx: number) => `
       <div class="hero-attr-item absolute inset-0 flex items-center gap-2 font-mono text-xs text-zinc-300 ${idx === 0 ? 'opacity-100' : 'opacity-0'}">
