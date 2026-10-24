@@ -1,0 +1,251 @@
+---
+// src/components/WikiCinematicHero.astro
+export interface WikiHeroImage {
+  id: string;
+  title: string;
+  cleanTitle?: string;
+  url: string;
+  thumbUrl: string;
+  width: number;
+  height: number;
+  license: string;
+  licenseShortName?: string;
+  isCC0OrPublicDomain?: boolean;
+  author: string;
+  description: string;
+}
+
+interface Props {
+  title?: string;
+  subtitle?: string;
+  images?: WikiHeroImage[];
+  headline?: string;
+  tagline?: string;
+}
+
+const { 
+  title = Astro.props.headline || "Acervo Documental TGP", 
+  subtitle = Astro.props.tagline || "Wikimedia Commons Scale", 
+  images = [] 
+} = Astro.props;
+---
+
+<section 
+  id="tgp-cinemax-hero"
+  class="relative w-full h-[85vh] min-h-[580px] max-h-[960px] bg-black overflow-hidden flex flex-col justify-between border-b border-zinc-800 select-none"
+>
+  <!-- Barras Cinemax 2.39:1 sutiles + Indicador superior de cadencia -->
+  <div class="relative z-20 w-full px-8 py-4 bg-gradient-to-b from-black/90 to-transparent flex items-center justify-between text-xs font-mono text-zinc-400">
+    <div class="flex items-center gap-3">
+      <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span>CINEMAX ARCHIVE ENGINE</span>
+      <span id="hero-cadence-badge" class="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-700 text-zinc-300">
+        Calculando cadencia...
+      </span>
+    </div>
+    <div id="hero-counter" class="text-zinc-300 tracking-widest">
+      01 / {String(images.length).padStart(2, '0')}
+    </div>
+  </div>
+
+  <!-- Escenario de Imágenes -->
+  <div id="hero-stage" class="absolute inset-0 z-0 bg-black">
+    {images.map((img, idx) => (
+      <div 
+        class={`hero-slide absolute inset-0 ${idx === 0 ? 'opacity-100' : 'opacity-0'}`}
+        data-index={idx}
+      >
+        <img
+          src={img.thumbUrl || img.url}
+          alt={img.description || img.title}
+          crossorigin="anonymous"
+          class="hero-zoom-img w-full h-full object-cover object-center will-change-transform"
+        />
+        <!-- Viñeta periférica + Lower-Third Cinemático -->
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_35%,rgba(0,0,0,0.75)_100%)]"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/65 to-transparent"></div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Lower-Third: Tipografía H1 Extra Bold + H2 Sans + Créditos Dinámicos -->
+  <div class="relative z-20 w-full max-w-7xl mx-auto px-8 pb-12 pt-24">
+    <h2 
+      id="hero-subtitle"
+      class="font-sans text-xs md:text-base font-medium text-amber-400/90 uppercase tracking-[0.35em] mb-2"
+    >
+      {subtitle}
+    </h2>
+    <h1 
+      id="hero-title"
+      class="font-black text-4xl sm:text-6xl md:text-8xl text-white uppercase tracking-tighter leading-[0.92] mb-6 drop-shadow-2xl"
+    >
+      {title}
+    </h1>
+
+    <!-- Barra inferior: Píldora de atribución sincronizada + Barra de progreso GSAP -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-white/15">
+      <div id="hero-attr-stage" class="relative h-6 flex-1 overflow-hidden">
+        {images.map((img, idx) => (
+          <div 
+            class={`hero-attr-item absolute inset-0 flex items-center gap-2 font-mono text-xs text-zinc-400 ${idx === 0 ? 'opacity-100' : 'opacity-0'}`}
+          >
+            <span class="px-2 py-0.5 rounded-full bg-white/10 text-white font-semibold border border-white/15">
+              {img.license || 'CC Commons'}
+            </span>
+            <span class="truncate">
+              Foto: <strong class="text-zinc-200">{img.author || 'Wikimedia Commons'}</strong> — {img.title.replace(/^File:/i, '')}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <!-- Barra de tiempo visual de la diapositiva activa -->
+      <div class="w-full sm:w-48 h-1 bg-zinc-800 rounded-full overflow-hidden">
+        <div id="hero-progress-bar" class="h-full bg-amber-400 w-0"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from "gsap";
+
+  let activeTimeline: gsap.core.Timeline | null = null;
+
+  function computeAdaptiveTiming(count: number) {
+    // Si son pocas (1 a 4): Fade lento y suave para deleitarse con la imagen
+    if (count <= 4) {
+      return {
+        hold: 5.5,
+        fade: 1.25,
+        scale: 1.06,
+        ease: "sine.inOut",
+        label: `MODO CONTEMPLATIVO (${count} FOTOS • FADE 1.25s)`
+      };
+    }
+    // Si es un grupo medio (5 a 8)
+    if (count <= 8) {
+      return {
+        hold: 3.6,
+        fade: 0.65,
+        scale: 1.07,
+        ease: "power2.inOut",
+        label: `MODO EDITORIAL (${count} FOTOS • FADE 0.65s)`
+      };
+    }
+    // Si son hasta 12 o más: Corte rápido a negro con ritmo cinematográfico
+    return {
+      hold: 2.5,
+      fade: 0.35,
+      scale: 1.09,
+      ease: "power3.inOut",
+      label: `MODO SECUENCIA ÁGIL (${count} FOTOS • FADE 0.35s)`
+    };
+  }
+
+  function initHeroTimeline() {
+    if (activeTimeline) {
+      activeTimeline.kill();
+      activeTimeline = null;
+    }
+
+    const container = document.getElementById("tgp-cinemax-hero");
+    if (!container) return;
+
+    const slides = container.querySelectorAll<HTMLElement>(".hero-slide");
+    const imgs = container.querySelectorAll<HTMLElement>(".hero-zoom-img");
+    const attrs = container.querySelectorAll<HTMLElement>(".hero-attr-item");
+    const badge = document.getElementById("hero-cadence-badge");
+    const counter = document.getElementById("hero-counter");
+    const progressBar = document.getElementById("hero-progress-bar");
+
+    const total = slides.length;
+    if (total === 0) return;
+
+    const cfg = computeAdaptiveTiming(total);
+    if (badge) badge.textContent = cfg.label;
+
+    if (total === 1) {
+      gsap.fromTo(imgs[0], { scale: 1 }, { scale: cfg.scale, duration: 10, yoyo: true, repeat: -1, ease: "sine.inOut" });
+      return;
+    }
+
+    gsap.set(slides, { opacity: 0 });
+    gsap.set(attrs, { opacity: 0 });
+    gsap.set(slides[0], { opacity: 1 });
+    gsap.set(attrs[0], { opacity: 1 });
+    gsap.set(imgs, { scale: 1 });
+
+    const tl = gsap.timeline({ repeat: -1 });
+    activeTimeline = tl;
+
+    slides.forEach((slide, i) => {
+      const next = (i + 1) % total;
+
+      tl.call(() => {
+        if (counter) {
+          counter.textContent = `${String(i + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+        }
+      });
+
+      // Barra de progreso sincronizada
+      if (progressBar) {
+        tl.fromTo(progressBar, { width: "0%" }, { width: "100%", duration: cfg.hold, ease: "none" });
+      }
+
+      // Ken Burns continuo durante la ventana de exposición
+      tl.fromTo(
+        imgs[i],
+        { scale: 1 },
+        { scale: cfg.scale, duration: cfg.hold + cfg.fade, ease: "none" },
+        `<`
+      );
+
+      // Salida hacia negro + Entrada según la cantidad de fotos
+      tl.to([slide, attrs[i]], {
+        opacity: 0,
+        duration: cfg.fade,
+        ease: cfg.ease
+      }, `-=${cfg.fade}`);
+
+      tl.to([slides[next], attrs[next]], {
+        opacity: 1,
+        duration: cfg.fade,
+        ease: cfg.ease
+      }, total <= 4 ? `-=${cfg.fade * 0.45}` : `>`); // Si son pocas hace cross-dissolve sedoso; si son 12 hace fade-to-black punzante
+    });
+  }
+
+  document.addEventListener("astro:page-load", initHeroTimeline);
+  if (document.readyState !== "loading") initHeroTimeline();
+
+  // Escucha en tiempo real cuando el Developer actualiza el lote desde el Lightbox Curador
+  window.addEventListener("tgp:preview-batch", ((e: CustomEvent) => {
+    const { images, queryTitle } = e.detail;
+    const stage = document.getElementById("hero-stage");
+    const attrStage = document.getElementById("hero-attr-stage");
+    const titleEl = document.getElementById("hero-title");
+
+    if (!stage || !attrStage || !images?.length) return;
+    if (titleEl && queryTitle) titleEl.textContent = queryTitle;
+
+    stage.innerHTML = images.map((img: any, idx: number) => `
+      <div class="hero-slide absolute inset-0 ${idx === 0 ? 'opacity-100' : 'opacity-0'}" data-index="${idx}">
+        <img src="${img.thumbUrl || img.url}" alt="${img.title}" crossorigin="anonymous" class="hero-zoom-img w-full h-full object-cover object-center will-change-transform" />
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_35%,rgba(0,0,0,0.75)_100%)]"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/65 to-transparent"></div>
+      </div>
+    `).join("");
+
+    attrStage.innerHTML = images.map((img: any, idx: number) => `
+      <div class="hero-attr-item absolute inset-0 flex items-center gap-2 font-mono text-xs text-zinc-400 ${idx === 0 ? 'opacity-100' : 'opacity-0'}">
+        <span class="px-2 py-0.5 rounded-full bg-white/10 text-white font-semibold border border-white/15">${img.license || 'CC Commons'}</span>
+        <span class="truncate">Foto: <strong class="text-zinc-200">${img.author || 'Wikimedia'}</strong> — ${img.title.replace(/^File:/i, '')}</span>
+      </div>
+    `).join("");
+
+    initHeroTimeline();
+    document.getElementById("tgp-cinemax-hero")?.scrollIntoView({ behavior: "smooth" });
+  }) as EventListener);
+</script>

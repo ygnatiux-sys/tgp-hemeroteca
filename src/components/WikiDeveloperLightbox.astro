@@ -1,0 +1,642 @@
+---
+// src/components/WikiDeveloperLightbox.astro
+import type { WikiHeroImage } from './WikiCinematicHero.astro';
+
+interface Props {
+  initialQuery?: string;
+  initialBatch?: WikiHeroImage[];
+  cloudRunEndpoint?: string; // URL de tu servicio Cloud Run para comprimir WebP/PDF y mandar a Drive
+}
+
+const { 
+  initialQuery = "Saqqara pyramid", 
+  initialBatch = [],
+  cloudRunEndpoint = "/api/cloudrun-magazine-export"
+} = Astro.props;
+---
+
+<section 
+  id="tgp-dev-workbench" 
+  data-cloudrun-url={cloudRunEndpoint}
+  class="w-full max-w-7xl mx-auto my-10 bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden text-zinc-100 font-sans"
+>
+  <!-- 1. BARRA SUPERIOR: Buscador Ontológico (Joya L2-02) + Controles de Selección -->
+  <div class="p-5 bg-zinc-900/90 border-b border-zinc-800 flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
+    
+    <!-- Buscador con Clean Search & New Search -->
+    <div class="flex-1 flex items-center gap-2">
+      <div class="relative flex-1">
+        <input 
+          id="wb-search-input"
+          type="text" 
+          value={initialQuery}
+          placeholder="Ej: Pirámide Acodada Dahshur, Moais Rano Raraku, Tikal..."
+          class="w-full bg-zinc-950 border border-zinc-700 focus:border-amber-400 rounded-xl pl-4 pr-24 py-2.5 text-sm text-white placeholder-zinc-500 outline-none transition"
+        />
+        <span id="wb-translated-pill" class="hidden sm:inline-block absolute right-3 top-1/2 -translate-y-1/2 px-2 py-0.5 text-[10px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 rounded">
+          EN: Auto-Commons
+        </span>
+      </div>
+
+      <button 
+        id="wb-btn-new-search"
+        type="button"
+        class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-bold text-xs uppercase tracking-wider transition shrink-0 cursor-pointer"
+      >
+        New Search (40)
+      </button>
+
+      <button 
+        id="wb-btn-clean-search"
+        type="button"
+        title="Limpiar búsqueda y resetear filtros"
+        class="px-3 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-mono transition shrink-0 cursor-pointer"
+      >
+        Clean
+      </button>
+    </div>
+
+    <!-- Botonera de Selección Masiva / Individual -->
+    <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
+      <button id="wb-select-all" type="button" class="px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 cursor-pointer">
+        ☑ Select All
+      </button>
+      <button id="wb-select-top12" type="button" class="px-3 py-2 rounded-lg bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-700/60 text-indigo-200 cursor-pointer">
+        ★ Top 12 Magazine
+      </button>
+      <button id="wb-deselect-all" type="button" class="px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-400 cursor-pointer">
+        ☐ Deselect All
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. SUB-BARRA DE ESTADO, FILTROS RÁPIDOS DE LICENCIA Y BOTONERA DESPLEGABLE CLOUD RUN -->
+  <div class="px-5 py-3 bg-zinc-900/40 border-b border-zinc-800/80 flex flex-wrap items-center justify-between gap-4 text-xs">
+    
+    <!-- Filtros rápidos sin re-fetch -->
+    <div class="flex items-center gap-2 font-mono">
+      <span class="text-zinc-500">FILTRO RÁPIDO:</span>
+      <button data-filter="all" class="wb-filter-pill px-2.5 py-1 rounded-full bg-white text-black font-semibold cursor-pointer">
+        Todas (<span id="count-all">{initialBatch.length}</span>)
+      </button>
+      <button data-filter="cc0" class="wb-filter-pill px-2.5 py-1 rounded-full bg-zinc-800 text-emerald-300 hover:bg-zinc-700 cursor-pointer">
+        Solo CC0 / Public Domain
+      </button>
+      <button data-filter="landscape" class="wb-filter-pill px-2.5 py-1 rounded-full bg-zinc-800 text-sky-300 hover:bg-zinc-700 cursor-pointer">
+        Ratio Horizontal (≥16:10)
+      </button>
+    </div>
+
+    <!-- Indicador de Selección + Botón para Inyectar en Hero + Menú Desplegable Cloud Run -->
+    <div class="flex items-center gap-3">
+      <div class="font-mono text-zinc-400">
+        Seleccionadas: <strong id="wb-selected-count" class="text-amber-400">0</strong>
+        <span id="wb-weight-estimator" class="ml-2 text-[11px] text-emerald-400">
+          (~0 MB en .WebP)
+        </span>
+      </div>
+
+      <!-- Enviar selección al Hero Cinemax de arriba en vivo -->
+      <button 
+        id="wb-btn-push-hero"
+        type="button"
+        class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition cursor-pointer"
+      >
+        ▶ Probar en Hero Cinemax
+      </button>
+
+      <!-- BOTONERA DESPLEGABLE (CLOUD RUN / EXPORTACIÓN) -->
+      <div class="relative">
+        <button 
+          id="wb-export-dropdown-btn"
+          type="button"
+          class="px-3.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 font-semibold flex items-center gap-2 cursor-pointer"
+        >
+          <span>⚡ Exportar / Cloud Run</span>
+          <span class="text-[10px]">▼</span>
+        </button>
+
+        <div 
+          id="wb-export-drawer"
+          class="hidden absolute right-0 mt-2 w-80 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl p-2 z-50 text-xs"
+        >
+          <div class="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-zinc-400 border-b border-zinc-800">
+            Pipeline Cloud Run (Compresión 2 Vías)
+          </div>
+
+          <button 
+            data-action="zip-desktop-dual"
+            class="wb-cloud-action w-full text-left px-3 py-2.5 hover:bg-zinc-800 rounded-lg flex items-start gap-2.5 transition cursor-pointer"
+          >
+            <span class="text-base">📦</span>
+            <div>
+              <div class="font-bold text-white">Descargar .ZIP a mi Escritorio (2 Vías)</div>
+              <div class="text-[11px] text-zinc-400">Array convertido a .WebP ultraligero + Hoja de contacto PDF con licencias.</div>
+            </div>
+          </button>
+
+          <button 
+            data-action="drive-magazine-folder"
+            class="wb-cloud-action w-full text-left px-3 py-2.5 hover:bg-zinc-800 rounded-lg flex items-start gap-2.5 transition cursor-pointer"
+          >
+            <span class="text-base">📁</span>
+            <div>
+              <div class="font-bold text-emerald-300">Enviar a Google Drive (Asset Magazine)</div>
+              <div class="text-[11px] text-zinc-400">Guarda el lote .WebP + PDF directo en tu carpeta de revista en Drive.</div>
+            </div>
+          </button>
+
+          <div class="my-1 border-t border-zinc-800"></div>
+
+          <button 
+            data-action="copy-mdx-manifest"
+            class="wb-cloud-action w-full text-left px-3 py-2 hover:bg-zinc-800 rounded-lg flex items-center justify-between text-zinc-300 font-mono cursor-pointer"
+          >
+            <span>📋 Copiar Array JSON / Frontmatter MDX</span>
+            <span class="text-[10px] px-1.5 py-0.5 bg-zinc-800 rounded">Local</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. VIEWPORT DE 12 FOTOS VISIBLES CON SCROLLBAR HASTA LAS 40 -->
+  <!-- 4 columnas x 3 filas visibles (~690px de alto) con scroll suave hacia abajo para ver las 40 -->
+  <div 
+    id="wb-grid-viewport"
+    class="p-5 max-h-[700px] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 scroll-smooth"
+  >
+    {initialBatch.map((img, idx) => {
+      const isCC0 = /cc0|public domain|pd/i.test(img.license || '') || Boolean(img.isCC0OrPublicDomain);
+      const ratio = (img.width && img.height) ? (img.width / img.height).toFixed(2) : '1.50';
+      return (
+        <article 
+          class="wb-card group relative bg-zinc-900 border border-zinc-800 hover:border-amber-400/60 rounded-xl overflow-hidden flex flex-col transition"
+          data-id={img.id}
+          data-cc0={isCC0 ? 'true' : 'false'}
+          data-landscape={Number(ratio) >= 1.3 ? 'true' : 'false'}
+          data-json={JSON.stringify(img)}
+        >
+          <!-- Miniatura + Checkbox individual + Botón Zoom Lightbox -->
+          <div class="relative aspect-[16/10] w-full bg-black overflow-hidden">
+            <img 
+              src={img.thumbUrl || img.url} 
+              alt={img.title}
+              loading="lazy"
+              class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+            />
+            
+            <!-- Número de orden (#01 a #40) -->
+            <span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/75 text-[10px] font-mono text-zinc-300">
+              #{String(idx + 1).padStart(2, '0')}
+            </span>
+
+            <!-- Checkbox de Selección Individual -->
+            <label class="absolute top-2 right-2 z-10 flex items-center justify-center w-7 h-7 rounded-lg bg-black/80 border border-white/20 cursor-pointer hover:border-amber-400">
+              <input 
+                type="checkbox" 
+                class="wb-card-checkbox w-4 h-4 accent-amber-400 cursor-pointer"
+                checked={idx < 12}
+              />
+            </label>
+
+            <!-- Botón central para abrir el Lightbox de Inspección -->
+            <button 
+              type="button"
+              class="wb-open-lightbox opacity-0 group-hover:opacity-100 absolute inset-0 bg-black/45 flex items-center justify-center transition cursor-pointer"
+            >
+              <span class="px-3 py-1.5 rounded-full bg-black/85 border border-white/20 text-xs font-mono text-white">
+                🔍 Inspeccionar HD
+              </span>
+            </button>
+          </div>
+
+          <!-- PILL VISOR INFERIOR: Créditos CC0 / CC-BY y Dimensiones -->
+          <div class="p-2.5 flex flex-col gap-1.5 justify-between flex-1 bg-zinc-900">
+            <div class="text-xs font-medium text-zinc-200 truncate" title={img.title}>
+              {img.cleanTitle || img.title.replace(/^File:/i, '')}
+            </div>
+
+            <div class="flex items-center justify-between gap-1 text-[10px] font-mono">
+              <!-- Pill de Licencia con color semántico -->
+              <span class={`px-2 py-0.5 rounded-full font-semibold truncate ${
+                isCC0 
+                  ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' 
+                  : 'bg-sky-500/15 text-sky-300 border border-sky-500/30'
+              }`}>
+                {img.licenseShortName || img.license || 'CC-BY-SA'}
+              </span>
+
+              <span class="text-zinc-400 shrink-0">
+                {img.width}×{img.height}
+              </span>
+            </div>
+          </div>
+        </article>
+      );
+    })}
+  </div>
+
+  <!-- 4. MODAL LIGHTBOX / FANCYBOX NATIVO DE INSPECCIÓN PROFUNDA -->
+  <dialog 
+    id="wb-lightbox-modal" 
+    class="backdrop:bg-black/90 bg-zinc-950 text-white border border-zinc-700 rounded-2xl max-w-5xl w-[92vw] p-0 overflow-hidden shadow-2xl"
+  >
+    <div class="grid grid-cols-1 lg:grid-cols-3 min-h-[520px]">
+      <div class="lg:col-span-2 bg-black flex items-center justify-center p-4 relative">
+        <img id="lb-modal-img" src="" alt="" class="max-h-[75vh] w-auto object-contain rounded" />
+      </div>
+      <div class="p-6 flex flex-col justify-between bg-zinc-900 border-l border-zinc-800">
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span id="lb-modal-license" class="px-2.5 py-1 rounded-full text-xs font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              CC0
+            </span>
+            <button id="lb-modal-close" class="text-zinc-400 hover:text-white font-mono text-sm cursor-pointer">
+              ✕ ESC
+            </button>
+          </div>
+          <h3 id="lb-modal-title" class="font-bold text-lg text-white break-words"></h3>
+          <p id="lb-modal-desc" class="text-xs text-zinc-400 leading-relaxed max-h-40 overflow-y-auto"></p>
+          <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 font-mono text-xs space-y-1 text-zinc-300">
+            <div>Autor: <strong id="lb-modal-author" class="text-white"></strong></div>
+            <div>Resolución: <strong id="lb-modal-dims" class="text-amber-300"></strong></div>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-zinc-800 flex flex-col gap-2">
+          <button id="lb-modal-toggle-select" type="button" class="w-full py-2.5 rounded-xl bg-amber-400 text-black font-bold text-xs uppercase cursor-pointer">
+            Alternar Selección en Lote
+          </button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</section>
+
+<style>
+  /* Scrollbar oscura refinada */
+  #wb-grid-viewport::-webkit-scrollbar {
+    width: 6px;
+  }
+  #wb-grid-viewport::-webkit-scrollbar-track {
+    background: rgba(24, 24, 27, 0.6);
+    border-radius: 9999px;
+  }
+  #wb-grid-viewport::-webkit-scrollbar-thumb {
+    background: rgba(245, 158, 11, 0.35);
+    border-radius: 9999px;
+  }
+  #wb-grid-viewport::-webkit-scrollbar-thumb:hover {
+    background: rgba(245, 158, 11, 0.7);
+  }
+</style>
+
+<script>
+  function initWorkbench() {
+    const root = document.getElementById("tgp-dev-workbench");
+    if (!root) return;
+
+    const cloudRunUrl = root.getAttribute("data-cloudrun-url") || "/api/cloudrun-magazine-export";
+    const cards = () => Array.from(root.querySelectorAll<HTMLElement>(".wb-card"));
+    const checkboxes = () => Array.from(root.querySelectorAll<HTMLInputElement>(".wb-card-checkbox"));
+
+    const selectedCountEl = document.getElementById("wb-selected-count");
+    const weightEstimatorEl = document.getElementById("wb-weight-estimator");
+
+    function getSelectedItems() {
+      const selected: any[] = [];
+      cards().forEach((card) => {
+        const cb = card.querySelector<HTMLInputElement>(".wb-card-checkbox");
+        if (cb && cb.checked && card.style.display !== "none") {
+          const raw = card.getAttribute("data-json");
+          if (raw) selected.push(JSON.parse(raw));
+        }
+      });
+      return selected;
+    }
+
+    function updateCounters() {
+      const items = getSelectedItems();
+      if (selectedCountEl) selectedCountEl.textContent = String(items.length);
+      // Estimación: ~180 KB por imagen optimizada a WebP en Cloud Run vs ~3.5 MB original
+      const webpMb = (items.length * 0.18).toFixed(1);
+      if (weightEstimatorEl) weightEstimatorEl.textContent = `(~${webpMb} MB en .WebP comprimido)`;
+
+      const countAllEl = document.getElementById("count-all");
+      if (countAllEl) countAllEl.textContent = String(cards().length);
+    }
+
+    // Eventos de checkboxes individuales
+    root.addEventListener("change", (e) => {
+      if ((e.target as HTMLElement).classList.contains("wb-card-checkbox")) {
+        updateCounters();
+      }
+    });
+
+    // Select All / Top 12 / Deselect All
+    document.getElementById("wb-select-all")?.addEventListener("click", () => {
+      cards().forEach((c) => {
+        if (c.style.display !== "none") {
+          const cb = c.querySelector<HTMLInputElement>(".wb-card-checkbox");
+          if (cb) cb.checked = true;
+        }
+      });
+      updateCounters();
+    });
+
+    document.getElementById("wb-select-top12")?.addEventListener("click", () => {
+      let count = 0;
+      cards().forEach((c) => {
+        const cb = c.querySelector<HTMLInputElement>(".wb-card-checkbox");
+        if (!cb) return;
+        if (c.style.display !== "none" && count < 12) {
+          cb.checked = true;
+          count++;
+        } else {
+          cb.checked = false;
+        }
+      });
+      updateCounters();
+    });
+
+    document.getElementById("wb-deselect-all")?.addEventListener("click", () => {
+      checkboxes().forEach((cb) => (cb.checked = false));
+      updateCounters();
+    });
+
+    // Clean Search
+    document.getElementById("wb-btn-clean-search")?.addEventListener("click", () => {
+      const input = document.getElementById("wb-search-input") as HTMLInputElement;
+      if (input) {
+        input.value = "";
+        input.focus();
+      }
+      checkboxes().forEach((cb) => (cb.checked = false));
+      updateCounters();
+    });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // NEW SEARCH (40): LLAMADA DINÁMICA AL MOTOR PRE-FETCH CON CIRRUSSEARCH
+    // ─────────────────────────────────────────────────────────────────────────
+    document.getElementById("wb-btn-new-search")?.addEventListener("click", async () => {
+      const input = document.getElementById("wb-search-input") as HTMLInputElement;
+      const btn = document.getElementById("wb-btn-new-search") as HTMLButtonElement;
+      const query = input?.value.trim();
+      if (!query) return;
+
+      const originalBtnText = btn.innerHTML;
+      btn.innerHTML = `<span class="inline-block animate-spin mr-1">↻</span> Buscando 40...`;
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/api/wiki-curator-search?query=${encodeURIComponent(query)}&limit=40`);
+        if (!res.ok) throw new Error("Error en el motor pre-fetch");
+        const data = await res.json();
+
+        if (Array.isArray(data.images) && data.images.length > 0) {
+          // Actualizar píldora de traducción en inglés de Commons
+          const pill = document.getElementById("wb-translated-pill");
+          if (pill && data.searchTermEnglish) {
+            pill.textContent = `EN: ${data.searchTermEnglish}`;
+            pill.classList.remove("hidden");
+          }
+
+          // Re-renderizar las tarjetas en la grilla
+          const grid = document.getElementById("wb-grid-viewport");
+          if (grid) {
+            grid.innerHTML = data.images.map((img: any, idx: number) => {
+              const isCC0 = /cc0|public domain|pd/i.test(img.licenseShortName || img.license || '') || Boolean(img.isCC0OrPublicDomain);
+              const ratio = (img.width && img.height) ? (img.width / img.height).toFixed(2) : '1.50';
+              return `
+                <article 
+                  class="wb-card group relative bg-zinc-900 border border-zinc-800 hover:border-amber-400/60 rounded-xl overflow-hidden flex flex-col transition"
+                  data-id="${img.id}"
+                  data-cc0="${isCC0 ? 'true' : 'false'}"
+                  data-landscape="${Number(ratio) >= 1.3 ? 'true' : 'false'}"
+                  data-json='${JSON.stringify(img).replace(/'/g, "&apos;")}'
+                >
+                  <div class="relative aspect-[16/10] w-full bg-black overflow-hidden">
+                    <img 
+                      src="${img.thumbUrl || img.url}" 
+                      alt="${img.cleanTitle || img.title}"
+                      loading="lazy"
+                      class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    />
+                    <span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/75 text-[10px] font-mono text-zinc-300">
+                      #${String(idx + 1).padStart(2, '0')}
+                    </span>
+                    <label class="absolute top-2 right-2 z-10 flex items-center justify-center w-7 h-7 rounded-lg bg-black/80 border border-white/20 cursor-pointer hover:border-amber-400">
+                      <input 
+                        type="checkbox" 
+                        class="wb-card-checkbox w-4 h-4 accent-amber-400 cursor-pointer"
+                        ${idx < 12 ? 'checked' : ''}
+                      />
+                    </label>
+                    <button 
+                      type="button"
+                      class="wb-open-lightbox opacity-0 group-hover:opacity-100 absolute inset-0 bg-black/45 flex items-center justify-center transition cursor-pointer"
+                    >
+                      <span class="px-3 py-1.5 rounded-full bg-black/85 border border-white/20 text-xs font-mono text-white">
+                        🔍 Inspeccionar HD
+                      </span>
+                    </button>
+                  </div>
+                  <div class="p-2.5 flex flex-col gap-1.5 justify-between flex-1 bg-zinc-900">
+                    <div class="text-xs font-medium text-zinc-200 truncate" title="${img.cleanTitle || img.title}">
+                      ${img.cleanTitle || img.title.replace(/^File:/i, '')}
+                    </div>
+                    <div class="flex items-center justify-between gap-1 text-[10px] font-mono">
+                      <span class="px-2 py-0.5 rounded-full font-semibold truncate ${
+                        isCC0 
+                          ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' 
+                          : 'bg-sky-500/15 text-sky-300 border border-sky-500/30'
+                      }">
+                        ${img.licenseShortName || img.license || 'CC-BY-SA'}
+                      </span>
+                      <span class="text-zinc-400 shrink-0">
+                        ${img.width}×${img.height}
+                      </span>
+                    </div>
+                  </div>
+                </article>
+              `;
+            }).join('');
+
+            bindCardEvents();
+            updateCounters();
+
+            // Auto-probar en Hero los Top 12 del nuevo lote
+            const top12 = data.images.slice(0, 12);
+            window.dispatchEvent(
+              new CustomEvent("tgp:preview-batch", {
+                detail: { images: top12, queryTitle: query }
+              })
+            );
+          }
+        }
+      } catch (err) {
+        console.error("Error en búsqueda:", err);
+      } finally {
+        btn.innerHTML = originalBtnText;
+        btn.disabled = false;
+      }
+    });
+
+    // Filtros rápidos (Todas / CC0 / Horizontal)
+    root.querySelectorAll<HTMLElement>(".wb-filter-pill").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const filter = btn.getAttribute("data-filter");
+        cards().forEach((card) => {
+          const isCC0 = card.getAttribute("data-cc0") === "true";
+          const isLandscape = card.getAttribute("data-landscape") === "true";
+          const show =
+            filter === "all" ||
+            (filter === "cc0" && isCC0) ||
+            (filter === "landscape" && isLandscape);
+          card.style.display = show ? "flex" : "none";
+        });
+
+        // Estilos activos
+        root.querySelectorAll<HTMLElement>(".wb-filter-pill").forEach(p => {
+          p.className = "wb-filter-pill px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-300 hover:bg-zinc-700 cursor-pointer font-mono text-xs";
+        });
+        btn.className = "wb-filter-pill px-2.5 py-1 rounded-full bg-white text-black font-semibold cursor-pointer font-mono text-xs";
+
+        updateCounters();
+      });
+    });
+
+    // Sincronizar con el Hero Cinemax de arriba
+    document.getElementById("wb-btn-push-hero")?.addEventListener("click", () => {
+      const selected = getSelectedItems();
+      const input = document.getElementById("wb-search-input") as HTMLInputElement;
+      if (selected.length === 0) return alert("Seleccioná al menos 1 imagen para enviarla al Hero.");
+      window.dispatchEvent(
+        new CustomEvent("tgp:preview-batch", {
+          detail: { images: selected, queryTitle: input?.value || "Colección Curada" }
+        })
+      );
+      document.getElementById("wiki-cinematic-hero")?.scrollIntoView({ behavior: "smooth" });
+    });
+
+    // Botonera desplegable Cloud Run
+    const dropdownBtn = document.getElementById("wb-export-dropdown-btn");
+    const drawer = document.getElementById("wb-export-drawer");
+    dropdownBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      drawer?.classList.toggle("hidden");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!dropdownBtn?.contains(e.target as Node) && !drawer?.contains(e.target as Node)) {
+        drawer?.classList.add("hidden");
+      }
+    });
+
+    // Acciones del Drawer (ZIP 2 vías, Drive Magazine Folder, Copy MDX)
+    root.querySelectorAll<HTMLElement>(".wb-cloud-action").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const action = btn.getAttribute("data-action");
+        const selected = getSelectedItems();
+        const query = (document.getElementById("wb-search-input") as HTMLInputElement)?.value || "tgp-batch";
+
+        if (selected.length === 0) return alert("Seleccioná al menos una imagen primero.");
+
+        if (action === "copy-mdx-manifest") {
+          const mdxSnippet = `---
+title: "Galería Curada ${query}"
+galeriaTgp:
+${selected.map(img => `  - url: "${img.url}"\n    titulo: "${(img.cleanTitle || img.title).replace(/"/g, '\\"')}"\n    autor: "${(img.author || 'Wikimedia').replace(/"/g, '\\"')}"\n    licencia: "${img.licenseShortName || img.license || 'PD'}"\n    aspectRatio: ${(img.width && img.height) ? (img.width / img.height).toFixed(2) : 1.5}`).join('\n')}
+---`;
+          await navigator.clipboard.writeText(mdxSnippet);
+          drawer?.classList.add("hidden");
+          return alert(`Copiadas ${selected.length} imágenes en formato MDX / Frontmatter.`);
+        }
+
+        // Llamada al servicio en Cloud Run para comprimir a WebP + PDF o subir a Drive
+        try {
+          btn.style.opacity = "0.5";
+          const res = await fetch(cloudRunUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action, // 'zip-desktop-dual' | 'drive-magazine-folder'
+              collectionName: query,
+              formats: ["webp", "pdf-contact-sheet"],
+              webpQuality: 82,
+              images: selected
+            })
+          });
+
+          if (action === "zip-desktop-dual" && res.ok) {
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${query.toLowerCase().replace(/\s+/g, "-")}-webp-and-pdf.zip`;
+            a.click();
+            URL.revokeObjectURL(url);
+          } else if (action === "drive-magazine-folder" && res.ok) {
+            const data = await res.json();
+            alert(`Lote enviado a tu carpeta Asset Magazine en Google Drive: ${data.data?.targetFolder || "OK"}`);
+          } else {
+            const errData = await res.json().catch(() => ({}));
+            alert(`Error: ${errData.error || "No se pudo completar la acción"}`);
+          }
+        } catch (err) {
+          console.error("Error comunicando con Cloud Run:", err);
+          alert("Error comunicando con el servicio Cloud Run.");
+        } finally {
+          btn.style.opacity = "1";
+          drawer?.classList.add("hidden");
+        }
+      });
+    });
+
+    // Lightbox Modal de Inspección
+    const modal = document.getElementById("wb-lightbox-modal") as HTMLDialogElement;
+    let activeCardCheckbox: HTMLInputElement | null = null;
+
+    function bindCardEvents() {
+      root?.querySelectorAll<HTMLElement>(".wb-open-lightbox").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const card = (e.currentTarget as HTMLElement).closest(".wb-card") as HTMLElement;
+          if (!card || !modal) return;
+          const raw = card.getAttribute("data-json");
+          const data = raw ? JSON.parse(raw) : {};
+          activeCardCheckbox = card.querySelector<HTMLInputElement>(".wb-card-checkbox");
+
+          (document.getElementById("lb-modal-img") as HTMLImageElement).src = data.url || data.thumbUrl;
+          document.getElementById("lb-modal-title")!.textContent = data.cleanTitle || data.title?.replace(/^File:/i, "") || "";
+          document.getElementById("lb-modal-desc")!.textContent = data.description || "Sin descripción adicional.";
+          document.getElementById("lb-modal-author")!.textContent = data.author || "Wikimedia Commons";
+          document.getElementById("lb-modal-dims")!.textContent = `${data.width} × ${data.height} px`;
+          document.getElementById("lb-modal-license")!.textContent = data.licenseShortName || data.license || "CC";
+
+          modal.showModal();
+        });
+      });
+    }
+
+    bindCardEvents();
+
+    document.getElementById("lb-modal-close")?.addEventListener("click", () => modal?.close());
+    document.getElementById("lb-modal-toggle-select")?.addEventListener("click", () => {
+      if (activeCardCheckbox) {
+        activeCardCheckbox.checked = !activeCardCheckbox.checked;
+        updateCounters();
+      }
+      modal?.close();
+    });
+
+    modal?.addEventListener("click", (e) => {
+      if (e.target === modal) modal.close();
+    });
+
+    updateCounters();
+  }
+
+  document.addEventListener("astro:page-load", initWorkbench);
+  if (document.readyState !== "loading") initWorkbench();
+</script>
