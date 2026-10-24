@@ -24,8 +24,8 @@ interface Props {
 }
 
 const { 
-  title = Astro.props.headline || "Acervo Documental TGP", 
-  subtitle = Astro.props.tagline || "Wikimedia Commons Scale", 
+  title = Astro.props.title || Astro.props.headline || "Acervo Documental TGP", 
+  subtitle = Astro.props.subtitle || Astro.props.tagline || "Wikimedia Commons Scale", 
   images = [] 
 } = Astro.props;
 ---
