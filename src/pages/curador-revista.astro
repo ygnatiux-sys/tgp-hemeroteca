@@ -1,0 +1,98 @@
+---
+/**
+ * src/pages/curador-revista.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * MESA DE CURADURÍA VISUAL Y EXHIBICIÓN (TGP SCRIPTORIUM / REVISTAS DIGITALES)
+ *
+ * Herramienta editorial privada accesible desde TGP Scriptorium (/tgp-app/):
+ * - Hero Cinemax Max (21:9) con GSAP adaptativo según volumen de fotos.
+ * - Mesa de luz Developer Lightbox con grilla 4x3 de 12 tarjetas en vista (40 totales).
+ * - Sincronización reactiva en tiempo real vía evento 'tgp:preview-batch'.
+ * - Exportación Cloud Run de 2 vías (WebP q82 + Catálogo de Referencia PDF).
+ * - Acceso circular protegido con enlace de retorno a /tgp-app/.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+export const prerender = false;
+
+import Layout from '../layouts/Layout.astro';
+import WikiCinematicHero from '../components/WikiCinematicHero.astro';
+import WikiDeveloperLightbox from '../components/WikiDeveloperLightbox.astro';
+import { searchWikiCurator } from '../lib/wikiCuratorEngine';
+
+const queryParam = Astro.url.searchParams.get('q') || 'Saqqara pyramid';
+
+// Pre-fetch inicial en el servidor vía Gemini Agente Documentalista + Commons
+const curatorResult = await searchWikiCurator({
+  query: queryParam,
+  limit: 40,
+  useGeminiAgent: true,
+});
+
+const initialImages = curatorResult.images;
+const initialHeroBatch = initialImages.slice(0, 12);
+---
+
+<Layout 
+  title="Curaduría Visual & Exhibición · TGP Scriptorium"
+  description="Mesa de curaduría fotográfica, Hero Apple 72vh y exportación Cloud Run para Revistas Digitales"
+  hideHeader={true}
+  footerVariant="minimal"
+>
+  <main class="w-full min-h-screen bg-black text-white selection:bg-amber-400 selection:text-black">
+    
+    <!-- Barra Superior de Navegación Privada (Retorno a TGP Scriptorium Hub) -->
+    <header class="w-full bg-zinc-950/90 border-b border-zinc-800/80 px-4 sm:px-8 py-2.5 flex items-center justify-between text-xs font-mono sticky top-0 z-50 backdrop-blur-md">
+      <div class="flex items-center gap-3">
+        <a 
+          href="/tgp-app/" 
+          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700/80 transition-colors"
+          title="Regresar al panel de TGP Scriptorium"
+        >
+          ← Volver a TGP Scriptorium
+        </a>
+        <span class="hidden sm:inline-block text-zinc-600">|</span>
+        <span class="hidden sm:inline-flex items-center gap-1.5 text-zinc-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Mesa Editorial Privada · Revistas Digitales</span>
+        </span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-zinc-500 hidden md:inline">Traducción Commons:</span>
+        <span class="px-2.5 py-0.5 rounded bg-zinc-900 border border-amber-500/30 text-amber-300 font-mono text-[11px]">
+          {curatorResult.searchTermEnglish}
+        </span>
+      </div>
+    </header>
+
+    <!-- 1. VISOR PRINCIPAL APPLE SHOWCASE (72vh + Carrusel Inset) -->
+    <WikiCinematicHero 
+      images={initialHeroBatch}
+      headline={`Acervo Curado: ${queryParam}`}
+      tagline="Lote de Alta Resolución · Wikimedia Commons Scale"
+    />
+
+    <!-- Separador Sutil con Indicador de Flujo -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-2 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+        <h2 class="font-mono text-xs uppercase tracking-widest text-zinc-400">
+          Mesa de Luz y Selector de Revista (Lote de 40 fotos)
+        </h2>
+      </div>
+
+      <div class="font-mono text-[11px] text-zinc-500">
+        Fotos en lote: <span class="text-emerald-400 font-semibold">{initialImages.length}</span>
+      </div>
+    </div>
+
+    <!-- 2. DEVELOPER LIGHTBOX CON EXPORTACIÓN CLOUD RUN -->
+    <WikiDeveloperLightbox 
+      initialQuery={queryParam}
+      initialBatch={initialImages}
+      cloudRunEndpoint="/api/cloudrun-magazine-export"
+    />
+
+  </main>
+</Layout>

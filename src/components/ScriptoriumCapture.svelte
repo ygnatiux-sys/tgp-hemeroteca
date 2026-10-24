@@ -533,6 +533,16 @@
           </button>
 
           <a
+            href="/curador-revista"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="px-3.5 py-2 text-xs font-sans font-semibold rounded-full transition-all inline-flex items-center gap-1.5 {theme === 'dia' ? 'text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200' : 'text-amber-300 bg-amber-950/60 hover:bg-amber-900/60 border border-amber-800/80'}"
+            title="Abrir Mesa de Curaduría Visual y Revistas"
+          >
+            🏛️ Curador Revistas
+          </a>
+
+          <a
             href="/tgp-app/"
             class="px-4 py-2 text-xs font-sans font-semibold rounded-full transition-all inline-flex items-center gap-1.5 {theme === 'dia' ? 'text-[#1a73e8] bg-[#e8f0fe] hover:bg-[#d2e3fc]' : 'text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-800'}"
             title="Volver al Panel Principal de TGP App"

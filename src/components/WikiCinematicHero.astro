@@ -15,10 +15,10 @@ export interface WikiHeroImage {
   description: string;
 }
 
-interface Props {
+export interface Props {
   title?: string;
   subtitle?: string;
-  images?: WikiHeroImage[];
+  images?: any[];
   headline?: string;
   tagline?: string;
 }
@@ -31,79 +31,144 @@ const {
 ---
 
 <section 
-  id="tgp-cinemax-hero"
-  class="relative w-full h-[85vh] min-h-145 max-h-240 bg-black overflow-hidden flex flex-col justify-between border-b border-zinc-800 select-none"
+  id="tgp-apple-visor" 
+  class="relative w-full bg-black select-none border-b border-zinc-800/80"
 >
-  <!-- Barras Cinemax 2.39:1 sutiles + Indicador superior de cadencia -->
-  <div class="relative z-20 w-full px-8 py-4 bg-linear-to-b from-black/90 to-transparent flex items-center justify-between text-xs font-mono text-zinc-400">
-    <div class="flex items-center gap-3">
-      <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-      <span>CINEMAX ARCHIVE ENGINE</span>
-      <span id="hero-cadence-badge" class="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-700 text-zinc-300">
-        Calculando cadencia...
+  <!-- 1. VISOR PRINCIPAL (72vh): Control de altura relativo Apple Showcase -->
+  <div 
+    id="tgp-cinemax-hero" 
+    class="relative w-full h-[72vh] min-h-115 max-h-205 bg-black overflow-hidden flex flex-col justify-between"
+  >
+    <!-- Barra superior de control del Hero (discreta y elegante) -->
+    <div class="relative z-20 w-full px-6 sm:px-10 py-3 bg-linear-to-b from-black/80 via-black/30 to-transparent flex items-center justify-between text-xs font-mono text-zinc-300">
+      <div class="flex items-center gap-3">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="tracking-wider uppercase text-zinc-300 font-semibold">TGP Apple Visor</span>
+        <span id="hero-cadence-badge" class="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-zinc-900/90 border border-zinc-700/80 text-zinc-300 text-[11px]">
+          Calculando cadencia...
+        </span>
+      </div>
+      <div id="hero-counter" class="text-zinc-200 tracking-widest font-semibold px-2.5 py-0.5 rounded-full bg-black/60 border border-white/10">
+        01 / {String(images.length).padStart(2, '0')}
+      </div>
+    </div>
+
+    <!-- Escenario de Imágenes Nativas (object-fit: cover, nitidez y escala) -->
+    <div id="hero-stage" class="absolute inset-0 z-0 bg-black">
+      {images.map((img, idx) => (
+        <div 
+          class={`hero-slide absolute inset-0 ${idx === 0 ? 'opacity-100' : 'opacity-0'}`}
+          data-index={idx}
+        >
+          <img
+            src={img.thumbUrl || img.url}
+            alt={img.description || img.title}
+            crossorigin="anonymous"
+            class="hero-zoom-img w-full h-full object-cover object-center will-change-transform"
+          />
+          <!-- Gradiente semitransparente localizado solo detrás del texto, dejando el resto de la imagen brillante -->
+          <div class="absolute inset-0 bg-linear-to-t from-black/85 via-black/30 to-transparent pointer-events-none"></div>
+          <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(0,0,0,0.85)_0%,rgba(0,0,0,0.35)_45%,transparent_80%)] pointer-events-none"></div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Posicionamiento de Tipografía: Anclada en la esquina inferior izquierda (bottom: 40px; left: 40px;) -->
+    <div class="relative z-20 w-full px-6 sm:px-10 pb-8 pt-12 flex flex-col justify-end">
+      <div class="max-w-3xl">
+        <h2 
+          id="hero-subtitle"
+          class="font-sans text-xs sm:text-sm font-semibold tracking-wider text-amber-400 uppercase mb-1 drop-shadow"
+        >
+          {subtitle}
+        </h2>
+        <h1 
+          id="hero-title"
+          class="font-sans font-bold text-[clamp(1.75rem,3.6vw,3.5rem)] text-white tracking-tight leading-[1.08] drop-shadow-xl mb-3"
+        >
+          {title}
+        </h1>
+
+        <!-- Píldora de atribución + Barra de progreso sincronizada -->
+        <div class="flex items-center gap-4 pt-1">
+          <div id="hero-attr-stage" class="relative h-6 flex-1 max-w-lg overflow-hidden">
+            {images.map((img, idx) => (
+              <div 
+                class={`hero-attr-item absolute inset-0 flex items-center gap-2 font-mono text-xs text-zinc-300 ${idx === 0 ? 'opacity-100' : 'opacity-0'}`}
+              >
+                <span class="px-2 py-0.5 rounded-full bg-white/15 text-white font-semibold border border-white/20 text-[11px]">
+                  {img.licenseShortName || img.license || 'CC Commons'}
+                </span>
+                <span class="truncate text-zinc-300 drop-shadow">
+                  Foto: <strong class="text-white">{img.author || 'Wikimedia Commons'}</strong> — {img.cleanTitle || img.title.replace(/^File:/i, '')}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div class="w-28 sm:w-44 h-1 bg-white/20 rounded-full overflow-hidden shrink-0">
+            <div id="hero-progress-bar" class="h-full bg-amber-400 w-0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. EL EFECTO "INSET" DEL CARRUSEL (Array de imágenes sobre fondo #1c1c1e) -->
+  <div 
+    id="tgp-apple-carousel-strip" 
+    class="w-full bg-[#1c1c1e] py-3.5 border-t border-white/10"
+  >
+    <div class="px-6 sm:px-10 pb-2 flex items-center justify-between text-xs font-mono text-zinc-400">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+        <span class="uppercase tracking-widest text-zinc-200 font-semibold text-[11px]">Carrusel Inset Apple</span>
+        <span class="text-zinc-500 hidden md:inline text-[11px]">· {images.length} piezas seleccionadas</span>
+      </div>
+      <span class="text-zinc-400 text-[11px] hidden sm:inline font-sans">
+        Toca cualquier miniatura para proyectarla en el visor principal
       </span>
     </div>
-    <div id="hero-counter" class="text-zinc-300 tracking-widest">
-      01 / {String(images.length).padStart(2, '0')}
-    </div>
-  </div>
 
-  <!-- Escenario de Imágenes -->
-  <div id="hero-stage" class="absolute inset-0 z-0 bg-black">
-    {images.map((img, idx) => (
-      <div 
-        class={`hero-slide absolute inset-0 ${idx === 0 ? 'opacity-100' : 'opacity-0'}`}
-        data-index={idx}
-      >
-        <img
-          src={img.thumbUrl || img.url}
-          alt={img.description || img.title}
-          crossorigin="anonymous"
-          class="hero-zoom-img w-full h-full object-cover object-center will-change-transform"
-        />
-        <!-- Viñeta periférica + Lower-Third Cinemático -->
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_35%,rgba(0,0,0,0.75)_100%)]"></div>
-        <div class="absolute inset-0 bg-linear-to-t from-black via-black/65 to-transparent"></div>
-      </div>
-    ))}
-  </div>
-
-  <!-- Lower-Third: Tipografía H1 Extra Bold + H2 Sans + Créditos Dinámicos -->
-  <div class="relative z-20 w-full max-w-7xl mx-auto px-8 pb-12 pt-24">
-    <h2 
-      id="hero-subtitle"
-      class="font-sans text-xs md:text-base font-medium text-amber-400/90 uppercase tracking-[0.35em] mb-2"
+    <!-- Contenedor del array: flex, gap: 20px, overflow-x: auto, scroll-snap-type: x mandatory, padding: 10px 40px -->
+    <div 
+      id="hero-thumb-carousel"
+      class="flex gap-5 overflow-x-auto scroll-smooth px-6 sm:px-10 py-2 [scroll-snap-type:x_mandatory] cursor-grab active:cursor-grabbing"
     >
-      {subtitle}
-    </h2>
-    <h1 
-      id="hero-title"
-      class="font-black text-4xl sm:text-6xl md:text-8xl text-white uppercase tracking-tighter leading-[0.92] mb-6 drop-shadow-2xl"
-    >
-      {title}
-    </h1>
+      {images.map((img, idx) => (
+        <button
+          type="button"
+          class={`hero-thumb-card relative aspect-16/9 w-[260px] sm:w-[300px] shrink-0 [scroll-snap-align:start] rounded-2xl overflow-hidden bg-black border-2 transition-all duration-300 cursor-pointer shadow-[0_8px_24px_rgba(0,0,0,0.5)] group text-left ${
+            idx === 0 
+              ? 'border-amber-400 ring-2 ring-amber-400/50 scale-[1.02]' 
+              : 'border-white/10 hover:border-amber-400/70 hover:scale-[1.01]'
+          }`}
+          data-index={idx}
+          title={`Ver imagen #${idx + 1}`}
+        >
+          <img 
+            src={img.thumbUrl || img.url} 
+            alt={img.title} 
+            loading="lazy"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+          />
+          <div class="absolute inset-0 bg-linear-to-t from-black/75 via-transparent to-black/30 pointer-events-none"></div>
+          
+          <!-- Número de orden -->
+          <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-black/80 border border-white/10 text-[10px] font-mono font-semibold text-zinc-200">
+            #{String(idx + 1).padStart(2, '0')}
+          </span>
 
-    <!-- Barra inferior: Píldora de atribución sincronizada + Barra de progreso GSAP -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-white/15">
-      <div id="hero-attr-stage" class="relative h-6 flex-1 overflow-hidden">
-        {images.map((img, idx) => (
-          <div 
-            class={`hero-attr-item absolute inset-0 flex items-center gap-2 font-mono text-xs text-zinc-400 ${idx === 0 ? 'opacity-100' : 'opacity-0'}`}
-          >
-            <span class="px-2 py-0.5 rounded-full bg-white/10 text-white font-semibold border border-white/15">
-              {img.license || 'CC Commons'}
-            </span>
-            <span class="truncate">
-              Foto: <strong class="text-zinc-200">{img.author || 'Wikimedia Commons'}</strong> — {img.title.replace(/^File:/i, '')}
-            </span>
-          </div>
-        ))}
-      </div>
+          <!-- Pill de licencia -->
+          <span class="absolute bottom-2.5 left-2.5 px-2 py-0.5 rounded-full bg-black/80 border border-white/15 text-[10px] font-mono text-amber-300 font-medium truncate max-w-[65%]">
+            {img.licenseShortName || img.license || 'Commons'}
+          </span>
 
-      <!-- Barra de tiempo visual de la diapositiva activa -->
-      <div class="w-full sm:w-48 h-1 bg-zinc-800 rounded-full overflow-hidden">
-        <div id="hero-progress-bar" class="h-full bg-amber-400 w-0"></div>
-      </div>
+          <span class="absolute bottom-2.5 right-2.5 text-[10px] font-mono text-zinc-400">
+            {img.width}×{img.height}
+          </span>
+        </button>
+      ))}
     </div>
   </div>
 </section>
@@ -112,39 +177,90 @@ const {
   import { gsap } from "gsap";
 
   let activeTimeline: gsap.core.Timeline | null = null;
+  let currentIndex = 0;
 
   function computeAdaptiveTiming(count: number) {
-    // Si son pocas (1 a 4): Fade lento y suave para deleitarse con la imagen
     if (count <= 4) {
       return {
         hold: 5.5,
         fade: 1.25,
-        scale: 1.06,
+        scale: 1.05,
         ease: "sine.inOut",
         label: `MODO CONTEMPLATIVO (${count} FOTOS • FADE 1.25s)`
       };
     }
-    // Si es un grupo medio (5 a 8)
     if (count <= 8) {
       return {
         hold: 3.6,
         fade: 0.65,
-        scale: 1.07,
+        scale: 1.06,
         ease: "power2.inOut",
         label: `MODO EDITORIAL (${count} FOTOS • FADE 0.65s)`
       };
     }
-    // Si son hasta 12 o más: Corte rápido a negro con ritmo cinematográfico
     return {
       hold: 2.5,
       fade: 0.35,
-      scale: 1.09,
+      scale: 1.08,
       ease: "power3.inOut",
       label: `MODO SECUENCIA ÁGIL (${count} FOTOS • FADE 0.35s)`
     };
   }
 
-  function initHeroTimeline() {
+  function highlightThumbCard(idx: number) {
+    const thumbs = document.querySelectorAll<HTMLElement>(".hero-thumb-card");
+    thumbs.forEach((th, i) => {
+      if (i === idx) {
+        th.classList.add("border-amber-400", "ring-2", "ring-amber-400/50", "scale-[1.02]");
+        th.classList.remove("border-white/10");
+        // Centrar suavemente en el carrusel
+        th.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      } else {
+        th.classList.remove("border-amber-400", "ring-2", "ring-amber-400/50", "scale-[1.02]");
+        th.classList.add("border-white/10");
+      }
+    });
+  }
+
+  function jumpToSlide(targetIdx: number) {
+    const container = document.getElementById("tgp-cinemax-hero");
+    if (!container) return;
+
+    const slides = container.querySelectorAll<HTMLElement>(".hero-slide");
+    const attrs = container.querySelectorAll<HTMLElement>(".hero-attr-item");
+    const counter = document.getElementById("hero-counter");
+    const progressBar = document.getElementById("hero-progress-bar");
+    const total = slides.length;
+
+    if (total === 0 || targetIdx < 0 || targetIdx >= total) return;
+
+    if (activeTimeline) {
+      activeTimeline.kill();
+      activeTimeline = null;
+    }
+
+    slides.forEach((s, i) => {
+      gsap.to(s, { opacity: i === targetIdx ? 1 : 0, duration: 0.4, ease: "power2.out" });
+    });
+    attrs.forEach((a, i) => {
+      gsap.to(a, { opacity: i === targetIdx ? 1 : 0, duration: 0.4, ease: "power2.out" });
+    });
+
+    if (counter) {
+      counter.textContent = `${String(targetIdx + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+    }
+    if (progressBar) {
+      gsap.fromTo(progressBar, { width: "0%" }, { width: "100%", duration: 4, ease: "none" });
+    }
+
+    currentIndex = targetIdx;
+    highlightThumbCard(targetIdx);
+
+    // Reanudar la cadencia adaptativa tras la interacción manual
+    initHeroTimeline(targetIdx);
+  }
+
+  function initHeroTimeline(startIndex = 0) {
     if (activeTimeline) {
       activeTimeline.kill();
       activeTimeline = null;
@@ -171,30 +287,31 @@ const {
       return;
     }
 
-    gsap.set(slides, { opacity: 0 });
-    gsap.set(attrs, { opacity: 0 });
-    gsap.set(slides[0], { opacity: 1 });
-    gsap.set(attrs[0], { opacity: 1 });
-    gsap.set(imgs, { scale: 1 });
+    // Configuración inicial respetando el índice inicial
+    slides.forEach((s, i) => gsap.set(s, { opacity: i === startIndex ? 1 : 0 }));
+    attrs.forEach((a, i) => gsap.set(a, { opacity: i === startIndex ? 1 : 0 }));
+    imgs.forEach(img => gsap.set(img, { scale: 1 }));
+    highlightThumbCard(startIndex);
 
     const tl = gsap.timeline({ repeat: -1 });
     activeTimeline = tl;
 
-    slides.forEach((slide, i) => {
+    for (let offset = 0; offset < total; offset++) {
+      const i = (startIndex + offset) % total;
       const next = (i + 1) % total;
 
       tl.call(() => {
+        currentIndex = i;
         if (counter) {
           counter.textContent = `${String(i + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
         }
+        highlightThumbCard(i);
       });
 
-      // Barra de progreso sincronizada
       if (progressBar) {
         tl.fromTo(progressBar, { width: "0%" }, { width: "100%", duration: cfg.hold, ease: "none" });
       }
 
-      // Ken Burns continuo durante la ventana de exposición
       tl.fromTo(
         imgs[i],
         { scale: 1 },
@@ -202,8 +319,7 @@ const {
         `<`
       );
 
-      // Salida hacia negro + Entrada según la cantidad de fotos
-      tl.to([slide, attrs[i]], {
+      tl.to([slides[i], attrs[i]], {
         opacity: 0,
         duration: cfg.fade,
         ease: cfg.ease
@@ -213,12 +329,31 @@ const {
         opacity: 1,
         duration: cfg.fade,
         ease: cfg.ease
-      }, total <= 4 ? `-=${cfg.fade * 0.45}` : `>`); // Si son pocas hace cross-dissolve sedoso; si son 12 hace fade-to-black punzante
+      }, total <= 4 ? `-=${cfg.fade * 0.45}` : `>`);
+    }
+  }
+
+  function bindThumbClickEvents() {
+    const thumbs = document.querySelectorAll<HTMLElement>(".hero-thumb-card");
+    thumbs.forEach(th => {
+      th.addEventListener("click", () => {
+        const idx = Number(th.dataset.index);
+        if (!isNaN(idx)) {
+          jumpToSlide(idx);
+        }
+      });
     });
   }
 
-  document.addEventListener("astro:page-load", initHeroTimeline);
-  if (document.readyState !== "loading") initHeroTimeline();
+  document.addEventListener("astro:page-load", () => {
+    initHeroTimeline();
+    bindThumbClickEvents();
+  });
+
+  if (document.readyState !== "loading") {
+    initHeroTimeline();
+    bindThumbClickEvents();
+  }
 
   // Escucha en tiempo real cuando el Developer actualiza el lote desde el Lightbox Curador
   window.addEventListener("tgp:preview-batch", ((e: CustomEvent) => {
@@ -226,26 +361,77 @@ const {
     const stage = document.getElementById("hero-stage");
     const attrStage = document.getElementById("hero-attr-stage");
     const titleEl = document.getElementById("hero-title");
+    const thumbCarousel = document.getElementById("hero-thumb-carousel");
 
-    if (!stage || !attrStage || !images?.length) return;
+    if (!stage || !attrStage || !thumbCarousel || !images?.length) return;
     if (titleEl && queryTitle) titleEl.textContent = queryTitle;
 
+    // 1. Reconstruir Visor Principal
     stage.innerHTML = images.map((img: any, idx: number) => `
       <div class="hero-slide absolute inset-0 ${idx === 0 ? 'opacity-100' : 'opacity-0'}" data-index="${idx}">
         <img src="${img.thumbUrl || img.url}" alt="${img.title}" crossorigin="anonymous" class="hero-zoom-img w-full h-full object-cover object-center will-change-transform" />
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_35%,rgba(0,0,0,0.75)_100%)]"></div>
-        <div class="absolute inset-0 bg-linear-to-t from-black via-black/65 to-transparent"></div>
+        <div class="absolute inset-0 bg-linear-to-t from-black/85 via-black/30 to-transparent pointer-events-none"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(0,0,0,0.85)_0%,rgba(0,0,0,0.35)_45%,transparent_80%)] pointer-events-none"></div>
       </div>
     `).join("");
 
     attrStage.innerHTML = images.map((img: any, idx: number) => `
-      <div class="hero-attr-item absolute inset-0 flex items-center gap-2 font-mono text-xs text-zinc-400 ${idx === 0 ? 'opacity-100' : 'opacity-0'}">
-        <span class="px-2 py-0.5 rounded-full bg-white/10 text-white font-semibold border border-white/15">${img.license || 'CC Commons'}</span>
-        <span class="truncate">Foto: <strong class="text-zinc-200">${img.author || 'Wikimedia'}</strong> — ${img.title.replace(/^File:/i, '')}</span>
+      <div class="hero-attr-item absolute inset-0 flex items-center gap-2 font-mono text-xs text-zinc-300 ${idx === 0 ? 'opacity-100' : 'opacity-0'}">
+        <span class="px-2 py-0.5 rounded-full bg-white/15 text-white font-semibold border border-white/20 text-[11px]">${img.licenseShortName || img.license || 'CC Commons'}</span>
+        <span class="truncate text-zinc-300 drop-shadow">Foto: <strong class="text-white">${img.author || 'Wikimedia'}</strong> — ${img.cleanTitle || img.title.replace(/^File:/i, '')}</span>
       </div>
     `).join("");
 
-    initHeroTimeline();
-    document.getElementById("tgp-cinemax-hero")?.scrollIntoView({ behavior: "smooth" });
+    // 2. Reconstruir Carrusel Inset
+    thumbCarousel.innerHTML = images.map((img: any, idx: number) => `
+      <button
+        type="button"
+        class="hero-thumb-card relative aspect-16/9 w-[260px] sm:w-[300px] shrink-0 [scroll-snap-align:start] rounded-2xl overflow-hidden bg-black border-2 transition-all duration-300 cursor-pointer shadow-[0_8px_24px_rgba(0,0,0,0.5)] group text-left ${
+          idx === 0 
+            ? 'border-amber-400 ring-2 ring-amber-400/50 scale-[1.02]' 
+            : 'border-white/10 hover:border-amber-400/70 hover:scale-[1.01]'
+        }"
+        data-index="${idx}"
+        title="Ver imagen #${idx + 1}"
+      >
+        <img 
+          src="${img.thumbUrl || img.url}" 
+          alt="${img.title}" 
+          loading="lazy"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+        />
+        <div class="absolute inset-0 bg-linear-to-t from-black/75 via-transparent to-black/30 pointer-events-none"></div>
+        <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-black/80 border border-white/10 text-[10px] font-mono font-semibold text-zinc-200">
+          #${String(idx + 1).padStart(2, '0')}
+        </span>
+        <span class="absolute bottom-2.5 left-2.5 px-2 py-0.5 rounded-full bg-black/80 border border-white/15 text-[10px] font-mono text-amber-300 font-medium truncate max-w-[65%]">
+          ${img.licenseShortName || img.license || 'Commons'}
+        </span>
+        <span class="absolute bottom-2.5 right-2.5 text-[10px] font-mono text-zinc-400">
+          ${img.width}×${img.height}
+        </span>
+      </button>
+    `).join("");
+
+    bindThumbClickEvents();
+    initHeroTimeline(0);
+    document.getElementById("tgp-apple-visor")?.scrollIntoView({ behavior: "smooth" });
   }) as EventListener);
 </script>
+
+<style>
+  /* Scrollbar oculta y suave para el carrusel de miniaturas */
+  #hero-thumb-carousel::-webkit-scrollbar {
+    height: 4px;
+  }
+  #hero-thumb-carousel::-webkit-scrollbar-track {
+    background: #1c1c1e;
+  }
+  #hero-thumb-carousel::-webkit-scrollbar-thumb {
+    background: #3a3a3c;
+    border-radius: 9999px;
+  }
+  #hero-thumb-carousel::-webkit-scrollbar-thumb:hover {
+    background: #505054;
+  }
+</style>
