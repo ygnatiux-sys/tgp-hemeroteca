@@ -164,7 +164,7 @@ const {
   <!-- 4 columnas x 3 filas visibles (~690px de alto) con scroll suave hacia abajo para ver las 40 -->
   <div 
     id="wb-grid-viewport"
-    class="p-5 max-h-[700px] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 scroll-smooth"
+    class="p-5 max-h-175 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 scroll-smooth"
   >
     {initialBatch.map((img, idx) => {
       const isCC0 = /cc0|public domain|pd/i.test(img.license || '') || Boolean(img.isCC0OrPublicDomain);
@@ -178,7 +178,7 @@ const {
           data-json={JSON.stringify(img)}
         >
           <!-- Miniatura + Checkbox individual + Botón Zoom Lightbox -->
-          <div class="relative aspect-[16/10] w-full bg-black overflow-hidden">
+          <div class="relative aspect-16/10 w-full bg-black overflow-hidden">
             <img 
               src={img.thumbUrl || img.url} 
               alt={img.title}
@@ -242,7 +242,7 @@ const {
     id="wb-lightbox-modal" 
     class="backdrop:bg-black/90 bg-zinc-950 text-white border border-zinc-700 rounded-2xl max-w-5xl w-[92vw] p-0 overflow-hidden shadow-2xl"
   >
-    <div class="grid grid-cols-1 lg:grid-cols-3 min-h-[520px]">
+    <div class="grid grid-cols-1 lg:grid-cols-3 min-h-130">
       <div class="lg:col-span-2 bg-black flex items-center justify-center p-4 relative">
         <img id="lb-modal-img" src="" alt="" class="max-h-[75vh] w-auto object-contain rounded" />
       </div>
@@ -256,7 +256,7 @@ const {
               ✕ ESC
             </button>
           </div>
-          <h3 id="lb-modal-title" class="font-bold text-lg text-white break-words"></h3>
+          <h3 id="lb-modal-title" class="font-bold text-lg text-white wrap-break-word"></h3>
           <p id="lb-modal-desc" class="text-xs text-zinc-400 leading-relaxed max-h-40 overflow-y-auto"></p>
           <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 font-mono text-xs space-y-1 text-zinc-300">
             <div>Autor: <strong id="lb-modal-author" class="text-white"></strong></div>
@@ -416,7 +416,7 @@ const {
                   data-landscape="${Number(ratio) >= 1.3 ? 'true' : 'false'}"
                   data-json='${JSON.stringify(img).replace(/'/g, "&apos;")}'
                 >
-                  <div class="relative aspect-[16/10] w-full bg-black overflow-hidden">
+                  <div class="relative aspect-16/10 w-full bg-black overflow-hidden">
                     <img 
                       src="${img.thumbUrl || img.url}" 
                       alt="${img.cleanTitle || img.title}"
