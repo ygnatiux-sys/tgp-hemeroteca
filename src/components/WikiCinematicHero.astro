@@ -28,29 +28,56 @@ const {
   subtitle = Astro.props.subtitle || Astro.props.tagline || "Wikimedia Commons Scale", 
   images = [] 
 } = Astro.props;
+
+const FONT_CLASSES = [
+  "font-['Gloock',serif] tracking-tight font-normal text-[clamp(2.1rem,4.2vw,3.8rem)] capitalize leading-[1.08]",
+  "font-['Oswald',sans-serif] tracking-wider uppercase font-bold text-[clamp(2.3rem,4.6vw,4rem)] leading-[1.02]",
+  "font-['Syne',sans-serif] tracking-tight font-black text-[clamp(2.1rem,4.4vw,3.9rem)] leading-[1.05]",
+  "font-['League_Spartan',sans-serif] tracking-tighter uppercase font-black text-[clamp(2.3rem,4.5vw,4.1rem)] leading-[0.98]",
+  "font-['Cinzel',serif] tracking-wide uppercase font-bold text-[clamp(1.9rem,3.8vw,3.5rem)] leading-[1.08]",
+];
 ---
+
+<!-- Importación directa de las fuentes cinematográficas para rotación algorítmica -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link 
+  href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Gloock&family=League+Spartan:wght@700;800;900&family=Oswald:wght@600;700&family=Syne:wght@700;800;900&display=swap" 
+  rel="stylesheet" 
+/>
 
 <section 
   id="tgp-apple-visor" 
   class="relative w-full max-w-full m-0 p-0 bg-black select-none border-none group/hero"
 >
-  <!-- 1. VISOR PRINCIPAL (90vh): Máxima Visión Inmersiva Apple Showcase -->
+  <!-- 1. VISOR PRINCIPAL (90vh): Máxima Visión Inmersiva Apple TV Moderno -->
   <div 
     id="tgp-cinemax-hero" 
     class="relative w-screen max-w-full m-0 p-0 h-[90vh] bg-black overflow-hidden"
     style="width: 100vw; max-width: 100%; margin: 0; padding: 0; height: 90vh;"
   >
-    <!-- Barra superior de control del Hero (discreta y elegante) -->
-    <div class="absolute top-0 left-0 z-20 w-full px-6 sm:px-10 py-3 bg-linear-to-b from-black/80 via-black/20 to-transparent flex items-center justify-between text-xs font-mono text-zinc-300">
-      <div class="flex items-center gap-3">
-        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span class="tracking-wider uppercase text-zinc-300 font-semibold">TGP Visor · Máxima Visión</span>
-        <span id="hero-cadence-badge" class="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-zinc-900/90 border border-zinc-700/80 text-zinc-300 text-[11px]">
-          Calculando cadencia...
-        </span>
+    <!-- Barra superior de control del Hero (Minimalista extrema: solo retorno y contador) -->
+    <div class="absolute top-0 left-0 z-20 w-full px-6 sm:px-10 py-5 bg-linear-to-b from-black/85 via-black/25 to-transparent flex items-center justify-between text-xs font-mono pointer-events-none">
+      <div class="pointer-events-auto">
+        <a 
+          href="/tgp-app/" 
+          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 hover:bg-black/80 text-zinc-300 hover:text-white border border-white/10 hover:border-white/30 backdrop-blur-md transition-all text-xs font-sans tracking-wide cursor-pointer shadow-lg active:scale-95"
+          title="Volver a TGP Scriptorium"
+        >
+          <svg class="w-4 h-4 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span class="font-medium">Scriptorium</span>
+        </a>
       </div>
-      <div id="hero-counter" class="text-zinc-200 tracking-widest font-semibold px-2.5 py-0.5 rounded-full bg-black/60 border border-white/10">
-        01 / {String(images.length).padStart(2, '0')}
+
+      <div class="pointer-events-auto">
+        <span 
+          id="hero-counter" 
+          class="text-zinc-300 tracking-widest font-mono text-xs px-3 py-1 rounded-full bg-black/40 border border-white/10 backdrop-blur-md"
+        >
+          01 / {String(images.length).padStart(2, '0')}
+        </span>
       </div>
     </div>
 
@@ -96,51 +123,94 @@ const {
       <!-- Un único gradiente estático exterior: protege la legibilidad sin cortes, sin flicker y sin z-fighting -->
       <div 
         class="absolute inset-0 pointer-events-none z-5"
-        style="background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.35) 20%, transparent 45%);"
+        style="background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.4) 22%, transparent 50%);"
       ></div>
     </div>
 
-    <!-- Posicionamiento de Tipografía Apple: z-index: 10, flex column justify-end, misma altura exacta del Hero -->
+    <!-- Posicionamiento de Tipografía y Layout Apple TV Moderno -->
     <div 
-      class="absolute inset-0 z-10 w-full h-full flex flex-col justify-end px-6 sm:px-10 pb-8 pointer-events-none"
+      class="absolute inset-0 z-10 w-full h-full flex flex-col justify-end px-6 sm:px-12 pb-10 pointer-events-none"
       style="z-index: 10; display: flex; flex-direction: column; justify-content: flex-end;"
     >
-      <div class="max-w-3xl pointer-events-auto">
-        <h2 
-          id="hero-subtitle"
-          class="font-sans text-xs sm:text-sm font-semibold tracking-wider text-amber-400 uppercase mb-1 drop-shadow"
-        >
-          {subtitle}
-        </h2>
-        <h1 
-          id="hero-title"
-          class="font-sans font-bold text-[clamp(1.75rem,3.6vw,3.5rem)] text-white tracking-tight leading-[1.08] drop-shadow-xl mb-3"
-        >
-          {title}
-        </h1>
+      <div id="hero-meta-stage" class="relative w-full min-h-40 sm:min-h-45">
+        {images.map((img, idx) => {
+          const fontClass = FONT_CLASSES[idx % FONT_CLASSES.length];
+          const cleanTitle = (img.cleanTitle || img.title || title)
+            .replace(/^File:/i, "")
+            .replace(/\.[a-zA-Z0-9]+$/, "")
+            .replace(/[-_]/g, " ")
+            .trim();
+          const cleanAuthor = img.author || "Wikimedia Commons";
+          const isCC0 = /cc0|public domain|pd/i.test(img.licenseShortName || img.license || "");
+          const licenseLabel = img.licenseShortName || img.license || (isCC0 ? "Dominio Público" : "CC BY-SA");
+          const descriptionText = img.description || "Registro histórico y arqueológico de alta fidelidad preservado en el acervo digital.";
 
-        <!-- Píldora de atribución + Barra de progreso sincronizada -->
-        <div class="flex items-center gap-4 pt-1">
-          <div id="hero-attr-stage" class="relative h-6 flex-1 max-w-lg overflow-hidden">
-            {images.map((img, idx) => (
-              <div 
-                class={`hero-attr-item absolute inset-0 flex items-center gap-2 font-mono text-xs text-zinc-300 ${idx === 0 ? 'opacity-100' : 'opacity-0'}`}
-              >
-                <span class="px-2 py-0.5 rounded-full bg-white/15 text-white font-semibold border border-white/20 text-[11px]">
-                  {img.licenseShortName || img.license || 'CC Commons'}
-                </span>
-                <span class="truncate text-zinc-300 drop-shadow">
-                  Foto: <strong class="text-white">{img.author || 'Wikimedia Commons'}</strong> — {img.cleanTitle || img.title.replace(/^File:/i, '')}
-                </span>
+          return (
+            <div 
+              class={`hero-meta-item absolute inset-0 flex flex-col md:flex-row md:items-end justify-between gap-6 ${idx === 0 ? 'opacity-100' : 'opacity-0'}`}
+              data-index={idx}
+            >
+              <!-- Bloque Principal Izquierdo: Titular, Sinopsis y Botones -->
+              <div class="max-w-2xl pointer-events-auto">
+                <!-- Micro-Categoría Editorial monocromática sin amarillos estridentes -->
+                <div class="flex items-center gap-2 text-xs font-mono text-zinc-300 mb-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-white/70"></span>
+                  <span class="uppercase tracking-wider text-white/90 font-medium">Acervo TGP</span>
+                  <span class="text-zinc-600">·</span>
+                  <span class="text-zinc-400">Patrimonio Histórico</span>
+                  <span class="text-zinc-600">·</span>
+                  <span class="px-1.5 py-0.5 rounded bg-white/10 text-[10px] font-mono text-zinc-300 border border-white/15">
+                    {img.width ? `${img.width}×${img.height}` : "HD 4K"}
+                  </span>
+                </div>
+
+                <!-- H1 Cinematográfico con Tipografía Algorítmica -->
+                <h1 class={`${fontClass} text-white drop-shadow-2xl mb-2.5 max-w-2xl line-clamp-2`}>
+                  {cleanTitle}
+                </h1>
+
+                <!-- Sinopsis compacta de 2 líneas -->
+                <p class="text-xs sm:text-sm text-zinc-300/85 leading-relaxed line-clamp-2 mb-4 font-sans max-w-xl drop-shadow">
+                  {descriptionText}
+                </p>
+
+                <!-- Botonera Minimalista Apple TV -->
+                <div class="flex items-center gap-3 pt-0.5">
+                  <a 
+                    href="#wb-grid-viewport" 
+                    class="hero-btn-explore inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white hover:bg-zinc-200 text-black font-semibold text-xs transition-all shadow-lg active:scale-95 cursor-pointer"
+                  >
+                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <span>Explorar en Mesa</span>
+                  </a>
+
+                  <button 
+                    type="button" 
+                    class="hero-btn-save w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 hover:border-white/40 text-white flex items-center justify-center transition-all shadow-lg active:scale-95 text-xl font-light cursor-pointer" 
+                    title="Guardar en selección de revista"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-            ))}
-          </div>
 
-          <div class="w-28 sm:w-44 h-1 bg-white/20 rounded-full overflow-hidden shrink-0">
-            <div id="hero-progress-bar" class="h-full bg-amber-400 w-0"></div>
-          </div>
-        </div>
+              <!-- Bloque Derecho: Ficha Técnica (Estilo Reparto/Dirección Apple TV) -->
+              <div class="hidden md:flex flex-col text-right text-xs text-zinc-400 font-sans space-y-1.5 drop-shadow shrink-0 pb-1 pointer-events-auto">
+                <div>Fotografía: <strong class="text-white font-medium">{cleanAuthor}</strong></div>
+                <div>Acervo: <span class="text-zinc-300">The Great Puzzle Project</span></div>
+                <div class="text-[11px] font-mono text-zinc-400">
+                  Licencia: <span class="text-zinc-200 underline decoration-white/20">{licenseLabel}</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
+    </div>
+
+    <!-- Barra de progreso ultra-fina (1.5px) al pie del visor -->
+    <div class="absolute bottom-0 inset-x-0 h-[1.5px] bg-white/10 z-20 overflow-hidden">
+      <div id="hero-progress-bar" class="h-full bg-white/70 w-0"></div>
     </div>
   </div>
 </section>
@@ -151,29 +221,22 @@ const {
   let activeTimeline: gsap.core.Timeline | null = null;
   let currentIndex = 0;
 
+  const FONT_CLASSES = [
+    "font-['Gloock',serif] tracking-tight font-normal text-[clamp(2.1rem,4.2vw,3.8rem)] capitalize leading-[1.08]",
+    "font-['Oswald',sans-serif] tracking-wider uppercase font-bold text-[clamp(2.3rem,4.6vw,4rem)] leading-[1.02]",
+    "font-['Syne',sans-serif] tracking-tight font-black text-[clamp(2.1rem,4.4vw,3.9rem)] leading-[1.05]",
+    "font-['League_Spartan',sans-serif] tracking-tighter uppercase font-black text-[clamp(2.3rem,4.5vw,4.1rem)] leading-[0.98]",
+    "font-['Cinzel',serif] tracking-wide uppercase font-bold text-[clamp(1.9rem,3.8vw,3.5rem)] leading-[1.08]",
+  ];
+
   function computeAdaptiveTiming(count: number) {
     if (count <= 4) {
-      return {
-        hold: 5.5,
-        fade: 1.25,
-        ease: "power2.inOut",
-        label: `MODO CONTEMPLATIVO (${count} FOTOS • FADE 1.25s)`
-      };
+      return { hold: 6.0, fade: 0.9, ease: "power2.inOut" };
     }
     if (count <= 8) {
-      return {
-        hold: 3.6,
-        fade: 0.65,
-        ease: "power2.inOut",
-        label: `MODO EDITORIAL (${count} FOTOS • FADE 0.65s)`
-      };
+      return { hold: 4.5, fade: 0.65, ease: "power2.inOut" };
     }
-    return {
-      hold: 2.5,
-      fade: 0.35,
-      ease: "power2.inOut",
-      label: `MODO SECUENCIA ÁGIL (${count} FOTOS • FADE 0.35s)`
-    };
+    return { hold: 3.5, fade: 0.45, ease: "power2.inOut" };
   }
 
   function jumpToSlide(targetIdx: number) {
@@ -181,7 +244,7 @@ const {
     if (!container) return;
 
     const slides = container.querySelectorAll<HTMLElement>(".hero-slide");
-    const attrs = container.querySelectorAll<HTMLElement>(".hero-attr-item");
+    const metas = container.querySelectorAll<HTMLElement>(".hero-meta-item");
     const counter = document.getElementById("hero-counter");
     const progressBar = document.getElementById("hero-progress-bar");
     const total = slides.length;
@@ -196,8 +259,8 @@ const {
     slides.forEach((s, i) => {
       gsap.to(s, { opacity: i === targetIdx ? 1 : 0, duration: 0.4, ease: "power2.out" });
     });
-    attrs.forEach((a, i) => {
-      gsap.to(a, { opacity: i === targetIdx ? 1 : 0, duration: 0.4, ease: "power2.out" });
+    metas.forEach((m, i) => {
+      gsap.to(m, { opacity: i === targetIdx ? 1 : 0, duration: 0.4, ease: "power2.out" });
     });
 
     if (counter) {
@@ -208,8 +271,6 @@ const {
     }
 
     currentIndex = targetIdx;
-
-    // Reanudar la cadencia adaptativa tras la interacción manual
     initHeroTimeline(targetIdx);
   }
 
@@ -223,8 +284,7 @@ const {
     if (!container) return;
 
     const slides = container.querySelectorAll<HTMLElement>(".hero-slide");
-    const attrs = container.querySelectorAll<HTMLElement>(".hero-attr-item");
-    const badge = document.getElementById("hero-cadence-badge");
+    const metas = container.querySelectorAll<HTMLElement>(".hero-meta-item");
     const counter = document.getElementById("hero-counter");
     const progressBar = document.getElementById("hero-progress-bar");
 
@@ -232,17 +292,16 @@ const {
     if (total === 0) return;
 
     const cfg = computeAdaptiveTiming(total);
-    if (badge) badge.textContent = cfg.label;
 
     if (total === 1) {
       slides.forEach((s) => gsap.set(s, { opacity: 1 }));
-      attrs.forEach((a) => gsap.set(a, { opacity: 1 }));
+      metas.forEach((m) => gsap.set(m, { opacity: 1 }));
       return;
     }
 
     // Configuración inicial limpia respetando el índice inicial (sin escala / transform)
     slides.forEach((s, i) => gsap.set(s, { opacity: i === startIndex ? 1 : 0 }));
-    attrs.forEach((a, i) => gsap.set(a, { opacity: i === startIndex ? 1 : 0 }));
+    metas.forEach((m, i) => gsap.set(m, { opacity: i === startIndex ? 1 : 0 }));
 
     const tl = gsap.timeline({ repeat: -1 });
     activeTimeline = tl;
@@ -265,14 +324,14 @@ const {
       // Tiempo de permanencia estática
       tl.to({}, { duration: Math.max(0.1, cfg.hold - cfg.fade) });
 
-      // Transición limpia de pura opacidad (sin transformaciones Ken Burns ni reescalados)
-      tl.to([slides[i], attrs[i]], {
+      // Transición limpia de pura opacidad
+      tl.to([slides[i], metas[i]], {
         opacity: 0,
         duration: cfg.fade,
         ease: cfg.ease
       });
 
-      tl.to([slides[next], attrs[next]], {
+      tl.to([slides[next], metas[next]], {
         opacity: 1,
         duration: cfg.fade,
         ease: cfg.ease
@@ -323,27 +382,76 @@ const {
   window.addEventListener("tgp:preview-batch", ((e: CustomEvent) => {
     const { images, queryTitle } = e.detail;
     const stage = document.getElementById("hero-stage");
-    const attrStage = document.getElementById("hero-attr-stage");
-    const titleEl = document.getElementById("hero-title");
+    const metaStage = document.getElementById("hero-meta-stage");
+    const counter = document.getElementById("hero-counter");
 
-    if (!stage || !attrStage || !images?.length) return;
-    if (titleEl && queryTitle) titleEl.textContent = queryTitle;
+    if (!stage || !metaStage || !images?.length) return;
 
-    // 1. Reconstruir Visor Principal (Limpio, centrado y sin gradientes duplicados)
+    // 1. Reconstruir Visor de Imágenes
     stage.innerHTML = images.map((img: any, idx: number) => `
       <div class="hero-slide absolute inset-0 w-full h-full overflow-hidden ${idx === 0 ? 'opacity-100' : 'opacity-0'}" data-index="${idx}">
         <img src="${img.thumbUrl || img.url}" alt="${img.title}" crossorigin="anonymous" class="hero-zoom-img absolute top-0 left-0 w-full h-full object-cover object-center" />
       </div>
     `).join("") + `
-      <div class="absolute inset-0 pointer-events-none z-5" style="background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.35) 20%, transparent 45%);"></div>
+      <div class="absolute inset-0 pointer-events-none z-5" style="background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.4) 22%, transparent 50%);"></div>
     `;
 
-    attrStage.innerHTML = images.map((img: any, idx: number) => `
-      <div class="hero-attr-item absolute inset-0 flex items-center gap-2 font-mono text-xs text-zinc-300 ${idx === 0 ? 'opacity-100' : 'opacity-0'}">
-        <span class="px-2 py-0.5 rounded-full bg-white/15 text-white font-semibold border border-white/20 text-[11px]">${img.licenseShortName || img.license || 'CC Commons'}</span>
-        <span class="truncate text-zinc-300 drop-shadow">Foto: <strong class="text-white">${img.author || 'Wikimedia'}</strong> — ${img.cleanTitle || img.title.replace(/^File:/i, '')}</span>
-      </div>
-    `).join("");
+    // 2. Reconstruir Bloque Apple TV con Tipografía Algorítmica
+    metaStage.innerHTML = images.map((img: any, idx: number) => {
+      const fontClass = FONT_CLASSES[idx % FONT_CLASSES.length];
+      const cleanTitle = (img.cleanTitle || img.title || queryTitle || "Obra Documental")
+        .replace(/^File:/i, "")
+        .replace(/\.[a-zA-Z0-9]+$/, "")
+        .replace(/[-_]/g, " ")
+        .trim();
+      const cleanAuthor = img.author || "Wikimedia Commons";
+      const isCC0 = /cc0|public domain|pd/i.test(img.licenseShortName || img.license || "");
+      const licenseLabel = img.licenseShortName || img.license || (isCC0 ? "Dominio Público" : "CC BY-SA");
+      const descriptionText = img.description || "Registro histórico y arqueológico de alta fidelidad preservado en el acervo digital.";
+
+      return `
+        <div class="hero-meta-item absolute inset-0 flex flex-col md:flex-row md:items-end justify-between gap-6 ${idx === 0 ? 'opacity-100' : 'opacity-0'}" data-index="${idx}">
+          <div class="max-w-2xl pointer-events-auto">
+            <div class="flex items-center gap-2 text-xs font-mono text-zinc-300 mb-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-white/70"></span>
+              <span class="uppercase tracking-wider text-white/90 font-medium">Acervo TGP</span>
+              <span class="text-zinc-600">·</span>
+              <span class="text-zinc-400">Patrimonio Histórico</span>
+              <span class="text-zinc-600">·</span>
+              <span class="px-1.5 py-0.5 rounded bg-white/10 text-[10px] font-mono text-zinc-300 border border-white/15">
+                ${img.width ? `${img.width}×${img.height}` : "HD 4K"}
+              </span>
+            </div>
+            <h1 class="${fontClass} text-white drop-shadow-2xl mb-2.5 max-w-2xl line-clamp-2">
+              ${cleanTitle}
+            </h1>
+            <p class="text-xs sm:text-sm text-zinc-300/85 leading-relaxed line-clamp-2 mb-4 font-sans max-w-xl drop-shadow">
+              ${descriptionText}
+            </p>
+            <div class="flex items-center gap-3 pt-0.5">
+              <a href="#wb-grid-viewport" class="hero-btn-explore inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white hover:bg-zinc-200 text-black font-semibold text-xs transition-all shadow-lg active:scale-95 cursor-pointer">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <span>Explorar en Mesa</span>
+              </a>
+              <button type="button" class="hero-btn-save w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 hover:border-white/40 text-white flex items-center justify-center transition-all shadow-lg active:scale-95 text-xl font-light cursor-pointer" title="Guardar en selección de revista">
+                +
+              </button>
+            </div>
+          </div>
+          <div class="hidden md:flex flex-col text-right text-xs text-zinc-400 font-sans space-y-1.5 drop-shadow shrink-0 pb-1 pointer-events-auto">
+            <div>Fotografía: <strong class="text-white font-medium">${cleanAuthor}</strong></div>
+            <div>Acervo: <span class="text-zinc-300">The Great Puzzle Project</span></div>
+            <div class="text-[11px] font-mono text-zinc-400">
+              Licencia: <span class="text-zinc-200 underline decoration-white/20">${licenseLabel}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    if (counter) {
+      counter.textContent = `01 / ${String(images.length).padStart(2, '0')}`;
+    }
 
     bindNavButtons();
     initHeroTimeline(0);

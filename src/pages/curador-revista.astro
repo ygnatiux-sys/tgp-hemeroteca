@@ -41,32 +41,7 @@ const initialHeroBatch = initialImages.slice(0, 12);
 >
   <main class="w-full min-h-screen bg-black text-white selection:bg-amber-400 selection:text-black">
     
-    <!-- Barra Superior de Navegación Privada (Retorno a TGP Scriptorium Hub) -->
-    <header class="w-full bg-zinc-950/90 border-b border-zinc-800/80 px-4 sm:px-8 py-2.5 flex items-center justify-between text-xs font-mono sticky top-0 z-50 backdrop-blur-md">
-      <div class="flex items-center gap-3">
-        <a 
-          href="/tgp-app/" 
-          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700/80 transition-colors"
-          title="Regresar al panel de TGP Scriptorium"
-        >
-          ← Volver a TGP Scriptorium
-        </a>
-        <span class="hidden sm:inline-block text-zinc-600">|</span>
-        <span class="hidden sm:inline-flex items-center gap-1.5 text-zinc-400">
-          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>Mesa Editorial Privada · Revistas Digitales</span>
-        </span>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <span class="text-zinc-500 hidden md:inline">Traducción Commons:</span>
-        <span class="px-2.5 py-0.5 rounded bg-zinc-900 border border-amber-500/30 text-amber-300 font-mono text-[11px]">
-          {curatorResult.searchTermEnglish}
-        </span>
-      </div>
-    </header>
-
-    <!-- 1. VISOR PRINCIPAL APPLE SHOWCASE (72vh + Carrusel Inset) -->
+    <!-- 1. VISOR PRINCIPAL APPLE SHOWCASE (90vh Inmersivo Full-Bleed) -->
     <WikiCinematicHero 
       images={initialHeroBatch}
       headline={`Acervo Curado: ${queryParam}`}
@@ -82,8 +57,10 @@ const initialHeroBatch = initialImages.slice(0, 12);
         </h2>
       </div>
 
-      <div class="font-mono text-[11px] text-zinc-500">
-        Fotos en lote: <span class="text-emerald-400 font-semibold">{initialImages.length}</span>
+      <div class="flex items-center gap-2 font-mono text-[11px] text-zinc-500">
+        <span>Commons: <span class="text-amber-300">{curatorResult.searchTermEnglish}</span></span>
+        <span class="text-zinc-700">·</span>
+        <span>Lote: <span class="text-emerald-400 font-semibold">{initialImages.length}</span> fotos</span>
       </div>
     </div>
 
