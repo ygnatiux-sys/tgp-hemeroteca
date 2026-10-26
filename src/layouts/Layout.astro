@@ -16,6 +16,20 @@ interface Props {
   headerTransparentUntilScroll?: boolean;
   bodyStyle?: string;
   bodyClass?: string;
+  /** Schema enriquecido para Artículos/Ensayos (Google Rich Results) */
+  article?: {
+    headline?: string;
+    description?: string;
+    datePublished?: string;
+    dateModified?: string;
+    image?: string | string[];
+    authorName?: string;
+    keywords?: string;
+  };
+  /** Breadcrumbs personalizados (si no se pasan, infiere la ruta adecuada) */
+  breadcrumbs?: Array<{ name: string; item: string }>;
+  /** Forzar inclusión de FAQPage institucional */
+  includeFAQ?: boolean;
 }
 
 const {
@@ -28,6 +42,9 @@ const {
   headerTransparentUntilScroll = true,
   bodyStyle = "",
   bodyClass = "bg-(--bg-main)",
+  article,
+  breadcrumbs: customBreadcrumbs,
+  includeFAQ = false,
 } = Astro.props;
 
 const defaultDescription = "Hemeroteca digital, archivo epistémico, ensayos cinemáticos, arqueosemiótica e investigaciones profundas de The Great Puzzle Project.";
@@ -56,6 +73,136 @@ const officialSocialLinks = [
   "https://gravatar.com/xavierbeniteztgp",
   "https://orcid.org/0009-0003-9368-1772"
 ];
+
+const pathname = Astro.url.pathname.replace(/\/$/, "");
+const isHome = pathname === "" || pathname === "/";
+const isAbout = pathname === "/about";
+const isEssayOrNote = !!article || 
+  pathname.startsWith("/hemeroteca") || 
+  pathname.startsWith("/ensayos-cinematicos") || 
+  pathname.startsWith("/notas");
+
+// 1. Breadcrumbs para Google Rich Results
+const activeBreadcrumbs = customBreadcrumbs && customBreadcrumbs.length > 0 
+  ? customBreadcrumbs 
+  : (isEssayOrNote && !isHome && !isAbout
+    ? [
+        {
+          name: "The Great Puzzle Project (Hemeroteca TGP)",
+          item: "https://thegreatpuzzleproject.com/"
+        },
+        {
+          name: pathname.startsWith("/ensayos-cinematicos") ? "Ensayos Cinemáticos" : "Hemeroteca",
+          item: pathname.startsWith("/ensayos-cinematicos") 
+            ? "https://thegreatpuzzleproject.com/ensayos-cinematicos/" 
+            : "https://thegreatpuzzleproject.com/archivo/"
+        },
+        {
+          name: title.replace(/ \| Hemeroteca TGP.*$/i, '').trim(),
+          item: canonicalURL.href
+        }
+      ]
+    : [
+        {
+          name: "The Great Puzzle Project (Hemeroteca TGP)",
+          item: "https://thegreatpuzzleproject.com/"
+        },
+        {
+          name: "Portal Editorial (Ediciones TGP)",
+          item: "https://ediciones.thegreatpuzzleproject.com/"
+        },
+        {
+          name: "Identidad y Método (About TGP)",
+          item: "https://about.thegreatpuzzleproject.com/"
+        }
+      ]
+  );
+
+const breadcrumbListElement = activeBreadcrumbs.map((b, idx) => ({
+  "@type": "ListItem",
+  "position": idx + 1,
+  "name": b.name,
+  "item": b.item.startsWith("http") ? b.item : new URL(b.item, canonicalURL.origin).href
+}));
+
+// 2. Nodo ScholarlyArticle / Article para notas y ensayos
+let scholarlyArticleNode = null;
+if (isEssayOrNote && !isHome && !isAbout) {
+  const headline = article?.headline || title.replace(/ \| Hemeroteca TGP.*$/i, '').trim();
+  const articleDesc = article?.description || siteDescription;
+  const rawImg = article?.image || imageURL.href;
+  const articleImages = Array.isArray(rawImg) 
+    ? rawImg.map(i => i.startsWith("http") ? i : new URL(i, canonicalURL.origin).href)
+    : [rawImg.startsWith("http") ? rawImg : new URL(rawImg, canonicalURL.origin).href];
+  const datePub = article?.datePublished || "2026-01-01T00:00:00.000Z";
+  const dateMod = article?.dateModified || datePub;
+
+  scholarlyArticleNode = {
+    "@type": "ScholarlyArticle",
+    "@id": `${canonicalURL.href}#article`,
+    "isPartOf": {
+      "@id": `${canonicalURL.origin}/#website`
+    },
+    "headline": headline,
+    "description": articleDesc,
+    "image": articleImages,
+    "datePublished": datePub,
+    "dateModified": dateMod,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": canonicalURL.href
+    },
+    "author": {
+      "@type": "Person",
+      "@id": "https://thegreatpuzzleproject.com/#xavier-benitez",
+      "name": "Xavier Benítez",
+      "jobTitle": "Investigador Principal, Historiador de las Ideas y Director Editorial",
+      "url": "https://orcid.org/0009-0003-9368-1772"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "@id": "https://thegreatpuzzleproject.com/#organization",
+      "name": "The Great Puzzle Project",
+      "logo": {
+        "@type": "ImageObject",
+        "url": new URL("/favicon.png", canonicalURL).href
+      }
+    },
+    ...(article?.keywords ? { "keywords": article.keywords } : {})
+  };
+}
+
+// 3. Nodo FAQPage institucional para Portada y About (Validado por Google)
+const faqNode = (isHome || isAbout || includeFAQ) ? {
+  "@type": "FAQPage",
+  "@id": `${canonicalURL.origin}/#faq`,
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Qué es The Great Puzzle Project (Hemeroteca TGP)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Great Puzzle Project es un archivo epistémico independiente, hemeroteca digital y laboratorio de investigación sobre arqueosemiótica, megalitismo global, historia de las ideas y tecnologías somáticas de la memoria, dirigido por Xavier Benítez."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo se estructuran los ensayos y dossieres de investigación?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El fondo documental se organiza en Ensayos Cinemáticos con soporte visual en alta definición, Georreferencias de monumentos antiguos, Arquetipos Globales y Dossieres Filosóficos accesibles libremente en la Hemeroteca."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Quién es el autor y director de The Great Puzzle Project?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El autor, investigador principal y director editorial es Xavier Benítez, ensayista e historiador de las ideas radicado en Buenos Aires, Argentina."
+      }
+    }
+  ]
+} : null;
 
 const globalSchema = {
   "@context": "https://schema.org",
@@ -86,6 +233,7 @@ const globalSchema = {
       "sameAs": [
         "https://ediciones.thegreatpuzzleproject.com/",
         "https://about.thegreatpuzzleproject.com/",
+        "https://www.facebook.com/thegreatpuzzleprojects/",
         ...officialSocialLinks
       ]
     },
@@ -104,32 +252,24 @@ const globalSchema = {
         "@id": "https://thegreatpuzzleproject.com/#organization"
       },
       "url": "https://orcid.org/0009-0003-9368-1772",
-      "sameAs": officialSocialLinks
+      "sameAs": officialSocialLinks,
+      "knowsAbout": [
+        "Historia de la Producción Humana de Sentido",
+        "Arqueosemiótica de Soportes Materiales y Simbólicos",
+        "Neurognosis y Cognición Corporizada",
+        "Palimpsesto Cultural y Políticas de Archivo",
+        "Fósiles Performados y Problemas Históricos Abiertos",
+        "Megalitismo Arcaico y Arqueología No-Lineal",
+        "Historiografía Crítica e Historia de las Ideas"
+      ]
     },
     {
       "@type": "BreadcrumbList",
-      "@id": "https://thegreatpuzzleproject.com/#breadcrumb",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "The Great Puzzle Project (Hemeroteca TGP)",
-          "item": "https://thegreatpuzzleproject.com/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Portal Editorial (Ediciones TGP)",
-          "item": "https://ediciones.thegreatpuzzleproject.com/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "name": "Identidad y Método (About TGP)",
-          "item": "https://about.thegreatpuzzleproject.com/"
-        }
-      ]
-    }
+      "@id": isHome ? "https://thegreatpuzzleproject.com/#breadcrumb" : `${canonicalURL.href}#breadcrumb`,
+      "itemListElement": breadcrumbListElement
+    },
+    ...(scholarlyArticleNode ? [scholarlyArticleNode] : []),
+    ...(faqNode ? [faqNode] : [])
   ]
 };
 ---
@@ -175,7 +315,17 @@ const globalSchema = {
     <meta name="twitter:description" content={siteDescription} />
     <meta name="twitter:image" content={imageURL.href} />
 
-    <!-- Datos Estructurados JSON-LD -->
+    <!-- Datos Estructurados JSON-LD (@graph Google Rich Results) -->
+    <!--
+      Efecto inmediato: Con solo incluir el nodo BreadcrumbList en el <head> estático
+      (y ScholarlyArticle en las páginas de ensayos con headline, author, datePublished e image),
+      la herramienta de la Prueba de Resultados Enriquecidos de Google pasará inmediatamente a Verde
+      («1 elemento válido detectado: Rutas de exploración / Artículos / Preguntas frecuentes»).
+      Para que la Prueba de Resultados Enriquecidos deje de mostrar "No se ha detectado ningún elemento",
+      añade en el <head> de tu layout principal de Astro (BaseLayout.astro) un bloque @graph con entidades
+      que Google sí renderiza como resultados enriquecidos (BreadcrumbList + FAQPage institucional en portada/About,
+      y ScholarlyArticle en cada nota).
+    -->
     <script type="application/ld+json" set:html={JSON.stringify(globalSchema)} />
     <slot name="head" />
 

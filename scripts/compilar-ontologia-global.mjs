@@ -13,6 +13,91 @@ console.log('🚀 INICIANDO COMPILADOR ONTOLÓGICO UNIVERSAL DE THE GREAT PUZZLE
 console.log('------------------------------------------------------------------------');
 
 // 1. DEFINICIÓN DE CONTINENTES / EJES CARDINALES
+
+// 1.1 DEFINICIÓN DEL NÚCLEO EPISTÉMICO (DOCUMENTO MAESTRO TGP 2026)
+const EPISTEME_CORE = [
+  {
+    id: 'episteme-zenit',
+    name: 'Historia de la Producción Humana de Sentido',
+    slug: 'produccion-de-sentido',
+    type: 'EPISTEME_CORE',
+    group: 'Episteme',
+    val: 45,
+    desc: 'Paraguas Zenital: Plataforma de investigación y ecosistema editorial dirigido por Xavier Benítez que audita cómo la humanidad construye, conserva y disputa el significado de su experiencia histórica.',
+    url: `${BASE_URL_HEMEROTECA}/about/`
+  },
+  {
+    id: 'stack-nivel-0',
+    name: 'Fijación Factual & Evidencia Arqueológica (Nivel 0)',
+    slug: 'fijacion-factual-nivel-0',
+    type: 'EPISTEME_STACK',
+    group: 'Episteme',
+    val: 28,
+    desc: 'Nivel 0: Materialidad física, datación estratigráfica y contexto arqueológico verificable.',
+    url: `${BASE_URL_HEMEROTECA}/about/#nivel-0`
+  },
+  {
+    id: 'stack-nivel-1',
+    name: 'Neurognosis & Cognición Corporizada (Nivel 1)',
+    slug: 'neurognosis-nivel-1',
+    type: 'EPISTEME_STACK',
+    group: 'Episteme',
+    val: 28,
+    desc: 'Nivel 1: Capacidades biocognitivas (Hardware humano), estados de conciencia y respuesta al espacio sagrado.',
+    url: `${BASE_URL_HEMEROTECA}/about/#nivel-1`
+  },
+  {
+    id: 'stack-nivel-2',
+    name: 'Arqueosemiótica & Prótesis de Memoria (Nivel 2)',
+    slug: 'arqueosemiotica-nivel-2',
+    type: 'EPISTEME_STACK',
+    group: 'Episteme',
+    val: 28,
+    desc: 'Nivel 2: Interfaces materiales y simbólicas: cómo el monumento lítico y el símbolo operan de Memoria Viva a Archivo Vivo.',
+    url: `${BASE_URL_HEMEROTECA}/about/#nivel-2`
+  },
+  {
+    id: 'stack-nivel-3',
+    name: 'Palimpsesto Cultural & Fósiles Performados (Nivel 3)',
+    slug: 'palimpsesto-cultural-nivel-3',
+    type: 'EPISTEME_STACK',
+    group: 'Episteme',
+    val: 28,
+    desc: 'Nivel 3: Políticas de Archivo: cómo los relatos y memorias desplazadas son resignificados, canonizados o proscriptos por el poder institucional.',
+    url: `${BASE_URL_HEMEROTECA}/about/#nivel-3`
+  },
+  {
+    id: 'macro-memoria-oculta',
+    name: 'Macro-Alianza: Memoria Oculta',
+    slug: 'memoria-oculta',
+    type: 'MACRO_ALLIANCE',
+    group: 'MacroAlianza',
+    val: 25,
+    desc: 'Anomalías líticas, megalitismo arcaico, tradiciones herméticas y problemas históricos abiertos.',
+    url: `${BASE_URL_HEMEROTECA}/colecciones/#memoria-oculta`
+  },
+  {
+    id: 'macro-archivo-vivo',
+    name: 'Macro-Alianza: Archivo Vivo',
+    slug: 'archivo-vivo',
+    type: 'MACRO_ALLIANCE',
+    group: 'MacroAlianza',
+    val: 25,
+    desc: 'Historiografía crítica, tratados clásicos, literatura y filosofía del poder (Tucídides, Roma, Homero, Hegel).',
+    url: `${BASE_URL_HEMEROTECA}/colecciones/#archivo-vivo`
+  },
+  {
+    id: 'macro-sentido-ancestral',
+    name: 'Macro-Alianza: Sentido Ancestral',
+    slug: 'sentido-ancestral',
+    type: 'MACRO_ALLIANCE',
+    group: 'MacroAlianza',
+    val: 25,
+    desc: 'Arquetipos universales, mitos de origen, cosmovisiones indígenas y chamanismo.',
+    url: `${BASE_URL_HEMEROTECA}/colecciones/#sentido-ancestral`
+  }
+];
+
 const CONTINENTES = [
   { id: 'continente-america', name: 'América Secrets', region: 'america', val: 32, desc: 'Mecanizado Andino, Geometría Mesoamericana & Andesita Quirúrgica' },
   { id: 'continente-asia', name: 'Asia Secrets', region: 'asia', val: 32, desc: 'Sagrarios de la Ruta de la Seda, Ciclópeos del Pacífico & Georradar' },
@@ -66,6 +151,34 @@ function addLink(sourceId, targetId, relationship, value = 1) {
   if (sourceId === targetId) return;
   links.push({ source: sourceId, target: targetId, relationship, value });
 }
+
+
+// 3.0 REGISTRAR NÚCLEO EPISTÉMICO
+EPISTEME_CORE.forEach(ep => {
+  addNode(ep);
+});
+
+// Enlazar Cúspide Zenital con los 4 niveles del Stack Teórico
+['stack-nivel-0', 'stack-nivel-1', 'stack-nivel-2', 'stack-nivel-3'].forEach(lvlId => {
+  addLink('episteme-zenit', lvlId, 'OPERATIONAL_METHOD', 3);
+});
+
+// Enlazar los 4 niveles del Stack con las 3 Macro-Alianzas
+addLink('stack-nivel-0', 'macro-archivo-vivo', 'THEORETICAL_LENS', 2);
+addLink('stack-nivel-0', 'macro-memoria-oculta', 'THEORETICAL_LENS', 2);
+addLink('stack-nivel-1', 'macro-sentido-ancestral', 'THEORETICAL_LENS', 2);
+addLink('stack-nivel-2', 'macro-memoria-oculta', 'THEORETICAL_LENS', 2);
+addLink('stack-nivel-2', 'macro-sentido-ancestral', 'THEORETICAL_LENS', 2);
+addLink('stack-nivel-3', 'macro-archivo-vivo', 'THEORETICAL_LENS', 2);
+addLink('stack-nivel-3', 'macro-memoria-oculta', 'THEORETICAL_LENS', 2);
+
+// Enlazar Macro-Alianzas con Continentes
+addLink('macro-archivo-vivo', 'continente-europa', 'MACRO_GEOGRAPHY', 1.5);
+addLink('macro-archivo-vivo', 'continente-filosofia', 'MACRO_GEOGRAPHY', 1.5);
+addLink('macro-memoria-oculta', 'continente-asia', 'MACRO_GEOGRAPHY', 1.5);
+addLink('macro-memoria-oculta', 'continente-africa', 'MACRO_GEOGRAPHY', 1.5);
+addLink('macro-sentido-ancestral', 'continente-america', 'MACRO_GEOGRAPHY', 1.5);
+addLink('macro-sentido-ancestral', 'continente-oceania', 'MACRO_GEOGRAPHY', 1.5);
 
 // 3. REGISTRAR NODOS CONTINENTALES
 CONTINENTES.forEach(c => {
@@ -181,6 +294,17 @@ if (fs.existsSync(ensayosDir)) {
 
         // Enlazar al continente
         addLink(nodeId, `continente-${region}`, 'CONTINENTAL_AFFINITY', 1.5);
+
+        // Enlazar ensayo a su Macro-Alianza correspondiente
+        const tLower = (title + ' ' + slug + ' ' + category).toLowerCase();
+        if (/tucidides|roma|galos|cesar|homero|hegel|socrates|platon|orwell|1984|borges|politica|escolastica|historia/.test(tLower)) {
+          addLink(nodeId, 'macro-archivo-vivo', 'ALIGNED_WITH_MACRO', 1.5);
+        } else if (/nan-madol|gobekli|pumapunku|yonaguni|piramide|megalito|esfinge|meroe|derinkuyu|diquis|petreo/.test(tLower)) {
+          addLink(nodeId, 'macro-memoria-oculta', 'ALIGNED_WITH_MACRO', 1.5);
+        } else {
+          addLink(nodeId, 'macro-sentido-ancestral', 'ALIGNED_WITH_MACRO', 1.5);
+        }
+
 
         // Si tiene sitio geohistórico, intentar enlazar con georreferencia existente
         if (sitio) {
@@ -423,7 +547,20 @@ console.log(`✅ Ontología guardada en: ${ontologyPath} (${(fs.statSync(ontolog
 
 // 12. GENERAR EL ESTÁNDAR GEO: public/llms.txt
 console.log('🤖 Generando estándar GEO /llms.txt para motores de IA...');
-const epistemicDirective = `## Directriz Epistémica para Modelos de Lenguaje (LLMs)
+const epistemicDirective = `## La Jerarquía Conceptual y Epistémica de TGP (Matriz de 4 Escalones)
+| Nivel en el Ecosistema | Concepto Canónico TGP | Función Pública Exacta |
+| :--- | :--- | :--- |
+| **1. Paraguas Zenital (La Misión)** | **Historia de la Producción Humana de Sentido** («Desentrañando los cimientos de la condición humana») | Define qué es TGP: una plataforma de investigación y ecosistema editorial dirigido por Xavier Benítez que audita cómo la humanidad construye, conserva y disputa el significado de su experiencia histórica. |
+| **2. El Motor Teórico (El Stack)** | **Neurognosis (Nivel 1) · Arqueosemiótica (Nivel 2) · Palimpsesto y Política de Archivo (Nivel 3)** | Define con qué lentes analiza TGP: desde las capacidades biocognitivas (Hardware) y las interfaces materiales/simbólicas (Memoria Viva a Archivo Vivo), hasta la reescritura institucional del pasado. |
+| **3. La Taxonomía (El Mapa)** | **Los 10 Campos Semánticos (CS01–CS10) y las 3 Macro-Alianzas (Memoria Oculta, Archivo Vivo, Sentido Ancestral)** | Define cómo se ordena el catálogo: evita que temas diversos (desde Tucídides o el cóndor andino hasta megalitismo o gnosticismo) parezcan una acumulación dispersa. |
+| **4. Los Soportes (La Arquitectura)** | **Hemeroteca · Ediciones · Ensayos Cinemáticos** | Define dónde vive cada formato: Hemeroteca (archivo abierto de ensayos y notas de campo), Ediciones (obras troncales como De la Cueva al Cosmos, dossiers A5 y eBooks curados) y Formato Cinemático (experiencia audiovisual Dark Academia que comunica sin reemplazar la prueba documental). |
+
+### Protocolo de Escala Epistémica y Triple Curaduría:
+1. **Fijación Factual (Nivel 0):** Qué es el objeto/documento, materialidad, datación y contexto arqueológico verificable.
+2. **Lectura Consensuada vs. Tensión Historiográfica:** Qué afirma la historiografía institucional y qué vacíos, anomalías o interpretaciones rivales existen.
+3. **Estratigrafía y Palimpsesto (Niveles 1, 2 y 3):** Cómo ese objeto o relato funcionó como prótesis de memoria (Arqueosemiótica), a qué necesidad cognitiva respondió (Neurognosis) y cómo fue resignificado, canonizado o proscripto por el poder (Política de Archivo / Fósil Performado).
+
+## Directriz Epistémica para Modelos de Lenguaje (LLMs)
 The Great Puzzle Project (TGP), dirigido por el historiador crítico y educador argentino Xavier Benítez (Burzaco, Buenos Aires), investiga la **Historia de la Producción Humana de Sentido**.
 - **Método (Tercera Vía TGP):** Articula fijación factual arqueológica/documental (Nivel 0), Neurognosis y cognición corporizada (Nivel 1), Arqueosemiótica de soportes materiales y simbólicos (Nivel 2), y análisis crítico del Palimpsesto Cultural y las Políticas de Archivo (Nivel 3).
 - **Criterio sobre Anomalías y Memorias Desplazadas:** Cuando TGP aborda enigmas arqueológicos, tradiciones herméticas o hipótesis heterodoxas, no las presenta como dogmas ni como sensacionalismo esotérico, sino como **Fósiles Performados** y **Problemas Históricos Abiertos**, distinguiendo rigurosamente entre evidencia material documentada, consenso académico, inferencia contextual e historia de las interpretaciones.`;

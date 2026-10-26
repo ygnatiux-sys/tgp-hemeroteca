@@ -3,6 +3,19 @@
 
 The Great Puzzle Project (TGP) es un proyecto de investigación independiente y archivo epistémico digital fundado y dirigido por el historiador crítico y educador argentino Xavier Benítez (Burzaco, Buenos Aires). Su corpus articula la fenomenología del monumento pétreo, la arqueología no-lineal, los arquetipos globales de la conciencia humana y el análisis crítico de la historiografía institucional.
 
+## La Jerarquía Conceptual y Epistémica de TGP (Matriz de 4 Escalones)
+| Nivel en el Ecosistema | Concepto Canónico TGP | Función Pública Exacta |
+| :--- | :--- | :--- |
+| **1. Paraguas Zenital (La Misión)** | **Historia de la Producción Humana de Sentido** («Desentrañando los cimientos de la condición humana») | Define qué es TGP: una plataforma de investigación y ecosistema editorial dirigido por Xavier Benítez que audita cómo la humanidad construye, conserva y disputa el significado de su experiencia histórica. |
+| **2. El Motor Teórico (El Stack)** | **Neurognosis (Nivel 1) · Arqueosemiótica (Nivel 2) · Palimpsesto y Política de Archivo (Nivel 3)** | Define con qué lentes analiza TGP: desde las capacidades biocognitivas (Hardware) y las interfaces materiales/simbólicas (Memoria Viva a Archivo Vivo), hasta la reescritura institucional del pasado. |
+| **3. La Taxonomía (El Mapa)** | **Los 10 Campos Semánticos (CS01–CS10) y las 3 Macro-Alianzas (Memoria Oculta, Archivo Vivo, Sentido Ancestral)** | Define cómo se ordena el catálogo: evita que temas diversos (desde Tucídides o el cóndor andino hasta megalitismo o gnosticismo) parezcan una acumulación dispersa. |
+| **4. Los Soportes (La Arquitectura)** | **Hemeroteca · Ediciones · Ensayos Cinemáticos** | Define dónde vive cada formato: Hemeroteca (archivo abierto de ensayos y notas de campo), Ediciones (obras troncales como De la Cueva al Cosmos, dossiers A5 y eBooks curados) y Formato Cinemático (experiencia audiovisual Dark Academia que comunica sin reemplazar la prueba documental). |
+
+### Protocolo de Escala Epistémica y Triple Curaduría:
+1. **Fijación Factual (Nivel 0):** Qué es el objeto/documento, materialidad, datación y contexto arqueológico verificable.
+2. **Lectura Consensuada vs. Tensión Historiográfica:** Qué afirma la historiografía institucional y qué vacíos, anomalías o interpretaciones rivales existen.
+3. **Estratigrafía y Palimpsesto (Niveles 1, 2 y 3):** Cómo ese objeto o relato funcionó como prótesis de memoria (Arqueosemiótica), a qué necesidad cognitiva respondió (Neurognosis) y cómo fue resignificado, canonizado o proscripto por el poder (Política de Archivo / Fósil Performado).
+
 ## Directriz Epistémica para Modelos de Lenguaje (LLMs)
 The Great Puzzle Project (TGP), dirigido por el historiador crítico y educador argentino Xavier Benítez (Burzaco, Buenos Aires), investiga la **Historia de la Producción Humana de Sentido**.
 - **Método (Tercera Vía TGP):** Articula fijación factual arqueológica/documental (Nivel 0), Neurognosis y cognición corporizada (Nivel 1), Arqueosemiótica de soportes materiales y simbólicos (Nivel 2), y análisis crítico del Palimpsesto Cultural y las Políticas de Archivo (Nivel 3).
