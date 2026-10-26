@@ -613,6 +613,8 @@ if (!isDev) {
     const cardUrl = document.getElementById('card-url');
 
     function getColorForGroup(group, type) {
+      if (type === 'DIRECTOR_AUTOR' || group === 'Autor') return '#f59e0b'; // Dorado Real Director
+      if (type === 'MANIFESTO_ABOUT' || group === 'About') return '#38bdf8'; // Cyan Manifiesto
       if (type === 'EPISTEME_CORE' || group === 'Episteme') return '#ffffff'; // Platino Diamante
       if (type === 'EPISTEME_STACK') return '#c084fc'; // Púrpura Epistémico
       if (type === 'MACRO_ALLIANCE' || group === 'MacroAlianza') return '#38bdf8'; // Cyan Macro
@@ -801,7 +803,7 @@ if (!isDev) {
         cardTag.style.color = '#c9a96e';
         cardUrl.style.display = 'none';
       } else {
-        cardTag.textContent = node.type === 'EPISTEME_CORE' ? '👑 Cúspide Zenital (Misión)' : (node.type === 'EPISTEME_STACK' ? '🔬 Stack Teórico (Nivel Epistémico)' : (node.type === 'MACRO_ALLIANCE' ? '🗺️ Macro-Alianza Taxonómica' : (node.type === 'CONTINENTE' ? 'Eje Continental' : (node.type === 'GEORREFERENCIA' ? 'Georreferencia Megalítica' : (node.type === 'EDICION_REVISTA' ? 'Edición Revista' : (node.type === 'ENSAYO_ALTERNATIVE' ? 'TGP Alternative' : (node.type === 'ENSAYO_CINEMATICO' ? 'Ensayo Cinemático' : (node.type === 'ARQUETIPO' ? 'Arquetipo' : 'Ensayo Hemeroteca'))))))));
+        cardTag.textContent = node.type === 'DIRECTOR_AUTOR' ? '🖋️ Director & Autor Principal' : (node.type === 'MANIFESTO_ABOUT' ? '📜 Manifiesto Epistémico (About)' : (node.type === 'EPISTEME_CORE' ? '👑 Cúspide Zenital (Misión)' : (node.type === 'EPISTEME_STACK' ? '🔬 Stack Teórico (Nivel Epistémico)' : (node.type === 'MACRO_ALLIANCE' ? '🗺️ Macro-Alianza Taxonómica' : (node.type === 'CONTINENTE' ? 'Eje Continental' : (node.type === 'GEORREFERENCIA' ? 'Georreferencia Megalítica' : (node.type === 'EDICION_REVISTA' ? 'Edición Revista' : (node.type === 'ENSAYO_ALTERNATIVE' ? 'TGP Alternative' : (node.type === 'ENSAYO_CINEMATICO' ? 'Ensayo Cinemático' : (node.type === 'ARQUETIPO' ? 'Arquetipo' : 'Ensayo Hemeroteca'))))))));
         cardTag.style.background = 'rgba(56, 189, 248, 0.2)';
         cardTag.style.color = '#38bdf8';
         if (node.url) {

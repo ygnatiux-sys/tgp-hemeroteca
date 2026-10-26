@@ -1,5 +1,5 @@
 ﻿# The Great Puzzle Project — Índice Exhaustivo de Conocimiento (Corpus Completo)
-> Versión Ontológica: 2.0.0 | Entidades Indexadas: 218 | Relaciones Semánticas: 532
+> Versión Ontológica: 2.0.0 | Entidades Indexadas: 220 | Relaciones Semánticas: 533
 
 Este documento contiene el catálogo completo de entidades, tratados, georreferencias y ediciones de The Great Puzzle Project indexadas para agentes autónomos y motores de síntesis (Perplexity, Gemini, ChatGPT, Claude).
 

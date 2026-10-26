@@ -27,6 +27,26 @@ const EPISTEME_CORE = [
     url: `${BASE_URL_HEMEROTECA}/about/`
   },
   {
+    id: 'autor-xavier-benitez',
+    name: 'Xavier Benítez (Director & Autor)',
+    slug: 'xavier-benitez',
+    type: 'DIRECTOR_AUTOR',
+    group: 'Autor',
+    val: 40,
+    desc: 'Investigador y ensayista argentino (Buenos Aires). Creador y Director de The Great Puzzle Project, dedicado al estudio de la memoria cultural, la arqueosemiótica y la evolución del pensamiento humano.',
+    url: 'https://about.thegreatpuzzleproject.com/sobre-tgp-xavier-benitez-identidad'
+  },
+  {
+    id: 'about-identidad-epistemica',
+    name: 'Manifiesto: Memoria, Sentido & Homo Sapiens',
+    slug: 'sobre-tgp-xavier-benitez-identidad',
+    type: 'MANIFESTO_ABOUT',
+    group: 'About',
+    val: 30,
+    desc: 'Manifiesto sobre la memoria humana, neurocognición, semiótica y la evolución de los grandes relatos desde la tradición oral hasta la inteligencia artificial.',
+    url: 'https://about.thegreatpuzzleproject.com/sobre-tgp-xavier-benitez-identidad'
+  },
+  {
     id: 'stack-nivel-0',
     name: 'Fijación Factual & Evidencia Arqueológica (Nivel 0)',
     slug: 'fijacion-factual-nivel-0',
@@ -179,6 +199,12 @@ addLink('macro-memoria-oculta', 'continente-asia', 'MACRO_GEOGRAPHY', 1.5);
 addLink('macro-memoria-oculta', 'continente-africa', 'MACRO_GEOGRAPHY', 1.5);
 addLink('macro-sentido-ancestral', 'continente-america', 'MACRO_GEOGRAPHY', 1.5);
 addLink('macro-sentido-ancestral', 'continente-oceania', 'MACRO_GEOGRAPHY', 1.5);
+
+// Enlazar al Autor con la Misión Zenital y el Manifiesto de About
+addLink('autor-xavier-benitez', 'episteme-zenit', 'CREATOR_AND_DIRECTOR', 4);
+addLink('autor-xavier-benitez', 'about-identidad-epistemica', 'AUTHORED_MANIFESTO', 3.5);
+addLink('about-identidad-epistemica', 'episteme-zenit', 'EPISTEMIC_FOUNDATION', 3);
+
 
 // 3. REGISTRAR NODOS CONTINENTALES
 CONTINENTES.forEach(c => {
