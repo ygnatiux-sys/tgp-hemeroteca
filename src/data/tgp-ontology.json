@@ -3,14 +3,14 @@
     "project": "The Great Puzzle Project",
     "title": "Ontología Semántica & Cartografía Cognitiva Universal",
     "version": "2.0.0",
-    "generatedAt": "2026-10-26T08:09:50.296Z",
-    "totalNodes": 214,
-    "totalLinks": 486,
+    "generatedAt": "2026-10-26T10:23:33.963Z",
+    "totalNodes": 210,
+    "totalLinks": 461,
     "stats": {
       "continentes": 6,
       "georreferencias": 17,
       "hemeroteca": 51,
-      "cinematicos": 58,
+      "cinematicos": 54,
       "arquetipos": 10,
       "alternative": 64,
       "ediciones": 8
@@ -543,7 +543,7 @@
       "category": "Filosofía",
       "sitioGeohistorico": "",
       "region": "filosofia",
-      "coverImage": "/src/assets/ensayos/hegel-la-historia-y-dios/coverImage.jpg",
+      "coverImage": "/src/assets/ensayos/hegel-la-historia-y-dios/coverImage.webp",
       "val": 12,
       "desc": "Ensayo canónico de Hemeroteca: Hegel, la historia y Dios",
       "url": "https://thegreatpuzzleproject.com/hemeroteca/hegel-la-historia-y-dios/"
@@ -1403,20 +1403,6 @@
       "url": "https://thegreatpuzzleproject.com/ensayos-cinematicos/el-umbral-de-lo-irrevocable-fenomenologia-del-confirmar-y-publicar/"
     },
     {
-      "id": "cine-ensayo-erudito-tgp",
-      "name": "Ensayo Erudito TGP",
-      "slug": "ensayo-erudito-tgp",
-      "type": "ENSAYO_CINEMATICO",
-      "group": "Cinemático",
-      "category": "Ensayo Cinemático",
-      "sitioGeohistorico": "",
-      "region": "filosofia",
-      "coverImage": "/src/assets/ensayos-cinematicos/ensayo-erudito-tgp/coverImage.jpg",
-      "val": 14,
-      "desc": "Ensayo cinemático audiovisual: Ensayo Erudito TGP",
-      "url": "https://thegreatpuzzleproject.com/ensayos-cinematicos/ensayo-erudito-tgp/"
-    },
-    {
       "id": "cine-esferas-de-diquis-la-geometria-sagrada-del-silencio-precolombino",
       "name": "Esferas de Diquís: La Geometría Sagrada del Silencio Precolombino",
       "slug": "esferas-de-diquis-la-geometria-sagrada-del-silencio-precolombino",
@@ -1537,24 +1523,10 @@
       "category": "Ensayo Cinemático",
       "sitioGeohistorico": "",
       "region": "europa",
-      "coverImage": "/src/assets/ensayos-cinematicos/la-ciudadela-inexpugnable-filosofia-poder-y-trascendencia-en-el-estoicismo-romano/coverImage.jpg",
+      "coverImage": "https://storage.thegreatpuzzleproject.com/storage/marco-aurelio-busto-marmol-roma-f259652b.webp",
       "val": 14,
       "desc": "Ensayo cinemático audiovisual: La Ciudadela Inexpugnable: Filosofía, Poder y Trascendencia en el Estoicismo Romano",
       "url": "https://thegreatpuzzleproject.com/ensayos-cinematicos/la-ciudadela-inexpugnable-filosofia-poder-y-trascendencia-en-el-estoicismo-romano/"
-    },
-    {
-      "id": "cine-la-ciudadela-interior-anatomia-cinematica-del-estoicismo-romano",
-      "name": "La Ciudadela Interior: Anatomía Cinemática del Estoicismo Romano",
-      "slug": "la-ciudadela-interior-anatomia-cinematica-del-estoicismo-romano",
-      "type": "ENSAYO_CINEMATICO",
-      "group": "Cinemático",
-      "category": "Ensayo Cinemático",
-      "sitioGeohistorico": "",
-      "region": "europa",
-      "coverImage": "/src/assets/ensayos-cinematicos/la-ciudadela-interior-anatomia-cinematica-del-estoicismo-romano/coverImage.jpg",
-      "val": 14,
-      "desc": "Ensayo cinemático audiovisual: La Ciudadela Interior: Anatomía Cinemática del Estoicismo Romano",
-      "url": "https://thegreatpuzzleproject.com/ensayos-cinematicos/la-ciudadela-interior-anatomia-cinematica-del-estoicismo-romano/"
     },
     {
       "id": "cine-la-hemeroteca-del-porvenir-el-oraculo-de-delfos-y-el-archivo-de-las-voces-perdidas",
@@ -1669,20 +1641,6 @@
       "url": "https://thegreatpuzzleproject.com/ensayos-cinematicos/los-tipos-de-vacas-en-argentina/"
     },
     {
-      "id": "cine-montsegur-y-las-herejias-medievales",
-      "name": "Montségur y las herejías medievales",
-      "slug": "montsegur-y-las-herejias-medievales",
-      "type": "ENSAYO_CINEMATICO",
-      "group": "Cinemático",
-      "category": "Ensayo Cinemático",
-      "sitioGeohistorico": "",
-      "region": "filosofia",
-      "coverImage": "https://storage.thegreatpuzzleproject.com/wikimedia/1789892903810-fba5e304.webp",
-      "val": 14,
-      "desc": "Ensayo cinemático audiovisual: Montségur y las herejías medievales",
-      "url": "https://thegreatpuzzleproject.com/ensayos-cinematicos/montsegur-y-las-herejias-medievales/"
-    },
-    {
       "id": "cine-nichiren-daishonin-la-tempestad-de-la-dignidad-y-el-despertar-de-la-budeidad-soberana",
       "name": "Nichiren Daishonin: La Tempestad de la Dignidad y el Despertar de la Budeidad Soberana",
       "slug": "nichiren-daishonin-la-tempestad-de-la-dignidad-y-el-despertar-de-la-budeidad-soberana",
@@ -1733,24 +1691,10 @@
       "category": "Ensayo Cinemático",
       "sitioGeohistorico": "",
       "region": "asia",
-      "coverImage": "/src/assets/ensayos-cinematicos/sadhguru-y-la-cinematografia-del-misticismo-global-arqueologia-del-guru-hipermoderno/coverImage.jpg",
+      "coverImage": "https://storage.thegreatpuzzleproject.com/storage/sadhguru-adiyogi-shiva-busto-coimbatore-d70153b2.webp",
       "val": 14,
       "desc": "Ensayo cinemático audiovisual: Sadhguru y la Cinematografía del Misticismo Global: Arqueología del Gurú Hipermoderno",
       "url": "https://thegreatpuzzleproject.com/ensayos-cinematicos/sadhguru-y-la-cinematografia-del-misticismo-global-arqueologia-del-guru-hipermoderno/"
-    },
-    {
-      "id": "cine-sadhguru-y-la-gramatica-cinematografica-del-mistico-global-arqueosemiotica-del-extasis-mecanizado",
-      "name": "Sadhguru y la gramática cinematográfica del místico global: arqueosemiótica del éxtasis mecanizado",
-      "slug": "sadhguru-y-la-gramatica-cinematografica-del-mistico-global-arqueosemiotica-del-extasis-mecanizado",
-      "type": "ENSAYO_CINEMATICO",
-      "group": "Cinemático",
-      "category": "Ensayo Cinemático",
-      "sitioGeohistorico": "",
-      "region": "asia",
-      "coverImage": "/src/assets/ensayos-cinematicos/sadhguru-y-la-gramatica-cinematografica-del-mistico-global-arqueosemiotica-del-extasis-mecanizado/coverImage.jpg",
-      "val": 14,
-      "desc": "Ensayo cinemático audiovisual: Sadhguru y la gramática cinematográfica del místico global: arqueosemiótica del éxtasis mecanizado",
-      "url": "https://thegreatpuzzleproject.com/ensayos-cinematicos/sadhguru-y-la-gramatica-cinematografica-del-mistico-global-arqueosemiotica-del-extasis-mecanizado/"
     },
     {
       "id": "cine-saqqara-la-arquitectura-del-tiempo-y-el-umbral-de-la-inmortalidad",
@@ -3509,12 +3453,6 @@
       "value": 1.5
     },
     {
-      "source": "cine-ensayo-erudito-tgp",
-      "target": "continente-filosofia",
-      "relationship": "CINEMATIC_NARRATIVE",
-      "value": 1.5
-    },
-    {
       "source": "cine-esferas-de-diquis-la-geometria-sagrada-del-silencio-precolombino",
       "target": "continente-america",
       "relationship": "CINEMATIC_NARRATIVE",
@@ -3569,12 +3507,6 @@
       "value": 1.5
     },
     {
-      "source": "cine-la-ciudadela-interior-anatomia-cinematica-del-estoicismo-romano",
-      "target": "continente-europa",
-      "relationship": "CINEMATIC_NARRATIVE",
-      "value": 1.5
-    },
-    {
       "source": "cine-la-hemeroteca-del-porvenir-el-oraculo-de-delfos-y-el-archivo-de-las-voces-perdidas",
       "target": "continente-europa",
       "relationship": "CINEMATIC_NARRATIVE",
@@ -3623,12 +3555,6 @@
       "value": 1.5
     },
     {
-      "source": "cine-montsegur-y-las-herejias-medievales",
-      "target": "continente-filosofia",
-      "relationship": "CINEMATIC_NARRATIVE",
-      "value": 1.5
-    },
-    {
       "source": "cine-nichiren-daishonin-la-tempestad-de-la-dignidad-y-el-despertar-de-la-budeidad-soberana",
       "target": "continente-asia",
       "relationship": "CINEMATIC_NARRATIVE",
@@ -3648,12 +3574,6 @@
     },
     {
       "source": "cine-sadhguru-y-la-cinematografia-del-misticismo-global-arqueologia-del-guru-hipermoderno",
-      "target": "continente-asia",
-      "relationship": "CINEMATIC_NARRATIVE",
-      "value": 1.5
-    },
-    {
-      "source": "cine-sadhguru-y-la-gramatica-cinematografica-del-mistico-global-arqueosemiotica-del-extasis-mecanizado",
       "target": "continente-asia",
       "relationship": "CINEMATIC_NARRATIVE",
       "value": 1.5
@@ -4433,12 +4353,6 @@
       "value": 1
     },
     {
-      "source": "cine-adam-s-bridge",
-      "target": "cine-sadhguru-y-la-cinematografia-del-misticismo-global-arqueologia-del-guru-hipermoderno",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
       "source": "cine-alejandro-magno-la-geometria-del-mito-y-el-abismo-de-la-desmesura",
       "target": "cine-el-ocaso-de-la-luz-pura-montsegur-y-el-drama-metafisico-cataro",
       "relationship": "THEMATIC_RESONANCE",
@@ -4446,25 +4360,19 @@
     },
     {
       "source": "cine-alejandro-magno-la-geometria-del-mito-y-el-abismo-de-la-desmesura",
-      "target": "cine-la-catedral-de-la-razon-arqueosemiotica-y-vigencia-de-la-escolastica",
+      "target": "cine-espartaco-y-la-rebelion-de-los-gladiadores-anatomia-de-la-insurgencia-ontologica",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-alejandro-magno-la-geometria-del-mito-y-el-abismo-de-la-desmesura",
-      "target": "cine-los-albigenses",
+      "target": "cine-sombras-de-cnosos-la-hemeroteca-del-laberinto-y-el-monstruo-interior",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-amaterasu-una-breve-historia",
       "target": "cine-el-buda-anatomia-del-deseo-y-la-disolucion-del-yo",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "cine-amaterasu-una-breve-historia",
-      "target": "cine-tratado-arqueologico-y-estratigrafico-de-las-terrazas-megaliticas-de-gunung-padang-un-ensayo-cinematico-de-la-prehistoria-de-java",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
@@ -4487,14 +4395,14 @@
       "value": 1
     },
     {
-      "source": "cine-borges-y-su-obra-el-laberinto-del-infinito",
-      "target": "cine-el-tatu-carreta",
+      "source": "cine-borges-y-el-porvenir-el-laberinto-de-los-futuros-bifurcados",
+      "target": "cine-vision-2026-09-18-temple-of-the-sun-left-temple-xiv-and-the-palace-right-from-the-",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-borges-y-su-obra-el-laberinto-del-infinito",
-      "target": "cine-los-tipos-de-vacas-en-argentina",
+      "target": "cine-el-tatu-carreta",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
@@ -4505,14 +4413,8 @@
       "value": 1
     },
     {
-      "source": "cine-cartografias-de-la-sombra-freud-y-el-descubrimiento-del-inconsciente",
-      "target": "cine-espartaco-y-la-rebelion-de-los-gladiadores-anatomia-de-la-insurgencia-ontologica",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "cine-cartografias-de-la-sombra-freud-y-el-descubrimiento-del-inconsciente",
-      "target": "cine-los-argonautas",
+      "source": "cine-caligula-la-estetica-del-vertigo-y-la-fractura-del-poder",
+      "target": "cine-la-perdiz-bonaerense",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
@@ -4524,31 +4426,31 @@
     },
     {
       "source": "cine-darwin-y-el-evolucionismo-la-demolicion-del-diseno-cosmico",
-      "target": "cine-la-catedral-de-la-razon-arqueosemiotica-y-vigencia-de-la-escolastica",
+      "target": "cine-espartaco-y-la-rebelion-de-los-gladiadores-anatomia-de-la-insurgencia-ontologica",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-darwin-y-el-evolucionismo-la-demolicion-del-diseno-cosmico",
-      "target": "cine-los-albigenses",
+      "target": "cine-sombras-de-cnosos-la-hemeroteca-del-laberinto-y-el-monstruo-interior",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-demeter-la-geometria-sagrada-del-dolor-y-la-cosecha",
-      "target": "cine-ensayo-erudito-tgp",
+      "target": "cine-la-catedral-de-la-razon-arqueosemiotica-y-vigencia-de-la-escolastica",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-demeter-la-geometria-sagrada-del-dolor-y-la-cosecha",
-      "target": "cine-la-teogonia-de-hesiodo-el-abismo-primordial-y-el-t",
+      "target": "cine-los-argonautas",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-demeter-la-geometria-sagrada-del-dolor-y-la-cosecha",
-      "target": "cine-piramide-del-adivino-de-uxmal",
+      "target": "cine-vision-2026-10-12-consulta-manual",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
@@ -4560,19 +4462,13 @@
     },
     {
       "source": "cine-el-buda-anatomia-del-deseo-y-la-disolucion-del-yo",
-      "target": "cine-jiddu-krishnamurti-la-disolucion-del-dogma-y-la-anatomia-del-observador",
+      "target": "cine-pueblos-azules-los-hunza2",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-el-busto-clasico-de-julio-cesar",
-      "target": "cine-i-la-gomera-y-el-resplandor-catodico",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "cine-el-busto-clasico-de-julio-cesar",
-      "target": "cine-la-hemeroteca-del-porvenir-el-oraculo-de-delfos-y-el-archivo-de-las-voces-perdidas",
+      "target": "cine-tucidides-la-patologia-del-poder-y-la-fractura-moral-de-la-polis",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
@@ -4590,31 +4486,31 @@
     },
     {
       "source": "cine-el-filo-de-la-voluntad-alejandro-magno-y-la-ruptura-del-nudo-gordiano",
-      "target": "cine-la-catedral-de-la-razon-arqueosemiotica-y-vigencia-de-la-escolastica",
+      "target": "cine-espartaco-y-la-rebelion-de-los-gladiadores-anatomia-de-la-insurgencia-ontologica",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-el-filo-de-la-voluntad-alejandro-magno-y-la-ruptura-del-nudo-gordiano",
-      "target": "cine-los-albigenses",
+      "target": "cine-sombras-de-cnosos-la-hemeroteca-del-laberinto-y-el-monstruo-interior",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-el-flash-historico-del-ok-de-chiste-nerd-a-mantra-de-la-humanidad",
-      "target": "cine-ensayo-erudito-tgp",
+      "target": "cine-la-catedral-de-la-razon-arqueosemiotica-y-vigencia-de-la-escolastica",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-el-flash-historico-del-ok-de-chiste-nerd-a-mantra-de-la-humanidad",
-      "target": "cine-la-teogonia-de-hesiodo-el-abismo-primordial-y-el-t",
+      "target": "cine-los-argonautas",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-el-flash-historico-del-ok-de-chiste-nerd-a-mantra-de-la-humanidad",
-      "target": "cine-piramide-del-adivino-de-uxmal",
+      "target": "cine-vision-2026-10-12-consulta-manual",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
@@ -4625,8 +4521,14 @@
       "value": 1
     },
     {
+      "source": "cine-el-nandu-pampeano",
+      "target": "cine-vision-2026-09-18-temple-of-the-sun-left-temple-xiv-and-the-palace-right-from-the-",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
       "source": "cine-el-ocaso-de-la-luz-pura-montsegur-y-el-drama-metafisico-cataro",
-      "target": "cine-vision-2026-10-12-consulta-manual",
+      "target": "cine-piramide-del-adivino-de-uxmal",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
@@ -4638,121 +4540,79 @@
     },
     {
       "source": "cine-el-tapir",
-      "target": "cine-vision-2026-09-18-temple-of-the-sun-left-temple-xiv-and-the-palace-right-from-the-",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "cine-el-tatu-carreta",
-      "target": "cine-esferas-de-diquis-la-geometria-sagrada-del-silencio-precolombino",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "cine-ensayo-erudito-tgp",
-      "target": "cine-la-perdiz-bonaerense",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "cine-ensayo-erudito-tgp",
-      "target": "cine-montsegur-y-las-herejias-medievales",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "cine-ensayo-erudito-tgp",
-      "target": "cine-sombras-de-cnosos-la-hemeroteca-del-laberinto-y-el-monstruo-interior",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "cine-esferas-de-diquis-la-geometria-sagrada-del-silencio-precolombino",
       "target": "cine-los-tipos-de-vacas-en-argentina",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
+      "source": "cine-el-tero",
+      "target": "cine-esferas-de-diquis-la-geometria-sagrada-del-silencio-precolombino",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "cine-el-umbral-de-lo-irrevocable-fenomenologia-del-confirmar-y-publicar",
+      "target": "cine-los-albigenses",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "cine-esferas-de-diquis-la-geometria-sagrada-del-silencio-precolombino",
+      "target": "cine-vision-2026-09-18-temple-of-the-sun-left-temple-xiv-and-the-palace-right-from-the-",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "cine-espartaco-y-la-rebelion-de-los-gladiadores-anatomia-de-la-insurgencia-ontologica",
+      "target": "cine-piramide-del-adivino-de-uxmal",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
       "source": "cine-herodoto-el-nacimiento-de-la-indagacion-y-la-invencion-del-otro",
-      "target": "cine-la-ciudadela-inexpugnable-filosofia-poder-y-trascendencia-en-el-estoicismo-romano",
+      "target": "cine-i-la-gomera-y-el-resplandor-catodico",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-i-la-gomera-y-el-resplandor-catodico",
-      "target": "cine-tucidides-la-patologia-del-poder-y-la-fractura-moral-de-la-polis",
+      "target": "cine-la-hemeroteca-del-porvenir-el-oraculo-de-delfos-y-el-archivo-de-las-voces-perdidas",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "cine-jiddu-krishnamurti-la-disolucion-del-dogma-y-la-anatomia-del-observador",
-      "target": "cine-tratado-arqueologico-y-estratigrafico-de-las-terrazas-megaliticas-de-gunung-padang-un-ensayo-cinematico-de-la-prehistoria-de-java",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "cine-juan-sebastian-elcano-y-la-clausura-empirica-del-globo",
+      "source": "cine-i-la-gomera-y-el-resplandor-catodico",
       "target": "cine-tacito-y-la-dramaturgia-del-poder-anatomia-de-la-sombra-imperial",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-la-catedral-de-la-razon-arqueosemiotica-y-vigencia-de-la-escolastica",
-      "target": "cine-vision-2026-10-12-consulta-manual",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "cine-la-ciudadela-inexpugnable-filosofia-poder-y-trascendencia-en-el-estoicismo-romano",
-      "target": "cine-la-ciudadela-interior-anatomia-cinematica-del-estoicismo-romano",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "cine-la-ciudadela-inexpugnable-filosofia-poder-y-trascendencia-en-el-estoicismo-romano",
-      "target": "cine-los-cataros-y-el-bogomilismo",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "cine-la-hemeroteca-del-porvenir-el-oraculo-de-delfos-y-el-archivo-de-las-voces-perdidas",
-      "target": "cine-tucidides-la-patologia-del-poder-y-la-fractura-moral-de-la-polis",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "cine-la-perdiz-bonaerense",
       "target": "cine-la-teogonia-de-hesiodo-el-abismo-primordial-y-el-t",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "cine-la-perdiz-bonaerense",
-      "target": "cine-piramide-del-adivino-de-uxmal",
+      "source": "cine-la-ciudadela-inexpugnable-filosofia-poder-y-trascendencia-en-el-estoicismo-romano",
+      "target": "cine-tucidides-la-patologia-del-poder-y-la-fractura-moral-de-la-polis",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-la-teogonia-de-hesiodo-el-abismo-primordial-y-el-t",
-      "target": "cine-montsegur-y-las-herejias-medievales",
+      "target": "cine-los-argonautas",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "cine-la-teogonia-de-hesiodo-el-abismo-primordial-y-el-t",
-      "target": "cine-sombras-de-cnosos-la-hemeroteca-del-laberinto-y-el-monstruo-interior",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "cine-los-albigenses",
       "target": "cine-vision-2026-10-12-consulta-manual",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "cine-montsegur-y-las-herejias-medievales",
-      "target": "cine-piramide-del-adivino-de-uxmal",
+      "source": "cine-los-cataros-y-el-bogomilismo",
+      "target": "cine-tucidides-la-patologia-del-poder-y-la-fractura-moral-de-la-polis",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
@@ -4764,1015 +4624,949 @@
     },
     {
       "source": "cine-sadhguru-y-la-cinematografia-del-misticismo-global-arqueologia-del-guru-hipermoderno",
-      "target": "cine-sadhguru-y-la-gramatica-cinematografica-del-mistico-global-arqueosemiotica-del-extasis-mecanizado",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "cine-sadhguru-y-la-cinematografia-del-misticismo-global-arqueologia-del-guru-hipermoderno",
       "target": "cine-vision-2026-10-12-confucio-a32172d8-2275859918-260916191857-1281x720",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "arquetipo-arquetipos-globales-introduccion",
-      "target": "arquetipo-el-puma-americano",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "arquetipo-arquetipos-globales-introduccion",
-      "target": "arquetipo-venus",
+      "target": "arquetipo-la-torre-de-babel",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "arquetipo-carl-jung-biografia",
-      "target": "arquetipo-urano",
+      "target": "arquetipo-el-puma-americano",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "arquetipo-carl-jung-biografia",
+      "target": "arquetipo-venus",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "arquetipo-el-puma-americano",
-      "target": "arquetipo-sanson",
+      "target": "arquetipo-urano",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "arquetipo-la-torre-de-babel",
-      "target": "arquetipo-pazuzu",
+      "target": "arquetipo-sanson",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "arquetipo-los-orixas",
-      "target": "arquetipo-los-orixas-africanos",
+      "target": "arquetipo-pazuzu",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "arquetipo-sanson",
+      "source": "arquetipo-urano",
       "target": "arquetipo-venus",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
       "source": "alt-amnesia-programada",
-      "target": "alt-borrador-ia-visual-2026-08-18t05-24-50",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-amnesia-programada",
-      "target": "alt-el-tel-y-la-sombra-belo-brdo",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-amnesia-programada",
-      "target": "alt-la-biblioteca-de-alejandria",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-amnesia-programada",
-      "target": "alt-la-ginebra-una-breve-historia-de-la-bebida-7313",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-amnesia-programada",
-      "target": "alt-la-viruela-en-el-siglo-xx-y-su-erradicacion-5557",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-amnesia-programada",
-      "target": "alt-los-mayas-y-uxmal-5339",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-amnesia-programada",
-      "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-4394",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-amnesia-programada",
-      "target": "alt-r007-borrador-visual-2026-08-18t10-23-17",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-amnesia-programada",
-      "target": "alt-test-final-scriptorium-antigravity-8527",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-asado-argentino-4796",
-      "target": "alt-borrador-ia-2026-08-18t07-00-15",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-asado-argentino-4796",
-      "target": "alt-el-silencio-de-nefertiti-un-rostro-en-la-fractura-del-tiempo-6183",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-asado-argentino-4796",
-      "target": "alt-la-tabla-periodica-arquitectura-cuantica-de-la-materia",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-asado-argentino-4796",
-      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-7098",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-asado-argentino-4796",
-      "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-1213",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-asado-argentino-4796",
-      "target": "alt-test-automatizado-scriptorium-antigravity-4591",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-borrador-ia-2026-08-18t07-00-15",
-      "target": "alt-el-monte-kailash-6233",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-borrador-ia-2026-08-18t07-00-15",
-      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-4864",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-borrador-ia-2026-08-18t07-00-15",
-      "target": "alt-sintesis-ontologica-breve-sobre-la-cantera-de-yangshan-y-el--3630",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-borrador-ia-visual-2026-08-18t05-24-50",
-      "target": "alt-ejemplo",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-borrador-ia-visual-2026-08-18t05-24-50",
-      "target": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-borrador-ia-visual-2026-08-18t05-24-50",
-      "target": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-borrador-ia-visual-2026-08-18t05-24-50",
-      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-borrador-ia-visual-2026-08-18t05-24-50",
-      "target": "alt-piri-reis",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-borrador-ia-visual-2026-08-18t05-24-50",
-      "target": "alt-sintesis-ontologica-breve-sobre-la-acustica-en-los-hipogeos--3054",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-borrador-ia-visual-2026-08-18t05-24-50",
-      "target": "alt-younger-dryas",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-borrador-ia-visual-2026-08-18t09-16-08",
-      "target": "alt-gobekli-tepe",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-borrador-ia-visual-2026-08-18t09-16-08",
-      "target": "alt-las-lineas-de-nasca-y-maria-reiche-homenaje",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-borrador-ia-visual-2026-08-18t09-16-08",
-      "target": "alt-mercurio-hermes-arquetipo-liminal",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-borrador-ia-visual-2026-08-18t09-16-08",
-      "target": "alt-sample-registro",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-borrador-ia-visual-2026-08-18t09-16-08",
-      "target": "alt-wayna-picchu-0324",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-colapso-1177",
       "target": "alt-el-vodka-una-bebida-del-mundo-eslavo-7802",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-colapso-1177",
+      "source": "alt-amnesia-programada",
       "target": "alt-la-civilizacion-maya-un-legado-de-sabiduria-ancest-1446",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-colapso-1177",
+      "source": "alt-amnesia-programada",
       "target": "alt-la-memoria-del-laberinto-y-el-tiempo-material-8555",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-colapso-1177",
+      "source": "alt-amnesia-programada",
       "target": "alt-masuda-no-iwafune",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-colapso-1177",
+      "source": "alt-amnesia-programada",
       "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-5611",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-colapso-1177",
+      "source": "alt-amnesia-programada",
       "target": "alt-recertificacion-scriptorium-antigravity-8289",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-colapso-1177",
+      "source": "alt-amnesia-programada",
       "target": "alt-the-caterpillar",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-ejemplo",
+      "source": "alt-asado-argentino-4796",
+      "target": "alt-borrador-ia-visual-2026-08-18t05-24-50",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-asado-argentino-4796",
       "target": "alt-el-tel-y-la-sombra-belo-brdo",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-ejemplo",
+      "source": "alt-asado-argentino-4796",
       "target": "alt-la-biblioteca-de-alejandria",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-ejemplo",
+      "source": "alt-asado-argentino-4796",
       "target": "alt-la-ginebra-una-breve-historia-de-la-bebida-7313",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-ejemplo",
+      "source": "alt-asado-argentino-4796",
       "target": "alt-la-viruela-en-el-siglo-xx-y-su-erradicacion-5557",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-ejemplo",
+      "source": "alt-asado-argentino-4796",
       "target": "alt-los-mayas-y-uxmal-5339",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-ejemplo",
+      "source": "alt-asado-argentino-4796",
       "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-4394",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-ejemplo",
+      "source": "alt-asado-argentino-4796",
       "target": "alt-r007-borrador-visual-2026-08-18t10-23-17",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-ejemplo",
+      "source": "alt-asado-argentino-4796",
       "target": "alt-test-final-scriptorium-antigravity-8527",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-el-monte-kailash-6233",
+      "source": "alt-borrador-ia-2026-08-18t07-00-15",
       "target": "alt-el-silencio-de-nefertiti-un-rostro-en-la-fractura-del-tiempo-6183",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-el-monte-kailash-6233",
+      "source": "alt-borrador-ia-2026-08-18t07-00-15",
       "target": "alt-la-tabla-periodica-arquitectura-cuantica-de-la-materia",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-el-monte-kailash-6233",
+      "source": "alt-borrador-ia-2026-08-18t07-00-15",
       "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-7098",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-el-monte-kailash-6233",
+      "source": "alt-borrador-ia-2026-08-18t07-00-15",
       "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-1213",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-el-monte-kailash-6233",
+      "source": "alt-borrador-ia-2026-08-18t07-00-15",
       "target": "alt-test-automatizado-scriptorium-antigravity-4591",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-el-silencio-de-nefertiti-un-rostro-en-la-fractura-del-tiempo-6183",
+      "source": "alt-borrador-ia-visual-2026-08-18t05-24-50",
+      "target": "alt-el-monte-kailash-6233",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-borrador-ia-visual-2026-08-18t05-24-50",
       "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-4864",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-el-silencio-de-nefertiti-un-rostro-en-la-fractura-del-tiempo-6183",
+      "source": "alt-borrador-ia-visual-2026-08-18t05-24-50",
       "target": "alt-sintesis-ontologica-breve-sobre-la-cantera-de-yangshan-y-el--3630",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-el-tel-y-la-sombra-belo-brdo",
-      "target": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
+      "source": "alt-borrador-ia-visual-2026-08-18t09-16-08",
+      "target": "alt-colapso-1177",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-el-tel-y-la-sombra-belo-brdo",
-      "target": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-el-tel-y-la-sombra-belo-brdo",
-      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-el-tel-y-la-sombra-belo-brdo",
-      "target": "alt-piri-reis",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-el-tel-y-la-sombra-belo-brdo",
-      "target": "alt-sintesis-ontologica-breve-sobre-la-acustica-en-los-hipogeos--3054",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-el-tel-y-la-sombra-belo-brdo",
-      "target": "alt-younger-dryas",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-el-vodka-una-bebida-del-mundo-eslavo-7802",
+      "source": "alt-borrador-ia-visual-2026-08-18t09-16-08",
       "target": "alt-hal-saflieni",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-el-vodka-una-bebida-del-mundo-eslavo-7802",
+      "source": "alt-borrador-ia-visual-2026-08-18t09-16-08",
       "target": "alt-la-piramide-doblada-ecos-de-la-eternidad-en-la-arquitectura--7258",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-el-vodka-una-bebida-del-mundo-eslavo-7802",
+      "source": "alt-borrador-ia-visual-2026-08-18t09-16-08",
       "target": "alt-los-mayas-con-imagen-sintetica-de-uxmal-9734",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-el-vodka-una-bebida-del-mundo-eslavo-7802",
+      "source": "alt-borrador-ia-visual-2026-08-18t09-16-08",
       "target": "alt-michael-cremo-homenaje-5218",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-el-vodka-una-bebida-del-mundo-eslavo-7802",
+      "source": "alt-borrador-ia-visual-2026-08-18t09-16-08",
       "target": "alt-sintesis-breve-sobre-la-acustica-megalitica-1139",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-gobekli-tepe",
+      "source": "alt-colapso-1177",
+      "target": "alt-gobekli-tepe",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-colapso-1177",
       "target": "alt-las-lineas-de-nasca-y-maria-reiche-homenaje",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-gobekli-tepe",
+      "source": "alt-colapso-1177",
       "target": "alt-mercurio-hermes-arquetipo-liminal",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-gobekli-tepe",
+      "source": "alt-colapso-1177",
       "target": "alt-sample-registro",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-gobekli-tepe",
+      "source": "alt-colapso-1177",
       "target": "alt-wayna-picchu-0324",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-hal-saflieni",
+      "source": "alt-ejemplo",
+      "target": "alt-el-vodka-una-bebida-del-mundo-eslavo-7802",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-ejemplo",
       "target": "alt-la-civilizacion-maya-un-legado-de-sabiduria-ancest-1446",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-hal-saflieni",
+      "source": "alt-ejemplo",
       "target": "alt-la-memoria-del-laberinto-y-el-tiempo-material-8555",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-hal-saflieni",
+      "source": "alt-ejemplo",
       "target": "alt-masuda-no-iwafune",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-hal-saflieni",
+      "source": "alt-ejemplo",
       "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-5611",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-hal-saflieni",
+      "source": "alt-ejemplo",
       "target": "alt-recertificacion-scriptorium-antigravity-8289",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-hal-saflieni",
+      "source": "alt-ejemplo",
       "target": "alt-the-caterpillar",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
+      "source": "alt-el-monte-kailash-6233",
+      "target": "alt-el-tel-y-la-sombra-belo-brdo",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-el-monte-kailash-6233",
       "target": "alt-la-biblioteca-de-alejandria",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
+      "source": "alt-el-monte-kailash-6233",
       "target": "alt-la-ginebra-una-breve-historia-de-la-bebida-7313",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
+      "source": "alt-el-monte-kailash-6233",
       "target": "alt-la-viruela-en-el-siglo-xx-y-su-erradicacion-5557",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
+      "source": "alt-el-monte-kailash-6233",
       "target": "alt-los-mayas-y-uxmal-5339",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
+      "source": "alt-el-monte-kailash-6233",
       "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-4394",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
+      "source": "alt-el-monte-kailash-6233",
       "target": "alt-r007-borrador-visual-2026-08-18t10-23-17",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
+      "source": "alt-el-monte-kailash-6233",
       "target": "alt-test-final-scriptorium-antigravity-8527",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-la-arepa-colombiana-3034",
-      "target": "alt-la-arepa-colombiana-6858",
+      "source": "alt-el-silencio-de-nefertiti-un-rostro-en-la-fractura-del-tiempo-6183",
+      "target": "alt-la-tabla-periodica-arquitectura-cuantica-de-la-materia",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-la-arepa-colombiana-3034",
-      "target": "alt-la-geometria-petrea-de-pumapunku-andesita-tiempo-y-cosmos-3332",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-arepa-colombiana-3034",
-      "target": "alt-pumapunku-la-geometria-del-silencio",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-arepa-colombiana-6858",
-      "target": "alt-pumapunku-geometria-andesita-0068",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-biblioteca-de-alejandria",
-      "target": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-biblioteca-de-alejandria",
-      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-biblioteca-de-alejandria",
-      "target": "alt-piri-reis",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-biblioteca-de-alejandria",
-      "target": "alt-sintesis-ontologica-breve-sobre-la-acustica-en-los-hipogeos--3054",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-biblioteca-de-alejandria",
-      "target": "alt-younger-dryas",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-civilizacion-maya-un-legado-de-sabiduria-ancest-1446",
-      "target": "alt-la-piramide-doblada-ecos-de-la-eternidad-en-la-arquitectura--7258",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-civilizacion-maya-un-legado-de-sabiduria-ancest-1446",
-      "target": "alt-los-mayas-con-imagen-sintetica-de-uxmal-9734",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-civilizacion-maya-un-legado-de-sabiduria-ancest-1446",
-      "target": "alt-michael-cremo-homenaje-5218",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-civilizacion-maya-un-legado-de-sabiduria-ancest-1446",
-      "target": "alt-sintesis-breve-sobre-la-acustica-megalitica-1139",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-geometria-petrea-de-pumapunku-andesita-tiempo-y-cosmos-3332",
-      "target": "alt-pumapunku-geometria-andesita-0068",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-ginebra-una-breve-historia-de-la-bebida-7313",
-      "target": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-ginebra-una-breve-historia-de-la-bebida-7313",
-      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-ginebra-una-breve-historia-de-la-bebida-7313",
-      "target": "alt-piri-reis",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-ginebra-una-breve-historia-de-la-bebida-7313",
-      "target": "alt-sintesis-ontologica-breve-sobre-la-acustica-en-los-hipogeos--3054",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-ginebra-una-breve-historia-de-la-bebida-7313",
-      "target": "alt-younger-dryas",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-memoria-del-laberinto-y-el-tiempo-material-8555",
-      "target": "alt-la-piramide-doblada-ecos-de-la-eternidad-en-la-arquitectura--7258",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-memoria-del-laberinto-y-el-tiempo-material-8555",
-      "target": "alt-los-mayas-con-imagen-sintetica-de-uxmal-9734",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-memoria-del-laberinto-y-el-tiempo-material-8555",
-      "target": "alt-michael-cremo-homenaje-5218",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-memoria-del-laberinto-y-el-tiempo-material-8555",
-      "target": "alt-sintesis-breve-sobre-la-acustica-megalitica-1139",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-piramide-doblada-ecos-de-la-eternidad-en-la-arquitectura--7258",
-      "target": "alt-masuda-no-iwafune",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-piramide-doblada-ecos-de-la-eternidad-en-la-arquitectura--7258",
-      "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-5611",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-piramide-doblada-ecos-de-la-eternidad-en-la-arquitectura--7258",
-      "target": "alt-recertificacion-scriptorium-antigravity-8289",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-piramide-doblada-ecos-de-la-eternidad-en-la-arquitectura--7258",
-      "target": "alt-the-caterpillar",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
-      "target": "alt-la-viruela-en-el-siglo-xx-y-su-erradicacion-5557",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
-      "target": "alt-los-mayas-y-uxmal-5339",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
-      "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-4394",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
-      "target": "alt-r007-borrador-visual-2026-08-18t10-23-17",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
-      "target": "alt-test-final-scriptorium-antigravity-8527",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-tabla-periodica-arquitectura-cuantica-de-la-materia",
-      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-4864",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-tabla-periodica-arquitectura-cuantica-de-la-materia",
-      "target": "alt-sintesis-ontologica-breve-sobre-la-cantera-de-yangshan-y-el--3630",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-viruela-en-el-siglo-xx-y-su-erradicacion-5557",
-      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-viruela-en-el-siglo-xx-y-su-erradicacion-5557",
-      "target": "alt-piri-reis",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-viruela-en-el-siglo-xx-y-su-erradicacion-5557",
-      "target": "alt-sintesis-ontologica-breve-sobre-la-acustica-en-los-hipogeos--3054",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-la-viruela-en-el-siglo-xx-y-su-erradicacion-5557",
-      "target": "alt-younger-dryas",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-las-cuevas-de-longyou-en-china",
-      "target": "alt-yonaguni-monumento-sumergido",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-las-lineas-de-nasca-y-maria-reiche-homenaje",
-      "target": "alt-mercurio-hermes-arquetipo-liminal",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-las-lineas-de-nasca-y-maria-reiche-homenaje",
-      "target": "alt-sample-registro",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-las-lineas-de-nasca-y-maria-reiche-homenaje",
-      "target": "alt-wayna-picchu-0324",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-los-mayas-con-imagen-sintetica-de-uxmal-9734",
-      "target": "alt-masuda-no-iwafune",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-los-mayas-con-imagen-sintetica-de-uxmal-9734",
-      "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-5611",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-los-mayas-con-imagen-sintetica-de-uxmal-9734",
-      "target": "alt-recertificacion-scriptorium-antigravity-8289",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-los-mayas-con-imagen-sintetica-de-uxmal-9734",
-      "target": "alt-the-caterpillar",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
-      "target": "alt-los-mayas-y-uxmal-5339",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
-      "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-4394",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
-      "target": "alt-r007-borrador-visual-2026-08-18t10-23-17",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
-      "target": "alt-test-final-scriptorium-antigravity-8527",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-4864",
+      "source": "alt-el-silencio-de-nefertiti-un-rostro-en-la-fractura-del-tiempo-6183",
       "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-7098",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-4864",
+      "source": "alt-el-silencio-de-nefertiti-un-rostro-en-la-fractura-del-tiempo-6183",
       "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-1213",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-4864",
+      "source": "alt-el-silencio-de-nefertiti-un-rostro-en-la-fractura-del-tiempo-6183",
       "target": "alt-test-automatizado-scriptorium-antigravity-4591",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-7098",
+      "source": "alt-el-tel-y-la-sombra-belo-brdo",
+      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-4864",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-el-tel-y-la-sombra-belo-brdo",
       "target": "alt-sintesis-ontologica-breve-sobre-la-cantera-de-yangshan-y-el--3630",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-los-mayas-y-uxmal-5339",
+      "source": "alt-el-vodka-una-bebida-del-mundo-eslavo-7802",
+      "target": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-el-vodka-una-bebida-del-mundo-eslavo-7802",
+      "target": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-el-vodka-una-bebida-del-mundo-eslavo-7802",
+      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-el-vodka-una-bebida-del-mundo-eslavo-7802",
       "target": "alt-piri-reis",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-los-mayas-y-uxmal-5339",
+      "source": "alt-el-vodka-una-bebida-del-mundo-eslavo-7802",
       "target": "alt-sintesis-ontologica-breve-sobre-la-acustica-en-los-hipogeos--3054",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-los-mayas-y-uxmal-5339",
+      "source": "alt-el-vodka-una-bebida-del-mundo-eslavo-7802",
       "target": "alt-younger-dryas",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-masuda-no-iwafune",
+      "source": "alt-gobekli-tepe",
+      "target": "alt-hal-saflieni",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-gobekli-tepe",
+      "target": "alt-la-piramide-doblada-ecos-de-la-eternidad-en-la-arquitectura--7258",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-gobekli-tepe",
+      "target": "alt-los-mayas-con-imagen-sintetica-de-uxmal-9734",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-gobekli-tepe",
       "target": "alt-michael-cremo-homenaje-5218",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-masuda-no-iwafune",
+      "source": "alt-gobekli-tepe",
       "target": "alt-sintesis-breve-sobre-la-acustica-megalitica-1139",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-mercurio-hermes-arquetipo-liminal",
+      "source": "alt-hal-saflieni",
+      "target": "alt-las-lineas-de-nasca-y-maria-reiche-homenaje",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-hal-saflieni",
+      "target": "alt-mercurio-hermes-arquetipo-liminal",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-hal-saflieni",
       "target": "alt-sample-registro",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-mercurio-hermes-arquetipo-liminal",
+      "source": "alt-hal-saflieni",
       "target": "alt-wayna-picchu-0324",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-michael-cremo-homenaje-5218",
+      "source": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
+      "target": "alt-la-civilizacion-maya-un-legado-de-sabiduria-ancest-1446",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
+      "target": "alt-la-memoria-del-laberinto-y-el-tiempo-material-8555",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
+      "target": "alt-masuda-no-iwafune",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
       "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-5611",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-michael-cremo-homenaje-5218",
+      "source": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
       "target": "alt-recertificacion-scriptorium-antigravity-8289",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-michael-cremo-homenaje-5218",
+      "source": "alt-homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074",
       "target": "alt-the-caterpillar",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-1213",
-      "target": "alt-sintesis-ontologica-breve-sobre-la-cantera-de-yangshan-y-el--3630",
+      "source": "alt-la-arepa-colombiana-6858",
+      "target": "alt-la-geometria-petrea-de-pumapunku-andesita-tiempo-y-cosmos-3332",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-4394",
-      "target": "alt-piri-reis",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-4394",
-      "target": "alt-sintesis-ontologica-breve-sobre-la-acustica-en-los-hipogeos--3054",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-4394",
-      "target": "alt-younger-dryas",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-5611",
-      "target": "alt-sintesis-breve-sobre-la-acustica-megalitica-1139",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-piri-reis",
-      "target": "alt-r007-borrador-visual-2026-08-18t10-23-17",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-piri-reis",
-      "target": "alt-test-final-scriptorium-antigravity-8527",
-      "relationship": "THEMATIC_RESONANCE",
-      "value": 1
-    },
-    {
-      "source": "alt-pumapunku-geometria-andesita-0068",
+      "source": "alt-la-arepa-colombiana-6858",
       "target": "alt-pumapunku-la-geometria-del-silencio",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-r007-borrador-visual-2026-08-18t10-23-17",
+      "source": "alt-la-biblioteca-de-alejandria",
+      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-4864",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-biblioteca-de-alejandria",
+      "target": "alt-sintesis-ontologica-breve-sobre-la-cantera-de-yangshan-y-el--3630",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-civilizacion-maya-un-legado-de-sabiduria-ancest-1446",
+      "target": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-civilizacion-maya-un-legado-de-sabiduria-ancest-1446",
+      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-civilizacion-maya-un-legado-de-sabiduria-ancest-1446",
+      "target": "alt-piri-reis",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-civilizacion-maya-un-legado-de-sabiduria-ancest-1446",
       "target": "alt-sintesis-ontologica-breve-sobre-la-acustica-en-los-hipogeos--3054",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-r007-borrador-visual-2026-08-18t10-23-17",
+      "source": "alt-la-civilizacion-maya-un-legado-de-sabiduria-ancest-1446",
       "target": "alt-younger-dryas",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-recertificacion-scriptorium-antigravity-8289",
-      "target": "alt-sintesis-breve-sobre-la-acustica-megalitica-1139",
+      "source": "alt-la-esfinge-de-beluchistan-0695",
+      "target": "alt-la-esfinge-de-beluchistan-4545",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-sample-registro",
+      "source": "alt-la-esfinge-de-beluchistan-0695",
+      "target": "alt-piramide-roja-dahshur",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-geometria-petrea-de-pumapunku-andesita-tiempo-y-cosmos-3332",
+      "target": "alt-pumapunku-la-geometria-del-silencio",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-ginebra-una-breve-historia-de-la-bebida-7313",
+      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-4864",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-ginebra-una-breve-historia-de-la-bebida-7313",
+      "target": "alt-sintesis-ontologica-breve-sobre-la-cantera-de-yangshan-y-el--3630",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-memoria-del-laberinto-y-el-tiempo-material-8555",
+      "target": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-memoria-del-laberinto-y-el-tiempo-material-8555",
+      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-memoria-del-laberinto-y-el-tiempo-material-8555",
+      "target": "alt-piri-reis",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-memoria-del-laberinto-y-el-tiempo-material-8555",
+      "target": "alt-sintesis-ontologica-breve-sobre-la-acustica-en-los-hipogeos--3054",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-memoria-del-laberinto-y-el-tiempo-material-8555",
+      "target": "alt-younger-dryas",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-muralla-china-2716",
+      "target": "alt-yonaguni-monumento-sumergido",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-piramide-doblada-ecos-de-la-eternidad-en-la-arquitectura--7258",
+      "target": "alt-las-lineas-de-nasca-y-maria-reiche-homenaje",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-piramide-doblada-ecos-de-la-eternidad-en-la-arquitectura--7258",
+      "target": "alt-mercurio-hermes-arquetipo-liminal",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-piramide-doblada-ecos-de-la-eternidad-en-la-arquitectura--7258",
+      "target": "alt-sample-registro",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-piramide-doblada-ecos-de-la-eternidad-en-la-arquitectura--7258",
       "target": "alt-wayna-picchu-0324",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-sintesis-breve-sobre-la-acustica-megalitica-1139",
+      "source": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
+      "target": "alt-masuda-no-iwafune",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
+      "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-5611",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
+      "target": "alt-recertificacion-scriptorium-antigravity-8289",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898",
       "target": "alt-the-caterpillar",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-sintesis-ontologica-breve-sobre-la-acustica-en-los-hipogeos--3054",
-      "target": "alt-test-final-scriptorium-antigravity-8527",
+      "source": "alt-la-tabla-periodica-arquitectura-cuantica-de-la-materia",
+      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-7098",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-sintesis-ontologica-breve-sobre-la-cantera-de-yangshan-y-el--3630",
+      "source": "alt-la-tabla-periodica-arquitectura-cuantica-de-la-materia",
+      "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-1213",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-tabla-periodica-arquitectura-cuantica-de-la-materia",
       "target": "alt-test-automatizado-scriptorium-antigravity-4591",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     },
     {
-      "source": "alt-test-final-scriptorium-antigravity-8527",
+      "source": "alt-la-viruela-en-el-siglo-xx-y-su-erradicacion-5557",
+      "target": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-4864",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-la-viruela-en-el-siglo-xx-y-su-erradicacion-5557",
+      "target": "alt-sintesis-ontologica-breve-sobre-la-cantera-de-yangshan-y-el--3630",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-las-lineas-de-nasca-y-maria-reiche-homenaje",
+      "target": "alt-los-mayas-con-imagen-sintetica-de-uxmal-9734",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-las-lineas-de-nasca-y-maria-reiche-homenaje",
+      "target": "alt-michael-cremo-homenaje-5218",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-las-lineas-de-nasca-y-maria-reiche-homenaje",
+      "target": "alt-sintesis-breve-sobre-la-acustica-megalitica-1139",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-los-mayas-con-imagen-sintetica-de-uxmal-9734",
+      "target": "alt-mercurio-hermes-arquetipo-liminal",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-los-mayas-con-imagen-sintetica-de-uxmal-9734",
+      "target": "alt-sample-registro",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-los-mayas-con-imagen-sintetica-de-uxmal-9734",
+      "target": "alt-wayna-picchu-0324",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
+      "target": "alt-masuda-no-iwafune",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
+      "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-5611",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
+      "target": "alt-recertificacion-scriptorium-antigravity-8289",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744",
+      "target": "alt-the-caterpillar",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-4864",
+      "target": "alt-los-mayas-y-uxmal-5339",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-4864",
+      "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-4394",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-4864",
+      "target": "alt-r007-borrador-visual-2026-08-18t10-23-17",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-4864",
+      "target": "alt-test-final-scriptorium-antigravity-8527",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-7098",
+      "target": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-1213",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-7098",
+      "target": "alt-test-automatizado-scriptorium-antigravity-4591",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-los-mayas-y-uxmal-5339",
+      "target": "alt-sintesis-ontologica-breve-sobre-la-cantera-de-yangshan-y-el--3630",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-masuda-no-iwafune",
+      "target": "alt-piri-reis",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-masuda-no-iwafune",
+      "target": "alt-sintesis-ontologica-breve-sobre-la-acustica-en-los-hipogeos--3054",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-masuda-no-iwafune",
       "target": "alt-younger-dryas",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-mercurio-hermes-arquetipo-liminal",
+      "target": "alt-michael-cremo-homenaje-5218",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-mercurio-hermes-arquetipo-liminal",
+      "target": "alt-sintesis-breve-sobre-la-acustica-megalitica-1139",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-michael-cremo-homenaje-5218",
+      "target": "alt-sample-registro",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-michael-cremo-homenaje-5218",
+      "target": "alt-wayna-picchu-0324",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-1213",
+      "target": "alt-test-automatizado-scriptorium-antigravity-4591",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-4394",
+      "target": "alt-sintesis-ontologica-breve-sobre-la-cantera-de-yangshan-y-el--3630",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-5611",
+      "target": "alt-piri-reis",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-5611",
+      "target": "alt-sintesis-ontologica-breve-sobre-la-acustica-en-los-hipogeos--3054",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-nefertiti-el-rostro-que-desafia-al-tiempo-5611",
+      "target": "alt-younger-dryas",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-piri-reis",
+      "target": "alt-recertificacion-scriptorium-antigravity-8289",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-piri-reis",
+      "target": "alt-the-caterpillar",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-r007-borrador-visual-2026-08-18t10-23-17",
+      "target": "alt-sintesis-ontologica-breve-sobre-la-cantera-de-yangshan-y-el--3630",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-recertificacion-scriptorium-antigravity-8289",
+      "target": "alt-sintesis-ontologica-breve-sobre-la-acustica-en-los-hipogeos--3054",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-recertificacion-scriptorium-antigravity-8289",
+      "target": "alt-younger-dryas",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-sample-registro",
+      "target": "alt-sintesis-breve-sobre-la-acustica-megalitica-1139",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-sintesis-breve-sobre-la-acustica-megalitica-1139",
+      "target": "alt-wayna-picchu-0324",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-sintesis-ontologica-breve-sobre-la-acustica-en-los-hipogeos--3054",
+      "target": "alt-the-caterpillar",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-sintesis-ontologica-breve-sobre-la-cantera-de-yangshan-y-el--3630",
+      "target": "alt-test-final-scriptorium-antigravity-8527",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "alt-the-caterpillar",
+      "target": "alt-younger-dryas",
+      "relationship": "THEMATIC_RESONANCE",
+      "value": 1
+    },
+    {
+      "source": "edic-cosmos-1",
+      "target": "edic-the-mask",
       "relationship": "THEMATIC_RESONANCE",
       "value": 1
     }

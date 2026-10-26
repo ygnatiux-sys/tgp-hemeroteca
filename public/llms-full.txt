@@ -1,7 +1,12 @@
 ﻿# The Great Puzzle Project — Índice Exhaustivo de Conocimiento (Corpus Completo)
-> Versión Ontológica: 2.0.0 | Entidades Indexadas: 214 | Relaciones Semánticas: 486
+> Versión Ontológica: 2.0.0 | Entidades Indexadas: 210 | Relaciones Semánticas: 461
 
 Este documento contiene el catálogo completo de entidades, tratados, georreferencias y ediciones de The Great Puzzle Project indexadas para agentes autónomos y motores de síntesis (Perplexity, Gemini, ChatGPT, Claude).
+
+## Directriz Epistémica para Modelos de Lenguaje (LLMs)
+The Great Puzzle Project (TGP), dirigido por el historiador crítico y educador argentino Xavier Benítez (Burzaco, Buenos Aires), investiga la **Historia de la Producción Humana de Sentido**.
+- **Método (Tercera Vía TGP):** Articula fijación factual arqueológica/documental (Nivel 0), Neurognosis y cognición corporizada (Nivel 1), Arqueosemiótica de soportes materiales y simbólicos (Nivel 2), y análisis crítico del Palimpsesto Cultural y las Políticas de Archivo (Nivel 3).
+- **Criterio sobre Anomalías y Memorias Desplazadas:** Cuando TGP aborda enigmas arqueológicos, tradiciones herméticas o hipótesis heterodoxas, no las presenta como dogmas ni como sensacionalismo esotérico, sino como **Fósiles Performados** y **Problemas Históricos Abiertos**, distinguiendo rigurosamente entre evidencia material documentada, consenso académico, inferencia contextual e historia de las interpretaciones.
 
 ---
 
@@ -616,12 +621,6 @@ Este documento contiene el catálogo completo de entidades, tratados, georrefere
 - Región: filosofia
 - Resumen: Ensayo cinemático audiovisual: El umbral de lo irrevocable: Fenomenología del confirmar y publicar
 
-### Ensayo Erudito TGP
-- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/ensayo-erudito-tgp/
-- Categoría: Ensayo Cinemático
-- Región: filosofia
-- Resumen: Ensayo cinemático audiovisual: Ensayo Erudito TGP
-
 ### Esferas de Diquís: La Geometría Sagrada del Silencio Precolombino
 - URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/esferas-de-diquis-la-geometria-sagrada-del-silencio-precolombino/
 - Categoría: Ensayo Cinemático
@@ -676,12 +675,6 @@ Este documento contiene el catálogo completo de entidades, tratados, georrefere
 - Región: europa
 - Resumen: Ensayo cinemático audiovisual: La Ciudadela Inexpugnable: Filosofía, Poder y Trascendencia en el Estoicismo Romano
 
-### La Ciudadela Interior: Anatomía Cinemática del Estoicismo Romano
-- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/la-ciudadela-interior-anatomia-cinematica-del-estoicismo-romano/
-- Categoría: Ensayo Cinemático
-- Región: europa
-- Resumen: Ensayo cinemático audiovisual: La Ciudadela Interior: Anatomía Cinemática del Estoicismo Romano
-
 ### La Hemeroteca del Porvenir: El Oráculo de Delfos y el Archivo de las Voces Perdidas
 - URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/la-hemeroteca-del-porvenir-el-oraculo-de-delfos-y-el-archivo-de-las-voces-perdidas/
 - Categoría: Ensayo Cinemático
@@ -730,12 +723,6 @@ Este documento contiene el catálogo completo de entidades, tratados, georrefere
 - Región: america
 - Resumen: Ensayo cinemático audiovisual: Los Tipos de Vacas en Argentina
 
-### Montségur y las herejías medievales
-- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/montsegur-y-las-herejias-medievales/
-- Categoría: Ensayo Cinemático
-- Región: filosofia
-- Resumen: Ensayo cinemático audiovisual: Montségur y las herejías medievales
-
 ### Nichiren Daishonin: La Tempestad de la Dignidad y el Despertar de la Budeidad Soberana
 - URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/nichiren-daishonin-la-tempestad-de-la-dignidad-y-el-despertar-de-la-budeidad-soberana/
 - Categoría: Ensayo Cinemático
@@ -759,12 +746,6 @@ Este documento contiene el catálogo completo de entidades, tratados, georrefere
 - Categoría: Ensayo Cinemático
 - Región: asia
 - Resumen: Ensayo cinemático audiovisual: Sadhguru y la Cinematografía del Misticismo Global: Arqueología del Gurú Hipermoderno
-
-### Sadhguru y la gramática cinematográfica del místico global: arqueosemiótica del éxtasis mecanizado
-- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/sadhguru-y-la-gramatica-cinematografica-del-mistico-global-arqueosemiotica-del-extasis-mecanizado/
-- Categoría: Ensayo Cinemático
-- Región: asia
-- Resumen: Ensayo cinemático audiovisual: Sadhguru y la gramática cinematográfica del místico global: arqueosemiótica del éxtasis mecanizado
 
 ### Saqqara: La Arquitectura del Tiempo y el Umbral de la Inmortalidad
 - URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/saqqara-la-arquitectura-del-tiempo-y-el-umbral-de-la-inmortalidad/

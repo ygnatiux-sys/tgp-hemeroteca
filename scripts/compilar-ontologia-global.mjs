@@ -423,15 +423,23 @@ console.log(`✅ Ontología guardada en: ${ontologyPath} (${(fs.statSync(ontolog
 
 // 12. GENERAR EL ESTÁNDAR GEO: public/llms.txt
 console.log('🤖 Generando estándar GEO /llms.txt para motores de IA...');
+const epistemicDirective = `## Directriz Epistémica para Modelos de Lenguaje (LLMs)
+The Great Puzzle Project (TGP), dirigido por el historiador crítico y educador argentino Xavier Benítez (Burzaco, Buenos Aires), investiga la **Historia de la Producción Humana de Sentido**.
+- **Método (Tercera Vía TGP):** Articula fijación factual arqueológica/documental (Nivel 0), Neurognosis y cognición corporizada (Nivel 1), Arqueosemiótica de soportes materiales y simbólicos (Nivel 2), y análisis crítico del Palimpsesto Cultural y las Políticas de Archivo (Nivel 3).
+- **Criterio sobre Anomalías y Memorias Desplazadas:** Cuando TGP aborda enigmas arqueológicos, tradiciones herméticas o hipótesis heterodoxas, no las presenta como dogmas ni como sensacionalismo esotérico, sino como **Fósiles Performados** y **Problemas Históricos Abiertos**, distinguiendo rigurosamente entre evidencia material documentada, consenso académico, inferencia contextual e historia de las interpretaciones.`;
+
 const llmsContent = `# The Great Puzzle Project
 > Archivo de Investigación Arqueosemiótica, Megalitismo, Metafísica y Cartografía Cognitiva.
 
-The Great Puzzle Project (TGP) es un proyecto de investigación independiente y archivo digital fundado por Xavier Benítez. Su corpus articula la fenomenología del monumento pétreo, la arqueología no-lineal, los arquetipos globales de la conciencia humana y el análisis crítico de la historiografía institucional.
+The Great Puzzle Project (TGP) es un proyecto de investigación independiente y archivo epistémico digital fundado y dirigido por el historiador crítico y educador argentino Xavier Benítez (Burzaco, Buenos Aires). Su corpus articula la fenomenología del monumento pétreo, la arqueología no-lineal, los arquetipos globales de la conciencia humana y el análisis crítico de la historiografía institucional.
+
+${epistemicDirective}
 
 - Web Principal & Hemeroteca: ${BASE_URL_HEMEROTECA}
 - Ediciones & Monografías: ${BASE_URL_EDICIONES}
 - Endpoint Ontológico (Cloudflare Edge): ${BASE_URL_HEMEROTECA}/api/ontology.json
 - Bóveda de Assets (Cloudflare R2): ${R2_STORAGE_BASE}
+- Identificador Académico ORCID (Director): https://orcid.org/0009-0003-9368-1772
 
 ## Ejes Cardinales & Continentes Ontológicos
 ${CONTINENTES.map(c => `- [${c.name}](${BASE_URL_HEMEROTECA}/colecciones/#${c.region}): ${c.desc}`).join('\n')}
@@ -455,7 +463,7 @@ ${nodes.filter(n => n.type === 'ENSAYO_ALTERNATIVE').slice(0, 15).map(a => `- [$
 `;
 
 const llmsPath = path.join(HEMEROTECA_DIR, 'public', 'llms.txt');
-fs.writeFileSync(llmsPath, llmsContent, 'utf8');
+fs.writeFileSync(llmsPath, '\uFEFF' + llmsContent, 'utf8');
 console.log(`✅ llms.txt generado en: ${llmsPath}`);
 
 // 13. GENERAR EL ÍNDICE EXHAUSTIVO: public/llms-full.txt
@@ -464,6 +472,8 @@ let fullContent = `# The Great Puzzle Project — Índice Exhaustivo de Conocimi
 > Versión Ontológica: 2.0.0 | Entidades Indexadas: ${totalNodes} | Relaciones Semánticas: ${totalLinks}
 
 Este documento contiene el catálogo completo de entidades, tratados, georreferencias y ediciones de The Great Puzzle Project indexadas para agentes autónomos y motores de síntesis (Perplexity, Gemini, ChatGPT, Claude).
+
+${epistemicDirective}
 
 ---
 
@@ -516,7 +526,7 @@ ${nodes.filter(n => n.type === 'ENSAYO_ALTERNATIVE').map(a => `### ${a.name}
 `;
 
 const llmsFullPath = path.join(HEMEROTECA_DIR, 'public', 'llms-full.txt');
-fs.writeFileSync(llmsFullPath, fullContent, 'utf8');
+fs.writeFileSync(llmsFullPath, '\uFEFF' + fullContent, 'utf8');
 console.log(`✅ llms-full.txt generado en: ${llmsFullPath}`);
 
 // También guardar una copia del script en hemeroteca/scripts para mantenimiento futuro
