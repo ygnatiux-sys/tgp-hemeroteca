@@ -74,20 +74,61 @@ const globalSchema = {
       "@type": "Organization",
       "@id": "https://thegreatpuzzleproject.com/#organization",
       "name": "The Great Puzzle Project",
-      "url": "https://thegreatpuzzleproject.com",
+      "alternateName": "TGP Project",
+      "url": "https://thegreatpuzzleproject.com/",
       "logo": {
         "@type": "ImageObject",
         "url": new URL("/favicon.png", canonicalURL).href
       },
-      "sameAs": officialSocialLinks
+      "founder": {
+        "@id": "https://thegreatpuzzleproject.com/#xavier-benitez"
+      },
+      "sameAs": [
+        "https://ediciones.thegreatpuzzleproject.com/",
+        "https://about.thegreatpuzzleproject.com/",
+        ...officialSocialLinks
+      ]
     },
     {
       "@type": "Person",
-      "@id": "https://thegreatpuzzleproject.com/#author",
+      "@id": "https://thegreatpuzzleproject.com/#xavier-benitez",
       "name": "Xavier Benítez",
-      "url": "https://linktr.ee/thegreatpuzzleproject",
-      "jobTitle": "Investigador & Editor General",
+      "jobTitle": "Investigador Principal, Historiador de las Ideas y Director Editorial",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Burzaco",
+        "addressRegion": "Buenos Aires",
+        "addressCountry": "AR"
+      },
+      "worksFor": {
+        "@id": "https://thegreatpuzzleproject.com/#organization"
+      },
+      "url": "https://orcid.org/0009-0003-9368-1772",
       "sameAs": officialSocialLinks
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://thegreatpuzzleproject.com/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "The Great Puzzle Project (Hemeroteca TGP)",
+          "item": "https://thegreatpuzzleproject.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Portal Editorial (Ediciones TGP)",
+          "item": "https://ediciones.thegreatpuzzleproject.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Identidad y Método (About TGP)",
+          "item": "https://about.thegreatpuzzleproject.com/"
+        }
+      ]
     }
   ]
 };
