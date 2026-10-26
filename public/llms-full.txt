@@ -1,0 +1,1204 @@
+# The Great Puzzle Project — Índice Exhaustivo de Conocimiento (Corpus Completo)
+> Versión Ontológica: 2.0.0 | Entidades Indexadas: 214 | Relaciones Semánticas: 486
+
+Este documento contiene el catálogo completo de entidades, tratados, georreferencias y ediciones de The Great Puzzle Project indexadas para agentes autónomos y motores de síntesis (Perplexity, Gemini, ChatGPT, Claude).
+
+---
+
+## 1. Monografías y Ediciones TGP (ediciones.thegreatpuzzleproject.com)
+### Cosmos 1: Universo Observable
+- URL Canónica: https://ediciones.thegreatpuzzleproject.com/revista/cosmos-1-universo-observable/
+- Síntesis: Monografía editorial sobre cosmología arcaica, mecánica celeste y percepción del vacío.
+- Región: filosofia
+
+### Las Pirámides de Bosnia & Valle de Visoko
+- URL Canónica: https://ediciones.thegreatpuzzleproject.com/revista/las-pirmades-de-bosnia/
+- Síntesis: Investigación estratigráfica de las colinas de Visoko, túneles de Ravne y anomalías electromagnéticas.
+- Región: europa
+
+### The Mask: Máscaras Rituales & Arquetipos Ocultos
+- URL Canónica: https://ediciones.thegreatpuzzleproject.com/revista/the-mask/
+- Síntesis: Estudio antropológico del disfraz chamánico y la trasmutación de la identidad sagrada.
+- Región: filosofia
+
+### Viajes Extraordinarios: Sagrarios de Japón
+- URL Canónica: https://ediciones.thegreatpuzzleproject.com/revista/viajes-extraordinarios-japon-1/
+- Síntesis: Ruta sintoísta, megalitos de Asuka, Ishi-no-Hoden y templos de Kioto.
+- Región: asia
+
+### Göbekli Tepe: El Amanecer Megalítico de Anatolia
+- URL Canónica: https://ediciones.thegreatpuzzleproject.com/revista/gobekli-tepe/
+- Síntesis: Análisis de los pilares T, astronomía pre-agrícola y la revolución del templo.
+- Región: asia
+
+### Pompeya & Herculano: El Instante Petrificado
+- URL Canónica: https://ediciones.thegreatpuzzleproject.com/revista/pompeya-vesubio/
+- Síntesis: Crónica arqueológica de la catástrofe vesubiana y la vida íntima romana.
+- Región: europa
+
+### La Biblioteca de Alejandría & El Archivo Universal
+- URL Canónica: https://ediciones.thegreatpuzzleproject.com/revista/biblioteca-alejandria/
+- Síntesis: Historia del mayor centro de compilación de saber clásico y su trágico destino.
+- Región: africa
+
+### Espíritus del Sur: Mitología Selk'nam & Yagán
+- URL Canónica: https://ediciones.thegreatpuzzleproject.com/revista/espiritus-del-sur/
+- Síntesis: Cosmovisión de los pueblos del confín austral de Tierra del Fuego.
+- Región: america
+
+
+---
+
+## 2. Georreferencias y Asentamientos Sagrados
+### Aramu Muru: El Umbral Megalítico de Hayumarca
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/aramu-muru-puerta-de-los-dioses/
+- Sitio Geohistórico: Aramu Muru (Puno, Perú)
+- Región: america
+- Contexto: En las altiplanicies desérticas de Puno, Aramu Muru se yergue como una hendidura pétrea entre la etnografía aymara y la liminalidad.
+
+### Capacete, Brasil
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/capacete-brasil/
+- Sitio Geohistórico: Capacete, Brasil
+- Región: america
+- Contexto: Georreferencia arqueológica: Capacete, Brasil
+
+### cueva de altamira
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/cueva-de-altamira/
+- Sitio Geohistórico: cueva de altamira
+- Región: europa
+- Contexto: Georreferencia arqueológica: cueva de altamira
+
+### Cueva de las Manos: El Lenguaje Rupestre de la Patagonia
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/cueva-de-las-manos-patagonia/
+- Sitio Geohistórico: Cañadón del Río Pinturas (Santa Cruz, Patagonia, Argentina)
+- Región: america
+- Contexto: Cueva de las Manos: ¿Un archivo estético de 9.000 años o el primer manifiesto de presencia humana en el confín austral?
+
+### Ellora Caves
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/ellora-caves/
+- Sitio Geohistórico: Ellora Caves
+- Región: asia
+- Contexto: Georreferencia arqueológica: Ellora Caves
+
+### Isla de los Estados en Tierra del Fuego
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/isla-de-los-estados-en-tierra-del-fuego/
+- Sitio Geohistórico: Isla de los Estados en Tierra del Fuego
+- Región: america
+- Contexto: ¿Santuario de presidiarios y loberos o vestigio antártico sumergido? Isla de los Estados oculta el verdadero faro del fin del mundo.
+
+### la cueva de lascaux
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/la-cueva-de-lascaux/
+- Sitio Geohistórico: la cueva de lascaux
+- Región: europa
+- Contexto: Georreferencia arqueológica: la cueva de lascaux
+
+### Los Gitanos del mar
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/los-gitanos-del-mar/
+- Sitio Geohistórico: Los Gitanos del mar
+- Región: oceania
+- Contexto: Georreferencia arqueológica: Los Gitanos del mar
+
+### Meroe , la Dinastia Egipcia Nubia
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/meroe-la-dinastia-egipcia-nubia/
+- Sitio Geohistórico: Meroe , la Dinastia Egipcia Nubia
+- Región: africa
+- Contexto: Georreferencia arqueológica: Meroe , la Dinastia Egipcia Nubia
+
+### Meroe y la Dinastía Negra: El Códice de las Pirámides Nubias
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/meroe-y-la-dinasta-negra-el-cdice-de-las-pirmides-nubias/
+- Sitio Geohistórico: Meroe y la Dinastía Negra: El Códice de las Pirámides Nubias
+- Región: africa
+- Contexto: ¿Fue Meroe el crisol metalúrgico de los faraones negros o un vórtice de saberes perdidos en el desierto nubio?
+
+### olumo rock
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/olumo-rock/
+- Sitio Geohistórico: olumo rock
+- Región: africa
+- Contexto: Georreferencia arqueológica: olumo rock
+
+### Pedra Inga
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/pedra-inga/
+- Sitio Geohistórico: Pedra Inga
+- Región: america
+- Contexto: ¿Un mapa estelar prehistórico o el último testamento lítico de una civilización devorada por los milenios en el sertón brasileño?
+
+### Piramide Romana de Cestia
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/piramide-romana-de-cestia/
+- Sitio Geohistórico: Piramide Romana de Cestia
+- Región: europa
+- Contexto: Georreferencia arqueológica: Piramide Romana de Cestia
+
+### Santuario de Ballenas, peninsula de Valdez, patagonia
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/santuario-de-ballenas-peninsula-de-valdez-patagonia/
+- Sitio Geohistórico: Santuario de Ballenas, peninsula de Valdez, patagonia
+- Región: america
+- Contexto: Georreferencia Arqueosemiótica e investigación geohistórica sobre Santuario de Ballenas, peninsula de Valdez, patagonia.
+
+### Stonehenge
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/stonehenge/
+- Sitio Geohistórico: Stonehenge
+- Región: europa
+- Contexto: ¿Un calendario estelar fosilizado en la piedra o el epicentro ritual de una civilización perdida en la bruma de Albión?
+
+### Valle de la Luna
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/valle-de-la-luna/
+- Sitio Geohistórico: Valle de la Luna
+- Región: america
+- Contexto: Georreferencia arqueológica: Valle de la Luna
+
+### Yonaguni: El Enigma Sumergido
+- URL: https://thegreatpuzzleproject.com/colecciones/georreferencias/yonaguni/
+- Sitio Geohistórico: Monumento de Yonaguni (Archipiélago Ryūkyū, Japón)
+- Región: asia
+- Contexto: Yonaguni: ¿La Atlántida japonesa o una anomalía tectónica en el abismo del Pacífico?
+
+
+---
+
+## 3. Ensayos Canónicos de Hemeroteca
+### 1984 : La prediccion de Orwell?
+- URL: https://thegreatpuzzleproject.com/hemeroteca/1984-la-prediccion-de-orwell/
+- Categoría: Ficcion literaria
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: 1984 : La prediccion de Orwell?
+
+### 7 pecados, 7 chackras
+- URL: https://thegreatpuzzleproject.com/hemeroteca/7-pecados-7-chackras/
+- Categoría: Ensayo Histórico
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: 7 pecados, 7 chackras
+
+### america invertida
+- URL: https://thegreatpuzzleproject.com/hemeroteca/america-invertida/
+- Categoría: Ensayo Histórico
+- Región: america
+- Resumen: Ensayo canónico de Hemeroteca: america invertida
+
+### Atila y el Papa 
+- URL: https://thegreatpuzzleproject.com/hemeroteca/atila-y-el-papa/
+- Categoría: historia antigua
+- Región: europa
+- Resumen: Ensayo canónico de Hemeroteca: Atila y el Papa 
+
+### Bonampak: La Sinfonía del Cinabrio y la Selva
+- URL: https://thegreatpuzzleproject.com/hemeroteca/bonampak/
+- Categoría: Arqueología
+- Región: america
+- Resumen: Ensayo canónico de Hemeroteca: Bonampak: La Sinfonía del Cinabrio y la Selva
+
+### Bonampak
+- URL: https://thegreatpuzzleproject.com/hemeroteca/bonampak-1/
+- Categoría: Arqueología
+- Región: america
+- Resumen: Ensayo canónico de Hemeroteca: Bonampak
+
+### del cosmos a la luna
+- URL: https://thegreatpuzzleproject.com/hemeroteca/del-cosmos-a-la-luna/
+- Categoría: Ensayo Histórico
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: del cosmos a la luna
+
+### Derinkuyu Acustica Subterranea
+- URL: https://thegreatpuzzleproject.com/hemeroteca/derinkuyu-acustica-subterranea/
+- Categoría: Arqueologia
+- Región: asia
+- Resumen: Ensayo canónico de Hemeroteca: Derinkuyu Acustica Subterranea
+
+### El Ankh Egipcio
+- URL: https://thegreatpuzzleproject.com/hemeroteca/el-ankh-egipcio/
+- Categoría: antropologia
+- Región: africa
+- Resumen: Ensayo canónico de Hemeroteca: El Ankh Egipcio
+
+### El Diablo en el Tarot
+- URL: https://thegreatpuzzleproject.com/hemeroteca/el-diablo-en-el-tarot/
+- Categoría: Arqueosemiótica
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: El Diablo en el Tarot
+
+### el mito de sisifo
+- URL: https://thegreatpuzzleproject.com/hemeroteca/el-mito-de-sisifo/
+- Categoría: Ensayo Histórico
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: el mito de sisifo
+
+### El Qapaq Ñan: una obra de ingenieria arcaica asombroso en las entrañas de Sudamerica
+- URL: https://thegreatpuzzleproject.com/hemeroteca/el-qapaq-nan-una-obra-de-ingenieria-arcaica-asombroso-en-las-entranas-de-sudamerica/
+- Categoría: arqueologia
+- Región: america
+- Resumen: Ensayo canónico de Hemeroteca: El Qapaq Ñan: una obra de ingenieria arcaica asombroso en las entrañas de Sudamerica
+
+### El Simbolismo del Laberinto
+- URL: https://thegreatpuzzleproject.com/hemeroteca/el-simbolismo-del-laberinto/
+- Categoría: Filosofía
+- Región: filosofia
+- Resumen: De Minotauros a Cavernas Digitales
+
+### Gengis Khan
+- URL: https://thegreatpuzzleproject.com/hemeroteca/gengis-khan/
+- Categoría: Historia medieval
+- Región: asia
+- Resumen: Ensayo canónico de Hemeroteca: Gengis Khan
+
+### Hegel, la historia y Dios
+- URL: https://thegreatpuzzleproject.com/hemeroteca/hegel-la-historia-y-dios/
+- Categoría: Filosofía
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: Hegel, la historia y Dios
+
+### Homero, el poeta ciego
+- URL: https://thegreatpuzzleproject.com/hemeroteca/homero-el-poeta-ciego/
+- Categoría: Historia
+- Región: europa
+- Resumen: Ensayo canónico de Hemeroteca: Homero, el poeta ciego
+
+### Ishi-no-Hōden: El Monolito Flotante de Harima
+- URL: https://thegreatpuzzleproject.com/hemeroteca/ishi-no-hoden/
+- Categoría: Arqueología
+- Región: asia
+- Resumen: Ensayo canónico de Hemeroteca: Ishi-no-Hōden: El Monolito Flotante de Harima
+
+### Isis : los misterios del Iniciacion.
+- URL: https://thegreatpuzzleproject.com/hemeroteca/isis-los-misterios-del-iniciacion/
+- Categoría: sociologia
+- Región: africa
+- Resumen: Ensayo canónico de Hemeroteca: Isis : los misterios del Iniciacion.
+
+### JULIO CESAR Y LOS GALOS 2026
+- URL: https://thegreatpuzzleproject.com/hemeroteca/julio-cesar-y-los-galos-2026/
+- Categoría: HISTORIA
+- Región: europa
+- Resumen: ARQUEOHISTORIA MILITAR · ROMA Y LA GALIA
+
+### Jung y los Arquetipos
+- URL: https://thegreatpuzzleproject.com/hemeroteca/jung-y-los-arquetipos/
+- Categoría: Historia
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: Jung y los Arquetipos
+
+### Júpiter y la Astrología: El Benigno
+- URL: https://thegreatpuzzleproject.com/hemeroteca/jupiter-y-la-astrologia-el-benigno/
+- Categoría: Historia
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: Júpiter y la Astrología: El Benigno
+
+### La Arquitectura de los Sueños Lúcidos
+- URL: https://thegreatpuzzleproject.com/hemeroteca/la-arquitectura-de-los-suenos-lucidos/
+- Categoría: Filosofía
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: La Arquitectura de los Sueños Lúcidos
+
+### LA CAIDA DE CARTAGO
+- URL: https://thegreatpuzzleproject.com/hemeroteca/la-caida-de-cartago/
+- Categoría: HISTORIA ANTIGUA
+- Región: africa
+- Resumen: Ensayo canónico de Hemeroteca: LA CAIDA DE CARTAGO
+
+### La Chilinga 
+- URL: https://thegreatpuzzleproject.com/hemeroteca/la-chilinga/
+- Categoría: sociologia
+- Región: america
+- Resumen: Ensayo canónico de Hemeroteca: La Chilinga 
+
+### La Cronometría Etrusca: Anomalías y Sincronismos en el Mediterráneo Antiguo
+- URL: https://thegreatpuzzleproject.com/hemeroteca/la-cronometria-etrusca-anomalias-y-sincronismos-en-el-mediterraneo-antiguo/
+- Categoría: Arqueología
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: La Cronometría Etrusca: Anomalías y Sincronismos en el Mediterráneo Antiguo
+
+### La Estética del Silencio en el Cine
+- URL: https://thegreatpuzzleproject.com/hemeroteca/la-estetica-del-silencio/
+- Categoría: Historia de la Cultura
+- Región: filosofia
+- Resumen: Una reflexión sobre la ausencia de sonido como recurso narrativo
+
+### La Gran Piramide y la Resonancia Hermetica
+- URL: https://thegreatpuzzleproject.com/hemeroteca/la-gran-piramide-y-la-resonancia-hermetica/
+- Categoría: arqueosemiotica
+- Región: filosofia
+- Resumen: Dossier Central
+
+### La Ingeniería Temporal del Calendario Chino Clásico: Precisión y Poder Dinástico
+- URL: https://thegreatpuzzleproject.com/hemeroteca/la-ingenieria-temporal-del-calendario-chino-clasico-precision-y-poder-dinastico/
+- Categoría: Historia
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: La Ingeniería Temporal del Calendario Chino Clásico: Precisión y Poder Dinástico
+
+### Los Carpocracianos
+- URL: https://thegreatpuzzleproject.com/hemeroteca/los-carpocracianos/
+- Categoría: Historia de las Religiones
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: Los Carpocracianos
+
+### Los Esenios mgzn
+- URL: https://thegreatpuzzleproject.com/hemeroteca/los-esenios-mgzn/
+- Categoría: Antropología
+- Región: asia
+- Resumen: Ensayo canónico de Hemeroteca: Los Esenios mgzn
+
+### Los Nestorianos
+- URL: https://thegreatpuzzleproject.com/hemeroteca/los-nestorianos/
+- Categoría: Historia de las Religiones
+- Región: asia
+- Resumen: Ensayo canónico de Hemeroteca: Los Nestorianos
+
+### Masuda no Iwafune: La Enigma Pétrea y los Ecos Megalíticos de Asuka
+- URL: https://thegreatpuzzleproject.com/hemeroteca/masuda-no-iwafune-la-enigma-petrea-y-los-ecos/
+- Categoría: Historia Alternativa
+- Región: filosofia
+- Resumen: Arqueología Megalítica & Hermenéuticas del Silencio Lítico
+
+### Mercurio
+- URL: https://thegreatpuzzleproject.com/hemeroteca/mercurio/
+- Categoría: Historia
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: Mercurio
+
+### Moctezuma Y Cortez: el Ultimo Azteca
+- URL: https://thegreatpuzzleproject.com/hemeroteca/moctezuma-y-cortez-el-ultimo-azteca/
+- Categoría: Historia
+- Región: america
+- Resumen: Ensayo canónico de Hemeroteca: Moctezuma Y Cortez: el Ultimo Azteca
+
+### nag hammadi abril 2026
+- URL: https://thegreatpuzzleproject.com/hemeroteca/nag-hammadi-abril-2026/
+- Categoría: Ensayo Histórico
+- Región: asia
+- Resumen: Ensayo canónico de Hemeroteca: nag hammadi abril 2026
+
+### Neoplatónicos
+- URL: https://thegreatpuzzleproject.com/hemeroteca/neoplatonicos/
+- Categoría: Filosofía
+- Región: europa
+- Resumen: Ensayo canónico de Hemeroteca: Neoplatónicos
+
+### Nerón y Roma
+- URL: https://thegreatpuzzleproject.com/hemeroteca/neron-y-roma/
+- Categoría: Historia Antigua
+- Región: europa
+- Resumen: Ensayo canónico de Hemeroteca: Nerón y Roma
+
+### Osiris , el Dios Verde
+- URL: https://thegreatpuzzleproject.com/hemeroteca/osiris-el-dios-verde/
+- Categoría: Historia de las Religiones
+- Región: africa
+- Resumen: Ensayo canónico de Hemeroteca: Osiris , el Dios Verde
+
+### Pumapunku
+- URL: https://thegreatpuzzleproject.com/hemeroteca/pumapunku/
+- Categoría: Arqueologia
+- Región: america
+- Resumen: Ensayo canónico de Hemeroteca: Pumapunku
+
+### Qumram 2026
+- URL: https://thegreatpuzzleproject.com/hemeroteca/qumram-2026/
+- Categoría: Arqueología
+- Región: asia
+- Resumen: Ensayo canónico de Hemeroteca: Qumram 2026
+
+### Saber es Recordar: la Teoria de Platon
+- URL: https://thegreatpuzzleproject.com/hemeroteca/saber-es-recordar-la-teoria-de-platon/
+- Categoría: Filosofía
+- Región: europa
+- Resumen: Ensayo canónico de Hemeroteca: Saber es Recordar: la Teoria de Platon
+
+### San Agustin y su pasado
+- URL: https://thegreatpuzzleproject.com/hemeroteca/san-agustin-y-su-pasado/
+- Categoría: Historia de las Religiones
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: San Agustin y su pasado
+
+### Saturno y la Astrología
+- URL: https://thegreatpuzzleproject.com/hemeroteca/saturno-y-la-astrologia/
+- Categoría: Historia
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: Saturno y la Astrología
+
+### Schlieman y el Descubrimiento de Troya
+- URL: https://thegreatpuzzleproject.com/hemeroteca/schlieman-y-el-descubrimiento-de-troya/
+- Categoría: Arqueología
+- Región: europa
+- Resumen: Ensayo canónico de Hemeroteca: Schlieman y el Descubrimiento de Troya
+
+### Simon, el Estilita
+- URL: https://thegreatpuzzleproject.com/hemeroteca/simon-el-estilita/
+- Categoría: Historia de las Ideas
+- Región: asia
+- Resumen: Ensayo canónico de Hemeroteca: Simon, el Estilita
+
+### socrates2
+- URL: https://thegreatpuzzleproject.com/hemeroteca/socrates2/
+- Categoría: Historia
+- Región: europa
+- Resumen: Ensayo canónico de Hemeroteca: socrates2
+
+### the ATACAMA mummy 
+- URL: https://thegreatpuzzleproject.com/hemeroteca/the-atacama-mummy/
+- Categoría: Arqueología
+- Región: america
+- Resumen: Ensayo canónico de Hemeroteca: the ATACAMA mummy 
+
+### The Mask
+- URL: https://thegreatpuzzleproject.com/hemeroteca/the-mask/
+- Categoría: Sociología
+- Región: filosofia
+- Resumen: Ensayo canónico de Hemeroteca: The Mask
+
+### tikal
+- URL: https://thegreatpuzzleproject.com/hemeroteca/tikal/
+- Categoría: Arqueosemiótica
+- Región: america
+- Resumen: Ensayo canónico de Hemeroteca: tikal
+
+### Ulyses y las Sirenas
+- URL: https://thegreatpuzzleproject.com/hemeroteca/ulyses-y-las-sirenas/
+- Categoría: Historia de la Cultura
+- Región: europa
+- Resumen: Ensayo canónico de Hemeroteca: Ulyses y las Sirenas
+
+### Pakal de Palenque: El Rostro de Estuco y la Inmortalidad Dinástica
+- URL: https://thegreatpuzzleproject.com/hemeroteca/vision-2026-09-21-5c3cbc481eb2a0a5d9609a87b16fd0a099126377/
+- Categoría: Historia
+- Región: america
+- Resumen: Ensayo canónico de Hemeroteca: Pakal de Palenque: El Rostro de Estuco y la Inmortalidad Dinástica
+
+
+---
+
+## 4. Ensayos Cinemáticos Audiovisuales
+### Adam's Bridge
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/adam-s-bridge/
+- Categoría: Ensayo Cinemático
+- Región: asia
+- Resumen: Ensayo cinemático audiovisual: Adam's Bridge
+
+### Alejandro Magno: la geometría del mito y el abismo de la desmesura
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/alejandro-magno-la-geometria-del-mito-y-el-abismo-de-la-desmesura/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: Alejandro Magno: la geometría del mito y el abismo de la desmesura
+
+### amaterasu: una breve historia
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/amaterasu-una-breve-historia/
+- Categoría: Ensayo Cinemático
+- Región: asia
+- Resumen: Ensayo cinemático audiovisual: amaterasu: una breve historia
+
+### Bonampak: el Fin del Idealismo Maya
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/bonampak-el-fin-del-idealismo-maya/
+- Categoría: Ensayo Cinemático
+- Región: america
+- Resumen: Ensayo cinemático audiovisual: Bonampak: el Fin del Idealismo Maya
+
+### Borges y el Porvenir: El Laberinto de los Futuros Bifurcados
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/borges-y-el-porvenir-el-laberinto-de-los-futuros-bifurcados/
+- Categoría: Ensayo Cinemático
+- Región: america
+- Resumen: Ensayo cinemático audiovisual: Borges y el Porvenir: El Laberinto de los Futuros Bifurcados
+
+### Borges y su obra: El laberinto del infinito
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/borges-y-su-obra-el-laberinto-del-infinito/
+- Categoría: Ensayo Cinemático
+- Región: america
+- Resumen: Ensayo cinemático audiovisual: Borges y su obra: El laberinto del infinito
+
+### Calígula: La Estética del Vértigo y la Fractura del Poder
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/caligula-la-estetica-del-vertigo-y-la-fractura-del-poder/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: Calígula: La Estética del Vértigo y la Fractura del Poder
+
+### Cartografías de la Sombra: Freud y el Descubrimiento del Inconsciente
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/cartografias-de-la-sombra-freud-y-el-descubrimiento-del-inconsciente/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: Cartografías de la Sombra: Freud y el Descubrimiento del Inconsciente
+
+### Darwin y el Evolucionismo: la demolición del diseño cósmico
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/darwin-y-el-evolucionismo-la-demolicion-del-diseno-cosmico/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: Darwin y el Evolucionismo: la demolición del diseño cósmico
+
+### Deméter: La Geometría Sagrada del Dolor y la Cosecha
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/demeter-la-geometria-sagrada-del-dolor-y-la-cosecha/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: Deméter: La Geometría Sagrada del Dolor y la Cosecha
+
+### el aguara guazu sudamericano
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/el-aguara-guazu-sudamericano/
+- Categoría: Ensayo Cinemático
+- Región: america
+- Resumen: Ensayo cinemático audiovisual: el aguara guazu sudamericano
+
+### El Buda: anatomía del deseo y la disolución del yo
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/el-buda-anatomia-del-deseo-y-la-disolucion-del-yo/
+- Categoría: Ensayo Cinemático
+- Región: asia
+- Resumen: Ensayo cinemático audiovisual: El Buda: anatomía del deseo y la disolución del yo
+
+### El busto clasico de Julio Cesar 
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/el-busto-clasico-de-julio-cesar/
+- Categoría: Ensayo Cinemático
+- Región: europa
+- Resumen: Ensayo cinemático audiovisual: El busto clasico de Julio Cesar 
+
+### El condor andino
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/el-condor-andino/
+- Categoría: Ensayo Cinemático
+- Región: america
+- Resumen: Ensayo cinemático audiovisual: El condor andino
+
+### El enigma lítico de Klerksdorp: Geometría mineral y la ilusión del artificio
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/el-enigma-litico-de-klerksdorp-geometria-mineral-y-la-ilusion-del-artificio/
+- Categoría: Ensayo Cinemático
+- Región: africa
+- Resumen: Ensayo cinemático audiovisual: El enigma lítico de Klerksdorp: Geometría mineral y la ilusión del artificio
+
+### El Filo de la Voluntad: Alejandro Magno y la Ruptura del Nudo Gordiano
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/el-filo-de-la-voluntad-alejandro-magno-y-la-ruptura-del-nudo-gordiano/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: El Filo de la Voluntad: Alejandro Magno y la Ruptura del Nudo Gordiano
+
+### El flash histórico del OK: De chiste nerd a mantra de la humanidad
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/el-flash-historico-del-ok-de-chiste-nerd-a-mantra-de-la-humanidad/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: El flash histórico del OK: De chiste nerd a mantra de la humanidad
+
+### El Gato Montés Salvaje Argentino
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/el-gato-montes-salvaje-argentino/
+- Categoría: Ensayo Cinemático
+- Región: america
+- Resumen: Ensayo cinemático audiovisual: El Gato Montés Salvaje Argentino
+
+### El ñandu pampeano
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/el-nandu-pampeano/
+- Categoría: Ensayo Cinemático
+- Región: america
+- Resumen: Ensayo cinemático audiovisual: El ñandu pampeano
+
+### El ocaso de la luz pura: Montségur y el drama metafísico cátaro
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/el-ocaso-de-la-luz-pura-montsegur-y-el-drama-metafisico-cataro/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: El ocaso de la luz pura: Montségur y el drama metafísico cátaro
+
+### El Tango Argentino
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/el-tango-argentino/
+- Categoría: Ensayo Cinemático
+- Región: america
+- Resumen: Ensayo cinemático audiovisual: El Tango Argentino
+
+### el tapir
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/el-tapir/
+- Categoría: Ensayo Cinemático
+- Región: america
+- Resumen: Ensayo cinemático audiovisual: el tapir
+
+### El Tatu Carreta
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/el-tatu-carreta/
+- Categoría: Ensayo Cinemático
+- Región: america
+- Resumen: Ensayo cinemático audiovisual: El Tatu Carreta
+
+### El Tero
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/el-tero/
+- Categoría: Ensayo Cinemático
+- Región: america
+- Resumen: Ensayo cinemático audiovisual: El Tero
+
+### El umbral de lo irrevocable: Fenomenología del confirmar y publicar
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/el-umbral-de-lo-irrevocable-fenomenologia-del-confirmar-y-publicar/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: El umbral de lo irrevocable: Fenomenología del confirmar y publicar
+
+### Ensayo Erudito TGP
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/ensayo-erudito-tgp/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: Ensayo Erudito TGP
+
+### Esferas de Diquís: La Geometría Sagrada del Silencio Precolombino
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/esferas-de-diquis-la-geometria-sagrada-del-silencio-precolombino/
+- Categoría: Ensayo Cinemático
+- Región: america
+- Resumen: Ensayo cinemático audiovisual: Esferas de Diquís: La Geometría Sagrada del Silencio Precolombino
+
+### Espartaco y la rebelión de los gladiadores: Anatomía de la insurgencia ontológica
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/espartaco-y-la-rebelion-de-los-gladiadores-anatomia-de-la-insurgencia-ontologica/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: Espartaco y la rebelión de los gladiadores: Anatomía de la insurgencia ontológica
+
+### Heródoto: el nacimiento de la indagación y la invención del Otro
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/herodoto-el-nacimiento-de-la-indagacion-y-la-invencion-del-otro/
+- Categoría: Ensayo Cinemático
+- Región: europa
+- Resumen: Ensayo cinemático audiovisual: Heródoto: el nacimiento de la indagación y la invención del Otro
+
+### I. La gomera y el resplandor catódico
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/i-la-gomera-y-el-resplandor-catodico/
+- Categoría: Ensayo Cinemático
+- Región: europa
+- Resumen: Ensayo cinemático audiovisual: I. La gomera y el resplandor catódico
+
+### Jiddu Krishnamurti: la disolución del dogma y la anatomía del observador
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/jiddu-krishnamurti-la-disolucion-del-dogma-y-la-anatomia-del-observador/
+- Categoría: Ensayo Cinemático
+- Región: asia
+- Resumen: Ensayo cinemático audiovisual: Jiddu Krishnamurti: la disolución del dogma y la anatomía del observador
+
+### Juan Sebastián Elcano y la clausura empírica del globo
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/juan-sebastian-elcano-y-la-clausura-empirica-del-globo/
+- Categoría: Ensayo Cinemático
+- Región: europa
+- Resumen: Ensayo cinemático audiovisual: Juan Sebastián Elcano y la clausura empírica del globo
+
+### Kheper: La Geometría Sagrada de la Resurrección Solar
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/kheper-la-geometria-sagrada-de-la-resurreccion-solar/
+- Categoría: Ensayo Cinemático
+- Región: africa
+- Resumen: Ensayo cinemático audiovisual: Kheper: La Geometría Sagrada de la Resurrección Solar
+
+### La Catedral de la Razón: Arqueosemiótica y Vigencia de la Escolástica
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/la-catedral-de-la-razon-arqueosemiotica-y-vigencia-de-la-escolastica/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: La Catedral de la Razón: Arqueosemiótica y Vigencia de la Escolástica
+
+### La Ciudadela Inexpugnable: Filosofía, Poder y Trascendencia en el Estoicismo Romano
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/la-ciudadela-inexpugnable-filosofia-poder-y-trascendencia-en-el-estoicismo-romano/
+- Categoría: Ensayo Cinemático
+- Región: europa
+- Resumen: Ensayo cinemático audiovisual: La Ciudadela Inexpugnable: Filosofía, Poder y Trascendencia en el Estoicismo Romano
+
+### La Ciudadela Interior: Anatomía Cinemática del Estoicismo Romano
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/la-ciudadela-interior-anatomia-cinematica-del-estoicismo-romano/
+- Categoría: Ensayo Cinemático
+- Región: europa
+- Resumen: Ensayo cinemático audiovisual: La Ciudadela Interior: Anatomía Cinemática del Estoicismo Romano
+
+### La Hemeroteca del Porvenir: El Oráculo de Delfos y el Archivo de las Voces Perdidas
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/la-hemeroteca-del-porvenir-el-oraculo-de-delfos-y-el-archivo-de-las-voces-perdidas/
+- Categoría: Ensayo Cinemático
+- Región: europa
+- Resumen: Ensayo cinemático audiovisual: La Hemeroteca del Porvenir: El Oráculo de Delfos y el Archivo de las Voces Perdidas
+
+### La Perdiz Bonaerense
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/la-perdiz-bonaerense/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: La Perdiz Bonaerense
+
+### La Pirámide Roja: Geometría, Sangre y Trascendencia en Dahshur
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/la-piramide-roja-geometria-sangre-y-trascendencia-en-dahshur/
+- Categoría: Ensayo Cinemático
+- Región: africa
+- Resumen: Ensayo cinemático audiovisual: La Pirámide Roja: Geometría, Sangre y Trascendencia en Dahshur
+
+### La Teogonía de Hesíodo: El Abismo Primordial y el Tiempo de los Titanes
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/la-teogonia-de-hesiodo-el-abismo-primordial-y-el-t/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: La Teogonía de Hesíodo: El Abismo Primordial y el Tiempo de los Titanes
+
+### Los Albigenses
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/los-albigenses/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: Los Albigenses
+
+### Los Argonautas
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/los-argonautas/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: Los Argonautas
+
+### Los Cátaros y el Bogomilismo
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/los-cataros-y-el-bogomilismo/
+- Categoría: Ensayo Cinemático
+- Región: europa
+- Resumen: Ensayo cinemático audiovisual: Los Cátaros y el Bogomilismo
+
+### Los Tipos de Vacas en Argentina
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/los-tipos-de-vacas-en-argentina/
+- Categoría: Ensayo Cinemático
+- Región: america
+- Resumen: Ensayo cinemático audiovisual: Los Tipos de Vacas en Argentina
+
+### Montségur y las herejías medievales
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/montsegur-y-las-herejias-medievales/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: Montségur y las herejías medievales
+
+### Nichiren Daishonin: La Tempestad de la Dignidad y el Despertar de la Budeidad Soberana
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/nichiren-daishonin-la-tempestad-de-la-dignidad-y-el-despertar-de-la-budeidad-soberana/
+- Categoría: Ensayo Cinemático
+- Región: asia
+- Resumen: Ensayo cinemático audiovisual: Nichiren Daishonin: La Tempestad de la Dignidad y el Despertar de la Budeidad Soberana
+
+### Piramide del Adivino de Uxmal
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/piramide-del-adivino-de-uxmal/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: Piramide del Adivino de Uxmal
+
+### Pueblos Azules: los Hunza
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/pueblos-azules-los-hunza2/
+- Categoría: Ensayo Cinemático
+- Región: asia
+- Resumen: Ensayo cinemático audiovisual: Pueblos Azules: los Hunza
+
+### Sadhguru y la Cinematografía del Misticismo Global: Arqueología del Gurú Hipermoderno
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/sadhguru-y-la-cinematografia-del-misticismo-global-arqueologia-del-guru-hipermoderno/
+- Categoría: Ensayo Cinemático
+- Región: asia
+- Resumen: Ensayo cinemático audiovisual: Sadhguru y la Cinematografía del Misticismo Global: Arqueología del Gurú Hipermoderno
+
+### Sadhguru y la gramática cinematográfica del místico global: arqueosemiótica del éxtasis mecanizado
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/sadhguru-y-la-gramatica-cinematografica-del-mistico-global-arqueosemiotica-del-extasis-mecanizado/
+- Categoría: Ensayo Cinemático
+- Región: asia
+- Resumen: Ensayo cinemático audiovisual: Sadhguru y la gramática cinematográfica del místico global: arqueosemiótica del éxtasis mecanizado
+
+### Saqqara: La Arquitectura del Tiempo y el Umbral de la Inmortalidad
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/saqqara-la-arquitectura-del-tiempo-y-el-umbral-de-la-inmortalidad/
+- Categoría: Ensayo Cinemático
+- Región: africa
+- Resumen: Ensayo cinemático audiovisual: Saqqara: La Arquitectura del Tiempo y el Umbral de la Inmortalidad
+
+### Sombras de Cnosos: La Hemeroteca del Laberinto y el Monstruo Interior
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/sombras-de-cnosos-la-hemeroteca-del-laberinto-y-el-monstruo-interior/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: Sombras de Cnosos: La Hemeroteca del Laberinto y el Monstruo Interior
+
+### Tácito y la dramaturgia del poder: Anatomía de la sombra imperial
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/tacito-y-la-dramaturgia-del-poder-anatomia-de-la-sombra-imperial/
+- Categoría: Ensayo Cinemático
+- Región: europa
+- Resumen: Ensayo cinemático audiovisual: Tácito y la dramaturgia del poder: Anatomía de la sombra imperial
+
+### Tratado Arqueológico y Estratigráfico de las Terrazas Megalíticas de Gunung Padang: Un Ensayo Cinemático de la Prehistoria de Java
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/tratado-arqueologico-y-estratigrafico-de-las-terrazas-megaliticas-de-gunung-padang-un-ensayo-cinematico-de-la-prehistoria-de-java/
+- Categoría: Ensayo Cinemático
+- Región: asia
+- Resumen: Ensayo cinemático audiovisual: Tratado Arqueológico y Estratigráfico de las Terrazas Megalíticas de Gunung Padang: Un Ensayo Cinemático de la Prehistoria de Java
+
+### Tucídides: la patología del poder y la fractura moral de la polis
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/tucidides-la-patologia-del-poder-y-la-fractura-moral-de-la-polis/
+- Categoría: Ensayo Cinemático
+- Región: europa
+- Resumen: Ensayo cinemático audiovisual: Tucídides: la patología del poder y la fractura moral de la polis
+
+### Captura Informe Base — Temple_of_the_Sun_(left),_Temple_XIV_and_the_Palace_(right)_from_the_top_of_Temple_of_the_Cross_-_Palenque_Maya_Site,_Feb_2020.jpg
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/vision-2026-09-18-temple-of-the-sun-left-temple-xiv-and-the-palace-right-from-the-/
+- Categoría: Ensayo Cinemático
+- Región: america
+- Resumen: Ensayo cinemático audiovisual: Captura Informe Base — Temple_of_the_Sun_(left),_Temple_XIV_and_the_Palace_(right)_from_the_top_of_Temple_of_the_Cross_-_Palenque_Maya_Site,_Feb_2020.jpg
+
+### Captura Hermenéutica — confucio_a32172d8_2275859918_260916191857_1281x720.webp
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/vision-2026-10-12-confucio-a32172d8-2275859918-260916191857-1281x720/
+- Categoría: Ensayo Cinemático
+- Región: asia
+- Resumen: Ensayo cinemático audiovisual: Captura Hermenéutica — confucio_a32172d8_2275859918_260916191857_1281x720.webp
+
+### Captura Puesto de Mando · ensayosCinematicos — consulta-manual
+- URL: https://thegreatpuzzleproject.com/ensayos-cinematicos/vision-2026-10-12-consulta-manual/
+- Categoría: Ensayo Cinemático
+- Región: filosofia
+- Resumen: Ensayo cinemático audiovisual: Captura Puesto de Mando · ensayosCinematicos — consulta-manual
+
+
+---
+
+## 5. Corpus Crítico TGP Alternative
+### La Heurística Alterna: Cartografía Crítica del Olvido Institucional y los Paradigmas Excluidos en la Arqueología Oficial
+- URL: https://thegreatpuzzleproject.com/ensayos/amnesia-programada/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: En los pasillos sepulcrales de la academia contemporánea, el Proyecto del Gran Rompecabezas se ha erigido como el triunfo definitivo de la historia domesticada....
+
+### asado argentino
+- URL: https://thegreatpuzzleproject.com/ensayos/asado-argentino-4796/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: asado argentino...
+
+### Uxmal: La Epopeya Pétrea de la Serranía Puuc
+- URL: https://thegreatpuzzleproject.com/ensayos/borrador-ia-2026-08-18t07-00-15/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: La península de Yucatán guarda en Uxmal una de las más sublimes expresiones del genio maya: una sinfonía arquitectónica cincelada en piedra caliza que desafió l...
+
+### Amazonía Primigenia: La Memoria Hídrica y los Geoglifos del Antropoceno
+- URL: https://thegreatpuzzleproject.com/ensayos/borrador-ia-visual-2026-08-18t05-24-50/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: La Amazonía revela a través de sus patrones fluviales y geoglifos la confrontación entre procesos geológicos milenarios y la impronta territorial del Antropocen...
+
+### Bonampak: La Crónica Pictórica de la Selva Lacandona
+- URL: https://thegreatpuzzleproject.com/ensayos/borrador-ia-visual-2026-08-18t07-48-40/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: america
+- Resumen: Conocido como muros pintados en lengua lacandona, Bonampak es un códice visual monumental: una crónica pictórica que desafía el tiempo con testimonios de ritual...
+
+### Los Frescos de Pompeya: Un Diálogo Visual con la Ciudad Sepultada
+- URL: https://thegreatpuzzleproject.com/ensayos/borrador-ia-visual-2026-08-18t09-16-08/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Sepultada bajo las cenizas del Vesubio en el 79 d.C., Pompeya conserva en sus frescos una cápsula del tiempo incomparable: mitos, rituales y la intimidad de sus...
+
+### 1177 a.C.: El Gran Apagón del Bronce Tardío y la Amnesia Sistémica del Mediterráneo Oriental
+- URL: https://thegreatpuzzleproject.com/ensayos/colapso-1177/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: En el crepúsculo del duodécimo siglo antes de nuestra era, la vasta red de palacios y rutas comerciales que sostenía el mundo civilizado se desintegró en un cor...
+
+### Ensayo de prueba
+- URL: https://thegreatpuzzleproject.com/ensayos/ejemplo/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Este es un ensayo de prueba para inicializar la colección....
+
+### EL MONTE KAILASH
+- URL: https://thegreatpuzzleproject.com/ensayos/el-monte-kailash-6233/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Una pirámide de roca, no tallada por manos humanas sino por la paciencia geológica de eones, se alza en el Tíbet occidental. El Monte Kailash no es una cima ent...
+
+### El Silencio de Nefertiti: Un Rostro en la Fractura del Tiempo
+- URL: https://thegreatpuzzleproject.com/ensayos/el-silencio-de-nefertiti-un-rostro-en-la-fractura-del-tiempo-6183/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: El busto de Nefertiti no es solo una obra de arte; es un fragmento de tiempo petrificado, un rostro que emerge de la arena y el olvido para interpelar nuestra p...
+
+### El Tel y la Sombra: El Descubrimiento de Belo Brdo
+- URL: https://thegreatpuzzleproject.com/ensayos/el-tel-y-la-sombra-belo-brdo/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: La cultura Vinča y la estratigrafía milenaria de Belo Brdo: metalurgia del cobre, proto-escritura en Tărtăria y el enigma de la Vieja Europa en las riberas del ...
+
+### El vodka: una bebida del mundo eslavo?
+- URL: https://thegreatpuzzleproject.com/ensayos/el-vodka-una-bebida-del-mundo-eslavo-7802/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: La palabra ...
+
+### Catedrales del Polvo: Göbekli Tepe y la Alborada Ritual del Neolítico Precerámico
+- URL: https://thegreatpuzzleproject.com/ensayos/gobekli-tepe/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Antes de la domesticación del trigo o la invención de la rueda, los cazadores-recolectores de la Alta Mesopotamia erigieron un complejo megalítico que fractura ...
+
+### Ecos del Abismo Calcáreo: Ħal Saflieni y la Arquitectura Psicoacústica del Neolítico
+- URL: https://thegreatpuzzleproject.com/ensayos/hal-saflieni/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Bajo la árida superficie de Malta, el Hipogeo de Ħal Saflieni se erige no solo como un osario monumental, sino como un colosal instrumento lítico. Este ensayo d...
+
+### Homenaje a María Reiche y las Líneas de Nasca
+- URL: https://thegreatpuzzleproject.com/ensayos/homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Cuarenta años barriendo la pampa con una escoba de mano para preservar un templo sin techo. La geometría sagrada de Jumana y la mirada que sólo los dioses o el ...
+
+### La Arepa colombiana
+- URL: https://thegreatpuzzleproject.com/ensayos/la-arepa-colombiana-3034/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: america
+- Resumen: La Arepa colombiana...
+
+### La Arepa colombiana
+- URL: https://thegreatpuzzleproject.com/ensayos/la-arepa-colombiana-6858/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: america
+- Resumen: La Arepa colombiana...
+
+### La Biblioteca de Alejandría: El Sueño del Conocimiento Universal
+- URL: https://thegreatpuzzleproject.com/ensayos/la-biblioteca-de-alejandria/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: El intento más ambicioso de la antigüedad por concentrar todo el saber del mundo conocido en un solo espacio sagrado de papiros, fuego y filosofía....
+
+### La Civilización Maya: Un Legado de Sabiduría Ancestral
+- URL: https://thegreatpuzzleproject.com/ensayos/la-civilizacion-maya-un-legado-de-sabiduria-ancest-1446/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: La Civilización Maya: Un Legado de Sabiduría Ancestral...
+
+### La Esfinge de Beluchistán
+- URL: https://thegreatpuzzleproject.com/ensayos/la-esfinge-de-beluchistan-0695/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: africa
+- Resumen: La Esfinge de Beluchistán...
+
+### La esfinge de Beluchistán
+- URL: https://thegreatpuzzleproject.com/ensayos/la-esfinge-de-beluchistan-4545/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: africa
+- Resumen: La esfinge de Beluchistán...
+
+### La Esfinge de Beluchistán
+- URL: https://thegreatpuzzleproject.com/ensayos/la-esfinge-de-beluchistan-8776/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: africa
+- Resumen: La Esfinge de Beluchistán...
+
+### La Esfinge de Giza: ¿Misterio geologico o cronologia inmutable?
+- URL: https://thegreatpuzzleproject.com/ensayos/la-esfinge-de-giza-misterio-geologico-o-cronologia-0367/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: africa
+- Resumen: La Esfinge de Giza: ¿Misterio geologico o cronologia inmutable?...
+
+### La Geometría Pétrea de Pumapunku: Andesita, Tiempo y Cosmos
+- URL: https://thegreatpuzzleproject.com/ensayos/la-geometria-petrea-de-pumapunku-andesita-tiempo-y-cosmos-3332/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: america
+- Resumen: En las alturas del altiplano boliviano, Pumapunku se alza como un desafío a la comprensión, un rompecabezas de andesita cuya perfección geométrica desmiente las...
+
+### La Ginebra: una breve historia de la bebida.
+- URL: https://thegreatpuzzleproject.com/ensayos/la-ginebra-una-breve-historia-de-la-bebida-7313/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: El alambique de cobre, en sus primeras iteraciones, no era un instrumento de placer, sino una promesa de alivio. En los Países Bajos del siglo XVI, el destilado...
+
+### La Memoria del Laberinto y el Tiempo Material
+- URL: https://thegreatpuzzleproject.com/ensayos/la-memoria-del-laberinto-y-el-tiempo-material-8555/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: El umbral de caliza no miente sobre el peso: el laberinto como trampa mineral donde el tiempo deja de fluir para ganar peso específico....
+
+### la muralla china
+- URL: https://thegreatpuzzleproject.com/ensayos/la-muralla-china-2716/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: asia
+- Resumen: La cicatriz se extiende, una línea petrificada sobre la piel del continente, no como una falla geológica, sino como la manifestación más cruda de una voluntad. ...
+
+### La Pirámide Doblada: Ecos de la Eternidad en la Arquitectura Cotidiana
+- URL: https://thegreatpuzzleproject.com/ensayos/la-piramide-doblada-ecos-de-la-eternidad-en-la-arquitectura--7258/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: La ...
+
+### La Pirámide Doblada: Ecos de la Eternidad en la Arquitectura Cotidiana
+- URL: https://thegreatpuzzleproject.com/ensayos/la-piramide-doblada-ecos-eternidad-arquitectura-cotidiana-9898/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Una forma ancestral, un nombre grandioso, una realidad comercial. La ...
+
+### La Pirámide Escalonada de Saqqara y los Orígenes de la Arquitectura Monumental
+- URL: https://thegreatpuzzleproject.com/ensayos/la-piramide-escalonada-de-saqqara-y-los-origenes-de-la-arquitectura-monumental-de-imhotep/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: africa
+- Resumen: Sobre la meseta de Saqqara, la mente de Imhotep concibió una transmutación radical: petrificar el tiempo y convertir la morada de los muertos en la primera esca...
+
+### La Tabla Periódica: Arquitectura Cuántica de la Materia
+- URL: https://thegreatpuzzleproject.com/ensayos/la-tabla-periodica-arquitectura-cuantica-de-la-materia/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Tratado crítico de TGP Alternative: La Tabla Periódica: Arquitectura Cuántica de la Materia
+
+### La viruela en el Siglo XX y su erradicación
+- URL: https://thegreatpuzzleproject.com/ensayos/la-viruela-en-el-siglo-xx-y-su-erradicacion-5557/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: La viruela en el Siglo XX y su erradicación...
+
+### Catedrales de la Penumbra: La Anomalía de Longyou y la Geometría de la Piedra
+- URL: https://thegreatpuzzleproject.com/ensayos/las-cuevas-de-longyou-en-china/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: asia
+- Resumen: Bajo la superficie de Zhejiang yace un vacío esculpido que desafía el canon histórico. Las Cuevas de Longyou, desprovistas de registro escrito, exhiben una prec...
+
+### Las Líneas de Nasca y María Reiche: el Códice de la Pampa
+- URL: https://thegreatpuzzleproject.com/ensayos/las-lineas-de-nasca-y-maria-reiche-homenaje/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Cuarenta años barriendo la pampa con una escoba de mano para preservar un templo sin techo. La geometría sagrada de Jumana y la mirada que sólo los dioses o el ...
+
+### Los mayas con imagen sintética de Uxmal
+- URL: https://thegreatpuzzleproject.com/ensayos/los-mayas-con-imagen-sintetica-de-uxmal-9734/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Los mayas con imagen sintética de Uxmal...
+
+### Los Mayas de la época de Uxmal para educación en TGP Alternative
+- URL: https://thegreatpuzzleproject.com/ensayos/los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-2744/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Los Mayas de la época de Uxmal para educación en TGP Alternative...
+
+### Los mayas de la época de Uxmal para educación en TGP Alternative
+- URL: https://thegreatpuzzleproject.com/ensayos/los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-4864/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Los mayas de la época de Uxmal para educación en TGP Alternative...
+
+### Los mayas de la época de Uxmal para educación en TGP Alternative
+- URL: https://thegreatpuzzleproject.com/ensayos/los-mayas-de-la-epoca-de-uxmal-para-educacion-en-t-7098/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Los mayas de la época de Uxmal para educación en TGP Alternative...
+
+### Los Mayas y Uxmal
+- URL: https://thegreatpuzzleproject.com/ensayos/los-mayas-y-uxmal-5339/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Los Mayas y Uxmal...
+
+### Masuda no Iwafune: La Nave de Roca y el Abismo del Tiempo en Asuka
+- URL: https://thegreatpuzzleproject.com/ensayos/masuda-no-iwafune/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Suspendida en la neblina topográfica de la Prefectura de Nara, una anomalía de granito de ochocientas toneladas desafía la exégesis arqueológica. Sus incisiones...
+
+### El Dios de las Encrucijadas: Hermes, Mercurio y la Semiótica de lo Liminal
+- URL: https://thegreatpuzzleproject.com/ensayos/mercurio-hermes-arquetipo-liminal/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Entre el polvo de los caminos profanos y el silencio de las tumbas arcaicas, Hermes no custodia la frontera: la constituye. Una autopsia conceptual y arqueológi...
+
+### Michael Cremo, homenaje
+- URL: https://thegreatpuzzleproject.com/ensayos/michael-cremo-homenaje-5218/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Michael Cremo, homenaje...
+
+### Nan Madol
+- URL: https://thegreatpuzzleproject.com/ensayos/nan-madol-9803/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: oceania
+- Resumen: Nan Madol...
+
+### Nan Madol: La Venecia Megalítica de Micronesia y la Geometría del Abismo
+- URL: https://thegreatpuzzleproject.com/ensayos/nan-madol-el-enigma-megalitico/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: oceania
+- Resumen: Perdida entre los asfixiantes manglares de Pohnpei, esta metrópolis construida sobre un arrecife coralino desafía la comprensión geométrica del transporte antig...
+
+### Nefertiti: El Rostro Que Desafía al Tiempo
+- URL: https://thegreatpuzzleproject.com/ensayos/nefertiti-el-rostro-que-desafia-al-tiempo-1213/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Emergida de las arenas de Amarna, la efigie de Nefertiti no es solo un objeto arqueológico, sino un umbral hacia la comprensión de la belleza, el poder y la mem...
+
+### Nefertiti: El Rostro Que Desafía al Tiempo
+- URL: https://thegreatpuzzleproject.com/ensayos/nefertiti-el-rostro-que-desafia-al-tiempo-4394/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: El ojo izquierdo de Nefertiti está vacío. No es una mutilación del tiempo, ni el capricho de un escultor, sino una ausencia deliberada, un umbral. Una invitació...
+
+### Nefertiti: El Rostro Que Desafía al Tiempo
+- URL: https://thegreatpuzzleproject.com/ensayos/nefertiti-el-rostro-que-desafia-al-tiempo-5611/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: El busto de Nefertiti, con su ojo vacío, es más que una efigie; es una fractura temporal que irrumpió en el siglo XX. Su historia material y simbólica nos confr...
+
+### Pirámide de Tikal
+- URL: https://thegreatpuzzleproject.com/ensayos/piramide-etical-4895/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: america
+- Resumen: La pirámide de tikal...
+
+### La Geometría de lo Eterno: La Pirámide Roja de Dahshur
+- URL: https://thegreatpuzzleproject.com/ensayos/piramide-roja-dahshur/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: africa
+- Resumen: Antes de las colosales moles de Guiza, la solitaria planicie de Dahshur presenció la transformación conceptual más radical: la invención de la primera pirámide ...
+
+### El Portulano de la Eternidad: El Mapa de Piri Reis de 1513, las Bibliotecas Perdidas y el Enigma de la Antártida Desnuda
+- URL: https://thegreatpuzzleproject.com/ensayos/piri-reis/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: En los confines del archivo del Palacio de Topkapi yace un fragmento de piel de gacela que desafía la cronología ortodoxa de la exploración humana. Este ensayo ...
+
+### Pumapunku: La Geometría Grabada en Andesita
+- URL: https://thegreatpuzzleproject.com/ensayos/pumapunku-geometria-andesita-0068/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: america
+- Resumen: En Pumapunku, la piedra no es solo materia, sino un lenguaje de precisión cósmica. Sus ruinas, un rompecabezas desmembrado, revelan una sabiduría arquitectónica...
+
+### Pumapunku: La Geometría del Silencio
+- URL: https://thegreatpuzzleproject.com/ensayos/pumapunku-la-geometria-del-silencio/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: america
+- Resumen: En la desolación del altiplano boliviano, los bloques H de Pumapunku se erigen como un enigma lítico insoslayable. Su precisión nanométrica en andesita gris des...
+
+### El Culto a Príapo en Pompeya: Fecundidad, Rito y Protección Apotropaica
+- URL: https://thegreatpuzzleproject.com/ensayos/r007-borrador-visual-2026-08-18t10-23-17/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: El dios Príapo, con su atributo fálico y su balanza de cosechas, era en Pompeya un guardián de la buena fortuna y un escudo apotropaico contra el mal de ojo en ...
+
+### Recertificacion Scriptorium Antigravity
+- URL: https://thegreatpuzzleproject.com/ensayos/recertificacion-scriptorium-antigravity-8289/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Un fragmento de ámbar, suspendido en el vacío, no niega la gravedad; la redefine. No es una ausencia de fuerza, sino la manifestación de una fuerza contraria, c...
+
+### Sample Registro
+- URL: https://thegreatpuzzleproject.com/ensayos/sample-registro/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Tratado crítico de TGP Alternative: Sample Registro
+
+### Sintesis breve sobre la acustica megalitica
+- URL: https://thegreatpuzzleproject.com/ensayos/sintesis-breve-sobre-la-acustica-megalitica-1139/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: El umbral de piedra, pulido por milenios de lluvia y el roce de cuerpos olvidados, no solo marca la entrada a un espacio, sino a una resonancia. Dentro de las c...
+
+### Sintesis ontologica breve sobre la acustica en los hipogeos malteses
+- URL: https://thegreatpuzzleproject.com/ensayos/sintesis-ontologica-breve-sobre-la-acustica-en-los-hipogeos--3054/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: El umbral de piedra, pulido por milenios de pisadas y la erosión del aire salino, no solo marca una entrada a la oscuridad, sino una fractura en el tejido de la...
+
+### Sintesis ontologica breve sobre la cantera de Yangshan y el bloque inacabado
+- URL: https://thegreatpuzzleproject.com/ensayos/sintesis-ontologica-breve-sobre-la-cantera-de-yangshan-y-el--3630/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: El bloque inacabado de Yangshan no es un mero vestigio de una empresa fallida, sino una pregunta petrificada, una masa de granito que condensa la ontología de l...
+
+### Test Automatizado Scriptorium Antigravity
+- URL: https://thegreatpuzzleproject.com/ensayos/test-automatizado-scriptorium-antigravity-4591/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Los motes de polvo, atrapados en un único haz de luz que perforaba la alta ventana de un scriptorium medieval, danzaban con el peso de los siglos. Cada partícul...
+
+### Test Final Scriptorium Antigravity
+- URL: https://thegreatpuzzleproject.com/ensayos/test-final-scriptorium-antigravity-8527/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: El pergamino, anclado por la gravedad de su propia materia, yace sobre la mesa de roble. Su superficie, una piel curtida por el tiempo, ha absorbido siglos de t...
+
+### The Caterpillar: La Paradoja Ontológica de la Metamorfosis
+- URL: https://thegreatpuzzleproject.com/ensayos/the-caterpillar/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Pocos seres vivos encarnan una paradoja ontológica tan radical: la oruga se digiere a sí misma en la crisálida para forjar las alas, planteando la inquietante p...
+
+### Wayna Picchu
+- URL: https://thegreatpuzzleproject.com/ensayos/wayna-picchu-0324/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Wayna Picchu...
+
+### El Monumento de Yonaguni: La Anomalía Sumergida de Ryukyu
+- URL: https://thegreatpuzzleproject.com/ensayos/yonaguni-monumento-sumergido/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: asia
+- Resumen: Estructuras megalíticas bajo las aguas del archipiélago de Yaeyama: terrazas en ángulo recto, monolitos escalonados y el dilema entre fractura geológica o arqui...
+
+### Cenizas en la Memoria del Hielo: El Gran Invierno del Younger Dryas y el Ocaso Megalítico
+- URL: https://thegreatpuzzleproject.com/ensayos/younger-dryas/
+- Eje: Crítica Histórica & Paradigmas Excluidos
+- Región: filosofia
+- Resumen: Bajo nuestros pies yace una frontera fúnebre de hollín, platino y nanodiamantes que marca el abrupto final del Pleistoceno. Este tratado desentraña la evidencia...
+

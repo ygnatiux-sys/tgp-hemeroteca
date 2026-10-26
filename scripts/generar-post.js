@@ -1,10 +1,12 @@
 /**
  * scripts/generar-post.js
  *
- * TGP Hemeroteca — CLI Cognitivo de Generación de Ensayos
- * SDK: @google/genai (moderno)
- * Modelo texto: gemini-3.1-pro
- * Modelo imagen: imagen-3.0-generate-001
+ * TGP Hemeroteca — Taller Cognitivo Unificado & Seguro (Desk Local)
+ * Motores de Texto: Gemini 1.5 Flash (Rápido) / Gemini 1.5 Pro / 3.1 Pro (Erudito)
+ * Curaduría Visual:
+ *   - Golden Wiki (CirrusSearch) con transmutación WebP + R2
+ *   - Google Imagen 3 (Sintética Banana) con transmutación WebP + R2
+ *   - Conjuntiva: Wiki Hero + Galería Wiki (3/5/9) Y/O Imagen 3
  *
  * Uso: node scripts/generar-post.js
  */
@@ -15,65 +17,234 @@ import { stdin as input, stdout as output } from 'node:process';
 import { GoogleGenAI } from '@google/genai';
 import fs from 'node:fs';
 import path from 'node:path';
+import { transmuteRemoteToR2, uploadBufferToR2Webp } from '../src/lib/vault-r2.mjs';
+import { orquestarTaxonomiaFlash, imprimirFichaUbicacionExacta } from '../src/lib/tgp-router-oracle.mjs';
 
-// ─── SLUGIFY CON SOPORTE UNICODE / TILDES ─────────────────────────────────────
-// "Chichén Itzá" → "chichen-itza"
+// ─── SLUGIFY UNICODE ──────────────────────────────────────────────────────────
 const slugify = (text) =>
   text
     .toString()
-    .normalize('NFD')                         // Descompone diacríticos (á → a + ́)
-    .replace(/[\u0300-\u036f]/g, '')          // Elimina los diacríticos
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9\s-]/g, '')            // Solo letras, números, espacios y guiones
-    .replace(/\s+/g, '-')                     // Espacios → guiones
-    .replace(/-+/g, '-')                      // Guiones múltiples → uno
-    .replace(/^-+|-+$/g, '');                 // Sin guiones al inicio/fin
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+// ─── CONSULTA DIRECTA WIKIMEDIA CIRRUSSEARCH ──────────────────────────────────
+async function fetchWikimediaCandidates(query, limit = 15) {
+  const clean = query.replace(/[:(].*$/, '').trim();
+  const cirrusFilter = 'filetype:bitmap -intitle:map -intitle:diagram -intitle:plan -intitle:coat -intitle:flag -intitle:svg';
+  const fullSearch = `${clean} ${cirrusFilter}`;
+
+  const params = new URLSearchParams({
+    action: 'query',
+    format: 'json',
+    generator: 'search',
+    gsrsearch: fullSearch,
+    gsrnamespace: '6',
+    gsrlimit: String(limit),
+    prop: 'imageinfo',
+    iiprop: 'url|size|mime|extmetadata',
+    iiurlwidth: '1280',
+    origin: '*',
+  });
+
+  try {
+    const res = await fetch(`https://commons.wikimedia.org/w/api.php?${params.toString()}`, {
+      headers: { 'User-Agent': 'TGP-Cognitive-Studio/1.0 (contact@thegreatpuzzleproject.com)' },
+    });
+    const data = await res.json();
+    const pages = Object.values(data.query?.pages || {});
+    const items = [];
+
+    for (const p of pages) {
+      const info = p.imageinfo?.[0];
+      if (!info || !info.url) continue;
+      const width = info.width || 0;
+      const height = info.height || 0;
+      if (width < 800) continue; // Descartar thumbnails enanos
+
+      items.push({
+        title: p.title.replace(/^File:/i, ''),
+        url: info.url,
+        thumbUrl: info.thumburl || info.url,
+        width,
+        height,
+        aspectRatio: height > 0 ? (width / height).toFixed(2) : 1,
+      });
+    }
+
+    return items;
+  } catch (err) {
+    console.warn('  ⚠️ No se pudo consultar Wikimedia:', err.message);
+    return [];
+  }
+}
+
+// ─── GENERADOR DE IMAGEN SINTÉTICA (IMAGEN BANANA GEMINI) ─────────────────────
+async function generarImagenBanana(apiKey, prompt, slug) {
+  console.log('  🍌 Conectando con Google Image Engine (gemini-3.1-flash-image-preview)...');
+  const ai = new GoogleGenAI({ apiKey });
+  const response = await ai.models.generateContent({
+    model: 'gemini-3.1-flash-image-preview',
+    contents: [{
+      role: 'user',
+      parts: [{ text: `${prompt}. Aspect ratio 16:9, ultra-detailed architectural photography, dark academia.` }],
+    }],
+  });
+
+  const candidate = response.candidates?.[0];
+  const imagePart = candidate?.content?.parts?.find((p) => p.inlineData);
+  const b64 = imagePart?.inlineData?.data;
+
+  if (!b64) {
+    throw new Error('El motor de imagen de Gemini no devolvió datos binarios (inlineData).');
+  }
+
+  const buffer = Buffer.from(b64, 'base64');
+  console.log('  ⚡ Transmutando imagen sintética a WebP y subiendo a R2...');
+  const uploaded = await uploadBufferToR2Webp(buffer, 'sinteticas-banana', `${slug}-banana`);
+  console.log(`  ✅ Guardada en Cloudflare R2: ${uploaded.url}`);
+  return uploaded.url;
+}
 
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 async function main() {
-  const rl = createInterface({ input, output });
+  const args = process.argv.slice(2);
+  const getArg = (name, fallback = '') => {
+    for (let i = 0; i < args.length; i++) {
+      if (args[i].startsWith(`--${name}=`)) return args[i].split('=')[1].replace(/^['"]|['"]$/g, '');
+      if (args[i] === `--${name}` && args[i + 1] && !args[i + 1].startsWith('--')) return args[i + 1].replace(/^['"]|['"]$/g, '');
+    }
+    return fallback;
+  };
 
-  console.log('\n╔════════════════════════════════════════════════════╗');
-  console.log('║  TGP Hemeroteca — Motor Cognitivo (gemini-3.1-pro)  ║');
-  console.log('╚════════════════════════════════════════════════════╝\n');
+  const cliTopic = getArg('topic');
+  const cliCategory = getArg('category', 'Ensayo');
+  const cliEngine = getArg('engine'); // 'flash' | 'pro'
+  const cliVisual = getArg('visual'); // '1' (wiki), '2' (banana), '3' (conjuntiva)
+  const cliGalleryCount = getArg('gallery', '3');
+
+  const rl = !cliTopic ? createInterface({ input, output }) : null;
+  const ask = async (q) => (rl ? (await rl.question(q)).trim() : '');
+
+  console.log('\n╔═════════════════════════════════════════════════════════════════╗');
+  console.log('║   🏛️ TGP COGNITIVE STUDIO — TALLER DE PRODUCCIÓN Y CURADURÍA   ║');
+  console.log('╚═════════════════════════════════════════════════════════════════╝\n');
 
   try {
-    // ── Paso 1: Input interactivo ──────────────────────────────────────────
-    const titulo = (await rl.question('  📝 Título o tema del ensayo: ')).trim();
+    const API_KEY = process.env.GEMINI_API_KEY;
+    if (!API_KEY) throw new Error('GEMINI_API_KEY no encontrada en .env');
+
+    // 1. Título y Categoría
+    const titulo = cliTopic || (await ask('  📝 Título o tema del ensayo: '));
     if (!titulo) throw new Error('El título no puede estar vacío.');
 
-    const categoriaInput = (await rl.question('  🗂  Categoría (ej. Historia, Arqueología) [Ensayo]: ')).trim();
+    const categoriaInput = cliTopic ? cliCategory : (await ask('  🗂  Categoría [Ensayo]: '));
     const categoria = categoriaInput || 'Ensayo';
 
-    const respuestaImagen = await rl.question('  🎨 ¿Generar imagen de portada? (s/n) [n]: ');
-    rl.close();
-
-    const generarImagen = respuestaImagen.toLowerCase() === 's';
-
-    // ── Paso 2: Validar API Key ────────────────────────────────────────────
-    const API_KEY = process.env.GEMINI_API_KEY;
-    if (!API_KEY) {
-      throw new Error('GEMINI_API_KEY no encontrada en .env');
+    // 2. Selección del Motor Cognitivo
+    let textModel = 'gemini-3.1-pro-preview';
+    if (cliEngine) {
+      textModel = cliEngine.toLowerCase() === 'flash' ? 'gemini-2.5-flash' : 'gemini-3.1-pro-preview';
+    } else {
+      console.log('\n  🧠 ¿Qué motor de redacción deseas usar?');
+      console.log('     [1] Gemini 2.5 Flash (Ultra rápido, ágil y económico)');
+      console.log('     [2] Gemini 3.1 Pro (Erudito, monumental y denso)');
+      const motorChoice = (await ask('     Selecciona (1/2) [2]: ')) || '2';
+      textModel = motorChoice === '1' ? 'gemini-2.5-flash' : 'gemini-3.1-pro-preview';
     }
 
+    // 3. Verificación Previa de Archivo Wikimedia (Golden Wiki)
+    console.log(`\n  🔎 Verificando existencia de fotos históricas en Wikimedia Commons para "${titulo}"...`);
+    const wikiCandidates = await fetchWikimediaCandidates(titulo, 15);
+    console.log(`     -> Encontradas ${wikiCandidates.length} imágenes válidas en el archivo histórico.`);
+
+    // 4. Árbol de Opciones Visuales
+    console.log('\n  🎨 CONFIGURACIÓN VISUAL DEL POST:');
+    if (wikiCandidates.length > 0) {
+      console.log(`     [1] Solo Fotografía Histórica de Archivo (Golden Wiki -> R2)`);
+      console.log(`     [2] Solo Arte Sintético con Imagen 3 (Banana IA -> R2)`);
+      console.log(`     [3] CONJUNTIVA: Wiki Hero + Galería de Fotos + Arte Sintético Imagen 3`);
+      console.log(`     [4] Sin imagen (Borrador de texto puro)`);
+    } else {
+      console.log(`     [1] Arte Sintético con Imagen 3 (Banana IA -> R2) [Recomendado: No hay fotos en Wiki]`);
+      console.log(`     [2] Sin imagen`);
+    }
+
+    const visualChoice = cliVisual || (await ask(`     Elige una opción [1]: `)) || '1';
+
+    let coverImage = null;
+    let galleryImages = [];
+    let imageMetadataLabel = '';
+    const slug = slugify(titulo);
+
+    if (wikiCandidates.length > 0 && visualChoice === '1') {
+      // Opción 1: Solo Wiki
+      console.log(`\n  ⚡ Transmutando mejor Hero de Wikimedia a WebP y alojando en R2...`);
+      coverImage = await transmuteRemoteToR2(wikiCandidates[0].url, 'wikimedia', `${slug}-hero`);
+      imageMetadataLabel = `wikimedia-commons (Golden Wiki): ${wikiCandidates[0].title}`;
+      console.log(`  ✅ Portada R2: ${coverImage}`);
+
+    } else if ((wikiCandidates.length > 0 && visualChoice === '2') || (wikiCandidates.length === 0 && visualChoice === '1')) {
+      // Opción: Solo Sintética
+      const imagePrompt = `Cinematic, dark academia editorial photography. Concept: ${titulo}. Category: ${categoria}. Moody atmosphere, archival textures, deep shadows, historical symbolism. No text, no fantasy elements. Restrained color palette, fine grain, high detail.`;
+      coverImage = await generarImagenBanana(API_KEY, imagePrompt, slug);
+      imageMetadataLabel = 'imagen-3.0-generate-001 (Sintética Banana IA)';
+
+    } else if (wikiCandidates.length > 0 && visualChoice === '3') {
+      // Opción 3: Conjuntiva (Wiki Hero + Galería + Imagen 3)
+      console.log(`\n  🌟 Modo Conjuntivo Activado.`);
+      console.log(`  ⚡ Transmutando Hero histórico de Wikimedia a R2...`);
+      coverImage = await transmuteRemoteToR2(wikiCandidates[0].url, 'wikimedia', `${slug}-hero`);
+      console.log(`  ✅ Portada Hero R2: ${coverImage}`);
+
+      // Preguntar cuántas fotos agregar a la galería
+      const maxGallery = Math.min(wikiCandidates.length - 1, 9);
+      if (maxGallery > 0) {
+        console.log(`\n  📚 Hay ${maxGallery} fotos adicionales disponibles para enriquecer el post.`);
+        const numImgsStr = cliVisual ? cliGalleryCount : ((await ask(`     ¿Cuántas imágenes incluir en la galería? (3 / 5 / 9) [3]: `)) || '3');
+        const numImgs = Math.min(parseInt(numImgsStr, 10) || 3, maxGallery);
+
+        console.log(`  ⚡ Transmutando ${numImgs} fotos de galería a R2...`);
+        for (let i = 1; i <= numImgs; i++) {
+          try {
+            const galUrl = await transmuteRemoteToR2(wikiCandidates[i].url, 'wikimedia', `${slug}-gal-${i}`);
+            galleryImages.push(galUrl);
+            console.log(`     [${i}/${numImgs}] Galería R2: ${galUrl}`);
+          } catch (e) {
+            console.warn(`     ⚠️ Error en imagen ${i}: ${e.message}`);
+          }
+        }
+      }
+
+      // Generar también la sintética
+      const imagePrompt = `Cinematic dark academia editorial concept: ${titulo}. Archaic atmosphere, solemn lighting, deep shadows.`;
+      const syntheticUrl = await generarImagenBanana(API_KEY, imagePrompt, `${slug}-sintetica`);
+      galleryImages.push(syntheticUrl);
+      imageMetadataLabel = `Híbrido: Golden Wiki Hero + ${galleryImages.length - 1} de Archivo + Imagen 3 Sintética`;
+    }
+
+    if (rl) rl.close();
+
+    // 5. Redacción Cognitiva con Gemini
+    console.log(`\n  ✍️  Redactando ensayo con ${textModel} (Estilo Xavier Benítez)...`);
     const ai = new GoogleGenAI({ apiKey: API_KEY });
-
-    // ── Paso 3: Generar texto con gemini-2.0-flash ─────────────────────────
-    console.log('\n  🧠 Generando ensayo con gemini-3.1-pro...');
-
     const textResult = await ai.models.generateContent({
-      model: 'gemini-3.1-pro-preview',
-      contents: titulo,
+      model: textModel,
+      contents: `Redacta un ensayo editorial monumental sobre: "${titulo}". Categoría: "${categoria}".`,
       config: {
         systemInstruction:
           'Eres el motor cognitivo TGP y socio analítico de Xavier Benítez. ' +
           'Tu función es redactar textos orientados al análisis cultural, histórico y filosófico ' +
           'bajo el formato de ensayo argentino contemporáneo. ' +
           'Tono: Dark Academia accesible — preciso, sobrio, agudo. Sin tono casual. ' +
-          'Estructura: Apertura con tensión, desarrollo que articule historia/filosofía/simbolismo, ' +
-          'y cierre reflexivo universal. Ve directo al núcleo. ' +
-          'Usa Markdown para párrafos y encabezados (##, ###). No uses H1.',
+          'Estructura: 1. Apertura con tensión material, 2. Anclaje histórico riguroso, 3. Tesis de transformación, ' +
+          '4. Tensión historiográfica, 5. Cierre en destilación filosófica. ' +
+          'Usa Markdown para párrafos y encabezados (##, ###). No uses H1 ni lugares comunes.',
       },
     });
 
@@ -82,128 +253,62 @@ async function main() {
       throw new Error('El texto generado está vacío o es demasiado corto.');
     }
 
-    // ── Paso 4: Preparar rutas ─────────────────────────────────────────────
-    const slug = slugify(titulo);
-    if (!slug) throw new Error(`No se pudo generar un slug válido para: "${titulo}"`);
-
+    // 6. Preparar Rutas y Archivos
     const folderPath = path.join(process.cwd(), 'src/content/ensayos', slug);
-    const assetsPath = path.join(process.cwd(), 'src/assets/ensayos', slug);
-
     if (fs.existsSync(folderPath)) {
       throw new Error(`Ya existe un post con el slug "${slug}". Elige un título diferente.`);
     }
 
-    // ── Paso 5: Generar imagen (opcional) ────────────────────────────────
-    let coverImage = null;
-
-    if (generarImagen) {
-      console.log('  🖼  Generando portada con imagen-3.0-generate-001...');
-      try {
-        const imagePrompt =
-          `Cinematic, dark academia editorial photography. Concept: ${titulo}. ` +
-          `Category: ${categoria}. Moody atmosphere, archival textures, deep shadows, ` +
-          `historical symbolism. No text, no people, no fantasy elements. ` +
-          `Restrained color palette, fine grain, high detail.`;
-
-        const imageResponse = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${API_KEY}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              instances: [{ prompt: imagePrompt }],
-              parameters: { sampleCount: 1, aspectRatio: '16:9' },
-            }),
-          }
-        );
-
-        const imageData = await imageResponse.json();
-
-        if (imageData?.predictions?.[0]?.bytesBase64Encoded) {
-          const buffer = Buffer.from(imageData.predictions[0].bytesBase64Encoded, 'base64');
-          const fileName = 'coverImage.jpg';
-
-          if (!fs.existsSync(assetsPath)) fs.mkdirSync(assetsPath, { recursive: true });
-          fs.writeFileSync(path.join(assetsPath, fileName), buffer);
-
-          coverImage = `/src/assets/ensayos/${slug}/${fileName}`;
-          console.log(`  ✅ Portada guardada: ${coverImage}`);
-        } else {
-          console.warn('  ⚠️  La API de imagen no devolvió datos. Continuando sin portada.');
-          if (imageData?.error) {
-            console.warn('     Error API:', imageData.error.message || JSON.stringify(imageData.error));
-          }
-        }
-      } catch (imgErr) {
-        console.warn('  ⚠️  Error generando imagen:', imgErr.message);
-      }
-    }
-
-    // ── Paso 6: Construir excerpt desde el texto ───────────────────────────
-    // Tomar el primer párrafo de texto plano (sin # ni **)
-    const excerptRaw = textoEnsayo
+    const firstParagraph = textoEnsayo
       .split('\n')
-      .map(l => l.trim())
-      .find(l => l.length > 40 && !l.startsWith('#') && !l.startsWith('*') && !l.startsWith('-'));
-    const excerpt = excerptRaw
-      ? excerptRaw.replace(/\*\*/g, '').substring(0, 200) + (excerptRaw.length > 200 ? '...' : '')
-      : '';
+      .map((p) => p.trim())
+      .find((p) => p.length > 50 && !p.startsWith('#') && !p.startsWith('>'));
+    const excerpt = firstParagraph ? firstParagraph.substring(0, 200).replace(/\*\*?/g, '') + '...' : '';
 
-    // ── Paso 7: Escribir archivos atómicamente ────────────────────────────
-    console.log('  💾 Escribiendo archivos...');
     fs.mkdirSync(folderPath, { recursive: true });
 
-    // index.json — metadatos (lo que lee Astro Content Layer y Keystatic)
+    // 7b. Orquestador Flash Taxonomist: Enriquecimiento semántico y categorización canónica
+    console.log('  🧠 Orquestando taxonomía canónica con Gemini Flash...');
+    const flashTaxonomy = await orquestarTaxonomiaFlash(API_KEY, titulo, textoEnsayo);
+    const finalCategory = (categoriaInput && categoriaInput !== 'Ensayo') ? categoriaInput : flashTaxonomy.categoria;
+
+    // Escribir index.json con Metadatos Blindados
     const metadata = {
       title: titulo,
-      volanta: '',
+      volanta: flashTaxonomy.dossierLevel || '',
       date: new Date().toISOString().split('T')[0],
-      category: categoria,
+      category: finalCategory,
       themeColor: 'british-green',
-      draft: true,                              // Siempre empieza como borrador
+      draft: true,
       coverImage: coverImage,
+      gallery: galleryImages,
       videoBg: null,
       excerpt,
-      generador: 'gemini-3.1-pro-preview',
-      generadorTexto: textoEnsayo,             // El texto completo en el campo tipado
-      generadorImagen: '',
-      notasInvestigador: '',
+      generador: textModel,
+      generadorTexto: textoEnsayo,
+      generadorImagen: imageMetadataLabel,
+      notasInvestigador: `Taxonomía: ${flashTaxonomy.tags?.join(' · ')}`,
       spotifyLink: null,
       youtubeLink: null,
     };
 
-    fs.writeFileSync(
-      path.join(folderPath, 'index.json'),
-      JSON.stringify(metadata, null, 2),
-      'utf-8'
-    );
+    fs.writeFileSync(path.join(folderPath, 'index.json'), JSON.stringify(metadata, null, 2), 'utf-8');
+    fs.writeFileSync(path.join(folderPath, 'content.mdoc'), textoEnsayo, 'utf-8');
 
-    // content.mdoc — contenido Markdoc (lo lee Keystatic en su editor)
-    fs.writeFileSync(
-      path.join(folderPath, 'content.mdoc'),
-      textoEnsayo,
-      'utf-8'
-    );
-
-    // ── Paso 8: Reporte final ─────────────────────────────────────────────
-    console.log('\n  ╔═══════════════════════════════════════════╗');
-    console.log('  ║           ✅ ENSAYO CREADO                ║');
-    console.log('  ╠═══════════════════════════════════════════╣');
-    console.log(`  ║  Título:   ${titulo.substring(0, 33).padEnd(33)} ║`);
-    console.log(`  ║  Slug:     ${slug.substring(0, 33).padEnd(33)} ║`);
-    console.log(`  ║  Categoría: ${categoria.substring(0, 32).padEnd(32)} ║`);
-    console.log(`  ║  Portada:  ${(coverImage ? '✓ Generada' : '✗ Sin portada').padEnd(33)} ║`);
-    console.log(`  ║  Estado:   BORRADOR (draft: true)          ║`);
-    console.log('  ╠═══════════════════════════════════════════╣');
-    console.log(`  ║  Ruta: src/content/ensayos/${slug.substring(0, 15)}  ║`);
-    console.log('  ╠═══════════════════════════════════════════╣');
-    console.log('  ║  ⚠️  Para publicar: abre Keystatic y       ║');
-    console.log('  ║     desmarca "Borrador" en este ensayo.    ║');
-    console.log('  ╚═══════════════════════════════════════════╝\n');
+    // 8. Ficha de Ubicación Exacta y Hubs Clickeables (Determinista + Flash)
+    imprimirFichaUbicacionExacta({
+      titulo,
+      slug,
+      collection: 'ensayos',
+      categoria: finalCategory,
+      coverUrl: coverImage,
+      galleryCount: galleryImages.length,
+      imageTag: imageMetadataLabel || 'Sin imagen',
+      engine: textModel,
+    });
 
   } catch (error) {
     console.error('\n  ❌ ERROR:', error.message || error);
-    console.log('');
     process.exit(1);
   }
 }

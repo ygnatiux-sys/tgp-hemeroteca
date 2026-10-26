@@ -1,13 +1,13 @@
 {
-    "title": "Hegel, la historia y Dios",
-    "date": "2026-08-05",
-    "category": "Filosofía",
-    "themeColor": "vintage-yellow",
-    "draft": false,
-    "sitioGeohistorico": null,
-    "publicarConImagen": true,
-    "coverImage": "/src/assets/ensayos/hegel-la-historia-y-dios/coverImage.jpg",
-    "excerpt": "",
-    "generador": "Gemini-3.1-Pro",
-    "dek": "La dialéctica del espíritu y el desarrollo de la conciencia a través del tiempo."
+  "title": "Hegel, la historia y Dios",
+  "date": "2026-08-05",
+  "category": "Filosofía",
+  "themeColor": "vintage-yellow",
+  "draft": false,
+  "sitioGeohistorico": null,
+  "publicarConImagen": true,
+  "coverImage": "/src/assets/ensayos/hegel-la-historia-y-dios/coverImage.webp",
+  "excerpt": "La historia, lejos de ser el caótico amasijo de eventos contingentes o la arena de voluntades ciegas, se erige en la filosofía hegeliana como la ineludible epifanía de lo Absoluto....",
+  "generador": "Gemini-3.1-Pro",
+  "dek": "La dialéctica del espíritu y el desarrollo de la conciencia a través del tiempo."
 }

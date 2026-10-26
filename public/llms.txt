@@ -1,0 +1,88 @@
+# The Great Puzzle Project
+> Archivo de Investigación Arqueosemiótica, Megalitismo, Metafísica y Cartografía Cognitiva.
+
+The Great Puzzle Project (TGP) es un proyecto de investigación independiente y archivo digital fundado por Xavier Benítez. Su corpus articula la fenomenología del monumento pétreo, la arqueología no-lineal, los arquetipos globales de la conciencia humana y el análisis crítico de la historiografía institucional.
+
+- Web Principal & Hemeroteca: https://thegreatpuzzleproject.com
+- Ediciones & Monografías: https://ediciones.thegreatpuzzleproject.com
+- Endpoint Ontológico (Cloudflare Edge): https://thegreatpuzzleproject.com/api/ontology.json
+- Bóveda de Assets (Cloudflare R2): https://storage.thegreatpuzzleproject.com
+
+## Ejes Cardinales & Continentes Ontológicos
+- [América Secrets](https://thegreatpuzzleproject.com/colecciones/#america): Mecanizado Andino, Geometría Mesoamericana & Andesita Quirúrgica
+- [Asia Secrets](https://thegreatpuzzleproject.com/colecciones/#asia): Sagrarios de la Ruta de la Seda, Ciclópeos del Pacífico & Georradar
+- [África Misteriosa](https://thegreatpuzzleproject.com/colecciones/#africa): Pirámides Negras de Nubia, Esfinges Pluviales & Litología Primaria
+- [Europa Oculta](https://thegreatpuzzleproject.com/colecciones/#europa): Megalitismo Atlántico, Cátaros, Herejías & Laberintos Subterráneos
+- [Oceanía Ancestral](https://thegreatpuzzleproject.com/colecciones/#oceania): Megaconstrucciones de Basalto en Arrecifes, Moais & Pueblos de las Olas
+- [Doctrina & Filosofía Trascendental](https://thegreatpuzzleproject.com/colecciones/#filosofia): Tratados Arquetípicos, Gnósticos, Escolástica & Metafísica
+
+## Ediciones Monográficas Especiales
+- [Cosmos 1: Universo Observable](https://ediciones.thegreatpuzzleproject.com/revista/cosmos-1-universo-observable/): Monografía editorial sobre cosmología arcaica, mecánica celeste y percepción del vacío.
+- [Las Pirámides de Bosnia & Valle de Visoko](https://ediciones.thegreatpuzzleproject.com/revista/las-pirmades-de-bosnia/): Investigación estratigráfica de las colinas de Visoko, túneles de Ravne y anomalías electromagnéticas.
+- [The Mask: Máscaras Rituales & Arquetipos Ocultos](https://ediciones.thegreatpuzzleproject.com/revista/the-mask/): Estudio antropológico del disfraz chamánico y la trasmutación de la identidad sagrada.
+- [Viajes Extraordinarios: Sagrarios de Japón](https://ediciones.thegreatpuzzleproject.com/revista/viajes-extraordinarios-japon-1/): Ruta sintoísta, megalitos de Asuka, Ishi-no-Hoden y templos de Kioto.
+- [Göbekli Tepe: El Amanecer Megalítico de Anatolia](https://ediciones.thegreatpuzzleproject.com/revista/gobekli-tepe/): Análisis de los pilares T, astronomía pre-agrícola y la revolución del templo.
+- [Pompeya & Herculano: El Instante Petrificado](https://ediciones.thegreatpuzzleproject.com/revista/pompeya-vesubio/): Crónica arqueológica de la catástrofe vesubiana y la vida íntima romana.
+- [La Biblioteca de Alejandría & El Archivo Universal](https://ediciones.thegreatpuzzleproject.com/revista/biblioteca-alejandria/): Historia del mayor centro de compilación de saber clásico y su trágico destino.
+- [Espíritus del Sur: Mitología Selk'nam & Yagán](https://ediciones.thegreatpuzzleproject.com/revista/espiritus-del-sur/): Cosmovisión de los pueblos del confín austral de Tierra del Fuego.
+
+## Georreferencias Megalíticas Clave
+- [Aramu Muru: El Umbral Megalítico de Hayumarca](https://thegreatpuzzleproject.com/colecciones/georreferencias/aramu-muru-puerta-de-los-dioses/): En las altiplanicies desérticas de Puno, Aramu Muru se yergue como una hendidura pétrea entre la etnografía aymara y la liminalidad. (Región: AMERICA)
+- [Capacete, Brasil](https://thegreatpuzzleproject.com/colecciones/georreferencias/capacete-brasil/): Georreferencia arqueológica: Capacete, Brasil (Región: AMERICA)
+- [cueva de altamira](https://thegreatpuzzleproject.com/colecciones/georreferencias/cueva-de-altamira/): Georreferencia arqueológica: cueva de altamira (Región: EUROPA)
+- [Cueva de las Manos: El Lenguaje Rupestre de la Patagonia](https://thegreatpuzzleproject.com/colecciones/georreferencias/cueva-de-las-manos-patagonia/): Cueva de las Manos: ¿Un archivo estético de 9.000 años o el primer manifiesto de presencia humana en el confín austral? (Región: AMERICA)
+- [Ellora Caves](https://thegreatpuzzleproject.com/colecciones/georreferencias/ellora-caves/): Georreferencia arqueológica: Ellora Caves (Región: ASIA)
+- [Isla de los Estados en Tierra del Fuego](https://thegreatpuzzleproject.com/colecciones/georreferencias/isla-de-los-estados-en-tierra-del-fuego/): ¿Santuario de presidiarios y loberos o vestigio antártico sumergido? Isla de los Estados oculta el verdadero faro del fin del mundo. (Región: AMERICA)
+- [la cueva de lascaux](https://thegreatpuzzleproject.com/colecciones/georreferencias/la-cueva-de-lascaux/): Georreferencia arqueológica: la cueva de lascaux (Región: EUROPA)
+- [Los Gitanos del mar](https://thegreatpuzzleproject.com/colecciones/georreferencias/los-gitanos-del-mar/): Georreferencia arqueológica: Los Gitanos del mar (Región: OCEANIA)
+- [Meroe , la Dinastia Egipcia Nubia](https://thegreatpuzzleproject.com/colecciones/georreferencias/meroe-la-dinastia-egipcia-nubia/): Georreferencia arqueológica: Meroe , la Dinastia Egipcia Nubia (Región: AFRICA)
+- [Meroe y la Dinastía Negra: El Códice de las Pirámides Nubias](https://thegreatpuzzleproject.com/colecciones/georreferencias/meroe-y-la-dinasta-negra-el-cdice-de-las-pirmides-nubias/): ¿Fue Meroe el crisol metalúrgico de los faraones negros o un vórtice de saberes perdidos en el desierto nubio? (Región: AFRICA)
+- [olumo rock](https://thegreatpuzzleproject.com/colecciones/georreferencias/olumo-rock/): Georreferencia arqueológica: olumo rock (Región: AFRICA)
+- [Pedra Inga](https://thegreatpuzzleproject.com/colecciones/georreferencias/pedra-inga/): ¿Un mapa estelar prehistórico o el último testamento lítico de una civilización devorada por los milenios en el sertón brasileño? (Región: AMERICA)
+- [Piramide Romana de Cestia](https://thegreatpuzzleproject.com/colecciones/georreferencias/piramide-romana-de-cestia/): Georreferencia arqueológica: Piramide Romana de Cestia (Región: EUROPA)
+- [Santuario de Ballenas, peninsula de Valdez, patagonia](https://thegreatpuzzleproject.com/colecciones/georreferencias/santuario-de-ballenas-peninsula-de-valdez-patagonia/): Georreferencia Arqueosemiótica e investigación geohistórica sobre Santuario de Ballenas, peninsula de Valdez, patagonia. (Región: AMERICA)
+- [Stonehenge](https://thegreatpuzzleproject.com/colecciones/georreferencias/stonehenge/): ¿Un calendario estelar fosilizado en la piedra o el epicentro ritual de una civilización perdida en la bruma de Albión? (Región: EUROPA)
+
+## Ensayos Fundacionales de Hemeroteca
+- [1984 : La prediccion de Orwell?](https://thegreatpuzzleproject.com/hemeroteca/1984-la-prediccion-de-orwell/): Ensayo canónico de Hemeroteca: 1984 : La prediccion de Orwell?
+- [7 pecados, 7 chackras](https://thegreatpuzzleproject.com/hemeroteca/7-pecados-7-chackras/): Ensayo canónico de Hemeroteca: 7 pecados, 7 chackras
+- [america invertida](https://thegreatpuzzleproject.com/hemeroteca/america-invertida/): Ensayo canónico de Hemeroteca: america invertida
+- [Atila y el Papa ](https://thegreatpuzzleproject.com/hemeroteca/atila-y-el-papa/): Ensayo canónico de Hemeroteca: Atila y el Papa 
+- [Bonampak: La Sinfonía del Cinabrio y la Selva](https://thegreatpuzzleproject.com/hemeroteca/bonampak/): Ensayo canónico de Hemeroteca: Bonampak: La Sinfonía del Cinabrio y la Selva
+- [Bonampak](https://thegreatpuzzleproject.com/hemeroteca/bonampak-1/): Ensayo canónico de Hemeroteca: Bonampak
+- [del cosmos a la luna](https://thegreatpuzzleproject.com/hemeroteca/del-cosmos-a-la-luna/): Ensayo canónico de Hemeroteca: del cosmos a la luna
+- [Derinkuyu Acustica Subterranea](https://thegreatpuzzleproject.com/hemeroteca/derinkuyu-acustica-subterranea/): Ensayo canónico de Hemeroteca: Derinkuyu Acustica Subterranea
+- [El Ankh Egipcio](https://thegreatpuzzleproject.com/hemeroteca/el-ankh-egipcio/): Ensayo canónico de Hemeroteca: El Ankh Egipcio
+- [El Diablo en el Tarot](https://thegreatpuzzleproject.com/hemeroteca/el-diablo-en-el-tarot/): Ensayo canónico de Hemeroteca: El Diablo en el Tarot
+- [el mito de sisifo](https://thegreatpuzzleproject.com/hemeroteca/el-mito-de-sisifo/): Ensayo canónico de Hemeroteca: el mito de sisifo
+- [El Qapaq Ñan: una obra de ingenieria arcaica asombroso en las entrañas de Sudamerica](https://thegreatpuzzleproject.com/hemeroteca/el-qapaq-nan-una-obra-de-ingenieria-arcaica-asombroso-en-las-entranas-de-sudamerica/): Ensayo canónico de Hemeroteca: El Qapaq Ñan: una obra de ingenieria arcaica asombroso en las entrañas de Sudamerica
+- [El Simbolismo del Laberinto](https://thegreatpuzzleproject.com/hemeroteca/el-simbolismo-del-laberinto/): De Minotauros a Cavernas Digitales
+- [Gengis Khan](https://thegreatpuzzleproject.com/hemeroteca/gengis-khan/): Ensayo canónico de Hemeroteca: Gengis Khan
+- [Hegel, la historia y Dios](https://thegreatpuzzleproject.com/hemeroteca/hegel-la-historia-y-dios/): Ensayo canónico de Hemeroteca: Hegel, la historia y Dios
+- [Homero, el poeta ciego](https://thegreatpuzzleproject.com/hemeroteca/homero-el-poeta-ciego/): Ensayo canónico de Hemeroteca: Homero, el poeta ciego
+- [Ishi-no-Hōden: El Monolito Flotante de Harima](https://thegreatpuzzleproject.com/hemeroteca/ishi-no-hoden/): Ensayo canónico de Hemeroteca: Ishi-no-Hōden: El Monolito Flotante de Harima
+- [Isis : los misterios del Iniciacion.](https://thegreatpuzzleproject.com/hemeroteca/isis-los-misterios-del-iniciacion/): Ensayo canónico de Hemeroteca: Isis : los misterios del Iniciacion.
+- [JULIO CESAR Y LOS GALOS 2026](https://thegreatpuzzleproject.com/hemeroteca/julio-cesar-y-los-galos-2026/): ARQUEOHISTORIA MILITAR · ROMA Y LA GALIA
+- [Jung y los Arquetipos](https://thegreatpuzzleproject.com/hemeroteca/jung-y-los-arquetipos/): Ensayo canónico de Hemeroteca: Jung y los Arquetipos
+
+## Ensayos Críticos (TGP Alternative)
+- [La Heurística Alterna: Cartografía Crítica del Olvido Institucional y los Paradigmas Excluidos en la Arqueología Oficial](https://thegreatpuzzleproject.com/ensayos/amnesia-programada/): En los pasillos sepulcrales de la academia contemporánea, el Proyecto del Gran Rompecabezas se ha erigido como el triunfo definitivo de la historia domesticada....
+- [asado argentino](https://thegreatpuzzleproject.com/ensayos/asado-argentino-4796/): asado argentino...
+- [Uxmal: La Epopeya Pétrea de la Serranía Puuc](https://thegreatpuzzleproject.com/ensayos/borrador-ia-2026-08-18t07-00-15/): La península de Yucatán guarda en Uxmal una de las más sublimes expresiones del genio maya: una sinfonía arquitectónica cincelada en piedra caliza que desafió l...
+- [Amazonía Primigenia: La Memoria Hídrica y los Geoglifos del Antropoceno](https://thegreatpuzzleproject.com/ensayos/borrador-ia-visual-2026-08-18t05-24-50/): La Amazonía revela a través de sus patrones fluviales y geoglifos la confrontación entre procesos geológicos milenarios y la impronta territorial del Antropocen...
+- [Bonampak: La Crónica Pictórica de la Selva Lacandona](https://thegreatpuzzleproject.com/ensayos/borrador-ia-visual-2026-08-18t07-48-40/): Conocido como muros pintados en lengua lacandona, Bonampak es un códice visual monumental: una crónica pictórica que desafía el tiempo con testimonios de ritual...
+- [Los Frescos de Pompeya: Un Diálogo Visual con la Ciudad Sepultada](https://thegreatpuzzleproject.com/ensayos/borrador-ia-visual-2026-08-18t09-16-08/): Sepultada bajo las cenizas del Vesubio en el 79 d.C., Pompeya conserva en sus frescos una cápsula del tiempo incomparable: mitos, rituales y la intimidad de sus...
+- [1177 a.C.: El Gran Apagón del Bronce Tardío y la Amnesia Sistémica del Mediterráneo Oriental](https://thegreatpuzzleproject.com/ensayos/colapso-1177/): En el crepúsculo del duodécimo siglo antes de nuestra era, la vasta red de palacios y rutas comerciales que sostenía el mundo civilizado se desintegró en un cor...
+- [Ensayo de prueba](https://thegreatpuzzleproject.com/ensayos/ejemplo/): Este es un ensayo de prueba para inicializar la colección....
+- [EL MONTE KAILASH](https://thegreatpuzzleproject.com/ensayos/el-monte-kailash-6233/): Una pirámide de roca, no tallada por manos humanas sino por la paciencia geológica de eones, se alza en el Tíbet occidental. El Monte Kailash no es una cima ent...
+- [El Silencio de Nefertiti: Un Rostro en la Fractura del Tiempo](https://thegreatpuzzleproject.com/ensayos/el-silencio-de-nefertiti-un-rostro-en-la-fractura-del-tiempo-6183/): El busto de Nefertiti no es solo una obra de arte; es un fragmento de tiempo petrificado, un rostro que emerge de la arena y el olvido para interpelar nuestra p...
+- [El Tel y la Sombra: El Descubrimiento de Belo Brdo](https://thegreatpuzzleproject.com/ensayos/el-tel-y-la-sombra-belo-brdo/): La cultura Vinča y la estratigrafía milenaria de Belo Brdo: metalurgia del cobre, proto-escritura en Tărtăria y el enigma de la Vieja Europa en las riberas del ...
+- [El vodka: una bebida del mundo eslavo?](https://thegreatpuzzleproject.com/ensayos/el-vodka-una-bebida-del-mundo-eslavo-7802/): La palabra ...
+- [Catedrales del Polvo: Göbekli Tepe y la Alborada Ritual del Neolítico Precerámico](https://thegreatpuzzleproject.com/ensayos/gobekli-tepe/): Antes de la domesticación del trigo o la invención de la rueda, los cazadores-recolectores de la Alta Mesopotamia erigieron un complejo megalítico que fractura ...
+- [Ecos del Abismo Calcáreo: Ħal Saflieni y la Arquitectura Psicoacústica del Neolítico](https://thegreatpuzzleproject.com/ensayos/hal-saflieni/): Bajo la árida superficie de Malta, el Hipogeo de Ħal Saflieni se erige no solo como un osario monumental, sino como un colosal instrumento lítico. Este ensayo d...
+- [Homenaje a María Reiche y las Líneas de Nasca](https://thegreatpuzzleproject.com/ensayos/homenaje-a-maria-reiche-y-las-lineas-de-nasca-3074/): Cuarenta años barriendo la pampa con una escoba de mano para preservar un templo sin techo. La geometría sagrada de Jumana y la mirada que sólo los dioses o el ...
+
+## Información de Citas y Consumo por LLMs
+- Estándar Semántico: Schema.org / ScholarlyArticle, Place, PublicationIssue
+- Cita sugerida: Benítez, Xavier. The Great Puzzle Project (TGP). https://thegreatpuzzleproject.com
+- Para el índice exhaustivo de las más de 200 entidades, consulte: https://thegreatpuzzleproject.com/llms-full.txt

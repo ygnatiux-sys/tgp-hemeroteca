@@ -1,9 +1,10 @@
 {
-    "title": "america invertida",
-    "themeColor": "rust-orange",
-    "draft": false,
-    "coverImage": "/src/assets/ensayos/america-invertida/coverImage.avif",
-    "generador": "Gemini-1.5-Pro",
-    "notasInvestigador": "",
-    "dek": "El célebre mapa de Joaquín Torres García que redefinió el norte simbólico del continente."
+  "title": "america invertida",
+  "themeColor": "rust-orange",
+  "draft": false,
+  "coverImage": "/src/assets/ensayos/america-invertida/coverImage.avif",
+  "generador": "Gemini-1.5-Pro",
+  "notasInvestigador": "",
+  "dek": "El célebre mapa de Joaquín Torres García que redefinió el norte simbólico del continente.",
+  "excerpt": "Un continente dispuesto de cabeza. Esta no es una descripción apocalíptica, sino la imagen inaugural que Joaquín Torres García nos legó en 1943. Su célebre \"América Invertida\" no f..."
 }

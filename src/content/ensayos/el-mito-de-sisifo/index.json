@@ -1,8 +1,9 @@
 {
-    "title": "el mito de sisifo",
-    "date": "2026-08-03",
-    "themeColor": "british-green",
-    "draft": false,
-    "coverImage": "/src/assets/ensayos/el-mito-de-sisifo/coverImage.jpg",
-    "dek": "Camus y el absurdo: encontrar sentido y rebelión en el esfuerzo incesante de la existencia."
+  "title": "el mito de sisifo",
+  "date": "2026-08-03",
+  "themeColor": "british-green",
+  "draft": false,
+  "coverImage": "/src/assets/ensayos/el-mito-de-sisifo/coverImage.jpg",
+  "dek": "Camus y el absurdo: encontrar sentido y rebelión en el esfuerzo incesante de la existencia.",
+  "excerpt": "La imagen es primigenia y brutal: un hombre condenado a empujar eternamente una roca cuesta arriba, solo para verla rodar de nuevo al valle. Este suplicio, lejos de ser un mero cas..."
 }

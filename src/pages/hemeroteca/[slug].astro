@@ -332,18 +332,26 @@ const isArquetipo = (doc.category || data.category || "").toLowerCase().includes
 // URL de imagen de portada para fondo (puede ser string base64, URL remota o rutas procesadas)
 const heroBgUrl: string = (typeof optimizedImage === 'string' ? optimizedImage : (optimizedImage as any)?.src || "");
 
+const metaImageUrl = typeof optimizedImage === 'object' && optimizedImage?.src ? optimizedImage.src : (typeof optimizedImage === 'string' ? optimizedImage : undefined);
+
 const articleSchema = {
   "@context": "https://schema.org",
   "@type": "ScholarlyArticle",
   "headline": doc.title,
   "abstract": doc.excerpt || doc.description,
+  "image": metaImageUrl ? [metaImageUrl] : undefined,
   "author": {
     "@type": "Person",
-    "name": "Xavier Benítez"
+    "name": "Xavier Benítez",
+    "url": "https://orcid.org/0009-0003-9368-1772"
   },
   "publisher": {
     "@type": "Organization",
-    "name": "The Great Puzzle Project"
+    "name": "The Great Puzzle Project",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://thegreatpuzzleproject.com/favicon.png"
+    }
   },
   "datePublished": doc.date,
   "dateModified": doc.updatedDate || doc.date,
@@ -353,7 +361,6 @@ const articleSchema = {
     ...(doc.tags || [])
   ].filter(Boolean).join(", ")
 };
-const metaImageUrl = typeof optimizedImage === 'object' && optimizedImage?.src ? optimizedImage.src : (typeof optimizedImage === 'string' ? optimizedImage : undefined);
 
 // Gradiente metálico adaptativo (Rojo Netflix, Azul Platinado, Titanio, Plata)
 const { gradientClass: heroGradientClass, strokeClass: heroStrokeClass } = recommendMetallicGradient(

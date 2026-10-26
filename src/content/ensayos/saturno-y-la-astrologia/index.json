@@ -1,13 +1,13 @@
 {
-    "title": "Saturno y la Astrología",
-    "date": "2026-08-05",
-    "category": "Historia",
-    "themeColor": "british-green",
-    "draft": false,
-    "sitioGeohistorico": null,
-    "publicarConImagen": true,
-    "coverImage": "/src/assets/ensayos/saturno-y-la-astrologia/coverImage.jpg",
-    "excerpt": "",
-    "generador": "Gemini-3.1-Pro",
-    "dek": "El arquetipo del tiempo, los límites, la disciplina y la melancolía filosófica."
+  "title": "Saturno y la Astrología",
+  "date": "2026-08-05",
+  "category": "Historia",
+  "themeColor": "british-green",
+  "draft": false,
+  "sitioGeohistorico": null,
+  "publicarConImagen": true,
+  "coverImage": "/src/assets/ensayos/saturno-y-la-astrologia/coverImage.jpg",
+  "excerpt": "La presunción de que un orbe distante y helado, apenas perceptible en el firmamento nocturno, pudiera dictar los plazos y las cargas de la existencia humana, es una anomalía intele...",
+  "generador": "Gemini-3.1-Pro",
+  "dek": "El arquetipo del tiempo, los límites, la disciplina y la melancolía filosófica."
 }

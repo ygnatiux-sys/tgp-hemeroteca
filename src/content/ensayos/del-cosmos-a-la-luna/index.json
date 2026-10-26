@@ -1,8 +1,9 @@
 {
-    "title": "del cosmos a la luna",
-    "themeColor": "old-navy",
-    "coverImage": "/src/assets/ensayos/del-cosmos-a-la-luna/coverImage.png",
-    "generador": "Gemini-1.5-Pro",
-    "notasInvestigador": "",
-    "dek": "La carrera espacial como metáfora del anhelo humano por traspasar sus propias fronteras."
+  "title": "del cosmos a la luna",
+  "themeColor": "old-navy",
+  "coverImage": "/src/assets/ensayos/del-cosmos-a-la-luna/coverImage.png",
+  "generador": "Gemini-1.5-Pro",
+  "notasInvestigador": "",
+  "dek": "La carrera espacial como metáfora del anhelo humano por traspasar sus propias fronteras.",
+  "excerpt": "El universo no fue concebido para la habitación humana, ni la Tierra para ser su prisión perpetua. El primer impulso que elevó la mirada del simio ancestral hacia el firmamento no ..."
 }

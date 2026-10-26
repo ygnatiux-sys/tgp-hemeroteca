@@ -1,0 +1,1054 @@
+{
+  "nodes": [
+    {
+      "id": "cat_Ficcion literaria",
+      "name": "Ficcion literaria",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_Archivo",
+      "name": "Archivo",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_historia antigua",
+      "name": "historia antigua",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_Arqueología",
+      "name": "Arqueología",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_antropologia",
+      "name": "antropologia",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_Arqueosemiótica",
+      "name": "Arqueosemiótica",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_arqueologia",
+      "name": "arqueologia",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_Filosofía",
+      "name": "Filosofía",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_Historia medieval",
+      "name": "Historia medieval",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_Historia",
+      "name": "Historia",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_sociologia",
+      "name": "sociologia",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_HISTORIA",
+      "name": "HISTORIA",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_HISTORIA ANTIGUA",
+      "name": "HISTORIA ANTIGUA",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_Historia de la Cultura",
+      "name": "Historia de la Cultura",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_Historia de las Religiones",
+      "name": "Historia de las Religiones",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_Antropología",
+      "name": "Antropología",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_Historia Alternativa",
+      "name": "Historia Alternativa",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_Historia Antigua",
+      "name": "Historia Antigua",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_Historia de las Ideas",
+      "name": "Historia de las Ideas",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_Sociología",
+      "name": "Sociología",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_Arquetipos Globales",
+      "name": "Arquetipos Globales",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "cat_Historia Natural",
+      "name": "Historia Natural",
+      "group": "Category",
+      "val": 18,
+      "isCategory": true
+    },
+    {
+      "id": "1984-la-prediccion-de-orwell",
+      "name": "1984 : La prediccion de Orwell?",
+      "group": "Essay",
+      "category": "Ficcion literaria",
+      "slug": "1984-la-prediccion-de-orwell",
+      "dek": "Vigilancia, manipulación del lenguaje y el control totalitario de la mente humana.",
+      "val": 10,
+      "url": "/hemeroteca/1984-la-prediccion-de-orwell"
+    },
+    {
+      "id": "7-pecados-7-chackras",
+      "name": "7 pecados, 7 chackras",
+      "group": "Essay",
+      "category": "Archivo",
+      "slug": "7-pecados-7-chackras",
+      "dek": "Paralelismos simbólicos entre los centros energéticos de Oriente y los vicios capitales de Occidente.",
+      "val": 10,
+      "url": "/hemeroteca/7-pecados-7-chackras"
+    },
+    {
+      "id": "america-invertida",
+      "name": "america invertida",
+      "group": "Essay",
+      "category": "Archivo",
+      "slug": "america-invertida",
+      "dek": "El célebre mapa de Joaquín Torres García que redefinió el norte simbólico del continente.",
+      "val": 10,
+      "url": "/hemeroteca/america-invertida"
+    },
+    {
+      "id": "atila-y-el-papa",
+      "name": "Atila y el Papa ",
+      "group": "Essay",
+      "category": "historia antigua",
+      "slug": "atila-y-el-papa",
+      "dek": "El encuentro legendario en el río Mincio entre Atila el Huno y el papa León Magno.",
+      "val": 10,
+      "url": "/hemeroteca/atila-y-el-papa"
+    },
+    {
+      "id": "bonampak",
+      "name": "Bonampak: La Sinfonía del Cinabrio y la Selva",
+      "group": "Essay",
+      "category": "Arqueología",
+      "slug": "bonampak",
+      "dek": "Pintura mural, sacerdotes y guerra en el corazón de la selva lacandona.",
+      "val": 10,
+      "url": "/hemeroteca/bonampak"
+    },
+    {
+      "id": "bonampak-1",
+      "name": "Bonampak",
+      "group": "Essay",
+      "category": "Arqueología",
+      "slug": "bonampak-1",
+      "dek": "Crónica visual de la vida cortesana y las ceremonias mayas en Bonampak.",
+      "val": 10,
+      "url": "/hemeroteca/bonampak-1"
+    },
+    {
+      "id": "del-cosmos-a-la-luna",
+      "name": "del cosmos a la luna",
+      "group": "Essay",
+      "category": "Archivo",
+      "slug": "del-cosmos-a-la-luna",
+      "dek": "La carrera espacial como metáfora del anhelo humano por traspasar sus propias fronteras.",
+      "val": 10,
+      "url": "/hemeroteca/del-cosmos-a-la-luna"
+    },
+    {
+      "id": "el-ankh-egipcio",
+      "name": "El Ankh Egipcio",
+      "group": "Essay",
+      "category": "antropologia",
+      "slug": "el-ankh-egipcio",
+      "dek": "El jeroglífico de la vida eterna: orígenes, simbolismo y poder en el Antiguo Egipto.",
+      "val": 10,
+      "url": "/hemeroteca/el-ankh-egipcio"
+    },
+    {
+      "id": "el-diablo-en-el-tarot",
+      "name": "El Diablo en el Tarot",
+      "group": "Essay",
+      "category": "Arqueosemiótica",
+      "slug": "el-diablo-en-el-tarot",
+      "dek": "La carta de la atadura, el instinto y las pulsiones ocultas de la psique.",
+      "val": 10,
+      "url": "/hemeroteca/el-diablo-en-el-tarot"
+    },
+    {
+      "id": "el-mito-de-sisifo",
+      "name": "el mito de sisifo",
+      "group": "Essay",
+      "category": "Archivo",
+      "slug": "el-mito-de-sisifo",
+      "dek": "Camus y el absurdo: encontrar sentido y rebelión en el esfuerzo incesante de la existencia.",
+      "val": 10,
+      "url": "/hemeroteca/el-mito-de-sisifo"
+    },
+    {
+      "id": "el-qapaq-nan-una-obra-de-ingenieria-arcaica-asombroso-en-las-entranas-de-sudamerica",
+      "name": "El Qapaq Ñan: una obra de ingenieria arcaica asombroso en las entrañas de Sudamerica",
+      "group": "Essay",
+      "category": "arqueologia",
+      "slug": "el-qapaq-nan-una-obra-de-ingenieria-arcaica-asombroso-en-las-entranas-de-sudamerica",
+      "dek": "La red vial andina que unió montañas, costas y selvas a lo largo de miles de kilómetros.",
+      "val": 10,
+      "url": "/hemeroteca/el-qapaq-nan-una-obra-de-ingenieria-arcaica-asombroso-en-las-entranas-de-sudamerica"
+    },
+    {
+      "id": "el-simbolismo-del-laberinto",
+      "name": "El Simbolismo del Laberinto",
+      "group": "Essay",
+      "category": "Filosofía",
+      "slug": "el-simbolismo-del-laberinto",
+      "dek": "El viaje iniciático, el monstruo interior y el camino hacia el centro de uno mismo.",
+      "val": 10,
+      "url": "/hemeroteca/el-simbolismo-del-laberinto"
+    },
+    {
+      "id": "gengis-khan",
+      "name": "Gengis Khan",
+      "group": "Essay",
+      "category": "Historia medieval",
+      "slug": "gengis-khan",
+      "dek": "El estratega mongol que unificó las estepas y forjó el mayor imperio contiguo del mundo.",
+      "val": 10,
+      "url": "/hemeroteca/gengis-khan"
+    },
+    {
+      "id": "hegel-la-historia-y-dios",
+      "name": "Hegel, la historia y Dios",
+      "group": "Essay",
+      "category": "Filosofía",
+      "slug": "hegel-la-historia-y-dios",
+      "dek": "La dialéctica del espíritu y el desarrollo de la conciencia a través del tiempo.",
+      "val": 10,
+      "url": "/hemeroteca/hegel-la-historia-y-dios"
+    },
+    {
+      "id": "homero-el-poeta-ciego",
+      "name": "Homero, el poeta ciego",
+      "group": "Essay",
+      "category": "Historia",
+      "slug": "homero-el-poeta-ciego",
+      "dek": "La Ilíada, la Odisea y la forja de la identidad mitológica y heroica de Grecia.",
+      "val": 10,
+      "url": "/hemeroteca/homero-el-poeta-ciego"
+    },
+    {
+      "id": "ishi-no-hoden",
+      "name": "Ishi-no-Hōden: El Monolito Flotante de Harima",
+      "group": "Essay",
+      "category": "Arqueología",
+      "slug": "ishi-no-hoden",
+      "dek": "Un estudio riguroso sobre el imponente Ishi-no-Hōden, analizando su composición geológica, dimensiones colosales, y las narrativas históricas que lo envuelven, desde las crónicas más antiguas de Japón hasta las observaciones pioneras de Occidente.",
+      "val": 10,
+      "url": "/hemeroteca/ishi-no-hoden"
+    },
+    {
+      "id": "isis-los-misterios-del-iniciacion",
+      "name": "Isis : los misterios del Iniciacion.",
+      "group": "Essay",
+      "category": "sociologia",
+      "slug": "isis-los-misterios-del-iniciacion",
+      "dek": "El culto a la gran madre egipcia y sus ritos de resurrección en el mundo helenístico.",
+      "val": 10,
+      "url": "/hemeroteca/isis-los-misterios-del-iniciacion"
+    },
+    {
+      "id": "julio-cesar-y-los-galos-2026",
+      "name": "JULIO CESAR Y LOS GALOS 2026",
+      "group": "Essay",
+      "category": "HISTORIA",
+      "slug": "julio-cesar-y-los-galos-2026",
+      "dek": "Análisis táctico de la Guerra de las Galias y el ascenso político de César.",
+      "val": 10,
+      "url": "/hemeroteca/julio-cesar-y-los-galos-2026"
+    },
+    {
+      "id": "jung-y-los-arquetipos",
+      "name": "Jung y los Arquetipos",
+      "group": "Essay",
+      "category": "Historia",
+      "slug": "jung-y-los-arquetipos",
+      "dek": "Exploración e investigación archivística sobre Jung y los Arquetipos en la hemeroteca TGP.",
+      "val": 10,
+      "url": "/hemeroteca/jung-y-los-arquetipos"
+    },
+    {
+      "id": "jupiter-y-la-astrologia-el-benigno",
+      "name": "Júpiter y la Astrología: El Benigno",
+      "group": "Essay",
+      "category": "Historia",
+      "slug": "jupiter-y-la-astrologia-el-benigno",
+      "dek": "Exploración e investigación archivística sobre J�piter y la Astrolog�a: El Benigno en la hemeroteca TGP.",
+      "val": 10,
+      "url": "/hemeroteca/jupiter-y-la-astrologia-el-benigno"
+    },
+    {
+      "id": "la-arquitectura-de-los-suenos-lucidos",
+      "name": "La Arquitectura de los Sueños Lúcidos",
+      "group": "Essay",
+      "category": "Filosofía",
+      "slug": "la-arquitectura-de-los-suenos-lucidos",
+      "dek": "Mecanismos neurológicos, control consciente y exploración del mundo onírico.",
+      "val": 10,
+      "url": "/hemeroteca/la-arquitectura-de-los-suenos-lucidos"
+    },
+    {
+      "id": "la-caida-de-cartago",
+      "name": "LA CAIDA DE CARTAGO",
+      "group": "Essay",
+      "category": "HISTORIA ANTIGUA",
+      "slug": "la-caida-de-cartago",
+      "dek": "El asedio romano del 146 a.C. y la destrucción definitiva de la gran potencia púnica.",
+      "val": 10,
+      "url": "/hemeroteca/la-caida-de-cartago"
+    },
+    {
+      "id": "la-chilinga",
+      "name": "La Chilinga ",
+      "group": "Essay",
+      "category": "sociologia",
+      "slug": "la-chilinga",
+      "dek": "El tambor comunitario, las raíces del candombe y la percusión como lenguaje colectivo.",
+      "val": 10,
+      "url": "/hemeroteca/la-chilinga"
+    },
+    {
+      "id": "la-cronometria-etrusca-anomalias-y-sincronismos-en-el-mediterraneo-antiguo",
+      "name": "La Cronometría Etrusca: Anomalías y Sincronismos en el Mediterráneo Antiguo",
+      "group": "Essay",
+      "category": "Arqueología",
+      "slug": "la-cronometria-etrusca-anomalias-y-sincronismos-en-el-mediterraneo-antiguo",
+      "dek": "Un análisis de la estructura temporal etrusca revela sus particularidades frente a los sistemas cronológicos grecorromanos, sugiriendo implicaciones en la percepción del tiempo y la ritualidad.",
+      "val": 10,
+      "url": "/hemeroteca/la-cronometria-etrusca-anomalias-y-sincronismos-en-el-mediterraneo-antiguo"
+    },
+    {
+      "id": "la-estetica-del-silencio",
+      "name": "La Estética del Silencio en el Cine",
+      "group": "Essay",
+      "category": "Historia de la Cultura",
+      "slug": "la-estetica-del-silencio",
+      "dek": "El valor del vacío y la pausa en el arte, la música y la contemplación.",
+      "val": 10,
+      "url": "/hemeroteca/la-estetica-del-silencio"
+    },
+    {
+      "id": "la-ingenieria-temporal-del-calendario-chino-clasico-precision-y-poder-dinastico",
+      "name": "La Ingeniería Temporal del Calendario Chino Clásico: Precisión y Poder Dinástico",
+      "group": "Essay",
+      "category": "Historia",
+      "slug": "la-ingenieria-temporal-del-calendario-chino-clasico-precision-y-poder-dinastico",
+      "dek": "La articulación de ciclos astronómicos y la legitimación imperial se manifiesta en la compleja estructura del calendario chino clásico, un artefacto de control temporal y político.",
+      "val": 10,
+      "url": "/hemeroteca/la-ingenieria-temporal-del-calendario-chino-clasico-precision-y-poder-dinastico"
+    },
+    {
+      "id": "los-carpocracianos",
+      "name": "Los Carpocracianos",
+      "group": "Essay",
+      "category": "Historia de las Religiones",
+      "slug": "los-carpocracianos",
+      "dek": "La secta gnóstica del siglo II que desafió las normas morales de su época.",
+      "val": 10,
+      "url": "/hemeroteca/los-carpocracianos"
+    },
+    {
+      "id": "los-esenios-mgzn",
+      "name": "Los Esenios mgzn",
+      "group": "Essay",
+      "category": "Antropología",
+      "slug": "los-esenios-mgzn",
+      "dek": "La comunidad ascética del Mar Muerto y sus manuscritos que iluminan el origen del cristianismo.",
+      "val": 10,
+      "url": "/hemeroteca/los-esenios-mgzn"
+    },
+    {
+      "id": "los-nestorianos",
+      "name": "Los Nestorianos",
+      "group": "Essay",
+      "category": "Historia de las Religiones",
+      "slug": "los-nestorianos",
+      "dek": "La vertiente cristiana de las dos naturalezas de Cristo que se expandió hasta China.",
+      "val": 10,
+      "url": "/hemeroteca/los-nestorianos"
+    },
+    {
+      "id": "masuda-no-iwafune-la-enigma-petrea-y-los-ecos",
+      "name": "Masuda no Iwafune: La Enigma Pétrea y los Ecos Megalíticos de Asuka",
+      "group": "Essay",
+      "category": "Historia Alternativa",
+      "slug": "masuda-no-iwafune-la-enigma-petrea-y-los-ecos",
+      "dek": "Una disquisición sobre la ingeniería arcaica, el propósito elusivo y la persistencia de lo incognoscible en el corazón del Japón ancestral.",
+      "val": 10,
+      "url": "/hemeroteca/masuda-no-iwafune-la-enigma-petrea-y-los-ecos"
+    },
+    {
+      "id": "mercurio",
+      "name": "Mercurio",
+      "group": "Essay",
+      "category": "Historia",
+      "slug": "mercurio",
+      "dek": "Exploración e investigación archivística sobre Mercurio en la hemeroteca TGP.",
+      "val": 10,
+      "url": "/hemeroteca/mercurio"
+    },
+    {
+      "id": "moctezuma-y-cortez-el-ultimo-azteca",
+      "name": "Moctezuma Y Cortez: el Ultimo Azteca",
+      "group": "Essay",
+      "category": "Historia",
+      "slug": "moctezuma-y-cortez-el-ultimo-azteca",
+      "dek": "El choque de dos mundos en Tenochtitlan y el fin del Imperio Mexica.",
+      "val": 10,
+      "url": "/hemeroteca/moctezuma-y-cortez-el-ultimo-azteca"
+    },
+    {
+      "id": "nag-hammadi-abril-2026",
+      "name": "nag hammadi abril 2026",
+      "group": "Essay",
+      "category": "Archivo",
+      "slug": "nag-hammadi-abril-2026",
+      "dek": "El hallazgo de los evangelios gnósticos que reescribieron la historia del cristianismo temprano.",
+      "val": 10,
+      "url": "/hemeroteca/nag-hammadi-abril-2026"
+    },
+    {
+      "id": "neoplatonicos",
+      "name": "Neoplatónicos",
+      "group": "Essay",
+      "category": "Filosofía",
+      "slug": "neoplatonicos",
+      "dek": "Plotino, el Uno y el retorno del alma a su fuente primordial mediante la filosofía.",
+      "val": 10,
+      "url": "/hemeroteca/neoplatonicos"
+    },
+    {
+      "id": "neron-y-roma",
+      "name": "Nerón y Roma",
+      "group": "Essay",
+      "category": "Historia Antigua",
+      "slug": "neron-y-roma",
+      "dek": "Poder, exceso y el incendio que transformó el destino del Imperio Romano.",
+      "val": 10,
+      "url": "/hemeroteca/neron-y-roma"
+    },
+    {
+      "id": "osiris-el-dios-verde",
+      "name": "Osiris , el Dios Verde",
+      "group": "Essay",
+      "category": "Historia de las Religiones",
+      "slug": "osiris-el-dios-verde",
+      "dek": "La deidad de la resurrección, la fertilidad del Nilo y el juicio de las almas.",
+      "val": 10,
+      "url": "/hemeroteca/osiris-el-dios-verde"
+    },
+    {
+      "id": "qumram-2026",
+      "name": "Qumram 2026",
+      "group": "Essay",
+      "category": "Arqueología",
+      "slug": "qumram-2026",
+      "dek": "Las cuevas del desierto de Judea y los rollos que conservaron textos bíblicos milenarios.",
+      "val": 10,
+      "url": "/hemeroteca/qumram-2026"
+    },
+    {
+      "id": "saber-es-recordar-la-teoria-de-platon",
+      "name": "Saber es Recordar: la Teoria de Platon",
+      "group": "Essay",
+      "category": "Filosofía",
+      "slug": "saber-es-recordar-la-teoria-de-platon",
+      "dek": "La reminiscencia platónica y el acceso al mundo de las Ideas.",
+      "val": 10,
+      "url": "/hemeroteca/saber-es-recordar-la-teoria-de-platon"
+    },
+    {
+      "id": "san-agustin-y-su-pasado",
+      "name": "San Agustin y su pasado",
+      "group": "Essay",
+      "category": "Historia de las Religiones",
+      "slug": "san-agustin-y-su-pasado",
+      "dek": "De los placeres de Cartago y el maniqueísmo a las Confesiones y la teología clásica.",
+      "val": 10,
+      "url": "/hemeroteca/san-agustin-y-su-pasado"
+    },
+    {
+      "id": "saturno-y-la-astrologia",
+      "name": "Saturno y la Astrología",
+      "group": "Essay",
+      "category": "Historia",
+      "slug": "saturno-y-la-astrologia",
+      "dek": "El arquetipo del tiempo, los límites, la disciplina y la melancolía filosófica.",
+      "val": 10,
+      "url": "/hemeroteca/saturno-y-la-astrologia"
+    },
+    {
+      "id": "schlieman-y-el-descubrimiento-de-troya",
+      "name": "Schlieman y el Descubrimiento de Troya",
+      "group": "Essay",
+      "category": "Arqueología",
+      "slug": "schlieman-y-el-descubrimiento-de-troya",
+      "dek": "La obsesión de un comerciante con los versos de Homero que desenterró Troya y Micenas.",
+      "val": 10,
+      "url": "/hemeroteca/schlieman-y-el-descubrimiento-de-troya"
+    },
+    {
+      "id": "simon-el-estilita",
+      "name": "Simon, el Estilita",
+      "group": "Essay",
+      "category": "Historia de las Ideas",
+      "slug": "simon-el-estilita",
+      "dek": "El ermitaño sirio que vivió décadas sobre una columna en busca de santidad extrema.",
+      "val": 10,
+      "url": "/hemeroteca/simon-el-estilita"
+    },
+    {
+      "id": "socrates2",
+      "name": "socrates2",
+      "group": "Essay",
+      "category": "Historia",
+      "slug": "socrates2",
+      "dek": "El método mayéutico, la ironía y el juicio que condenó a muerte al padre de la filosofía occidental.",
+      "val": 10,
+      "url": "/hemeroteca/socrates2"
+    },
+    {
+      "id": "the-atacama-mummy",
+      "name": "the ATACAMA mummy ",
+      "group": "Essay",
+      "category": "Arqueología",
+      "slug": "the-atacama-mummy",
+      "dek": "Momificación chinchorro en el desierto más árido del planeta: un rito milenario previo a Egipto.",
+      "val": 10,
+      "url": "/hemeroteca/the-atacama-mummy"
+    },
+    {
+      "id": "the-mask",
+      "name": "The Mask",
+      "group": "Essay",
+      "category": "Sociología",
+      "slug": "the-mask",
+      "dek": "Antropología del rostro cubierto: ocultamiento, transformación y poder sagrado en el ritual.",
+      "val": 10,
+      "url": "/hemeroteca/the-mask"
+    },
+    {
+      "id": "tikal",
+      "name": "tikal",
+      "group": "Essay",
+      "category": "Arqueosemiótica",
+      "slug": "tikal",
+      "dek": "Las pirámides que se elevan sobre el dosel de la selva en el corazón del reino maya.",
+      "val": 10,
+      "url": "/hemeroteca/tikal"
+    },
+    {
+      "id": "ulyses-y-las-sirenas",
+      "name": "Ulyses y las Sirenas",
+      "group": "Essay",
+      "category": "Historia de la Cultura",
+      "slug": "ulyses-y-las-sirenas",
+      "dek": "El canto mortal de las sirenas y la astucia del héroe que desafió la perdición.",
+      "val": 10,
+      "url": "/hemeroteca/ulyses-y-las-sirenas"
+    },
+    {
+      "id": "vision-2026-09-21-5c3cbc481eb2a0a5d9609a87b16fd0a099126377",
+      "name": "Pakal de Palenque: El Rostro de Estuco y la Inmortalidad Dinástica",
+      "group": "Essay",
+      "category": "Historia",
+      "slug": "vision-2026-09-21-5c3cbc481eb2a0a5d9609a87b16fd0a099126377",
+      "dek": "Bajo la cripta del Templo de las Inscripciones, el estuco modeló los rasgos de un gobernante transfigurado en dios del maíz: el conjuro de una dinastía para vencer la corrosión de la selva y el olvido.",
+      "val": 10,
+      "url": "/hemeroteca/vision-2026-09-21-5c3cbc481eb2a0a5d9609a87b16fd0a099126377"
+    },
+    {
+      "id": "arquetipos-globales-introduccion",
+      "name": "Arquetipos Globales: Cartografía de la Memoria Colectiva",
+      "group": "Archetype",
+      "category": "Arquetipos Globales",
+      "slug": "arquetipos-globales-introduccion",
+      "dek": "Fundamentos del inconsciente colectivo y los patrones que conectan a todas las culturas.",
+      "val": 10,
+      "url": "/arquetipos/arquetipos-globales-introduccion"
+    },
+    {
+      "id": "carl-jung-biografia",
+      "name": "Carl Jung . biografia",
+      "group": "Archetype",
+      "category": "Arquetipos Globales",
+      "slug": "carl-jung-biografia",
+      "dek": "Vida, método y descubrimientos del pionero de la psicología analítica.",
+      "val": 10,
+      "url": "/arquetipos/carl-jung-biografia"
+    },
+    {
+      "id": "el-puma-americano",
+      "name": "El Puma Americano",
+      "group": "Archetype",
+      "category": "Historia Natural",
+      "slug": "el-puma-americano",
+      "dek": "Investigación archivística de The Great Puzzle Project.",
+      "val": 10,
+      "url": "/arquetipos/el-puma-americano"
+    },
+    {
+      "id": "la-torre-de-babel",
+      "name": "La torre de Babel",
+      "group": "Archetype",
+      "category": "Arquetipos Globales",
+      "slug": "la-torre-de-babel",
+      "dek": "El mito de la soberbia humana, la confusión de las lenguas y la dispersión cultural.",
+      "val": 10,
+      "url": "/arquetipos/la-torre-de-babel"
+    },
+    {
+      "id": "los-orixas",
+      "name": "Los Orixas",
+      "group": "Archetype",
+      "category": "Arquetipos Globales",
+      "slug": "los-orixas",
+      "dek": "Fuerzas de la naturaleza, linajes sagrados y sabiduría viva del panteón yoruba.",
+      "val": 10,
+      "url": "/arquetipos/los-orixas"
+    },
+    {
+      "id": "los-orixas-africanos",
+      "name": "Los Orixas africanos",
+      "group": "Archetype",
+      "category": "Arquetipos Globales",
+      "slug": "los-orixas-africanos",
+      "dek": "La herencia espiritual africana y la cosmovisión de las divinidades yorubas.",
+      "val": 10,
+      "url": "/arquetipos/los-orixas-africanos"
+    },
+    {
+      "id": "pazuzu",
+      "name": "Pazuzu",
+      "group": "Archetype",
+      "category": "Arquetipos Globales",
+      "slug": "pazuzu",
+      "dek": "Entre la furia de los vientos y el amuleto apotropaico: anatomía del demonio asirio que protegía contra males mayores.",
+      "val": 10,
+      "url": "/arquetipos/pazuzu"
+    },
+    {
+      "id": "sanson",
+      "name": "Sanson",
+      "group": "Archetype",
+      "category": "Arquetipos Globales",
+      "slug": "sanson",
+      "dek": "Investigación archivística de The Great Puzzle Project.",
+      "val": 10,
+      "url": "/arquetipos/sanson"
+    },
+    {
+      "id": "urano",
+      "name": "urano ",
+      "group": "Archetype",
+      "category": "Arquetipos Globales",
+      "slug": "urano",
+      "dek": "Investigación archivística de The Great Puzzle Project.",
+      "val": 10,
+      "url": "/arquetipos/urano"
+    },
+    {
+      "id": "venus",
+      "name": "Venus ",
+      "group": "Archetype",
+      "category": "Arquetipos Globales",
+      "slug": "venus",
+      "dek": "De la soberanía itálica al ideal helénico: la metamorfosis simbólica del arquetipo de la belleza, la gracia y la atracción primordial.",
+      "val": 10,
+      "url": "/arquetipos/venus"
+    }
+  ],
+  "links": [
+    {
+      "source": "1984-la-prediccion-de-orwell",
+      "target": "cat_Ficcion literaria"
+    },
+    {
+      "source": "7-pecados-7-chackras",
+      "target": "cat_Archivo"
+    },
+    {
+      "source": "america-invertida",
+      "target": "cat_Archivo"
+    },
+    {
+      "source": "atila-y-el-papa",
+      "target": "cat_historia antigua"
+    },
+    {
+      "source": "bonampak",
+      "target": "cat_Arqueología"
+    },
+    {
+      "source": "bonampak-1",
+      "target": "cat_Arqueología"
+    },
+    {
+      "source": "del-cosmos-a-la-luna",
+      "target": "cat_Archivo"
+    },
+    {
+      "source": "el-ankh-egipcio",
+      "target": "cat_antropologia"
+    },
+    {
+      "source": "el-diablo-en-el-tarot",
+      "target": "cat_Arqueosemiótica"
+    },
+    {
+      "source": "el-mito-de-sisifo",
+      "target": "cat_Archivo"
+    },
+    {
+      "source": "el-qapaq-nan-una-obra-de-ingenieria-arcaica-asombroso-en-las-entranas-de-sudamerica",
+      "target": "cat_arqueologia"
+    },
+    {
+      "source": "el-simbolismo-del-laberinto",
+      "target": "cat_Filosofía"
+    },
+    {
+      "source": "gengis-khan",
+      "target": "cat_Historia medieval"
+    },
+    {
+      "source": "hegel-la-historia-y-dios",
+      "target": "cat_Filosofía"
+    },
+    {
+      "source": "homero-el-poeta-ciego",
+      "target": "cat_Historia"
+    },
+    {
+      "source": "ishi-no-hoden",
+      "target": "cat_Arqueología"
+    },
+    {
+      "source": "isis-los-misterios-del-iniciacion",
+      "target": "cat_sociologia"
+    },
+    {
+      "source": "julio-cesar-y-los-galos-2026",
+      "target": "cat_HISTORIA"
+    },
+    {
+      "source": "jung-y-los-arquetipos",
+      "target": "cat_Historia"
+    },
+    {
+      "source": "jupiter-y-la-astrologia-el-benigno",
+      "target": "cat_Historia"
+    },
+    {
+      "source": "la-arquitectura-de-los-suenos-lucidos",
+      "target": "cat_Filosofía"
+    },
+    {
+      "source": "la-caida-de-cartago",
+      "target": "cat_HISTORIA ANTIGUA"
+    },
+    {
+      "source": "la-chilinga",
+      "target": "cat_sociologia"
+    },
+    {
+      "source": "la-cronometria-etrusca-anomalias-y-sincronismos-en-el-mediterraneo-antiguo",
+      "target": "cat_Arqueología"
+    },
+    {
+      "source": "la-estetica-del-silencio",
+      "target": "cat_Historia de la Cultura"
+    },
+    {
+      "source": "la-ingenieria-temporal-del-calendario-chino-clasico-precision-y-poder-dinastico",
+      "target": "cat_Historia"
+    },
+    {
+      "source": "los-carpocracianos",
+      "target": "cat_Historia de las Religiones"
+    },
+    {
+      "source": "los-esenios-mgzn",
+      "target": "cat_Antropología"
+    },
+    {
+      "source": "los-nestorianos",
+      "target": "cat_Historia de las Religiones"
+    },
+    {
+      "source": "masuda-no-iwafune-la-enigma-petrea-y-los-ecos",
+      "target": "cat_Historia Alternativa"
+    },
+    {
+      "source": "mercurio",
+      "target": "cat_Historia"
+    },
+    {
+      "source": "moctezuma-y-cortez-el-ultimo-azteca",
+      "target": "cat_Historia"
+    },
+    {
+      "source": "nag-hammadi-abril-2026",
+      "target": "cat_Archivo"
+    },
+    {
+      "source": "neoplatonicos",
+      "target": "cat_Filosofía"
+    },
+    {
+      "source": "neron-y-roma",
+      "target": "cat_Historia Antigua"
+    },
+    {
+      "source": "osiris-el-dios-verde",
+      "target": "cat_Historia de las Religiones"
+    },
+    {
+      "source": "qumram-2026",
+      "target": "cat_Arqueología"
+    },
+    {
+      "source": "saber-es-recordar-la-teoria-de-platon",
+      "target": "cat_Filosofía"
+    },
+    {
+      "source": "san-agustin-y-su-pasado",
+      "target": "cat_Historia de las Religiones"
+    },
+    {
+      "source": "saturno-y-la-astrologia",
+      "target": "cat_Historia"
+    },
+    {
+      "source": "schlieman-y-el-descubrimiento-de-troya",
+      "target": "cat_Arqueología"
+    },
+    {
+      "source": "simon-el-estilita",
+      "target": "cat_Historia de las Ideas"
+    },
+    {
+      "source": "socrates2",
+      "target": "cat_Historia"
+    },
+    {
+      "source": "the-atacama-mummy",
+      "target": "cat_Arqueología"
+    },
+    {
+      "source": "the-mask",
+      "target": "cat_Sociología"
+    },
+    {
+      "source": "tikal",
+      "target": "cat_Arqueosemiótica"
+    },
+    {
+      "source": "ulyses-y-las-sirenas",
+      "target": "cat_Historia de la Cultura"
+    },
+    {
+      "source": "vision-2026-09-21-5c3cbc481eb2a0a5d9609a87b16fd0a099126377",
+      "target": "cat_Historia"
+    },
+    {
+      "source": "arquetipos-globales-introduccion",
+      "target": "cat_Arquetipos Globales"
+    },
+    {
+      "source": "carl-jung-biografia",
+      "target": "cat_Arquetipos Globales"
+    },
+    {
+      "source": "el-puma-americano",
+      "target": "cat_Historia Natural"
+    },
+    {
+      "source": "la-torre-de-babel",
+      "target": "cat_Arquetipos Globales"
+    },
+    {
+      "source": "los-orixas",
+      "target": "cat_Arquetipos Globales"
+    },
+    {
+      "source": "los-orixas-africanos",
+      "target": "cat_Arquetipos Globales"
+    },
+    {
+      "source": "pazuzu",
+      "target": "cat_Arquetipos Globales"
+    },
+    {
+      "source": "sanson",
+      "target": "cat_Arquetipos Globales"
+    },
+    {
+      "source": "urano",
+      "target": "cat_Arquetipos Globales"
+    },
+    {
+      "source": "venus",
+      "target": "cat_Arquetipos Globales"
+    }
+  ],
+  "cypherStatements": [
+    "MERGE (c:Category { name: 'Ficcion literaria' });",
+    "MERGE (c:Category { name: 'Archivo' });",
+    "MERGE (c:Category { name: 'historia antigua' });",
+    "MERGE (c:Category { name: 'Arqueología' });",
+    "MERGE (c:Category { name: 'antropologia' });",
+    "MERGE (c:Category { name: 'Arqueosemiótica' });",
+    "MERGE (c:Category { name: 'arqueologia' });",
+    "MERGE (c:Category { name: 'Filosofía' });",
+    "MERGE (c:Category { name: 'Historia medieval' });",
+    "MERGE (c:Category { name: 'Historia' });",
+    "MERGE (c:Category { name: 'sociologia' });",
+    "MERGE (c:Category { name: 'HISTORIA' });",
+    "MERGE (c:Category { name: 'HISTORIA ANTIGUA' });",
+    "MERGE (c:Category { name: 'Historia de la Cultura' });",
+    "MERGE (c:Category { name: 'Historia de las Religiones' });",
+    "MERGE (c:Category { name: 'Antropología' });",
+    "MERGE (c:Category { name: 'Historia Alternativa' });",
+    "MERGE (c:Category { name: 'Historia Antigua' });",
+    "MERGE (c:Category { name: 'Historia de las Ideas' });",
+    "MERGE (c:Category { name: 'Sociología' });",
+    "MERGE (c:Category { name: 'Arquetipos Globales' });",
+    "MERGE (c:Category { name: 'Historia Natural' });",
+    "MERGE (p:Essay { slug: '1984-la-prediccion-de-orwell', title: '1984 : La prediccion de Orwell?' })\nON CREATE SET p.dek = 'Vigilancia, manipulación del lenguaje y el control totalitario de la mente humana.'\nWITH p\nMATCH (c:Category { name: 'Ficcion literaria' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: '7-pecados-7-chackras', title: '7 pecados, 7 chackras' })\nON CREATE SET p.dek = 'Paralelismos simbólicos entre los centros energéticos de Oriente y los vicios capitales de Occidente.'\nWITH p\nMATCH (c:Category { name: 'Archivo' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'america-invertida', title: 'america invertida' })\nON CREATE SET p.dek = 'El célebre mapa de Joaquín Torres García que redefinió el norte simbólico del continente.'\nWITH p\nMATCH (c:Category { name: 'Archivo' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'atila-y-el-papa', title: 'Atila y el Papa ' })\nON CREATE SET p.dek = 'El encuentro legendario en el río Mincio entre Atila el Huno y el papa León Magno.'\nWITH p\nMATCH (c:Category { name: 'historia antigua' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'bonampak', title: 'Bonampak: La Sinfonía del Cinabrio y la Selva' })\nON CREATE SET p.dek = 'Pintura mural, sacerdotes y guerra en el corazón de la selva lacandona.'\nWITH p\nMATCH (c:Category { name: 'Arqueología' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'bonampak-1', title: 'Bonampak' })\nON CREATE SET p.dek = 'Crónica visual de la vida cortesana y las ceremonias mayas en Bonampak.'\nWITH p\nMATCH (c:Category { name: 'Arqueología' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'del-cosmos-a-la-luna', title: 'del cosmos a la luna' })\nON CREATE SET p.dek = 'La carrera espacial como metáfora del anhelo humano por traspasar sus propias fronteras.'\nWITH p\nMATCH (c:Category { name: 'Archivo' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'el-ankh-egipcio', title: 'El Ankh Egipcio' })\nON CREATE SET p.dek = 'El jeroglífico de la vida eterna: orígenes, simbolismo y poder en el Antiguo Egipto.'\nWITH p\nMATCH (c:Category { name: 'antropologia' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'el-diablo-en-el-tarot', title: 'El Diablo en el Tarot' })\nON CREATE SET p.dek = 'La carta de la atadura, el instinto y las pulsiones ocultas de la psique.'\nWITH p\nMATCH (c:Category { name: 'Arqueosemiótica' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'el-mito-de-sisifo', title: 'el mito de sisifo' })\nON CREATE SET p.dek = 'Camus y el absurdo: encontrar sentido y rebelión en el esfuerzo incesante de la existencia.'\nWITH p\nMATCH (c:Category { name: 'Archivo' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'el-qapaq-nan-una-obra-de-ingenieria-arcaica-asombroso-en-las-entranas-de-sudamerica', title: 'El Qapaq Ñan: una obra de ingenieria arcaica asombroso en las entrañas de Sudamerica' })\nON CREATE SET p.dek = 'La red vial andina que unió montañas, costas y selvas a lo largo de miles de kilómetros.'\nWITH p\nMATCH (c:Category { name: 'arqueologia' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'el-simbolismo-del-laberinto', title: 'El Simbolismo del Laberinto' })\nON CREATE SET p.dek = 'El viaje iniciático, el monstruo interior y el camino hacia el centro de uno mismo.'\nWITH p\nMATCH (c:Category { name: 'Filosofía' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'gengis-khan', title: 'Gengis Khan' })\nON CREATE SET p.dek = 'El estratega mongol que unificó las estepas y forjó el mayor imperio contiguo del mundo.'\nWITH p\nMATCH (c:Category { name: 'Historia medieval' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'hegel-la-historia-y-dios', title: 'Hegel, la historia y Dios' })\nON CREATE SET p.dek = 'La dialéctica del espíritu y el desarrollo de la conciencia a través del tiempo.'\nWITH p\nMATCH (c:Category { name: 'Filosofía' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'homero-el-poeta-ciego', title: 'Homero, el poeta ciego' })\nON CREATE SET p.dek = 'La Ilíada, la Odisea y la forja de la identidad mitológica y heroica de Grecia.'\nWITH p\nMATCH (c:Category { name: 'Historia' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'ishi-no-hoden', title: 'Ishi-no-Hōden: El Monolito Flotante de Harima' })\nON CREATE SET p.dek = 'Un estudio riguroso sobre el imponente Ishi-no-Hōden, analizando su composición geológica, dimensiones colosales, y las narrativas históricas que lo envuelven, desde las crónicas más antiguas de Japón hasta las observaciones pioneras de Occidente.'\nWITH p\nMATCH (c:Category { name: 'Arqueología' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'isis-los-misterios-del-iniciacion', title: 'Isis : los misterios del Iniciacion.' })\nON CREATE SET p.dek = 'El culto a la gran madre egipcia y sus ritos de resurrección en el mundo helenístico.'\nWITH p\nMATCH (c:Category { name: 'sociologia' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'julio-cesar-y-los-galos-2026', title: 'JULIO CESAR Y LOS GALOS 2026' })\nON CREATE SET p.dek = 'Análisis táctico de la Guerra de las Galias y el ascenso político de César.'\nWITH p\nMATCH (c:Category { name: 'HISTORIA' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'jung-y-los-arquetipos', title: 'Jung y los Arquetipos' })\nON CREATE SET p.dek = 'Exploración e investigación archivística sobre Jung y los Arquetipos en la hemeroteca TGP.'\nWITH p\nMATCH (c:Category { name: 'Historia' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'jupiter-y-la-astrologia-el-benigno', title: 'Júpiter y la Astrología: El Benigno' })\nON CREATE SET p.dek = 'Exploración e investigación archivística sobre J�piter y la Astrolog�a: El Benigno en la hemeroteca TGP.'\nWITH p\nMATCH (c:Category { name: 'Historia' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'la-arquitectura-de-los-suenos-lucidos', title: 'La Arquitectura de los Sueños Lúcidos' })\nON CREATE SET p.dek = 'Mecanismos neurológicos, control consciente y exploración del mundo onírico.'\nWITH p\nMATCH (c:Category { name: 'Filosofía' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'la-caida-de-cartago', title: 'LA CAIDA DE CARTAGO' })\nON CREATE SET p.dek = 'El asedio romano del 146 a.C. y la destrucción definitiva de la gran potencia púnica.'\nWITH p\nMATCH (c:Category { name: 'HISTORIA ANTIGUA' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'la-chilinga', title: 'La Chilinga ' })\nON CREATE SET p.dek = 'El tambor comunitario, las raíces del candombe y la percusión como lenguaje colectivo.'\nWITH p\nMATCH (c:Category { name: 'sociologia' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'la-cronometria-etrusca-anomalias-y-sincronismos-en-el-mediterraneo-antiguo', title: 'La Cronometría Etrusca: Anomalías y Sincronismos en el Mediterráneo Antiguo' })\nON CREATE SET p.dek = 'Un análisis de la estructura temporal etrusca revela sus particularidades frente a los sistemas cronológicos grecorromanos, sugiriendo implicaciones en la percepción del tiempo y la ritualidad.'\nWITH p\nMATCH (c:Category { name: 'Arqueología' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'la-estetica-del-silencio', title: 'La Estética del Silencio en el Cine' })\nON CREATE SET p.dek = 'El valor del vacío y la pausa en el arte, la música y la contemplación.'\nWITH p\nMATCH (c:Category { name: 'Historia de la Cultura' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'la-ingenieria-temporal-del-calendario-chino-clasico-precision-y-poder-dinastico', title: 'La Ingeniería Temporal del Calendario Chino Clásico: Precisión y Poder Dinástico' })\nON CREATE SET p.dek = 'La articulación de ciclos astronómicos y la legitimación imperial se manifiesta en la compleja estructura del calendario chino clásico, un artefacto de control temporal y político.'\nWITH p\nMATCH (c:Category { name: 'Historia' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'los-carpocracianos', title: 'Los Carpocracianos' })\nON CREATE SET p.dek = 'La secta gnóstica del siglo II que desafió las normas morales de su época.'\nWITH p\nMATCH (c:Category { name: 'Historia de las Religiones' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'los-esenios-mgzn', title: 'Los Esenios mgzn' })\nON CREATE SET p.dek = 'La comunidad ascética del Mar Muerto y sus manuscritos que iluminan el origen del cristianismo.'\nWITH p\nMATCH (c:Category { name: 'Antropología' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'los-nestorianos', title: 'Los Nestorianos' })\nON CREATE SET p.dek = 'La vertiente cristiana de las dos naturalezas de Cristo que se expandió hasta China.'\nWITH p\nMATCH (c:Category { name: 'Historia de las Religiones' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'masuda-no-iwafune-la-enigma-petrea-y-los-ecos', title: 'Masuda no Iwafune: La Enigma Pétrea y los Ecos Megalíticos de Asuka' })\nON CREATE SET p.dek = 'Una disquisición sobre la ingeniería arcaica, el propósito elusivo y la persistencia de lo incognoscible en el corazón del Japón ancestral.'\nWITH p\nMATCH (c:Category { name: 'Historia Alternativa' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'mercurio', title: 'Mercurio' })\nON CREATE SET p.dek = 'Exploración e investigación archivística sobre Mercurio en la hemeroteca TGP.'\nWITH p\nMATCH (c:Category { name: 'Historia' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'moctezuma-y-cortez-el-ultimo-azteca', title: 'Moctezuma Y Cortez: el Ultimo Azteca' })\nON CREATE SET p.dek = 'El choque de dos mundos en Tenochtitlan y el fin del Imperio Mexica.'\nWITH p\nMATCH (c:Category { name: 'Historia' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'nag-hammadi-abril-2026', title: 'nag hammadi abril 2026' })\nON CREATE SET p.dek = 'El hallazgo de los evangelios gnósticos que reescribieron la historia del cristianismo temprano.'\nWITH p\nMATCH (c:Category { name: 'Archivo' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'neoplatonicos', title: 'Neoplatónicos' })\nON CREATE SET p.dek = 'Plotino, el Uno y el retorno del alma a su fuente primordial mediante la filosofía.'\nWITH p\nMATCH (c:Category { name: 'Filosofía' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'neron-y-roma', title: 'Nerón y Roma' })\nON CREATE SET p.dek = 'Poder, exceso y el incendio que transformó el destino del Imperio Romano.'\nWITH p\nMATCH (c:Category { name: 'Historia Antigua' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'osiris-el-dios-verde', title: 'Osiris , el Dios Verde' })\nON CREATE SET p.dek = 'La deidad de la resurrección, la fertilidad del Nilo y el juicio de las almas.'\nWITH p\nMATCH (c:Category { name: 'Historia de las Religiones' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'qumram-2026', title: 'Qumram 2026' })\nON CREATE SET p.dek = 'Las cuevas del desierto de Judea y los rollos que conservaron textos bíblicos milenarios.'\nWITH p\nMATCH (c:Category { name: 'Arqueología' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'saber-es-recordar-la-teoria-de-platon', title: 'Saber es Recordar: la Teoria de Platon' })\nON CREATE SET p.dek = 'La reminiscencia platónica y el acceso al mundo de las Ideas.'\nWITH p\nMATCH (c:Category { name: 'Filosofía' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'san-agustin-y-su-pasado', title: 'San Agustin y su pasado' })\nON CREATE SET p.dek = 'De los placeres de Cartago y el maniqueísmo a las Confesiones y la teología clásica.'\nWITH p\nMATCH (c:Category { name: 'Historia de las Religiones' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'saturno-y-la-astrologia', title: 'Saturno y la Astrología' })\nON CREATE SET p.dek = 'El arquetipo del tiempo, los límites, la disciplina y la melancolía filosófica.'\nWITH p\nMATCH (c:Category { name: 'Historia' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'schlieman-y-el-descubrimiento-de-troya', title: 'Schlieman y el Descubrimiento de Troya' })\nON CREATE SET p.dek = 'La obsesión de un comerciante con los versos de Homero que desenterró Troya y Micenas.'\nWITH p\nMATCH (c:Category { name: 'Arqueología' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'simon-el-estilita', title: 'Simon, el Estilita' })\nON CREATE SET p.dek = 'El ermitaño sirio que vivió décadas sobre una columna en busca de santidad extrema.'\nWITH p\nMATCH (c:Category { name: 'Historia de las Ideas' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'socrates2', title: 'socrates2' })\nON CREATE SET p.dek = 'El método mayéutico, la ironía y el juicio que condenó a muerte al padre de la filosofía occidental.'\nWITH p\nMATCH (c:Category { name: 'Historia' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'the-atacama-mummy', title: 'the ATACAMA mummy ' })\nON CREATE SET p.dek = 'Momificación chinchorro en el desierto más árido del planeta: un rito milenario previo a Egipto.'\nWITH p\nMATCH (c:Category { name: 'Arqueología' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'the-mask', title: 'The Mask' })\nON CREATE SET p.dek = 'Antropología del rostro cubierto: ocultamiento, transformación y poder sagrado en el ritual.'\nWITH p\nMATCH (c:Category { name: 'Sociología' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'tikal', title: 'tikal' })\nON CREATE SET p.dek = 'Las pirámides que se elevan sobre el dosel de la selva en el corazón del reino maya.'\nWITH p\nMATCH (c:Category { name: 'Arqueosemiótica' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'ulyses-y-las-sirenas', title: 'Ulyses y las Sirenas' })\nON CREATE SET p.dek = 'El canto mortal de las sirenas y la astucia del héroe que desafió la perdición.'\nWITH p\nMATCH (c:Category { name: 'Historia de la Cultura' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Essay { slug: 'vision-2026-09-21-5c3cbc481eb2a0a5d9609a87b16fd0a099126377', title: 'Pakal de Palenque: El Rostro de Estuco y la Inmortalidad Dinástica' })\nON CREATE SET p.dek = 'Bajo la cripta del Templo de las Inscripciones, el estuco modeló los rasgos de un gobernante transfigurado en dios del maíz: el conjuro de una dinastía para vencer la corrosión de la selva y el olvido.'\nWITH p\nMATCH (c:Category { name: 'Historia' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Archetype { slug: 'arquetipos-globales-introduccion', title: 'Arquetipos Globales: Cartografía de la Memoria Colectiva' })\nON CREATE SET p.dek = 'Fundamentos del inconsciente colectivo y los patrones que conectan a todas las culturas.'\nWITH p\nMATCH (c:Category { name: 'Arquetipos Globales' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Archetype { slug: 'carl-jung-biografia', title: 'Carl Jung . biografia' })\nON CREATE SET p.dek = 'Vida, método y descubrimientos del pionero de la psicología analítica.'\nWITH p\nMATCH (c:Category { name: 'Arquetipos Globales' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Archetype { slug: 'el-puma-americano', title: 'El Puma Americano' })\nON CREATE SET p.dek = 'Investigación archivística de The Great Puzzle Project.'\nWITH p\nMATCH (c:Category { name: 'Historia Natural' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Archetype { slug: 'la-torre-de-babel', title: 'La torre de Babel' })\nON CREATE SET p.dek = 'El mito de la soberbia humana, la confusión de las lenguas y la dispersión cultural.'\nWITH p\nMATCH (c:Category { name: 'Arquetipos Globales' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Archetype { slug: 'los-orixas', title: 'Los Orixas' })\nON CREATE SET p.dek = 'Fuerzas de la naturaleza, linajes sagrados y sabiduría viva del panteón yoruba.'\nWITH p\nMATCH (c:Category { name: 'Arquetipos Globales' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Archetype { slug: 'los-orixas-africanos', title: 'Los Orixas africanos' })\nON CREATE SET p.dek = 'La herencia espiritual africana y la cosmovisión de las divinidades yorubas.'\nWITH p\nMATCH (c:Category { name: 'Arquetipos Globales' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Archetype { slug: 'pazuzu', title: 'Pazuzu' })\nON CREATE SET p.dek = 'Entre la furia de los vientos y el amuleto apotropaico: anatomía del demonio asirio que protegía contra males mayores.'\nWITH p\nMATCH (c:Category { name: 'Arquetipos Globales' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Archetype { slug: 'sanson', title: 'Sanson' })\nON CREATE SET p.dek = 'Investigación archivística de The Great Puzzle Project.'\nWITH p\nMATCH (c:Category { name: 'Arquetipos Globales' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Archetype { slug: 'urano', title: 'urano ' })\nON CREATE SET p.dek = 'Investigación archivística de The Great Puzzle Project.'\nWITH p\nMATCH (c:Category { name: 'Arquetipos Globales' })\nMERGE (p)-[:BELONGS_TO]->(c);",
+    "MERGE (p:Archetype { slug: 'venus', title: 'Venus ' })\nON CREATE SET p.dek = 'De la soberanía itálica al ideal helénico: la metamorfosis simbólica del arquetipo de la belleza, la gracia y la atracción primordial.'\nWITH p\nMATCH (c:Category { name: 'Arquetipos Globales' })\nMERGE (p)-[:BELONGS_TO]->(c);"
+  ]
+}

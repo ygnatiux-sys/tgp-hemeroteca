@@ -27,7 +27,7 @@ export function resolveMultivisionClass(src: string | { src: string } | null | u
     baseClass += ' enfocar-rostro';
   }
   
-  if (s.includes('mercurio') || s.includes('homero') || s.includes('saturno') || s.includes('busto') || s.includes('estatua') || s.includes('retrato') || s.includes('piramide')) {
+  if (s.includes('hegel') || s.includes('mercurio') || s.includes('homero') || s.includes('saturno') || s.includes('busto') || s.includes('estatua') || s.includes('retrato') || s.includes('piramide')) {
     baseClass += ' !w-full !h-full object-contain! bg-[#08090a]';
   }
   

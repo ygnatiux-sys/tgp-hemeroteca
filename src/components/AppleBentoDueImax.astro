@@ -1,0 +1,569 @@
+---
+/**
+ * AppleBentoDueImax.astro
+ * Nomenclatura Estándar: Apple Editorial Feature Billboard Portrait (IMAX Edition).
+ * Proporción Maestra: 3:4 Vertical Widescreen IMAX con márgenes laterales calibrados al 15% (w-[72vw] / max-w-6xl).
+ * Altura monumental expandida (min-h-[820px] md:min-h-[940px]) para otorgar escala heroica a la estatuaria.
+ * 
+ * Motor Cinemático GSAP:
+ * - Timeline asíncrono e independiente por tarjeta.
+ * - Entrada escalonada: telemetría, títulos bifásicos y créditos pasantes a velocidad de lectura natural.
+ * - Revelación tridimensional del artefacto con elevación y sombra de contacto sincronizada.
+ * - Pausa en hover y navegación directa por micro-docks.
+ * 
+ * Contenido:
+ * Card 1 (Superior): Venus de Willendorf · Busto de Nefertiti · Gudea de Lagash en Diorita
+ * Card 2 (Inferior): Máscara de Agamenón de Oro · Dama de Elche · Hermes Psicopompo
+ */
+
+interface ImaxArtifact {
+  id: string;
+  kicker: string;
+  titleLine1: string;
+  titleLine2: string;
+  logline: string;
+  era: string;
+  imageWebp: string;
+  alt: string;
+  ctaText: string;
+  ctaLink: string;
+}
+
+const card1Artifacts: ImaxArtifact[] = [
+  {
+    id: "venus-willendorf",
+    kicker: "PALEOLÍTICO SUPERIOR · C. 28.000 A.C.",
+    titleLine1: "La Matriz del Tiempo Profundo.",
+    titleLine2: "Venus de Willendorf.",
+    logline: "Oolito calizo no originario de la cuenca del Danubio: una anatomía de la fecundidad y la supervivencia antes de la retirada de los glaciares en Europa central.",
+    era: "Naturhistorisches Museum Viena · Gravetiense",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/1792994481079-1e547be9.webp",
+    alt: "Estatuilla paleolítica de la Venus de Willendorf",
+    ctaText: "Explorar investigación",
+    ctaLink: "/ensayos/la-memoria-del-laberinto-y-el-tiempo-material-8555"
+  },
+  {
+    id: "nefertiti",
+    kicker: "AMARNA · C. 1345 A.C.",
+    titleLine1: "El Silencio de Nefertiti.",
+    titleLine2: "La Mirada en la Fractura.",
+    logline: "Piedra caliza policromada y la cuenca vacía del ojo izquierdo: la efigie rescatada del taller de Tutmose que desafía la erosión del tiempo y el olvido solar.",
+    era: "Neues Museum Berlín · Dinastía XVIII",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/1792979907494-5629ca02.webp",
+    alt: "Busto egipcio de la reina Nefertiti",
+    ctaText: "Explorar investigación",
+    ctaLink: "/ensayos/el-silencio-de-nefertiti-un-rostro-en-la-fractura-del-tiempo-6183"
+  },
+  {
+    id: "gudea-lagash",
+    kicker: "MESOPOTAMIA · C. 2120 A.C.",
+    titleLine1: "La Piedra que no Miente.",
+    titleLine2: "Gudea de Lagash en Diorita.",
+    logline: "Diorita negra importada del golfo de Omán: el soberano arquitecto con las manos entrelazadas en plegaria perpetua ante los templos y dioses de Sumeria.",
+    era: "Museo del Louvre París · Renacimiento Sumerio",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/1792994485009-5aeeb989.webp",
+    alt: "Estatua sumeria de Gudea de Lagash en diorita negra",
+    ctaText: "Explorar investigación",
+    ctaLink: "/ensayos/colapso-1177"
+  }
+];
+
+const card2Artifacts: ImaxArtifact[] = [
+  {
+    id: "mascara-agamenon",
+    kicker: "MICENAS · C. 1550 A.C.",
+    titleLine1: "La Mortaja de Oro.",
+    titleLine2: "Máscara de Agamenón.",
+    logline: "Lámina de oro puro repujada sobre el rostro del héroe en el Círculo de Tumbas A: la dignidad fúnebre preservada antes de la catástrofe del Bronce Tardío.",
+    era: "Museo Arqueológico Nacional de Atenas",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/1792994487623-792aebf8.webp",
+    alt: "Máscara funeraria micénica de oro puro de Agamenón",
+    ctaText: "Explorar investigación",
+    ctaLink: "/ensayos/colapso-1177"
+  },
+  {
+    id: "dama-elche",
+    kicker: "IBÉRICO CLÁSICO · S. IV A.C.",
+    titleLine1: "La Esfinge de Occidente.",
+    titleLine2: "Dama de Elche.",
+    logline: "Arenisca fina policromada con rodetes ceremoniales y cavidad posterior para reliquias: el canon sacerdotal que desafió la amnesia del levante mediterráneo.",
+    era: "Museo Arqueológico Nacional Madrid · La Alcudia",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/1792994490277-3814b1e1.webp",
+    alt: "Busto íbero en piedra caliza de la Dama de Elche",
+    ctaText: "Explorar investigación",
+    ctaLink: "/ensayos/la-geometria-petrea-de-pumapunku-andesita-tiempo-y-cosmos-3332"
+  },
+  {
+    id: "hermes",
+    kicker: "ATENAS · C. 480 A.C.",
+    titleLine1: "El Guardián del Umbral.",
+    titleLine2: "Hermes Psicopompo.",
+    logline: "La figura del intermediario ontológico: el cetro del heraldo y la mirada serena que guía las almas en la frontera entre registros de la realidad.",
+    era: "Vulci / Louvre G264 · Siglo V a.C.",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/1792977769539-052061f8.webp",
+    alt: "Estatua clásica de Hermes con caduceo",
+    ctaText: "Explorar investigación",
+    ctaLink: "/ensayos/mercurio-hermes-arquetipo-liminal"
+  }
+];
+---
+
+<section class="apple-bento-due-imax-section w-full px-4 sm:px-6 my-24 md:my-32 relative z-10" id="showcase-bento-imax">
+  <!-- ENCABEZADO EDITORIAL DE LA SECCIÓN IMAX -->
+  <div class="max-w-4xl mx-auto text-center mb-16 md:mb-24">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/6 border border-white/10 text-white/70 text-[11px] font-mono tracking-widest uppercase mb-4 backdrop-blur-md">
+      <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+      Apple TV Editorial Billboard · IMAX Vertical Showcase
+    </div>
+    <h2 class="font-gloock text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-[1.05] mb-5">
+      Morfología Monumental & Arquetipos
+    </h2>
+    <p class="font-inter text-sm sm:text-base md:text-lg text-white/60 max-w-2xl mx-auto leading-relaxed font-light">
+      Lienzos verticales en formato estándar 3:4 con 15% de holgura lateral: secuencia orquestada con GSAP donde la estatuaria emerge con presencia de sala de museo y créditos cinematográficos.
+    </p>
+  </div>
+
+  <!-- CONTENEDOR EN COLUMNA CON MÁRGENES LATERALES DEL 15% (ANCHO EFECTIVO 70%-72%) -->
+  <div class="flex flex-col gap-20 sm:gap-28 md:gap-36 w-[92%] sm:w-[86%] lg:w-[72%] max-w-[1240px] mx-auto items-center">
+
+    <!-- ═══════════════════════════════════════════════════════
+         CANVAS IMAX 1 (SUPERIOR): VENUS / NEFERTITI / GUDEA
+         ═══════════════════════════════════════════════════════ -->
+    <div 
+      class="bento-imax-card group/imax relative w-full rounded-4xl sm:rounded-[44px] overflow-hidden bg-[#18181c] border border-white/10 text-[#f5f5f7] shadow-[0_36px_85px_rgba(0,0,0,0.75),inset_0_1px_1px_rgba(255,255,255,0.08)] flex flex-col justify-between aspect-[3/4] sm:aspect-[4/5] md:aspect-[3/4] lg:aspect-[10/12] min-h-[760px] sm:min-h-[860px] md:min-h-[940px] select-none transition-all duration-500 hover:shadow-[0_45px_100px_rgba(0,0,0,0.9)] hover:border-white/16 hover:-translate-y-1"
+      id="bento-imax-card-1"
+      data-card-id="imax-1"
+    >
+      <!-- HEADER EDITORIAL CON GSAP CREDITS -->
+      <div class="imax-header-block pt-10 sm:pt-14 md:pt-16 px-6 sm:px-14 md:px-20 text-center flex flex-col items-center z-20 relative">
+        <!-- KICKER TELEMETRÍA -->
+        <div class="imax-kicker inline-flex items-center gap-2 text-[10px] sm:text-[11px] md:text-xs font-mono tracking-[0.26em] uppercase text-white/50 mb-3.5">
+          <span class="flex items-center justify-center w-5 h-5 rounded-full bg-white/8 text-amber-400 border border-white/10">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M12 3v18M3 12h18"/>
+            </svg>
+          </span>
+          <span class="imax-kicker-text">{card1Artifacts[0].kicker}</span>
+        </div>
+
+        <!-- H3 PRINCIPAL EN DOS LÍNEAS -->
+        <h3 class="imax-title-block font-inter font-bold text-2xl sm:text-4xl md:text-5xl lg:text-[54px] text-white tracking-tight leading-[1.08]">
+          <span class="imax-line-1 block">{card1Artifacts[0].titleLine1}</span>
+          <span class="imax-line-2 block font-medium text-white/70 mt-1">{card1Artifacts[0].titleLine2}</span>
+        </h3>
+
+        <!-- LOGLINE CRÉDITOS PASANTES -->
+        <p class="imax-logline font-inter text-xs sm:text-sm md:text-base text-white/60 font-normal leading-relaxed max-w-2xl mt-4 tracking-[0.01em]">
+          {card1Artifacts[0].logline}
+        </p>
+
+        <!-- CTA APPLE STYLE Y PILL DE MUSEO -->
+        <div class="imax-meta-row flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-4">
+          <a 
+            href={card1Artifacts[0].ctaLink} 
+            class="imax-cta-link inline-flex items-center gap-1.5 text-xs sm:text-sm font-normal text-[#2997ff] hover:text-[#52aaff] group/link transition-colors"
+          >
+            <span class="imax-cta-text">{card1Artifacts[0].ctaText}</span>
+            <svg class="w-3.5 h-3.5 transform transition-transform group-hover/link:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </a>
+
+          <span class="text-white/20 hidden sm:inline">·</span>
+
+          <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/6 border border-white/8 text-[10px] sm:text-[11px] font-mono text-white/50 tracking-wider uppercase">
+            <span class="w-1 h-1 rounded-full bg-amber-400"></span>
+            <span class="imax-era-text">{card1Artifacts[0].era}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAGE: ESCENARIO IMAX VERTICAL GIGANTE (MÁS ESPACIO HACIA ABAJO) -->
+      <div class="bento-imax-stage mt-auto w-full relative grow flex justify-center items-end px-6 pb-8 sm:pb-12 md:pb-16 overflow-hidden min-h-[460px] sm:min-h-[560px] md:min-h-[640px] z-10">
+        <!-- HALO DE CONTRALUZ AMBIENTAL DE ALTO CONTRASTE -->
+        <div class="imax-ambient-glow absolute inset-0 pointer-events-none"></div>
+
+        <!-- SOMBRA DE CONTACTO BASE MULTICAPA ESTRATIFICADA -->
+        <div class="imax-contact-shadow absolute bottom-7 sm:bottom-10 md:bottom-14 left-1/2 -translate-x-1/2 w-72 sm:w-96 md:w-[500px] h-8 bg-black/85 rounded-full blur-lg pointer-events-none transform scale-y-50"></div>
+        <div class="imax-contact-core absolute bottom-8 sm:bottom-11 md:bottom-15 left-1/2 -translate-x-1/2 w-48 sm:w-64 md:w-80 h-3 bg-black/95 rounded-full blur-xs pointer-events-none"></div>
+
+        <!-- ARRAY DE IMÁGENES RECORTADAS EN ESCALA HEROICA -->
+        {card1Artifacts.map((art, idx) => (
+          <div
+            class={`imax-artifact-wrapper absolute bottom-8 sm:bottom-12 md:bottom-16 left-1/2 -translate-x-1/2 w-full h-[88%] sm:h-[92%] md:h-[95%] flex justify-center items-end pointer-events-none ${
+              idx === 0 ? "z-10 opacity-100" : "z-0 opacity-0 invisible"
+            }`}
+            data-index={idx}
+          >
+            <picture class="h-full w-auto flex justify-center items-end">
+              <source srcset={art.imageWebp} type="image/webp" />
+              <img 
+                src={art.imageWebp} 
+                alt={art.alt}
+                loading="lazy"
+                decoding="async"
+                class="imax-statue-img h-full w-auto max-w-[88%] sm:max-w-[82%] md:max-w-[76%] object-contain object-bottom imax-statue-shadow transition-transform duration-700 group-hover/imax:scale-[1.03]"
+              />
+            </picture>
+          </div>
+        ))}
+      </div>
+
+      <!-- MICRO-DOCK DE PAGINACIÓN EN LA ESQUINA SUPERIOR -->
+      <div class="absolute top-6 sm:top-8 right-6 sm:right-10 z-30 flex items-center gap-2 bg-white/6 border border-white/8 px-3 py-1.5 rounded-full backdrop-blur-md">
+        {card1Artifacts.map((_, idx) => (
+          <button 
+            type="button"
+            class={`imax-dot rounded-full transition-all duration-500 cursor-pointer ${
+              idx === 0 ? "bg-white w-4 h-1.5" : "bg-white/25 w-1.5 h-1.5 hover:bg-white/50"
+            }`}
+            data-target-idx={idx}
+            aria-label={`Ver artefacto ${idx + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         CANVAS IMAX 2 (INFERIOR): AGAMENÓN / DAMA DE ELCHE / HERMES
+         ═══════════════════════════════════════════════════════ -->
+    <div 
+      class="bento-imax-card group/imax relative w-full rounded-4xl sm:rounded-[44px] overflow-hidden bg-[#18181c] border border-white/10 text-[#f5f5f7] shadow-[0_36px_85px_rgba(0,0,0,0.75),inset_0_1px_1px_rgba(255,255,255,0.08)] flex flex-col justify-between aspect-[3/4] sm:aspect-[4/5] md:aspect-[3/4] lg:aspect-[10/12] min-h-[760px] sm:min-h-[860px] md:min-h-[940px] select-none transition-all duration-500 hover:shadow-[0_45px_100px_rgba(0,0,0,0.9)] hover:border-white/16 hover:-translate-y-1"
+      id="bento-imax-card-2"
+      data-card-id="imax-2"
+    >
+      <!-- HEADER EDITORIAL CON GSAP CREDITS -->
+      <div class="imax-header-block pt-10 sm:pt-14 md:pt-16 px-6 sm:px-14 md:px-20 text-center flex flex-col items-center z-20 relative">
+        <!-- KICKER TELEMETRÍA -->
+        <div class="imax-kicker inline-flex items-center gap-2 text-[10px] sm:text-[11px] md:text-xs font-mono tracking-[0.26em] uppercase text-white/50 mb-3.5">
+          <span class="flex items-center justify-center w-5 h-5 rounded-full bg-white/8 text-amber-400 border border-white/10">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </span>
+          <span class="imax-kicker-text">{card2Artifacts[0].kicker}</span>
+        </div>
+
+        <!-- H3 PRINCIPAL EN DOS LÍNEAS -->
+        <h3 class="imax-title-block font-inter font-bold text-2xl sm:text-4xl md:text-5xl lg:text-[54px] text-white tracking-tight leading-[1.08]">
+          <span class="imax-line-1 block">{card2Artifacts[0].titleLine1}</span>
+          <span class="imax-line-2 block font-medium text-white/70 mt-1">{card2Artifacts[0].titleLine2}</span>
+        </h3>
+
+        <!-- LOGLINE CRÉDITOS PASANTES -->
+        <p class="imax-logline font-inter text-xs sm:text-sm md:text-base text-white/60 font-normal leading-relaxed max-w-2xl mt-4 tracking-[0.01em]">
+          {card2Artifacts[0].logline}
+        </p>
+
+        <!-- CTA APPLE STYLE Y PILL DE MUSEO -->
+        <div class="imax-meta-row flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-4">
+          <a 
+            href={card2Artifacts[0].ctaLink} 
+            class="imax-cta-link inline-flex items-center gap-1.5 text-xs sm:text-sm font-normal text-[#2997ff] hover:text-[#52aaff] group/link transition-colors"
+          >
+            <span class="imax-cta-text">{card2Artifacts[0].ctaText}</span>
+            <svg class="w-3.5 h-3.5 transform transition-transform group-hover/link:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </a>
+
+          <span class="text-white/20 hidden sm:inline">·</span>
+
+          <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/6 border border-white/8 text-[10px] sm:text-[11px] font-mono text-white/50 tracking-wider uppercase">
+            <span class="w-1 h-1 rounded-full bg-amber-400"></span>
+            <span class="imax-era-text">{card2Artifacts[0].era}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAGE: ESCENARIO IMAX VERTICAL GIGANTE (MÁS ESPACIO HACIA ABAJO) -->
+      <div class="bento-imax-stage mt-auto w-full relative grow flex justify-center items-end px-6 pb-8 sm:pb-12 md:pb-16 overflow-hidden min-h-[460px] sm:min-h-[560px] md:min-h-[640px] z-10">
+        <!-- HALO DE CONTRALUZ AMBIENTAL DE ALTO CONTRASTE -->
+        <div class="imax-ambient-glow absolute inset-0 pointer-events-none"></div>
+
+        <!-- SOMBRA DE CONTACTO BASE MULTICAPA ESTRATIFICADA -->
+        <div class="imax-contact-shadow absolute bottom-7 sm:bottom-10 md:bottom-14 left-1/2 -translate-x-1/2 w-72 sm:w-96 md:w-[500px] h-8 bg-black/85 rounded-full blur-lg pointer-events-none transform scale-y-50"></div>
+        <div class="imax-contact-core absolute bottom-8 sm:bottom-11 md:bottom-15 left-1/2 -translate-x-1/2 w-48 sm:w-64 md:w-80 h-3 bg-black/95 rounded-full blur-xs pointer-events-none"></div>
+
+        <!-- ARRAY DE IMÁGENES RECORTADAS EN ESCALA HEROICA -->
+        {card2Artifacts.map((art, idx) => (
+          <div
+            class={`imax-artifact-wrapper absolute bottom-8 sm:bottom-12 md:bottom-16 left-1/2 -translate-x-1/2 w-full h-[88%] sm:h-[92%] md:h-[95%] flex justify-center items-end pointer-events-none ${
+              idx === 0 ? "z-10 opacity-100" : "z-0 opacity-0 invisible"
+            }`}
+            data-index={idx}
+          >
+            <picture class="h-full w-auto flex justify-center items-end">
+              <source srcset={art.imageWebp} type="image/webp" />
+              <img 
+                src={art.imageWebp} 
+                alt={art.alt}
+                loading="lazy"
+                decoding="async"
+                class="imax-statue-img h-full w-auto max-w-[88%] sm:max-w-[82%] md:max-w-[76%] object-contain object-bottom imax-statue-shadow transition-transform duration-700 group-hover/imax:scale-[1.03]"
+              />
+            </picture>
+          </div>
+        ))}
+      </div>
+
+      <!-- MICRO-DOCK DE PAGINACIÓN EN LA ESQUINA SUPERIOR -->
+      <div class="absolute top-6 sm:top-8 right-6 sm:right-10 z-30 flex items-center gap-2 bg-white/6 border border-white/8 px-3 py-1.5 rounded-full backdrop-blur-md">
+        {card2Artifacts.map((_, idx) => (
+          <button 
+            type="button"
+            class={`imax-dot rounded-full transition-all duration-500 cursor-pointer ${
+              idx === 0 ? "bg-white w-4 h-1.5" : "bg-white/25 w-1.5 h-1.5 hover:bg-white/50"
+            }`}
+            data-target-idx={idx}
+            aria-label={`Ver artefacto ${idx + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SCRIPT CINEMÁTICO GSAP: ORQUESTACIÓN EDITORIAL DE CRÉDITOS Y ESTATUARIA -->
+<script define:vars={{ card1Artifacts, card2Artifacts }}>
+  document.addEventListener("DOMContentLoaded", async () => {
+    // Carga dinámica de GSAP garantizada
+    let gsapModule;
+    try {
+      gsapModule = await import("gsap");
+    } catch (e) {
+      console.warn("GSAP no disponible, usando fallback CSS");
+    }
+    const gsap = gsapModule?.gsap || window.gsap;
+
+    function initImaxGsapCard(cardId, artifacts, initialOffsetSeconds) {
+      const cardEl = document.getElementById(cardId);
+      if (!cardEl) return;
+
+      const kickerEl = cardEl.querySelector(".imax-kicker-text");
+      const line1El = cardEl.querySelector(".imax-line-1");
+      const line2El = cardEl.querySelector(".imax-line-2");
+      const loglineEl = cardEl.querySelector(".imax-logline");
+      const ctaLinkEl = cardEl.querySelector(".imax-cta-link");
+      const ctaTextEl = cardEl.querySelector(".imax-cta-text");
+      const eraTextEl = cardEl.querySelector(".imax-era-text");
+      const wrappers = cardEl.querySelectorAll(".imax-artifact-wrapper");
+      const dots = cardEl.querySelectorAll(".imax-dot");
+      const shadowEl = cardEl.querySelector(".imax-contact-shadow");
+
+      let currentIndex = 0;
+      let isPaused = false;
+      let loopTimer = null;
+
+      function updateTexts(data) {
+        if (!data) return;
+        if (kickerEl) kickerEl.textContent = data.kicker;
+        if (line1El) line1El.textContent = data.titleLine1;
+        if (line2El) line2El.textContent = data.titleLine2;
+        if (loglineEl) loglineEl.textContent = data.logline;
+        if (ctaTextEl) ctaTextEl.textContent = data.ctaText;
+        if (ctaLinkEl) ctaLinkEl.setAttribute("href", data.ctaLink);
+        if (eraTextEl) eraTextEl.textContent = data.era;
+      }
+
+      function updateDots(activeIdx) {
+        dots.forEach((dot, i) => {
+          if (i === activeIdx) {
+            dot.classList.add("bg-white", "w-4");
+            dot.classList.remove("bg-white/25", "w-1.5");
+          } else {
+            dot.classList.remove("bg-white", "w-4");
+            dot.classList.add("bg-white/25", "w-1.5");
+          }
+        });
+      }
+
+      function transitionTo(nextIdx) {
+        if (nextIdx === currentIndex) return;
+
+        const currentWrap = wrappers[currentIndex];
+        const nextWrap = wrappers[nextIdx];
+        const nextData = artifacts[nextIdx];
+
+        if (gsap) {
+          // TIMELINE GSAP: OUTRO ELEGANTE DE CRÉDITOS Y ESTATUA
+          const outroTl = gsap.timeline({
+            onComplete: () => {
+              if (currentWrap) {
+                currentWrap.classList.remove("z-10");
+                currentWrap.classList.add("z-0", "invisible");
+              }
+              if (nextWrap) {
+                nextWrap.classList.remove("invisible", "z-0");
+                nextWrap.classList.add("z-10");
+              }
+
+              // Actualizar datos del nuevo artefacto
+              updateTexts(nextData);
+              updateDots(nextIdx);
+              currentIndex = nextIdx;
+
+              // TIMELINE GSAP: INTRO MAJESTUOSO EN CASCADA (CRÉDITOS CINEMATOGRÁFICOS)
+              const introTl = gsap.timeline();
+
+              // 1. Kicker
+              introTl.fromTo(
+                kickerEl,
+                { opacity: 0, y: 14 },
+                { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
+              );
+
+              // 2. Títulos bifásicos
+              introTl.fromTo(
+                [line1El, line2El],
+                { opacity: 0, y: 22 },
+                { opacity: 1, y: 0, duration: 0.8, stagger: 0.12, ease: "power3.out" },
+                "-=0.4"
+              );
+
+              // 3. Logline / Créditos a ritmo de lectura
+              introTl.fromTo(
+                loglineEl,
+                { opacity: 0, y: 16 },
+                { opacity: 1, y: 0, duration: 0.85, ease: "power2.out" },
+                "-=0.5"
+              );
+
+              // 4. CTA y Pill
+              introTl.fromTo(
+                [ctaLinkEl, eraTextEl?.parentElement],
+                { opacity: 0, y: 12 },
+                { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: "power2.out" },
+                "-=0.4"
+              );
+
+              // 5. Estatua e iluminación de apoyo
+              if (nextWrap) {
+                const img = nextWrap.querySelector("img");
+                introTl.fromTo(
+                  nextWrap,
+                  { opacity: 0, y: 35, scale: 0.94 },
+                  { opacity: 1, y: 0, scale: 1, duration: 1.1, ease: "power2.out" },
+                  "-=0.9"
+                );
+              }
+
+              if (shadowEl) {
+                introTl.fromTo(
+                  shadowEl,
+                  { opacity: 0, scaleX: 0.75 },
+                  { opacity: 0.85, scaleX: 1, duration: 1.0, ease: "power2.out" },
+                  "-=1.1"
+                );
+              }
+            }
+          });
+
+          outroTl.to([kickerEl, line1El, line2El, loglineEl, ctaLinkEl, eraTextEl?.parentElement], {
+            opacity: 0,
+            y: -16,
+            duration: 0.5,
+            stagger: 0.05,
+            ease: "power2.in"
+          });
+
+          if (currentWrap) {
+            outroTl.to(
+              currentWrap,
+              { opacity: 0, y: -20, scale: 0.97, duration: 0.55, ease: "power2.in" },
+              "-=0.45"
+            );
+          }
+        } else {
+          // Fallback CSS básico si GSAP no carga
+          wrappers.forEach((w, i) => {
+            if (i === nextIdx) {
+              w.classList.remove("opacity-0", "invisible", "z-0");
+              w.classList.add("opacity-100", "z-10");
+            } else {
+              w.classList.remove("opacity-100", "z-10");
+              w.classList.add("opacity-0", "invisible", "z-0");
+            }
+          });
+          updateTexts(nextData);
+          updateDots(nextIdx);
+          currentIndex = nextIdx;
+        }
+      }
+
+      function next() {
+        const nextIdx = (currentIndex + 1) % artifacts.length;
+        transitionTo(nextIdx);
+      }
+
+      function startCycle() {
+        stopCycle();
+        // Ciclo cinematográfico de 7.5 segundos por artefacto
+        loopTimer = setInterval(() => {
+          if (!isPaused) {
+            next();
+          }
+        }, 7500);
+      }
+
+      function stopCycle() {
+        if (loopTimer) clearInterval(loopTimer);
+      }
+
+      // Desfase asíncrono inicial
+      setTimeout(() => {
+        startCycle();
+      }, initialOffsetSeconds * 1000);
+
+      // Pausa en hover
+      cardEl.addEventListener("mouseenter", () => {
+        isPaused = true;
+      });
+      cardEl.addEventListener("mouseleave", () => {
+        isPaused = false;
+      });
+
+      // Navegación manual por dots
+      dots.forEach((dot) => {
+        dot.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const target = parseInt(dot.getAttribute("data-target-idx") || "0", 10);
+          transitionTo(target);
+          startCycle();
+        });
+      });
+    }
+
+    // Arranque asíncrono desacoplado:
+    // Card 1: Arranque con 0.3s
+    // Card 2: Arranque con 3.8s (desfase exacto de medio ciclo)
+    initImaxGsapCard("bento-imax-card-1", card1Artifacts, 0.3);
+    initImaxGsapCard("bento-imax-card-2", card2Artifacts, 3.8);
+  });
+</script>
+
+<style>
+  .apple-bento-due-imax-section {
+    contain: layout style;
+  }
+
+  .bento-imax-card {
+    will-change: transform, box-shadow;
+  }
+
+  .imax-ambient-glow {
+    background: radial-gradient(circle at 50% 65%, rgba(255, 255, 255, 0.05) 0%, transparent 68%);
+  }
+
+  .imax-statue-shadow {
+    filter: drop-shadow(0 26px 38px rgba(0, 0, 0, 0.8)) drop-shadow(0 8px 14px rgba(0, 0, 0, 0.52));
+  }
+
+  .bento-imax-stage picture img {
+    max-height: 100%;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+</style>

@@ -1,10 +1,10 @@
-﻿import type { APIRoute } from 'astro';
+import type { APIRoute } from 'astro';
 import { extractEntityToCypher } from '../../lib/knowledgeGraph';
 
 export const prerender = false;
 
 // Email autorizado en Cloudflare Zero Trust (Access)
-const AUTHORIZED_EMAIL = Xgnatiux@gmail.com;
+const AUTHORIZED_EMAIL = "Xgnatiux@gmail.com";
 
 export const POST: APIRoute = async ({ request, locals }) => {
   const isDev = import.meta.env.DEV;
@@ -13,8 +13,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
   if (!isDev) {
     const cfUserEmail = request.headers.get('cf-access-authenticated-user-email');
     if (!cfUserEmail || cfUserEmail.toLowerCase() !== AUTHORIZED_EMAIL.toLowerCase()) {
-      return new Response(JSON.stringify({ error: Recurso no encontrado }), {
-        status: 404, // Simula que el endpoint no existe
+      return new Response(JSON.stringify({ error: "Recurso no encontrado" }), {
+        status: 404,
         headers: { 'Content-Type': 'application/json' }
       });
     }
@@ -31,7 +31,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     if (!apiKey) {
       return new Response(JSON.stringify({ 
-        error: Falta configurar KNOWLEDGE_GRAPH_API_KEY en .env o Cloudflare Secrets 
+        error: "Falta configurar KNOWLEDGE_GRAPH_API_KEY en .env o Cloudflare Secrets" 
       }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
@@ -44,7 +44,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message || Error procesando entidad }), {
+    return new Response(JSON.stringify({ error: err.message || "Error procesando entidad" }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });

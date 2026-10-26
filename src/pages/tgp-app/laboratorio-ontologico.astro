@@ -1,10 +1,12 @@
-﻿---
+---
 // src/pages/tgp-app/laboratorio-ontologico.astro
 // TGP Grapher: Laboratorio Ontológico & Inyector Cypher (Google Knowledge Graph -> Neo4j)
+import tgpHemerotecaGraph from '../../data/tgp-ontology.json';
+
 export const prerender = false;
 
 const isDev = import.meta.env.DEV;
-const AUTHORIZED_EMAIL = Xgnatiux@gmail.com;
+const AUTHORIZED_EMAIL = "Xgnatiux@gmail.com";
 
 // ── BLINDAJE EN PRODUCCIÓN: EXIGIR VALIDACIÓN DE CLOUDFLARE ACCESS ──
 if (!isDev) {
@@ -16,158 +18,817 @@ if (!isDev) {
 ---
 
 <!DOCTYPE html>
-<html lang=es>
+<html lang="es">
 <head>
-  <meta charset=UTF-8>
-  <meta name=robots content=noindex, nofollow, noarchive>
-  <meta name=viewport content=width=device-width, initial-scale=1.0>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TGP Grapher · Laboratorio Ontológico Cypher</title>
-  <link rel=preconnect href=https://fonts.googleapis.com>
-  <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
-  <link href=https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap rel=stylesheet>
-  <script src=https://cdn.tailwindcss.com></script>
-  <!-- Motor de Grafo de Fuerza para ver brotar los nodos interactivos -->
-  <script src=https://unpkg.com/force-graph></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Motor de Grafo de Fuerza 2D -->
+  <script src="https://unpkg.com/force-graph"></script>
   <style>
     :root {
-      --bg-dark: #0b0f0e;
-      --card-dark: #111716;
-      --border-dark: #263231;
+      --bg: #0b0f0e;
+      --card-bg: #111716;
+      --card-border: #263231;
       --accent-gold: #c9a96e;
+      --accent-cyan: #38bdf8;
+      --accent-green: #4ade80;
+      --accent-orange: #fb923c;
+      --text-main: #f0f2f1;
+      --text-muted: #8a9a98;
     }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background-color: var(--bg-dark);
-      color: #d4d4d2;
-      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
     }
-    .font-cinzel { font-family: 'Cinzel', serif; }
-    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.25rem;
+      background: #0f1514;
+      border-bottom: 1px solid var(--card-border);
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .header-title h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #fff;
+    }
+    .header-title h1 span { color: var(--accent-gold); }
+    .badge-env {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 9999px;
+      background: rgba(74, 222, 128, 0.12);
+      border: 1px solid rgba(74, 222, 128, 0.35);
+      color: var(--accent-green);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .btn {
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .btn-gold {
+      background: var(--accent-gold);
+      color: #0b0f0e;
+    }
+    .btn-gold:hover { background: #dfbe82; }
+    .btn-dark {
+      background: #161d1c;
+      color: var(--text-main);
+      border-color: var(--card-border);
+    }
+    .btn-dark:hover { background: #1f2726; border-color: #3d4f4d; color: #fff; }
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.25);
+    }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+
+    .btn-alt-web {
+      border-color: rgba(56, 189, 248, 0.35);
+      background: rgba(56, 189, 248, 0.08);
+      color: #bae6fd;
+    }
+    .btn-alt-web:hover {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.18);
+      color: #fff;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    }
+
+    /* MENÚ DESPLEGABLE ECOSISTEMA TGP */
+    .dropdown-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 320px;
+      background: #111716;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.75), 0 0 20px rgba(201,169,110,0.12);
+      padding: 0.5rem;
+      z-index: 1000;
+    }
+    .dropdown-content.show {
+      display: block;
+      animation: fadeInDown 0.15s ease-out;
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .dropdown-item {
+      display: block;
+      padding: 0.6rem 0.75rem;
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--text-main);
+      transition: all 0.15s ease;
+      margin-bottom: 0.25rem;
+    }
+    .dropdown-item:last-child { margin-bottom: 0; }
+    .dropdown-item:hover {
+      background: #192422;
+    }
+    .dropdown-item.highlighted {
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+    .dropdown-item.highlighted:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: rgba(56, 189, 248, 0.45);
+    }
+    .item-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+    }
+    .pill-ext {
+      font-size: 0.6rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      background: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+    }
+    .item-desc {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+      line-height: 1.35;
+    }
+
+    /* LAYOUT PRINCIPAL: 2 COLUMNAS CON SIDEBAR PLEGABLE */
+    .workspace {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 58px);
+      background: var(--bg);
+      overflow: hidden;
+      position: relative;
+    }
+    .canvas-panel {
+      position: relative;
+      background: #0d1211;
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #graph-container {
+      width: 100%;
+      height: 100%;
+    }
+    .floating-open-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 35;
+      display: none;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      border: 1px solid var(--accent-gold);
+      background: #111716;
+      color: var(--accent-gold);
+    }
+    .floating-open-btn:hover {
+      background: #1a2220;
+    }
+    .workspace.sidebar-collapsed .floating-open-btn {
+      display: inline-flex;
+    }
+    .legend-bar {
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.4rem 0.85rem;
+      background: rgba(11, 15, 14, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--card-border);
+      border-radius: 9999px;
+      font-size: 0.7rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+    }
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .sidebar-panel {
+      width: 420px;
+      min-width: 420px;
+      background: var(--card-bg);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+      overflow-y: auto;
+      border-left: 1px solid var(--card-border);
+      transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 20;
+    }
+    .workspace.sidebar-collapsed .sidebar-panel {
+      margin-right: -420px;
+      transform: translateX(100%);
+      pointer-events: none;
+    }
+    .sidebar-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .sidebar-title {
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .btn-close-sidebar {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+    .btn-close-sidebar:hover {
+      background: #1e2826;
+      color: #fff;
+      border-color: var(--card-border);
+    }
+    .card-box {
+      background: #151d1c;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .box-title {
+      font-size: 0.7rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .search-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .input-text {
+      flex: 1;
+      background: #0c100f;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .input-text:focus { border-color: var(--accent-gold); }
+    .status-msg {
+      font-size: 0.7rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+      font-style: italic;
+    }
+
+    .node-detail-card {
+      background: #0e1413;
+      border: 1px solid #2f3d3b;
+      border-radius: 8px;
+      padding: 1rem;
+      display: none;
+    }
+    .node-detail-card.active { display: block; }
+    .node-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .node-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      color: #fff;
+      margin-bottom: 0.35rem;
+    }
+    .node-dek {
+      font-size: 0.8rem;
+      line-height: 1.4;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+    .node-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .node-link:hover { text-decoration: underline; color: #7dd3fc; }
+
+    textarea.cypher-area {
+      width: 100%;
+      height: 180px;
+      background: #080b0a;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 0.75rem;
+      color: var(--accent-green);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      resize: vertical;
+      line-height: 1.45;
+      outline: none;
+    }
   </style>
 </head>
-<body class=min-h-screen flex flex-col p-4 md:p-6 overflow-hidden>
+<body>
   
   <!-- BARRA DE CONTROL SUPERIOR -->
-  <header class=flex items-center justify-between pb-4 border-b border-[#263231] mb-4>
-    <div class=flex items-center gap-3>
-      <a href=/tgp-app class=px-2.5 py-1 rounded bg-[#161d1c] hover:bg-[#1f2726] border border-[#263231] text-xs font-mono text-[#8a9a98] hover:text-white transition-colors>
-        ← Volver a Scriptorium
+  <header>
+    <div class="header-title">
+      <a href="/tgp-app" class="btn btn-dark" title="Volver al Panel">← Scriptorium</a>
+      
+      <!-- DESPLEGABLE ECOSISTEMA TGP -->
+      <div class="dropdown-wrapper">
+        <button id="btn-ecosystem-toggle" class="btn btn-dark" aria-haspopup="true" aria-expanded="false" title="Desplegable del Ecosistema">
+          <span>🌐 Ecosistema TGP</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div id="ecosystem-dropdown-menu" class="dropdown-content">
+          <a href="https://alternative.thegreatpuzzleproject.com/" target="_blank" rel="noopener noreferrer" class="dropdown-item highlighted">
+            <div class="item-title">
+              <span>🌐 TGP Alternative (Main Web)</span>
+              <span class="pill-ext">EXTERNO ↗</span>
+            </div>
+            <p class="item-desc">Web hermana y portal principal de narrativas, ensayos y arquitectura visual.</p>
+          </a>
+          <a href="/tgp-app" class="dropdown-item">
+            <div class="item-title">
+              <span>📜 TGP Scriptorium</span>
+            </div>
+            <p class="item-desc">Panel de herramientas, forja de posteos y laboratorio forense.</p>
+          </a>
+          <a href="/" target="_blank" class="dropdown-item">
+            <div class="item-title">
+              <span>🏛️ TGP Hemeroteca</span>
+            </div>
+            <p class="item-desc">Archivo público y colecciones de ensayos.</p>
+          </a>
+          <a href="https://tgp-webfinal2026.pages.dev/tgp-vault" target="_blank" rel="noopener noreferrer" class="dropdown-item">
+            <div class="item-title">
+              <span>⚗️ TGP Vault / Atanor</span>
+              <span class="pill-ext">EXTERNO ↗</span>
+            </div>
+            <p class="item-desc">Ingesta masiva, limpieza HTML y almacenamiento R2/D1.</p>
+          </a>
+        </div>
+      </div>
+
+      <!-- BOTÓN DIRECTO TGP ALTERNATIVE WEB -->
+      <a href="https://alternative.thegreatpuzzleproject.com/" target="_blank" rel="noopener noreferrer" class="btn btn-alt-web" title="Abrir TGP Alternative (Web Principal)">
+        <span>🌐 TGP Alternative Web ↗</span>
       </a>
-      <span class=w-2.5 h-2.5 rounded-full bg-[#c9a96e] animate-pulse></span>
-      <h1 class=font-cinzel text-lg font-bold tracking-wider text-white>TGP Grapher <span class=text-[#c9a96e]>· Laboratorio Ontológico</span></h1>
-      <span class=px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-950/60 text-emerald-400 border border-emerald-800/60>
-        {isDev ? 'ENTORNO LOCAL (DEV)' : 'CLOUDFLARE ACCESS BLINDADO'}
-      </span>
+
+      <span style="width: 8px; height: 8px; border-radius: 50%; background: #c9a96e; box-shadow: 0 0 8px #c9a96e; margin-left: 0.25rem;"></span>
+      <h1>TGP Grapher <span>· Ontología Viva</span></h1>
+      <span class="badge-env">{isDev ? 'Local DEV' : 'Cloudflare Zero Trust'}</span>
     </div>
-    <div class=flex items-center gap-4 font-mono text-xs text-[#8a9a98]>
-      <span>Nodos en Red: <strong id=node-count class=text-white>0</strong></span>
-      <button id=btn-clear class=px-2.5 py-1 rounded bg-red-950/40 hover:bg-red-900/60 text-red-300 border border-red-800/40 text-[11px] transition-colors cursor-pointer>
-        Limpiar Grafo
+    
+    <div class="header-actions">
+      <span>Nodos: <strong id="node-count" style="color: #fff;">0</strong></span>
+      <button id="btn-sync-hemeroteca" class="btn btn-gold" title="Recargar la Ontología Global (+200 Nodos: Hemeroteca, Alternative, Georreferencias y Ediciones)">
+        ⚡ Sincronizar Cosmos (+200 Nodos)
+      </button>
+      <button id="btn-recenter" class="btn btn-dark" title="Centrar todos los nodos en la pantalla">
+        ⊙ Centrar
+      </button>
+      <button id="btn-toggle-sidebar" class="btn btn-dark" title="Plegar/Desplegar panel lateral">
+        ◨ Consola
+      </button>
+      <button id="btn-clear" class="btn btn-danger" title="Limpiar canvas">
+        Limpiar
       </button>
     </div>
   </header>
 
-  <!-- WORKSPACE DIVIDIDO (GRAFO 60% / CONSOLA CYPHER 40%) -->
-  <div class=grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 h-[calc(100vh-100px)]>
+  <!-- WORKSPACE DE 2 COLUMNAS (CANVAS + CONSOLA PLEGABLE) -->
+  <div id="workspace" class="workspace">
     
-    <!-- CANVAS DEL GRAFO DE FUERZA DIRIGIDA -->
-    <div class=lg:col-span-7 bg-[#111716] rounded-xl border border-[#263231] relative overflow-hidden flex flex-col shadow-2xl>
-      <div id=graph-container class=w-full flex-1></div>
+    <!-- CANVAS DE GRAFO DE FUERZA DIRIGIDA -->
+    <div class="canvas-panel">
+      <!-- BOTÓN FLOTANTE CUANDO EL PANEL ESTÁ PLEGADO -->
+      <button id="btn-floating-open" class="btn floating-open-btn" title="Abrir Consola y Auditoría">
+        ◨ Abrir Consola
+      </button>
+
+      <div id="graph-container"></div>
       
-      <!-- LEYENDA ONTO-TAXONÓMICA TGP -->
-      <div class=absolute bottom-3 left-4 pointer-events-none flex items-center gap-4 text-[10px] font-mono text-white/50 bg-black/60 px-3.5 py-1.5 rounded-full backdrop-blur-md border border-white/5>
-        <span class=flex items-center gap-1.5><span class=w-2 h-2 rounded-full bg-[#c9a96e]></span> :Agent (Persona/Org)</span>
-        <span class=flex items-center gap-1.5><span class=w-2 h-2 rounded-full bg-[#4a9eff]></span> :Concept (Filosofía/Idea)</span>
-        <span class=flex items-center gap-1.5><span class=w-2 h-2 rounded-full bg-[#48bb78]></span> :Locus (Yacimiento/Geografía)</span>
-        <span class=flex items-center gap-1.5><span class=w-2 h-2 rounded-full bg-[#e58e4a]></span> :Event (Cataclismo/Hito)</span>
+      <!-- LEYENDA TAXONÓMICA -->
+      <div class="legend-bar">
+        <span style="display: flex; align-items: center; gap: 0.35rem;">
+          <span class="legend-dot" style="background: var(--accent-gold);"></span> Hub Categoría
+        </span>
+        <span style="display: flex; align-items: center; gap: 0.35rem;">
+          <span class="legend-dot" style="background: var(--accent-cyan);"></span> Ensayo Hemeroteca
+        </span>
+        <span style="display: flex; align-items: center; gap: 0.35rem;">
+          <span class="legend-dot" style="background: var(--accent-orange);"></span> Arquetipo Global
+        </span>
+        <span style="display: flex; align-items: center; gap: 0.35rem;">
+          <span class="legend-dot" style="background: var(--accent-green);"></span> Google KG
+        </span>
       </div>
     </div>
 
-    <!-- TERMINAL CYPHER & PANEL DE CONTROL -->
-    <div class=lg:col-span-5 flex flex-col gap-3 h-full>
+    <!-- SIDEBAR PLEGABLE DE DETALLES, INYECCIÓN Y CYPHER -->
+    <aside id="sidebar-panel" class="sidebar-panel">
       
-      <!-- INBOX DE EXTRACCIÓN ONTO-SEMÁNTICA -->
-      <div class=bg-[#111716] p-4 rounded-xl border border-[#263231] flex flex-col gap-2.5 shadow-lg>
-        <div class=flex items-center justify-between>
-          <label class=text-xs font-mono text-[#8a9a98] tracking-wider uppercase>Inyección Ontológica (Google Knowledge Graph)</label>
-          <span class=text-[10px] font-mono text-[#c9a96e]>Cypher v5</span>
+      <div class="sidebar-top-bar">
+        <span class="sidebar-title">PANEL DE CONTROL & CYPHER</span>
+        <button id="btn-close-sidebar" class="btn-close-sidebar" title="Plegar panel lateral">✕</button>
+      </div>
+      
+      <!-- TARJETA DEL NODO SELECCIONADO AL HACER CLIC -->
+      <div id="selected-node-box" class="node-detail-card">
+        <span id="card-tag" class="node-tag">Ensayo</span>
+        <h3 id="card-title" class="node-title">Título del Ensayo</h3>
+        <p id="card-dek" class="node-dek">Extracto y síntesis archivística...</p>
+        <a id="card-url" href="#" target="_blank" class="node-link">
+          <span>Abrir ensayo en Hemeroteca</span> →
+        </a>
+      </div>
+
+      <!-- INBOX PARA INYECTAR NUEVAS ENTIDADES DESDE GOOGLE KNOWLEDGE GRAPH -->
+      <div class="card-box">
+        <div class="box-title">
+          <span>Inyectar desde Google KG</span>
+          <span style="color: var(--accent-gold);">En Vivo</span>
         </div>
-        <div class=flex gap-2>
+        <div class="search-row">
           <input 
-            type=text 
-            id=input-query 
-            placeholder=ej: Carl Jung, Göbekli Tepe, Biblioteca de Alejandría... 
-            class=flex-1 bg-[#161d1c] border border-[#263231] rounded-lg px-3.5 py-2 text-sm text-white placeholder-[#8a9a98]/50 focus:outline-none focus:border-[#c9a96e]
+            type="text" 
+            id="input-query" 
+            placeholder="ej: Carl Jung, Nínive, Göbekli Tepe..." 
+            class="input-text"
           />
-          <button 
-            id=btn-extract 
-            class=px-4 py-2 bg-[#c9a96e] hover:bg-[#b5955c] text-black font-semibold text-xs rounded-lg uppercase tracking-wider transition-colors cursor-pointer
-          >
+          <button id="btn-extract" class="btn btn-gold">
             Extraer
           </button>
         </div>
-        <p id=status-text class=text-[11px] font-mono text-[#8a9a98] italic>Listo para consultar y mapear entidades universales...</p>
+        <p id="status-text" class="status-msg">Haz clic en cualquier nodo del grafo para auditarlo.</p>
       </div>
 
-      <!-- VISOR CYPHER INTERACTIVO (NEO4J / MEMGRAPH READY) -->
-      <div class=bg-[#111716] p-4 rounded-xl border border-[#263231] flex-1 flex flex-col gap-2 overflow-hidden shadow-lg>
-        <div class=flex items-center justify-between>
-          <label class=text-xs font-mono text-emerald-400 font-semibold tracking-wider uppercase>Sentencias Cypher Generadas</label>
-          <button id=btn-copy class=text-[11px] font-mono text-[#8a9a98] hover:text-white transition-colors cursor-pointer px-2 py-0.5 rounded bg-white/5 border border-white/10>
+      <!-- TERMINAL CON SENTENCIAS CYPHER PARA NEO4J -->
+      <div class="card-box" style="flex: 1; display: flex; flex-direction: column;">
+        <div class="box-title">
+          <span style="color: var(--accent-green);">Sentencias Cypher (Neo4j)</span>
+          <button id="btn-copy" class="btn btn-dark" style="padding: 0.2rem 0.5rem; font-size: 0.65rem;">
             Copiar Todo
           </button>
         </div>
         <textarea 
-          id=cypher-output 
+          id="cypher-output" 
           readonly 
-          class=flex-1 w-full bg-[#0b0e0d] border border-[#263231] rounded-lg p-3 font-mono-code text-xs text-emerald-400 resize-none focus:outline-none leading-relaxed
-          placeholder=// Las sentencias Cypher (MERGE) aparecerán aquí estructuradas...
+          class="cypher-area"
+          placeholder="// Las sentencias Cypher generadas se listan aquí..."
         ></textarea>
       </div>
 
-    </div>
+    </aside>
+
   </div>
 
-  <script>
-    const graphData = JSON.parse(localStorage.getItem('tgp_graph_data') || '{nodes:[],links:[]}');
-    const cypherHistory = JSON.parse(localStorage.getItem('tgp_cypher_history') || '[]');
+  <!-- SCRIPT DE ORQUESTACIÓN DEL GRAFO -->
+  <script define:vars={{ defaultGraph: tgpHemerotecaGraph }}>
+    const STORAGE_KEY_GRAPH = 'tgp_global_ontology_v3';
+    const STORAGE_KEY_CYPHER = 'tgp_global_cypher_v3';
 
-    const elem = document.getElementById('graph-container');
+    // 1. Cargar grafo inicial sembrado con los 58 posteos si localStorage está vacío
+    let savedGraph = localStorage.getItem(STORAGE_KEY_GRAPH);
+    let graphData;
+    let cypherHistory;
+
+    if (savedGraph) {
+      try {
+        graphData = JSON.parse(savedGraph);
+        cypherHistory = JSON.parse(localStorage.getItem(STORAGE_KEY_CYPHER) || '[]');
+      } catch (e) {
+        graphData = defaultGraph;
+        cypherHistory = defaultGraph.cypherStatements || [];
+      }
+    } else {
+      // Primera visita: Inyectar automáticamente el grafo de los 58 posteos
+      graphData = defaultGraph;
+      cypherHistory = defaultGraph.cypherStatements || [];
+      localStorage.setItem(STORAGE_KEY_GRAPH, JSON.stringify(graphData));
+      localStorage.setItem(STORAGE_KEY_CYPHER, JSON.stringify(cypherHistory));
+    }
+
+    const container = document.getElementById('graph-container');
     const nodeCountEl = document.getElementById('node-count');
+    const linkCountEl = document.getElementById('link-count');
     const cypherOutput = document.getElementById('cypher-output');
     const inputQuery = document.getElementById('input-query');
     const btnExtract = document.getElementById('btn-extract');
     const statusText = document.getElementById('status-text');
 
-    const Graph = ForceGraph()(elem)
-      .graphData(graphData)
-      .nodeId('id')
-      .nodeLabel('name')
-      .nodeColor(node => {
-        if (node.group === 'Agent') return '#c9a96e';
-        if (node.group === 'Locus') return '#48bb78';
-        if (node.group === 'Event') return '#e58e4a';
-        return '#4a9eff';
-      })
-      .nodeVal(node => node.val || 8)
-      .linkDirectionalParticles(2)
-      .linkDirectionalParticleSpeed(0.005)
-      .linkColor(() => '#263231')
-      .backgroundColor('#111716');
+    // Elementos de la tarjeta de detalle de nodo
+    const detailCard = document.getElementById('selected-node-box');
+    const cardTag = document.getElementById('card-tag');
+    const cardTitle = document.getElementById('card-title');
+    const cardDek = document.getElementById('card-dek');
+    const cardUrl = document.getElementById('card-url');
+
+    function getColorForGroup(group, type) {
+      if (type === 'CONTINENTE' || group === 'Continente') return '#e2c88f'; // Dorado solar
+      if (type === 'GEORREFERENCIA' || group === 'Georreferencia') return '#10b981'; // Esmeralda megalítica
+      if (type === 'EDICION_REVISTA' || group === 'Edición Revista') return '#f59e0b'; // Ámbar editorial
+      if (type === 'ENSAYO_HEMEROTECA' || group === 'Hemeroteca') return '#38bdf8'; // Cyan hemeroteca
+      if (type === 'ENSAYO_CINEMATICO' || group === 'Cinemático') return '#a855f7'; // Púrpura cinematográfico
+      if (type === 'ENSAYO_ALTERNATIVE' || group === 'Alternative') return '#f43f5e'; // Carmesí crítico
+      if (type === 'ARQUETIPO' || group === 'Arquetipo') return '#fb923c'; // Naranja mitológico
+      if (group === 'Category') return '#c9a96e';
+      if (group === 'KG') return '#2dd4bf';
+      return '#38bdf8';
+    }
+
+    // Función de inicialización resiliente
+    let Graph = null;
+    let hoverNode = null;
+    let resize = null;
+
+    const workspaceEl = document.getElementById('workspace');
+    const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
+    const btnCloseSidebar = document.getElementById('btn-close-sidebar');
+    const btnFloatingOpen = document.getElementById('btn-floating-open');
+
+    function toggleSidebar(open) {
+      if (!workspaceEl) return;
+      const isCurrentlyCollapsed = workspaceEl.classList.contains('sidebar-collapsed');
+      const shouldCollapse = (open !== undefined) ? !open : !isCurrentlyCollapsed;
+
+      if (shouldCollapse) {
+        workspaceEl.classList.add('sidebar-collapsed');
+        if (btnToggleSidebar) btnToggleSidebar.innerHTML = '◨ Abrir Consola';
+      } else {
+        workspaceEl.classList.remove('sidebar-collapsed');
+        if (btnToggleSidebar) btnToggleSidebar.innerHTML = '◨ Consola';
+      }
+
+      // Re-adaptar dimensiones del canvas tras la transición CSS
+      setTimeout(() => {
+        if (resize) resize();
+      }, 310);
+    }
+
+    btnToggleSidebar?.addEventListener('click', () => toggleSidebar());
+    btnCloseSidebar?.addEventListener('click', () => toggleSidebar(false));
+    btnFloatingOpen?.addEventListener('click', () => toggleSidebar(true));
+
+    function startForceGraph() {
+      if (typeof ForceGraph === 'undefined') {
+        console.log('[TGP Grapher] Esperando carga de ForceGraph...');
+        setTimeout(startForceGraph, 100);
+        return;
+      }
+      if (!container) return;
+
+      console.log('[TGP Grapher] Inicializando grafo con', graphData.nodes.length, 'nodos');
+
+      Graph = ForceGraph()(container)
+        .graphData(graphData)
+        .nodeId('id')
+        .nodeVal(node => node.val || (node.isCategory ? 16 : 8))
+        .linkDirectionalParticles(2)
+        .linkDirectionalParticleSpeed(0.004)
+        .linkColor(() => '#233230')
+        .backgroundColor('#0d1211')
+        .onNodeHover(node => {
+          hoverNode = node;
+          container.style.cursor = node ? 'pointer' : 'default';
+        })
+        .nodeCanvasObject((node, ctx, globalScale) => {
+          const isCat = node.isCategory;
+          const isHovered = (hoverNode === node);
+          const r = isCat ? 7 : (isHovered ? 6 : 4);
+          const color = getColorForGroup(node.group, node.type);
+
+          // Aura sutil exterior
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, r + (isCat ? 3 : (isHovered ? 4 : 1.5)), 0, 2 * Math.PI, false);
+          ctx.fillStyle = isHovered 
+            ? 'rgba(56, 189, 248, 0.45)' 
+            : (isCat ? 'rgba(201, 169, 110, 0.25)' : 'rgba(56, 189, 248, 0.12)');
+          ctx.fill();
+
+          // Círculo central del nodo
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, r, 0, 2 * Math.PI, false);
+          ctx.fillStyle = isHovered ? '#fff' : color;
+          ctx.fill();
+
+          // Borde pulido
+          ctx.lineWidth = isHovered ? 2 : 1;
+          ctx.strokeStyle = isHovered ? '#38bdf8' : (isCat ? '#e2c88f' : '#ffffff33');
+          ctx.stroke();
+
+          // REGLA DE ORO DE LEGIBILIDAD (Cero amontonamiento):
+          // 1. Hubs de categoría siempre tienen etiqueta limpia.
+          // 2. Posteos SOLO muestran texto al pasar el cursor (hover) o con zoom profundo.
+          const showLabel = isCat || isHovered || (globalScale > 2.2);
+
+          if (showLabel) {
+            const label = node.name || '';
+            const fontSize = isHovered ? 12 : (isCat ? 11 : 9);
+            ctx.font = `${isHovered || isCat ? '600' : '400'} ${fontSize}px "JetBrains Mono", monospace`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+
+            const textWidth = ctx.measureText(label).width;
+            ctx.fillStyle = isHovered ? 'rgba(0, 0, 0, 0.92)' : 'rgba(11, 15, 14, 0.8)';
+            ctx.fillRect(node.x - textWidth / 2 - 3, node.y + r + 2, textWidth + 6, fontSize + 4);
+
+            ctx.fillStyle = isHovered ? '#38bdf8' : (isCat ? '#e2c88f' : '#cbd5e1');
+            ctx.fillText(label, node.x, node.y + r + 3);
+          }
+        })
+        .onNodeClick(node => {
+          showNodeDetails(node);
+        });
+
+      // Configurar fuerzas y ajuste inicial
+      Graph.d3Force('charge').strength(-180);
+      Graph.d3Force('link').distance(link => link.source.isCategory ? 60 : 40);
+
+      // Redimensionamiento responsivo
+      resize = () => {
+        if (Graph && container) {
+          Graph.width(container.clientWidth || 800);
+          Graph.height(container.clientHeight || 600);
+        }
+      };
+      window.addEventListener('resize', resize);
+
+      // Auto-centrar en pantalla una vez que la simulación física se estabilice
+      Graph.onEngineStop(() => {
+        Graph.zoomToFit(400, 30);
+      });
+
+      // Botón para recentrar manualmente
+      document.getElementById('btn-recenter')?.addEventListener('click', () => {
+        if (Graph) Graph.zoomToFit(400, 30);
+      });
+
+      setTimeout(() => {
+        resize();
+        if (Graph) Graph.zoomToFit(500, 30);
+      }, 300);
+    }
+
+    // Toggle y cierre del menú desplegable del Ecosistema TGP
+    const btnEcosystem = document.getElementById('btn-ecosystem-toggle');
+    const menuEcosystem = document.getElementById('ecosystem-dropdown-menu');
+
+    btnEcosystem?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isExpanded = menuEcosystem?.classList.toggle('show');
+      btnEcosystem.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!menuEcosystem?.contains(e.target) && e.target !== btnEcosystem) {
+        menuEcosystem?.classList.remove('show');
+        btnEcosystem?.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Iniciar carga
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startForceGraph);
+    } else {
+      startForceGraph();
+    }
+
+    function showNodeDetails(node) {
+      if (!node) return;
+      // Auto-abrir panel lateral si estaba cerrado al hacer clic en un nodo
+      if (workspaceEl && workspaceEl.classList.contains('sidebar-collapsed')) {
+        toggleSidebar(true);
+      }
+      detailCard.classList.add('active');
+      cardTitle.textContent = node.name;
+      cardDek.textContent = node.dek || (node.isCategory ? `Hub de Categoría con ensayos vinculados.` : 'Entidad ontológica TGP.');
+      
+      if (node.isCategory) {
+        cardTag.textContent = 'Hub Categoría';
+        cardTag.style.background = 'rgba(201, 169, 110, 0.2)';
+        cardTag.style.color = '#c9a96e';
+        cardUrl.style.display = 'none';
+      } else {
+        cardTag.textContent = node.type === 'CONTINENTE' ? 'Eje Continental' : (node.type === 'GEORREFERENCIA' ? 'Georreferencia Megalítica' : (node.type === 'EDICION_REVISTA' ? 'Edición Revista' : (node.type === 'ENSAYO_ALTERNATIVE' ? 'TGP Alternative' : (node.type === 'ENSAYO_CINEMATICO' ? 'Ensayo Cinemático' : (node.type === 'ARQUETIPO' ? 'Arquetipo' : 'Ensayo Hemeroteca')))));
+        cardTag.style.background = 'rgba(56, 189, 248, 0.2)';
+        cardTag.style.color = '#38bdf8';
+        if (node.url) {
+          cardUrl.href = node.url;
+          cardUrl.style.display = 'inline-flex';
+        } else {
+          cardUrl.style.display = 'none';
+        }
+      }
+
+      // Si tiene sentencia Cypher, mostrarla en el inspector
+      const cypherSnippet = `// Nodo Seleccionado:\nMATCH (n { id: '${node.id}' })\nRETURN n;`;
+      statusText.textContent = `Auditando: ${node.name}`;
+    }
 
     function updateUI() {
       if (nodeCountEl) nodeCountEl.textContent = graphData.nodes.length;
+      if (linkCountEl) linkCountEl.textContent = graphData.links.length;
       if (cypherOutput) {
         cypherOutput.value = cypherHistory.join('\n\n');
-        cypherOutput.scrollTop = cypherOutput.scrollHeight;
       }
     }
     updateUI();
 
+    // ── 2. INYECCIÓN DINÁMICA DESDE GOOGLE KNOWLEDGE GRAPH ──
     async function handleExtract() {
       const q = inputQuery.value.trim();
       if (!q) return;
 
-      statusText.textContent = Consultando Google Knowledge Graph API...;
+      statusText.textContent = `Consultando Google Knowledge Graph para "${q}"...`;
       btnExtract.disabled = true;
 
       try {
@@ -179,29 +840,38 @@ if (!isDev) {
         const data = await res.json();
         if (data.error) throw new Error(data.error);
 
-        if (!graphData.nodes.find(n => n.id === data.name)) {
-          graphData.nodes.push({
-            id: data.name,
-            name: ${data.name} (),
-            group: data.labelTGP,
-            val: 10
-          });
-          if (graphData.nodes.length > 1) {
-            const prev = graphData.nodes[graphData.nodes.length - 2];
-            graphData.links.push({ source: prev.id, target: data.name });
+        const newId = `kg_${data.name.toLowerCase().replace(/\\s+/g, '_')}`;
+        if (!graphData.nodes.find(n => n.id === newId)) {
+          const newNode = {
+            id: newId,
+            name: `${data.name} (${data.labelTGP})`,
+            group: data.labelTGP || 'KG',
+            dek: data.description || 'Entidad extraída de Google Knowledge Graph',
+            val: 12
+          };
+          graphData.nodes.push(newNode);
+
+          // Conectar con el primer Hub o último nodo
+          const targetHub = graphData.nodes.find(n => n.id === 'cat_Historia') || graphData.nodes[0];
+          if (targetHub) {
+            graphData.links.push({ source: newId, target: targetHub.id });
           }
-          Graph.graphData(graphData);
-          localStorage.setItem('tgp_graph_data', JSON.stringify(graphData));
+
+          if (Graph) Graph.graphData(graphData);
+          localStorage.setItem(STORAGE_KEY_GRAPH, JSON.stringify(graphData));
+
+          cypherHistory.push(data.cypher);
+          localStorage.setItem(STORAGE_KEY_CYPHER, JSON.stringify(cypherHistory));
+
+          updateUI();
+          showNodeDetails(newNode);
+          inputQuery.value = '';
+          statusText.textContent = `Entidad '${data.name}' integrada al grafo.`;
+        } else {
+          statusText.textContent = `La entidad '${data.name}' ya existe en el grafo.`;
         }
-
-        cypherHistory.push(data.cypher);
-        localStorage.setItem('tgp_cypher_history', JSON.stringify(cypherHistory));
-
-        updateUI();
-        inputQuery.value = '';
-        statusText.textContent = Entidad '' () integrada al grafo.;
       } catch (err) {
-        statusText.textContent = Error: ;
+        statusText.textContent = `Error: ${err.message}`;
       } finally {
         btnExtract.disabled = false;
       }
@@ -210,21 +880,38 @@ if (!isDev) {
     btnExtract.addEventListener('click', handleExtract);
     inputQuery.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleExtract(); });
 
-    document.getElementById('btn-clear').addEventListener('click', () => {
-      if (confirm('¿Vaciar todos los nodos acumulados en el grafo?')) {
-        graphData.nodes = [];
-        graphData.links = [];
-        cypherHistory.length = 0;
-        localStorage.removeItem('tgp_graph_data');
-        localStorage.removeItem('tgp_cypher_history');
-        Graph.graphData(graphData);
+    // ── 3. BOTÓN PARA RESETEAR Y RE-SEMBRAR LOS 58 POSTEOS ──
+    document.getElementById('btn-sync-hemeroteca').addEventListener('click', () => {
+      if (confirm('¿Sincronizar y recargar la Ontología Completa (+200 Nodos) en el grafo?')) {
+        graphData = JSON.parse(JSON.stringify(defaultGraph));
+        cypherHistory = defaultGraph.cypherStatements || [];
+        localStorage.setItem(STORAGE_KEY_GRAPH, JSON.stringify(graphData));
+        localStorage.setItem(STORAGE_KEY_CYPHER, JSON.stringify(cypherHistory));
+        if (Graph) Graph.graphData(graphData);
+        updateUI();
+        statusText.textContent = '¡Grafo sincronizado con los +200 nodos de la Ontología Global!';
         updateUI();
       }
     });
 
+    // ── 4. BOTÓN LIMPIAR ──
+    document.getElementById('btn-clear').addEventListener('click', () => {
+      if (confirm('¿Vaciar los nodos del canvas? (Podrás restaurarlos con el botón de Sincronizar)')) {
+        graphData = { nodes: [], links: [] };
+        cypherHistory = [];
+        localStorage.setItem(STORAGE_KEY_GRAPH, JSON.stringify(graphData));
+        localStorage.setItem(STORAGE_KEY_CYPHER, JSON.stringify(cypherHistory));
+        if (Graph) Graph.graphData(graphData);
+        updateUI();
+        detailCard.classList.remove('active');
+        statusText.textContent = 'Canvas limpiado.';
+      }
+    });
+
+    // ── 5. BOTÓN COPIAR CYPHER ──
     document.getElementById('btn-copy').addEventListener('click', () => {
       navigator.clipboard.writeText(cypherOutput.value);
-      alert('¡Comandos Cypher copiados al portapapeles!');
+      alert('¡Sentencias Cypher de los posteos copiadas al portapapeles!');
     });
   </script>
 </body>
