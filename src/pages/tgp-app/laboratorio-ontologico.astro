@@ -1,0 +1,231 @@
+﻿---
+// src/pages/tgp-app/laboratorio-ontologico.astro
+// TGP Grapher: Laboratorio Ontológico & Inyector Cypher (Google Knowledge Graph -> Neo4j)
+export const prerender = false;
+
+const isDev = import.meta.env.DEV;
+const AUTHORIZED_EMAIL = Xgnatiux@gmail.com;
+
+// ── BLINDAJE EN PRODUCCIÓN: EXIGIR VALIDACIÓN DE CLOUDFLARE ACCESS ──
+if (!isDev) {
+  const cfUserEmail = Astro.request.headers.get('cf-access-authenticated-user-email');
+  if (!cfUserEmail || cfUserEmail.toLowerCase() !== AUTHORIZED_EMAIL.toLowerCase()) {
+    return Astro.redirect('/404');
+  }
+}
+---
+
+<!DOCTYPE html>
+<html lang=es>
+<head>
+  <meta charset=UTF-8>
+  <meta name=robots content=noindex, nofollow, noarchive>
+  <meta name=viewport content=width=device-width, initial-scale=1.0>
+  <title>TGP Grapher · Laboratorio Ontológico Cypher</title>
+  <link rel=preconnect href=https://fonts.googleapis.com>
+  <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+  <link href=https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap rel=stylesheet>
+  <script src=https://cdn.tailwindcss.com></script>
+  <!-- Motor de Grafo de Fuerza para ver brotar los nodos interactivos -->
+  <script src=https://unpkg.com/force-graph></script>
+  <style>
+    :root {
+      --bg-dark: #0b0f0e;
+      --card-dark: #111716;
+      --border-dark: #263231;
+      --accent-gold: #c9a96e;
+    }
+    body {
+      background-color: var(--bg-dark);
+      color: #d4d4d2;
+      font-family: 'Inter', sans-serif;
+    }
+    .font-cinzel { font-family: 'Cinzel', serif; }
+    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class=min-h-screen flex flex-col p-4 md:p-6 overflow-hidden>
+  
+  <!-- BARRA DE CONTROL SUPERIOR -->
+  <header class=flex items-center justify-between pb-4 border-b border-[#263231] mb-4>
+    <div class=flex items-center gap-3>
+      <a href=/tgp-app class=px-2.5 py-1 rounded bg-[#161d1c] hover:bg-[#1f2726] border border-[#263231] text-xs font-mono text-[#8a9a98] hover:text-white transition-colors>
+        ← Volver a Scriptorium
+      </a>
+      <span class=w-2.5 h-2.5 rounded-full bg-[#c9a96e] animate-pulse></span>
+      <h1 class=font-cinzel text-lg font-bold tracking-wider text-white>TGP Grapher <span class=text-[#c9a96e]>· Laboratorio Ontológico</span></h1>
+      <span class=px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-950/60 text-emerald-400 border border-emerald-800/60>
+        {isDev ? 'ENTORNO LOCAL (DEV)' : 'CLOUDFLARE ACCESS BLINDADO'}
+      </span>
+    </div>
+    <div class=flex items-center gap-4 font-mono text-xs text-[#8a9a98]>
+      <span>Nodos en Red: <strong id=node-count class=text-white>0</strong></span>
+      <button id=btn-clear class=px-2.5 py-1 rounded bg-red-950/40 hover:bg-red-900/60 text-red-300 border border-red-800/40 text-[11px] transition-colors cursor-pointer>
+        Limpiar Grafo
+      </button>
+    </div>
+  </header>
+
+  <!-- WORKSPACE DIVIDIDO (GRAFO 60% / CONSOLA CYPHER 40%) -->
+  <div class=grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 h-[calc(100vh-100px)]>
+    
+    <!-- CANVAS DEL GRAFO DE FUERZA DIRIGIDA -->
+    <div class=lg:col-span-7 bg-[#111716] rounded-xl border border-[#263231] relative overflow-hidden flex flex-col shadow-2xl>
+      <div id=graph-container class=w-full flex-1></div>
+      
+      <!-- LEYENDA ONTO-TAXONÓMICA TGP -->
+      <div class=absolute bottom-3 left-4 pointer-events-none flex items-center gap-4 text-[10px] font-mono text-white/50 bg-black/60 px-3.5 py-1.5 rounded-full backdrop-blur-md border border-white/5>
+        <span class=flex items-center gap-1.5><span class=w-2 h-2 rounded-full bg-[#c9a96e]></span> :Agent (Persona/Org)</span>
+        <span class=flex items-center gap-1.5><span class=w-2 h-2 rounded-full bg-[#4a9eff]></span> :Concept (Filosofía/Idea)</span>
+        <span class=flex items-center gap-1.5><span class=w-2 h-2 rounded-full bg-[#48bb78]></span> :Locus (Yacimiento/Geografía)</span>
+        <span class=flex items-center gap-1.5><span class=w-2 h-2 rounded-full bg-[#e58e4a]></span> :Event (Cataclismo/Hito)</span>
+      </div>
+    </div>
+
+    <!-- TERMINAL CYPHER & PANEL DE CONTROL -->
+    <div class=lg:col-span-5 flex flex-col gap-3 h-full>
+      
+      <!-- INBOX DE EXTRACCIÓN ONTO-SEMÁNTICA -->
+      <div class=bg-[#111716] p-4 rounded-xl border border-[#263231] flex flex-col gap-2.5 shadow-lg>
+        <div class=flex items-center justify-between>
+          <label class=text-xs font-mono text-[#8a9a98] tracking-wider uppercase>Inyección Ontológica (Google Knowledge Graph)</label>
+          <span class=text-[10px] font-mono text-[#c9a96e]>Cypher v5</span>
+        </div>
+        <div class=flex gap-2>
+          <input 
+            type=text 
+            id=input-query 
+            placeholder=ej: Carl Jung, Göbekli Tepe, Biblioteca de Alejandría... 
+            class=flex-1 bg-[#161d1c] border border-[#263231] rounded-lg px-3.5 py-2 text-sm text-white placeholder-[#8a9a98]/50 focus:outline-none focus:border-[#c9a96e]
+          />
+          <button 
+            id=btn-extract 
+            class=px-4 py-2 bg-[#c9a96e] hover:bg-[#b5955c] text-black font-semibold text-xs rounded-lg uppercase tracking-wider transition-colors cursor-pointer
+          >
+            Extraer
+          </button>
+        </div>
+        <p id=status-text class=text-[11px] font-mono text-[#8a9a98] italic>Listo para consultar y mapear entidades universales...</p>
+      </div>
+
+      <!-- VISOR CYPHER INTERACTIVO (NEO4J / MEMGRAPH READY) -->
+      <div class=bg-[#111716] p-4 rounded-xl border border-[#263231] flex-1 flex flex-col gap-2 overflow-hidden shadow-lg>
+        <div class=flex items-center justify-between>
+          <label class=text-xs font-mono text-emerald-400 font-semibold tracking-wider uppercase>Sentencias Cypher Generadas</label>
+          <button id=btn-copy class=text-[11px] font-mono text-[#8a9a98] hover:text-white transition-colors cursor-pointer px-2 py-0.5 rounded bg-white/5 border border-white/10>
+            Copiar Todo
+          </button>
+        </div>
+        <textarea 
+          id=cypher-output 
+          readonly 
+          class=flex-1 w-full bg-[#0b0e0d] border border-[#263231] rounded-lg p-3 font-mono-code text-xs text-emerald-400 resize-none focus:outline-none leading-relaxed
+          placeholder=// Las sentencias Cypher (MERGE) aparecerán aquí estructuradas...
+        ></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const graphData = JSON.parse(localStorage.getItem('tgp_graph_data') || '{nodes:[],links:[]}');
+    const cypherHistory = JSON.parse(localStorage.getItem('tgp_cypher_history') || '[]');
+
+    const elem = document.getElementById('graph-container');
+    const nodeCountEl = document.getElementById('node-count');
+    const cypherOutput = document.getElementById('cypher-output');
+    const inputQuery = document.getElementById('input-query');
+    const btnExtract = document.getElementById('btn-extract');
+    const statusText = document.getElementById('status-text');
+
+    const Graph = ForceGraph()(elem)
+      .graphData(graphData)
+      .nodeId('id')
+      .nodeLabel('name')
+      .nodeColor(node => {
+        if (node.group === 'Agent') return '#c9a96e';
+        if (node.group === 'Locus') return '#48bb78';
+        if (node.group === 'Event') return '#e58e4a';
+        return '#4a9eff';
+      })
+      .nodeVal(node => node.val || 8)
+      .linkDirectionalParticles(2)
+      .linkDirectionalParticleSpeed(0.005)
+      .linkColor(() => '#263231')
+      .backgroundColor('#111716');
+
+    function updateUI() {
+      if (nodeCountEl) nodeCountEl.textContent = graphData.nodes.length;
+      if (cypherOutput) {
+        cypherOutput.value = cypherHistory.join('\n\n');
+        cypherOutput.scrollTop = cypherOutput.scrollHeight;
+      }
+    }
+    updateUI();
+
+    async function handleExtract() {
+      const q = inputQuery.value.trim();
+      if (!q) return;
+
+      statusText.textContent = Consultando Google Knowledge Graph API...;
+      btnExtract.disabled = true;
+
+      try {
+        const res = await fetch('/api/cypher-extract', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: q })
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        if (!graphData.nodes.find(n => n.id === data.name)) {
+          graphData.nodes.push({
+            id: data.name,
+            name: ${data.name} (),
+            group: data.labelTGP,
+            val: 10
+          });
+          if (graphData.nodes.length > 1) {
+            const prev = graphData.nodes[graphData.nodes.length - 2];
+            graphData.links.push({ source: prev.id, target: data.name });
+          }
+          Graph.graphData(graphData);
+          localStorage.setItem('tgp_graph_data', JSON.stringify(graphData));
+        }
+
+        cypherHistory.push(data.cypher);
+        localStorage.setItem('tgp_cypher_history', JSON.stringify(cypherHistory));
+
+        updateUI();
+        inputQuery.value = '';
+        statusText.textContent = Entidad '' () integrada al grafo.;
+      } catch (err) {
+        statusText.textContent = Error: ;
+      } finally {
+        btnExtract.disabled = false;
+      }
+    }
+
+    btnExtract.addEventListener('click', handleExtract);
+    inputQuery.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleExtract(); });
+
+    document.getElementById('btn-clear').addEventListener('click', () => {
+      if (confirm('¿Vaciar todos los nodos acumulados en el grafo?')) {
+        graphData.nodes = [];
+        graphData.links = [];
+        cypherHistory.length = 0;
+        localStorage.removeItem('tgp_graph_data');
+        localStorage.removeItem('tgp_cypher_history');
+        Graph.graphData(graphData);
+        updateUI();
+      }
+    });
+
+    document.getElementById('btn-copy').addEventListener('click', () => {
+      navigator.clipboard.writeText(cypherOutput.value);
+      alert('¡Comandos Cypher copiados al portapapeles!');
+    });
+  </script>
+</body>
+</html>

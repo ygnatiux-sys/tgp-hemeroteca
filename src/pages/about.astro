@@ -17,6 +17,7 @@ import AppleShowcaseBento, { type BentoHistoryItem } from '../components/AppleSh
 import AppleBentoArchetypes from '../components/AppleBentoArchetypes.astro';
 import TgpHeroTriptych from '../components/TgpHeroTriptych.astro';
 import WikiGsapTimeline, { type WikiImage } from '../components/WikiGsapTimeline.astro';
+import AppleDualBentoDark from '../components/AppleDualBentoDark.astro';
 import { sanitizeImageUrl, getPublishableEssays, resolveEssayImage, isValidImageSrc, formatCategory, normalizeCategory } from '../lib/content-filter';
 
 // Portada Hero Cinemática (Monjes Novicios Leyendo en el Templo - Wikimedia Commons)
@@ -568,6 +569,13 @@ const cinemaShowcasePosts = publishable
       subtitle="Mesoamérica • Patrimonio de la Humanidad"
       images={tikalWikiImages}
     />
+  </section>
+
+  {/* ═══════════════════════════════════════════════════════
+      SHOWCASE DUAL BENTO DARK: FORMATO APPLE TV 4K (MUSEO & ARQUEOLOGÍA)
+      ═══════════════════════════════════════════════════════ */}
+  <section class="w-full max-w-7xl mx-auto px-4 md:px-8 my-20">
+    <AppleDualBentoDark />
   </section>
 
 </Layout>

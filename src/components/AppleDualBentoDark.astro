@@ -1,0 +1,466 @@
+---
+/**
+ * AppleDualBentoDark.astro
+ * Fork Arquitectónico: Dual Bento Showcase Dark Edition (Apple TV 4K Master Reference).
+ * Paleta Dark Calibrada: Fondo de tarjeta en grafito/obsidiana suave (#1a1a1f) contrastado
+ * contra el fondo negro puro (#070709), permitiendo que la sombra de apoyo volumétrica
+ * y el contorno de las estatuas recortadas proyecten profundidad tridimensional.
+ * Rotación asíncrona de 3 artefactos por tarjeta (tríadas ontológicas del archivo TGP).
+ */
+
+interface Artifact {
+  id: string;
+  kickerIcon: string;
+  kicker: string;
+  titleLine1: string;
+  titleLine2: string;
+  logline: string;
+  era: string;
+  imageWebp: string;
+  alt: string;
+  ctaText: string;
+  ctaLink: string;
+}
+
+const bentoLeftArtifacts: Artifact[] = [
+  {
+    id: "hermes",
+    kickerIcon: "mercury",
+    kicker: "HERMES · EL PSICOPOMPO",
+    titleLine1: "El Dios de las Encrucijadas.",
+    titleLine2: "Hermes y lo Liminal.",
+    logline: "La frontera no se custodia: se constituye. Autopsia conceptual y arqueológica sobre el psicopompo y el kerykeion en el Mediterráneo antiguo.",
+    era: "Vulci / Louvre G264 · c. 480 a.C.",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/1792977769539-052061f8.webp",
+    alt: "Estatua clásica de mármol de Hermes con caduceo",
+    ctaText: "Explorar ensayo",
+    ctaLink: "/ensayos/mercurio-hermes-arquetipo-liminal"
+  },
+  {
+    id: "nike",
+    kickerIcon: "wings",
+    kicker: "SAMOTRACIA · DINÁMICA HELÉNICA",
+    titleLine1: "La Victoria sin Rostro.",
+    titleLine2: "El Vuelo en la Piedra.",
+    logline: "El viento marino esculpido en el mármol de Paros. La proa de guerra que desafió el olvido del Mediterráneo.",
+    era: "Pariano Helénico · c. 190 a.C.",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/1792977775310-08f70d8d.webp",
+    alt: "Estatua helenística de la Victoria Alada de Samotracia",
+    ctaText: "Explorar ensayo",
+    ctaLink: "/ensayos/amnesia-programada"
+  },
+  {
+    id: "nefertiti",
+    kickerIcon: "crown",
+    kicker: "AMARNA · EL ROSTRO DEL TIEMPO",
+    titleLine1: "El Silencio de Nefertiti.",
+    titleLine2: "La Mirada en la Fractura.",
+    logline: "Piedra caliza policromada y la cuenca vacía del ojo izquierdo: el rostro que emerge del polvo para interpelar la permanencia de la memoria.",
+    era: "Taller de Tutmose · c. 1345 a.C.",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/1792979907494-5629ca02.webp",
+    alt: "Busto egipcio de la reina Nefertiti en caliza policromada",
+    ctaText: "Explorar ensayo",
+    ctaLink: "/ensayos/el-silencio-de-nefertiti-un-rostro-en-la-fractura-del-tiempo-6183"
+  }
+];
+
+const bentoRightArtifacts: Artifact[] = [
+  {
+    id: "apollo",
+    kickerIcon: "sun",
+    kicker: "APOLO · EL ARQUERO SOLAR",
+    titleLine1: "El Canon de la Luz.",
+    titleLine2: "La Flecha Inmóvil.",
+    logline: "La encarnación del orden apolíneo y la victoria sobre la serpiente Pitón: el ideal clásico antes de la fractura del cataclismo.",
+    era: "Mármol Romano · c. 120–140 d.C.",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/1792979909395-131dc59d.webp",
+    alt: "Estatua clásica del Apolo de Belvedere en mármol",
+    ctaText: "Explorar ensayo",
+    ctaLink: "/ensayos/colapso-1177"
+  },
+  {
+    id: "athena",
+    kickerIcon: "shield",
+    kicker: "ATENEA · LA INTELIGENCIA TÉCNICA",
+    titleLine1: "La Razón Vigilante.",
+    titleLine2: "Memoria de la Pólis.",
+    logline: "El escudo con el rostro de la Gorgona y la mirada serena: la técnica y el logos preservados frente al cataclismo civilizatorio.",
+    era: "Ático Clásico · c. 460 a.C.",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/1792977773642-b069c3e0.webp",
+    alt: "Estatua clásica de Atenea con yelmo, égida y lanza",
+    ctaText: "Explorar ensayo",
+    ctaLink: "/ensayos/la-geometria-petrea-de-pumapunku-andesita-tiempo-y-cosmos-3332"
+  },
+  {
+    id: "jupiter",
+    kickerIcon: "lightning",
+    kicker: "JÚPITER · SOBERANÍA LÍTICA",
+    titleLine1: "El Orden Arquetípico.",
+    titleLine2: "La Potestad del Rayo.",
+    logline: "El trono soberano de la cosmología clásica. La precesión astronómica y el equilibrio celeste labrado en el canon monumental.",
+    era: "Mármol Pentélico · Siglo I d.C.",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/1792977771856-9e9bf8d2.webp",
+    alt: "Estatua romana de Júpiter entronizado con águila y rayo",
+    ctaText: "Explorar ensayo",
+    ctaLink: "/ensayos/pumapunku-la-geometria-del-silencio"
+  }
+];
+
+interface Props {
+  showHeader?: boolean;
+}
+
+const { showHeader = true } = Astro.props;
+---
+
+<section class={`apple-dual-bento-dark-section w-full px-4 sm:px-6 relative z-10 ${showHeader ? 'py-20' : 'pb-16'}`} id="showcase-dual-bento-dark">
+  <!-- ENCABEZADO DE SECCIÓN EDITORIAL (DARK PREMIUM) -->
+  {showHeader && (
+    <div class="max-w-4xl mx-auto text-center mb-14 md:mb-16">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/6 border border-white/10 text-white/70 text-[11px] font-mono tracking-widest uppercase mb-4 backdrop-blur-md">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+        Apple TV Dark Format · Dual Bento Gallery
+      </div>
+      <h2 class="font-gloock text-3xl sm:text-4xl md:text-5xl text-white tracking-tight mb-4">
+        Galería de Sombras & Memoria Lítica
+      </h2>
+      <p class="font-inter text-sm sm:text-base text-white/60 max-w-2xl mx-auto leading-relaxed font-light">
+        Morfología vertical 4:5 en acabado obsidiana y grafito calibrado: fondo semioscuro de alto contraste que realza la volumetría de las piezas arqueológicas y su sombra de apoyo.
+      </p>
+    </div>
+  )}
+
+  <!-- CONTENEDOR GRID DUAL CENTRADO -->
+  <div class="max-w-5xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 items-stretch justify-items-center">
+
+    <!-- ═══════════════════════════════════════════════════════
+         TARJETA BENTO DARK 1: HERMES / SAMOTRACIA / NEFERTITI
+         ═══════════════════════════════════════════════════════ -->
+    <div 
+      class="bento-dark-card group/bento relative w-full max-w-115 rounded-4xl overflow-hidden bg-[#18181c] border border-white/10 text-[#f5f5f7] shadow-[0_24px_54px_rgba(0,0,0,0.65),inset_0_1px_1px_rgba(255,255,255,0.08)] flex flex-col justify-between aspect-4/5 min-h-130 md:min-h-145 select-none transition-all duration-500 hover:shadow-[0_32px_70px_rgba(0,0,0,0.85)] hover:border-white/16 hover:-translate-y-1"
+      id="bento-dark-left"
+      data-card-id="left"
+    >
+      <!-- HEADER EDITORIAL SUPERIOR -->
+      <div class="pt-8 sm:pt-10 px-8 pb-2 text-center flex flex-col items-center z-20 relative">
+        <!-- ICONO + KICKER APPLE STYLE -->
+        <div class="inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase text-white/50 mb-3">
+          <span class="bento-icon-wrapper flex items-center justify-center w-5 h-5 rounded-full bg-white/8 text-amber-400 border border-white/10">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="12" cy="8" r="5"/>
+              <path d="M12 13v8M9 16h6M9 5a3 3 0 016 0"/>
+            </svg>
+          </span>
+          <span class="bento-kicker-text transition-opacity duration-500">{bentoLeftArtifacts[0].kicker}</span>
+        </div>
+
+        <!-- H3 PRINCIPAL EN DOS LÍNEAS -->
+        <h3 class="bento-title-text font-inter font-bold text-2xl sm:text-[28px] lg:text-[32px] text-white tracking-tight leading-[1.15] transition-opacity duration-500">
+          <span class="line-1 block">{bentoLeftArtifacts[0].titleLine1}</span>
+          <span class="line-2 block font-medium text-white/70">{bentoLeftArtifacts[0].titleLine2}</span>
+        </h3>
+
+        <!-- LOGLINE CONCISO Y FILOSÓFICO -->
+        <p class="bento-logline-text font-inter text-xs sm:text-[13px] text-white/60 font-normal leading-relaxed max-w-xs mt-2.5 transition-opacity duration-500">
+          {bentoLeftArtifacts[0].logline}
+        </p>
+
+        <!-- ENLACE ACCIÓN APPLE CON CHEVRON -->
+        <a 
+          href={bentoLeftArtifacts[0].ctaLink} 
+          class="bento-cta-link inline-flex items-center gap-1 text-xs sm:text-sm font-normal text-[#2997ff] hover:text-[#52aaff] mt-3 group/link transition-colors"
+        >
+          <span class="bento-cta-text">{bentoLeftArtifacts[0].ctaText}</span>
+          <svg class="w-3.5 h-3.5 transform transition-transform group-hover/link:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </a>
+
+        <!-- PILL CONTEXTUAL DE ÉPOCA Y MATERIAL -->
+        <div class="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/6 border border-white/8 text-[10px] font-mono text-white/50 tracking-wider uppercase">
+          <span class="w-1 h-1 rounded-full bg-amber-400"></span>
+          <span class="bento-era-text">{bentoLeftArtifacts[0].era}</span>
+        </div>
+      </div>
+
+      <!-- STAGE: ESCENARIO INFERIOR CON LUZ AMBIENTAL Y SOMBRA PROFUNDA -->
+      <div class="bento-stage mt-auto w-full relative grow flex justify-center items-end px-6 pb-4 sm:pb-6 overflow-hidden min-h-72.5 md:min-h-85 z-10">
+        <!-- HALO DE CONTRALUZ AMBIENTAL PARA RECORTES -->
+        <div class="bento-ambient-glow absolute inset-0 pointer-events-none"></div>
+
+        <!-- SOMBRA DE CONTACTO BASE SOBRE FONDO GRAFITO -->
+        <div class="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 w-48 sm:w-60 h-6 bg-black/75 rounded-full blur-md pointer-events-none transform scale-y-50"></div>
+
+        <!-- ARRAY DE IMÁGENES RECORTADAS CON ROTACIÓN ASÍNCRONA -->
+        {bentoLeftArtifacts.map((art, idx) => (
+          <div
+            class={`bento-artifact-wrapper absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 w-full h-[90%] md:h-[94%] flex justify-center items-end transition-all duration-700 ease-out pointer-events-none ${
+              idx === 0 
+                ? "opacity-100 translate-y-0 scale-100 z-10" 
+                : "opacity-0 translate-y-5 scale-[0.98] z-0 invisible"
+            }`}
+            data-index={idx}
+          >
+            <picture class="h-full w-auto flex justify-center items-end">
+              <source srcset={art.imageWebp} type="image/webp" />
+              <img 
+                src={art.imageWebp} 
+                alt={art.alt}
+                loading="lazy"
+                decoding="async"
+                class="h-full w-auto max-w-[85%] object-contain object-bottom bento-dark-statue-shadow transition-transform duration-700 group-hover/bento:scale-[1.03]"
+              />
+            </picture>
+          </div>
+        ))}
+      </div>
+
+      <!-- PAGINACIÓN POR PUNTOS SUTILES EN DARK -->
+      <div class="absolute top-5 right-6 z-30 flex items-center gap-1.5 bg-white/6 border border-white/8 px-2 py-1 rounded-full backdrop-blur-xs">
+        {bentoLeftArtifacts.map((_, idx) => (
+          <button 
+            type="button"
+            class={`bento-dot rounded-full transition-all duration-500 cursor-pointer ${
+              idx === 0 ? "bg-white w-3.5 h-1.5" : "bg-white/25 w-1.5 h-1.5 hover:bg-white/50"
+            }`}
+            data-target-idx={idx}
+            aria-label={`Ver artefacto ${idx + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         TARJETA BENTO DARK 2: APOLO / ATENEA / JÚPITER
+         ═══════════════════════════════════════════════════════ -->
+    <div 
+      class="bento-dark-card group/bento relative w-full max-w-115 rounded-4xl overflow-hidden bg-[#18181c] border border-white/10 text-[#f5f5f7] shadow-[0_24px_54px_rgba(0,0,0,0.65),inset_0_1px_1px_rgba(255,255,255,0.08)] flex flex-col justify-between aspect-4/5 min-h-130 md:min-h-145 select-none transition-all duration-500 hover:shadow-[0_32px_70px_rgba(0,0,0,0.85)] hover:border-white/16 hover:-translate-y-1"
+      id="bento-dark-right"
+      data-card-id="right"
+    >
+      <!-- HEADER EDITORIAL SUPERIOR -->
+      <div class="pt-8 sm:pt-10 px-8 pb-2 text-center flex flex-col items-center z-20 relative">
+        <!-- ICONO + KICKER APPLE STYLE -->
+        <div class="inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase text-white/50 mb-3">
+          <span class="bento-icon-wrapper flex items-center justify-center w-5 h-5 rounded-full bg-white/8 text-amber-400 border border-white/10">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="12" cy="12" r="5"/>
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+          </span>
+          <span class="bento-kicker-text transition-opacity duration-500">{bentoRightArtifacts[0].kicker}</span>
+        </div>
+
+        <!-- H3 PRINCIPAL EN DOS LÍNEAS -->
+        <h3 class="bento-title-text font-inter font-bold text-2xl sm:text-[28px] lg:text-[32px] text-white tracking-tight leading-[1.15] transition-opacity duration-500">
+          <span class="line-1 block">{bentoRightArtifacts[0].titleLine1}</span>
+          <span class="line-2 block font-medium text-white/70">{bentoRightArtifacts[0].titleLine2}</span>
+        </h3>
+
+        <!-- LOGLINE CONCISO Y FILOSÓFICO -->
+        <p class="bento-logline-text font-inter text-xs sm:text-[13px] text-white/60 font-normal leading-relaxed max-w-xs mt-2.5 transition-opacity duration-500">
+          {bentoRightArtifacts[0].logline}
+        </p>
+
+        <!-- ENLACE ACCIÓN APPLE CON CHEVRON -->
+        <a 
+          href={bentoRightArtifacts[0].ctaLink} 
+          class="bento-cta-link inline-flex items-center gap-1 text-xs sm:text-sm font-normal text-[#2997ff] hover:text-[#52aaff] mt-3 group/link transition-colors"
+        >
+          <span class="bento-cta-text">{bentoRightArtifacts[0].ctaText}</span>
+          <svg class="w-3.5 h-3.5 transform transition-transform group-hover/link:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </a>
+
+        <!-- PILL CONTEXTUAL DE ÉPOCA Y MATERIAL -->
+        <div class="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/6 border border-white/8 text-[10px] font-mono text-white/50 tracking-wider uppercase">
+          <span class="w-1 h-1 rounded-full bg-amber-400"></span>
+          <span class="bento-era-text">{bentoRightArtifacts[0].era}</span>
+        </div>
+      </div>
+
+      <!-- STAGE: ESCENARIO INFERIOR CON LUZ AMBIENTAL Y SOMBRA PROFUNDA -->
+      <div class="bento-stage mt-auto w-full relative grow flex justify-center items-end px-6 pb-4 sm:pb-6 overflow-hidden min-h-72.5 md:min-h-85 z-10">
+        <!-- HALO DE CONTRALUZ AMBIENTAL PARA RECORTES -->
+        <div class="bento-ambient-glow absolute inset-0 pointer-events-none"></div>
+
+        <!-- SOMBRA DE CONTACTO BASE SOBRE FONDO GRAFITO -->
+        <div class="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 w-48 sm:w-60 h-6 bg-black/75 rounded-full blur-md pointer-events-none transform scale-y-50"></div>
+
+        <!-- ARRAY DE IMÁGENES RECORTADAS CON ROTACIÓN ASÍNCRONA -->
+        {bentoRightArtifacts.map((art, idx) => (
+          <div
+            class={`bento-artifact-wrapper absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 w-full h-[90%] md:h-[94%] flex justify-center items-end transition-all duration-700 ease-out pointer-events-none ${
+              idx === 0 
+                ? "opacity-100 translate-y-0 scale-100 z-10" 
+                : "opacity-0 translate-y-5 scale-[0.98] z-0 invisible"
+            }`}
+            data-index={idx}
+          >
+            <picture class="h-full w-auto flex justify-center items-end">
+              <source srcset={art.imageWebp} type="image/webp" />
+              <img 
+                src={art.imageWebp} 
+                alt={art.alt}
+                loading="lazy"
+                decoding="async"
+                class="h-full w-auto max-w-[85%] object-contain object-bottom bento-dark-statue-shadow transition-transform duration-700 group-hover/bento:scale-[1.03]"
+              />
+            </picture>
+          </div>
+        ))}
+      </div>
+
+      <!-- PAGINACIÓN POR PUNTOS SUTILES EN DARK -->
+      <div class="absolute top-5 right-6 z-30 flex items-center gap-1.5 bg-white/6 border border-white/8 px-2 py-1 rounded-full backdrop-blur-xs">
+        {bentoRightArtifacts.map((_, idx) => (
+          <button 
+            type="button"
+            class={`bento-dot rounded-full transition-all duration-500 cursor-pointer ${
+              idx === 0 ? "bg-white w-3.5 h-1.5" : "bg-white/25 w-1.5 h-1.5 hover:bg-white/50"
+            }`}
+            data-target-idx={idx}
+            aria-label={`Ver artefacto ${idx + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SCRIPT DE ORQUESTACIÓN ASÍNCRONA DESACOPLADA (DARK FORK) -->
+<script define:vars={{ bentoLeftArtifacts, bentoRightArtifacts }}>
+  document.addEventListener("DOMContentLoaded", () => {
+    function setupBentoCard(cardElement, artifacts, intervalMs, initialDelayMs) {
+      if (!cardElement) return;
+
+      const wrappers = cardElement.querySelectorAll(".bento-artifact-wrapper");
+      const kickerEl = cardElement.querySelector(".bento-kicker-text");
+      const line1El = cardElement.querySelector(".bento-title-text .line-1");
+      const line2El = cardElement.querySelector(".bento-title-text .line-2");
+      const loglineEl = cardElement.querySelector(".bento-logline-text");
+      const ctaLinkEl = cardElement.querySelector(".bento-cta-link");
+      const ctaTextEl = cardElement.querySelector(".bento-cta-text");
+      const eraTextEl = cardElement.querySelector(".bento-era-text");
+      const dots = cardElement.querySelectorAll(".bento-dot");
+
+      let currentIndex = 0;
+      let timer = null;
+      let isPaused = false;
+
+      function goToIndex(nextIndex) {
+        if (nextIndex === currentIndex) return;
+
+        wrappers.forEach((w, i) => {
+          if (i === nextIndex) {
+            w.classList.remove("opacity-0", "translate-y-5", "scale-[0.98]", "z-0", "invisible");
+            w.classList.add("opacity-100", "translate-y-0", "scale-100", "z-10");
+          } else {
+            w.classList.remove("opacity-100", "translate-y-0", "scale-100", "z-10");
+            w.classList.add("opacity-0", "translate-y-5", "scale-[0.98]", "z-0");
+            setTimeout(() => {
+              if (i !== currentIndex) {
+                w.classList.add("invisible");
+              }
+            }, 700);
+          }
+        });
+
+        const data = artifacts[nextIndex];
+        if (data) {
+          if (kickerEl) kickerEl.textContent = data.kicker;
+          if (line1El) line1El.textContent = data.titleLine1;
+          if (line2El) line2El.textContent = data.titleLine2;
+          if (loglineEl) loglineEl.textContent = data.logline;
+          if (ctaTextEl) ctaTextEl.textContent = data.ctaText;
+          if (ctaLinkEl) ctaLinkEl.setAttribute("href", data.ctaLink);
+          if (eraTextEl) eraTextEl.textContent = data.era;
+        }
+
+        dots.forEach((dot, i) => {
+          if (i === nextIndex) {
+            dot.classList.add("bg-white", "w-3.5");
+            dot.classList.remove("bg-white/25", "w-1.5");
+          } else {
+            dot.classList.remove("bg-white", "w-3.5");
+            dot.classList.add("bg-white/25", "w-1.5");
+          }
+        });
+
+        currentIndex = nextIndex;
+      }
+
+      function next() {
+        const nextIdx = (currentIndex + 1) % artifacts.length;
+        goToIndex(nextIdx);
+      }
+
+      function startLoop() {
+        stopLoop();
+        timer = setInterval(() => {
+          if (!isPaused) {
+            next();
+          }
+        }, intervalMs);
+      }
+
+      function stopLoop() {
+        if (timer) clearInterval(timer);
+      }
+
+      setTimeout(() => {
+        startLoop();
+      }, initialDelayMs);
+
+      cardElement.addEventListener("mouseenter", () => {
+        isPaused = true;
+      });
+      cardElement.addEventListener("mouseleave", () => {
+        isPaused = false;
+      });
+
+      dots.forEach((dot) => {
+        dot.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const target = parseInt(dot.getAttribute("data-target-idx") || "0", 10);
+          goToIndex(target);
+          startLoop();
+        });
+      });
+    }
+
+    const cardLeft = document.getElementById("bento-dark-left");
+    const cardRight = document.getElementById("bento-dark-right");
+
+    setupBentoCard(cardLeft, bentoLeftArtifacts, 6000, 300);
+    setupBentoCard(cardRight, bentoRightArtifacts, 6000, 3300);
+  });
+</script>
+
+<style>
+  .apple-dual-bento-dark-section {
+    contain: layout style;
+  }
+
+  .bento-dark-card {
+    will-change: transform, box-shadow;
+  }
+
+  /* Halo sutil de fondo para elevar el contraste contra las estatuas */
+  .bento-ambient-glow {
+    background: radial-gradient(circle at 50% 68%, rgba(255, 255, 255, 0.04) 0%, transparent 65%);
+  }
+
+  /* Sombra tridimensional contrastada en modo Dark */
+  .bento-dark-statue-shadow {
+    filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.75)) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5));
+  }
+
+  .bento-stage picture img {
+    max-height: 100%;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+</style>

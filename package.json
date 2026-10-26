@@ -14,7 +14,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "//1": "--- 1. DIAGNÓSTICO ---",
-    "doctor": "node check-images.mjs && node scripts/buscar-sin-hero.mjs && node scripts/tgp-morph-audit.mjs",
+    "doctor": "node scripts/tgp-doctor-universal.mjs && node scripts/buscar-sin-hero.mjs && node scripts/tgp-morph-audit.mjs",
     "doctor:sanitizer": "node scripts/doctor-sanitizer.mjs",
     "archive:orphans": "node scripts/doctor-sanitizer.mjs --archive",
     "//2": "--- 2. CURACIÓN ---",
