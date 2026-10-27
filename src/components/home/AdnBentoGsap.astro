@@ -1,0 +1,307 @@
+---
+/**
+ * AdnBentoGsap.astro
+ * Módulo Bento Cinemático con GSAP Timeline (ADN Zenital TGP + Duda. Investiga. Conecta.)
+ * Configurado con fuentes, tamaños y modos heredados del sistema TGP (Gloock, Proza Libre, font-metadata, mono).
+ */
+
+export interface AdnSlide {
+  main: string;
+  highlight: string;
+}
+
+export interface AdnCard {
+  number: string;
+  category: string;
+  title: string;
+  description: string;
+}
+
+interface Props {
+  instanceId?: string;
+  variant?: 'portal' | 'canvas';
+  badgeText?: string;
+  kickerPills?: [string, string, string];
+  sequences?: AdnSlide[];
+  cards?: [AdnCard, AdnCard, AdnCard];
+  metaRuleLeft?: string;
+  metaRuleRight?: string;
+  className?: string;
+}
+
+const {
+  instanceId = 'tgp-adn-bento',
+  variant = 'canvas',
+  badgeText = 'ADN TGP · CARTOGRAFÍA CRÍTICA',
+  kickerPills = ['Duda.', 'Investiga.', 'Conecta.'],
+  sequences = variant === 'portal'
+    ? [
+        {
+          main: "Duda de los datos sueltos.",
+          highlight: "La historia no es solo lo que nos pasó; es cómo aprendimos a darle sentido."
+        },
+        {
+          main: "Investiga la huella en la materia.",
+          highlight: "Tallamos la piedra y el relato para no disolvernos en la incertidumbre del olvido."
+        },
+        {
+          main: "Conecta símbolos con rigor crítico.",
+          highlight: "Diez dominios epistémicos para desentrañar cómo construimos los mundos en los que creemos."
+        }
+      ]
+    : [
+        {
+          main: "No estudiamos ruinas mudas.",
+          highlight: "Investigamos cómo la humanidad aprendió a darle sentido a lo que vivía."
+        },
+        {
+          main: "Audita el Archivo Vivo.",
+          highlight: "Qué recordamos, qué dejamos en la sombra y cómo cada época reescribe su pasado."
+        },
+        {
+          main: "Cartografía crítica sin dogma.",
+          highlight: "La evidencia como ancla, la condición humana como horizonte de sentido."
+        }
+      ],
+  cards = [
+    {
+      number: "01 · Condición Humana",
+      category: "CAPACIDADES",
+      title: "La mente que simboliza",
+      description: "Qué nos permite recordar, imaginar y transformar la incertidumbre en refugio desde el Paleolítico hasta hoy."
+    },
+    {
+      number: "02 · Palimpsesto Cultural",
+      category: "HUELLAS",
+      title: "La materia reescrita",
+      description: "Templos, mitos, lenguajes y máquinas leídos como capas de significado que se conservan, se disputan y reaparecen."
+    },
+    {
+      number: "03 · Archivo Vivo",
+      category: "MÉTODO",
+      title: "Memoria, poder y evidencia",
+      description: "Por qué una época recuerda ciertas historias y olvida otras, explorando conexiones sin confundir analogías con pruebas."
+    }
+  ],
+  metaRuleLeft = 'La historia es nuestro laboratorio',
+  metaRuleRight = 'Comprender el presente, nuestra orientación',
+  className = '',
+} = Astro.props;
+---
+
+<section 
+  id={instanceId}
+  data-adn-root
+  data-adn-instance={instanceId}
+  aria-label="ADN de The Great Puzzle Project"
+  class={`adn-bento-section relative w-full py-16 sm:py-24 md:py-32 px-4 sm:px-8 overflow-hidden select-none isolate ${className}`}
+  style="mask-image: linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%);"
+>
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 p-6 sm:p-8 md:p-11 rounded-3xl border border-white/10 bg-[#161817]/90 backdrop-blur-xl relative overflow-hidden shadow-[0_20px_70px_rgba(0,0,0,0.85)]">
+      
+      {/* Luz ambiental cinematográfica ámbar/oro */}
+      <div class="pointer-events-none absolute -top-32 -right-32 w-[28rem] h-[28rem] rounded-full bg-amber-500/10 blur-[90px]" aria-hidden="true"></div>
+      <div class="pointer-events-none absolute -bottom-32 -left-32 w-[26rem] h-[26rem] rounded-full bg-amber-500/8 blur-[90px]" aria-hidden="true"></div>
+
+      {/* Columna Principal (8 cols): Stage Tipográfico Monumental + GSAP Timeline */}
+      <div class="lg:col-span-8 flex flex-col justify-between min-h-[340px] sm:min-h-[400px] md:min-h-[450px] p-6 sm:p-9 md:p-12 rounded-2xl bg-[#0e0f0f]/85 border border-white/5 relative shadow-inner">
+        
+        {/* Header del Stage con Tricolon Interactivo */}
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5">
+          <div class="flex items-center gap-3 text-xs sm:text-[13px] uppercase tracking-[0.28em] text-[#d4af37] font-metadata font-bold">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shadow-[0_0_12px_#f59e0b]"></span>
+            <span>{badgeText}</span>
+          </div>
+
+          <div class="flex items-center gap-3 text-xs sm:text-[13px] font-metadata font-bold tracking-[0.25em] uppercase text-zinc-500">
+            {kickerPills.map((pill, pIdx) => (
+              <span 
+                class={`adn-pill px-3 py-1 rounded-full transition-all duration-500 cursor-default ${pIdx === 0 ? 'text-[#F0E6D2] bg-amber-500/15 border border-amber-500/30' : 'border border-transparent'}`}
+                data-pill-index={pIdx}
+              >
+                {pill}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Stage Central de Letras Monumentales */}
+        <div class="adn-stage relative my-auto py-8 sm:py-12" aria-live="polite">
+          <p class="adn-step font-['Gloock'] text-2xl sm:text-4xl md:text-[2.85rem] lg:text-[3.15rem] leading-[1.12] tracking-tight text-[#EDEDE8] drop-shadow-[0_2px_14px_rgba(0,0,0,0.9)]">
+            {sequences[0]?.main} <br/>
+            <span class="adn-highlight text-[#d4af37] font-serif italic drop-shadow-[0_0_20px_rgba(212,175,55,0.35)]">
+              {sequences[0]?.highlight}
+            </span>
+          </p>
+        </div>
+
+        {/* Footer del Stage: Barra de progreso GSAP + Meta-regla */}
+        <div class="space-y-4 pt-4 border-t border-white/5">
+          <div class="w-full h-[3px] bg-white/10 overflow-hidden rounded-full">
+            <div class="adn-progress h-full w-0 bg-gradient-to-r from-amber-500 via-amber-400 to-[#d4af37] shadow-[0_0_10px_rgba(245,158,11,0.8)]"></div>
+          </div>
+          <div class="flex justify-between items-center text-xs sm:text-[13px] font-metadata uppercase tracking-[0.25em] text-[#C5C5BF]/80">
+            <span>{metaRuleLeft}</span>
+            <span class="hidden sm:inline text-[#d4af37] font-bold">{metaRuleRight}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Columna Lateral (4 cols): 3 Nodos Estructurales del ADN con Tipografía Amplia */}
+      <div class="lg:col-span-4 flex flex-col gap-4 justify-between">
+        {cards.map((card, cIdx) => (
+          <div 
+            class="adn-card group p-6 sm:p-7 rounded-2xl bg-[#0e0f0f]/65 border border-white/5 hover:border-amber-500/35 transition-all duration-500 hover:scale-[1.01] shadow-lg flex flex-col justify-between"
+            data-card-index={cIdx}
+          >
+            <div>
+              <div class="flex items-center justify-between pb-1.5 border-b border-white/5">
+                <span class="text-xs sm:text-[13px] font-metadata uppercase tracking-[0.25em] text-[#d4af37] font-bold">
+                  {card.number}
+                </span>
+                <span class="text-[11px] sm:text-xs font-metadata tracking-widest text-zinc-500 uppercase">
+                  {card.category}
+                </span>
+              </div>
+              <h3 class="font-serif text-xl sm:text-2xl text-[#EDEDE8] mt-3 group-hover:text-white transition-colors duration-300">
+                {card.title}
+              </h3>
+              <p class="text-sm sm:text-[15px] font-['Proza_Libre'] text-[#C5C5BF] mt-2 leading-relaxed">
+                {card.description}
+              </p>
+            </div>
+            
+            <div class="pt-3 flex items-center gap-1.5 text-xs font-metadata uppercase tracking-widest text-[#d4af37]/60 group-hover:text-[#d4af37] transition-colors duration-300">
+              <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">▸</span>
+              <span class="text-[11px]">Explorar dimensión</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  </div>
+
+  {/* Inyección de datos JSON limpia para que el script cliente nunca falle */}
+  <script type="application/json" class="adn-sequences-data" set:html={JSON.stringify(sequences)} />
+</section>
+
+<script>
+  import gsap from "gsap";
+
+  interface AdnSlideItem {
+    main: string;
+    highlight: string;
+  }
+
+  function initAdnBentoInstances(): void {
+    const roots = document.querySelectorAll<HTMLElement>("[data-adn-root]");
+    if (roots.length === 0) return;
+
+    roots.forEach((root) => {
+      if (root.dataset.adnInitialized === "true") return;
+      root.dataset.adnInitialized = "true";
+
+      const dataScript = root.querySelector<HTMLScriptElement>(".adn-sequences-data");
+      let sequences: AdnSlideItem[] = [];
+      if (dataScript && dataScript.textContent) {
+        try {
+          sequences = JSON.parse(dataScript.textContent);
+        } catch (e) {
+          console.error("[ADN BENTO] Falló parseo de secuencias JSON", e);
+        }
+      }
+
+      if (!sequences || sequences.length === 0) return;
+
+      const stage = root.querySelector<HTMLElement>(".adn-stage .adn-step");
+      const progress = root.querySelector<HTMLElement>(".adn-progress");
+      const cards = gsap.utils.toArray<HTMLElement>(root.querySelectorAll<HTMLElement>(".adn-card"));
+      const pills = gsap.utils.toArray<HTMLElement>(root.querySelectorAll<HTMLElement>(".adn-pill"));
+
+      if (!stage || !progress) return;
+
+      // Respetar accesibilidad de reducción de movimiento
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduceMotion) {
+        stage.innerHTML = `${sequences[0].main} <br/><span class="adn-highlight text-[#d4af37] font-serif italic">${sequences[0].highlight}</span>`;
+        return;
+      }
+
+      const ctx = gsap.context(() => {
+        gsap.killTweensOf([stage, progress, ...cards, ...pills]);
+
+        // Entrada cinemática elegante para las tarjetas laterales (expo.out)
+        gsap.fromTo(
+          cards,
+          { opacity: 0, y: 22, filter: "blur(10px)" },
+          {
+            opacity: 1,
+            y: 0,
+            filter: "blur(0px)",
+            duration: 0.85,
+            stagger: 0.12,
+            ease: "expo.out"
+          }
+        );
+
+        const masterTl = gsap.timeline({ repeat: -1 });
+
+        sequences.forEach((item, idx) => {
+          masterTl
+            .call(() => {
+              pills.forEach((pill, pIdx) => {
+                const isActive = pIdx === idx;
+                pill.classList.toggle("text-[#F0E6D2]", isActive);
+                pill.classList.toggle("bg-amber-500/15", isActive);
+                pill.classList.toggle("border-amber-500/30", isActive);
+                pill.classList.toggle("text-zinc-500", !isActive);
+                pill.classList.toggle("border-transparent", !isActive);
+              });
+            })
+            .fromTo(
+              progress,
+              { width: "0%" },
+              { width: "100%", duration: 4.8, ease: "power1.inOut" }
+            )
+            .to(stage, {
+              opacity: 0,
+              y: -14,
+              filter: "blur(10px)",
+              duration: 0.45,
+              ease: "power2.in",
+              onComplete: () => {
+                stage.innerHTML = `${item.main} <br/><span class="adn-highlight text-[#d4af37] font-serif italic">${item.highlight}</span>`;
+              }
+            })
+            .fromTo(
+              stage,
+              { opacity: 0, y: 16, filter: "blur(10px)" },
+              { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7, ease: "expo.out" }
+            );
+
+          if (cards[idx]) {
+            masterTl.fromTo(
+              cards[idx],
+              { borderColor: "rgba(212, 175, 55, 0.65)", boxShadow: "0 0 25px rgba(212, 175, 55, 0.2)" },
+              { borderColor: "rgba(255, 255, 255, 0.05)", boxShadow: "none", duration: 1.8, ease: "power2.out" },
+              "<"
+            );
+          }
+        });
+      }, root);
+
+      document.addEventListener("astro:before-swap", () => {
+        ctx.revert();
+      }, { once: true });
+    });
+  }
+
+  document.addEventListener("astro:page-load", initAdnBentoInstances);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAdnBentoInstances);
+  } else {
+    initAdnBentoInstances();
+  }
+</script>

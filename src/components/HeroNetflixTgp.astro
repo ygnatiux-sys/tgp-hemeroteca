@@ -203,10 +203,10 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
         : "items-center text-center max-w-4xl mx-auto"
     }`}
   >
-    {/* Kicker Zenital ADN TGP */}
+    {/* Kicker Zenital ADN TGP (Modo Cinemático Amplio) */}
     {kicker && (
-      <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-300 font-mono text-[11px] sm:text-xs uppercase tracking-[0.22em] mb-4.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true"></span>
+      <div class="inline-flex items-center gap-3 px-5 py-2 sm:px-6 sm:py-2.5 rounded-full border border-[#d4af37]/35 bg-[#161817]/85 text-[#F0E6D2] font-metadata font-bold text-xs sm:text-sm uppercase tracking-[0.32em] mb-6 backdrop-blur-md shadow-[0_0_24px_rgba(212,175,55,0.18)]">
+        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse shadow-[0_0_10px_#f59e0b]" aria-hidden="true"></span>
         <span>{kicker}</span>
       </div>
     )}
@@ -243,14 +243,14 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
       {bajada}
     </p>
 
-    {/* Typewriter interactivo del ADN TGP */}
+    {/* Typewriter interactivo del ADN TGP (Modo Cinemático de Alto Impacto) */}
     {enableTypewriter && (
       <div 
-        class="mt-4 flex items-center gap-2.5 text-xs sm:text-sm font-mono text-amber-200/90 tracking-wide min-h-[28px] bg-black/40 border border-white/10 px-3.5 py-1.5 rounded-lg backdrop-blur-sm"
+        class="mt-6 sm:mt-8 flex items-center gap-3.5 font-['Proza_Libre'] text-base sm:text-xl md:text-2xl text-[#F3ECE0]/95 tracking-wide min-h-[40px] drop-shadow-[0_2px_14px_rgba(0,0,0,0.95)]"
         aria-live="polite"
       >
-        <span class="text-amber-400 select-none font-bold" aria-hidden="true">›</span>
-        <span id="hero-typewriter-text" class="border-r-2 border-amber-400 pr-1 animate-pulse">
+        <span class="font-mono text-amber-400 text-lg sm:text-2xl select-none font-bold" aria-hidden="true">›</span>
+        <span id="hero-typewriter-text" class="border-r-2 border-amber-400 pr-1.5 italic font-serif text-[#F3ECE0]">
           Duda. Investiga. Conecta.
         </span>
       </div>
