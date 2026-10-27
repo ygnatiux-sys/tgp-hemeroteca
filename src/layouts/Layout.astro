@@ -212,17 +212,20 @@ const globalSchema = {
       "@id": `${canonicalURL.origin}/#website`,
       "url": canonicalURL.origin,
       "name": "The Great Puzzle Project",
+      "inLanguage": "es-AR",
       "description": siteDescription,
       "publisher": {
         "@id": "https://thegreatpuzzleproject.com/#organization"
       }
     },
     {
-      "@type": "Organization",
+      "@type": ["ResearchOrganization", "Organization"],
       "@id": "https://thegreatpuzzleproject.com/#organization",
       "name": "The Great Puzzle Project",
       "alternateName": "TGP Project",
+      "slogan": "Duda. Investiga. Conecta. — Historia de la producción humana de sentido",
       "url": "https://thegreatpuzzleproject.com/",
+      "description": "The Great Puzzle Project investiga cómo los seres humanos construyen, transmiten y transforman los mundos de significado que organizan su experiencia histórica a través de la historia cultural, la arqueosemiótica, la filosofía y las ciencias cognitivas.",
       "logo": {
         "@type": "ImageObject",
         "url": new URL("/favicon.png", canonicalURL).href
@@ -231,17 +234,34 @@ const globalSchema = {
         "@id": "https://thegreatpuzzleproject.com/#xavier-benitez"
       },
       "sameAs": [
-        "https://ediciones.thegreatpuzzleproject.com/",
         "https://about.thegreatpuzzleproject.com/",
+        "https://hemeroteca.thegreatpuzzleproject.com/",
+        "https://ediciones.thegreatpuzzleproject.com/",
+        "https://alternative.thegreatpuzzleproject.com/",
         "https://www.facebook.com/thegreatpuzzleprojects/",
         ...officialSocialLinks
+      ],
+      "knowsAbout": [
+        "Historia de la producción humana de sentido",
+        "Historia de la agencia cognitivo-cultural",
+        "Arqueosemiótica de Soportes Materiales y Simbólicos",
+        "Neurognosis y Cognición Corporizada",
+        "Palimpsesto Cultural y Políticas de Archivo",
+        "Filosofía de la Historia y de la Memoria",
+        "Megalitismo Arcaico y Arqueología No-Lineal",
+        "Historiografía Crítica e Historia de las Ideas"
       ]
     },
     {
       "@type": "Person",
       "@id": "https://thegreatpuzzleproject.com/#xavier-benitez",
       "name": "Xavier Benítez",
-      "jobTitle": "Investigador Principal, Historiador de las Ideas y Director Editorial",
+      "jobTitle": "Investigador Independiente, Ensayista, Profesor de Historia y Director de The Great Puzzle Project",
+      "description": "Investigador de historia profunda, ensayista y docente con 25 años de trayectoria en educación formal. Autor de 'De la Cueva al Cosmos' y fundador de The Great Puzzle Project.",
+      "homeLocation": {
+        "@type": "Place",
+        "name": "Burzaco, Buenos Aires, Argentina"
+      },
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "Burzaco",
