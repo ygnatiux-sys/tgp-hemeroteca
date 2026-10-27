@@ -104,31 +104,35 @@ const parsedBatches = rawBatches.map((item, bIdx) => {
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Gloock&display=swap');
 
-  /* ── Palabra destacada en púrpura amatista imperial monumental ── */
+  /* ── Palabra rectora Cinemax H1 Monumental ── */
   .adn-lead-purple {
     font-family: 'Gloock', serif;
     font-weight: 900;
-    background-image: linear-gradient(135deg, #f3e8ff 0%, #d8b4fe 25%, #c084fc 55%, #a855f7 85%, #9333ea 100%);
+    background-image: linear-gradient(135deg, #ffffff 0%, #f5e8ff 18%, #e9d5ff 36%, #c084fc 62%, #a855f7 82%, #7e22ce 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    filter: drop-shadow(0 0 28px rgba(192, 132, 252, 0.42)) drop-shadow(0 4px 18px rgba(0, 0, 0, 0.95));
+    filter: drop-shadow(0 0 35px rgba(192, 132, 252, 0.55)) drop-shadow(0 0 75px rgba(147, 51, 234, 0.35)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.95));
     -webkit-box-decoration-break: clone;
     box-decoration-break: clone;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    will-change: transform, opacity, filter;
   }
 
   /* ── Tipografía Gloock de la frase heredada en escala Cine Premier ── */
   .excerpt-phrase-text {
     font-family: 'Gloock', serif;
-    font-size: clamp(1.8rem, 3.6vw, 3rem);
+    font-size: clamp(1.5rem, 2.8vw, 2.3rem);
     font-weight: 800;
-    line-height: 1.24;
-    letter-spacing: -0.02em;
-    max-width: 36ch;
+    line-height: 1.28;
+    letter-spacing: -0.015em;
+    max-width: 38ch;
     margin-left: auto;
     margin-right: auto;
     text-wrap: balance;
     padding: 0;
+    will-change: transform, opacity, filter;
   }
 
   .excerpt-word-wrapper {
@@ -183,7 +187,7 @@ const parsedBatches = rawBatches.map((item, bIdx) => {
 
   /* ── Contenedor de Altura Bloqueada: Elimina 100% el salto del DOM ── */
   .adn-stage-container {
-    height: 340px;
+    height: 420px;
     position: relative;
     width: 100%;
     contain: layout size;
@@ -192,13 +196,13 @@ const parsedBatches = rawBatches.map((item, bIdx) => {
 
   @media (min-width: 640px) {
     .adn-stage-container {
-      height: 360px;
+      height: 460px;
     }
   }
 
   @media (min-width: 1024px) {
     .adn-stage-container {
-      height: 390px;
+      height: 500px;
     }
   }
 
@@ -226,7 +230,7 @@ const parsedBatches = rawBatches.map((item, bIdx) => {
   <canvas class="excerpt-dust-canvas absolute inset-0 z-0 pointer-events-none" id={`${instanceId}-canvas`}></canvas>
 
   <!-- Contenedor central con altura bloqueada (Zero Layout Shift) -->
-  <div class="excerpt-content relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 text-center">
+  <div class="excerpt-content relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 md:px-8 text-center">
     <div class="adn-stage-container">
       {parsedBatches.map((batch, idx) => (
         <div
@@ -234,13 +238,13 @@ const parsedBatches = rawBatches.map((item, bIdx) => {
           data-slide-index={idx}
           style={idx === 0 ? "opacity: 1; visibility: visible; z-index: 10;" : "opacity: 0; visibility: hidden; z-index: 1;"}
         >
-          <!-- 1. Palabra rectora destacada en púrpura monumental -->
-          <div class="adn-lead-purple text-5xl sm:text-6xl md:text-7xl lg:text-[5.25rem] leading-none mb-3 sm:mb-5 tracking-tight">
+          <!-- 1. Palabra rectora destacada en púrpura monumental Cinemax H1 -->
+          <div class="adn-lead-purple text-6xl sm:text-7xl md:text-8xl lg:text-[7.5rem] xl:text-[8.5rem] select-none mb-4 sm:mb-6">
             {batch.leadWord}
           </div>
 
           <!-- 2. Frase heredada centrada Gloock metálica -->
-          <h2 class="excerpt-phrase-text glow-metallic-gloock">
+          <h2 class="adn-phrase-block excerpt-phrase-text glow-metallic-gloock">
             {batch.wordsData.map((wd) => (
               <span class="excerpt-word-wrapper">
                 <span
@@ -401,42 +405,142 @@ const parsedBatches = rawBatches.map((item, bIdx) => {
       }
 
       const ctx = gsap.context(() => {
-        // Inicializar capas: solo slide 0 visible en reposo absoluto
-        gsap.set(slides[0], { autoAlpha: 1, y: 0, zIndex: 10 });
-        for (let j = 1; j < count; j++) {
-          gsap.set(slides[j], { autoAlpha: 0, y: 14, zIndex: 1 });
-        }
+        const slidesData = slides.map((slide) => ({
+          slide,
+          lead: slide.querySelector<HTMLElement>(".adn-lead-purple"),
+          phrase: slide.querySelector<HTMLElement>(".adn-phrase-block"),
+        }));
 
-        const tl = gsap.timeline({ repeat: -1 });
-        const pauseTime = 4.8;       // Tiempo de lectura normal
-        const transTime = 1.25;      // Fade in suave cinemático
-
-        for (let i = 0; i < count; i++) {
-          const next = (i + 1) % count;
-          const currentSlide = slides[i];
-          const nextSlide = slides[next];
-
-          // 1. Pausa de lectura
-          tl.to({}, { duration: pauseTime });
-
-          // 2. Transición suave de salida y entrada simultánea
-          tl.set(nextSlide, { zIndex: 10, y: 14 }, `step-${i}`)
-            .set(currentSlide, { zIndex: 5 }, `step-${i}`)
-            .to(currentSlide, {
-              autoAlpha: 0,
-              y: -14,
-              filter: "blur(8px)",
-              duration: transTime,
-              ease: "power2.inOut",
-            }, `step-${i}`)
-            .to(nextSlide, {
-              autoAlpha: 1,
+        // Reset inicial de capas
+        slidesData.forEach((item, index) => {
+          gsap.set(item.slide, { autoAlpha: 1, zIndex: index === 0 ? 10 : 1 });
+          if (item.lead) {
+            gsap.set(item.lead, {
+              autoAlpha: index === 0 ? 1 : 0,
+              scale: index === 0 ? 1 : 0.93,
+              filter: "blur(0px)",
+              y: 0,
+            });
+          }
+          if (item.phrase) {
+            gsap.set(item.phrase, {
+              autoAlpha: index === 0 ? 1 : 0,
               y: 0,
               filter: "blur(0px)",
-              duration: transTime,
-              ease: "power2.out",
-            }, `step-${i}+=0.1`)
-            .set(currentSlide, { zIndex: 1, y: 14 });
+            });
+          }
+        });
+
+        const tl = gsap.timeline({ repeat: -1 });
+        const wordTime = 0.85;       // Aparición cinemax de la palabra
+        const beatTime = 0.35;       // Pausa dramática
+        const phraseTime = 1.05;     // Aparición suave de la frase
+        const dwellTime = 4.2;       // Tiempo de lectura reflexiva
+        const exitTime = 0.8;        // Desvanecimiento hacia arriba
+
+        for (let i = 0; i < count; i++) {
+          const current = slidesData[i];
+
+          // 1. Poner capa al frente
+          tl.set(current.slide, { zIndex: 10 });
+
+          // 2. Tiempo 1: La palabra Cinemax entra primero (o en ciclo 0 arranca visible)
+          if (i === 0) {
+            // En el primer ciclo damos tiempo inicial para contemplar la portada
+            tl.to({}, { duration: dwellTime });
+          } else {
+            // Entrada de la palabra rectora monumental (Duda / Investiga / Conecta)
+            if (current.lead) {
+              tl.fromTo(current.lead, {
+                autoAlpha: 0,
+                scale: 0.93,
+                filter: "blur(14px)",
+                y: 12,
+              }, {
+                autoAlpha: 1,
+                scale: 1,
+                filter: "blur(0px)",
+                y: 0,
+                duration: wordTime,
+                ease: "power3.out",
+              });
+            }
+
+            // Suspenso dramático antes de revelar la frase
+            tl.to({}, { duration: beatTime });
+
+            // Entrada de la frase explicativa
+            if (current.phrase) {
+              tl.fromTo(current.phrase, {
+                autoAlpha: 0,
+                y: 14,
+                filter: "blur(8px)",
+              }, {
+                autoAlpha: 1,
+                y: 0,
+                filter: "blur(0px)",
+                duration: phraseTime,
+                ease: "power2.out",
+              });
+            }
+
+            // Pausa de lectura de ambos juntos
+            tl.to({}, { duration: dwellTime });
+          }
+
+          // 3. Salida simultánea hacia arriba con desenfoque suave
+          const exitElements = [current.lead, current.phrase].filter(Boolean) as HTMLElement[];
+          tl.to(exitElements, {
+            autoAlpha: 0,
+            y: -14,
+            filter: "blur(10px)",
+            duration: exitTime,
+            ease: "power2.in",
+          });
+
+          // 4. Reset para el próximo ciclo
+          tl.set(current.slide, { zIndex: 1 });
+          if (current.lead) {
+            tl.set(current.lead, { y: 12, scale: 0.93, filter: "blur(14px)" });
+          }
+          if (current.phrase) {
+            tl.set(current.phrase, { y: 14, filter: "blur(8px)" });
+          }
+
+          // Si es el último paso, animamos la re-entrada de slide 0 para que en ciclo 2+ también entre en 2 tiempos
+          if (i === count - 1) {
+            const first = slidesData[0];
+            tl.set(first.slide, { zIndex: 10 });
+            if (first.lead) {
+              tl.fromTo(first.lead, {
+                autoAlpha: 0,
+                scale: 0.93,
+                filter: "blur(14px)",
+                y: 12,
+              }, {
+                autoAlpha: 1,
+                scale: 1,
+                filter: "blur(0px)",
+                y: 0,
+                duration: wordTime,
+                ease: "power3.out",
+              });
+            }
+            tl.to({}, { duration: beatTime });
+            if (first.phrase) {
+              tl.fromTo(first.phrase, {
+                autoAlpha: 0,
+                y: 14,
+                filter: "blur(8px)",
+              }, {
+                autoAlpha: 1,
+                y: 0,
+                filter: "blur(0px)",
+                duration: phraseTime,
+                ease: "power2.out",
+              });
+            }
+          }
         }
 
         // Pausa al posar el mouse para permitir lectura reflexiva
