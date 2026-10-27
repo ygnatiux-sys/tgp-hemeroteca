@@ -127,7 +127,7 @@ const DEFAULT_HERO_ITEMS: CinemaShowcaseItem[] = [
     title: "CANTERAS IMPERIALES",
     subtitle: "Los monolitos inconclusos de Yangshan: millones de toneladas de piedra desprendidas de la roca madre en un acto de ingeniería ciclópea desmesurada.",
     category: "Megalitismo",
-    image: "https://storage.thegreatpuzzleproject.com/remotas/yangshan-stele-quarry.webp",
+    image: "/src/assets/remotas/yangshan-stele-quarry.jpg",
     href: "/colecciones/historia/",
     fontH1: IMPACT_FONT_PRESETS[3].fontH1,
     fontH2: IMPACT_FONT_PRESETS[3].fontH2,
@@ -213,12 +213,8 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
             alt={item.title}
             loading={sIdx === 0 ? "eager" : "lazy"}
             decoding="async"
-            class="w-full h-full object-cover object-center scale-100 brightness-[0.82] contrast-[1.06]"
+            class="w-full h-full object-cover object-center scale-100 brightness-100 contrast-[1.04]"
           />
-          <!-- Degradé vertical y viñeta lateral Apple TV para proteger el texto -->
-          <div class="absolute inset-0 bg-linear-to-t from-[#07080a] via-[#07080a]/50 via-40% to-transparent pointer-events-none z-1"></div>
-          <div class="absolute inset-0 bg-linear-to-r from-[#07080a] via-[#07080a]/80 via-45% to-transparent pointer-events-none z-1"></div>
-          <div class="absolute inset-x-0 top-0 h-28 bg-linear-to-b from-black/50 to-transparent pointer-events-none z-1"></div>
         </div>
       ))}
     </div>
@@ -232,10 +228,12 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
           data-mayday-content={sIdx}
           style={sIdx === 0 ? 'display: flex;' : 'display: none;'}
         >
-          <!-- TÍTULO MONUMENTAL H1 EN FUENTE IMPACT / EXTRABOLD ROTATIVA -->
-          <h1 class={`mayday-title text-4xl sm:text-5xl md:text-6xl lg:text-[68px] text-white leading-[0.92] drop-shadow-[0_4px_25px_rgba(0,0,0,0.95)] max-w-2xl ${item.fontH1}`}>
-            {item.title}
-          </h1>
+          <!-- TÍTULO MONUMENTAL H1 CON BG DESTACADO Y BRILLO SOBRE EL POST -->
+          <div class="inline-block relative px-5 py-2.5 rounded-2xl bg-black/45 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.65)]">
+            <h1 class={`mayday-title text-4xl sm:text-5xl md:text-6xl lg:text-[68px] text-white leading-[0.92] drop-shadow-[0_4px_30px_rgba(0,0,0,0.95)] max-w-2xl ${item.fontH1}`}>
+              {item.title}
+            </h1>
+          </div>
 
           <!-- PÍLDORA Y CATEGORÍA ESTILO APPLE TV (como el logo TV + Película · Acción · Comedia +13) -->
           <div class="flex items-center gap-2 text-xs sm:text-sm text-white/90 pt-1">
