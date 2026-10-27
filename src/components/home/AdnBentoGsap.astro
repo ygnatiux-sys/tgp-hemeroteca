@@ -101,11 +101,11 @@ const {
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 p-6 sm:p-8 md:p-11 rounded-3xl border border-white/10 bg-[#161817]/90 backdrop-blur-xl relative overflow-hidden shadow-[0_20px_70px_rgba(0,0,0,0.85)]">
       
       {/* Luz ambiental cinematográfica ámbar/oro */}
-      <div class="pointer-events-none absolute -top-32 -right-32 w-[28rem] h-[28rem] rounded-full bg-amber-500/10 blur-[90px]" aria-hidden="true"></div>
-      <div class="pointer-events-none absolute -bottom-32 -left-32 w-[26rem] h-[26rem] rounded-full bg-amber-500/8 blur-[90px]" aria-hidden="true"></div>
+      <div class="pointer-events-none absolute -top-32 -right-32 w-md h-112 rounded-full bg-amber-500/10 blur-[90px]" aria-hidden="true"></div>
+      <div class="pointer-events-none absolute -bottom-32 -left-32 w-104 h-104 rounded-full bg-amber-500/8 blur-[90px]" aria-hidden="true"></div>
 
       {/* Columna Principal (8 cols): Stage Tipográfico Monumental + GSAP Timeline */}
-      <div class="lg:col-span-8 flex flex-col justify-between min-h-[340px] sm:min-h-[400px] md:min-h-[450px] p-6 sm:p-9 md:p-12 rounded-2xl bg-[#0e0f0f]/85 border border-white/5 relative shadow-inner">
+      <div class="lg:col-span-8 flex flex-col justify-between min-h-85 sm:min-h-100 md:min-h-112.5 p-6 sm:p-9 md:p-12 rounded-2xl bg-[#0e0f0f]/85 border border-white/5 relative shadow-inner">
         
         {/* Header del Stage con Tricolon Interactivo */}
         <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5">
@@ -138,8 +138,8 @@ const {
 
         {/* Footer del Stage: Barra de progreso GSAP + Meta-regla */}
         <div class="space-y-4 pt-4 border-t border-white/5">
-          <div class="w-full h-[3px] bg-white/10 overflow-hidden rounded-full">
-            <div class="adn-progress h-full w-0 bg-gradient-to-r from-amber-500 via-amber-400 to-[#d4af37] shadow-[0_0_10px_rgba(245,158,11,0.8)]"></div>
+          <div class="w-full h-0.75 bg-white/10 overflow-hidden rounded-full">
+            <div class="adn-progress h-full w-0 bg-linear-to-r from-amber-500 via-amber-400 to-[#d4af37] shadow-[0_0_10px_rgba(245,158,11,0.8)]"></div>
           </div>
           <div class="flex justify-between items-center text-xs sm:text-[13px] font-metadata uppercase tracking-[0.25em] text-[#C5C5BF]/80">
             <span>{metaRuleLeft}</span>

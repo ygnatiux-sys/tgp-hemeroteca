@@ -15,6 +15,7 @@ export interface HeroTile {
 
 interface Props {
   tiles: HeroTile[];
+  kicker?: string;
   titulo?: string;
   bajada?: string;
   ctaPrimary?: { label: string; href: string };
@@ -26,6 +27,7 @@ interface Props {
 
 const {
   tiles = [],
+  kicker,
   titulo = "Explorá sin límites. Recorré las colecciones del archivo TGP.",
   bajada = "Ensayos, arquetipos y georreferencias en un solo mapa. Leé cuando quieras.",
   ctaPrimary = { label: "Explorar colecciones", href: "#sec-col-vertical" },
@@ -46,6 +48,12 @@ const grid = tiles.slice(0, 12);
     <div class="hs-glow" aria-hidden="true"></div>
 
     <div class="hs-copy">
+      {kicker && (
+        <div class="inline-flex items-center gap-3 px-4 py-1.5 sm:px-5 sm:py-2 rounded-full border border-[#d4af37]/35 bg-[#161817]/85 text-[#F0E6D2] font-metadata font-bold text-xs uppercase tracking-[0.3em] mb-4 backdrop-blur-md shadow-[0_0_20px_rgba(212,175,55,0.18)]">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse shadow-[0_0_8px_#f59e0b]" aria-hidden="true"></span>
+          <span>{kicker}</span>
+        </div>
+      )}
       {isH1 ? (
         <h1 class={`hs-title ${titleFont === 'gloock' ? 'is-gloock font-gloock' : ''}`}>{titulo}</h1>
       ) : (

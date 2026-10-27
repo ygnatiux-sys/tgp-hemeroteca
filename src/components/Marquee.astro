@@ -5,6 +5,8 @@ import { sanitizeImageUrl } from "../lib/content-filter";
 interface Props {
   title: string;
   subtitle?: string;
+  kicker?: string;
+  abstract?: string;
   imageUrl?: string;
   vibeClass?: string;
   isH1?: boolean;
@@ -20,6 +22,8 @@ interface Props {
 const {
   title,
   subtitle = "The Great Puzzle",
+  kicker,
+  abstract,
   imageUrl = "",
   vibeClass = "",
   isH1 = false,
@@ -76,6 +80,13 @@ const gradientClass = hasExplicitGradient ? "" : (isGloockOrSerif ? "gradient-ge
         : "py-6 md:py-8 -translate-y-4 my-auto"
     ]}
   >
+    {kicker && (
+      <div class="inline-flex items-center gap-3 px-5 py-2 sm:px-6 sm:py-2.5 rounded-full border border-[#d4af37]/35 bg-[#161817]/85 text-[#F0E6D2] font-metadata font-bold text-xs sm:text-sm uppercase tracking-[0.32em] mb-4.5 backdrop-blur-md shadow-[0_0_24px_rgba(212,175,55,0.18)]">
+        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse shadow-[0_0_8px_#f59e0b]" aria-hidden="true"></span>
+        <span>{kicker}</span>
+      </div>
+    )}
+
     {isH1 ? (
       <h1
         class:list={[
@@ -102,6 +113,11 @@ const gradientClass = hasExplicitGradient ? "" : (isGloockOrSerif ? "gradient-ge
         class="vibe-target-h2 font-sans text-xs md:text-sm tracking-[0.15em] text-[#c4a484]/80 my-2 drop-shadow-md text-balance max-w-2xl mx-auto"
       >
         {subtitle}
+      </p>
+    )}
+    {abstract && (
+      <p class="font-['Proza_Libre'] text-sm sm:text-base md:text-lg text-[#EFEBE3]/90 leading-relaxed text-balance max-w-3xl mx-auto my-3 drop-shadow-md">
+        {abstract}
       </p>
     )}
     <h3
