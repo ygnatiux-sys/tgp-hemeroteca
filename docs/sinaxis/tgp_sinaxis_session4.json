@@ -1,0 +1,84 @@
+{
+  "version": "4.0.0",
+  "canon": "Canon Maestro TGP v1.9",
+  "source_session": "Sesión 4 (Capítulos 3, 4, 5 y Mapa Narrativo EDC)",
+  "nodes": [
+    {
+      "id": "CAP_03",
+      "labels": ["Capitulo"],
+      "properties": {
+        "numero": 3,
+        "titulo": "La invención del canon",
+        "subtitulo": "Cuando el orden se volvió verdad",
+        "tesis": "Giro antropocéntrico en Grecia y Roma; interiorización del Archivo Solar en la mente lógica.",
+        "aforismo": "El canon nació para ordenar el mundo, pero terminó ordenando la mente. Desde entonces, toda verdad lleva un sello de archivo."
+      }
+    },
+    {
+      "id": "CAP_04",
+      "labels": ["Capitulo"],
+      "properties": {
+        "numero": 4,
+        "titulo": "La verdad como texto",
+        "subtitulo": "Cuando la palabra reemplazó la experiencia",
+        "tesis": "La palabra revelada de los monoteísmos y la Inquisición como censura administrativa del alma.",
+        "aforismo": "El verbo fue el primer algoritmo: codificó el mundo en palabras y nos convenció de que leer era entender."
+      }
+    },
+    {
+      "id": "CAP_05",
+      "labels": ["Capitulo"],
+      "properties": {
+        "numero": 5,
+        "titulo": "Del papel a la razón",
+        "subtitulo": "La era moderna del archivo y el nacimiento del dato",
+        "tesis": "Gutenberg, la Enciclopedia y el Archivo de Indias: sustitución del territorio por el papel sellado.",
+        "aforismo": "El dato reemplazó al dogma, pero la devoción al archivo siguió intacta. Solo cambió el altar: del templo al laboratorio."
+      }
+    },
+    {
+      "id": "ALEPH_08",
+      "labels": ["PuntoAleph"],
+      "properties": {
+        "numero": 8,
+        "badge": "[ALEPH #8 · LA JAULA DEL LOGOS Y LA INQUISICIÓN]",
+        "color": "#DC2626",
+        "region": "Interiorización del Canon & Dogma Punitivo",
+        "axioma": "El verbo fue el primer algoritmo: codificó el mundo en palabras y nos convenció de que leer era entender."
+      }
+    },
+    {
+      "id": "ALEPH_09",
+      "labels": ["PuntoAleph"],
+      "properties": {
+        "numero": 9,
+        "badge": "[ALEPH #9 · EL MAPA QUE DEVORÓ LA TIERRA]",
+        "color": "#D97706",
+        "region": "Modernidad Racionalista & Matriz Colonial del Dato",
+        "axioma": "El dato reemplazó al dogma, pero la devoción al archivo siguió intacta. Solo cambió el altar: del templo al laboratorio."
+      }
+    },
+    {
+      "id": "EVAL_CRITICA_SESION_4",
+      "labels": ["EvaluacionCriticaTGP"],
+      "properties": {
+        "titulo": "Dictamen Epistémico Sesión 4: La Tríada del Confinamiento Simbólico (Canon, Dogma y Burocracia Imperial)",
+        "autor": "Antigravity IDE en diálogo con Xavier Benítez",
+        "badge": "[AUDITORÍA CRÍTICA SESIÓN 4]",
+        "color": "#84CC16",
+        "tesis_epistemica": "Grecia inventa la jaula taxonómica mental (Aristóteles); la Iglesia medieval la sacraliza mediante el terror inquisitorial; la Modernidad la desacraliza pero la expande colonialmente con la imprenta y el Archivo de Indias.",
+        "alerta_ontologica": "El peligro del reemplazo de la realidad por el mapa: cuando el Estado colonial cree que conocer América es apilar 40 millones de folios en Sevilla, nace la patología moderna que hoy culmina en el Big Data.",
+        "aforismo_cierre": "Occidente no conquistó el mundo con pólvora, sino con papel sellado. El algoritmo contemporáneo es el bisnieto directo del escriba de Indias."
+      }
+    }
+  ],
+  "edges": [
+    { "type": "SINTETIZA", "from": "ALEPH_08", "to": "CAP_03" },
+    { "type": "SINTETIZA", "from": "ALEPH_08", "to": "CAP_04" },
+    { "type": "SINTETIZA", "from": "ALEPH_09", "to": "CAP_05" },
+    { "type": "AUDITA", "from": "EVAL_CRITICA_SESION_4", "to": "ALEPH_08" },
+    { "type": "AUDITA", "from": "EVAL_CRITICA_SESION_4", "to": "ALEPH_09" },
+    { "type": "MUTACION_HISTORICA", "from": "CAP_03", "to": "CAP_04" },
+    { "type": "MUTACION_HISTORICA", "from": "CAP_04", "to": "CAP_05" }
+  ]
+}

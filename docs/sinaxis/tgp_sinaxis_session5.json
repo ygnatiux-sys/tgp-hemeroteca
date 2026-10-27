@@ -1,0 +1,105 @@
+{
+  "version": "5.0.0",
+  "canon": "Canon Maestro TGP v1.9",
+  "source_session": "Sesión 5 Final (Capítulos 7 y 9, Canon Museum Dark, Sinopsis Magistral y Cierre Total de 14 Fuentes)",
+  "nodes": [
+    {
+      "id": "CAP_07",
+      "labels": ["Capitulo"],
+      "properties": {
+        "numero": 7,
+        "titulo": "La rebelión de la memoria",
+        "subtitulo": "El retorno del agua interior",
+        "tesis": "La sospecha del siglo XXI, la cultura del historial y la pérdida del borrador; activación de la Retrogénesis (Tool_55).",
+        "aforismo": "La memoria no se conserva: se cultiva. Y como toda agua viva, solo fluye cuando se comparte."
+      }
+    },
+    {
+      "id": "CAP_09",
+      "labels": ["Capitulo"],
+      "properties": {
+        "numero": 9,
+        "titulo": "La Gnosis del Sentido",
+        "subtitulo": "Del archivo muerto al archivo vivo",
+        "tesis": "La Gran Confluencia TGP: el archivo deja de ser la jaula del logos para volverse órgano vivo del alma planetaria; el humano es el archivo encarnado.",
+        "aforismo": "Cuando la memoria se reconcilia con el olvido, el archivo vuelve a respirar. Recordar es crear."
+      }
+    },
+    {
+      "id": "CANON_MUSEUM_DARK",
+      "labels": ["CanonEditorial"],
+      "properties": {
+        "nombre": "Canon Maestro TGP v1.9 — Estética Museum Dark",
+        "obra": "Historia del Archivo (Libro 1, Serie E)",
+        "paleta": "Negro grafito (#0A0D14), Cian (#00EAFF), Oro (#F2C779), Titanio (#F9F9F9)",
+        "volumenII": "La Rebelión de la Memoria (Donde el alma se libera del archivo y vuelve a hablar en agua)"
+      }
+    },
+    {
+      "id": "SINOPSIS_BIOGRAFIA_MEMORIA",
+      "labels": ["SinopsisMagistral"],
+      "properties": {
+        "titulo": "Del barro al algoritmo: la biografía secreta de nuestra memoria",
+        "autor": "Xavier Benítez",
+        "arco_temporal": "20.000 años (De Ishango a la IA)",
+        "tesis_central": "Durante milenios creímos que la memoria necesitaba custodios; hoy descubrimos que necesita oyentes somáticos."
+      }
+    },
+    {
+      "id": "ALEPH_10",
+      "labels": ["PuntoAleph"],
+      "properties": {
+        "numero": 10,
+        "badge": "[ALEPH #10 · LA PÉRDIDA DEL BORRADOR]",
+        "color": "#06B6D4",
+        "region": "Retrogénesis Somática & Cultura del Historial",
+        "axioma": "La memoria no se conserva: se cultiva. Y como toda agua viva, solo fluye cuando se comparte."
+      }
+    },
+    {
+      "id": "ALEPH_11",
+      "labels": ["PuntoAleph"],
+      "properties": {
+        "numero": 11,
+        "badge": "[ALEPH #11 · LA GNOSIS DEL SENTIDO Y EL ARCHIVO VIVO]",
+        "color": "#14B8A6",
+        "region": "Gran Confluencia Gnoseológica & Resonancia",
+        "axioma": "Cuando la memoria se reconcilia con el olvido, el archivo vuelve a respirar. Recordar es crear."
+      }
+    },
+    {
+      "id": "ALEPH_12",
+      "labels": ["PuntoAleph"],
+      "properties": {
+        "numero": 12,
+        "badge": "[ALEPH #12 · EL CÓDICE MUSEUM DARK]",
+        "color": "#F59E0B",
+        "region": "Encarnación Editorial & Puente al Volumen II",
+        "axioma": "Cada palabra que pronunciamos es un fósil de luz. Cada silencio, una semilla de agua. Y entre ambos crece el árbol invisible del sentido."
+      }
+    },
+    {
+      "id": "EVAL_CRITICA_SESION_5_FINAL",
+      "labels": ["EvaluacionCriticaTGP"],
+      "properties": {
+        "titulo": "Dictamen Epistémico Cumbre: La Reconciliación del Fuego y del Agua (El Archivo Encarnado)",
+        "autor": "Antigravity IDE en diálogo con Xavier Benítez",
+        "badge": "[AUDITORÍA CRÍTICA FINAL — 14 FUENTES]",
+        "color": "#6366F1",
+        "tesis_epistemica": "El archivo no se destruye ni se idolatra; se encarna. Al demostrar que el Big Data es ciego al amor y al consuelo, TGP rescata el cuerpo como el archivo irreductible.",
+        "alerta_ontologica": "Un mundo sin borrador es un mundo sin perdón ni creación. El olvido es la tecnología biológica más avanzada de renovación.",
+        "aforismo_cierre": "No estamos parados frente a la historia: nosotros somos el archivo en su forma viva."
+      }
+    }
+  ],
+  "edges": [
+    { "type": "SINTETIZA", "from": "ALEPH_10", "to": "CAP_07" },
+    { "type": "SINTETIZA", "from": "ALEPH_11", "to": "CAP_09" },
+    { "type": "SINTETIZA", "from": "ALEPH_12", "to": "CANON_MUSEUM_DARK" },
+    { "type": "SINTETIZA", "from": "ALEPH_12", "to": "SINOPSIS_BIOGRAFIA_MEMORIA" },
+    { "type": "AUDITA", "from": "EVAL_CRITICA_SESION_5_FINAL", "to": "ALEPH_10" },
+    { "type": "AUDITA", "from": "EVAL_CRITICA_SESION_5_FINAL", "to": "ALEPH_11" },
+    { "type": "AUDITA", "from": "EVAL_CRITICA_SESION_5_FINAL", "to": "ALEPH_12" },
+    { "type": "CULMINA_EN", "from": "CAP_07", "to": "CAP_09" }
+  ]
+}

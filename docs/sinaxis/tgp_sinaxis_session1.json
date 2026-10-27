@@ -1,0 +1,192 @@
+{
+  "version": "1.0.0",
+  "canon": "Canon Maestro TGP v1.9",
+  "source_session": "Sesión 1 (Fuentes 01-03) + Arquitectura Web Zenital",
+  "generated_at": "2026-10-27T02:47:00-03:00",
+  "nodes": [
+    {
+      "id": "CONC_CONDICION_HUMANA",
+      "labels": ["ConceptoTGP"],
+      "properties": {
+        "nombre": "Condición Humana y Miedo Ontológico",
+        "eje": "Neurognosis / Somática",
+        "definicion": "El impulso biológico del animal humano de fabricar refugios de sentido ante la finitud, el azar y la muerte.",
+        "axioma": "El primer archivo fue un acto de fe: creer que el recuerdo podía sobrevivir al cuerpo."
+      }
+    },
+    {
+      "id": "CONC_PALIMPSESTO",
+      "labels": ["ConceptoTGP"],
+      "properties": {
+        "nombre": "Palimpsesto Cultural",
+        "eje": "Arqueosemiótica",
+        "definicion": "La materia y el símbolo como estratigrafía viviente: lo arcaico nunca muere, se reescribe, disfraza y reaparece.",
+        "axioma": "La cultura no es un monumento estático; es una sobreescritura perpetua."
+      }
+    },
+    {
+      "id": "CONC_ARCHIVO_VIVO",
+      "labels": ["ConceptoTGP"],
+      "properties": {
+        "nombre": "Archivo Vivo",
+        "eje": "Ecología del Sentido",
+        "definicion": "Ecosistema dinámico que integra la memoria afectiva con la evidencia documental frente al archivo burocrático petrificado.",
+        "axioma": "No recordamos para conservar el pasado, sino para seguir vivos en el presente."
+      }
+    },
+    {
+      "id": "CONC_CARTOGRAFIA_CRITICA",
+      "labels": ["ConceptoTGP"],
+      "properties": {
+        "nombre": "Cartografía Crítica",
+        "eje": "Método TGP",
+        "definicion": "Tercera Vía TGP: audacia comparativa sin pastiche esotérico ni esterilidad académica; no confunde analogía con causalidad.",
+        "axioma": "Duda. Investiga. Conecta."
+      }
+    },
+    {
+      "id": "TENS_SOLAR_LUNAR",
+      "labels": ["TensionDialectica"],
+      "properties": {
+        "nombre": "Archivo Solar vs. Memoria Hidráulica",
+        "poloA": "Archivo Solar (Uruk, Piedra, Ley, Estado, Fijeza, Sequedad, Poder)",
+        "poloB": "Memoria Hidráulica (Agua, Afecto, Flujo, Disolución, Olvido, Inconsciente)",
+        "resolucion": "Ecología del Sentido (Tool_51)"
+      }
+    },
+    {
+      "id": "TENS_SEGURIDAD_VITALIDAD",
+      "labels": ["TensionDialectica"],
+      "properties": {
+        "nombre": "Seguridad Ontológica vs. Vitalidad Somática",
+        "poloA": "El archivo busca seguridad acumulando datos muertos.",
+        "poloB": "La memoria viva necesita olvidar para regenerar la experiencia.",
+        "resolucion": "Axioma: Cuanto más orden logramos, más olvidamos lo que queríamos proteger."
+      }
+    },
+    {
+      "id": "OBRA_HISTORIA_DEL_ARCHIVO",
+      "labels": ["Obra"],
+      "properties": {
+        "titulo": "Historia del Archivo",
+        "subtitulo": "Del barro a la nube: génesis, poder y metamorfosis del sentido",
+        "serie": "Serie E – Los Arcontes del Sentido (Libro 1)",
+        "autor": "Xavier Benítez",
+        "estetica": "Museum Dark (#0A0D14, Cian #00EAFF, Oro #F2C779)",
+        "dedicatoria": "A quienes aún escuchan el murmullo de las aguas bajo el ruido de los archivos."
+      }
+    },
+    {
+      "id": "MOV_01",
+      "labels": ["Movimiento"],
+      "properties": {
+        "numero": 1,
+        "titulo": "El Orden Nace del Miedo",
+        "cadena": "Memoria corporal -> Signo -> Registro -> Poder",
+        "clima": "Ocre-tierra, pulsos arcaicos, percusión lenta",
+        "axioma": "El primer archivo fue un acto de fe: creer que el recuerdo podía sobrevivir al cuerpo."
+      }
+    },
+    {
+      "id": "MOV_02",
+      "labels": ["Movimiento"],
+      "properties": {
+        "numero": 2,
+        "titulo": "El Archivo se Vuelve Poder",
+        "cadena": "Texto -> Dogma -> Ciencia -> Algoritmo",
+        "clima": "Gris-papel a azul-luz, coral a zumbido digital, tensión media",
+        "axioma": "Cuanto más orden logramos, más olvidamos lo que queríamos proteger."
+      }
+    },
+    {
+      "id": "MOV_03",
+      "labels": ["Movimiento"],
+      "properties": {
+        "numero": 3,
+        "titulo": "Lo Que el Archivo No Puede Guardar",
+        "cadena": "Olvido -> Memoria afectiva -> Disidencia -> Contra-archivo",
+        "clima": "Sepia-oscuro, silencio, respiración somática, ritmo lento-dramático",
+        "axioma": "Lo que no se archiva, nos archiva desde dentro."
+      }
+    },
+    {
+      "id": "MOV_04",
+      "labels": ["Movimiento"],
+      "properties": {
+        "numero": 4,
+        "titulo": "El Retorno de la Memoria Viva",
+        "cadena": "Red -> Conciencia -> Ecología del sentido",
+        "clima": "Azul-cian-blanco, tono ambiental continuo, ritmo sereno-ascendente",
+        "axioma": "No recordamos para conservar el pasado, sino para seguir vivos en el presente."
+      }
+    },
+    {
+      "id": "TOOL_58",
+      "labels": ["HerramientaTGP"],
+      "properties": {
+        "codigo": "Tool_58",
+        "nombre": "Método del Embudo TGP",
+        "funcion": "De la evidencia empírica factual al desvelo filosófico-somático"
+      }
+    },
+    {
+      "id": "TOOL_51",
+      "labels": ["HerramientaTGP"],
+      "properties": {
+        "codigo": "Tool_51",
+        "nombre": "Ecología del Sentido",
+        "funcion": "Equilibrio dialéctico entre memoria viva (afectiva) y archivo documental"
+      }
+    },
+    {
+      "id": "WEB_HOME",
+      "labels": ["NodoWeb"],
+      "properties": {
+        "ruta": "/",
+        "nombre": "Inicio / Home",
+        "rol": "Impacto inmediato en 5s + Micro-Manifiesto Vivo (AdnBentoGsap)"
+      }
+    },
+    {
+      "id": "WEB_ABOUT",
+      "labels": ["NodoWeb"],
+      "properties": {
+        "ruta": "/about",
+        "nombre": "About / Manifiesto Integrado",
+        "rol": "Desarrollo en profundidad del ADN y Blindaje Epistémico"
+      }
+    },
+    {
+      "id": "WEB_ARCHIVO",
+      "labels": ["NodoWeb"],
+      "properties": {
+        "ruta": "/archivo",
+        "nombre": "Archivo / Hemeroteca",
+        "rol": "Archivo Vivo · Memoria en Movimiento (Ensayos y Dossiers)"
+      }
+    },
+    {
+      "id": "WEB_COLECCION",
+      "labels": ["NodoWeb"],
+      "properties": {
+        "ruta": "/coleccion",
+        "nombre": "Colecciones",
+        "rol": "Cartografía de la Experiencia Humana (10 Dominios Semánticos CS01-CS10)"
+      }
+    }
+  ],
+  "edges": [
+    { "type": "ESTRUCTURADA_EN", "from": "OBRA_HISTORIA_DEL_ARCHIVO", "to": "MOV_01" },
+    { "type": "ESTRUCTURADA_EN", "from": "OBRA_HISTORIA_DEL_ARCHIVO", "to": "MOV_02" },
+    { "type": "ESTRUCTURADA_EN", "from": "OBRA_HISTORIA_DEL_ARCHIVO", "to": "MOV_03" },
+    { "type": "ESTRUCTURADA_EN", "from": "OBRA_HISTORIA_DEL_ARCHIVO", "to": "MOV_04" },
+    { "type": "APLICA", "from": "OBRA_HISTORIA_DEL_ARCHIVO", "to": "TOOL_58" },
+    { "type": "CULMINA_EN", "from": "MOV_04", "to": "TOOL_51" },
+    { "type": "DISPUTA", "from": "MOV_01", "to": "TENS_SEGURIDAD_VITALIDAD" },
+    { "type": "DISPUTA", "from": "MOV_02", "to": "TENS_SOLAR_LUNAR" },
+    { "type": "FUNDAMENTA_A", "from": "WEB_ABOUT", "to": "OBRA_HISTORIA_DEL_ARCHIVO" },
+    { "type": "DERIVA_AUTORIDAD", "from": "WEB_HOME", "to": "WEB_ABOUT" },
+    { "type": "EXPLORA_EN", "from": "WEB_HOME", "to": "WEB_ARCHIVO" },
+    { "type": "CLASIFICA_EN", "from": "WEB_HOME", "to": "WEB_COLECCION" }
+  ]
+}

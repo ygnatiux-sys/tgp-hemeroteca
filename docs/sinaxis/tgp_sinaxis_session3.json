@@ -1,0 +1,132 @@
+{
+  "version": "3.0.0",
+  "canon": "Canon Maestro TGP v1.9",
+  "source_session": "Sesión 3 (Fuentes 07, 08 y 09: ADN Intelectual, Cap. 8 y Epílogo)",
+  "nodes": [
+    {
+      "id": "GUARD_REGLA_ORO",
+      "labels": ["GuardrailEpistemico"],
+      "properties": {
+        "nombre": "Regla de Oro Epistemológica TGP",
+        "enunciado": "Prohibido pasar de una analogía productiva a una supuesta validación científica: comparar dos fenómenos no prueba que compartan el mismo mecanismo causal."
+      }
+    },
+    {
+      "id": "GUARD_DESAMBIGUACION_MEMORIA",
+      "labels": ["GuardrailEpistemico"],
+      "properties": {
+        "nombre": "Cuádruple Desambiguación de la Memoria Ancestral",
+        "enunciado": "Distinguir taxativamente: Memoria Cultural, Herencia Biológica, Memoria Colectiva y Persistencia Simbólica."
+      }
+    },
+    {
+      "id": "AUDIT_EES_JABLONKA",
+      "labels": ["GuardrailEpistemico"],
+      "properties": {
+        "nombre": "Síntesis Evolutiva Extendida (EES)",
+        "enunciado": "Distinción de 4 dimensiones de herencia (genética, epigenética, conductual y simbólica). Prohibido asumir herencia biológica de símbolos en el cráneo."
+      }
+    },
+    {
+      "id": "TOOL_54",
+      "labels": ["HerramientaTGP"],
+      "properties": {
+        "codigo": "Tool_54",
+        "nombre": "Acto Inaugural del Archivo",
+        "definicion": "Escisión histórica entre las aguas de la experiencia viva y la tierra firme de la letra y el dogma."
+      }
+    },
+    {
+      "id": "TOOL_65",
+      "labels": ["HerramientaTGP"],
+      "properties": {
+        "codigo": "Tool_65",
+        "nombre": "Choque de Archivos",
+        "definicion": "Imposición de un sistema hegemónico de registro sobre cosmologías somáticas subordinadas."
+      }
+    },
+    {
+      "id": "TOOL_55",
+      "labels": ["HerramientaTGP"],
+      "properties": {
+        "codigo": "Tool_55",
+        "nombre": "Retrogénesis del Sentido",
+        "definicion": "Movimiento de descenso crítico hacia el sustrato afectivo para regenerar sentido ante la saturación digital."
+      }
+    },
+    {
+      "id": "TOOL_56",
+      "labels": ["HerramientaTGP"],
+      "properties": {
+        "codigo": "Tool_56",
+        "nombre": "Hidromemoria del Alma",
+        "definicion": "Conocimiento como resonancia líquida y afectiva frente a la acumulación maquínica de datos."
+      }
+    },
+    {
+      "id": "CAP_08",
+      "labels": ["Capitulo"],
+      "properties": {
+        "numero": 8,
+        "titulo": "El alma tecnológica",
+        "subtitulo": "Cuando la red empezó a soñar",
+        "tesis": "La IA como exteriorización del proceso simbólico humano y crisis ontológica de la verdad visual (deepfakes)."
+      }
+    },
+    {
+      "id": "EPILOGO_EDC",
+      "labels": ["Epilogo"],
+      "properties": {
+        "titulo": "El eco del archivo",
+        "tesis": "El archivo no necesita custodios sino oyentes. El sentido solo vive en los vínculos que reactivan los objetos.",
+        "aforismo": "Cada palabra que pronunciamos es un fósil de luz. Cada silencio, una semilla de agua. Y entre ambos crece el árbol invisible del sentido."
+      }
+    },
+    {
+      "id": "ALEPH_06",
+      "labels": ["PuntoAleph"],
+      "properties": {
+        "numero": 6,
+        "badge": "[ALEPH #6 · EL GRAN FILTRO EPISTEMOLÓGICO]",
+        "color": "#38BDF8",
+        "region": "Auditoría Metodológica & Desambiguación Somática",
+        "axioma": "Comparar dos fenómenos no prueba que compartan el mismo mecanismo causal."
+      }
+    },
+    {
+      "id": "ALEPH_07",
+      "labels": ["PuntoAleph"],
+      "properties": {
+        "numero": 7,
+        "badge": "[ALEPH #7 · EL ESPEJO DEL ALMA TECNOLÓGICA]",
+        "color": "#A855F7",
+        "region": "Inteligencia Artificial & Transición a Oyentes",
+        "axioma": "El archivo no necesita sacerdotes que vigilen el templo; necesita oyentes que devuelvan el pulso a la palabra."
+      }
+    },
+    {
+      "id": "EVAL_CRITICA_SESION_3",
+      "labels": ["EvaluacionCriticaTGP"],
+      "properties": {
+        "titulo": "Dictamen Epistémico Sesión 3: El Blindaje Anti-Lamarckiano y la Desmitificación de la IA",
+        "autor": "Antigravity IDE en diálogo con Xavier Benítez",
+        "badge": "[AUDITORÍA CRÍTICA SESIÓN 3]",
+        "color": "#EC4899",
+        "tesis_epistemica": "La desambiguación de la Memoria Ancestral salva a TGP de la pseudociencia al adoptar la Síntesis Evolutiva Extendida (EES): los símbolos no se heredan en el ADN, se transmiten en el palimpsesto cultural y material.",
+        "alerta_ontologica": "Riesgo de fetichizar la IA como 'mente sintiente': la red neuronal no hace anamnesis platónica; calcula matrices estadísticas sobre el archivo acumulado. La chispa del sentido sigue siendo patrimonio exclusivo del animal somático.",
+        "giro_politico": "De Custodios a Oyentes: el fin del monopolio burocrático del escriba. El archivo solo es fértil si el cuerpo vivo lo disputa y reescribe."
+      }
+    }
+  ],
+  "edges": [
+    { "type": "SINTETIZA", "from": "ALEPH_06", "to": "GUARD_REGLA_ORO" },
+    { "type": "SINTETIZA", "from": "ALEPH_06", "to": "GUARD_DESAMBIGUACION_MEMORIA" },
+    { "type": "SINTETIZA", "from": "ALEPH_06", "to": "AUDIT_EES_JABLONKA" },
+    { "type": "SINTETIZA", "from": "ALEPH_07", "to": "CAP_08" },
+    { "type": "SINTETIZA", "from": "ALEPH_07", "to": "TOOL_56" },
+    { "type": "SINTETIZA", "from": "ALEPH_07", "to": "EPILOGO_EDC" },
+    { "type": "AUDITA", "from": "EVAL_CRITICA_SESION_3", "to": "ALEPH_06" },
+    { "type": "AUDITA", "from": "EVAL_CRITICA_SESION_3", "to": "ALEPH_07" },
+    { "type": "INTERPRETA_DIALECTICA", "from": "EVAL_CRITICA_SESION_3", "to": "TOOL_53" }
+  ]
+}

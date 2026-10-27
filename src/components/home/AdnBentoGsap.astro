@@ -1,207 +1,272 @@
 ---
 /**
- * AdnBentoGsap.astro — Stream Cinemático ADN Zenital TGP
+ * AdnBentoGsap.astro — Respiro Editorial ADN Zenital TGP
  * "Duda. Investiga. Conecta. — Historia de la producción humana de sentido"
  *
- * Arquitectura Técnica Robusta:
- * - Grid Stacking en CSS (col-start-1 row-start-1) para evitar colapsos de altura y desbordes.
- * - Gestión estricta de z-index y autoAlpha en GSAP para erradicar cualquier z-fight o parpadeo.
- * - Sin transiciones CSS conflictivas en elementos animados por GSAP (cero micro-stutter).
- * - Canvas de polvo dorado cinemático suspendido automáticamente fuera del viewport (IntersectionObserver).
- * - Full bleed con máscara vertical suave que se integra en --bg-main.
+ * Características:
+ * 1. Palabra rectora destacada (CamelCase) en púrpura amatista luminoso monumental (extra bold, extra grande).
+ * 2. Frase heredada centrada con tipografía Gloock y gradientes metálicos idénticos a About (CinematicExcerptRest).
+ * 3. Altura de contenedor bloqueada (Zero Layout Shift) para erradicar el salto arriba/abajo entre frases.
+ * 4. Canvas de polvo dorado en tiempo real con física suave de brisa.
+ * 5. GSAP Timeline con fade in suave, paso de tiempo normal y sin cortes en el DOM.
  */
-
-export interface AdnBatch {
-  kicker: string;
-  main: string;
-  highlight: string;
-  reflection: string;
-  image: string;
-  imageLabel: string;
-  tag: string;
-}
 
 interface Props {
   instanceId?: string;
-  batches?: AdnBatch[];
   className?: string;
 }
 
-const defaultBatches: AdnBatch[] = [
+const {
+  instanceId = "tgp-adn-respiro",
+  className = "",
+} = Astro.props;
+
+interface AdnItem {
+  leadWord: string;
+  restText: string;
+}
+
+const rawBatches: AdnItem[] = [
   {
-    kicker: "01 · DUDA METÓDICA",
-    main: "Duda de los datos sueltos.",
-    highlight: "La historia no es solo lo que nos pasó; es cómo aprendimos a darle sentido.",
-    reflection: "Conectamos fragmentos materiales, piedras y relatos para comprender cómo la humanidad transforma el caos en significado.",
-    image: "https://storage.thegreatpuzzleproject.com/wikimedia/1791676137832-aca96ac9.webp",
-    imageLabel: "GUNUNG PADANG · TERRAZAS MEGALÍTICAS",
-    tag: "ANOMALÍA ESTRATIGRÁFICA"
+    leadWord: "Duda.",
+    restText: "de los **datos sueltos.** La historia no es solo lo que nos pasó; es cómo aprendimos a [[darle sentido]]."
   },
   {
-    kicker: "02 · LA HUELLA EN LA MATERIA",
-    main: "Investiga la huella en la materia.",
-    highlight: "Tallamos la piedra y el relato para no disolvernos en la incertidumbre del olvido.",
-    reflection: "Templos, mitos, lenguajes y máquinas leídos como palimpsestos de significado que se conservan, se disputan y reaparecen.",
-    image: "https://storage.thegreatpuzzleproject.com/portadas/piramide-del-adivino-de-uxmal/1792584099533-53cd17a4.webp",
-    imageLabel: "UXMAL · PIRÁMIDE DEL ADIVINO",
-    tag: "ARQUEOSEMIÓTICA MAYA"
+    leadWord: "Investiga.",
+    restText: "la **huella en la materia.** Tallamos la piedra y el relato para no disolvernos en la [[incertidumbre del olvido]]."
   },
   {
-    kicker: "03 · LA RED DE SÍMBOLOS",
-    main: "Conecta símbolos con rigor crítico.",
-    highlight: "Diez dominios epistémicos para desentrañar cómo construimos los mundos en los que creemos.",
-    reflection: "Exploramos conexiones profundas entre épocas sin confundir analogías con pruebas ni hipótesis con dogmas.",
-    image: "https://storage.thegreatpuzzleproject.com/vault-media/1792290262796-a9133c37.webp",
-    imageLabel: "HESÍODO · LA TEOGONÍA",
-    tag: "COSMOGONÍA Y ARCHIVO"
+    leadWord: "Conecta.",
+    restText: "símbolos con **rigor crítico.** Diez dominios epistémicos para desentrañar cómo construimos los [[mundos en los que creemos]]."
   }
 ];
 
-const {
-  instanceId = 'tgp-adn-stream',
-  batches = defaultBatches,
-  className = '',
-} = Astro.props;
+// Tokenizador de palabras para la frase secundaria con soporte para ** (glow blanco) y [[ ]] (dorado TGP)
+const parsedBatches = rawBatches.map((item, bIdx) => {
+  const rawWords = item.restText.trim().split(/\s+/);
+  let currentMode: 'normal' | 'glow' | 'accent' = 'normal';
+
+  const wordsData = rawWords.map((rawWord, wordIdx) => {
+    let word = rawWord;
+    let type: 'normal' | 'glow' | 'accent' = currentMode;
+
+    if (word.startsWith('**')) {
+      currentMode = 'glow';
+      type = 'glow';
+      word = word.slice(2);
+    } else if (word.startsWith('[[')) {
+      currentMode = 'accent';
+      type = 'accent';
+      word = word.slice(2);
+    }
+
+    let endsGlow = false;
+    let endsAccent = false;
+
+    if (word.endsWith('**')) {
+      endsGlow = true;
+      word = word.slice(0, -2);
+    } else if (word.includes('**')) {
+      word = word.replace(/\*\*/g, '');
+      endsGlow = true;
+    }
+
+    if (word.endsWith(']]') || word.includes(']].') || word.includes(']],') || word.includes(']]:') || word.includes(']];')) {
+      endsAccent = true;
+      word = word.replace(/\]\]/g, '');
+    } else if (word.includes(']]')) {
+      word = word.replace(/\]\]/g, '');
+      endsAccent = true;
+    }
+
+    const cleanWord = word.replace(/\[\[/g, '').replace(/\]\]/g, '').replace(/\*\*/g, '');
+
+    if (endsGlow || endsAccent) {
+      currentMode = 'normal';
+    }
+
+    return {
+      word: cleanWord,
+      type,
+      index: wordIdx
+    };
+  });
+
+  return {
+    bIdx,
+    leadWord: item.leadWord,
+    wordsData
+  };
+});
 ---
 
+<!-- Import de fuente Gloock idéntica a CinematicExcerptRest -->
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Gloock&display=swap');
-  @import url('https://fonts.googleapis.com/css2?family=Proza+Libre:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
 
-  /* Sombras y reflejos metálicos optimizados para aceleración GPU */
-  .adn-title-glow {
-    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.95), 0 0 24px rgba(212, 175, 55, 0.22);
+  /* ── Palabra destacada en púrpura amatista imperial monumental ── */
+  .adn-lead-purple {
+    font-family: 'Gloock', serif;
+    font-weight: 900;
+    background-image: linear-gradient(135deg, #f3e8ff 0%, #d8b4fe 25%, #c084fc 55%, #a855f7 85%, #9333ea 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 28px rgba(192, 132, 252, 0.42)) drop-shadow(0 4px 18px rgba(0, 0, 0, 0.95));
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 
-  .adn-highlight-glow {
-    text-shadow: 0 0 28px rgba(234, 179, 8, 0.35);
+  /* ── Tipografía Gloock de la frase heredada en escala Cine Premier ── */
+  .excerpt-phrase-text {
+    font-family: 'Gloock', serif;
+    font-size: clamp(1.8rem, 3.6vw, 3rem);
+    font-weight: 800;
+    line-height: 1.24;
+    letter-spacing: -0.02em;
+    max-width: 36ch;
+    margin-left: auto;
+    margin-right: auto;
+    text-wrap: balance;
+    padding: 0;
   }
 
-  /* Grid Stack: todos los hijos comparten la misma celda sin absolute colapsado */
-  .adn-stack-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
+  .excerpt-word-wrapper {
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .excerpt-space {
+    display: inline-block;
+  }
+
+  .excerpt-word {
+    display: inline-block;
+  }
+
+  /* ── Degradados metálicos idénticos a About (CinematicExcerptRest) ── */
+  .word-normal {
+    background-image: linear-gradient(to bottom, #EFEBE3 0%, #D8D2C2 50%, rgba(200, 192, 175, 0.7) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .word-glow {
+    background-image: linear-gradient(to bottom, #FFFFFF 0%, #F5F0E6 50%, #E3DDD3 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 900;
+    filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.42));
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .word-accent {
+    background-image: linear-gradient(to bottom, #FFF3D1 0%, #E8CA82 45%, #C29B4F 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 900;
+    filter: drop-shadow(0 0 18px rgba(234, 179, 8, 0.42));
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .glow-metallic-gloock {
+    filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 22px rgba(227, 221, 211, 0.2));
+  }
+
+  /* ── Contenedor de Altura Bloqueada: Elimina 100% el salto del DOM ── */
+  .adn-stage-container {
+    height: 340px;
+    position: relative;
+    width: 100%;
+    contain: layout size;
+  }
+
+  @media (min-width: 640px) {
+    .adn-stage-container {
+      height: 360px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .adn-stage-container {
+      height: 390px;
+    }
+  }
+
+  .adn-slide-item {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-  }
-
-  .adn-stack-cell {
-    grid-column: 1 / -1;
-    grid-row: 1 / -1;
-    will-change: opacity, transform;
+    justify-content: center;
+    text-align: center;
+    will-change: opacity, transform, filter;
   }
 </style>
 
 <section
   id={instanceId}
-  data-adn-stream-root
-  data-adn-instance={instanceId}
-  aria-label="Manifiesto Cinemático TGP — Duda, Investiga, Conecta"
-  class={`adn-stream-section relative w-full overflow-hidden select-none isolate py-20 sm:py-28 md:py-36 bg-[#060707] ${className}`}
-  style="mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);"
+  class={`cinematic-excerpt-rest relative w-full bg-(--bg-main) overflow-hidden select-none py-16 sm:py-24 md:py-32 flex flex-col justify-center items-center ${className}`}
+  style="background-color: var(--bg-main, #121413);"
+  data-adn-excerpt-root
 >
-  <!-- Canvas de partículas vivas de polvo dorado -->
-  <canvas
-    id={`${instanceId}-dust-canvas`}
-    class="adn-dust-canvas absolute inset-0 w-full h-full pointer-events-none z-0"
-    aria-hidden="true"
-  ></canvas>
+  <!-- Lienzo de partículas de polvo dorado en suspensión -->
+  <canvas class="excerpt-dust-canvas absolute inset-0 z-0 pointer-events-none" id={`${instanceId}-canvas`}></canvas>
 
-  <!-- Luz ambiental cálida de fondo -->
-  <div class="pointer-events-none absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-96 sm:w-lg md:w-2xl h-96 sm:h-128 md:h-168 rounded-full bg-amber-500/8 blur-[110px]" aria-hidden="true"></div>
-
-  <!-- Contenedor maestro 60 / 40 -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-8 md:px-12 relative z-10">
-    <div class="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16 xl:gap-20">
-      
-      <!-- ═══════════════════════════════════════════════════════════════════
-           LADO TEXTO (60%): Stage de Frases Monumentales en Grid Stack
-      ═══════════════════════════════════════════════════════════════════ -->
-      <div class="w-full lg:w-[58%] xl:w-[60%] adn-stack-grid relative">
-        {batches.map((batch, idx) => (
-          <div
-            class={`adn-text-slide adn-stack-cell flex flex-col justify-center py-4 ${idx === 0 ? 'visible z-10' : 'invisible z-0'}`}
-            data-slide-index={idx}
-            style={idx === 0 ? "opacity: 1;" : "opacity: 0; pointer-events: none;"}
-          >
-            <!-- Kicker con aura ámbar pulsante -->
-            <div class="flex items-center gap-3 text-xs sm:text-[13px] uppercase tracking-[0.32em] text-[#d4af37] font-metadata font-bold mb-4 sm:mb-6">
-              <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shadow-[0_0_12px_#f59e0b]"></span>
-              <span>{batch.kicker}</span>
-            </div>
-
-            <!-- Título Monumental Gloock + Cursiva Dorada TGP -->
-            <h2 class="font-['Gloock'] text-3xl sm:text-4xl md:text-[2.75rem] lg:text-[3.25rem] leading-[1.12] tracking-tight text-[#EDEDE8] adn-title-glow">
-              {batch.main} <br/>
-              <span class="text-[#d4af37] font-serif italic font-normal adn-highlight-glow">
-                {batch.highlight}
-              </span>
-            </h2>
-
-            <!-- Bajada reflexiva en Proza Libre -->
-            <p class="font-['Proza_Libre'] text-base sm:text-lg md:text-xl text-[#D8D2C2]/85 leading-relaxed mt-6 sm:mt-8 max-w-2xl drop-shadow-md">
-              {batch.reflection}
-            </p>
-
-            <!-- Línea de reposo sutil sin bordes invasivos -->
-            <div class="flex items-center gap-4 pt-6 mt-6 border-t border-white/5 font-metadata text-[11px] sm:text-xs tracking-[0.26em] uppercase text-zinc-500">
-              <span class="text-amber-400/80 font-bold">TGP</span>
-              <span class="opacity-40">•</span>
-              <span>HISTORIA DE LA PRODUCCIÓN HUMANA DE SENTIDO</span>
-            </div>
+  <!-- Contenedor central con altura bloqueada (Zero Layout Shift) -->
+  <div class="excerpt-content relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 text-center">
+    <div class="adn-stage-container">
+      {parsedBatches.map((batch, idx) => (
+        <div
+          class="adn-slide-item"
+          data-slide-index={idx}
+          style={idx === 0 ? "opacity: 1; visibility: visible; z-index: 10;" : "opacity: 0; visibility: hidden; z-index: 1;"}
+        >
+          <!-- 1. Palabra rectora destacada en púrpura monumental -->
+          <div class="adn-lead-purple text-5xl sm:text-6xl md:text-7xl lg:text-[5.25rem] leading-none mb-3 sm:mb-5 tracking-tight">
+            {batch.leadWord}
           </div>
-        ))}
-      </div>
 
-      <!-- ═══════════════════════════════════════════════════════════════════
-           LADO VISUAL (40%): Portada Arqueológica con Ambient Glow
-      ═══════════════════════════════════════════════════════════════════ -->
-      <div class="w-full lg:w-[42%] xl:w-[40%] flex justify-center items-center relative">
-        <!-- Resplandor ambiental hacia la imagen que elimina cortes duros -->
-        <div class="pointer-events-none absolute -inset-8 bg-linear-to-tr from-amber-500/25 via-amber-400/12 to-transparent blur-3xl rounded-3xl opacity-80" aria-hidden="true"></div>
-        <div class="pointer-events-none absolute -bottom-10 -left-10 w-60 h-60 bg-amber-600/15 blur-[80px] rounded-full" aria-hidden="true"></div>
-
-        <!-- Marco cinemático con difuminado interno y bordes suaves -->
-        <div class="relative w-full aspect-4/3 sm:aspect-16/10 lg:aspect-4/3 max-w-lg rounded-3xl overflow-hidden border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.95)] bg-black/60 adn-stack-grid isolate">
-          <!-- Viñeta perimetral interior para fundir bordes a la penumbra -->
-          <div class="pointer-events-none absolute inset-0 z-20 shadow-[inset_0_0_60px_rgba(0,0,0,0.95)] rounded-3xl" aria-hidden="true"></div>
-
-          {batches.map((batch, idx) => (
-            <div
-              class={`adn-img-slide adn-stack-cell w-full h-full overflow-hidden ${idx === 0 ? 'visible z-10' : 'invisible z-0'}`}
-              data-img-index={idx}
-              style={idx === 0 ? "opacity: 1;" : "opacity: 0;"}
-            >
-              <img
-                src={batch.image}
-                alt={batch.imageLabel}
-                class="w-full h-full object-cover filter brightness-[0.88] contrast-[1.08]"
-                loading={idx === 0 ? "eager" : "lazy"}
-                decoding="async"
-              />
-              <!-- Gradiente sutil inferior para legibilidad de cartela -->
-              <div class="absolute inset-0 z-10 bg-linear-to-t from-black/85 via-black/25 to-transparent"></div>
-
-              <!-- Cartela informativa sutil -->
-              <div class="absolute bottom-4 left-4 right-4 z-30 flex items-center justify-between text-[11px] font-metadata tracking-[0.22em] uppercase text-white/75">
-                <span class="text-[#d4af37] font-bold drop-shadow">{batch.imageLabel}</span>
-                <span class="px-2.5 py-1 rounded-full bg-black/65 backdrop-blur-md border border-white/10 text-white/60 text-[10px]">{batch.tag}</span>
-              </div>
-            </div>
-          ))}
+          <!-- 2. Frase heredada centrada Gloock metálica -->
+          <h2 class="excerpt-phrase-text glow-metallic-gloock">
+            {batch.wordsData.map((wd) => (
+              <span class="excerpt-word-wrapper">
+                <span
+                  class:list={[
+                    "excerpt-word",
+                    wd.type === "glow" ? "word-glow" : "",
+                    wd.type === "accent" ? "word-accent" : "word-normal",
+                  ]}
+                >
+                  {wd.word}
+                </span>
+                <span class="excerpt-space" aria-hidden="true">&nbsp;</span>
+              </span>
+            ))}
+          </h2>
         </div>
-      </div>
-
+      ))}
     </div>
   </div>
 </section>
 
-<!-- Script GSAP Puro & Canvas Control -->
+<!-- Script de Polvo Dorado y GSAP Timeline Suave -->
 <script>
   import { gsap } from "gsap";
 
-  // ─── CANVAS DE POLVO DORADO (Control de ciclos limpios) ────────────────────
-  class DustMotesStream {
+  // ─── CANVAS DE POLVO DORADO IDÉNTICO A CINEMATICEXCERPTREST ───────────────
+  class DustMotesEffect {
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
     private motes: Array<{
@@ -233,7 +298,7 @@ const {
       const parent = this.canvas.parentElement;
       const rect = parent ? parent.getBoundingClientRect() : null;
       this.canvas.width = rect && rect.width > 0 ? rect.width : window.innerWidth;
-      this.canvas.height = rect && rect.height > 0 ? rect.height : (window.innerHeight * 0.8);
+      this.canvas.height = rect && rect.height > 0 ? rect.height : (window.innerHeight * 0.85);
     }
 
     private spawnMote(fromLeft = false) {
@@ -242,25 +307,22 @@ const {
       return {
         x: fromLeft ? -10 : Math.random() * w,
         y: Math.random() * h,
-        radius: 0.7 + Math.random() * 2.2,
-        opacity: 0.15 + Math.random() * 0.45,
-        speedX: 0.22 + Math.random() * 0.45,
-        speedY: (Math.random() - 0.5) * 0.12,
+        radius: 0.8 + Math.random() * 2.4,
+        opacity: 0.12 + Math.random() * 0.50,
+        speedX: 0.20 + Math.random() * 0.55,
+        speedY: (Math.random() - 0.5) * 0.13,
         angle: Math.random() * Math.PI * 2,
-        angleSpeed: 0.005 + Math.random() * 0.012,
-        osc: 0.05 + Math.random() * 0.10,
+        angleSpeed: 0.004 + Math.random() * 0.015,
+        osc: 0.06 + Math.random() * 0.11,
         flickPhase: Math.random() * Math.PI * 2,
-        flickSpeed: 0.012 + Math.random() * 0.025,
+        flickSpeed: 0.010 + Math.random() * 0.028,
       };
     }
 
     public start() {
       if (this.isRunning) return;
       this.isRunning = true;
-      const count = Math.min(50, Math.max(20, Math.floor(this.canvas.width / 26)));
-      if (this.motes.length === 0) {
-        this.motes = Array.from({ length: count }, () => this.spawnMote(false));
-      }
+      this.motes = Array.from({ length: 55 }, () => this.spawnMote(false));
       this.loop();
     }
 
@@ -279,65 +341,58 @@ const {
 
     private loop() {
       if (!this.isRunning) return;
-      const ctx = this.ctx;
-      const w = this.canvas.width;
-      const h = this.canvas.height;
-      ctx.clearRect(0, 0, w, h);
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-      for (let i = 0; i < this.motes.length; i++) {
-        const m = this.motes[i];
-        m.angle += m.angleSpeed;
-        m.flickPhase += m.flickSpeed;
+      this.motes.forEach(m => {
         m.x += m.speedX;
         m.y += m.speedY + Math.sin(m.angle) * m.osc;
+        m.angle += m.angleSpeed;
+        m.flickPhase += m.flickSpeed;
 
-        if (m.x > w + 12 || m.y < -12 || m.y > h + 12) {
-          this.motes[i] = this.spawnMote(true);
-          continue;
+        if (m.x > this.canvas.width + 14) {
+          Object.assign(m, this.spawnMote(true));
         }
 
-        const flicker = 0.75 + Math.sin(m.flickPhase) * 0.25;
-        const alpha = Math.max(0, Math.min(1, m.opacity * flicker));
+        const flick = 1 + 0.16 * Math.sin(m.flickPhase);
+        const finalOp = Math.min(1, m.opacity * flick);
+        const grad = this.ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.radius * 2.6);
+        grad.addColorStop(0, `rgba(201, 168, 108, ${finalOp})`);
+        grad.addColorStop(0.4, `rgba(223, 202, 157, ${(finalOp * 0.6).toFixed(3)})`);
+        grad.addColorStop(1, 'rgba(201, 168, 108, 0)');
 
-        ctx.beginPath();
-        ctx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(201, 168, 108, ${alpha})`;
-        ctx.shadowColor = "rgba(212, 175, 55, 0.4)";
-        ctx.shadowBlur = 6;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
+        this.ctx.beginPath();
+        this.ctx.fillStyle = grad;
+        this.ctx.arc(m.x, m.y, m.radius * 2.6, 0, Math.PI * 2);
+        this.ctx.fill();
+      });
 
       this.animationFrameId = requestAnimationFrame(this.loop.bind(this));
     }
   }
 
-  // ─── CONTROLADOR GSAP TIMELINE EN 3 ETAPAS (Sin Z-fights) ───────────────────
-  function initAdnStreamInstances() {
-    const roots = document.querySelectorAll<HTMLElement>("[data-adn-stream-root]");
+  // ─── CONTROLADOR GSAP SECUENCIAL CON TRANSICIÓN SUAVE ──────────────────────
+  function initAdnExcerptInstances() {
+    const roots = document.querySelectorAll<HTMLElement>("[data-adn-excerpt-root]");
     if (roots.length === 0) return;
 
     roots.forEach((root) => {
-      if (root.dataset.adnInitialized === "true") return;
-      root.dataset.adnInitialized = "true";
+      if (root.dataset.adnInit === "true") return;
+      root.dataset.adnInit = "true";
 
-      // 1. Instanciar Dust Canvas
-      let dustEffect: DustMotesStream | null = null;
-      const canvas = root.querySelector<HTMLCanvasElement>(".adn-dust-canvas");
+      const canvas = root.querySelector<HTMLCanvasElement>(".excerpt-dust-canvas");
+      let dustEffect: DustMotesEffect | null = null;
       if (canvas) {
-        dustEffect = new DustMotesStream(canvas);
+        dustEffect = new DustMotesEffect(canvas);
       }
 
-      const textSlides = gsap.utils.toArray<HTMLElement>(root.querySelectorAll<HTMLElement>(".adn-text-slide"));
-      const imgSlides = gsap.utils.toArray<HTMLElement>(root.querySelectorAll<HTMLElement>(".adn-img-slide"));
-      const count = textSlides.length;
+      const slides = gsap.utils.toArray<HTMLElement>(root.querySelectorAll<HTMLElement>(".adn-slide-item"));
+      const count = slides.length;
 
       if (count < 2) {
         dustEffect?.start();
         return;
       }
 
-      // Accesibilidad
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       if (reduceMotion) {
         dustEffect?.start();
@@ -345,77 +400,51 @@ const {
       }
 
       const ctx = gsap.context(() => {
-        // Inicializar capas: solo slide 0 visible en z-index 10
-        gsap.set(textSlides[0], { autoAlpha: 1, y: 0, zIndex: 10 });
-        gsap.set(imgSlides[0], { autoAlpha: 1, scale: 1, zIndex: 10 });
-
+        // Inicializar capas: solo slide 0 visible en reposo absoluto
+        gsap.set(slides[0], { autoAlpha: 1, y: 0, zIndex: 10 });
         for (let j = 1; j < count; j++) {
-          gsap.set(textSlides[j], { autoAlpha: 0, y: 18, zIndex: 1 });
-          gsap.set(imgSlides[j], { autoAlpha: 0, scale: 1.05, zIndex: 1 });
+          gsap.set(slides[j], { autoAlpha: 0, y: 14, zIndex: 1 });
         }
 
-        // Timeline suave, semi-slow y robusto
         const tl = gsap.timeline({ repeat: -1 });
-        const pauseDuration = 4.8;
-        const transitionDuration = 1.35;
+        const pauseTime = 4.8;       // Tiempo de lectura normal
+        const transTime = 1.25;      // Fade in suave cinemático
 
         for (let i = 0; i < count; i++) {
           const next = (i + 1) % count;
-          const currentText = textSlides[i];
-          const currentImg = imgSlides[i];
-          const nextText = textSlides[next];
-          const nextImg = imgSlides[next];
+          const currentSlide = slides[i];
+          const nextSlide = slides[next];
 
           // 1. Pausa de lectura
-          tl.to({}, { duration: pauseDuration });
+          tl.to({}, { duration: pauseTime });
 
-          // 2. Transición sincronizada
-          // Elevar z-index de la que entra para que cubra a la que sale sin z-fighting
-          tl.set(nextText, { zIndex: 10, y: 18 }, `step-${i}`)
-            .set(nextImg, { zIndex: 10, scale: 1.05 }, `step-${i}`)
-            .set(currentText, { zIndex: 5 }, `step-${i}`)
-            .set(currentImg, { zIndex: 5 }, `step-${i}`)
-
-            // Salida de la actual
-            .to(currentText, {
+          // 2. Transición suave de salida y entrada simultánea
+          tl.set(nextSlide, { zIndex: 10, y: 14 }, `step-${i}`)
+            .set(currentSlide, { zIndex: 5 }, `step-${i}`)
+            .to(currentSlide, {
               autoAlpha: 0,
-              y: -18,
-              duration: transitionDuration,
+              y: -14,
+              filter: "blur(8px)",
+              duration: transTime,
               ease: "power2.inOut",
             }, `step-${i}`)
-            .to(currentImg, {
-              autoAlpha: 0,
-              scale: 0.98,
-              duration: transitionDuration,
-              ease: "power2.inOut",
-            }, `step-${i}`)
-
-            // Entrada de la siguiente (ligero desfase armónico de 0.1s)
-            .to(nextText, {
+            .to(nextSlide, {
               autoAlpha: 1,
               y: 0,
-              duration: transitionDuration,
+              filter: "blur(0px)",
+              duration: transTime,
               ease: "power2.out",
             }, `step-${i}+=0.1`)
-            .to(nextImg, {
-              autoAlpha: 1,
-              scale: 1.0,
-              duration: transitionDuration * 1.05,
-              ease: "power2.out",
-            }, `step-${i}+=0.1`)
-
-            // Limpieza: tras salir, volver la capa anterior a z-index base y reposicionar
-            .set(currentText, { zIndex: 1, y: 18 })
-            .set(currentImg, { zIndex: 1, scale: 1.05 });
+            .set(currentSlide, { zIndex: 1, y: 14 });
         }
 
-        // Pausa interactiva al posar el mouse
+        // Pausa al posar el mouse para permitir lectura reflexiva
         const handleMouseEnter = () => tl.pause();
         const handleMouseLeave = () => tl.resume();
         root.addEventListener("mouseenter", handleMouseEnter);
         root.addEventListener("mouseleave", handleMouseLeave);
 
-        // Optimización de recursos con IntersectionObserver
+        // Optimización con IntersectionObserver: se pausa cuando no está visible
         const observer = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
@@ -426,11 +455,11 @@ const {
               tl.pause();
             }
           });
-        }, { threshold: 0.15 });
+        }, { threshold: 0.1 });
 
         observer.observe(root);
 
-        // Limpieza de ciclo de vida de Astro View Transitions
+        // Limpieza para View Transitions
         document.addEventListener("astro:before-swap", () => {
           observer.disconnect();
           root.removeEventListener("mouseenter", handleMouseEnter);
@@ -442,10 +471,10 @@ const {
     });
   }
 
-  document.addEventListener("astro:page-load", initAdnStreamInstances);
+  document.addEventListener("astro:page-load", initAdnExcerptInstances);
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initAdnStreamInstances);
+    document.addEventListener("DOMContentLoaded", initAdnExcerptInstances);
   } else {
-    initAdnStreamInstances();
+    initAdnExcerptInstances();
   }
 </script>

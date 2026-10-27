@@ -1,0 +1,71 @@
+{
+  "version": "2.0.0",
+  "canon": "Canon Maestro TGP v1.9",
+  "source_session": "Sesión 2 (Fuentes 04, 05 y 06: Capítulos 1, 6 y 2)",
+  "nodes": [
+    {
+      "id": "TOOL_53",
+      "labels": ["HerramientaTGP"],
+      "properties": {
+        "codigo": "Tool_53",
+        "nombre": "Dialéctica Solar-Lunar & Eclipse del Sentido",
+        "definicion": "Superposición crítica donde el máximo acceso a datos coincide con la mínima capacidad de interpretar en profundidad; polaridad entre la fijeza solar y la fluidez lunar."
+      }
+    },
+    {
+      "id": "TOOL_57",
+      "labels": ["HerramientaTGP"],
+      "properties": {
+        "codigo": "Tool_57",
+        "nombre": "Inconsciente Hidrosimbólico",
+        "definicion": "El sustrato líquido, afectivo y disolvente de la memoria humana que subyace y erosiona todo soporte material (barro húmedo, tinta, papiro, sangre, lágrima, código binario)."
+      }
+    },
+    {
+      "id": "CONC_ANIMAL_ARCHIVADOR",
+      "labels": ["ConceptoTGP"],
+      "properties": {
+        "nombre": "Animal Archivador",
+        "eje": "Antropología Somática",
+        "axioma": "El archivo nació como refugio, pero llevó a la humanidad a confundir el registro con la vida."
+      }
+    },
+    {
+      "id": "CONC_HERIDA_ESCISION",
+      "labels": ["ConceptoTGP"],
+      "properties": {
+        "nombre": "Escisión Ontológica de la Memoria",
+        "eje": "Arqueosemiótica",
+        "axioma": "Inmortaliza el registro, pero mata la voz y el pulso somático."
+      }
+    },
+    {
+      "id": "CONC_CEGUERA_BLANCA",
+      "labels": ["ConceptoTGP"],
+      "properties": {
+        "nombre": "Ceguera Blanca y Censura por Saturación",
+        "eje": "Biopolítica del Silicio",
+        "axioma": "El nuevo archivo planetario no quema libros; los sepulta bajo una marea infinita de datos."
+      }
+    },
+    {
+      "id": "CONC_ARCHIVO_SOLAR",
+      "labels": ["ConceptoTGP"],
+      "properties": {
+        "nombre": "Archivo Solar",
+        "eje": "Sociología del Poder",
+        "axioma": "Quien domina los signos escritos domina el destino de la comunidad."
+      }
+    }
+  ],
+  "edges": [
+    { "type": "ABRE_HERIDA", "from": "CAP_01", "to": "CONC_HERIDA_ESCISION" },
+    { "type": "MODELA_A", "from": "CAP_01", "to": "CONC_ANIMAL_ARCHIVADOR" },
+    { "type": "ENGENDRA", "from": "CAP_02", "to": "CONC_ARCHIVO_SOLAR" },
+    { "type": "SUBORDINADO_A", "from": "CAP_02", "to": "TOOL_57" },
+    { "type": "DESEMBOCA_EN", "from": "CAP_06", "to": "CONC_CEGUERA_BLANCA" },
+    { "type": "PRODUCE_PARADOJA", "from": "CAP_06", "to": "TOOL_53" },
+    { "type": "REACTIVA_RESISTENCIA", "from": "CAP_06", "to": "TOOL_57" },
+    { "type": "MUTACION_TECNOLOGICA", "from": "ART_ISHANGO", "to": "ART_NUBE_SILICIO" }
+  ]
+}

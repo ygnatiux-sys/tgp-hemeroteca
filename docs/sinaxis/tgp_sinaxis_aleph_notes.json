@@ -1,0 +1,57 @@
+{
+  "version": "1.0.0",
+  "system": "Sinaxis TGP — Puntos Aleph de Confluencia Crítica",
+  "total_alephs": 5,
+  "alephs": [
+    {
+      "id": "ALEPH_01",
+      "numero": 1,
+      "badge": "[ALEPH #1 · UMBRAL SOMÁTICO]",
+      "color": "#F59E0B",
+      "region": "Origen Paleolítico & Pulsión Negentrópica",
+      "nodos_convergentes": ["CONC_CONDICION_HUMANA", "ART_ISHANGO", "CAP_01", "TOOL_58"],
+      "abstract": "El primer archivo humano no nació en una biblioteca sino en el cuerpo del primate. Las muescas de Ishango son listas sin palabras, prótesis mnemónicas de supervivencia biológica y tecnologías de consuelo ante la finitud.",
+      "axioma": "El primer archivo fue un acto de fe: creer que el recuerdo podía sobrevivir al cuerpo."
+    },
+    {
+      "id": "ALEPH_02",
+      "numero": 2,
+      "badge": "[ALEPH #2 · LA DESECACIÓN DEL BARRO]",
+      "color": "#EA580C",
+      "region": "Expropiación Teocrática & Archivo Solar",
+      "nodos_convergentes": ["CONC_HERIDA_ESCISION", "CONC_ARCHIVO_SOLAR", "ART_URUK", "CAP_02", "TOOL_57"],
+      "abstract": "En Uruk y Egipto el templo actúa como el primer servidor de datos. Para fijar la deuda y el censo, se deseca el barro húmedo al fuego, expulsando el agua para petrificar la ley. Se gana fijeza estatal pero se amputa la voz viva del pueblo.",
+      "axioma": "Quien domina los signos escritos, domina el destino de la comunidad."
+    },
+    {
+      "id": "ALEPH_03",
+      "numero": 3,
+      "badge": "[ALEPH #3 · CEGUERA BLANCA]",
+      "color": "#00EAFF",
+      "region": "Atmósfera Cibernética & Inversión Algorítmica",
+      "nodos_convergentes": ["CONC_CEGUERA_BLANCA", "ART_NUBE_SILICIO", "CAP_06", "TOOL_53"],
+      "abstract": "El Archivo Solar culmina en la nube de silicio y la atmósfera digital ubicua. La censura ya no quema textos: opera por saturación e hipertrofia. El cuerpo humano deja de usar la prótesis y se convierte en el insumo de telemetría de la máquina.",
+      "axioma": "El nuevo archivo planetario no quema libros; los sepulta bajo una marea infinita de datos."
+    },
+    {
+      "id": "ALEPH_04",
+      "numero": 4,
+      "badge": "[ALEPH #4 · MEMORIA HIDRÁULICA]",
+      "color": "#10B981",
+      "region": "Resistencia Límbica & Ecología del Sentido",
+      "nodos_convergentes": ["TOOL_57", "TOOL_51", "MOV_04", "CONC_ARCHIVO_VIVO"],
+      "abstract": "Frente a la petrificación burocrática y el eclipse digital, el Inconsciente Hidrosimbólico reaparece a través del arte, la emoción y el olvido fértil. El archivo solo vive si circula y se rehidrata en la experiencia somática presente.",
+      "axioma": "No recordamos para conservar el pasado, sino para seguir vivos en el presente."
+    },
+    {
+      "id": "ALEPH_05",
+      "numero": 5,
+      "badge": "[ALEPH #5 · HUB & SPOKE ZENITAL]",
+      "color": "#F2C779",
+      "region": "Arquitectura Web & Interfaz Metodológica",
+      "nodos_convergentes": ["WEB_HOME", "WEB_ABOUT", "WEB_ARCHIVO", "WEB_COLECCION", "CONC_CARTOGRAFIA_CRITICA"],
+      "abstract": "La plataforma thegreatpuzzleproject.com materializa su método sin rutas huérfanas: impacto existencial en 5 segundos (Home + AdnBentoGsap), cartografía de huellas en Colección CS01-CS10 y blindaje riguroso en About con Schema JSON-LD.",
+      "axioma": "La historia es nuestro laboratorio. La interpretación, nuestra herramienta. Comprender el presente, nuestra orientación."
+    }
+  ]
+}
