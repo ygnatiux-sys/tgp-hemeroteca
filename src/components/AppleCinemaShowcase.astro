@@ -53,9 +53,17 @@ interface Props {
   items?: CinemaShowcaseItem[];
   frames?: RoundFrameItem[];
   collectionTitle?: string;
+  isImax?: boolean;
+  showBottomSection?: boolean;
 }
 
-const { items, frames, collectionTitle = "Colecciones Cinemáticas" } = Astro.props;
+const { 
+  items, 
+  frames, 
+  collectionTitle = "Colecciones Cinemáticas",
+  isImax = false,
+  showBottomSection = true
+} = Astro.props;
 
 // Presets tipográficos de alto impacto estilo Apple TV+
 const IMPACT_FONT_PRESETS = [
@@ -228,7 +236,7 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
   <!-- ═══════════════════════════════════════════════════════════════════
        1. HERO SHOWCASE ESTILO "MAYDAY" (PROPORCIÓN Y DISPOSICIÓN EXACTA)
        ═══════════════════════════════════════════════════════════════════ -->
-  <div class="cinema-mayday-hero relative w-full h-[76vh] min-h-140 max-h-195 rounded-3xl overflow-hidden bg-[#07080a] border border-white/10 shadow-[0_30px_90px_rgba(0,0,0,0.95)]">
+  <div class={`cinema-mayday-hero relative w-full ${isImax ? 'h-[84vh] min-h-[600px] lg:min-h-[740px] max-h-[880px]' : 'h-[76vh] min-h-140 max-h-195'} rounded-3xl overflow-hidden bg-[#07080a] border border-white/10 shadow-[0_30px_90px_rgba(0,0,0,0.95)]`}>
     
     <!-- CONTENEDOR DE FONDOS PANORÁMICOS CON ZOOM DISCRETO -->
     <div class="absolute inset-0 w-full h-full overflow-hidden z-0">
@@ -371,87 +379,89 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
   <!-- ═══════════════════════════════════════════════════════════════════
        2. SECCIÓN INFERIOR: REPARTO Y EQUIPO (FRAMES REDONDOS) + CÓMO VER
        ═══════════════════════════════════════════════════════════════════ -->
-  <div class="cinema-bottom-section relative w-full mt-8 p-6 sm:p-10 rounded-3xl overflow-hidden border border-white/10 shadow-[0_20px_70px_rgba(0,0,0,0.85)]">
-    
-    <!-- MAIN BG GRADIENT GLOW EXACTO DE APPLE TV (HEX #090a0d base con glow radial #1c263c) -->
-    <div class="absolute inset-0 bg-[#090a0d] z-0 pointer-events-none"></div>
-    <div 
-      class="absolute inset-0 pointer-events-none z-1 opacity-75"
-      style="background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(28, 38, 56, 0.45) 0%, rgba(9, 10, 13, 0.98) 100%);"
-    ></div>
+  {showBottomSection && (
+    <div class="cinema-bottom-section relative w-full mt-8 p-6 sm:p-10 rounded-3xl overflow-hidden border border-white/10 shadow-[0_20px_70px_rgba(0,0,0,0.85)]">
+      
+      <!-- MAIN BG GRADIENT GLOW EXACTO DE APPLE TV (HEX #090a0d base con glow radial #1c263c) -->
+      <div class="absolute inset-0 bg-[#090a0d] z-0 pointer-events-none"></div>
+      <div 
+        class="absolute inset-0 pointer-events-none z-1 opacity-75"
+        style="background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(28, 38, 56, 0.45) 0%, rgba(9, 10, 13, 0.98) 100%);"
+      ></div>
 
-    <!-- ── BLOQUE A: REPARTO Y EQUIPO (FRAMES REDONDOS) ── -->
-    <div class="relative z-10 mb-10">
-      <div class="flex items-center gap-2 mb-6">
-        <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-1.5">
-          <span>Reparto y autores del acervo</span>
-          <svg class="w-4 h-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </h2>
-      </div>
-
-      <!-- Fila horizontal scrolleable con los frames redondos -->
-      <div class="flex items-center gap-5 sm:gap-6 md:gap-8 overflow-x-auto pb-4 scrollbar-none">
-        {finalRoundFrames.map((frame) => (
-          <div class="group/frame flex flex-col items-center text-center shrink-0 w-22 sm:w-24 md:w-28 cursor-pointer">
-            <!-- Frame Redondo Perfecto (rounded-full aspect-square) -->
-            <div class="relative w-20 h-20 sm:w-24 sm:h-24 md:w-26 md:h-26 rounded-full overflow-hidden border border-white/15 bg-zinc-900 shadow-xl transition-all duration-300 group-hover/frame:scale-105 group-hover/frame:border-amber-400/80 group-hover/frame:shadow-[0_0_20px_rgba(245,158,11,0.3)] mb-2.5">
-              {frame.image ? (
-                <img 
-                  src={frame.image} 
-                  alt={frame.name}
-                  loading="lazy"
-                  decoding="async"
-                  class="w-full h-full object-cover object-center transition-transform duration-500 group-hover/frame:scale-110"
-                />
-              ) : (
-                <div class="w-full h-full flex items-center justify-center bg-zinc-800 text-white font-mono font-bold text-lg">
-                  {frame.initials || "TGP"}
-                </div>
-              )}
-            </div>
-
-            <!-- Nombre y Rol con jerarquía Apple TV -->
-            <h3 class="text-xs sm:text-sm font-bold text-white leading-tight group-hover/frame:text-amber-200 transition-colors line-clamp-1">
-              {frame.name}
-            </h3>
-            <span class="text-[10px] sm:text-[11px] text-zinc-400 font-normal leading-tight line-clamp-1 mt-0.5">
-              {frame.role}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-
-    <!-- ── BLOQUE B: CÓMO VER (CARD OSCURO TIPO TGP PROJECT C I N E M A T I C A) ── -->
-    <div class="relative z-10 pt-4 border-t border-white/10">
-      <h2 class="text-base sm:text-lg font-bold text-white tracking-tight mb-4">
-        Cómo explorar
-      </h2>
-
-      <!-- Card oscuro estilo Apple TV con branding espaciado -->
-      <div class="max-w-md p-5 rounded-2xl bg-black/60 backdrop-blur-md border border-white/15 shadow-xl flex flex-col gap-2">
-        <div class="flex items-center gap-3">
-          <!-- Logo / Ícono estilo tv pero con TGP PROJECT C I N E M A T I C A -->
-          <div class="px-3 py-1.5 rounded-lg bg-white/10 border border-white/10 flex items-center gap-1.5 text-white">
-            <span class="font-bold text-sm tracking-widest font-mono">TGP</span>
-            <span class="text-[10px] font-sans font-light tracking-[0.25em] uppercase text-zinc-300">
-              c i n e m a
-            </span>
-          </div>
-          <span class="text-sm font-bold text-white tracking-wide">
-            Acceso libre e inmediato
-          </span>
+      <!-- ── BLOQUE A: REPARTO Y EQUIPO (FRAMES REDONDOS) ── -->
+      <div class="relative z-10 mb-10">
+        <div class="flex items-center gap-2 mb-6">
+          <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-1.5">
+            <span>Reparto y autores del acervo</span>
+            <svg class="w-4 h-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </h2>
         </div>
 
-        <p class="text-[11px] text-zinc-400 font-mono pl-1">
-          Investigaciones completas, acervo visual y dossiers sin suscripción comercial.
-        </p>
-      </div>
-    </div>
+        <!-- Fila horizontal scrolleable con los frames redondos -->
+        <div class="flex items-center gap-5 sm:gap-6 md:gap-8 overflow-x-auto pb-4 scrollbar-none">
+          {finalRoundFrames.map((frame) => (
+            <div class="group/frame flex flex-col items-center text-center shrink-0 w-22 sm:w-24 md:w-28 cursor-pointer">
+              <!-- Frame Redondo Perfecto (rounded-full aspect-square) -->
+              <div class="relative w-20 h-20 sm:w-24 sm:h-24 md:w-26 md:h-26 rounded-full overflow-hidden border border-white/15 bg-zinc-900 shadow-xl transition-all duration-300 group-hover/frame:scale-105 group-hover/frame:border-amber-400/80 group-hover/frame:shadow-[0_0_20px_rgba(245,158,11,0.3)] mb-2.5">
+                {frame.image ? (
+                  <img 
+                    src={frame.image} 
+                    alt={frame.name}
+                    loading="lazy"
+                    decoding="async"
+                    class="w-full h-full object-cover object-center transition-transform duration-500 group-hover/frame:scale-110"
+                  />
+                ) : (
+                  <div class="w-full h-full flex items-center justify-center bg-zinc-800 text-white font-mono font-bold text-lg">
+                    {frame.initials || "TGP"}
+                  </div>
+                )}
+              </div>
 
-  </div>
+              <!-- Nombre y Rol con jerarquía Apple TV -->
+              <h3 class="text-xs sm:text-sm font-bold text-white leading-tight group-hover/frame:text-amber-200 transition-colors line-clamp-1">
+                {frame.name}
+              </h3>
+              <span class="text-[10px] sm:text-[11px] text-zinc-400 font-normal leading-tight line-clamp-1 mt-0.5">
+                {frame.role}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- ── BLOQUE B: CÓMO VER (CARD OSCURO TIPO TGP PROJECT C I N E M A T I C A) ── -->
+      <div class="relative z-10 pt-4 border-t border-white/10">
+        <h2 class="text-base sm:text-lg font-bold text-white tracking-tight mb-4">
+          Cómo explorar
+        </h2>
+
+        <!-- Card oscuro estilo Apple TV con branding espaciado -->
+        <div class="max-w-md p-5 rounded-2xl bg-black/60 backdrop-blur-md border border-white/15 shadow-xl flex flex-col gap-2">
+          <div class="flex items-center gap-3">
+            <!-- Logo / Ícono estilo tv pero con TGP PROJECT C I N E M A T I C A -->
+            <div class="px-3 py-1.5 rounded-lg bg-white/10 border border-white/10 flex items-center gap-1.5 text-white">
+              <span class="font-bold text-sm tracking-widest font-mono">TGP</span>
+              <span class="text-[10px] font-sans font-light tracking-[0.25em] uppercase text-zinc-300">
+                c i n e m a
+              </span>
+            </div>
+            <span class="text-sm font-bold text-white tracking-wide">
+              Acceso libre e inmediato
+            </span>
+          </div>
+
+          <p class="text-[11px] text-zinc-400 font-mono pl-1">
+            Investigaciones completas, acervo visual y dossiers sin suscripción comercial.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  )}
 
 </div>
 

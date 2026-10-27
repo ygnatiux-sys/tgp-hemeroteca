@@ -5,6 +5,7 @@ import Layout from '../../layouts/Layout.astro';
 import Image from '../../components/SafeImage.astro';
 import CinematicArchiveCard from '../../components/CinematicArchiveCard.astro';
 import CinematicCollectionPrologue from '../../components/CinematicCollectionPrologue.astro';
+import AppleCinemaShowcase, { type CinemaShowcaseItem } from '../../components/AppleCinemaShowcase.astro';
 import Marquee from '../../components/Marquee.astro';
 import CinematicExcerptRest from '../../components/CinematicExcerptRest.astro';
 import AguaNieve from '../../components/AguaNieve.astro';
@@ -129,6 +130,84 @@ const heroGallerySlides = resolvedEssays
     };
   });
 
+// ─── CABECERA IMAX MAX ESTILO APPLE TV+ (ARQUEOSEMIÓTICA E HISTORIA) ──────────
+const isImaxShowcaseCollection = key === 'arqueosemiotica' || key === 'historia';
+
+const IMPACT_FONT_PRESETS = [
+  {
+    fontH1: "font-['League_Spartan',sans-serif] font-black tracking-[-0.03em] uppercase",
+    fontH2: "font-['Inter',sans-serif]",
+    serviceColor: "#2563eb",
+    serviceIcon: "",
+    samRating: "SAM 13",
+    ratingScore: "98%",
+    ratingIcon: "🍅",
+    techSpecs: ["4K", "IMAX 70MM", "DOLBY VISION", "CC", "AD"]
+  },
+  {
+    fontH1: "font-['Gloock',serif] font-bold tracking-[0.14em] uppercase",
+    fontH2: "font-['Space_Mono',monospace]",
+    serviceColor: "#9333ea",
+    serviceIcon: "◈",
+    samRating: "SAM 13",
+    ratingScore: "95%",
+    ratingIcon: "✳️",
+    techSpecs: ["4K", "DOLBY ATMOS", "RESONANCIA 432HZ", "CC", "AD"]
+  },
+  {
+    fontH1: "font-['Syne',sans-serif] font-black tracking-[0.08em] uppercase",
+    fontH2: "font-['IBM_Plex_Mono',monospace]",
+    serviceColor: "#0284c7",
+    serviceIcon: "⟡",
+    samRating: "SAM 16",
+    ratingScore: "97%",
+    ratingIcon: "🍅",
+    techSpecs: ["4K", "GPR SCANNER", "TOPOGRAFÍA 3D", "SDH"]
+  },
+  {
+    fontH1: "font-['Cinzel',serif] font-black tracking-[0.18em] uppercase",
+    fontH2: "font-['Plus_Jakarta_Sans',sans-serif]",
+    serviceColor: "#e11d48",
+    serviceIcon: "✦",
+    samRating: "SAM 13",
+    ratingScore: "96%",
+    ratingIcon: "🍅",
+    techSpecs: ["4K", "IMAX 70MM", "COLOR RAW", "CC", "AD"]
+  }
+];
+
+const imaxShowcaseItems: CinemaShowcaseItem[] = isImaxShowcaseCollection
+  ? resolvedEssays.slice(0, 4).map((e: typeof resolvedEssays[0], idx: number) => {
+      const preset = IMPACT_FONT_PRESETS[idx % IMPACT_FONT_PRESETS.length];
+      const isCine = (e as any).isCinematicGSAP || e.entry?.category === 'Ensayos Cinemáticos';
+      const isNota = (e as any).isNota || (e.entry as any)?.isNota || e.entry?.category === 'Notas de Cuaderno';
+      const link = isNota ? `/notas/${e.slug}/` : isCine ? `/ensayos-cinematicos/${e.slug}/` : `/hemeroteca/${e.slug}/`;
+      const imgUrl = sanitizeImageUrl((e.img as any)?.src ?? e.img);
+      const subtitleText = e.entry.volanta || e.entry.dek || e.entry.excerpt || `Investigación monográfica del acervo de ${label}.`;
+      
+      return {
+        title: (e.entry.title || 'Expediente Documental').toUpperCase(),
+        subtitle: subtitleText,
+        category: formatCategory(e.entry.category || label),
+        image: imgUrl || '/images/placeholder-cover.png',
+        href: link,
+        fontH1: preset.fontH1,
+        fontH2: preset.fontH2,
+        accentBadge: `Expediente 0${idx + 1} · ${label}`,
+        serviceColor: preset.serviceColor,
+        serviceIcon: preset.serviceIcon,
+        categoryLabel: `Expediente 0${idx + 1} · ${label}`,
+        samRating: preset.samRating,
+        ratingScore: preset.ratingScore,
+        ratingIcon: preset.ratingIcon,
+        techSpecs: preset.techSpecs,
+        duration: (e.entry as any)?.duration || "1h 45m",
+        author: (e.entry as any)?.author || "Xavier Benítez",
+        director: "The Great Puzzle Project"
+      };
+    })
+  : [];
+
 // ─── TEXTOS DE POLVO DORADO POR CATEGORÍA ────────────────────────────────────
 const categoryDustTexts: Record<string, string> = {
   'antropologia':        '[[Anthropos]] y su memoria inscrita. **El ser humano** como primer archivo, portador de ritos, lenguas y saberes que anteceden toda escritura. Aquí cada hallazgo es un espejo roto que refleja lo que fuimos antes de saber que éramos.',
@@ -165,8 +244,17 @@ const dustText = categoryDustTexts[key] ?? defaultDustText;
     {/* ── HERO: SEO H1 INVISIBLE ── */}
     <h1 class="sr-only">{label} | Colección Exclusiva TGP</h1>
 
-    {/* ── HERO CABECERA: PRÓLOGO CINEMÁTICO IMAX CON N POSTS Y BANDEJA INTERACTIVA ── */}
-    {heroGallerySlides.length > 0 ? (
+    {/* ── HERO CABECERA: IMAX SHOWCASE PARA ARQUEOSEMIÓTICA E HISTORIA / PRÓLOGO HEREDADO PARA EL RESTO ── */}
+    {isImaxShowcaseCollection && imaxShowcaseItems.length > 0 ? (
+      <div class="max-w-430 2xl:max-w-460 mx-auto px-4 md:px-8 lg:px-12 pt-4 md:pt-6">
+        <AppleCinemaShowcase
+          items={imaxShowcaseItems}
+          isImax={true}
+          showBottomSection={false}
+          collectionTitle={label}
+        />
+      </div>
+    ) : heroGallerySlides.length > 0 ? (
       <div class="max-w-430 2xl:max-w-460 mx-auto px-4 md:px-8 lg:px-12 pt-4 md:pt-6">
         <CinematicCollectionPrologue
           slides={heroGallerySlides}
