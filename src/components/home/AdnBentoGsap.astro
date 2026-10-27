@@ -1,295 +1,374 @@
 ---
 /**
- * AdnBentoGsap.astro
- * Módulo Bento Cinemático con GSAP Timeline (ADN Zenital TGP + Duda. Investiga. Conecta.)
- * Configurado con fuentes, tamaños y modos heredados del sistema TGP (Gloock, Proza Libre, font-metadata, mono).
+ * AdnBentoGsap.astro — Stream Cinemático ADN Zenital TGP
+ * "Duda. Investiga. Conecta. — Historia de la producción humana de sentido"
+ *
+ * Características:
+ * - Full bleed con máscara vertical de gradiente suave (fade a --bg-main).
+ * - Canvas de partículas vivas de polvo dorado (DustMotesEffect).
+ * - Split cinemático 60 / 40 (Texto monumental Gloock + Imagen arqueológica nítida).
+ * - Halo ambiental cálido ámbar/oro fundiendo los límites de la imagen.
+ * - GSAP Timeline suave y semi-slow en 3 etapas sin barras ni puntos invasivos.
  */
 
-export interface AdnSlide {
+export interface AdnBatch {
+  kicker: string;
   main: string;
   highlight: string;
-}
-
-export interface AdnCard {
-  number: string;
-  category: string;
-  title: string;
-  description: string;
+  reflection: string;
+  image: string;
+  imageLabel: string;
+  tag: string;
 }
 
 interface Props {
   instanceId?: string;
-  variant?: 'portal' | 'canvas';
-  badgeText?: string;
-  kickerPills?: [string, string, string];
-  sequences?: AdnSlide[];
-  cards?: [AdnCard, AdnCard, AdnCard];
-  metaRuleLeft?: string;
-  metaRuleRight?: string;
+  batches?: AdnBatch[];
   className?: string;
 }
 
+const defaultBatches: AdnBatch[] = [
+  {
+    kicker: "01 · DUDA METÓDICA",
+    main: "Duda de los datos sueltos.",
+    highlight: "La historia no es solo lo que nos pasó; es cómo aprendimos a darle sentido.",
+    reflection: "Conectamos fragmentos materiales, piedras y relatos para comprender cómo la humanidad transforma el caos en significado.",
+    image: "https://storage.thegreatpuzzleproject.com/wikimedia/1791676137832-aca96ac9.webp",
+    imageLabel: "GUNUNG PADANG · TERRAZAS MEGALÍTICAS",
+    tag: "ANOMALÍA ESTRATIGRÁFICA"
+  },
+  {
+    kicker: "02 · LA HUELLA EN LA MATERIA",
+    main: "Investiga la huella en la materia.",
+    highlight: "Tallamos la piedra y el relato para no disolvernos en la incertidumbre del olvido.",
+    reflection: "Templos, mitos, lenguajes y máquinas leídos como palimpsestos de significado que se conservan, se disputan y reaparecen.",
+    image: "https://storage.thegreatpuzzleproject.com/portadas/piramide-del-adivino-de-uxmal/1792584099533-53cd17a4.webp",
+    imageLabel: "UXMAL · PIRÁMIDE DEL ADIVINO",
+    tag: "ARQUEOSEMIÓTICA MAYA"
+  },
+  {
+    kicker: "03 · LA RED DE SÍMBOLOS",
+    main: "Conecta símbolos con rigor crítico.",
+    highlight: "Diez dominios epistémicos para desentrañar cómo construimos los mundos en los que creemos.",
+    reflection: "Exploramos conexiones profundas entre épocas sin confundir analogías con pruebas ni hipótesis con dogmas.",
+    image: "https://storage.thegreatpuzzleproject.com/vault-media/1792290262796-a9133c37.webp",
+    imageLabel: "HESÍODO · LA TEOGONÍA",
+    tag: "COSMOGONÍA Y ARCHIVO"
+  }
+];
+
 const {
-  instanceId = 'tgp-adn-bento',
-  variant = 'canvas',
-  badgeText = 'ADN TGP · CARTOGRAFÍA CRÍTICA',
-  kickerPills = ['Duda.', 'Investiga.', 'Conecta.'],
-  sequences = variant === 'portal'
-    ? [
-        {
-          main: "Duda de los datos sueltos.",
-          highlight: "La historia no es solo lo que nos pasó; es cómo aprendimos a darle sentido."
-        },
-        {
-          main: "Investiga la huella en la materia.",
-          highlight: "Tallamos la piedra y el relato para no disolvernos en la incertidumbre del olvido."
-        },
-        {
-          main: "Conecta símbolos con rigor crítico.",
-          highlight: "Diez dominios epistémicos para desentrañar cómo construimos los mundos en los que creemos."
-        }
-      ]
-    : [
-        {
-          main: "No estudiamos ruinas mudas.",
-          highlight: "Investigamos cómo la humanidad aprendió a darle sentido a lo que vivía."
-        },
-        {
-          main: "Audita el Archivo Vivo.",
-          highlight: "Qué recordamos, qué dejamos en la sombra y cómo cada época reescribe su pasado."
-        },
-        {
-          main: "Cartografía crítica sin dogma.",
-          highlight: "La evidencia como ancla, la condición humana como horizonte de sentido."
-        }
-      ],
-  cards = [
-    {
-      number: "01 · Condición Humana",
-      category: "CAPACIDADES",
-      title: "La mente que simboliza",
-      description: "Qué nos permite recordar, imaginar y transformar la incertidumbre en refugio desde el Paleolítico hasta hoy."
-    },
-    {
-      number: "02 · Palimpsesto Cultural",
-      category: "HUELLAS",
-      title: "La materia reescrita",
-      description: "Templos, mitos, lenguajes y máquinas leídos como capas de significado que se conservan, se disputan y reaparecen."
-    },
-    {
-      number: "03 · Archivo Vivo",
-      category: "MÉTODO",
-      title: "Memoria, poder y evidencia",
-      description: "Por qué una época recuerda ciertas historias y olvida otras, explorando conexiones sin confundir analogías con pruebas."
-    }
-  ],
-  metaRuleLeft = 'La historia es nuestro laboratorio',
-  metaRuleRight = 'Comprender el presente, nuestra orientación',
+  instanceId = 'tgp-adn-stream',
+  batches = defaultBatches,
   className = '',
 } = Astro.props;
 ---
 
-<section 
+<!-- Import de fuente Gloock -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gloock&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Proza+Libre:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
+
+  .glow-metallic-gloock {
+    filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 24px rgba(212, 175, 55, 0.25));
+  }
+
+  .glow-ambient-gold {
+    filter: drop-shadow(0 0 35px rgba(234, 179, 8, 0.28));
+  }
+</style>
+
+<section
   id={instanceId}
-  data-adn-root
+  data-adn-stream-root
   data-adn-instance={instanceId}
-  aria-label="ADN de The Great Puzzle Project"
-  class={`adn-bento-section relative w-full py-16 sm:py-24 md:py-32 px-4 sm:px-8 overflow-hidden select-none isolate ${className}`}
-  style="mask-image: linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%);"
+  aria-label="Manifiesto Cinemático TGP — Duda, Investiga, Conecta"
+  class={`adn-stream-section relative w-full overflow-hidden select-none isolate py-20 sm:py-28 md:py-36 bg-[#060707] ${className}`}
+  style="mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);"
 >
-  <div class="max-w-7xl mx-auto">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 p-6 sm:p-8 md:p-11 rounded-3xl border border-white/10 bg-[#161817]/90 backdrop-blur-xl relative overflow-hidden shadow-[0_20px_70px_rgba(0,0,0,0.85)]">
+  <!-- Canvas de polvo dorado flotante en tiempo real -->
+  <canvas
+    id={`${instanceId}-dust-canvas`}
+    class="adn-dust-canvas absolute inset-0 w-full h-full pointer-events-none z-0"
+    aria-hidden="true"
+  ></canvas>
+
+  <!-- Brillo ambiental radial de fondo -->
+  <div class="pointer-events-none absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-160 h-160 rounded-full bg-amber-500/8 blur-[120px]" aria-hidden="true"></div>
+
+  <!-- Contenedor central 60 / 40 -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-8 md:px-12 relative z-10">
+    <div class="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16 xl:gap-20 min-h-[440px] md:min-h-[500px]">
       
-      {/* Luz ambiental cinematográfica ámbar/oro */}
-      <div class="pointer-events-none absolute -top-32 -right-32 w-md h-112 rounded-full bg-amber-500/10 blur-[90px]" aria-hidden="true"></div>
-      <div class="pointer-events-none absolute -bottom-32 -left-32 w-104 h-104 rounded-full bg-amber-500/8 blur-[90px]" aria-hidden="true"></div>
-
-      {/* Columna Principal (8 cols): Stage Tipográfico Monumental + GSAP Timeline */}
-      <div class="lg:col-span-8 flex flex-col justify-between min-h-85 sm:min-h-100 md:min-h-112.5 p-6 sm:p-9 md:p-12 rounded-2xl bg-[#0e0f0f]/85 border border-white/5 relative shadow-inner">
-        
-        {/* Header del Stage con Tricolon Interactivo */}
-        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5">
-          <div class="flex items-center gap-3 text-xs sm:text-[13px] uppercase tracking-[0.28em] text-[#d4af37] font-metadata font-bold">
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shadow-[0_0_12px_#f59e0b]"></span>
-            <span>{badgeText}</span>
-          </div>
-
-          <div class="flex items-center gap-3 text-xs sm:text-[13px] font-metadata font-bold tracking-[0.25em] uppercase text-zinc-500">
-            {kickerPills.map((pill, pIdx) => (
-              <span 
-                class={`adn-pill px-3 py-1 rounded-full transition-all duration-500 cursor-default ${pIdx === 0 ? 'text-[#F0E6D2] bg-amber-500/15 border border-amber-500/30' : 'border border-transparent'}`}
-                data-pill-index={pIdx}
-              >
-                {pill}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Stage Central de Letras Monumentales */}
-        <div class="adn-stage relative my-auto py-8 sm:py-12" aria-live="polite">
-          <p class="adn-step font-['Gloock'] text-2xl sm:text-4xl md:text-[2.85rem] lg:text-[3.15rem] leading-[1.12] tracking-tight text-[#EDEDE8] drop-shadow-[0_2px_14px_rgba(0,0,0,0.9)]">
-            {sequences[0]?.main} <br/>
-            <span class="adn-highlight text-[#d4af37] font-serif italic drop-shadow-[0_0_20px_rgba(212,175,55,0.35)]">
-              {sequences[0]?.highlight}
-            </span>
-          </p>
-        </div>
-
-        {/* Footer del Stage: Barra de progreso GSAP + Meta-regla */}
-        <div class="space-y-4 pt-4 border-t border-white/5">
-          <div class="w-full h-0.75 bg-white/10 overflow-hidden rounded-full">
-            <div class="adn-progress h-full w-0 bg-linear-to-r from-amber-500 via-amber-400 to-[#d4af37] shadow-[0_0_10px_rgba(245,158,11,0.8)]"></div>
-          </div>
-          <div class="flex justify-between items-center text-xs sm:text-[13px] font-metadata uppercase tracking-[0.25em] text-[#C5C5BF]/80">
-            <span>{metaRuleLeft}</span>
-            <span class="hidden sm:inline text-[#d4af37] font-bold">{metaRuleRight}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Columna Lateral (4 cols): 3 Nodos Estructurales del ADN con Tipografía Amplia */}
-      <div class="lg:col-span-4 flex flex-col gap-4 justify-between">
-        {cards.map((card, cIdx) => (
-          <div 
-            class="adn-card group p-6 sm:p-7 rounded-2xl bg-[#0e0f0f]/65 border border-white/5 hover:border-amber-500/35 transition-all duration-500 hover:scale-[1.01] shadow-lg flex flex-col justify-between"
-            data-card-index={cIdx}
+      <!-- ═══════════════════════════════════════════════════════════════════
+           LADO TEXTO (60%): Stage de Frases Monumentales Gloock
+      ═══════════════════════════════════════════════════════════════════ -->
+      <div class="w-full lg:w-[60%] flex flex-col justify-center relative min-h-[320px] sm:min-h-[360px] md:min-h-[400px]">
+        {batches.map((batch, idx) => (
+          <div
+            class={`adn-text-slide absolute inset-0 flex flex-col justify-center ${idx === 0 ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+            data-slide-index={idx}
           >
-            <div>
-              <div class="flex items-center justify-between pb-1.5 border-b border-white/5">
-                <span class="text-xs sm:text-[13px] font-metadata uppercase tracking-[0.25em] text-[#d4af37] font-bold">
-                  {card.number}
-                </span>
-                <span class="text-[11px] sm:text-xs font-metadata tracking-widest text-zinc-500 uppercase">
-                  {card.category}
-                </span>
-              </div>
-              <h3 class="font-serif text-xl sm:text-2xl text-[#EDEDE8] mt-3 group-hover:text-white transition-colors duration-300">
-                {card.title}
-              </h3>
-              <p class="text-sm sm:text-[15px] font-['Proza_Libre'] text-[#C5C5BF] mt-2 leading-relaxed">
-                {card.description}
-              </p>
+            <!-- Kicker con aura ámbar -->
+            <div class="flex items-center gap-3 text-xs sm:text-[13px] uppercase tracking-[0.32em] text-[#d4af37] font-metadata font-bold mb-4 sm:mb-6">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shadow-[0_0_12px_#f59e0b]"></span>
+              <span>{batch.kicker}</span>
             </div>
-            
-            <div class="pt-3 flex items-center gap-1.5 text-xs font-metadata uppercase tracking-widest text-[#d4af37]/60 group-hover:text-[#d4af37] transition-colors duration-300">
-              <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">▸</span>
-              <span class="text-[11px]">Explorar dimensión</span>
+
+            <!-- Título Monumental Gloock + Cursiva Dorada -->
+            <h2 class="font-['Gloock'] text-3xl sm:text-4xl md:text-[2.75rem] lg:text-[3.25rem] leading-[1.12] tracking-tight text-[#EDEDE8] glow-metallic-gloock">
+              {batch.main} <br/>
+              <span class="text-[#d4af37] font-serif italic font-normal glow-ambient-gold">
+                {batch.highlight}
+              </span>
+            </h2>
+
+            <!-- Bajada reflexiva en Proza Libre -->
+            <p class="font-['Proza_Libre'] text-base sm:text-lg md:text-xl text-[#D8D2C2]/85 leading-relaxed mt-6 sm:mt-8 max-w-2xl drop-shadow-md">
+              {batch.reflection}
+            </p>
+
+            <!-- Línea de reposo sutil -->
+            <div class="flex items-center gap-4 pt-6 mt-6 border-t border-white/5 font-metadata text-[11px] sm:text-xs tracking-[0.26em] uppercase text-zinc-500">
+              <span class="text-amber-400/70">TGP</span>
+              <span>•</span>
+              <span>HISTORIA DE LA PRODUCCIÓN HUMANA DE SENTIDO</span>
             </div>
           </div>
         ))}
       </div>
 
+      <!-- ═══════════════════════════════════════════════════════════════════
+           LADO VISUAL (40%): Portada Arqueológica con Ambient Glow
+      ═══════════════════════════════════════════════════════════════════ -->
+      <div class="w-full lg:w-[40%] flex justify-center items-center relative">
+        <!-- Resplandor ambiental que funde los límites hacia la imagen -->
+        <div class="pointer-events-none absolute -inset-8 bg-gradient-to-tr from-amber-500/25 via-amber-400/12 to-transparent blur-3xl rounded-3xl opacity-80" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute -bottom-10 -left-10 w-64 h-64 bg-amber-600/15 blur-[80px] rounded-full" aria-hidden="true"></div>
+
+        <!-- Marco cinemático con difuminado interno y bordes suaves -->
+        <div class="relative w-full aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] max-w-lg rounded-3xl overflow-hidden border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.95)] bg-black/60 isolate">
+          <!-- Sombra interior para desvanecer los bordes a la penumbra -->
+          <div class="pointer-events-none absolute inset-0 z-10 shadow-[inset_0_0_60px_rgba(0,0,0,0.9)] rounded-3xl" aria-hidden="true"></div>
+
+          {batches.map((batch, idx) => (
+            <div
+              class={`adn-img-slide absolute inset-0 w-full h-full overflow-hidden ${idx === 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-105'}`}
+              data-img-index={idx}
+            >
+              <img
+                src={batch.image}
+                alt={batch.imageLabel}
+                class="w-full h-full object-cover filter brightness-[0.90] contrast-[1.08] transition-transform duration-1000"
+                loading={idx === 0 ? "eager" : "lazy"}
+                decoding="async"
+              />
+              <!-- Gradiente de base para texto informativo -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
+
+              <!-- Cartela sutil en esquina inferior -->
+              <div class="absolute bottom-4 left-4 right-4 z-20 flex items-center justify-between text-[11px] font-metadata tracking-[0.22em] uppercase text-white/70">
+                <span class="text-[#d4af37] font-bold drop-shadow">{batch.imageLabel}</span>
+                <span class="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-white/60 text-[10px]">{batch.tag}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
     </div>
   </div>
-
-  {/* Inyección de datos JSON limpia para que el script cliente nunca falle */}
-  <script type="application/json" class="adn-sequences-data" set:html={JSON.stringify(sequences)} />
 </section>
 
+<!-- Script de Polvo Dorado y GSAP Timeline Soft / Semi-Slow -->
 <script>
-  import gsap from "gsap";
+  import { gsap } from "gsap";
 
-  interface AdnSlideItem {
-    main: string;
-    highlight: string;
+  // ─── PARTÍCULAS DE POLVO DORADO (Canvas DustMotesEffect) ────────────────────
+  class DustMotesStream {
+    private canvas: HTMLCanvasElement;
+    private ctx: CanvasRenderingContext2D;
+    private motes: Array<{
+      x: number;
+      y: number;
+      radius: number;
+      opacity: number;
+      speedX: number;
+      speedY: number;
+      angle: number;
+      angleSpeed: number;
+      osc: number;
+      flickPhase: number;
+      flickSpeed: number;
+    }> = [];
+    private animationFrameId: number | null = null;
+    private isRunning: boolean = false;
+
+    constructor(canvas: HTMLCanvasElement) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext("2d")!;
+      this.resize();
+      window.addEventListener("resize", this.resize.bind(this));
+    }
+
+    private resize() {
+      const rect = this.canvas.parentElement?.getBoundingClientRect();
+      this.canvas.width = rect?.width ?? window.innerWidth;
+      this.canvas.height = rect?.height ?? window.innerHeight;
+    }
+
+    private spawnMote(fromLeft = false) {
+      const w = this.canvas.width;
+      const h = this.canvas.height;
+      return {
+        x: fromLeft ? -10 : Math.random() * w,
+        y: Math.random() * h,
+        radius: 0.7 + Math.random() * 2.2,
+        opacity: 0.15 + Math.random() * 0.50,
+        speedX: 0.22 + Math.random() * 0.45,
+        speedY: (Math.random() - 0.5) * 0.12,
+        angle: Math.random() * Math.PI * 2,
+        angleSpeed: 0.005 + Math.random() * 0.012,
+        osc: 0.05 + Math.random() * 0.10,
+        flickPhase: Math.random() * Math.PI * 2,
+        flickSpeed: 0.012 + Math.random() * 0.025,
+      };
+    }
+
+    public start() {
+      if (this.isRunning) return;
+      this.isRunning = true;
+      const count = Math.min(50, Math.floor(this.canvas.width / 24));
+      this.motes = Array.from({ length: count }, () => this.spawnMote(false));
+      this.loop();
+    }
+
+    public stop() {
+      this.isRunning = false;
+      if (this.animationFrameId) {
+        cancelAnimationFrame(this.animationFrameId);
+        this.animationFrameId = null;
+      }
+    }
+
+    private loop() {
+      if (!this.isRunning) return;
+      const ctx = this.ctx;
+      const w = this.canvas.width;
+      const h = this.canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      for (let i = 0; i < this.motes.length; i++) {
+        const m = this.motes[i];
+        m.angle += m.angleSpeed;
+        m.flickPhase += m.flickSpeed;
+        m.x += m.speedX;
+        m.y += m.speedY + Math.sin(m.angle) * m.osc;
+
+        if (m.x > w + 12 || m.y < -12 || m.y > h + 12) {
+          this.motes[i] = this.spawnMote(true);
+          continue;
+        }
+
+        const flicker = 0.75 + Math.sin(m.flickPhase) * 0.25;
+        const alpha = Math.max(0, Math.min(1, m.opacity * flicker));
+
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(201, 168, 108, ${alpha})`;
+        ctx.shadowColor = "rgba(212, 175, 55, 0.45)";
+        ctx.shadowBlur = 6;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      this.animationFrameId = requestAnimationFrame(this.loop.bind(this));
+    }
   }
 
-  function initAdnBentoInstances(): void {
-    const roots = document.querySelectorAll<HTMLElement>("[data-adn-root]");
+  // ─── CONTROLADOR GSAP TIMELINE EN 3 ETAPAS ──────────────────────────────────
+  function initAdnStreamInstances() {
+    const roots = document.querySelectorAll<HTMLElement>("[data-adn-stream-root]");
     if (roots.length === 0) return;
 
     roots.forEach((root) => {
       if (root.dataset.adnInitialized === "true") return;
       root.dataset.adnInitialized = "true";
 
-      const dataScript = root.querySelector<HTMLScriptElement>(".adn-sequences-data");
-      let sequences: AdnSlideItem[] = [];
-      if (dataScript && dataScript.textContent) {
-        try {
-          sequences = JSON.parse(dataScript.textContent);
-        } catch (e) {
-          console.error("[ADN BENTO] Falló parseo de secuencias JSON", e);
-        }
+      // 1. Iniciar Canvas de Polvo Dorado
+      const canvas = root.querySelector<HTMLCanvasElement>(".adn-dust-canvas");
+      if (canvas) {
+        const dustEffect = new DustMotesStream(canvas);
+        dustEffect.start();
+        document.addEventListener("astro:before-swap", () => dustEffect.stop(), { once: true });
       }
 
-      if (!sequences || sequences.length === 0) return;
+      const textSlides = gsap.utils.toArray<HTMLElement>(root.querySelectorAll<HTMLElement>(".adn-text-slide"));
+      const imgSlides = gsap.utils.toArray<HTMLElement>(root.querySelectorAll<HTMLElement>(".adn-img-slide"));
+      const count = textSlides.length;
 
-      const stage = root.querySelector<HTMLElement>(".adn-stage .adn-step");
-      const progress = root.querySelector<HTMLElement>(".adn-progress");
-      const cards = gsap.utils.toArray<HTMLElement>(root.querySelectorAll<HTMLElement>(".adn-card"));
-      const pills = gsap.utils.toArray<HTMLElement>(root.querySelectorAll<HTMLElement>(".adn-pill"));
+      if (count < 2) return;
 
-      if (!stage || !progress) return;
-
-      // Respetar accesibilidad de reducción de movimiento
+      // Respetar preferencias de reducción de movimiento
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (reduceMotion) {
-        stage.innerHTML = `${sequences[0].main} <br/><span class="adn-highlight text-[#d4af37] font-serif italic">${sequences[0].highlight}</span>`;
-        return;
-      }
+      if (reduceMotion) return;
 
       const ctx = gsap.context(() => {
-        gsap.killTweensOf([stage, progress, ...cards, ...pills]);
+        // Timeline infinito suave y semi-slow
+        const tl = gsap.timeline({ repeat: -1 });
+        const pauseTime = 4.8; // Tiempo de reposo y lectura de cada frase
+        const transDuration = 1.35; // Transición suave cinemática
 
-        // Entrada cinemática elegante para las tarjetas laterales (expo.out)
-        gsap.fromTo(
-          cards,
-          { opacity: 0, y: 22, filter: "blur(10px)" },
-          {
-            opacity: 1,
-            y: 0,
-            filter: "blur(0px)",
-            duration: 0.85,
-            stagger: 0.12,
-            ease: "expo.out"
-          }
-        );
+        for (let i = 0; i < count; i++) {
+          const next = (i + 1) % count;
 
-        const masterTl = gsap.timeline({ repeat: -1 });
-
-        sequences.forEach((item, idx) => {
-          masterTl
-            .call(() => {
-              pills.forEach((pill, pIdx) => {
-                const isActive = pIdx === idx;
-                pill.classList.toggle("text-[#F0E6D2]", isActive);
-                pill.classList.toggle("bg-amber-500/15", isActive);
-                pill.classList.toggle("border-amber-500/30", isActive);
-                pill.classList.toggle("text-zinc-500", !isActive);
-                pill.classList.toggle("border-transparent", !isActive);
-              });
-            })
-            .fromTo(
-              progress,
-              { width: "0%" },
-              { width: "100%", duration: 4.8, ease: "power1.inOut" }
-            )
-            .to(stage, {
+          tl.to({}, { duration: pauseTime })
+            // Salida de la etapa actual (desvanecer y subir levemente)
+            .to(textSlides[i], {
               opacity: 0,
-              y: -14,
-              filter: "blur(10px)",
-              duration: 0.45,
-              ease: "power2.in",
-              onComplete: () => {
-                stage.innerHTML = `${item.main} <br/><span class="adn-highlight text-[#d4af37] font-serif italic">${item.highlight}</span>`;
+              y: -18,
+              duration: transDuration,
+              ease: "power2.inOut",
+              onStart: () => {
+                textSlides[i].style.pointerEvents = "none";
               }
-            })
-            .fromTo(
-              stage,
-              { opacity: 0, y: 16, filter: "blur(10px)" },
-              { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7, ease: "expo.out" }
-            );
+            }, `step-${i}`)
+            .to(imgSlides[i], {
+              opacity: 0,
+              scale: 0.98,
+              duration: transDuration,
+              ease: "power2.inOut",
+            }, `step-${i}`)
 
-          if (cards[idx]) {
-            masterTl.fromTo(
-              cards[idx],
-              { borderColor: "rgba(212, 175, 55, 0.65)", boxShadow: "0 0 25px rgba(212, 175, 55, 0.2)" },
-              { borderColor: "rgba(255, 255, 255, 0.05)", boxShadow: "none", duration: 1.8, ease: "power2.out" },
-              "<"
+            // Entrada de la siguiente etapa (desvanecer y descender a reposo)
+            .fromTo(textSlides[next], 
+              { opacity: 0, y: 18 },
+              {
+                opacity: 1,
+                y: 0,
+                duration: transDuration,
+                ease: "power2.out",
+                onStart: () => {
+                  textSlides[next].style.pointerEvents = "auto";
+                }
+              },
+              `step-${i}+=0.1`
+            )
+            .fromTo(imgSlides[next],
+              { opacity: 0, scale: 1.05 },
+              {
+                opacity: 1,
+                scale: 1.0,
+                duration: transDuration * 1.1,
+                ease: "power2.out",
+              },
+              `step-${i}+=0.1`
             );
-          }
-        });
+        }
+
+        // Pausa suave al posar el cursor para facilitar lectura profunda
+        root.addEventListener("mouseenter", () => tl.pause());
+        root.addEventListener("mouseleave", () => tl.resume());
       }, root);
 
       document.addEventListener("astro:before-swap", () => {
@@ -298,10 +377,10 @@ const {
     });
   }
 
-  document.addEventListener("astro:page-load", initAdnBentoInstances);
+  document.addEventListener("astro:page-load", initAdnStreamInstances);
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initAdnBentoInstances);
+    document.addEventListener("DOMContentLoaded", initAdnStreamInstances);
   } else {
-    initAdnBentoInstances();
+    initAdnStreamInstances();
   }
 </script>
