@@ -15,6 +15,7 @@ export const prerender = true;
 import Layout from '../layouts/Layout.astro';
 import PolvoDorado from '../components/PolvoDorado.astro';
 import AppleCinemaShowcase, { type CinemaShowcaseItem } from '../components/AppleCinemaShowcase.astro';
+import AppleDualBentoDark from '../components/AppleDualBentoDark.astro';
 import curatedData from '../data/lost-posts-curated.json';
 
 const rawReel1 = (curatedData.reel1_arqueologia_litica || []).slice(0, 6);
@@ -331,6 +332,18 @@ const allRecoveredPosts = [...rawReel1, ...rawReel2];
       />
 
     </section>
+
+    <!-- ══════════════════════════════════════════════════════════════════════════
+         VESTÍBULO ESCULTÓRICO: DUAL BENTO DARK (ARTEFACTOS DE MUSEO 4:5)
+         ══════════════════════════════════════════════════════════════════════════ -->
+    <div class="relative z-10 max-w-7xl mx-auto my-24 sm:my-32">
+      <AppleDualBentoDark
+        showHeader={true}
+        customKicker="VESTÍBULO ESCULTÓRICO · BÓVEDA DE ARCHIVO"
+        customTitle="Galería de Sombras & Memoria Lítica"
+        customDescription="Tríadas ontológicas y estatuaria clásica en formato vertical 4:5: piezas arqueológicas y escultóricas del archivo TGP proyectadas en rotación asíncrona."
+      />
+    </div>
 
     <!-- ══════════════════════════════════════════════════════════════════════════
          CALL TO ACTION: CONTINUAR LA INDAGACIÓN EN LA HEMEROTECA

@@ -108,24 +108,32 @@ const bentoRightArtifacts: Artifact[] = [
 
 interface Props {
   showHeader?: boolean;
+  customKicker?: string;
+  customTitle?: string;
+  customDescription?: string;
 }
 
-const { showHeader = true } = Astro.props;
+const { 
+  showHeader = true,
+  customKicker = "Apple TV Dark Format · Dual Bento Gallery",
+  customTitle = "Galería de Sombras & Memoria Lítica",
+  customDescription = "Morfología vertical 4:5 en acabado obsidiana y grafito calibrado: fondo semioscuro de alto contraste que realza la volumetría de las piezas arqueológicas y su sombra de apoyo."
+} = Astro.props;
 ---
 
-<section class={`apple-dual-bento-dark-section w-full px-4 sm:px-6 relative z-10 ${showHeader ? 'py-20' : 'pb-16'}`} id="showcase-dual-bento-dark">
+<section class={`apple-dual-bento-dark-section w-full px-4 sm:px-6 relative z-10 ${showHeader ? 'py-16 sm:py-20' : 'pb-16'}`} id="showcase-dual-bento-dark">
   <!-- ENCABEZADO DE SECCIÓN EDITORIAL (DARK PREMIUM) -->
   {showHeader && (
-    <div class="max-w-4xl mx-auto text-center mb-14 md:mb-16">
+    <div class="max-w-4xl mx-auto text-center mb-12 md:mb-16">
       <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/6 border border-white/10 text-white/70 text-[11px] font-mono tracking-widest uppercase mb-4 backdrop-blur-md">
         <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-        Apple TV Dark Format · Dual Bento Gallery
+        {customKicker}
       </div>
       <h2 class="font-gloock text-3xl sm:text-4xl md:text-5xl text-white tracking-tight mb-4">
-        Galería de Sombras & Memoria Lítica
+        {customTitle}
       </h2>
       <p class="font-inter text-sm sm:text-base text-white/60 max-w-2xl mx-auto leading-relaxed font-light">
-        Morfología vertical 4:5 en acabado obsidiana y grafito calibrado: fondo semioscuro de alto contraste que realza la volumetría de las piezas arqueológicas y su sombra de apoyo.
+        {customDescription}
       </p>
     </div>
   )}
