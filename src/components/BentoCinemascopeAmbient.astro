@@ -1,0 +1,223 @@
+---
+/**
+ * src/components/BentoCinemascopeAmbient.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Bento Card Cinemascope (21:9 Widescreen Monumental) con Resplandor Reactivo
+ * 
+ * - Tamaño monumental calibrado para exhibir esculturas COMPLETAS de cabeza a base.
+ * - Haz lumínico geométrico oblicuo (Wedge Light Beam) en degradé oro/ámbar/violeta.
+ * - Resplandor ambiental reactivo al cursor (mousemove con tracking suave).
+ * - Escultura aislada en primer plano con contraste afilado y doble drop-shadow volumétrico.
+ * - Tipografía limpia: H1 en Serif monumental + Kicker y Subtítulo en Sans limpio.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+interface Props {
+  kicker?: string;
+  kickerIcon?: string;
+  title?: string;
+  subtitle?: string;
+  imageSrc?: string;
+  imageAlt?: string;
+  aspectRatio?: '21/9' | '16/9' | '2.35/1';
+  primaryGlowColor?: string; // Color primario del rayo (ej: #facc15 para amarillo solar)
+  secondaryGlowColor?: string; // Color secundario de penumbra (ej: #6d28d9 para violeta)
+  href?: string;
+  ctaText?: string;
+  fontH1?: string;
+  fontSans?: string;
+  className?: string;
+}
+
+const {
+  kicker = "ARCHIVOS DEL MEDITERRÁNEO · SERIE E",
+  kickerIcon = "✦",
+  title = "Hermes y el Dios de las Encrucijadas",
+  subtitle = "La frontera no se custodia: se constituye. Autopsia conceptual sobre el psicopompo y el nacimiento del espacio liminal.",
+  imageSrc = "/images/museum/statue-hermes.webp",
+  imageAlt = "Escultura clásica de Hermes",
+  aspectRatio = '21/9',
+  primaryGlowColor = "#facc15",
+  secondaryGlowColor = "#6d28d9",
+  href = "/archivo",
+  ctaText = "Explorar investigación",
+  fontH1 = "font-serif font-black",
+  fontSans = "font-sans",
+  className = ""
+} = Astro.props;
+
+// Proporción monumental: altura generosa para que quepa la estatua completa sin cortes
+const aspectClass = aspectRatio === '21/9' 
+  ? 'aspect-[21/9] min-h-[540px] sm:min-h-[600px] md:min-h-[660px] lg:min-h-[720px]' 
+  : aspectRatio === '2.35/1' 
+    ? 'aspect-[2.35/1] min-h-[520px] sm:min-h-[580px] md:min-h-[640px]' 
+    : 'aspect-[16/9] min-h-[540px] sm:min-h-[620px] md:min-h-[700px]';
+---
+
+<article 
+  class={`bento-cinemascope-root relative w-full ${aspectClass} rounded-3xl sm:rounded-[2.5rem] overflow-hidden bg-[#07080a] border border-white/12 shadow-[0_35px_100px_rgba(0,0,0,0.9)] group transition-all duration-700 select-none ${className}`}
+  data-bento-ambient
+  style={`--glow-primary: ${primaryGlowColor}; --glow-secondary: ${secondaryGlowColor};`}
+>
+  <!-- 1. FONDO DE OBSIDIANA Y PROFUNDIDAD RADIAL -->
+  <div class="absolute inset-0 bg-radial from-[#121318] via-[#08090b] to-[#030304] z-0"></div>
+
+  <!-- 2. ATMÓSFERA Y RESPLANDOR DIFUSO DE FONDO -->
+  <div 
+    class="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-screen filter blur-xs scale-105 pointer-events-none transition-opacity duration-700 group-hover:opacity-35"
+    style="background-image: radial-gradient(circle at 65% 35%, rgba(250, 204, 21, 0.3) 0%, transparent 65%);"
+  ></div>
+
+  <!-- 3. HAZ DE LUZ GEOMÉTRICO OBLICUO (WEDGE BEAM EFFECT) -->
+  <div class="wedge-light-beam absolute inset-0 z-[1] pointer-events-none"></div>
+
+  <!-- 4. RESPLANDOR REACTIVO AL CURSOR -->
+  <div class="interactive-glow-layer absolute inset-0 z-[2] pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+  <!-- 5. VIÑETA CINEMATOGRÁFICA PERIMETRAL -->
+  <div class="absolute inset-0 z-[3] pointer-events-none bg-gradient-to-t from-black/95 via-transparent to-black/40"></div>
+  <div class="absolute inset-0 z-[3] pointer-events-none bg-gradient-to-r from-black/85 via-transparent to-black/60"></div>
+
+  <!-- 6. ESCULTURA AISLADA EN PRIMER PLANO (ESTRUCTURA DE CONTENCIÓN COMPLETA DE CABEZA A BASE) -->
+  <div class="absolute right-2 sm:right-6 md:right-12 lg:right-16 top-0 bottom-0 h-full w-[46%] sm:w-[42%] md:w-[38%] lg:w-[36%] z-10 flex items-end justify-center pointer-events-none py-6 sm:py-8 md:py-10">
+    <div class="statue-wrapper relative w-full h-full flex items-end justify-center">
+      <!-- Aureola de luz directa en la silueta -->
+      <div class="statue-rim-aura absolute top-1/3 w-3/4 aspect-square rounded-full opacity-60 filter blur-3xl mix-blend-screen pointer-events-none transition-all duration-700 group-hover:opacity-95 group-hover:scale-120"></div>
+
+      <!-- Imagen contenida al 88% de la altura total con espacio libre arriba y abajo -->
+      <img
+        src={imageSrc}
+        alt={imageAlt}
+        class="statue-asset relative h-[86%] sm:h-[88%] md:h-[90%] w-auto max-w-full object-contain object-bottom filter drop-shadow-[0_25px_45px_rgba(0,0,0,0.95)] drop-shadow-[0_0_1px_rgba(255,255,255,0.25)] contrast-[1.04] brightness-[1.02] transition-all duration-700 ease-out group-hover:scale-[1.03] group-hover:translate-y-[-6px]"
+        loading="eager"
+        decoding="async"
+      />
+    </div>
+  </div>
+
+  <!-- 7. BLOQUE EDITORIAL Y TIPOGRAFÍA LIMPIA (LEFT WING) -->
+  <div class="relative z-20 h-full w-full flex flex-col justify-between p-6 sm:p-10 md:p-14 lg:p-16 max-w-2xl pointer-events-none">
+    <!-- Kicker superior -->
+    <div class="flex items-center gap-2 pointer-events-auto">
+      <span class="text-amber-400 font-mono text-xs">{kickerIcon}</span>
+      <span class={`${fontSans} text-[11px] sm:text-xs uppercase font-medium tracking-[0.28em] text-white/70`}>
+        {kicker}
+      </span>
+    </div>
+
+    <!-- Título Monumental Serif Limpio -->
+    <div class="my-auto py-6">
+      <h2 class={`${fontH1} text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight leading-[1.06] drop-shadow-lg`}>
+        {title}
+      </h2>
+    </div>
+
+    <!-- Subtítulo Sans y Botonera inferior estilo Apple TV -->
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pointer-events-auto pt-2">
+      <p class={`${fontSans} text-xs sm:text-sm text-stone-300/85 font-light leading-relaxed max-w-sm sm:max-w-md drop-shadow`}>
+        {subtitle}
+      </p>
+
+      {href && (
+        <a 
+          href={href}
+          class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 text-white font-sans text-xs font-semibold tracking-wider uppercase backdrop-blur-md transition-all duration-300 hover:scale-105 shrink-0 self-start sm:self-auto shadow-lg"
+        >
+          <span>{ctaText}</span>
+          <svg class="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      )}
+    </div>
+  </div>
+</article>
+
+<style>
+  /* HAZ DE LUZ GEOMÉTRICO OBLICUO (WEDGE) */
+  .wedge-light-beam {
+    background: 
+      linear-gradient(125deg, 
+        transparent 15%, 
+        var(--glow-secondary) 28%, 
+        var(--glow-primary) 50%, 
+        transparent 75%
+      );
+    opacity: 0.55;
+    mix-blend-mode: screen;
+    filter: blur(32px);
+    transform: scale(1.15) rotate(-2deg);
+    transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .bento-cinemascope-root:hover .wedge-light-beam {
+    opacity: 0.88;
+    filter: blur(24px);
+    transform: scale(1.2) rotate(0deg);
+  }
+
+  /* CAPA REACTIVA AL CURSOR */
+  .interactive-glow-layer {
+    background: radial-gradient(
+      circle 550px at var(--mouse-x, 70%) var(--mouse-y, 50%),
+      var(--glow-primary) 0%,
+      transparent 70%
+    );
+    mix-blend-mode: color-dodge;
+    filter: blur(45px);
+    opacity: 0.35;
+    transition: opacity 0.4s ease;
+  }
+
+  .bento-cinemascope-root:hover .interactive-glow-layer {
+    opacity: 0.7;
+  }
+
+  /* AURA DE CONTORNO DE LA ESCULTURA */
+  .statue-rim-aura {
+    background: radial-gradient(
+      circle at center,
+      var(--glow-primary) 0%,
+      var(--glow-secondary) 50%,
+      transparent 80%
+    );
+  }
+
+  /* Nitidez de la escultura */
+  .statue-asset {
+    image-rendering: -webkit-optimize-contrast;
+  }
+</style>
+
+<script>
+  function initBentoAmbient() {
+    const cards = document.querySelectorAll<HTMLElement>('[data-bento-ambient]');
+    
+    cards.forEach((card) => {
+      let bounds = card.getBoundingClientRect();
+      
+      const onResize = () => {
+        bounds = card.getBoundingClientRect();
+      };
+      
+      window.addEventListener('resize', onResize, { passive: true });
+      
+      card.addEventListener('mousemove', (e) => {
+        const x = e.clientX - bounds.left;
+        const y = e.clientY - bounds.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.setProperty('--mouse-x', '70%');
+        card.style.setProperty('--mouse-y', '50%');
+      });
+    });
+  }
+
+  if (typeof document !== 'undefined') {
+    initBentoAmbient();
+    document.addEventListener('astro:page-load', initBentoAmbient);
+  }
+</script>
