@@ -108,7 +108,7 @@ const {
   ></canvas>
 
   <!-- Luz ambiental cálida de fondo -->
-  <div class="pointer-events-none absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-96 sm:w-[32rem] md:w-[42rem] h-96 sm:h-[32rem] md:h-[42rem] rounded-full bg-amber-500/8 blur-[110px]" aria-hidden="true"></div>
+  <div class="pointer-events-none absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-96 sm:w-lg md:w-2xl h-96 sm:h-128 md:h-168 rounded-full bg-amber-500/8 blur-[110px]" aria-hidden="true"></div>
 
   <!-- Contenedor maestro 60 / 40 -->
   <div class="max-w-7xl mx-auto px-4 sm:px-8 md:px-12 relative z-10">
@@ -158,11 +158,11 @@ const {
       ═══════════════════════════════════════════════════════════════════ -->
       <div class="w-full lg:w-[42%] xl:w-[40%] flex justify-center items-center relative">
         <!-- Resplandor ambiental hacia la imagen que elimina cortes duros -->
-        <div class="pointer-events-none absolute -inset-8 bg-gradient-to-tr from-amber-500/25 via-amber-400/12 to-transparent blur-3xl rounded-3xl opacity-80" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute -inset-8 bg-linear-to-tr from-amber-500/25 via-amber-400/12 to-transparent blur-3xl rounded-3xl opacity-80" aria-hidden="true"></div>
         <div class="pointer-events-none absolute -bottom-10 -left-10 w-60 h-60 bg-amber-600/15 blur-[80px] rounded-full" aria-hidden="true"></div>
 
         <!-- Marco cinemático con difuminado interno y bordes suaves -->
-        <div class="relative w-full aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] max-w-lg rounded-3xl overflow-hidden border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.95)] bg-black/60 adn-stack-grid isolate">
+        <div class="relative w-full aspect-4/3 sm:aspect-16/10 lg:aspect-4/3 max-w-lg rounded-3xl overflow-hidden border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.95)] bg-black/60 adn-stack-grid isolate">
           <!-- Viñeta perimetral interior para fundir bordes a la penumbra -->
           <div class="pointer-events-none absolute inset-0 z-20 shadow-[inset_0_0_60px_rgba(0,0,0,0.95)] rounded-3xl" aria-hidden="true"></div>
 
@@ -180,7 +180,7 @@ const {
                 decoding="async"
               />
               <!-- Gradiente sutil inferior para legibilidad de cartela -->
-              <div class="absolute inset-0 z-10 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
+              <div class="absolute inset-0 z-10 bg-linear-to-t from-black/85 via-black/25 to-transparent"></div>
 
               <!-- Cartela informativa sutil -->
               <div class="absolute bottom-4 left-4 right-4 z-30 flex items-center justify-between text-[11px] font-metadata tracking-[0.22em] uppercase text-white/75">
