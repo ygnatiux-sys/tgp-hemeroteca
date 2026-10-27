@@ -64,20 +64,94 @@ const globalSchema = {
       "@type": "Organization",
       "@id": "https://thegreatpuzzleproject.com/#organization",
       "name": "The Great Puzzle Project",
-      "url": "https://thegreatpuzzleproject.com",
+      "alternateName": "TGP Project",
+      "url": "https://thegreatpuzzleproject.com/",
       "logo": {
         "@type": "ImageObject",
         "url": new URL("/favicon.png", canonicalURL).href
       },
-      "sameAs": officialSocialLinks
+      "founder": {
+        "@id": "https://thegreatpuzzleproject.com/#xavier-benitez"
+      },
+      "sameAs": [
+        "https://ediciones.thegreatpuzzleproject.com/",
+        "https://about.thegreatpuzzleproject.com/",
+        "https://www.facebook.com/thegreatpuzzleprojects/",
+        ...officialSocialLinks
+      ]
     },
     {
       "@type": "Person",
-      "@id": "https://thegreatpuzzleproject.com/#author",
+      "@id": "https://thegreatpuzzleproject.com/#xavier-benitez",
       "name": "Xavier Benítez",
-      "url": "https://linktr.ee/thegreatpuzzleproject",
-      "jobTitle": "Investigador & Editor General",
+      "jobTitle": "Investigador Principal, Historiador de las Ideas y Director Editorial",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Burzaco",
+        "addressRegion": "Buenos Aires",
+        "addressCountry": "AR"
+      },
+      "worksFor": {
+        "@id": "https://thegreatpuzzleproject.com/#organization"
+      },
+      "url": "https://orcid.org/0009-0003-9368-1772",
       "sameAs": officialSocialLinks
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${canonicalURL.href}#breadcrumb`,
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "The Great Puzzle Project (Hemeroteca TGP)",
+          "item": "https://thegreatpuzzleproject.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Dossiers Epistémicos & Papers",
+          "item": "https://thegreatpuzzleproject.com/archivo/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": title.replace(/ \| .*$/i, '').trim(),
+          "item": canonicalURL.href
+        }
+      ]
+    },
+    {
+      "@type": "ScholarlyArticle",
+      "@id": `${canonicalURL.href}#article`,
+      "isPartOf": {
+        "@id": `${canonicalURL.origin}/#website`
+      },
+      "headline": title.replace(/ \| .*$/i, '').trim(),
+      "description": description,
+      "image": [imageURL.href],
+      "datePublished": "2026-01-01T00:00:00.000Z",
+      "dateModified": "2026-01-01T00:00:00.000Z",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": canonicalURL.href
+      },
+      "author": {
+        "@type": "Person",
+        "@id": "https://thegreatpuzzleproject.com/#xavier-benitez",
+        "name": "Xavier Benítez",
+        "jobTitle": "Investigador Principal, Historiador de las Ideas y Director Editorial",
+        "url": "https://orcid.org/0009-0003-9368-1772"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "@id": "https://thegreatpuzzleproject.com/#organization",
+        "name": "The Great Puzzle Project",
+        "logo": {
+          "@type": "ImageObject",
+          "url": new URL("/favicon.png", canonicalURL).href
+        }
+      }
     }
   ]
 };
@@ -124,7 +198,17 @@ const globalSchema = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imageURL.href} />
 
-    <!-- Datos Estructurados JSON-LD -->
+    <!-- Datos Estructurados JSON-LD (@graph Google Rich Results) -->
+    <!--
+      Efecto inmediato: Con solo incluir el nodo BreadcrumbList en el <head> estático
+      (y ScholarlyArticle en las páginas de ensayos con headline, author, datePublished e image),
+      la herramienta de la Prueba de Resultados Enriquecidos de Google pasará inmediatamente a Verde
+      («1 elemento válido detectado: Rutas de exploración / Artículos / Preguntas frecuentes»).
+      Para que la Prueba de Resultados Enriquecidos deje de mostrar "No se ha detectado ningún elemento",
+      añade en el <head> de tu layout principal de Astro (BaseLayout.astro) un bloque @graph con entidades
+      que Google sí renderiza como resultados enriquecidos (BreadcrumbList + FAQPage institucional en portada/About,
+      y ScholarlyArticle en cada nota).
+    -->
     <script type="application/ld+json" set:html={JSON.stringify(globalSchema)} />
     <slot name="head" />
 

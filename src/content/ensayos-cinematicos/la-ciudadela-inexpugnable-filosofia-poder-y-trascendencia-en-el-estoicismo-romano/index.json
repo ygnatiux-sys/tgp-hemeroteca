@@ -5,5 +5,8 @@
   "atmosfera": {
     "discriminant": "obsidiana"
   },
-  "coverImage": "/src/assets/ensayos-cinematicos/la-ciudadela-inexpugnable-filosofia-poder-y-trascendencia-en-el-estoicismo-romano/coverImage.jpg"
+  "coverImage": "https://storage.thegreatpuzzleproject.com/storage/marco-aurelio-busto-marmol-roma-f259652b.webp",
+  "gallery": [
+    "https://storage.thegreatpuzzleproject.com/storage/marco-aurelio-estatua-ecuestre-campidoglio-1db0d65a.webp"
+  ]
 }

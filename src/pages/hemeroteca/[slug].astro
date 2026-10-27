@@ -379,8 +379,15 @@ const heroTitleClass = `text-[clamp(2.25rem,5vw,4.5rem)] font-cinzel font-extrab
   title={`${doc.title} | Hemeroteca TGP`}
   description={doc.excerpt || doc.description}
   image={metaImageUrl}
+  article={{
+    headline: doc.title,
+    description: doc.excerpt || doc.description,
+    image: metaImageUrl,
+    datePublished: doc.date,
+    dateModified: doc.updatedDate || doc.date,
+    keywords: articleSchema.keywords
+  }}
 >
-  <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
   {
     isCinematicView ? (
       <div id="cinematic-override" class="w-full min-h-dvh overflow-hidden">

@@ -1,0 +1,24 @@
+---
+/**
+ * BaseLayout.astro — Layout Principal Canónico (Alias de Layout.astro)
+ *
+ * Efecto inmediato: Con solo incluir el nodo BreadcrumbList en el <head> estático
+ * (y ScholarlyArticle en las páginas de ensayos con headline, author, datePublished e image),
+ * la herramienta de la Prueba de Resultados Enriquecidos de Google pasará inmediatamente a Verde
+ * («1 elemento válido detectado: Rutas de exploración / Artículos / Preguntas frecuentes»).
+ * 
+ * Para que la Prueba de Resultados Enriquecidos deje de mostrar "No se ha detectado ningún elemento",
+ * añade en el <head> de tu layout principal de Astro (BaseLayout.astro) un bloque @graph con entidades
+ * que Google sí renderiza como resultados enriquecidos (BreadcrumbList + FAQPage institucional en portada/About,
+ * y ScholarlyArticle en cada nota).
+ */
+import Layout from "./Layout.astro";
+
+type Props = Parameters<typeof Layout>[0];
+const props = Astro.props;
+---
+
+<Layout {...props}>
+  <slot name="head" slot="head" />
+  <slot />
+</Layout>
