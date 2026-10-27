@@ -39,6 +39,8 @@ export interface CinemaShowcaseItem {
   duration: string;
   author: string;
   director: string;
+  modalId?: string;
+  actionLabel?: string;
 }
 
 export interface RoundFrameItem {
@@ -55,6 +57,8 @@ interface Props {
   collectionTitle?: string;
   isImax?: boolean;
   showBottomSection?: boolean;
+  minimalist?: boolean;
+  actionLabel?: string;
 }
 
 const { 
@@ -62,7 +66,9 @@ const {
   frames, 
   collectionTitle = "Colecciones Cinemáticas",
   isImax = false,
-  showBottomSection = true
+  showBottomSection = true,
+  minimalist = false,
+  actionLabel
 } = Astro.props;
 
 // Presets tipográficos de alto impacto estilo Apple TV+
@@ -226,10 +232,12 @@ const DEFAULT_ROUND_FRAMES: RoundFrameItem[] = [
 const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FRAMES;
 ---
 
-<!-- Carga de fuentes requeridas -->
+<!-- Carga de fuentes requeridas (Google Fonts + Fontshare) -->
+<link rel="preconnect" href="https://api.fontshare.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;800;900&family=Oswald:wght@600;700&family=Syne:wght@700;800&family=Cinzel:wght@700;800;900&family=Gloock&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,800;0,6..96,900;1,6..96,700&family=Fraunces:ital,opsz,wght@0,9..144,800;0,9..144,900;1,9..144,800&family=League+Spartan:wght@700;800;900&family=Oswald:wght@600;700&family=Space+Grotesk:wght@600;700&family=Syne:wght@700;800;900&family=Unbounded:wght@700;800;900&family=Cinzel:wght@700;800;900&family=Gloock&display=swap" rel="stylesheet">
 
 <div class="apple-cinema-showcase-wrapper relative w-full my-12 select-none font-sans" data-active-slide="0">
   
@@ -291,17 +299,19 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
             </span>
           </div>
 
-          <!-- SINOPSIS DESCRIPTIVA CON BOTÓN 'MÁS' INTEGRADO -->
+          <!-- SINOPSIS DESCRIPTIVA -->
           <div class="relative max-w-lg">
             <p class={`mayday-desc text-xs sm:text-sm md:text-base text-zinc-300 leading-relaxed font-normal drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] line-clamp-2 ${item.fontH2}`}>
               {item.subtitle}
             </p>
-            <a 
-              href={item.href}
-              class="inline-block px-1.5 py-0.5 rounded bg-white/20 hover:bg-white/30 text-white font-mono text-[9px] font-bold mt-1 tracking-wider uppercase transition-colors pointer-events-auto"
-            >
-              MÁS
-            </a>
+            {!minimalist && (
+              <a 
+                href={item.href}
+                class="inline-block px-1.5 py-0.5 rounded bg-white/20 hover:bg-white/30 text-white font-mono text-[9px] font-bold mt-1 tracking-wider uppercase transition-colors pointer-events-auto"
+              >
+                MÁS
+              </a>
+            )}
           </div>
 
           <!-- ESPECIFICACIONES TÉCNICAS Y RATING CON SÍMBOLO DE COLOR ESTILO APPLE TV -->
@@ -318,32 +328,36 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
             ))}
           </div>
 
-          <!-- BOTONERA APPLE TV+: BOTÓN BLANCO + BOTÓN CIRCULAR (+) -->
+          <!-- BOTONERA APPLE TV+ -->
           <div class="flex items-center gap-3 pt-3">
-            <!-- Botón Blanco Principal ("Aceptar prueba gratuita" / "Leer Investigación") -->
+            <!-- Botón Blanco Principal ("Aceptar prueba gratuita" / "Leer Investigación" / "Leer Ensayo Rescatado") -->
             <a 
               href={item.href}
-              class="inline-flex items-center justify-center gap-2 px-7 sm:px-8 py-3 rounded-full bg-white text-zinc-950 font-bold text-xs sm:text-sm shadow-[0_10px_25px_rgba(255,255,255,0.2)] hover:bg-zinc-200 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 cursor-pointer pointer-events-auto"
+              data-open-modal={item.modalId}
+              class="btn-apple-showcase-action inline-flex items-center justify-center gap-2 px-7 sm:px-8 py-3 rounded-full bg-white text-zinc-950 font-bold text-xs sm:text-sm shadow-[0_10px_25px_rgba(255,255,255,0.2)] hover:bg-zinc-200 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 cursor-pointer pointer-events-auto"
             >
-              <span>Acceder a la Investigación</span>
+              <span>{item.actionLabel || actionLabel || "Acceder a la Investigación"}</span>
             </a>
 
-            <!-- Botón Circular Guardar (+) -->
-            <button 
-              type="button"
-              aria-label="Guardar en acervo"
-              class="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer pointer-events-auto shadow-md"
-              title="Guardar en biblioteca"
-            >
-              <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-              </svg>
-            </button>
+            {!minimalist && (
+              <button 
+                type="button"
+                aria-label="Guardar en acervo"
+                class="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer pointer-events-auto shadow-md"
+                title="Guardar en biblioteca"
+              >
+                <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+            )}
           </div>
 
-          <p class="text-[10px] text-zinc-400 font-mono pt-1">
-            Archivo TGP abierto · Acceso libre e inmediato
-          </p>
+          {!minimalist && (
+            <p class="text-[10px] text-zinc-400 font-mono pt-1">
+              Archivo TGP abierto · Acceso libre e inmediato
+            </p>
+          )}
 
         </div>
       ))}
@@ -472,132 +486,136 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
   import { gsap } from 'gsap';
 
   function initMaydayShowcase() {
-    const wrapper = document.querySelector('.apple-cinema-showcase-wrapper') as HTMLElement | null;
-    if (!wrapper || wrapper.dataset.showcaseReady === 'true') return;
-    wrapper.dataset.showcaseReady = 'true';
+    const wrappers = document.querySelectorAll<HTMLElement>('.apple-cinema-showcase-wrapper');
+    if (!wrappers.length) return;
 
-    const bgs = gsap.utils.toArray<HTMLElement>('.mayday-bg-slide');
-    const contents = gsap.utils.toArray<HTMLElement>('.mayday-content-slide');
-    const dots = gsap.utils.toArray<HTMLButtonElement>('.mayday-dot');
+    wrappers.forEach((wrapper) => {
+      if (wrapper.dataset.showcaseReady === 'true') return;
+      wrapper.dataset.showcaseReady = 'true';
 
-    if (contents.length <= 1) return;
+      const bgs = gsap.utils.toArray<HTMLElement>(wrapper.querySelectorAll('.mayday-bg-slide'));
+      const contents = gsap.utils.toArray<HTMLElement>(wrapper.querySelectorAll('.mayday-content-slide'));
+      const dots = gsap.utils.toArray<HTMLButtonElement>(wrapper.querySelectorAll('.mayday-dot'));
 
-    let currentIndex = 0;
-    let isTransitioning = false;
-    let autoTimer: gsap.core.Tween | null = null;
-    let isHovering = false;
+      if (contents.length <= 1) return;
 
-    function updateDots(targetIdx: number) {
+      let currentIndex = 0;
+      let isTransitioning = false;
+      let autoTimer: gsap.core.Tween | null = null;
+      let isHovering = false;
+
+      function updateDots(targetIdx: number) {
+        dots.forEach((dot, idx) => {
+          if (idx === targetIdx) {
+            dot.className = 'mayday-dot transition-all duration-300 rounded-full cursor-pointer w-6 h-1.5 bg-white';
+          } else {
+            dot.className = 'mayday-dot transition-all duration-300 rounded-full cursor-pointer w-1.5 h-1.5 bg-white/35 hover:bg-white/60';
+          }
+        });
+      }
+
+      function goToSlide(nextIdx: number) {
+        if (nextIdx === currentIndex || isTransitioning) return;
+        isTransitioning = true;
+
+        const currentBg = bgs[currentIndex];
+        const nextBg = bgs[nextIdx];
+        const currentContent = contents[currentIndex];
+        const nextContent = contents[nextIdx];
+
+        const tl = gsap.timeline({
+          onComplete: () => {
+            isTransitioning = false;
+          }
+        });
+
+        // 1. Apagar contenido y fondo actual
+        tl.to(
+          currentContent,
+          {
+            opacity: 0,
+            y: -12,
+            duration: 0.4,
+            ease: 'power2.in',
+            onComplete: () => {
+              currentContent.style.display = 'none';
+              currentContent.style.pointerEvents = 'none';
+            }
+          },
+          0
+        );
+
+        tl.to(
+          currentBg,
+          {
+            opacity: 0,
+            duration: 0.6,
+            ease: 'power2.inOut',
+            onComplete: () => {
+              currentBg.style.display = 'none';
+            }
+          },
+          0
+        );
+
+        // 2. Encender nuevo fondo con leve scale out
+        tl.set(nextBg, { display: 'block', zIndex: '10' }, 0.2);
+        tl.fromTo(
+          nextBg,
+          { opacity: 0, scale: 1.04 },
+          { opacity: 1, scale: 1, duration: 0.8, ease: 'power3.out' },
+          0.2
+        );
+
+        // 3. Encender nuevo contenido con stagger
+        tl.set(nextContent, { display: 'flex', zIndex: '30', pointerEvents: 'auto' }, 0.3);
+        tl.fromTo(
+          nextContent,
+          { opacity: 0, y: 18 },
+          { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' },
+          0.3
+        );
+
+        currentIndex = nextIdx;
+        wrapper.dataset.activeSlide = String(currentIndex);
+        updateDots(currentIndex);
+      }
+
+      function scheduleTimer() {
+        if (autoTimer) autoTimer.kill();
+        autoTimer = gsap.delayedCall(5.5, () => {
+          if (!isHovering) {
+            const next = (currentIndex + 1) % contents.length;
+            goToSlide(next);
+            scheduleTimer();
+          }
+        });
+      }
+
       dots.forEach((dot, idx) => {
-        if (idx === targetIdx) {
-          dot.className = 'mayday-dot transition-all duration-300 rounded-full cursor-pointer w-6 h-1.5 bg-white';
+        dot.addEventListener('click', (e) => {
+          e.preventDefault();
+          goToSlide(idx);
+          scheduleTimer();
+        });
+      });
+
+      wrapper.addEventListener('mouseenter', () => {
+        isHovering = true;
+        if (autoTimer) autoTimer.pause();
+      });
+
+      wrapper.addEventListener('mouseleave', () => {
+        isHovering = false;
+        if (autoTimer) {
+          autoTimer.resume();
         } else {
-          dot.className = 'mayday-dot transition-all duration-300 rounded-full cursor-pointer w-1.5 h-1.5 bg-white/35 hover:bg-white/60';
-        }
-      });
-    }
-
-    function goToSlide(nextIdx: number) {
-      if (nextIdx === currentIndex || isTransitioning) return;
-      isTransitioning = true;
-
-      const currentBg = bgs[currentIndex];
-      const nextBg = bgs[nextIdx];
-      const currentContent = contents[currentIndex];
-      const nextContent = contents[nextIdx];
-
-      const tl = gsap.timeline({
-        onComplete: () => {
-          isTransitioning = false;
-        }
-      });
-
-      // 1. Apagar contenido y fondo actual
-      tl.to(
-        currentContent,
-        {
-          opacity: 0,
-          y: -12,
-          duration: 0.4,
-          ease: 'power2.in',
-          onComplete: () => {
-            currentContent.style.display = 'none';
-            currentContent.style.pointerEvents = 'none';
-          }
-        },
-        0
-      );
-
-      tl.to(
-        currentBg,
-        {
-          opacity: 0,
-          duration: 0.6,
-          ease: 'power2.inOut',
-          onComplete: () => {
-            currentBg.style.display = 'none';
-          }
-        },
-        0
-      );
-
-      // 2. Encender nuevo fondo con leve scale out
-      tl.set(nextBg, { display: 'block', zIndex: '10' }, 0.2);
-      tl.fromTo(
-        nextBg,
-        { opacity: 0, scale: 1.04 },
-        { opacity: 1, scale: 1, duration: 0.8, ease: 'power3.out' },
-        0.2
-      );
-
-      // 3. Encender nuevo contenido con stagger
-      tl.set(nextContent, { display: 'flex', zIndex: '30', pointerEvents: 'auto' }, 0.3);
-      tl.fromTo(
-        nextContent,
-        { opacity: 0, y: 18 },
-        { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' },
-        0.3
-      );
-
-      currentIndex = nextIdx;
-      wrapper.dataset.activeSlide = String(currentIndex);
-      updateDots(currentIndex);
-    }
-
-    function scheduleTimer() {
-      if (autoTimer) autoTimer.kill();
-      autoTimer = gsap.delayedCall(5.5, () => {
-        if (!isHovering) {
-          const next = (currentIndex + 1) % contents.length;
-          goToSlide(next);
           scheduleTimer();
         }
       });
-    }
 
-    dots.forEach((dot, idx) => {
-      dot.addEventListener('click', (e) => {
-        e.preventDefault();
-        goToSlide(idx);
-        scheduleTimer();
-      });
+      scheduleTimer();
     });
-
-    wrapper.addEventListener('mouseenter', () => {
-      isHovering = true;
-      if (autoTimer) autoTimer.pause();
-    });
-
-    wrapper.addEventListener('mouseleave', () => {
-      isHovering = false;
-      if (autoTimer) {
-        autoTimer.resume();
-      } else {
-        scheduleTimer();
-      }
-    });
-
-    scheduleTimer();
   }
 
   if (document.readyState === 'loading') {
