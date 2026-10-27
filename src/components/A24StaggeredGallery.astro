@@ -85,7 +85,7 @@ const sanitizeTitle = (rawTitle?: string) => {
 const normalizePost = (item: any, fallbackBadge: string = "ENSAYO") => {
   const rawImg = item.img || item.image || item.entry?.coverImage || resolveEssayImage(item.entry || item, item.slug);
   const image = sanitizeImageUrl(typeof rawImg === 'object' && rawImg?.src ? rawImg.src : (typeof rawImg === 'string' ? rawImg : '')) 
-    || 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1200&auto=format&fit=crop';
+    || 'https://storage.thegreatpuzzleproject.com/wikimedia/1790071455051-85f47995.webp';
   
   const rawTitle = item.title || item.titulo || item.entry?.title || "Investigación Editorial";
   const cleanedTitle = sanitizeTitle(rawTitle);
@@ -115,7 +115,7 @@ const epigraphMap: Record<string, string> = {
   "arquetipos": "Figuras que reaparecen en cada cultura. Los arquetipos son la gramática secreta del ser humano.",
 };
 
-// ─── COLECCIONES REALES SANITIZADAS (SOLO LAS EXISTENTES) ────────────────────
+// ─── COLECCIONES REALES SANITIZADAS (IMÁGENES SINTÉTICAS TGP / R2) ───────────
 const allItemsNormalized = items.map(i => normalizePost(i));
 
 interface ActiveCollection {
@@ -131,23 +131,23 @@ interface ActiveCollection {
 const realCollectionsMap: Record<string, { label: string; image: string }> = {
   "arqueosemiotica": {
     label: "Arqueosemiótica",
-    image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop"
-  },
-  "filosofia": {
-    label: "Filosofía",
-    image: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=1600&auto=format&fit=crop"
+    image: "https://storage.thegreatpuzzleproject.com/wikimedia/1791676137832-aca96ac9.webp"
   },
   "historia": {
     label: "Historia",
-    image: "https://images.unsplash.com/photo-1507842229451-7f01be8610ce?q=80&w=1600&auto=format&fit=crop"
+    image: "https://storage.thegreatpuzzleproject.com/wikimedia/1790071723833-46d3cf67.webp"
+  },
+  "filosofia": {
+    label: "Filosofía",
+    image: "https://storage.thegreatpuzzleproject.com/ensayos-cinematicos/la-catedral-de-la-razon-arqueosemiotica-y-vigencia-de-la-escolastica/coverImage.jpg"
   },
   "mitologia": {
     label: "Mitología",
-    image: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?q=80&w=1600&auto=format&fit=crop"
+    image: "https://storage.thegreatpuzzleproject.com/wikimedia/1790035296784-aa49629d.webp"
   },
   "ensayos-cinematicos": {
     label: "Ensayos Cinemáticos",
-    image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1600&auto=format&fit=crop"
+    image: "https://storage.thegreatpuzzleproject.com/wikimedia/1790170442476-ee7c416b.webp"
   }
 };
 
@@ -230,43 +230,44 @@ const activeCollections: ActiveCollection[] = Object.entries(realCollectionsMap)
     </div>
   </header>
 
-  <!-- ── 1. FRANJA BENTO ULTRA (SUPERIOR, PANORÁMICA, NO FULL BLEED) ── -->
+  <!-- ── 1. FRANJA BENTO ULTRA IMAX (SUPERIOR, PANORÁMICA, NO FULL BLEED) ── -->
   <div class="w-full mx-auto mb-10 md:mb-14">
     <div 
-      class="a24-bento-stage relative w-full h-85 sm:h-95 md:h-105 rounded-[28px] overflow-hidden bg-black border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)] select-none group/bento"
+      class="a24-bento-stage relative w-full h-[460px] sm:h-[520px] md:h-[580px] lg:h-[640px] xl:h-[680px] rounded-[28px] md:rounded-[36px] overflow-hidden bg-black border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)] select-none group/bento"
+      style="overflow-anchor: none;"
       data-total-collections={activeCollections.length}
     >
       
       {/* Flechas de Navegación Manual Flotantes */}
       <button 
         type="button" 
-        class="a24-bento-prev absolute left-3 md:left-5 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-0 group-hover/bento:opacity-100 hover:scale-110 active:scale-95 cursor-pointer shadow-xl pointer-events-auto"
+        class="a24-bento-prev absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-0 group-hover/bento:opacity-100 hover:scale-110 active:scale-95 cursor-pointer shadow-2xl pointer-events-auto"
         aria-label="Colección anterior"
       >
-        <svg class="w-5 h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <svg class="w-6 h-6 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
         </svg>
       </button>
 
       <button 
         type="button" 
-        class="a24-bento-next absolute right-3 md:right-5 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-0 group-hover/bento:opacity-100 hover:scale-110 active:scale-95 cursor-pointer shadow-xl pointer-events-auto"
+        class="a24-bento-next absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 backdrop-blur-md transition-all duration-300 flex items-center justify-center opacity-0 group-hover/bento:opacity-100 hover:scale-110 active:scale-95 cursor-pointer shadow-2xl pointer-events-auto"
         aria-label="Colección siguiente"
       >
-        <svg class="w-5 h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <svg class="w-6 h-6 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
         </svg>
       </button>
 
-      {/* Diapositivas de la Franja Bento Ultra */}
+      {/* Diapositivas de la Franja Bento Ultra IMAX */}
       <div class="relative w-full h-full">
         {activeCollections.map((col, cIdx) => (
           <div 
             class={`a24-bento-slide absolute inset-0 w-full h-full ${cIdx === 0 ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
             data-collection-index={cIdx}
           >
-            <!-- Imagen Panorámica Derecha de la Colección -->
-            <div class="absolute right-0 top-0 w-[72%] sm:w-[68%] md:w-[64%] h-full overflow-hidden">
+            <!-- Imagen Panorámica IMAX de la Colección -->
+            <div class="absolute right-0 top-0 w-[78%] sm:w-[74%] md:w-[70%] lg:w-[66%] h-full overflow-hidden">
               <img 
                 src={col.image} 
                 alt={col.label}
@@ -276,38 +277,38 @@ const activeCollections: ActiveCollection[] = Object.entries(realCollectionsMap)
               />
             </div>
 
-            <!-- Máscara de Fusión Apple TV + Ambient Glow Cobrizo -->
-            <div class="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,#000000_0%,#000000_36%,rgba(0,0,0,0.85)_50%,rgba(0,0,0,0)_72%)]"></div>
-            <div class="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_0%_0%,rgba(190,90,55,0.42)_0%,transparent_50%)]"></div>
+            <!-- Máscara de Fusión Apple TV IMAX + Ambient Glow Cobrizo -->
+            <div class="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,#000000_0%,#000000_30%,rgba(0,0,0,0.85)_46%,rgba(0,0,0,0)_74%)]"></div>
+            <div class="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_0%_0%,rgba(190,90,55,0.45)_0%,transparent_50%)]"></div>
 
             <!-- Bloque Editorial Izquierdo -->
-            <div class="absolute inset-y-0 left-0 z-20 w-full md:w-[54%] lg:w-[48%] pl-6 sm:pl-10 md:pl-14 pr-6 flex flex-col justify-center">
+            <div class="absolute inset-y-0 left-0 z-20 w-full md:w-[56%] lg:w-[50%] pl-6 sm:pl-10 md:pl-16 pr-6 flex flex-col justify-center">
               
-              <div class="flex items-center gap-2 mb-2.5">
-                <span class="text-xs uppercase tracking-[0.25em] text-amber-500 font-bold block font-mono">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-xs sm:text-sm uppercase tracking-[0.25em] text-amber-500 font-bold block font-mono">
                   COLECCIÓN TEMÁTICA // {col.count} INVESTIGACIONES
                 </span>
               </div>
 
-              <h3 class="text-3xl sm:text-4xl md:text-5xl font-black font-cinzel text-white leading-[1.08] tracking-tight mb-3 uppercase">
+              <h3 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black font-cinzel text-white leading-[1.04] tracking-tight mb-4 uppercase drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
                 {col.label}
               </h3>
 
-              <p class="text-xs sm:text-sm text-zinc-300/90 mb-6 leading-relaxed line-clamp-3 font-sans max-w-lg">
+              <p class="text-xs sm:text-sm md:text-base text-zinc-300/95 mb-8 leading-relaxed line-clamp-3 font-sans max-w-lg drop-shadow">
                 {col.epigraph}
               </p>
 
               <!-- Botones CTA 100% Funcionales -->
-              <div class="flex items-center gap-3 flex-wrap pointer-events-auto">
+              <div class="flex items-center gap-3.5 flex-wrap pointer-events-auto">
                 <a 
                   href={col.href}
-                  class="px-6 py-2.5 rounded-full bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-semibold tracking-wide transition shadow-lg hover:scale-[1.02] active:scale-[0.98] pointer-events-auto cursor-pointer"
+                  class="px-7 py-3 rounded-full bg-white hover:bg-zinc-200 text-zinc-950 text-xs sm:text-sm font-bold tracking-wide transition shadow-xl hover:scale-[1.02] active:scale-[0.98] pointer-events-auto cursor-pointer"
                 >
                   Explorar {col.label}
                 </a>
                 <a 
                   href="/archivo/"
-                  class="px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/20 text-[#E3DDD3] text-xs font-medium backdrop-blur-md transition hover:scale-[1.02] active:scale-[0.98] pointer-events-auto cursor-pointer"
+                  class="px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/20 text-[#E3DDD3] text-xs sm:text-sm font-medium backdrop-blur-md transition hover:scale-[1.02] active:scale-[0.98] pointer-events-auto cursor-pointer"
                 >
                   Ver Catálogo General
                 </a>
@@ -319,11 +320,11 @@ const activeCollections: ActiveCollection[] = Object.entries(realCollectionsMap)
       </div>
 
       <!-- Indicadores de Puntos Centrales Inferiores -->
-      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/10 pointer-events-auto">
+      <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2.5 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/10 pointer-events-auto">
         {activeCollections.map((_, dotIdx) => (
           <button 
             type="button" 
-            class={`a24-bento-dot transition-all duration-300 rounded-full cursor-pointer ${dotIdx === 0 ? 'w-5 h-2 bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]' : 'w-2 h-2 bg-white/30 hover:bg-white/60'}`}
+            class={`a24-bento-dot transition-all duration-300 rounded-full cursor-pointer ${dotIdx === 0 ? 'w-6 h-2 bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.85)]' : 'w-2 h-2 bg-white/30 hover:bg-white/60'}`}
             data-bento-dot={dotIdx}
             aria-label={`Ir a colección ${dotIdx + 1}`}
           ></button>
@@ -334,26 +335,26 @@ const activeCollections: ActiveCollection[] = Object.entries(realCollectionsMap)
   </div>
 
   <!-- ── 2. ARRAY DE 3 POSTS (DEBAJO DE LA FRANJA, TAMAÑO UNIFORME, AMPLIO Y VISIBLE) ── -->
-  <div class="w-full mx-auto">
+  <div class="w-full mx-auto" style="overflow-anchor: none;">
     
-    <!-- Subtítulo / Encabezado dinámico de los 3 posts -->
-    <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
+    <!-- Subtítulo / Encabezado dinámico de los 3 posts con altura rígida -->
+    <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-6 h-10 overflow-hidden" style="overflow-anchor: none;">
       <div class="flex items-center gap-2.5">
         <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-        <span class="text-xs font-mono uppercase tracking-[0.25em] text-zinc-300 font-bold">
+        <span class="text-xs font-mono uppercase tracking-[0.25em] text-zinc-300 font-bold truncate max-w-[280px] sm:max-w-none">
           INVESTIGACIONES EN <span class="a24-posts-col-name text-amber-300">{activeCollections[0].label.toUpperCase()}</span>
         </span>
       </div>
       <a 
         href={activeCollections[0].href} 
-        class="a24-posts-col-link text-[11px] font-mono uppercase tracking-widest text-amber-400 hover:text-amber-300 transition pointer-events-auto cursor-pointer"
+        class="a24-posts-col-link text-[11px] font-mono uppercase tracking-widest text-amber-400 hover:text-amber-300 transition pointer-events-auto cursor-pointer shrink-0"
       >
         Ver Colección Completa →
       </a>
     </div>
 
-    <!-- Contenedor del Stage de Posts (Sincronizado con la franja superior) -->
-    <div class="a24-posts-stage relative w-full grid grid-cols-1 grid-rows-1">
+    <!-- Contenedor del Stage de Posts (Sincronizado, Zero Layout Shift) -->
+    <div class="a24-posts-stage relative w-full grid grid-cols-1 grid-rows-1 overflow-hidden" style="overflow-anchor: none; contain: paint;">
       {activeCollections.map((col, cIdx) => (
         <div 
           class={`a24-posts-group col-start-1 row-start-1 w-full ${cIdx === 0 ? 'active opacity-100 pointer-events-auto z-10' : 'opacity-0 pointer-events-none z-0'}`}
@@ -529,17 +530,17 @@ function initA24SyncedStage() {
       );
     }
 
-    // ─── B. TRANSICIÓN DEL ARRAY DE 3 POSTS INFERIOR (UNO DESPUÉS DE OTRO) ───
+    // ─── B. TRANSICIÓN DEL ARRAY DE 3 POSTS INFERIOR (CERO SALTO DE LAYOUT) ───
     if (currentGroup) {
       tl.to(currentGroup, {
-        opacity: 0,
-        y: -10,
-        duration: 0.25,
+        autoAlpha: 0,
+        y: -4,
+        duration: 0.22,
         ease: "power2.in",
         onComplete: () => {
           currentGroup.classList.remove("active");
           currentGroup.classList.add("pointer-events-none");
-          gsap.set(currentGroup, { zIndex: 0 });
+          gsap.set(currentGroup, { zIndex: 0, y: 0 });
         }
       }, 0);
     }
@@ -547,18 +548,18 @@ function initA24SyncedStage() {
     if (nextGroup && nextCards) {
       nextGroup.classList.remove("pointer-events-none");
       nextGroup.classList.add("active", "pointer-events-auto");
-      gsap.set(nextGroup, { zIndex: 10, opacity: 1, y: 0 });
+      gsap.set(nextGroup, { zIndex: 10, autoAlpha: 1, y: 0 });
 
-      // Stagger secuencial para que las 3 tarjetas aparezcan "una después de otra"
-      gsap.set(nextCards, { opacity: 0, y: 24, scale: 1.02 });
+      // Stagger sutil sin ensanchar los bordes de la página
+      gsap.set(nextCards, { autoAlpha: 0, y: 6, scale: 0.99 });
       tl.to(nextCards, {
-        opacity: 1,
+        autoAlpha: 1,
         y: 0,
         scale: 1,
-        duration: 0.52,
-        stagger: 0.08,
+        duration: 0.45,
+        stagger: 0.07,
         ease: "expo.out"
-      }, 0.15);
+      }, 0.12);
     }
 
     updateIndicators(nextIndex);
