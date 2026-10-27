@@ -7,11 +7,30 @@ export const prerender = false;
 
 const isDev = import.meta.env.DEV;
 const AUTHORIZED_EMAIL = "Xgnatiux@gmail.com";
+const MASTER_PIN = "2771";
 
-// ── BLINDAJE EN PRODUCCIÓN: EXIGIR VALIDACIÓN DE CLOUDFLARE ACCESS ──
+// ── BLINDAJE EN PRODUCCIÓN: CLOUDFLARE ACCESS O PIN MAESTRO (2771) ──
 if (!isDev) {
   const cfUserEmail = Astro.request.headers.get('cf-access-authenticated-user-email');
-  if (!cfUserEmail || cfUserEmail.toLowerCase() !== AUTHORIZED_EMAIL.toLowerCase()) {
+  const isCloudflareAuth = cfUserEmail && cfUserEmail.toLowerCase() === AUTHORIZED_EMAIL.toLowerCase();
+
+  const queryPin = Astro.url.searchParams.get('pin') || Astro.url.searchParams.get('code') || Astro.url.searchParams.get('auth');
+  const cookiePin = Astro.cookies.get('tgp_pin')?.value;
+
+  const isPinAuth = (queryPin === MASTER_PIN) || (cookiePin === MASTER_PIN);
+
+  if (queryPin === MASTER_PIN) {
+    // Persistir cookie por 30 días para evitar tipear el PIN constantemente
+    Astro.cookies.set('tgp_pin', MASTER_PIN, {
+      path: '/',
+      httpOnly: true,
+      secure: true,
+      maxAge: 60 * 60 * 24 * 30, // 30 días
+      sameSite: 'lax'
+    });
+  }
+
+  if (!isCloudflareAuth && !isPinAuth) {
     return Astro.redirect('/404');
   }
 }
@@ -802,8 +821,20 @@ if (!isDev) {
         cardTag.style.background = 'rgba(201, 169, 110, 0.2)';
         cardTag.style.color = '#c9a96e';
         cardUrl.style.display = 'none';
-      } else {
-        cardTag.textContent = node.type === 'DIRECTOR_AUTOR' ? '🖋️ Director & Autor Principal' : (node.type === 'MANIFESTO_ABOUT' ? '📜 Manifiesto Epistémico (About)' : (node.type === 'EPISTEME_CORE' ? '👑 Cúspide Zenital (Misión)' : (node.type === 'EPISTEME_STACK' ? '🔬 Stack Teórico (Nivel Epistémico)' : (node.type === 'MACRO_ALLIANCE' ? '🗺️ Macro-Alianza Taxonómica' : (node.type === 'CONTINENTE' ? 'Eje Continental' : (node.type === 'GEORREFERENCIA' ? 'Georreferencia Megalítica' : (node.type === 'EDICION_REVISTA' ? 'Edición Revista' : (node.type === 'ENSAYO_ALTERNATIVE' ? 'TGP Alternative' : (node.type === 'ENSAYO_CINEMATICO' ? 'Ensayo Cinemático' : (node.type === 'ARQUETIPO' ? 'Arquetipo' : 'Ensayo Hemeroteca'))))))));
+        const typeLabels: Record<string, string> = {
+          DIRECTOR_AUTOR: '🖋️ Director & Autor Principal',
+          MANIFESTO_ABOUT: '📜 Manifiesto Epistémico (About)',
+          EPISTEME_CORE: '👑 Cúspide Zenital (Misión)',
+          EPISTEME_STACK: '🔬 Stack Teórico (Nivel Epistémico)',
+          MACRO_ALLIANCE: '🗺️ Macro-Alianza Taxonómica',
+          CONTINENTE: 'Eje Continental',
+          GEORREFERENCIA: 'Georreferencia Megalítica',
+          EDICION_REVISTA: 'Edición Revista',
+          ENSAYO_ALTERNATIVE: 'TGP Alternative',
+          ENSAYO_CINEMATICO: 'Ensayo Cinemático',
+          ARQUETIPO: 'Arquetipo',
+        };
+        cardTag.textContent = typeLabels[node.type] || 'Ensayo Hemeroteca';
         cardTag.style.background = 'rgba(56, 189, 248, 0.2)';
         cardTag.style.color = '#38bdf8';
         if (node.url) {
