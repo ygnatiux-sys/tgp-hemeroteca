@@ -3,9 +3,6 @@ import { resolveMultivisionClass } from "../lib/multivision";
 export const prerender = true;
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
-import m1 from '../assets/manifiesto/m1.png';
-import m2 from '../assets/manifiesto/m2.png';
-import m3 from '../assets/manifiesto/m3.png';
 import KitLeadMagnet from '../components/KitLeadMagnet.astro';
 import Marquee from '../components/Marquee.astro';
 import CinematicExcerptRest from '../components/CinematicExcerptRest.astro';
@@ -420,55 +417,95 @@ const cinemaShowcasePosts = publishable
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
-          PANEL 2: MANIFIESTO
+          PANEL 2: MANIFIESTO (ADN ZENITAL TGP)
       ══════════════════════════════════════════════════════════════════ */}
       <div id="panel-manifiesto" role="tabpanel" aria-labelledby="tab-manifiesto" class="about-panel hidden flex-col gap-0">
-        <div class="bg-[#050505] rounded-3xl overflow-hidden border border-white/5">
-          {/* Fragmento I */}
-          <section class="relative min-h-[70vh] w-full flex items-center justify-center overflow-hidden">
-            <div class="absolute inset-0 z-0">
-              <img src={m1.src} alt="Signals" loading="lazy" decoding="async" class="opacity-40 img-nativa" />
-              <div class="absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/80"></div>
-            </div>
-            <div class="relative z-10 text-center px-8 max-w-5xl py-20">
-              <header class="mb-10 opacity-30 font-mono text-[9px] uppercase tracking-[0.8em]">Fragmento I</header>
-              <p class="font-serif text-3xl md:text-5xl lg:text-6xl leading-[1.1] bg-linear-to-b from-[#e0e0e0] to-[#e0e0e0]/20 bg-clip-text text-transparent drop-shadow-2xl">
-                La historia no es una narrativa lineal, sino un archivo de señales esperando ser decodificadas.
+        <article class="max-w-4xl mx-auto px-4 sm:px-8 py-12 md:py-20 text-zinc-300 space-y-14 sm:space-y-16">
+          
+          {/* Header del Manifiesto */}
+          <header class="space-y-4 border-b border-white/10 pb-10">
+            <p class="font-metadata font-bold text-xs uppercase tracking-[0.28em] text-[#d4af37]">
+              DUDA. INVESTIGA. CONECTA. — HISTORIA DE LA PRODUCCIÓN HUMANA DE SENTIDO
+            </p>
+            <h1 class="font-['Gloock'] font-normal text-3xl sm:text-5xl lg:text-[3.25rem] text-[#EDEDE8] leading-[1.12] tracking-tight drop-shadow-[0_2px_14px_rgba(0,0,0,0.9)]">
+              La historia no es solo lo que nos pasó. <span class="font-serif italic text-[#d4af37]">Es lo que hicimos para darle sentido.</span>
+            </h1>
+            <p class="font-['Proza_Libre'] text-lg sm:text-xl text-[#C5C5BF] leading-relaxed pt-2">
+              <strong class="text-white font-medium">The Great Puzzle Project</strong> investiga cómo los seres humanos han construido, transmitido y transformado los mundos de significado a lo largo del tiempo. Conectamos fragmentos de memoria, objetos materiales, relatos y sistemas simbólicos para comprender cómo las sociedades interpretan su pasado y orientan su presente.
+            </p>
+          </header>
+
+          {/* Bloque 1: Condición Humana */}
+          <section class="space-y-4">
+            <span class="font-metadata font-bold text-xs uppercase tracking-[0.28em] text-[#d4af37]">01 · El Punto de Partida</span>
+            <h2 class="font-serif text-2xl sm:text-3xl lg:text-4xl text-[#EDEDE8]">La condición humana frente a la incertidumbre</h2>
+            <p class="font-['Proza_Libre'] leading-relaxed text-base sm:text-lg text-[#C5C5BF]">
+              Durante mucho tiempo la historia se contó como una lista de batallas, dinastías, fechas y objetos guardados detrás de una vitrina. Datos sueltos que informan qué ocurrió, pero rara vez explican qué significó estar vivo en ese momento.
+            </p>
+            <p class="font-['Proza_Libre'] leading-relaxed text-base sm:text-lg text-[#C5C5BF]">
+              Desde hace decenas de miles de años compartimos las mismas capacidades fundamentales: sentimos asombro y temor ante lo desconocido, recordamos a quienes ya no están, miramos el cielo buscando regularidades, imaginamos futuros posibles y necesitamos pertenecer. Con esas herramientas compartidas, cada cultura levantó su propio refugio de sentido: talló la piedra, inventó lenguajes, trazó mapas, consagró templos y escribió leyes.
+            </p>
+          </section>
+
+          {/* Bloque 2: Palimpsesto y Archivo Vivo */}
+          <section class="space-y-4">
+            <span class="font-metadata font-bold text-xs uppercase tracking-[0.28em] text-[#d4af37]">02 · Qué Investigamos</span>
+            <h2 class="font-serif text-2xl sm:text-3xl lg:text-4xl text-[#EDEDE8]">El Palimpsesto y el Archivo Vivo</h2>
+            <p class="font-['Proza_Libre'] leading-relaxed text-base sm:text-lg text-[#C5C5BF]">
+              La cultura no es una simple consecuencia pasiva de la mente, ni un monumento estático: es un <strong class="text-white font-medium">palimpsesto</strong>. Un tejido de significados que se conservan, se reescriben, se disputan y reaparecen bajo nuevas máscaras en contextos diferentes.
+            </p>
+            <p class="font-['Proza_Libre'] leading-relaxed text-base sm:text-lg text-[#C5C5BF]">
+              Por eso investigamos tanto las capacidades humanas que hacen posible simbolizar el mundo como el <strong class="text-white font-medium">Archivo Vivo</strong> de sus transformaciones: las condiciones materiales, las tecnologías de la palabra, las instituciones y las relaciones de poder que intervienen en lo que una sociedad recuerda, transmite como relato oficial o empuja hacia el olvido.
+            </p>
+          </section>
+
+          {/* Bloque 3: El Método (Bento Grid de 3 Reglas) */}
+          <section class="space-y-6">
+            <div>
+              <span class="font-metadata font-bold text-xs uppercase tracking-[0.28em] text-[#d4af37]">03 · Nuestro Método</span>
+              <h2 class="font-serif text-2xl sm:text-3xl lg:text-4xl text-[#EDEDE8] mt-1">Cartografía crítica, no dogma</h2>
+              <p class="font-['Proza_Libre'] leading-relaxed text-base sm:text-lg text-[#C5C5BF] mt-2">
+                TGP no propone una fórmula espiritualista de la evolución de la conciencia, ni busca atajos metafísicos, ni se conforma con repetir el catálogo escolar.
               </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div class="p-6 sm:p-7 rounded-2xl bg-[#0e0f0f]/80 border border-white/10 shadow-lg">
+                <h3 class="font-serif text-xl text-[#d4af37]">1. Cruce disciplinar</h3>
+                <p class="font-['Proza_Libre'] text-sm sm:text-base text-[#C5C5BF] mt-2.5 leading-relaxed">
+                  Articulamos la historia cultural, la arqueología, la semiótica, la filosofía y las ciencias cognitivas preservando siempre el peso de la evidencia material.
+                </p>
+              </div>
+              <div class="p-6 sm:p-7 rounded-2xl bg-[#0e0f0f]/80 border border-white/10 shadow-lg">
+                <h3 class="font-serif text-xl text-[#d4af37]">2. Rigor probatorio</h3>
+                <p class="font-['Proza_Libre'] text-sm sm:text-base text-[#C5C5BF] mt-2.5 leading-relaxed">
+                  Contrastamos fuentes y exploramos conexiones profundas entre épocas, pero <strong class="text-white font-medium">sin confundir analogías con pruebas ni hipótesis con hechos demostrados</strong>.
+                </p>
+              </div>
+              <div class="p-6 sm:p-7 rounded-2xl bg-[#0e0f0f]/80 border border-white/10 shadow-lg">
+                <h3 class="font-serif text-xl text-[#d4af37]">3. Doble coordenada</h3>
+                <p class="font-['Proza_Libre'] text-sm sm:text-base text-[#C5C5BF] mt-2.5 leading-relaxed">
+                  Cada pieza parte de un objeto concreto para responder dos preguntas: <em>¿de qué trata esta huella?</em> y <em>¿qué revela sobre cómo construimos sentido?</em>
+                </p>
+              </div>
             </div>
           </section>
 
-          {/* Fragmento II */}
-          <section class="relative min-h-[70vh] w-full flex items-center justify-center overflow-hidden">
-            <div class="absolute inset-0 z-0">
-              <img src={m2.src} alt="Stone & Algorithm" loading="lazy" decoding="async" class="opacity-40 img-nativa" />
-              <div class="absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/80"></div>
+          {/* Bloque de Cierre y Firma */}
+          <footer class="p-8 sm:p-10 rounded-3xl bg-[#0e0f0f]/90 border border-[#d4af37]/25 space-y-5 shadow-2xl">
+            <p class="font-metadata font-bold text-xs sm:text-sm uppercase tracking-[0.25em] text-[#d4af37]">
+              La historia es nuestro laboratorio. La interpretación, nuestra herramienta. Comprender el presente, nuestra orientación.
+            </p>
+            <blockquote class="font-serif text-xl sm:text-2xl md:text-[1.65rem] italic text-[#EDEDE8] leading-relaxed drop-shadow-sm">
+              “Entender el pasado no es memorizar lo que otros creyeron; es descubrir cómo los seres humanos aprendimos a habitar el mundo a través de lo que creamos, recordamos y disputamos.”
+            </blockquote>
+            <div class="pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-[13px] font-metadata tracking-wider text-[#C5C5BF]/80">
+              <span class="font-bold text-white/90">XAVIER BENÍTEZ · FUNDADOR, INVESTIGADOR Y DIRECTOR DE TGP</span>
+              <span>BURZACO, BUENOS AIRES · PROYECTO EDITORIAL & MULTIMEDIA</span>
             </div>
-            <div class="relative z-10 text-center px-8 max-w-5xl py-20">
-              <header class="mb-10 opacity-30 font-mono text-[9px] uppercase tracking-[0.8em]">Fragmento II</header>
-              <p class="font-serif text-3xl md:text-5xl lg:text-6xl leading-[1.1] bg-linear-to-b from-[#e0e0e0] to-[#e0e0e0]/20 bg-clip-text text-transparent drop-shadow-2xl">
-                Buscamos la arqueosemiótica de lo cotidiano, el lenguaje oculto tras la piedra y el algoritmo.
-              </p>
-            </div>
-          </section>
+          </footer>
 
-          {/* Fragmento III */}
-          <section class="relative min-h-[70vh] w-full flex items-center justify-center overflow-hidden">
-            <div class="absolute inset-0 z-0">
-              <img src={m3.src} alt="The Puzzle" loading="lazy" decoding="async" class="opacity-40 img-nativa" />
-              <div class="absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/80"></div>
-            </div>
-            <div class="relative z-10 text-center px-8 max-w-5xl py-20">
-              <header class="mb-10 opacity-30 font-mono text-[9px] uppercase tracking-[0.8em]">Fragmento III</header>
-              <p class="font-serif text-3xl md:text-5xl lg:text-6xl leading-[1.1] bg-linear-to-b from-[#e0e0e0] to-[#e0e0e0]/20 bg-clip-text text-transparent drop-shadow-2xl mb-12">
-                Bienvenido al gran rompecabezas. Aquí el silencio tiene su propia frecuencia.
-              </p>
-              <a href="/archivo/" class="inline-flex items-center gap-3 font-mono text-[10px] tracking-[0.35em] uppercase border border-white/10 bg-white/5 backdrop-blur-xl px-12 py-5 rounded-full transition-all duration-500 hover:border-rust-orange/40 text-white/40 hover:text-white">
-                Explorar Archivo →
-              </a>
-            </div>
-          </section>
-        </div>
+        </article>
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
