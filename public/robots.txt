@@ -1,3 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /tgp-app/
+Disallow: /admin/
+
 Sitemap: https://thegreatpuzzleproject.com/sitemap-index.xml

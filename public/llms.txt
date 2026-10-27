@@ -43,6 +43,8 @@ The Great Puzzle Project es una plataforma de investigación independiente, heme
 - **About / Manifiesto Integrado:** https://thegreatpuzzleproject.com/about
 - **Hemeroteca y Archivo Vivo:** https://thegreatpuzzleproject.com/archivo/
 - **Colecciones (CS01 - CS10):** https://thegreatpuzzleproject.com/coleccion/
+- **Knowledge Graph Oficial (Schema.org / JSON-LD):** https://thegreatpuzzleproject.com/grafo.json
 - **Substack Oficial:** https://thegreatpuzzleproject.substack.com
 - **Spotify Podcast:** https://open.spotify.com/show/3zFq9ab980MamMHW48Sqxy
 - **Canal de YouTube:** https://youtube.com/@thegreatpuzzleproject
+
