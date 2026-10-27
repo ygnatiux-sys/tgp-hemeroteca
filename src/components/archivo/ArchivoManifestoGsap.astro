@@ -174,22 +174,25 @@ const parsedManifesto = rawManifesto.map((group, gIdx) => {
 
   /* ── Contenedores de Altura Bloqueada (Zero Layout Shift) ── */
   .manifesto-stage-container {
-    height: 440px;
+    height: 320px;
     position: relative;
     width: 100%;
     contain: layout size;
     overflow-anchor: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   @media (min-width: 640px) {
     .manifesto-stage-container {
-      height: 480px;
+      height: 350px;
     }
   }
 
   @media (min-width: 1024px) {
     .manifesto-stage-container {
-      height: 520px;
+      height: 380px;
     }
   }
 
@@ -199,34 +202,23 @@ const parsedManifesto = rawManifesto.map((group, gIdx) => {
     width: 100%;
     height: 100%;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
+    pointer-events: none;
     will-change: opacity, transform, filter;
   }
 
   .manifesto-phrase-viewport {
-    position: relative;
+    position: absolute;
+    inset: 0;
     width: 100%;
-    height: 170px;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     contain: layout size;
     overflow-anchor: none;
-  }
-
-  @media (min-width: 640px) {
-    .manifesto-phrase-viewport {
-      height: 180px;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .manifesto-phrase-viewport {
-      height: 190px;
-    }
+    pointer-events: none;
   }
 
   .manifesto-phrase-layer {
@@ -238,6 +230,7 @@ const parsedManifesto = rawManifesto.map((group, gIdx) => {
     align-items: center;
     justify-content: center;
     text-align: center;
+    pointer-events: auto;
     will-change: opacity, transform, filter;
   }
 </style>
@@ -258,20 +251,19 @@ const parsedManifesto = rawManifesto.map((group, gIdx) => {
         <div
           class="manifesto-group-item"
           data-group-index={gIdx}
-          style={gIdx === 0 ? "opacity: 1; visibility: visible; z-index: 10;" : "opacity: 0; visibility: hidden; z-index: 1;"}
+          style="opacity: 1; visibility: visible;"
         >
-          <!-- 1. Palabra capital rectora destacada en púrpura monumental Cinemax H1 -->
-          <div class="manifesto-lead-purple text-6xl sm:text-7xl md:text-8xl lg:text-[7.5rem] xl:text-[8.5rem] select-none mb-5 sm:mb-7">
+          <!-- 1. Palabra capital rectora destacada en púrpura monumental Cinemax H1 (centrada absoluta) -->
+          <div class="manifesto-lead-purple absolute inset-0 flex items-center justify-center text-center text-6xl sm:text-7xl md:text-8xl lg:text-[7.5rem] xl:text-[8.5rem] select-none pointer-events-auto">
             {group.leadWord}
           </div>
 
-          <!-- 2. Viewport de frases con altura rígida -->
+          <!-- 2. Viewport de frases centradas absolutas -->
           <div class="manifesto-phrase-viewport">
             {group.parsedPhrases.map((phrase, pIdx) => (
               <div
-                class="manifesto-phrase-layer"
+                class="manifesto-phrase-layer px-4"
                 data-phrase-index={pIdx}
-                style={gIdx === 0 && pIdx === 0 ? "opacity: 1; visibility: visible;" : "opacity: 0; visibility: hidden;"}
               >
                 <h2 class="manifesto-phrase-text glow-metallic-gloock">
                   {phrase.wordsData.map((wd) => (
@@ -453,149 +445,97 @@ const parsedManifesto = rawManifesto.map((group, gIdx) => {
           phrases: gsap.utils.toArray<HTMLElement>(g.querySelectorAll<HTMLElement>(".manifesto-phrase-layer")),
         }));
 
-        // Reset inicial de todas las capas
-        groupsData.forEach((item, gIdx) => {
-          gsap.set(item.group, { autoAlpha: 1, zIndex: gIdx === 0 ? 10 : 1 });
+        // Reset inicial de todas las capas (todas ocultas para comenzar limpias en t=0 al scrollear)
+        groupsData.forEach((item) => {
+          gsap.set(item.group, { autoAlpha: 1 });
           if (item.lead) {
             gsap.set(item.lead, {
-              autoAlpha: gIdx === 0 ? 1 : 0,
-              scale: gIdx === 0 ? 1 : 0.93,
-              filter: "blur(0px)",
-              y: 0,
+              autoAlpha: 0,
+              scale: 0.93,
+              filter: "blur(14px)",
+              y: 12,
             });
           }
-          item.phrases.forEach((phrase, pIdx) => {
+          item.phrases.forEach((phrase) => {
             gsap.set(phrase, {
-              autoAlpha: gIdx === 0 && pIdx === 0 ? 1 : 0,
-              y: 0,
-              filter: "blur(0px)",
+              autoAlpha: 0,
+              y: 14,
+              filter: "blur(8px)",
             });
           });
         });
 
-        const tl = gsap.timeline({ repeat: -1 });
-        const wordTime = 0.85;       // Aparición cinemax de la palabra capital
-        const beatTime = 0.35;       // Pausa dramática antes de la frase
-        const phraseInTime = 0.95;   // Entrada de la frase
-        const dwellTime = 4.4;       // Pausa de lectura profunda
-        const phraseOutTime = 0.65;  // Desvanecimiento entre frases internas
-        const groupExitTime = 0.8;   // Desvanecimiento final del grupo
+        const tl = gsap.timeline({ repeat: -1, paused: true });
+        const wordInTime = 0.85;       // Aparición majestuosa de la consigna capital
+        const wordDwellTime = 1.6;     // Pausa de impacto de la consigna
+        const wordOutTime = 0.55;      // Desvanecimiento completo de la consigna
+        const breathTime = 0.2;        // Silencio dramático
+        const phraseInTime = 0.95;     // Aparición suave de la frase centrada
+        const phraseDwellTime = 4.2;   // Lectura profunda de la frase
+        const phraseOutTime = 0.65;    // Desvanecimiento suave de la frase
 
         for (let g = 0; g < groupCount; g++) {
           const currentGroup = groupsData[g];
           const phraseCount = currentGroup.phrases.length;
 
-          // 1. Poner grupo al frente
-          tl.set(currentGroup.group, { zIndex: 10 });
-
-          // 2. Si no es el paso 0 de inicio, animar entrada de la palabra capital
-          if (g !== 0) {
-            if (currentGroup.lead) {
-              tl.fromTo(currentGroup.lead, {
-                autoAlpha: 0,
-                scale: 0.93,
-                filter: "blur(14px)",
-                y: 12,
-              }, {
-                autoAlpha: 1,
-                scale: 1,
-                filter: "blur(0px)",
-                y: 0,
-                duration: wordTime,
-                ease: "power3.out",
-              });
-            }
-            tl.to({}, { duration: beatTime });
+          // 1. Palabra capital rectora (DUDA. / INVESTIGA. / CONECTA.) entra en el centro exacto
+          if (currentGroup.lead) {
+            tl.to(currentGroup.lead, {
+              autoAlpha: 1,
+              scale: 1,
+              filter: "blur(0px)",
+              y: 0,
+              duration: wordInTime,
+              ease: "power3.out",
+            });
+            // Pausa para leer la consigna con peso visual
+            tl.to({}, { duration: wordDwellTime });
+            // La consigna desaparece completamente antes de que entre la primera frase
+            tl.to(currentGroup.lead, {
+              autoAlpha: 0,
+              y: -12,
+              scale: 0.96,
+              filter: "blur(10px)",
+              duration: wordOutTime,
+              ease: "power2.in",
+            });
+            // Reset off-screen para el próximo ciclo
+            tl.set(currentGroup.lead, { y: 12, scale: 0.93, filter: "blur(14px)" });
           }
 
-          // 3. Iterar por cada frase dentro de la palabra rectora
+          // Silencio / respiración antes de la primera frase
+          tl.to({}, { duration: breathTime });
+
+          // 2. Iterar por cada frase del grupo en el centro exacto del visor
           for (let p = 0; p < phraseCount; p++) {
             const currentPhrase = currentGroup.phrases[p];
-            const isLastPhrase = p === phraseCount - 1;
 
-            if (g === 0 && p === 0) {
-              // En el primer ciclo, frase 0 de DUDA arranca visible; damos tiempo de lectura
-              tl.to({}, { duration: dwellTime });
-            } else {
-              // Entrada de la frase
-              tl.fromTo(currentPhrase, {
-                autoAlpha: 0,
-                y: 12,
-                filter: "blur(8px)",
-              }, {
-                autoAlpha: 1,
-                y: 0,
-                filter: "blur(0px)",
-                duration: phraseInTime,
-                ease: "power2.out",
-              });
+            // La frase entra en el centro exacto del visor
+            tl.to(currentPhrase, {
+              autoAlpha: 1,
+              y: 0,
+              filter: "blur(0px)",
+              duration: phraseInTime,
+              ease: "power2.out",
+            });
 
-              // Pausa de lectura de la frase
-              tl.to({}, { duration: dwellTime });
-            }
+            // Tiempo de lectura reflexiva
+            tl.to({}, { duration: phraseDwellTime });
 
-            // Si NO es la última frase del grupo, se desvanece suavemente para dar paso a la siguiente frase
-            if (!isLastPhrase) {
-              tl.to(currentPhrase, {
-                autoAlpha: 0,
-                y: -12,
-                filter: "blur(8px)",
-                duration: phraseOutTime,
-                ease: "power2.in",
-              });
-              tl.set(currentPhrase, { y: 12 });
-            } else {
-              // Es la ÚLTIMA frase: desvanecemos la frase Y la palabra capital junta
-              const exitElements = [currentGroup.lead, currentPhrase].filter(Boolean) as HTMLElement[];
-              tl.to(exitElements, {
-                autoAlpha: 0,
-                y: -14,
-                filter: "blur(10px)",
-                duration: groupExitTime,
-                ease: "power2.in",
-              });
+            // La frase desaparece por completo
+            tl.to(currentPhrase, {
+              autoAlpha: 0,
+              y: -14,
+              filter: "blur(10px)",
+              duration: phraseOutTime,
+              ease: "power2.in",
+            });
 
-              // Reset de posición
-              tl.set(currentGroup.group, { zIndex: 1 });
-              if (currentGroup.lead) tl.set(currentGroup.lead, { y: 12, scale: 0.93, filter: "blur(14px)" });
-              tl.set(currentPhrase, { y: 12 });
-            }
-          }
+            // Reset off-screen para el próximo ciclo
+            tl.set(currentPhrase, { y: 14, filter: "blur(8px)" });
 
-          // Si es el final de CONECTA (último grupo del ciclo), animar re-entrada de DUDA para ciclo 2+
-          if (g === groupCount - 1) {
-            const firstGroup = groupsData[0];
-            tl.set(firstGroup.group, { zIndex: 10 });
-            if (firstGroup.lead) {
-              tl.fromTo(firstGroup.lead, {
-                autoAlpha: 0,
-                scale: 0.93,
-                filter: "blur(14px)",
-                y: 12,
-              }, {
-                autoAlpha: 1,
-                scale: 1,
-                filter: "blur(0px)",
-                y: 0,
-                duration: wordTime,
-                ease: "power3.out",
-              });
-            }
-            tl.to({}, { duration: beatTime });
-            const firstPhrase = firstGroup.phrases[0];
-            if (firstPhrase) {
-              tl.fromTo(firstPhrase, {
-                autoAlpha: 0,
-                y: 12,
-                filter: "blur(8px)",
-              }, {
-                autoAlpha: 1,
-                y: 0,
-                filter: "blur(0px)",
-                duration: phraseInTime,
-                ease: "power2.out",
-              });
-            }
+            // Silencio antes de la próxima frase o siguiente palabra rectora
+            tl.to({}, { duration: breathTime });
           }
         }
 
@@ -605,18 +545,25 @@ const parsedManifesto = rawManifesto.map((group, gIdx) => {
         root.addEventListener("mouseenter", handleMouseEnter);
         root.addEventListener("mouseleave", handleMouseLeave);
 
-        // IntersectionObserver para suspender cuando está fuera de pantalla
+        // Activación inmediata por scroll con IntersectionObserver:
+        // Apenas el usuario scrollea y asoma la sección, arranca en t=0 con "DUDA."
+        let hasStarted = false;
         const observer = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               dustEffect?.start();
-              tl.play();
+              if (!hasStarted) {
+                hasStarted = true;
+                tl.restart(); // Arranca exactamente en t=0 con fade in de DUDA
+              } else {
+                tl.play();
+              }
             } else {
               dustEffect?.stop();
               tl.pause();
             }
           });
-        }, { threshold: 0.1 });
+        }, { threshold: 0.15 });
 
         observer.observe(root);
 
