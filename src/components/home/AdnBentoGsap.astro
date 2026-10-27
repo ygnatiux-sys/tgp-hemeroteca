@@ -3,12 +3,12 @@
  * AdnBentoGsap.astro — Stream Cinemático ADN Zenital TGP
  * "Duda. Investiga. Conecta. — Historia de la producción humana de sentido"
  *
- * Características:
- * - Full bleed con máscara vertical de gradiente suave (fade a --bg-main).
- * - Canvas de partículas vivas de polvo dorado (DustMotesEffect).
- * - Split cinemático 60 / 40 (Texto monumental Gloock + Imagen arqueológica nítida).
- * - Halo ambiental cálido ámbar/oro fundiendo los límites de la imagen.
- * - GSAP Timeline suave y semi-slow en 3 etapas sin barras ni puntos invasivos.
+ * Arquitectura Técnica Robusta:
+ * - Grid Stacking en CSS (col-start-1 row-start-1) para evitar colapsos de altura y desbordes.
+ * - Gestión estricta de z-index y autoAlpha en GSAP para erradicar cualquier z-fight o parpadeo.
+ * - Sin transiciones CSS conflictivas en elementos animados por GSAP (cero micro-stutter).
+ * - Canvas de polvo dorado cinemático suspendido automáticamente fuera del viewport (IntersectionObserver).
+ * - Full bleed con máscara vertical suave que se integra en --bg-main.
  */
 
 export interface AdnBatch {
@@ -64,17 +64,31 @@ const {
 } = Astro.props;
 ---
 
-<!-- Import de fuente Gloock -->
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Gloock&display=swap');
   @import url('https://fonts.googleapis.com/css2?family=Proza+Libre:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
 
-  .glow-metallic-gloock {
-    filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 24px rgba(212, 175, 55, 0.25));
+  /* Sombras y reflejos metálicos optimizados para aceleración GPU */
+  .adn-title-glow {
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.95), 0 0 24px rgba(212, 175, 55, 0.22);
   }
 
-  .glow-ambient-gold {
-    filter: drop-shadow(0 0 35px rgba(234, 179, 8, 0.28));
+  .adn-highlight-glow {
+    text-shadow: 0 0 28px rgba(234, 179, 8, 0.35);
+  }
+
+  /* Grid Stack: todos los hijos comparten la misma celda sin absolute colapsado */
+  .adn-stack-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    align-items: center;
+  }
+
+  .adn-stack-cell {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    will-change: opacity, transform;
   }
 </style>
 
@@ -86,39 +100,40 @@ const {
   class={`adn-stream-section relative w-full overflow-hidden select-none isolate py-20 sm:py-28 md:py-36 bg-[#060707] ${className}`}
   style="mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);"
 >
-  <!-- Canvas de polvo dorado flotante en tiempo real -->
+  <!-- Canvas de partículas vivas de polvo dorado -->
   <canvas
     id={`${instanceId}-dust-canvas`}
     class="adn-dust-canvas absolute inset-0 w-full h-full pointer-events-none z-0"
     aria-hidden="true"
   ></canvas>
 
-  <!-- Brillo ambiental radial de fondo -->
-  <div class="pointer-events-none absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-160 h-160 rounded-full bg-amber-500/8 blur-[120px]" aria-hidden="true"></div>
+  <!-- Luz ambiental cálida de fondo -->
+  <div class="pointer-events-none absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-96 sm:w-[32rem] md:w-[42rem] h-96 sm:h-[32rem] md:h-[42rem] rounded-full bg-amber-500/8 blur-[110px]" aria-hidden="true"></div>
 
-  <!-- Contenedor central 60 / 40 -->
+  <!-- Contenedor maestro 60 / 40 -->
   <div class="max-w-7xl mx-auto px-4 sm:px-8 md:px-12 relative z-10">
-    <div class="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16 xl:gap-20 min-h-[440px] md:min-h-[500px]">
+    <div class="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16 xl:gap-20">
       
       <!-- ═══════════════════════════════════════════════════════════════════
-           LADO TEXTO (60%): Stage de Frases Monumentales Gloock
+           LADO TEXTO (60%): Stage de Frases Monumentales en Grid Stack
       ═══════════════════════════════════════════════════════════════════ -->
-      <div class="w-full lg:w-[60%] flex flex-col justify-center relative min-h-[320px] sm:min-h-[360px] md:min-h-[400px]">
+      <div class="w-full lg:w-[58%] xl:w-[60%] adn-stack-grid relative">
         {batches.map((batch, idx) => (
           <div
-            class={`adn-text-slide absolute inset-0 flex flex-col justify-center ${idx === 0 ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+            class={`adn-text-slide adn-stack-cell flex flex-col justify-center py-4 ${idx === 0 ? 'visible z-10' : 'invisible z-0'}`}
             data-slide-index={idx}
+            style={idx === 0 ? "opacity: 1;" : "opacity: 0; pointer-events: none;"}
           >
-            <!-- Kicker con aura ámbar -->
+            <!-- Kicker con aura ámbar pulsante -->
             <div class="flex items-center gap-3 text-xs sm:text-[13px] uppercase tracking-[0.32em] text-[#d4af37] font-metadata font-bold mb-4 sm:mb-6">
               <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shadow-[0_0_12px_#f59e0b]"></span>
               <span>{batch.kicker}</span>
             </div>
 
-            <!-- Título Monumental Gloock + Cursiva Dorada -->
-            <h2 class="font-['Gloock'] text-3xl sm:text-4xl md:text-[2.75rem] lg:text-[3.25rem] leading-[1.12] tracking-tight text-[#EDEDE8] glow-metallic-gloock">
+            <!-- Título Monumental Gloock + Cursiva Dorada TGP -->
+            <h2 class="font-['Gloock'] text-3xl sm:text-4xl md:text-[2.75rem] lg:text-[3.25rem] leading-[1.12] tracking-tight text-[#EDEDE8] adn-title-glow">
               {batch.main} <br/>
-              <span class="text-[#d4af37] font-serif italic font-normal glow-ambient-gold">
+              <span class="text-[#d4af37] font-serif italic font-normal adn-highlight-glow">
                 {batch.highlight}
               </span>
             </h2>
@@ -128,10 +143,10 @@ const {
               {batch.reflection}
             </p>
 
-            <!-- Línea de reposo sutil -->
+            <!-- Línea de reposo sutil sin bordes invasivos -->
             <div class="flex items-center gap-4 pt-6 mt-6 border-t border-white/5 font-metadata text-[11px] sm:text-xs tracking-[0.26em] uppercase text-zinc-500">
-              <span class="text-amber-400/70">TGP</span>
-              <span>•</span>
+              <span class="text-amber-400/80 font-bold">TGP</span>
+              <span class="opacity-40">•</span>
               <span>HISTORIA DE LA PRODUCCIÓN HUMANA DE SENTIDO</span>
             </div>
           </div>
@@ -141,35 +156,36 @@ const {
       <!-- ═══════════════════════════════════════════════════════════════════
            LADO VISUAL (40%): Portada Arqueológica con Ambient Glow
       ═══════════════════════════════════════════════════════════════════ -->
-      <div class="w-full lg:w-[40%] flex justify-center items-center relative">
-        <!-- Resplandor ambiental que funde los límites hacia la imagen -->
+      <div class="w-full lg:w-[42%] xl:w-[40%] flex justify-center items-center relative">
+        <!-- Resplandor ambiental hacia la imagen que elimina cortes duros -->
         <div class="pointer-events-none absolute -inset-8 bg-gradient-to-tr from-amber-500/25 via-amber-400/12 to-transparent blur-3xl rounded-3xl opacity-80" aria-hidden="true"></div>
-        <div class="pointer-events-none absolute -bottom-10 -left-10 w-64 h-64 bg-amber-600/15 blur-[80px] rounded-full" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute -bottom-10 -left-10 w-60 h-60 bg-amber-600/15 blur-[80px] rounded-full" aria-hidden="true"></div>
 
         <!-- Marco cinemático con difuminado interno y bordes suaves -->
-        <div class="relative w-full aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] max-w-lg rounded-3xl overflow-hidden border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.95)] bg-black/60 isolate">
-          <!-- Sombra interior para desvanecer los bordes a la penumbra -->
-          <div class="pointer-events-none absolute inset-0 z-10 shadow-[inset_0_0_60px_rgba(0,0,0,0.9)] rounded-3xl" aria-hidden="true"></div>
+        <div class="relative w-full aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] max-w-lg rounded-3xl overflow-hidden border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.95)] bg-black/60 adn-stack-grid isolate">
+          <!-- Viñeta perimetral interior para fundir bordes a la penumbra -->
+          <div class="pointer-events-none absolute inset-0 z-20 shadow-[inset_0_0_60px_rgba(0,0,0,0.95)] rounded-3xl" aria-hidden="true"></div>
 
           {batches.map((batch, idx) => (
             <div
-              class={`adn-img-slide absolute inset-0 w-full h-full overflow-hidden ${idx === 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-105'}`}
+              class={`adn-img-slide adn-stack-cell w-full h-full overflow-hidden ${idx === 0 ? 'visible z-10' : 'invisible z-0'}`}
               data-img-index={idx}
+              style={idx === 0 ? "opacity: 1;" : "opacity: 0;"}
             >
               <img
                 src={batch.image}
                 alt={batch.imageLabel}
-                class="w-full h-full object-cover filter brightness-[0.90] contrast-[1.08] transition-transform duration-1000"
+                class="w-full h-full object-cover filter brightness-[0.88] contrast-[1.08]"
                 loading={idx === 0 ? "eager" : "lazy"}
                 decoding="async"
               />
-              <!-- Gradiente de base para texto informativo -->
-              <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
+              <!-- Gradiente sutil inferior para legibilidad de cartela -->
+              <div class="absolute inset-0 z-10 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
 
-              <!-- Cartela sutil en esquina inferior -->
-              <div class="absolute bottom-4 left-4 right-4 z-20 flex items-center justify-between text-[11px] font-metadata tracking-[0.22em] uppercase text-white/70">
+              <!-- Cartela informativa sutil -->
+              <div class="absolute bottom-4 left-4 right-4 z-30 flex items-center justify-between text-[11px] font-metadata tracking-[0.22em] uppercase text-white/75">
                 <span class="text-[#d4af37] font-bold drop-shadow">{batch.imageLabel}</span>
-                <span class="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-white/60 text-[10px]">{batch.tag}</span>
+                <span class="px-2.5 py-1 rounded-full bg-black/65 backdrop-blur-md border border-white/10 text-white/60 text-[10px]">{batch.tag}</span>
               </div>
             </div>
           ))}
@@ -180,11 +196,11 @@ const {
   </div>
 </section>
 
-<!-- Script de Polvo Dorado y GSAP Timeline Soft / Semi-Slow -->
+<!-- Script GSAP Puro & Canvas Control -->
 <script>
   import { gsap } from "gsap";
 
-  // ─── PARTÍCULAS DE POLVO DORADO (Canvas DustMotesEffect) ────────────────────
+  // ─── CANVAS DE POLVO DORADO (Control de ciclos limpios) ────────────────────
   class DustMotesStream {
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
@@ -203,18 +219,21 @@ const {
     }> = [];
     private animationFrameId: number | null = null;
     private isRunning: boolean = false;
+    private boundResize: () => void;
 
     constructor(canvas: HTMLCanvasElement) {
       this.canvas = canvas;
       this.ctx = canvas.getContext("2d")!;
+      this.boundResize = this.resize.bind(this);
       this.resize();
-      window.addEventListener("resize", this.resize.bind(this));
+      window.addEventListener("resize", this.boundResize);
     }
 
-    private resize() {
-      const rect = this.canvas.parentElement?.getBoundingClientRect();
-      this.canvas.width = rect?.width ?? window.innerWidth;
-      this.canvas.height = rect?.height ?? window.innerHeight;
+    public resize() {
+      const parent = this.canvas.parentElement;
+      const rect = parent ? parent.getBoundingClientRect() : null;
+      this.canvas.width = rect && rect.width > 0 ? rect.width : window.innerWidth;
+      this.canvas.height = rect && rect.height > 0 ? rect.height : (window.innerHeight * 0.8);
     }
 
     private spawnMote(fromLeft = false) {
@@ -224,7 +243,7 @@ const {
         x: fromLeft ? -10 : Math.random() * w,
         y: Math.random() * h,
         radius: 0.7 + Math.random() * 2.2,
-        opacity: 0.15 + Math.random() * 0.50,
+        opacity: 0.15 + Math.random() * 0.45,
         speedX: 0.22 + Math.random() * 0.45,
         speedY: (Math.random() - 0.5) * 0.12,
         angle: Math.random() * Math.PI * 2,
@@ -238,8 +257,10 @@ const {
     public start() {
       if (this.isRunning) return;
       this.isRunning = true;
-      const count = Math.min(50, Math.floor(this.canvas.width / 24));
-      this.motes = Array.from({ length: count }, () => this.spawnMote(false));
+      const count = Math.min(50, Math.max(20, Math.floor(this.canvas.width / 26)));
+      if (this.motes.length === 0) {
+        this.motes = Array.from({ length: count }, () => this.spawnMote(false));
+      }
       this.loop();
     }
 
@@ -249,6 +270,11 @@ const {
         cancelAnimationFrame(this.animationFrameId);
         this.animationFrameId = null;
       }
+    }
+
+    public destroy() {
+      this.stop();
+      window.removeEventListener("resize", this.boundResize);
     }
 
     private loop() {
@@ -276,7 +302,7 @@ const {
         ctx.beginPath();
         ctx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(201, 168, 108, ${alpha})`;
-        ctx.shadowColor = "rgba(212, 175, 55, 0.45)";
+        ctx.shadowColor = "rgba(212, 175, 55, 0.4)";
         ctx.shadowBlur = 6;
         ctx.fill();
         ctx.shadowBlur = 0;
@@ -286,7 +312,7 @@ const {
     }
   }
 
-  // ─── CONTROLADOR GSAP TIMELINE EN 3 ETAPAS ──────────────────────────────────
+  // ─── CONTROLADOR GSAP TIMELINE EN 3 ETAPAS (Sin Z-fights) ───────────────────
   function initAdnStreamInstances() {
     const roots = document.querySelectorAll<HTMLElement>("[data-adn-stream-root]");
     if (roots.length === 0) return;
@@ -295,85 +321,124 @@ const {
       if (root.dataset.adnInitialized === "true") return;
       root.dataset.adnInitialized = "true";
 
-      // 1. Iniciar Canvas de Polvo Dorado
+      // 1. Instanciar Dust Canvas
+      let dustEffect: DustMotesStream | null = null;
       const canvas = root.querySelector<HTMLCanvasElement>(".adn-dust-canvas");
       if (canvas) {
-        const dustEffect = new DustMotesStream(canvas);
-        dustEffect.start();
-        document.addEventListener("astro:before-swap", () => dustEffect.stop(), { once: true });
+        dustEffect = new DustMotesStream(canvas);
       }
 
       const textSlides = gsap.utils.toArray<HTMLElement>(root.querySelectorAll<HTMLElement>(".adn-text-slide"));
       const imgSlides = gsap.utils.toArray<HTMLElement>(root.querySelectorAll<HTMLElement>(".adn-img-slide"));
       const count = textSlides.length;
 
-      if (count < 2) return;
+      if (count < 2) {
+        dustEffect?.start();
+        return;
+      }
 
-      // Respetar preferencias de reducción de movimiento
+      // Accesibilidad
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (reduceMotion) return;
+      if (reduceMotion) {
+        dustEffect?.start();
+        return;
+      }
 
       const ctx = gsap.context(() => {
-        // Timeline infinito suave y semi-slow
+        // Inicializar capas: solo slide 0 visible en z-index 10
+        gsap.set(textSlides[0], { autoAlpha: 1, y: 0, zIndex: 10 });
+        gsap.set(imgSlides[0], { autoAlpha: 1, scale: 1, zIndex: 10 });
+
+        for (let j = 1; j < count; j++) {
+          gsap.set(textSlides[j], { autoAlpha: 0, y: 18, zIndex: 1 });
+          gsap.set(imgSlides[j], { autoAlpha: 0, scale: 1.05, zIndex: 1 });
+        }
+
+        // Timeline suave, semi-slow y robusto
         const tl = gsap.timeline({ repeat: -1 });
-        const pauseTime = 4.8; // Tiempo de reposo y lectura de cada frase
-        const transDuration = 1.35; // Transición suave cinemática
+        const pauseDuration = 4.8;
+        const transitionDuration = 1.35;
 
         for (let i = 0; i < count; i++) {
           const next = (i + 1) % count;
+          const currentText = textSlides[i];
+          const currentImg = imgSlides[i];
+          const nextText = textSlides[next];
+          const nextImg = imgSlides[next];
 
-          tl.to({}, { duration: pauseTime })
-            // Salida de la etapa actual (desvanecer y subir levemente)
-            .to(textSlides[i], {
-              opacity: 0,
+          // 1. Pausa de lectura
+          tl.to({}, { duration: pauseDuration });
+
+          // 2. Transición sincronizada
+          // Elevar z-index de la que entra para que cubra a la que sale sin z-fighting
+          tl.set(nextText, { zIndex: 10, y: 18 }, `step-${i}`)
+            .set(nextImg, { zIndex: 10, scale: 1.05 }, `step-${i}`)
+            .set(currentText, { zIndex: 5 }, `step-${i}`)
+            .set(currentImg, { zIndex: 5 }, `step-${i}`)
+
+            // Salida de la actual
+            .to(currentText, {
+              autoAlpha: 0,
               y: -18,
-              duration: transDuration,
+              duration: transitionDuration,
               ease: "power2.inOut",
-              onStart: () => {
-                textSlides[i].style.pointerEvents = "none";
-              }
             }, `step-${i}`)
-            .to(imgSlides[i], {
-              opacity: 0,
+            .to(currentImg, {
+              autoAlpha: 0,
               scale: 0.98,
-              duration: transDuration,
+              duration: transitionDuration,
               ease: "power2.inOut",
             }, `step-${i}`)
 
-            // Entrada de la siguiente etapa (desvanecer y descender a reposo)
-            .fromTo(textSlides[next], 
-              { opacity: 0, y: 18 },
-              {
-                opacity: 1,
-                y: 0,
-                duration: transDuration,
-                ease: "power2.out",
-                onStart: () => {
-                  textSlides[next].style.pointerEvents = "auto";
-                }
-              },
-              `step-${i}+=0.1`
-            )
-            .fromTo(imgSlides[next],
-              { opacity: 0, scale: 1.05 },
-              {
-                opacity: 1,
-                scale: 1.0,
-                duration: transDuration * 1.1,
-                ease: "power2.out",
-              },
-              `step-${i}+=0.1`
-            );
+            // Entrada de la siguiente (ligero desfase armónico de 0.1s)
+            .to(nextText, {
+              autoAlpha: 1,
+              y: 0,
+              duration: transitionDuration,
+              ease: "power2.out",
+            }, `step-${i}+=0.1`)
+            .to(nextImg, {
+              autoAlpha: 1,
+              scale: 1.0,
+              duration: transitionDuration * 1.05,
+              ease: "power2.out",
+            }, `step-${i}+=0.1`)
+
+            // Limpieza: tras salir, volver la capa anterior a z-index base y reposicionar
+            .set(currentText, { zIndex: 1, y: 18 })
+            .set(currentImg, { zIndex: 1, scale: 1.05 });
         }
 
-        // Pausa suave al posar el cursor para facilitar lectura profunda
-        root.addEventListener("mouseenter", () => tl.pause());
-        root.addEventListener("mouseleave", () => tl.resume());
-      }, root);
+        // Pausa interactiva al posar el mouse
+        const handleMouseEnter = () => tl.pause();
+        const handleMouseLeave = () => tl.resume();
+        root.addEventListener("mouseenter", handleMouseEnter);
+        root.addEventListener("mouseleave", handleMouseLeave);
 
-      document.addEventListener("astro:before-swap", () => {
-        ctx.revert();
-      }, { once: true });
+        // Optimización de recursos con IntersectionObserver
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              dustEffect?.start();
+              tl.play();
+            } else {
+              dustEffect?.stop();
+              tl.pause();
+            }
+          });
+        }, { threshold: 0.15 });
+
+        observer.observe(root);
+
+        // Limpieza de ciclo de vida de Astro View Transitions
+        document.addEventListener("astro:before-swap", () => {
+          observer.disconnect();
+          root.removeEventListener("mouseenter", handleMouseEnter);
+          root.removeEventListener("mouseleave", handleMouseLeave);
+          dustEffect?.destroy();
+          ctx.revert();
+        }, { once: true });
+      }, root);
     });
   }
 
