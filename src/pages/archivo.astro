@@ -14,6 +14,7 @@ import Marquee from '../components/Marquee.astro';
 import AppleBentoArchetypes from '../components/AppleBentoArchetypes.astro';
 import TgpHeroTriptych, { type TriptychPost } from '../components/TgpHeroTriptych.astro';
 import HeroSpotifyColecciones from '../components/HeroSpotifyColecciones.astro';
+import ArchivoManifestoGsap from '../components/archivo/ArchivoManifestoGsap.astro';
 import { customCollections } from '../lib/custom-collections';
 import {
   getPublishableEssays,
@@ -292,6 +293,11 @@ function createPremierSequences(essays: typeof resolvedEssays) {
       "Acceso libre y abierto. Sin registro ni suscripción requerida.",
     ]}
   />
+
+  {/* ── SECUENCIA EDITORIAL MANIFIESTO ADN TGP: DUDA · INVESTIGA · CONECTA ── */}
+  <div id="archivo-manifesto" class="w-full relative z-20">
+    <ArchivoManifestoGsap instanceId="archivo-manifesto-stream" />
+  </div>
 
   <div 
     id="archive-view-container" 

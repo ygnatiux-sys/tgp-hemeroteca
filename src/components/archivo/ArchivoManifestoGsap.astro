@@ -1,0 +1,641 @@
+---
+/**
+ * ArchivoManifestoGsap.astro — Manifiesto Editorial Extendido TGP
+ * Secuencia:
+ * DUDA. (capital monumental) > espacio > frase 1 > fade > frase 2 > fade
+ * INVESTIGA. (capital monumental) > espacio > frase 3 > fade > frase 4 > fade > frase 5 > fade
+ * CONECTA. (capital monumental) > espacio > frase 6 > fade > frase 7 > fade
+ */
+
+interface Props {
+  instanceId?: string;
+  className?: string;
+}
+
+const {
+  instanceId = "archivo-manifesto-stream",
+  className = "",
+} = Astro.props;
+
+interface ManifestoGroup {
+  leadWord: string;
+  phrases: string[];
+}
+
+const rawManifesto: ManifestoGroup[] = [
+  {
+    leadWord: "DUDA.",
+    phrases: [
+      "The Great Puzzle Project investiga cómo la humanidad ha construido, transmitido y transformado el [[sentido a lo largo de la historia]].",
+      "A través de la historia cultural, la arqueología, la semiótica y la filosofía, conectamos fragmentos de memoria para comprender cómo las sociedades [[interpretan su pasado y orientan su presente]]."
+    ]
+  },
+  {
+    leadWord: "INVESTIGA.",
+    phrases: [
+      "Entendemos la cultura como un palimpsesto: un conjunto de significados que se conservan, se reescriben, se disputan y [[reaparecen en nuevos contextos]].",
+      "Investigamos también el Archivo Vivo de esas transformaciones: las instituciones, prácticas y relaciones de poder que intervienen en lo que una sociedad [[recuerda, transmite u olvida]].",
+      "Nuestro método consiste en contrastar fuentes, comparar interpretaciones y explorar conexiones sin confundir [[analogías con pruebas ni hipótesis con hechos demostrados]]."
+    ]
+  },
+  {
+    leadWord: "CONECTA.",
+    phrases: [
+      "TGP no busca imponer una explicación única del pasado, sino construir una [[cartografía crítica]] de las formas en que la humanidad produce conocimiento, memoria y sentido.",
+      "La historia es nuestro laboratorio. La interpretación, nuestra herramienta. [[Comprender el presente, nuestra orientación]]."
+    ]
+  }
+];
+
+// Tokenizador que respeta [[destacado]] en dorado y palabras normales en degradado metálico sin asteriscos
+const parsedManifesto = rawManifesto.map((group, gIdx) => {
+  const parsedPhrases = group.phrases.map((phraseText, pIdx) => {
+    const rawWords = phraseText.trim().split(/\s+/);
+    let currentMode: 'normal' | 'accent' = 'normal';
+
+    const wordsData = rawWords.map((rawWord, wordIdx) => {
+      let word = rawWord;
+      let type: 'normal' | 'accent' = currentMode;
+
+      if (word.startsWith('[[')) {
+        currentMode = 'accent';
+        type = 'accent';
+        word = word.slice(2);
+      }
+
+      let endsAccent = false;
+      if (word.endsWith(']]') || word.includes(']].') || word.includes(']],') || word.includes(']]:') || word.includes(']];')) {
+        endsAccent = true;
+        word = word.replace(/\]\]/g, '');
+      } else if (word.includes(']]')) {
+        word = word.replace(/\]\]/g, '');
+        endsAccent = true;
+      }
+
+      const cleanWord = word.replace(/\[\[/g, '').replace(/\]\]/g, '').replace(/\*\*/g, '');
+      if (endsAccent) {
+        currentMode = 'normal';
+      }
+
+      return {
+        word: cleanWord,
+        type,
+        index: wordIdx
+      };
+    });
+
+    return {
+      pIdx,
+      wordsData
+    };
+  });
+
+  return {
+    gIdx,
+    leadWord: group.leadWord,
+    parsedPhrases
+  };
+});
+---
+
+<!-- Import de fuente Gloock idéntica a CinematicExcerptRest y portada -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gloock&display=swap');
+
+  /* ── Palabra rectora Cinemax H1 Monumental ── */
+  .manifesto-lead-purple {
+    font-family: 'Gloock', serif;
+    font-weight: 900;
+    background-image: linear-gradient(135deg, #ffffff 0%, #f5e8ff 18%, #e9d5ff 36%, #c084fc 62%, #a855f7 82%, #7e22ce 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 35px rgba(192, 132, 252, 0.55)) drop-shadow(0 0 75px rgba(147, 51, 234, 0.35)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.95));
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    will-change: transform, opacity, filter;
+  }
+
+  /* ── Tipografía Gloock de las frases en escala Cine Premier ── */
+  .manifesto-phrase-text {
+    font-family: 'Gloock', serif;
+    font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+    font-weight: 800;
+    line-height: 1.32;
+    letter-spacing: -0.015em;
+    max-width: 44ch;
+    margin-left: auto;
+    margin-right: auto;
+    text-wrap: balance;
+    padding: 0;
+    will-change: transform, opacity, filter;
+  }
+
+  .manifesto-word-wrapper {
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .manifesto-space {
+    display: inline-block;
+  }
+
+  .manifesto-word {
+    display: inline-block;
+  }
+
+  /* ── Degradados metálicos y dorados de TGP ── */
+  .word-normal {
+    background-image: linear-gradient(to bottom, #EFEBE3 0%, #D8D2C2 50%, rgba(200, 192, 175, 0.75) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .word-accent {
+    background-image: linear-gradient(to bottom, #FFF4D4 0%, #E8CA82 45%, #C29B4F 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 900;
+    filter: drop-shadow(0 0 16px rgba(234, 179, 8, 0.45));
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .glow-metallic-gloock {
+    filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 22px rgba(227, 221, 211, 0.2));
+  }
+
+  /* ── Contenedores de Altura Bloqueada (Zero Layout Shift) ── */
+  .manifesto-stage-container {
+    height: 440px;
+    position: relative;
+    width: 100%;
+    contain: layout size;
+    overflow-anchor: none;
+  }
+
+  @media (min-width: 640px) {
+    .manifesto-stage-container {
+      height: 480px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .manifesto-stage-container {
+      height: 520px;
+    }
+  }
+
+  .manifesto-group-item {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    will-change: opacity, transform, filter;
+  }
+
+  .manifesto-phrase-viewport {
+    position: relative;
+    width: 100%;
+    height: 170px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    contain: layout size;
+    overflow-anchor: none;
+  }
+
+  @media (min-width: 640px) {
+    .manifesto-phrase-viewport {
+      height: 180px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .manifesto-phrase-viewport {
+      height: 190px;
+    }
+  }
+
+  .manifesto-phrase-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    will-change: opacity, transform, filter;
+  }
+</style>
+
+<section
+  id={instanceId}
+  class={`cinematic-manifesto-stream relative w-full bg-(--bg-main) overflow-hidden select-none py-16 sm:py-24 md:py-28 flex flex-col justify-center items-center ${className}`}
+  style="background-color: var(--bg-main, #121413);"
+  data-manifesto-root
+>
+  <!-- Lienzo de partículas de polvo dorado en suspensión -->
+  <canvas class="manifesto-dust-canvas absolute inset-0 z-0 pointer-events-none" id={`${instanceId}-canvas`}></canvas>
+
+  <!-- Contenedor central con altura bloqueada (Zero Layout Shift) -->
+  <div class="manifesto-content relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 md:px-8 text-center">
+    <div class="manifesto-stage-container">
+      {parsedManifesto.map((group, gIdx) => (
+        <div
+          class="manifesto-group-item"
+          data-group-index={gIdx}
+          style={gIdx === 0 ? "opacity: 1; visibility: visible; z-index: 10;" : "opacity: 0; visibility: hidden; z-index: 1;"}
+        >
+          <!-- 1. Palabra capital rectora destacada en púrpura monumental Cinemax H1 -->
+          <div class="manifesto-lead-purple text-6xl sm:text-7xl md:text-8xl lg:text-[7.5rem] xl:text-[8.5rem] select-none mb-5 sm:mb-7">
+            {group.leadWord}
+          </div>
+
+          <!-- 2. Viewport de frases con altura rígida -->
+          <div class="manifesto-phrase-viewport">
+            {group.parsedPhrases.map((phrase, pIdx) => (
+              <div
+                class="manifesto-phrase-layer"
+                data-phrase-index={pIdx}
+                style={gIdx === 0 && pIdx === 0 ? "opacity: 1; visibility: visible;" : "opacity: 0; visibility: hidden;"}
+              >
+                <h2 class="manifesto-phrase-text glow-metallic-gloock">
+                  {phrase.wordsData.map((wd) => (
+                    <span class="manifesto-word-wrapper">
+                      <span
+                        class:list={[
+                          "manifesto-word",
+                          wd.type === "accent" ? "word-accent" : "word-normal",
+                        ]}
+                      >
+                        {wd.word}
+                      </span>
+                      <span class="manifesto-space" aria-hidden="true">&nbsp;</span>
+                    </span>
+                  ))}
+                </h2>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Script de Polvo Dorado y GSAP Timeline para la secuencia extendida -->
+<script>
+  import { gsap } from "gsap";
+
+  class DustMotesEffect {
+    private canvas: HTMLCanvasElement;
+    private ctx: CanvasRenderingContext2D | null;
+    private motes: Array<{
+      x: number;
+      y: number;
+      radius: number;
+      speedX: number;
+      speedY: number;
+      opacity: number;
+      maxOpacity: number;
+      fadeSpeed: number;
+      fadingIn: boolean;
+    }> = [];
+    private animationFrameId: number | null = null;
+    private isRunning = false;
+    private resizeHandler: () => void;
+
+    constructor(canvas: HTMLCanvasElement) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext("2d");
+      this.resize();
+      this.resizeHandler = () => this.resize();
+      window.addEventListener("resize", this.resizeHandler);
+      this.initMotes();
+    }
+
+    private resize() {
+      const rect = this.canvas.parentElement?.getBoundingClientRect() || this.canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      this.canvas.width = rect.width * dpr;
+      this.canvas.height = rect.height * dpr;
+      if (this.ctx) {
+        this.ctx.scale(dpr, dpr);
+      }
+    }
+
+    private initMotes() {
+      const rect = this.canvas.getBoundingClientRect();
+      const area = rect.width * rect.height;
+      const count = Math.min(Math.floor(area / 18000), 45);
+
+      this.motes = [];
+      for (let i = 0; i < count; i++) {
+        this.motes.push({
+          x: Math.random() * rect.width,
+          y: Math.random() * rect.height,
+          radius: Math.random() * 1.5 + 0.5,
+          speedX: (Math.random() - 0.5) * 0.28,
+          speedY: (Math.random() - 0.5) * 0.22 - 0.1,
+          opacity: Math.random() * 0.45,
+          maxOpacity: Math.random() * 0.45 + 0.15,
+          fadeSpeed: Math.random() * 0.005 + 0.002,
+          fadingIn: Math.random() > 0.5,
+        });
+      }
+    }
+
+    public start() {
+      if (this.isRunning) return;
+      this.isRunning = true;
+      const render = () => {
+        this.draw();
+        if (this.isRunning) {
+          this.animationFrameId = requestAnimationFrame(render);
+        }
+      };
+      this.animationFrameId = requestAnimationFrame(render);
+    }
+
+    public stop() {
+      this.isRunning = false;
+      if (this.animationFrameId) {
+        cancelAnimationFrame(this.animationFrameId);
+        this.animationFrameId = null;
+      }
+    }
+
+    public destroy() {
+      this.stop();
+      window.removeEventListener("resize", this.resizeHandler);
+    }
+
+    private draw() {
+      if (!this.ctx) return;
+      const rect = this.canvas.getBoundingClientRect();
+      this.ctx.clearRect(0, 0, rect.width, rect.height);
+
+      for (const m of this.motes) {
+        m.x += m.speedX;
+        m.y += m.speedY;
+
+        if (m.x < -10) m.x = rect.width + 10;
+        if (m.x > rect.width + 10) m.x = -10;
+        if (m.y < -10) m.y = rect.height + 10;
+        if (m.y > rect.height + 10) m.y = -10;
+
+        if (m.fadingIn) {
+          m.opacity += m.fadeSpeed;
+          if (m.opacity >= m.maxOpacity) m.fadingIn = false;
+        } else {
+          m.opacity -= m.fadeSpeed;
+          if (m.opacity <= 0.02) {
+            m.fadingIn = true;
+            m.maxOpacity = Math.random() * 0.45 + 0.15;
+          }
+        }
+
+        const gradient = this.ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.radius * 2);
+        gradient.addColorStop(0, `rgba(245, 230, 195, ${m.opacity})`);
+        gradient.addColorStop(0.5, `rgba(220, 185, 120, ${m.opacity * 0.6})`);
+        gradient.addColorStop(1, "rgba(180, 140, 80, 0)");
+
+        this.ctx.fillStyle = gradient;
+        this.ctx.beginPath();
+        this.ctx.arc(m.x, m.y, m.radius * 2, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+    }
+  }
+
+  function initArchivoManifestoInstances() {
+    const roots = document.querySelectorAll<HTMLElement>("[data-manifesto-root]");
+
+    roots.forEach((root) => {
+      if (root.dataset.manifestoInit === "true") return;
+      root.dataset.manifestoInit = "true";
+
+      const canvas = root.querySelector<HTMLCanvasElement>(".manifesto-dust-canvas");
+      let dustEffect: DustMotesEffect | null = null;
+      if (canvas) {
+        dustEffect = new DustMotesEffect(canvas);
+      }
+
+      const groups = gsap.utils.toArray<HTMLElement>(root.querySelectorAll<HTMLElement>(".manifesto-group-item"));
+      const groupCount = groups.length;
+      if (groupCount === 0) return;
+
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduceMotion) {
+        dustEffect?.start();
+        return;
+      }
+
+      const ctx = gsap.context(() => {
+        const groupsData = groups.map((g) => ({
+          group: g,
+          lead: g.querySelector<HTMLElement>(".manifesto-lead-purple"),
+          phrases: gsap.utils.toArray<HTMLElement>(g.querySelectorAll<HTMLElement>(".manifesto-phrase-layer")),
+        }));
+
+        // Reset inicial de todas las capas
+        groupsData.forEach((item, gIdx) => {
+          gsap.set(item.group, { autoAlpha: 1, zIndex: gIdx === 0 ? 10 : 1 });
+          if (item.lead) {
+            gsap.set(item.lead, {
+              autoAlpha: gIdx === 0 ? 1 : 0,
+              scale: gIdx === 0 ? 1 : 0.93,
+              filter: "blur(0px)",
+              y: 0,
+            });
+          }
+          item.phrases.forEach((phrase, pIdx) => {
+            gsap.set(phrase, {
+              autoAlpha: gIdx === 0 && pIdx === 0 ? 1 : 0,
+              y: 0,
+              filter: "blur(0px)",
+            });
+          });
+        });
+
+        const tl = gsap.timeline({ repeat: -1 });
+        const wordTime = 0.85;       // Aparición cinemax de la palabra capital
+        const beatTime = 0.35;       // Pausa dramática antes de la frase
+        const phraseInTime = 0.95;   // Entrada de la frase
+        const dwellTime = 4.4;       // Pausa de lectura profunda
+        const phraseOutTime = 0.65;  // Desvanecimiento entre frases internas
+        const groupExitTime = 0.8;   // Desvanecimiento final del grupo
+
+        for (let g = 0; g < groupCount; g++) {
+          const currentGroup = groupsData[g];
+          const phraseCount = currentGroup.phrases.length;
+
+          // 1. Poner grupo al frente
+          tl.set(currentGroup.group, { zIndex: 10 });
+
+          // 2. Si no es el paso 0 de inicio, animar entrada de la palabra capital
+          if (g !== 0) {
+            if (currentGroup.lead) {
+              tl.fromTo(currentGroup.lead, {
+                autoAlpha: 0,
+                scale: 0.93,
+                filter: "blur(14px)",
+                y: 12,
+              }, {
+                autoAlpha: 1,
+                scale: 1,
+                filter: "blur(0px)",
+                y: 0,
+                duration: wordTime,
+                ease: "power3.out",
+              });
+            }
+            tl.to({}, { duration: beatTime });
+          }
+
+          // 3. Iterar por cada frase dentro de la palabra rectora
+          for (let p = 0; p < phraseCount; p++) {
+            const currentPhrase = currentGroup.phrases[p];
+            const isLastPhrase = p === phraseCount - 1;
+
+            if (g === 0 && p === 0) {
+              // En el primer ciclo, frase 0 de DUDA arranca visible; damos tiempo de lectura
+              tl.to({}, { duration: dwellTime });
+            } else {
+              // Entrada de la frase
+              tl.fromTo(currentPhrase, {
+                autoAlpha: 0,
+                y: 12,
+                filter: "blur(8px)",
+              }, {
+                autoAlpha: 1,
+                y: 0,
+                filter: "blur(0px)",
+                duration: phraseInTime,
+                ease: "power2.out",
+              });
+
+              // Pausa de lectura de la frase
+              tl.to({}, { duration: dwellTime });
+            }
+
+            // Si NO es la última frase del grupo, se desvanece suavemente para dar paso a la siguiente frase
+            if (!isLastPhrase) {
+              tl.to(currentPhrase, {
+                autoAlpha: 0,
+                y: -12,
+                filter: "blur(8px)",
+                duration: phraseOutTime,
+                ease: "power2.in",
+              });
+              tl.set(currentPhrase, { y: 12 });
+            } else {
+              // Es la ÚLTIMA frase: desvanecemos la frase Y la palabra capital junta
+              const exitElements = [currentGroup.lead, currentPhrase].filter(Boolean) as HTMLElement[];
+              tl.to(exitElements, {
+                autoAlpha: 0,
+                y: -14,
+                filter: "blur(10px)",
+                duration: groupExitTime,
+                ease: "power2.in",
+              });
+
+              // Reset de posición
+              tl.set(currentGroup.group, { zIndex: 1 });
+              if (currentGroup.lead) tl.set(currentGroup.lead, { y: 12, scale: 0.93, filter: "blur(14px)" });
+              tl.set(currentPhrase, { y: 12 });
+            }
+          }
+
+          // Si es el final de CONECTA (último grupo del ciclo), animar re-entrada de DUDA para ciclo 2+
+          if (g === groupCount - 1) {
+            const firstGroup = groupsData[0];
+            tl.set(firstGroup.group, { zIndex: 10 });
+            if (firstGroup.lead) {
+              tl.fromTo(firstGroup.lead, {
+                autoAlpha: 0,
+                scale: 0.93,
+                filter: "blur(14px)",
+                y: 12,
+              }, {
+                autoAlpha: 1,
+                scale: 1,
+                filter: "blur(0px)",
+                y: 0,
+                duration: wordTime,
+                ease: "power3.out",
+              });
+            }
+            tl.to({}, { duration: beatTime });
+            const firstPhrase = firstGroup.phrases[0];
+            if (firstPhrase) {
+              tl.fromTo(firstPhrase, {
+                autoAlpha: 0,
+                y: 12,
+                filter: "blur(8px)",
+              }, {
+                autoAlpha: 1,
+                y: 0,
+                filter: "blur(0px)",
+                duration: phraseInTime,
+                ease: "power2.out",
+              });
+            }
+          }
+        }
+
+        // Pausa al posar el mouse para permitir lectura reflexiva
+        const handleMouseEnter = () => tl.pause();
+        const handleMouseLeave = () => tl.resume();
+        root.addEventListener("mouseenter", handleMouseEnter);
+        root.addEventListener("mouseleave", handleMouseLeave);
+
+        // IntersectionObserver para suspender cuando está fuera de pantalla
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              dustEffect?.start();
+              tl.play();
+            } else {
+              dustEffect?.stop();
+              tl.pause();
+            }
+          });
+        }, { threshold: 0.1 });
+
+        observer.observe(root);
+
+        // Limpieza para View Transitions
+        document.addEventListener("astro:before-swap", () => {
+          observer.disconnect();
+          root.removeEventListener("mouseenter", handleMouseEnter);
+          root.removeEventListener("mouseleave", handleMouseLeave);
+          dustEffect?.destroy();
+          ctx.revert();
+        }, { once: true });
+      }, root);
+    });
+  }
+
+  document.addEventListener("astro:page-load", initArchivoManifestoInstances);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initArchivoManifestoInstances);
+  } else {
+    initArchivoManifestoInstances();
+  }
+</script>
