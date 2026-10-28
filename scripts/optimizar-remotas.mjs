@@ -3,14 +3,20 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * Rastreador, Optimizador WebP y Sincronizador Inmediato a Cloudflare R2
  *
- * Funcionalidad:
- * 1. Escanea todos los archivos (.astro, .ts, .js, .md, .mdx, .json) en src/.
- * 2. Detecta URLs externas de imágenes (Wikimedia Commons) y las convierte a WebP.
- * 3. Las guarda como respaldo local en src/assets/remotas/ y las sube SIN FALTA
- *    en el acto a Cloudflare R2 (https://storage.thegreatpuzzleproject.com/remotas/...).
- * 4. Además, audita src/assets/remotas/ y src/assets/alternativa/ para asegurar
- *    que ningún archivo local haya quedado sin subir a Cloudflare R2 (con pre-check
- *    HeadObjectCommand para no gastar cómputo ni ancho de banda si ya existe).
+ * Funcionalidad Integral (Detector de Imágenes Escondidas en Desk):
+ * 1. Lista en 1 sola llamada (ListObjectsV2Command) todas las claves activas en
+ *    el bucket Cloudflare R2 ("tgp-storage") para no gastar operaciones innecesarias.
+ * 2. Escanea TODO src/assets/ y public/images/museum/:
+ *    - Si encuentra cualquier imagen local (.jpg, .png, .webp, .avif) que falte en R2,
+ *      la optimiza a WebP en memoria (según su perfil Sharp) y la sube SIN FALTA a R2.
+ *    - En src/assets/remotas/ y src/assets/alternativa/, genera también su par .webp
+ *      y lo sube a R2 para que cualquier referencia .webp o .jpg funcione en la nube.
+ * 3. Escanea todos los archivos (.astro, .tsx, .ts, .js, .md, .mdx, .mdoc, .json) en src/:
+ *    - Detecta URLs externas de Wikimedia Commons, las descarga, convierte a .webp,
+ *      sube a R2 y reemplaza la URL en el código por https://storage.thegreatpuzzleproject.com/remotas/<archivo>.webp.
+ *    - Detecta rutas locales "/src/assets/..." escondidas en componentes .astro/.tsx/.jsx
+ *      y las reemplaza directamente por su URL pública en Cloudflare R2 tras verificar
+ *      que el archivo esté subido en R2.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 import fs from 'fs';
@@ -18,7 +24,7 @@ import path from 'path';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import sharp from 'sharp';
-import { S3Client, PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { resolveSharpParams, printProfileSummary } from './lib/sharp-profiles.mjs';
 
 dotenv.config();
@@ -41,8 +47,11 @@ const s3 = (accessKeyId && secretAccessKey && endpoint)
   : null;
 
 // ── CONFIGURACIÓN DE DIRECTORIOS ─────────────────────────────────────────────
+const ASSETS_DIR = path.resolve('src/assets');
 const ASSETS_REMOTE_DIR = path.resolve('src/assets/remotas');
 const ASSETS_ALT_DIR = path.resolve('src/assets/alternativa');
+const PUBLIC_MUSEUM_DIR = path.resolve('public/images/museum');
+
 const DIRS_TO_SCAN = [
   path.resolve('src/pages'),
   path.resolve('src/components'),
@@ -53,42 +62,74 @@ const DIRS_TO_SCAN = [
 ];
 
 const URL_REGEX = /https:\/\/(?:upload|thumb)\.wikimedia\.org\/[^\s"'`\\]+/g;
-const ALLOWED_EXTS = /\.(astro|md|mdx|json|ts|js|tsx|jsx)$/;
+const LOCAL_ASSET_UI_REGEX = /(['"`])\/src\/assets\/((?:remotas|alternativa|vault-media|busts)\/[^'"`\s]+)\1/g;
+const ALLOWED_EXTS = /\.(astro|md|mdx|mdoc|json|ts|js|tsx|jsx)$/;
+const IMAGE_EXTS = /\.(jpe?g|png|webp|avif)$/i;
 
 if (!fs.existsSync(ASSETS_REMOTE_DIR)) {
   fs.mkdirSync(ASSETS_REMOTE_DIR, { recursive: true });
 }
 
-// ── UTILIDADES R2 ────────────────────────────────────────────────────────────
-async function existsInR2(r2Key) {
-  if (!s3) return false;
-  try {
-    await s3.send(new HeadObjectCommand({ Bucket: BUCKET_NAME, Key: r2Key }));
-    return true;
-  } catch {
-    return false;
-  }
+// Caché en memoria de claves existentes en R2
+const r2ExistingKeys = new Set();
+
+async function loadR2KeysIndex() {
+  if (!s3) return;
+  let token;
+  do {
+    const res = await s3.send(new ListObjectsV2Command({
+      Bucket: BUCKET_NAME,
+      ContinuationToken: token,
+    }));
+    for (const obj of (res.Contents || [])) {
+      if (obj.Key) r2ExistingKeys.add(obj.Key);
+    }
+    token = res.NextContinuationToken;
+  } while (token);
 }
 
-async function ensureUploadedToR2(r2Key, localFilePath, contentType = 'image/webp') {
-  if (!s3 || !fs.existsSync(localFilePath)) return false;
-  const alreadyThere = await existsInR2(r2Key);
-  if (alreadyThere) return true;
+async function ensureBufferUploadedToR2(r2Key, buffer, contentType = 'image/webp') {
+  if (!s3) return false;
+  if (r2ExistingKeys.has(r2Key)) return true;
 
   try {
-    const body = fs.readFileSync(localFilePath);
     await s3.send(new PutObjectCommand({
       Bucket: BUCKET_NAME,
       Key: r2Key,
-      Body: body,
+      Body: buffer,
       ContentType: contentType,
       CacheControl: 'public, max-age=31536000, immutable',
     }));
-    const kb = (body.length / 1024).toFixed(1);
+    r2ExistingKeys.add(r2Key);
+    const kb = (buffer.length / 1024).toFixed(1);
     console.log(`☁️  [R2 SUBIDO] ${R2_PUBLIC_URL}/${r2Key} (${kb} KB)`);
     return true;
   } catch (err) {
     console.error(`❌ Error subiendo ${r2Key} a R2:`, err.message);
+    return false;
+  }
+}
+
+async function ensureFileUploadedAsWebp(r2Key, localFilePath) {
+  if (!s3 || !fs.existsSync(localFilePath)) return false;
+  if (r2ExistingKeys.has(r2Key)) return true;
+
+  try {
+    const rawBuffer = fs.readFileSync(localFilePath);
+    let uploadBuffer = rawBuffer;
+    let contentType = 'image/webp';
+
+    if (IMAGE_EXTS.test(localFilePath)) {
+      const { resizeOptions, webpOptions } = resolveSharpParams(path.basename(localFilePath));
+      uploadBuffer = await sharp(rawBuffer, { limitInputPixels: false })
+        .resize(resizeOptions)
+        .webp(webpOptions)
+        .toBuffer();
+    }
+
+    return await ensureBufferUploadedToR2(r2Key, uploadBuffer, contentType);
+  } catch (err) {
+    console.error(`❌ Error optimizando/subiendo ${r2Key}:`, err.message);
     return false;
   }
 }
@@ -134,7 +175,7 @@ async function processUrl(url) {
   const localAssetUrl = `/src/assets/remotas/${filename}`;
 
   if (fs.existsSync(destPath)) {
-    await ensureUploadedToR2(r2Key, destPath, 'image/webp');
+    await ensureBufferUploadedToR2(r2Key, fs.readFileSync(destPath), 'image/webp');
     return s3 ? r2Url : localAssetUrl;
   }
 
@@ -154,12 +195,13 @@ async function processUrl(url) {
     const { profile, resizeOptions, webpOptions } = resolveSharpParams(filename);
     console.log(`✨ [${profile.name.toUpperCase()}] ${profile.log}: ${filename}`);
 
-    await sharp(buffer, { limitInputPixels: false })
+    const webpBuffer = await sharp(buffer, { limitInputPixels: false })
       .resize(resizeOptions)
       .webp(webpOptions)
-      .toFile(destPath);
+      .toBuffer();
 
-    await ensureUploadedToR2(r2Key, destPath, 'image/webp');
+    fs.writeFileSync(destPath, webpBuffer);
+    await ensureBufferUploadedToR2(r2Key, webpBuffer, 'image/webp');
     return s3 ? r2Url : localAssetUrl;
   } catch (error) {
     console.error(`❌ Error procesando ${url}:`, error.message);
@@ -168,65 +210,84 @@ async function processUrl(url) {
 }
 
 /**
- * Audita src/assets/remotas/ y src/assets/alternativa/:
- * - Si hay un .jpg/.png en remotas/ sin su par .webp, genera el .webp automáticamente.
- * - Verifica que cada archivo exista en Cloudflare R2 y lo sube si falta.
+ * Audita TODO src/assets/ y public/images/museum/ contra el índice de R2:
+ * - Cualquier archivo en src/assets/ que no esté en R2 se optimiza a WebP y se sube.
+ * - En remotas/ y alternativa/, si un archivo es .jpg/.png, también garantiza que su
+ *   equivalente .webp exista en disco y en R2.
+ * - En public/images/museum/, garantiza que todo .webp esté en vault-media/<file> en R2.
  */
-async function syncExistingLocalAssetsToR2() {
+async function syncAllHiddenDeskAssetsToR2() {
   if (!s3) {
     console.warn('⚠️ Sin credenciales R2 en .env: omitiendo verificación en la nube.');
-    return;
+    return 0;
   }
 
-  // 1. Asegurar conversión WebP y subida de src/assets/remotas/
-  if (fs.existsSync(ASSETS_REMOTE_DIR)) {
-    const remoteFiles = fs.readdirSync(ASSETS_REMOTE_DIR);
-    for (const file of remoteFiles) {
-      const fullPath = path.join(ASSETS_REMOTE_DIR, file);
-      if (!fs.statSync(fullPath).isFile()) continue;
+  let uploadedCount = 0;
 
-      if (/\.(jpe?g|png)$/i.test(file)) {
-        const webpName = file.replace(/\.(jpe?g|png)$/i, '.webp');
-        const webpPath = path.join(ASSETS_REMOTE_DIR, webpName);
-        if (!fs.existsSync(webpPath)) {
-          const { resizeOptions, webpOptions } = resolveSharpParams(webpName);
-          await sharp(fullPath, { limitInputPixels: false })
-            .resize(resizeOptions)
-            .webp(webpOptions)
-            .toFile(webpPath);
-          console.log(`🔄 Convertido a WebP local: remotas/${webpName}`);
-        }
-        await ensureUploadedToR2(`remotas/${webpName}`, webpPath, 'image/webp');
-        await ensureUploadedToR2(`remotas/${file}`, fullPath, file.endsWith('.png') ? 'image/png' : 'image/jpeg');
-      } else if (/\.webp$/i.test(file)) {
-        await ensureUploadedToR2(`remotas/${file}`, fullPath, 'image/webp');
+  // 1. Escanear absolutamente todo src/assets/
+  const allAssets = [];
+  walkDir(ASSETS_DIR, (fullPath) => {
+    if (IMAGE_EXTS.test(fullPath)) allAssets.push(fullPath);
+  });
+
+  for (const fullPath of allAssets) {
+    const relKey = path.relative(ASSETS_DIR, fullPath).split(path.sep).join('/');
+
+    // Garantizar que la clave exacta exista en R2 (convertida a WebP por Sharp)
+    if (!r2ExistingKeys.has(relKey)) {
+      const ok = await ensureFileUploadedAsWebp(relKey, fullPath);
+      if (ok) uploadedCount++;
+    }
+
+    // Si está en remotas/ o alternativa/ y es .jpg/.png, crear y subir también su .webp
+    if ((relKey.startsWith('remotas/') || relKey.startsWith('alternativa/')) && /\.(jpe?g|png)$/i.test(relKey)) {
+      const webpKey = relKey.replace(/\.(jpe?g|png)$/i, '.webp');
+      const webpLocalPath = fullPath.replace(/\.(jpe?g|png)$/i, '.webp');
+      if (!fs.existsSync(webpLocalPath)) {
+        const { resizeOptions, webpOptions } = resolveSharpParams(path.basename(webpLocalPath));
+        await sharp(fullPath, { limitInputPixels: false })
+          .resize(resizeOptions)
+          .webp(webpOptions)
+          .toFile(webpLocalPath);
+        console.log(`🔄 Convertido a WebP local: ${webpKey}`);
+      }
+      if (!r2ExistingKeys.has(webpKey)) {
+        const ok = await ensureBufferUploadedToR2(webpKey, fs.readFileSync(webpLocalPath), 'image/webp');
+        if (ok) uploadedCount++;
       }
     }
   }
 
-  // 2. Asegurar subida de src/assets/alternativa/
-  if (fs.existsSync(ASSETS_ALT_DIR)) {
-    const altFiles = fs.readdirSync(ASSETS_ALT_DIR);
-    for (const file of altFiles) {
-      const fullPath = path.join(ASSETS_ALT_DIR, file);
-      if (!fs.statSync(fullPath).isFile()) continue;
-      const mime = /\.webp$/i.test(file) ? 'image/webp' : /\.png$/i.test(file) ? 'image/png' : 'image/jpeg';
-      await ensureUploadedToR2(`alternativa/${file}`, fullPath, mime);
+  // 2. Escanear public/images/museum/ -> vault-media/ en R2
+  if (fs.existsSync(PUBLIC_MUSEUM_DIR)) {
+    const museumFiles = fs.readdirSync(PUBLIC_MUSEUM_DIR).filter(f => /\.webp$/i.test(f));
+    for (const file of museumFiles) {
+      const r2Key = `vault-media/${file}`;
+      if (!r2ExistingKeys.has(r2Key)) {
+        const fullPath = path.join(PUBLIC_MUSEUM_DIR, file);
+        const ok = await ensureBufferUploadedToR2(r2Key, fs.readFileSync(fullPath), 'image/webp');
+        if (ok) uploadedCount++;
+      }
     }
   }
+
+  return uploadedCount;
 }
 
 // ── BUCLE PRINCIPAL ──────────────────────────────────────────────────────────
 async function main() {
   console.log('======================================================');
-  console.log('  🌐 TGP - AUTO-OPTIMIZADOR WEBP + R2 SYNC OBLIGATORIO');
+  console.log('  🌐 TGP - DETECTOR DE IMÁGENES EN DESK + R2 SYNC');
   console.log('======================================================');
   console.log(printProfileSummary());
 
-  // Paso 1: Garantizar que todos los archivos en remotas/ y alternativa/ estén en R2
-  await syncExistingLocalAssetsToR2();
+  await loadR2KeysIndex();
+  console.log(`☁️  Claves activas verificadas en Cloudflare R2: ${r2ExistingKeys.size}`);
 
-  // Paso 2: Escanear código en busca de nuevas URLs de Wikimedia
+  // Paso 1: Detectar cualquier imagen en desk que falte pasar a WebP / R2
+  const newlyUploaded = await syncAllHiddenDeskAssetsToR2();
+
+  // Paso 2: Escanear código en busca de URLs de Wikimedia o rutas locales escondidas en UI
   let filesToScan = [];
   DIRS_TO_SCAN.forEach(dir => {
     walkDir(dir, (filePath) => {
@@ -241,36 +302,48 @@ async function main() {
 
   for (const filePath of filesToScan) {
     let content = fs.readFileSync(filePath, 'utf-8');
-    const matches = content.match(URL_REGEX);
+    let changed = false;
 
-    if (matches && matches.length > 0) {
-      let changed = false;
-      const uniqueUrls = [...new Set(matches)];
-
+    // 2A. URLs externas de Wikimedia
+    const wikiMatches = content.match(URL_REGEX);
+    if (wikiMatches && wikiMatches.length > 0) {
+      const uniqueUrls = [...new Set(wikiMatches)];
       for (const url of uniqueUrls) {
         const finalUrl = await processUrl(url);
-
         if (finalUrl && finalUrl !== url) {
           const escapedUrl = url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          const replaceRegex = new RegExp(escapedUrl, 'g');
-
-          content = content.replace(replaceRegex, finalUrl);
+          content = content.replace(new RegExp(escapedUrl, 'g'), finalUrl);
           changed = true;
           totalReplaced++;
         }
       }
+    }
 
-      if (changed) {
-        fs.writeFileSync(filePath, content, 'utf-8');
-        filesModified++;
-        console.log(`📝 Actualizado código en: ${path.relative(process.cwd(), filePath)}`);
-      }
+    // 2B. Rutas "/src/assets/remotas|alternativa|vault-media|busts/..." escondidas en .astro/.tsx/.jsx
+    if (/\.(astro|tsx|jsx)$/.test(filePath) && s3) {
+      content = content.replace(LOCAL_ASSET_UI_REGEX, (fullMatch, quote, relAssetPath) => {
+        const webpCandidate = relAssetPath.replace(/\.(jpe?g|png)$/i, '.webp');
+        const targetKey = r2ExistingKeys.has(webpCandidate) ? webpCandidate : relAssetPath;
+        if (r2ExistingKeys.has(targetKey)) {
+          changed = true;
+          totalReplaced++;
+          return `${quote}${R2_PUBLIC_URL}/${targetKey}${quote}`;
+        }
+        return fullMatch;
+      });
+    }
+
+    if (changed) {
+      fs.writeFileSync(filePath, content, 'utf-8');
+      filesModified++;
+      console.log(`📝 Actualizado código en: ${path.relative(process.cwd(), filePath)}`);
     }
   }
 
   console.log('\n======================================================');
-  console.log(`  ✅ Proceso finalizado.`);
-  console.log(`  • URLs externas convertidas y subidas a R2: ${totalReplaced}`);
+  console.log(`  ✅ Auditoría y sincronización finalizada.`);
+  console.log(`  • Imágenes escondidas en desk subidas a R2: ${newlyUploaded}`);
+  console.log(`  • Referencias en código actualizadas a R2:  ${totalReplaced}`);
   console.log(`  • Archivos de código actualizados:          ${filesModified}`);
   console.log('======================================================\n');
 }

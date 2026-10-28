@@ -18,13 +18,13 @@ import AppleDualBentoDark from '../components/AppleDualBentoDark.astro';
 import { sanitizeImageUrl, getPublishableEssays, resolveEssayImage, isValidImageSrc, formatCategory, normalizeCategory } from '../lib/content-filter';
 
 // Portada Hero Cinemática (Monjes Novicios Leyendo en el Templo - Wikimedia Commons)
-const ABOUT_WIKI_COVER = '/src/assets/remotas/monks-1822569-1280.webp';
+const ABOUT_WIKI_COVER = 'https://storage.thegreatpuzzleproject.com/remotas/monks-1822569-1280.webp';
 const aboutCoverUrl = sanitizeImageUrl(ABOUT_WIKI_COVER);
 
 // ── Galería Arqueológica: Investigación Tikal (Wikimedia Commons) ──
 const tikalWikiImages: WikiImage[] = [
   {
-    url: "/src/assets/remotas/tikal-temple-i-detail-01.webp",
+    url: "https://storage.thegreatpuzzleproject.com/remotas/tikal-temple-i-detail-01.webp",
     title: "Templo del Gran Jaguar",
     subtitle: "Mesoamérica • Pirámide I de Tikal",
     fontTitle: "font-['Syne',sans-serif]",
@@ -35,7 +35,7 @@ const tikalWikiImages: WikiImage[] = [
     description: "Tikal Temple I Detail"
   },
   {
-    url: "/src/assets/remotas/tikal-guatemala-laslovarga62.webp",
+    url: "https://storage.thegreatpuzzleproject.com/remotas/tikal-guatemala-laslovarga62.webp",
     title: "La Gran Plaza y la Acrópolis",
     subtitle: "Mesoamérica • Selva de Petén",
     fontTitle: "font-['Cinzel',serif]",
@@ -46,7 +46,7 @@ const tikalWikiImages: WikiImage[] = [
     description: "Tikal, Guatemala"
   },
   {
-    url: "/src/assets/remotas/tikal-temple-vi-temple-of-the-inscriptions.webp",
+    url: "https://storage.thegreatpuzzleproject.com/remotas/tikal-temple-vi-temple-of-the-inscriptions.webp",
     title: "Templo de las Inscripciones",
     subtitle: "Mesoamérica • Templo VI & Glifos Mayas",
     fontTitle: "font-['Outfit',sans-serif]",

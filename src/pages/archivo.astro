@@ -206,7 +206,7 @@ const categoryTrayItems: TrayCollectionItem[] = allCategoryCards.map(c => ({
 }));
 
 // ─── PORTADA DEL HERO: Imagen Wikimedia representativa del Archivo General ────
-const ARCHIVE_WIKI_COVER = '/src/assets/remotas/pieter-bruegel-the-elder-the-tower-of-babel-vienna.webp';
+const ARCHIVE_WIKI_COVER = 'https://storage.thegreatpuzzleproject.com/remotas/pieter-bruegel-the-elder-the-tower-of-babel-vienna.webp';
 
 const arquetiposConImg = publishableArquetipos
   .map(e => ({ ...e, img: resolveEssayImage(e.entry, e.slug) }))
