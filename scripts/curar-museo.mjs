@@ -2,22 +2,17 @@
 /**
  * scripts/curar-museo.mjs
  * ─────────────────────────────────────────────────────────────────────────────
- * PIPELINE DE CURADURÍA Y RECORTE DE OBJETOS DE MUSEO (WIKIMEDIA → BENTO DARK & DIURNO)
+ * PIPELINE DE CURADURÍA Y RECORTE DE OBJETOS DE MUSEO (WIKIMEDIA → R2 + BENTO DARK & DIURNO)
  *
- * Flujo automatizado:
- * 1. Ingesta desde Wikimedia Commons (búsqueda por término, título "File:..." o URL directa)
- *    o desde archivo local.
- * 2. Si la imagen de Wikimedia tiene fondo opaco (JPG/PNG de museo), extrae la silueta
- *    neuronal en un subproceso aislado (evitando colisión de DLLs en Windows) y aplica
- *    la máscara sobre los píxeles RGB originales en alta resolución (cero pixelado).
- * 3. Vacía las "islas internas" cerradas (huecos entre piernas, brazos, perforaciones).
- * 4. Calibración Dual-Theme (Apple Bento Dark #18181c + Modo Diurno #f5f5f7):
- *    Suavizado sub-píxel (Alpha Matting) y descontaminación cromática neutra en bordes
- *    semitransparentes para evitar halos blancos en Dark y bordes oscuros en Light.
- * 5. Auto-Crop (sharp.trim()) para anclaje lítico exacto en la base inferior.
- * 6. Guarda en:
- *    - public/images/museum/<prefijo>-<slug>.webp (y .png)
- *    - src/assets/vault-media/<prefijo>-<slug>.webp (listo para `npm run upload:assets` a R2)
+ * Reglas Mandatorias de Eficiencia (Cero gasto innecesario de cómputo/créditos):
+ * 1. Pre-Check de Caché (R2 + Local): Si la pieza `.webp` ya existe en Cloudflare R2
+ *    (`vault-media/<slug>.webp`) o en caché local (y no se pasa `--force`), retorna de
+ *    inmediato la URL de R2 con fallback local sin volver a correr la IA ni descargar nada.
+ * 2. Conversión Directa a WebP (`quality: 95, alphaQuality: 100`) con Auto-Crop (`sharp.trim()`).
+ * 3. Subida Inmediata a Cloudflare R2 (`tgp-storage` -> `vault-media/<slug>.webp`) en el
+ *    mismo acto y devolución de `{ r2Url, localFallbackUrl }`.
+ * 4. Calibración Dual-Theme: Bordes suaves anti-halo tanto para Apple Bento Dark (#1a1a1f)
+ *    como para Bento Diurno (#fbfbfd).
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -25,10 +20,66 @@ import sharp from 'sharp';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import dotenv from 'dotenv';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { S3Client, PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
+
+dotenv.config();
 
 const USER_AGENT = 'TGP-Hemeroteca/1.0 (https://thegreatpuzzleproject.com; editorial@thegreatpuzzleproject.com)';
+const R2_PUBLIC_URL = 'https://storage.thegreatpuzzleproject.com';
+const BUCKET_NAME = process.env.R2_BUCKET_NAME || 'tgp-storage';
+
+// ── CLIENTE R2 CON FALLBACK SEGURO ───────────────────────────────────────────
+
+function getR2Client() {
+  const accountId = process.env.R2_ACCOUNT_ID;
+  const accessKeyId = process.env.R2_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
+  const endpoint =
+    process.env.R2_ENDPOINT || (accountId ? `https://${accountId}.r2.cloudflarestorage.com` : null);
+
+  if (!accessKeyId || !secretAccessKey || !endpoint) {
+    return null;
+  }
+
+  return new S3Client({
+    region: 'auto',
+    endpoint,
+    credentials: { accessKeyId, secretAccessKey },
+    forcePathStyle: false,
+  });
+}
+
+async function existsInR2(s3, r2Key) {
+  if (!s3) return false;
+  try {
+    await s3.send(new HeadObjectCommand({ Bucket: BUCKET_NAME, Key: r2Key }));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function uploadWebpToR2(s3, r2Key, webpBuffer) {
+  if (!s3) return false;
+  try {
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: r2Key,
+        Body: webpBuffer,
+        ContentType: 'image/webp',
+        CacheControl: 'public, max-age=31536000, immutable',
+      })
+    );
+    return true;
+  } catch (err) {
+    console.warn(`⚠️ [Fallback Local] No se pudo subir a R2 (${err.message}). Usando copia local.`);
+    return false;
+  }
+}
 
 // ── 1. RESOLUCIÓN Y DESCARGA DESDE WIKIMEDIA COMMONS ─────────────────────────
 
@@ -40,7 +91,6 @@ export async function resolveWikimediaImageUrl(queryOrTitle) {
   let fileTitle = queryOrTitle.trim();
 
   if (!/^File:/i.test(fileTitle)) {
-    // 1. Intentar primero la imagen principal curada de Wikipedia (en y es)
     for (const lang of ['en', 'es']) {
       try {
         const wpUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(fileTitle)}&prop=pageimages&pithumbsize=1600&redirects=1&format=json`;
@@ -62,7 +112,6 @@ export async function resolveWikimediaImageUrl(queryOrTitle) {
       }
     }
 
-    // 2. Fallback: Búsqueda directa en Wikimedia Commons
     const searchUrl = `https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(fileTitle)}&srnamespace=6&srlimit=10&format=json`;
     const searchRes = await fetch(searchUrl, { headers: { 'User-Agent': USER_AGENT } });
     if (!searchRes.ok) throw new Error(`Error consultando Wikimedia API (${searchRes.status})`);
@@ -102,7 +151,7 @@ export async function downloadBuffer(url) {
   return Buffer.from(await res.arrayBuffer());
 }
 
-// ── 2. AISLAMIENTO DE SUBPROCESO PARA @imgly (EVITA COLISIÓN DE LIBVIPS EN WINDOWS) ──
+// ── 2. AISLAMIENTO DE SUBPROCESO PARA @imgly (CERO COLISIÓN DE DLLS) ─────────
 
 function runImglyInSubprocess(inputPngBuffer) {
   const tmpIn = path.join(os.tmpdir(), `tgp_in_${Date.now()}_${Math.random().toString(36).slice(2)}.png`);
@@ -123,8 +172,7 @@ function runImglyInSubprocess(inputPngBuffer) {
       stdio: 'pipe',
       cwd: process.cwd(),
     });
-    const outBuf = fs.readFileSync(tmpOut);
-    return outBuf;
+    return fs.readFileSync(tmpOut);
   } finally {
     if (fs.existsSync(tmpIn)) fs.unlinkSync(tmpIn);
     if (fs.existsSync(tmpOut)) fs.unlinkSync(tmpOut);
@@ -167,7 +215,7 @@ export async function curarObjetoMuseoBuffer(inputBuffer) {
   let baseAlpha = Buffer.alloc(W * H);
 
   if (!alreadyCutout) {
-    console.log('🧠 Fondo opaco detectado: extrayendo máscara neuronal (subproceso aislado) preservando RGB original...');
+    console.log('🧠 Fondo opaco detectado: extrayendo máscara neuronal preservando RGB original...');
     const flatPng = await sharp(normalizedBuf)
       .flatten({ background: '#ffffff' })
       .png()
@@ -191,7 +239,6 @@ export async function curarObjetoMuseoBuffer(inputBuffer) {
     }
   }
 
-  // Suavizar la máscara alfa 1px (Alpha Matting) para que los bordes jamás tengan "dientes de sierra"
   const smoothAlpha = await sharp(baseAlpha, { raw: { width: W, height: H, channels: 1 } })
     .toColourspace('b-w')
     .blur(0.85)
@@ -216,11 +263,8 @@ export async function curarObjetoMuseoBuffer(inputBuffer) {
       const g = outRgba[idx + 1];
       const b = outRgba[idx + 2];
 
-      // Proteger centro del objeto frente a brillos especulares
       const isCoreCenter = y > H * 0.15 && y < H * 0.48 && x > W * 0.25 && x < W * 0.75;
 
-      // Solo vaciar islas blancas por color si la imagen venía pre-recortada sin IA (caso Hermes).
-      // Si pasó por la red neuronal (!alreadyCutout), respetamos al 100% los reflejos especulares de oro/bronce.
       if (alreadyCutout && !isCoreCenter) {
         const maxC = Math.max(r, g, b);
         const minC = Math.min(r, g, b);
@@ -236,7 +280,6 @@ export async function curarObjetoMuseoBuffer(inputBuffer) {
         }
       }
 
-      // Descontaminación cromática neutra para bordes semitransparentes (Dual-Theme: Dark #18181c + Diurno #f5f5f7)
       if (a > 0 && a < 225) {
         const edgeRatio = 0.74 + 0.26 * (a / 225);
         outRgba[idx] = Math.round(r * edgeRatio);
@@ -248,7 +291,6 @@ export async function curarObjetoMuseoBuffer(inputBuffer) {
     }
   }
 
-  // Auto-Crop (sharp.trim()) para eliminar aire vacío y apoyar sobre la sombra de contacto
   const trimmedPngBuffer = await sharp(outRgba, { raw: { width: W, height: H, channels: 4 } })
     .trim({ threshold: 8 })
     .png({ compressionLevel: 9 })
@@ -264,16 +306,9 @@ export async function curarObjetoMuseoBuffer(inputBuffer) {
   };
 }
 
-export async function curarPiezaMuseo(sourceInput, outputSlug) {
-  let rawBuffer;
-  if (fs.existsSync(sourceInput)) {
-    console.log(`📂 Leyendo archivo local: ${sourceInput}`);
-    rawBuffer = fs.readFileSync(sourceInput);
-  } else {
-    const resolvedUrl = await resolveWikimediaImageUrl(sourceInput);
-    rawBuffer = await downloadBuffer(resolvedUrl);
-  }
+// ── 4. PIPELINE PRINCIPAL CON PRE-CHECK Y SUBIDA INMEDIATA A R2 + FALLBACK ───
 
+export async function curarPiezaMuseo(sourceInput, outputSlug, { force = false } = {}) {
   const cleanSlug = outputSlug
     .replace(/\.(webp|png|jpe?g)$/i, '')
     .replace(/[^a-zA-Z0-9_-]/g, '-')
@@ -284,11 +319,8 @@ export async function curarPiezaMuseo(sourceInput, outputSlug) {
       ? cleanSlug
       : `artifact-${cleanSlug}`;
 
-  const { pngBuffer, webpBuffer } = await curarObjetoMuseoBuffer(rawBuffer);
-
   const publicDir = path.resolve('public/images/museum');
   const assetsVaultDir = path.resolve('src/assets/vault-media');
-
   fs.mkdirSync(publicDir, { recursive: true });
   fs.mkdirSync(assetsVaultDir, { recursive: true });
 
@@ -296,51 +328,94 @@ export async function curarPiezaMuseo(sourceInput, outputSlug) {
   const publicPngPath = path.join(publicDir, `${fileNameBase}.png`);
   const r2ReadyWebpPath = path.join(assetsVaultDir, `${fileNameBase}.webp`);
 
+  const r2Key = `vault-media/${fileNameBase}.webp`;
+  const r2Url = `${R2_PUBLIC_URL}/${r2Key}`;
+  const localUrl = `/images/museum/${fileNameBase}.webp`;
+
+  const s3 = getR2Client();
+
+  // 1. PRE-CHECK ANTI-GASTO: Si ya está procesado en local y/o R2 y no es --force, ahorrar cómputo
+  if (!force && fs.existsSync(publicWebpPath)) {
+    const alreadyOnR2 = await existsInR2(s3, r2Key);
+    if (alreadyOnR2) {
+      console.log(`⚡ [Caché R2 Activo — 0 cómputo] ${fileNameBase}.webp ya existe en R2: ${r2Url}`);
+      return { primaryUrl: r2Url, fallbackUrl: localUrl, r2Url, localUrl, publicWebpPath, publicPngPath, r2ReadyWebpPath };
+    } else if (s3) {
+      // Ya está procesado localmente en WebP, solo lo subimos a R2 sin re-ejecutar IA
+      const existingWebpBuf = fs.readFileSync(publicWebpPath);
+      const uploaded = await uploadWebpToR2(s3, r2Key, existingWebpBuf);
+      if (uploaded) {
+        console.log(`☁️  [Subido desde caché local a R2 — 0 cómputo IA] ${r2Url}`);
+        return { primaryUrl: r2Url, fallbackUrl: localUrl, r2Url, localUrl, publicWebpPath, publicPngPath, r2ReadyWebpPath };
+      }
+    }
+  }
+
+  // 2. INGESTA Y PROCESAMIENTO (solo cuando es pieza nueva o --force)
+  let rawBuffer;
+  if (fs.existsSync(sourceInput)) {
+    console.log(`📂 Leyendo archivo local: ${sourceInput}`);
+    rawBuffer = fs.readFileSync(sourceInput);
+  } else {
+    const resolvedUrl = await resolveWikimediaImageUrl(sourceInput);
+    rawBuffer = await downloadBuffer(resolvedUrl);
+  }
+
+  const { pngBuffer, webpBuffer } = await curarObjetoMuseoBuffer(rawBuffer);
+
   fs.writeFileSync(publicWebpPath, webpBuffer);
   fs.writeFileSync(publicPngPath, pngBuffer);
   fs.writeFileSync(r2ReadyWebpPath, webpBuffer);
 
-  console.log(`✅ [${fileNameBase}] Curado y recortado (Dual-Theme: Dark #18181c + Diurno #f5f5f7):`);
-  console.log(`   • Local WebP: /images/museum/${fileNameBase}.webp (${(webpBuffer.length / 1024).toFixed(1)} KB)`);
-  console.log(`   • R2 Staging: src/assets/vault-media/${fileNameBase}.webp\n`);
+  // 3. SUBIDA INMEDIATA A CLOUDFLARE R2 CON FALLBACK LOCAL AUTOMÁTICO
+  const uploadedToR2 = await uploadWebpToR2(s3, r2Key, webpBuffer);
+  const primaryUrl = uploadedToR2 ? r2Url : localUrl;
+
+  console.log(`✅ [${fileNameBase}] Curado, convertido a WebP (${(webpBuffer.length / 1024).toFixed(1)} KB) y listo:`);
+  console.log(`   • R2 Storage:     ${uploadedToR2 ? r2Url + ' (ONLINE)' : 'Pendiente (usando Fallback Local)'}`);
+  console.log(`   • Fallback Local: ${localUrl}\n`);
 
   return {
-    localUrl: `/images/museum/${fileNameBase}.webp`,
-    r2Url: `https://storage.thegreatpuzzleproject.com/vault-media/${fileNameBase}.webp`,
+    primaryUrl,
+    fallbackUrl: localUrl,
+    r2Url,
+    localUrl,
     publicWebpPath,
     publicPngPath,
     r2ReadyWebpPath,
   };
 }
 
-// ── 4. CLI ───────────────────────────────────────────────────────────────────
+// ── 5. CLI ───────────────────────────────────────────────────────────────────
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
 
 if (isMain) {
   const args = process.argv.slice(2);
-  const wikiIdx = args.indexOf('--wiki');
+  const force = args.includes('--force');
+  const cleanArgs = args.filter(a => a !== '--force');
+  const wikiIdx = cleanArgs.indexOf('--wiki');
 
   let sourceArg = null;
   let slugArg = null;
 
   if (wikiIdx !== -1) {
-    sourceArg = args[wikiIdx + 1];
-    slugArg = args[wikiIdx + 2] || sourceArg;
+    sourceArg = cleanArgs[wikiIdx + 1];
+    slugArg = cleanArgs[wikiIdx + 2] || sourceArg;
   } else {
-    sourceArg = args[0];
-    slugArg = args[1] || (sourceArg ? path.basename(sourceArg, path.extname(sourceArg)) : null);
+    sourceArg = cleanArgs[0];
+    slugArg = cleanArgs[1] || (sourceArg ? path.basename(sourceArg, path.extname(sourceArg)) : null);
   }
 
   if (!sourceArg) {
     console.log(`
 Uso:
-  npm run curar:museo -- --wiki "<búsqueda o File: en Wikimedia>" <nombre-salida>
+  npm run curar:museo -- --wiki "<búsqueda o File: en Wikimedia>" <nombre-salida> [--force]
 `);
     process.exit(0);
   }
 
-  curarPiezaMuseo(sourceArg, slugArg).catch(err => {
+  curarPiezaMuseo(sourceArg, slugArg, { force }).catch(err => {
     console.error('\n❌ Error en curaduría de museo:', err.message);
     process.exit(1);
   });
