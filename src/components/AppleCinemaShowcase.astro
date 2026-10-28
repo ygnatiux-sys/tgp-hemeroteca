@@ -105,7 +105,7 @@ const DEFAULT_HERO_ITEMS: CinemaShowcaseItem[] = [
     title: "MAYDAY DEL TIEMPO",
     subtitle: "Cuando la civilización humana quedó atrapada tras las líneas del olvido milenario en una misión por descifrar los cimientos perdidos de la Tierra.",
     category: "Arqueosemiótica",
-    image: "/src/assets/remotas/stepped-pyramid-of-djoser-at-saqqara.webp",
+    image: "https://storage.thegreatpuzzleproject.com/remotas/stepped-pyramid-of-djoser-at-saqqara.webp",
     href: "/hemeroteca/la-arquitectura-del-tiempo/",
     fontH1: IMPACT_FONT_PRESETS[0].fontH1,
     fontH2: IMPACT_FONT_PRESETS[0].fontH2,
@@ -145,7 +145,7 @@ const DEFAULT_HERO_ITEMS: CinemaShowcaseItem[] = [
     title: "GUNUNG PADANG PROFUNDO",
     subtitle: "Una colina megalítica en Java Occidental donde el georradar y los estratos de basalto columnar desafían las líneas cronológicas establecidas.",
     category: "Prehistoria",
-    image: "/src/assets/alternativa/gunung-padang.jpg",
+    image: "https://storage.thegreatpuzzleproject.com/alternativa/gunung-padang.jpg",
     href: "/colecciones/arqueosemiotica/",
     fontH1: IMPACT_FONT_PRESETS[2].fontH1,
     fontH2: IMPACT_FONT_PRESETS[2].fontH2,
@@ -165,7 +165,7 @@ const DEFAULT_HERO_ITEMS: CinemaShowcaseItem[] = [
     title: "CANTERAS IMPERIALES",
     subtitle: "Los monolitos inconclusos de Yangshan: millones de toneladas de piedra desprendidas de la roca madre en un acto de ingeniería ciclópea desmesurada.",
     category: "Megalitismo",
-    image: "/src/assets/remotas/yangshan-stele-quarry.jpg",
+    image: "https://storage.thegreatpuzzleproject.com/remotas/yangshan-stele-quarry.webp",
     href: "/colecciones/historia/",
     fontH1: IMPACT_FONT_PRESETS[3].fontH1,
     fontH2: IMPACT_FONT_PRESETS[3].fontH2,
@@ -195,7 +195,7 @@ const DEFAULT_ROUND_FRAMES: RoundFrameItem[] = [
   {
     name: "Imhotep",
     role: "Arquitecto de Saqqara",
-    image: "/src/assets/remotas/stepped-pyramid-of-djoser-at-saqqara.webp"
+    image: "https://storage.thegreatpuzzleproject.com/remotas/stepped-pyramid-of-djoser-at-saqqara.webp"
   },
   {
     name: "Djoser",
@@ -244,7 +244,7 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
   <!-- ═══════════════════════════════════════════════════════════════════
        1. HERO SHOWCASE ESTILO "MAYDAY" (PROPORCIÓN Y DISPOSICIÓN EXACTA)
        ═══════════════════════════════════════════════════════════════════ -->
-  <div class={`cinema-mayday-hero relative w-full ${isImax ? 'h-[84vh] min-h-[600px] lg:min-h-[740px] max-h-[880px]' : 'h-[76vh] min-h-140 max-h-195'} rounded-3xl overflow-hidden bg-[#07080a] border border-white/10 shadow-[0_30px_90px_rgba(0,0,0,0.95)]`}>
+  <div class={`cinema-mayday-hero relative w-full ${isImax ? 'h-[84vh] min-h-150 lg:min-h-185 max-h-220' : 'h-[76vh] min-h-140 max-h-195'} rounded-3xl overflow-hidden bg-[#07080a] border border-white/10 shadow-[0_30px_90px_rgba(0,0,0,0.95)]`}>
     
     <!-- CONTENEDOR DE FONDOS PANORÁMICOS CON ZOOM DISCRETO -->
     <div class="absolute inset-0 w-full h-full overflow-hidden z-0">
@@ -255,7 +255,7 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
           style={sIdx === 0 ? 'display: block;' : 'display: none;'}
         >
           <img 
-            src={item.image} 
+            src={sanitizeImageUrl(item.image) || item.image} 
             alt={item.title}
             loading={sIdx === 0 ? "eager" : "lazy"}
             decoding="async"
@@ -279,7 +279,7 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
           style={sIdx === 0 ? 'display: flex;' : 'display: none;'}
         >
           <!-- TÍTULO MONUMENTAL H1 FILOSO (SHARP) Y PURO ESTILO APPLE TV (SIN CAJA NI FONDO ARTIFICIAL) -->
-          <h1 class={`mayday-title text-4xl sm:text-5xl md:text-6xl lg:text-[70px] text-white leading-[0.94] drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] drop-shadow-[0_6px_16px_rgba(0,0,0,0.95)] drop-shadow-[0_16px_36px_rgba(0,0,0,0.85)] max-w-2xl select-none ${item.fontH1}`}>
+          <h1 class={`mayday-title text-4xl sm:text-5xl md:text-6xl lg:text-[70px] text-white leading-[0.94] max-w-2xl select-none ${item.fontH1}`}>
             {item.title}
           </h1>
 
@@ -422,7 +422,7 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
               <div class="relative w-20 h-20 sm:w-24 sm:h-24 md:w-26 md:h-26 rounded-full overflow-hidden border border-white/15 bg-zinc-900 shadow-xl transition-all duration-300 group-hover/frame:scale-105 group-hover/frame:border-amber-400/80 group-hover/frame:shadow-[0_0_20px_rgba(245,158,11,0.3)] mb-2.5">
                 {frame.image ? (
                   <img 
-                    src={frame.image} 
+                    src={sanitizeImageUrl(frame.image) || frame.image} 
                     alt={frame.name}
                     loading="lazy"
                     decoding="async"
@@ -625,3 +625,11 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
   }
   document.addEventListener('astro:page-load', initMaydayShowcase);
 </script>
+
+<style>
+  .mayday-title {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95))
+            drop-shadow(0 6px 16px rgba(0, 0, 0, 0.95))
+            drop-shadow(0 16px 36px rgba(0, 0, 0, 0.85));
+  }
+</style>

@@ -169,7 +169,7 @@ const defaultSlides: SlideItem[] = [
     techSpecs: FONT_PRESETS[0].techSpecs,
     panels: [
       {
-        image: "/src/assets/remotas/stepped-pyramid-of-djoser-at-saqqara.webp",
+        image: "https://storage.thegreatpuzzleproject.com/remotas/stepped-pyramid-of-djoser-at-saqqara.webp",
         alt: "Pirámide Escalonada de Saqqara",
         title: "Pirámide de Saqqara",
         category: "Arqueosemiótica",
@@ -183,7 +183,7 @@ const defaultSlides: SlideItem[] = [
         objectPosition: "center 25%"
       },
       {
-        image: "/src/assets/alternativa/gunung-padang.jpg",
+        image: "https://storage.thegreatpuzzleproject.com/alternativa/gunung-padang.jpg",
         alt: "Terrazas Megalíticas de Gunung Padang",
         title: "Gunung Padang",
         category: "Prehistoria",
@@ -218,7 +218,7 @@ const defaultSlides: SlideItem[] = [
         objectPosition: "center 20%"
       },
       {
-        image: "/src/assets/remotas/stepped-pyramid-of-djoser-at-saqqara.webp",
+        image: "https://storage.thegreatpuzzleproject.com/remotas/stepped-pyramid-of-djoser-at-saqqara.webp",
         alt: "Pirámide Escalonada de Saqqara",
         title: "Pirámide de Saqqara",
         category: "Arqueosemiótica",
@@ -267,7 +267,7 @@ const allSlides: SlideItem[] = computedSlides.length > 0
         style={sIdx === 0 ? 'display: block;' : 'display: none;'}
       >
         <img 
-          src={slide.panels[0].image} 
+          src={sanitizeImageUrl(slide.panels[0].image) || slide.panels[0].image} 
           alt="" 
           aria-hidden="true"
           class="w-full h-full object-cover scale-125 blur-3xl opacity-35 brightness-75 saturate-125"
@@ -311,7 +311,7 @@ const allSlides: SlideItem[] = computedSlides.length > 0
               >
                 {/* Imagen en formato cuadrado */}
                 <img
-                  src={panel.image}
+                  src={sanitizeImageUrl(panel.image) || panel.image}
                   alt={panel.alt || panel.title || ''}
                   loading={sIdx === 0 ? "eager" : "lazy"}
                   decoding="async"
