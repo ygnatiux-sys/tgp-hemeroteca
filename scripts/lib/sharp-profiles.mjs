@@ -106,6 +106,18 @@ const PROFILES = [
     log: '⬛ Cuadrado · max 1600px · q85',
   },
   {
+    name: 'museum',
+    prefixes: ['statue-', 'museum-', 'artifact-'],
+    // Uso: Objetos de museo y estatuaria recortada con canal alfa para Bento Dark y Diurno
+    resize: {
+      width: 1920,
+      fit: 'inside',
+      withoutEnlargement: true,
+    },
+    webp: { quality: 95, alphaQuality: 100, effort: 6, smartSubsample: true },
+    log: '🏛️ Museo/Estatuaria · max 1920px inside · q95 alpha100',
+  },
+  {
     name: 'ui',
     prefixes: ['logo-', 'ui-', 'icon-'],
     // Uso: marca, logos — PROHIBIDO recortar o alterar ratio

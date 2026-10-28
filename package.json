@@ -22,6 +22,7 @@
     "sanear": "node scripts/sanear-esquemas-keystatic.mjs && node scripts/limpiar-urls-contenido.mjs",
     "curar:visual": "node scripts/curador-visual.mjs",
     "curar:batch": "node scripts/curar-batch-segundo.mjs",
+    "curar:museo": "node scripts/curar-museo.mjs",
     "//3": "--- 3. DESPLIEGUE ---",
     "sync": "node check-images.mjs && npm run optimize:remote && npm run upload:assets && git pull origin main && git add . && git commit -m \"TGP Sync: Cierre de jornada y subida de assets\" && git push origin main",
     "//4": "--- EL CIERRE MAESTRO ---",
