@@ -24,6 +24,7 @@ interface ImaxArtifact {
   logline: string;
   era: string;
   imageWebp: string;
+  fallbackWebp?: string;
   alt: string;
   ctaText: string;
   ctaLink: string;
@@ -65,6 +66,32 @@ const card1Artifacts: ImaxArtifact[] = [
     alt: "Estatua sumeria de Gudea de Lagash en diorita negra",
     ctaText: "Explorar investigación",
     ctaLink: "/ensayos/colapso-1177"
+  },
+  {
+    id: "disco-festo",
+    kicker: "CRETA MINOICA · C. 1700 A.C.",
+    titleLine1: "La Espiral Indescifrable.",
+    titleLine2: "El Disco de Festo.",
+    logline: "Arcilla cocida con 242 signos estampados mediante matrices móviles mil años antes de la imprenta: un código aislado sin traducción en el Mediterráneo.",
+    era: "Museo Arqueológico de Heraclión · Creta",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/artifact-disco-festo.webp",
+    fallbackWebp: "/images/museum/artifact-disco-festo.webp",
+    alt: "Disco de Festo en arcilla cocida con glifos en espiral",
+    ctaText: "Explorar investigación",
+    ctaLink: "/ensayos/la-memoria-del-laberinto-y-el-tiempo-material-8555"
+  },
+  {
+    id: "anticitera",
+    kicker: "ATENAS · C. 150–100 A.C.",
+    titleLine1: "El Reloj del Cosmos.",
+    titleLine2: "Mecanismo de Anticitera.",
+    logline: "Treinta engranajes diferenciales de bronce capaces de computar eclipses y ciclos metónicos: una cumbre mecánica helenística sin precedentes documentados.",
+    era: "Museo Arqueológico Nacional de Atenas",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/artifact-anticitera.webp",
+    fallbackWebp: "/images/museum/artifact-anticitera.webp",
+    alt: "Fragmento principal en bronce del Mecanismo de Anticitera",
+    ctaText: "Explorar investigación",
+    ctaLink: "/ensayos/amnesia-programada"
   }
 ];
 
@@ -100,10 +127,37 @@ const card2Artifacts: ImaxArtifact[] = [
     titleLine2: "Hermes Psicopompo.",
     logline: "La figura del intermediario ontológico: el cetro del heraldo y la mirada serena que guía las almas en la frontera entre registros de la realidad.",
     era: "Vulci / Louvre G264 · Siglo V a.C.",
-    imageWebp: "/images/museum/statue-hermes.webp",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/statue-hermes.webp",
+    fallbackWebp: "/images/museum/statue-hermes.webp",
     alt: "Estatua clásica de Hermes con caduceo",
     ctaText: "Explorar investigación",
     ctaLink: "/ensayos/mercurio-hermes-arquetipo-liminal"
+  },
+  {
+    id: "sanxingdui",
+    kicker: "SHU ANTIGUO · C. 1200 A.C.",
+    titleLine1: "El Rostro sin Crónica.",
+    titleLine2: "Máscara de Sanxingdui.",
+    logline: "Lámina de oro martillado sobre bronce de una civilización silenciada por las dinastías imperiales que incineró y sepultó ritualmente sus efigies.",
+    era: "Museo de Sanxingdui · Guanghan, Sichuan",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/artifact-sanxingdui.webp",
+    fallbackWebp: "/images/museum/artifact-sanxingdui.webp",
+    alt: "Máscara ritual de oro y bronce de la cultura Sanxingdui",
+    ctaText: "Explorar investigación",
+    ctaLink: "/ensayos/amnesia-programada"
+  },
+  {
+    id: "dodecaedro-romano",
+    kicker: "FRONTERA IMPERIAL · S. II–IV D.C.",
+    titleLine1: "La Geometría Muda.",
+    titleLine2: "Dodecaedro Romano.",
+    logline: "Más de cien ejemplares de bronce fundido con doce caras pentagonales y veinte esferas en los vértices sin una sola mención en los textos latinos.",
+    era: "Museo Galorromano de Tongeren · Bronce",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/artifact-dodecaedro-romano.webp",
+    fallbackWebp: "/images/museum/artifact-dodecaedro-romano.webp",
+    alt: "Dodecaedro romano de bronce con cavidades circulares",
+    ctaText: "Explorar investigación",
+    ctaLink: "/ensayos/pumapunku-la-geometria-del-silencio"
   }
 ];
 ---
