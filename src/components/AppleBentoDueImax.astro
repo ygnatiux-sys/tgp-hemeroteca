@@ -178,13 +178,13 @@ const card2Artifacts: ImaxArtifact[] = [
   </div>
 
   <!-- CONTENEDOR EN COLUMNA CON MÁRGENES LATERALES DEL 15% (ANCHO EFECTIVO 70%-72%) -->
-  <div class="flex flex-col gap-20 sm:gap-28 md:gap-36 w-[92%] sm:w-[86%] lg:w-[72%] max-w-[1240px] mx-auto items-center">
+  <div class="flex flex-col gap-20 sm:gap-28 md:gap-36 w-[92%] sm:w-[86%] lg:w-[72%] max-w-310 mx-auto items-center">
 
     <!-- ═══════════════════════════════════════════════════════
-         CANVAS IMAX 1 (SUPERIOR): VENUS / NEFERTITI / GUDEA
+         CANVAS IMAX 1 (SUPERIOR): VENUS / NEFERTITI / GUDEA / FESTO / ANTICITERA
          ═══════════════════════════════════════════════════════ -->
     <div 
-      class="bento-imax-card group/imax relative w-full rounded-4xl sm:rounded-[44px] overflow-hidden bg-[#18181c] border border-white/10 text-[#f5f5f7] shadow-[0_36px_85px_rgba(0,0,0,0.75),inset_0_1px_1px_rgba(255,255,255,0.08)] flex flex-col justify-between aspect-[3/4] sm:aspect-[4/5] md:aspect-[3/4] lg:aspect-[10/12] min-h-[760px] sm:min-h-[860px] md:min-h-[940px] select-none transition-all duration-500 hover:shadow-[0_45px_100px_rgba(0,0,0,0.9)] hover:border-white/16 hover:-translate-y-1"
+      class="bento-imax-card group/imax relative w-full rounded-4xl sm:rounded-[44px] overflow-hidden bg-[#18181c] border border-white/10 text-[#f5f5f7] shadow-[0_36px_85px_rgba(0,0,0,0.75),inset_0_1px_1px_rgba(255,255,255,0.08)] flex flex-col justify-between aspect-3/4 sm:aspect-4/5 md:aspect-3/4 lg:aspect-10/12 min-h-190 sm:min-h-215 md:min-h-235 select-none transition-all duration-500 hover:shadow-[0_45px_100px_rgba(0,0,0,0.9)] hover:border-white/16 hover:-translate-y-1"
       id="bento-imax-card-1"
       data-card-id="imax-1"
     >
@@ -234,12 +234,12 @@ const card2Artifacts: ImaxArtifact[] = [
       </div>
 
       <!-- STAGE: ESCENARIO IMAX VERTICAL GIGANTE (MÁS ESPACIO HACIA ABAJO) -->
-      <div class="bento-imax-stage mt-auto w-full relative grow flex justify-center items-end px-6 pb-8 sm:pb-12 md:pb-16 overflow-hidden min-h-[460px] sm:min-h-[560px] md:min-h-[640px] z-10">
+      <div class="bento-imax-stage mt-auto w-full relative grow flex justify-center items-end px-6 pb-8 sm:pb-12 md:pb-16 overflow-hidden min-h-115 sm:min-h-140 md:min-h-160 z-10">
         <!-- HALO DE CONTRALUZ AMBIENTAL DE ALTO CONTRASTE -->
         <div class="imax-ambient-glow absolute inset-0 pointer-events-none"></div>
 
         <!-- SOMBRA DE CONTACTO BASE MULTICAPA ESTRATIFICADA -->
-        <div class="imax-contact-shadow absolute bottom-7 sm:bottom-10 md:bottom-14 left-1/2 -translate-x-1/2 w-72 sm:w-96 md:w-[500px] h-8 bg-black/85 rounded-full blur-lg pointer-events-none transform scale-y-50"></div>
+        <div class="imax-contact-shadow absolute bottom-7 sm:bottom-10 md:bottom-14 left-1/2 -translate-x-1/2 w-72 sm:w-96 md:w-125 h-8 bg-black/85 rounded-full blur-lg pointer-events-none transform scale-y-50"></div>
         <div class="imax-contact-core absolute bottom-8 sm:bottom-11 md:bottom-15 left-1/2 -translate-x-1/2 w-48 sm:w-64 md:w-80 h-3 bg-black/95 rounded-full blur-xs pointer-events-none"></div>
 
         <!-- ARRAY DE IMÁGENES RECORTADAS EN ESCALA HEROICA -->
@@ -251,9 +251,10 @@ const card2Artifacts: ImaxArtifact[] = [
             data-index={idx}
           >
             <picture class="h-full w-auto flex justify-center items-end">
-              <source srcset={art.imageWebp} type="image/webp" />
               <img 
-                src={art.imageWebp} 
+                src={art.imageWebp}
+                data-fallback={art.fallbackWebp || ""}
+                onerror="if(this.dataset.fallback && this.src !== this.dataset.fallback){this.src = this.dataset.fallback;}"
                 alt={art.alt}
                 loading="lazy"
                 decoding="async"
@@ -280,10 +281,10 @@ const card2Artifacts: ImaxArtifact[] = [
     </div>
 
     <!-- ═══════════════════════════════════════════════════════
-         CANVAS IMAX 2 (INFERIOR): AGAMENÓN / DAMA DE ELCHE / HERMES
+         CANVAS IMAX 2 (INFERIOR): AGAMENÓN / DAMA DE ELCHE / HERMES / SANXINGDUI / DODECAEDRO
          ═══════════════════════════════════════════════════════ -->
     <div 
-      class="bento-imax-card group/imax relative w-full rounded-4xl sm:rounded-[44px] overflow-hidden bg-[#18181c] border border-white/10 text-[#f5f5f7] shadow-[0_36px_85px_rgba(0,0,0,0.75),inset_0_1px_1px_rgba(255,255,255,0.08)] flex flex-col justify-between aspect-[3/4] sm:aspect-[4/5] md:aspect-[3/4] lg:aspect-[10/12] min-h-[760px] sm:min-h-[860px] md:min-h-[940px] select-none transition-all duration-500 hover:shadow-[0_45px_100px_rgba(0,0,0,0.9)] hover:border-white/16 hover:-translate-y-1"
+      class="bento-imax-card group/imax relative w-full rounded-4xl sm:rounded-[44px] overflow-hidden bg-[#18181c] border border-white/10 text-[#f5f5f7] shadow-[0_36px_85px_rgba(0,0,0,0.75),inset_0_1px_1px_rgba(255,255,255,0.08)] flex flex-col justify-between aspect-3/4 sm:aspect-4/5 md:aspect-3/4 lg:aspect-10/12 min-h-190 sm:min-h-215 md:min-h-235 select-none transition-all duration-500 hover:shadow-[0_45px_100px_rgba(0,0,0,0.9)] hover:border-white/16 hover:-translate-y-1"
       id="bento-imax-card-2"
       data-card-id="imax-2"
     >
@@ -332,12 +333,12 @@ const card2Artifacts: ImaxArtifact[] = [
       </div>
 
       <!-- STAGE: ESCENARIO IMAX VERTICAL GIGANTE (MÁS ESPACIO HACIA ABAJO) -->
-      <div class="bento-imax-stage mt-auto w-full relative grow flex justify-center items-end px-6 pb-8 sm:pb-12 md:pb-16 overflow-hidden min-h-[460px] sm:min-h-[560px] md:min-h-[640px] z-10">
+      <div class="bento-imax-stage mt-auto w-full relative grow flex justify-center items-end px-6 pb-8 sm:pb-12 md:pb-16 overflow-hidden min-h-115 sm:min-h-140 md:min-h-160 z-10">
         <!-- HALO DE CONTRALUZ AMBIENTAL DE ALTO CONTRASTE -->
         <div class="imax-ambient-glow absolute inset-0 pointer-events-none"></div>
 
         <!-- SOMBRA DE CONTACTO BASE MULTICAPA ESTRATIFICADA -->
-        <div class="imax-contact-shadow absolute bottom-7 sm:bottom-10 md:bottom-14 left-1/2 -translate-x-1/2 w-72 sm:w-96 md:w-[500px] h-8 bg-black/85 rounded-full blur-lg pointer-events-none transform scale-y-50"></div>
+        <div class="imax-contact-shadow absolute bottom-7 sm:bottom-10 md:bottom-14 left-1/2 -translate-x-1/2 w-72 sm:w-96 md:w-125 h-8 bg-black/85 rounded-full blur-lg pointer-events-none transform scale-y-50"></div>
         <div class="imax-contact-core absolute bottom-8 sm:bottom-11 md:bottom-15 left-1/2 -translate-x-1/2 w-48 sm:w-64 md:w-80 h-3 bg-black/95 rounded-full blur-xs pointer-events-none"></div>
 
         <!-- ARRAY DE IMÁGENES RECORTADAS EN ESCALA HEROICA -->
@@ -349,9 +350,10 @@ const card2Artifacts: ImaxArtifact[] = [
             data-index={idx}
           >
             <picture class="h-full w-auto flex justify-center items-end">
-              <source srcset={art.imageWebp} type="image/webp" />
               <img 
-                src={art.imageWebp} 
+                src={art.imageWebp}
+                data-fallback={art.fallbackWebp || ""}
+                onerror="if(this.dataset.fallback && this.src !== this.dataset.fallback){this.src = this.dataset.fallback;}"
                 alt={art.alt}
                 loading="lazy"
                 decoding="async"

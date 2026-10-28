@@ -17,6 +17,7 @@ interface Artifact {
   era: string;
   imageWebp: string;
   imagePng: string;
+  fallbackWebp?: string;
   alt: string;
   ctaText: string;
   ctaLink: string;
@@ -31,11 +32,42 @@ const bentoLeftArtifacts: Artifact[] = [
     titleLine2: "Hermes y lo Liminal.",
     logline: "La frontera no se custodia: se constituye. Autopsia conceptual y arqueológica sobre el psicopompo y el kerykeion en el Mediterráneo antiguo.",
     era: "Vulci / Louvre G264 · c. 480 a.C.",
-    imageWebp: "/images/museum/statue-hermes.webp",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/statue-hermes.webp",
     imagePng: "/images/museum/statue-hermes.png",
+    fallbackWebp: "/images/museum/statue-hermes.webp",
     alt: "Estatua clásica de mármol de Hermes con caduceo",
     ctaText: "Explorar ensayo",
     ctaLink: "/ensayos/mercurio-hermes-arquetipo-liminal"
+  },
+  {
+    id: "disco-festo",
+    kickerIcon: "disc",
+    kicker: "CRETA · CÓDIGO EN ESPIRAL",
+    titleLine1: "El Disco de Festo.",
+    titleLine2: "La Imprenta sin Lengua.",
+    logline: "Doscientos cuarenta y dos signos estampados con punzones móviles en arcilla fresca antes de la caída de los palacios minoicos.",
+    era: "Museo de Heraclión · c. 1700 a.C.",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/artifact-disco-festo.webp",
+    imagePng: "/images/museum/artifact-disco-festo.webp",
+    fallbackWebp: "/images/museum/artifact-disco-festo.webp",
+    alt: "Disco de Festo en arcilla cocida con inscripción jeroglífica en espiral",
+    ctaText: "Explorar archivo",
+    ctaLink: "/archivo"
+  },
+  {
+    id: "anticitera",
+    kickerIcon: "gear",
+    kicker: "ATENAS · MECÁNICA CELESTE",
+    titleLine1: "El Mecanismo de Anticitera.",
+    titleLine2: "El Tiempo en Bronce.",
+    logline: "Trenes de engranajes epicicloidales rescatados de un naufragio helenístico: una computadora astronómica mil quinientos años adelantada.",
+    era: "Museo Arqueológico de Atenas · c. 150 a.C.",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/artifact-anticitera.webp",
+    imagePng: "/images/museum/artifact-anticitera.webp",
+    fallbackWebp: "/images/museum/artifact-anticitera.webp",
+    alt: "Fragmento principal A del Mecanismo de Anticitera con engranajes de bronce",
+    ctaText: "Explorar archivo",
+    ctaLink: "/archivo"
   },
   {
     id: "nike",
@@ -54,6 +86,36 @@ const bentoLeftArtifacts: Artifact[] = [
 ];
 
 const bentoRightArtifacts: Artifact[] = [
+  {
+    id: "sanxingdui",
+    kickerIcon: "mask",
+    kicker: "SICHUAN · LA CIVILIZACIÓN INCINERADA",
+    titleLine1: "La Máscara de Sanxingdui.",
+    titleLine2: "El Rostro fuera del Canon.",
+    logline: "Bronce monumental con pupilas cilíndricas proyectadas: una metalurgia soberana quebrada y enterrada ritualmente sin dejar una sola crónica escrita.",
+    era: "Museo de Sanxingdui · c. 1200 a.C.",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/artifact-sanxingdui.webp",
+    imagePng: "/images/museum/artifact-sanxingdui.webp",
+    fallbackWebp: "/images/museum/artifact-sanxingdui.webp",
+    alt: "Cabeza de bronce con máscara de oro de la cultura Sanxingdui",
+    ctaText: "Explorar archivo",
+    ctaLink: "/archivo"
+  },
+  {
+    id: "dodecaedro-romano",
+    kickerIcon: "polyhedron",
+    kicker: "FRONTERA IMPERIAL · GEOMETRÍA MUDA",
+    titleLine1: "El Dodecaedro Romano.",
+    titleLine2: "El Instrumento sin Nombre.",
+    logline: "Más de cien poliedros huecos de bronce con doce caras pentagonales y vértices esféricos, sin una sola mención en toda la literatura de Roma.",
+    era: "Galia y Britania Romana · Siglos II–IV d.C.",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/artifact-dodecaedro-romano.webp",
+    imagePng: "/images/museum/artifact-dodecaedro-romano.webp",
+    fallbackWebp: "/images/museum/artifact-dodecaedro-romano.webp",
+    alt: "Dodecaedro romano de bronce con aberturas circulares y perillas en los vértices",
+    ctaText: "Explorar archivo",
+    ctaLink: "/archivo"
+  },
   {
     id: "jupiter",
     kickerIcon: "lightning",
@@ -177,9 +239,10 @@ const { showHeader = true } = Astro.props;
             data-index={idx}
           >
             <picture class="h-full w-auto flex justify-center items-end">
-              <source srcset={art.imageWebp} type="image/webp" />
               <img 
                 src={art.imageWebp} 
+                data-fallback={art.fallbackWebp || ''}
+                onerror="if(this.dataset.fallback && this.src !== this.dataset.fallback){this.src = this.dataset.fallback;}"
                 alt={art.alt}
                 loading="lazy"
                 decoding="async"
@@ -270,9 +333,10 @@ const { showHeader = true } = Astro.props;
             data-index={idx}
           >
             <picture class="h-full w-auto flex justify-center items-end">
-              <source srcset={art.imageWebp} type="image/webp" />
               <img 
                 src={art.imageWebp} 
+                data-fallback={art.fallbackWebp || ''}
+                onerror="if(this.dataset.fallback && this.src !== this.dataset.fallback){this.src = this.dataset.fallback;}"
                 alt={art.alt}
                 loading="lazy"
                 decoding="async"
