@@ -4,7 +4,7 @@
     "title": "Ontología Semántica & Cartografía Cognitiva Universal",
     "version": "2.0.0",
     "generatedAt": "2026-10-26T12:10:19.336Z",
-    "totalNodes": 220,
+    "totalNodes": 221,
     "totalLinks": 533,
     "stats": {
       "continentes": 6,
@@ -34,7 +34,7 @@
       "type": "DIRECTOR_AUTOR",
       "group": "Autor",
       "val": 40,
-      "desc": "Investigador y ensayista argentino (Buenos Aires). Creador y Director de The Great Puzzle Project, dedicado al estudio de la memoria cultural, la arqueosemiótica y la evolución del pensamiento humano.",
+      "desc": "Investigador y ensayista argentino (Buenos Aires). Creador y Director de The Great Puzzle Project. Utiliza los relatos proscriptos, la arqueología anómala y la historia alternativa como su material de estudio más preciado: fósiles de sentido y casos de estudio sobre la supervivencia del Archivo humano frente al canon institucional.",
       "url": "https://about.thegreatpuzzleproject.com/sobre-tgp-xavier-benitez-identidad"
     },
     {
@@ -88,13 +88,23 @@
       "url": "https://thegreatpuzzleproject.com/about/#nivel-3"
     },
     {
+      "id": "tesis-fosiles-de-sentido",
+      "name": "El Relato Proscripto como Fósil de Sentido",
+      "slug": "relatos-proscriptos-fosiles-de-sentido",
+      "type": "EPISTEME_STACK",
+      "group": "Episteme",
+      "val": 30,
+      "desc": "Tesis Fundacional TGP: Los relatos proscriptos, el hermetismo y la historia alternativa constituyen el material de estudio más preciado de Xavier Benítez; operan como fósiles de sentido y casos de estudio sobre la supervivencia de la memoria viva frente a la censura del Archivo oficial.",
+      "url": "https://thegreatpuzzleproject.com/about/#fosiles-de-sentido"
+    },
+    {
       "id": "macro-memoria-oculta",
       "name": "Macro-Alianza: Memoria Oculta",
       "slug": "memoria-oculta",
       "type": "MACRO_ALLIANCE",
       "group": "MacroAlianza",
       "val": 25,
-      "desc": "Anomalías líticas, megalitismo arcaico, tradiciones herméticas y problemas históricos abiertos.",
+      "desc": "Arqueología anómala, arquitectura megalítica, cronologías en disputa y física de canteras.",
       "url": "https://thegreatpuzzleproject.com/colecciones/#memoria-oculta"
     },
     {
@@ -114,7 +124,7 @@
       "type": "MACRO_ALLIANCE",
       "group": "MacroAlianza",
       "val": 25,
-      "desc": "Arquetipos universales, mitos de origen, cosmovisiones indígenas y chamanismo.",
+      "desc": "Arqueosemiótica del símbolo, mitos cosmogónicos, cosmovisiones originarias y tecnologías somáticas de la memoria.",
       "url": "https://thegreatpuzzleproject.com/colecciones/#sentido-ancestral"
     },
     {
