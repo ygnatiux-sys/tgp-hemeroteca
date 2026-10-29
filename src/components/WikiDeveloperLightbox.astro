@@ -105,6 +105,16 @@ const {
         <span>Enviar a Hero</span>
       </button>
 
+      <!-- Guardar Array en Nodo / Flecha D1 -->
+      <button 
+        id="wb-btn-save-d1"
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-400/40 font-semibold text-xs transition cursor-pointer shadow-sm active:scale-95"
+        title="Guardar imágenes seleccionadas en formato array JSON para nodos o flechas D1"
+      >
+        <span>🧩 Guardar Array en Nodo / Flecha D1</span>
+      </button>
+
       <!-- Menú Desplegable de Exportación en Vidrio Ahumado -->
       <div class="relative">
         <button 
@@ -322,6 +332,66 @@ const {
         </div>
       </div>
 
+    </div>
+  </dialog>
+  <!-- 5. DIALOG / MODAL DE EXPORTACIÓN Y CONFIRMACIÓN A CLOUDFLARE D1 -->
+  <dialog 
+    id="wb-d1-modal" 
+    class="backdrop:bg-black/85 backdrop:backdrop-blur-md bg-transparent text-white border-none max-w-2xl w-[92vw] p-0 overflow-hidden shadow-2xl focus:outline-none"
+  >
+    <div class="relative bg-zinc-950 border border-sky-500/40 rounded-2xl p-5 sm:p-6 shadow-[0_0_50px_rgba(56,189,248,0.2)] flex flex-col gap-4">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🧩</span>
+          <h3 class="font-bold text-sm sm:text-base text-sky-300 font-mono">
+            Array JSON para Cloudflare D1
+          </h3>
+        </div>
+        <button id="wb-d1-close-btn" type="button" class="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-mono text-xs cursor-pointer border border-zinc-700 transition">
+          ✕ Cerrar
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between gap-3 text-xs font-mono text-zinc-300">
+        <div>
+          Imágenes marcadas: <strong id="wb-d1-items-count" class="text-white">0</strong>
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="flex items-center gap-1.5 cursor-pointer text-sky-200">
+            <input type="radio" name="d1-target-mode" value="node" checked class="accent-sky-400 cursor-pointer" />
+            <span>images_array_json (Nodo)</span>
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer text-amber-200">
+            <input type="radio" name="d1-target-mode" value="edge" class="accent-amber-400 cursor-pointer" />
+            <span>edge_images_array_json (Flecha)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="relative">
+        <textarea 
+          id="wb-d1-json-preview" 
+          readonly 
+          rows="10" 
+          class="w-full bg-zinc-900/90 border border-zinc-800 rounded-xl p-3 text-xs font-mono text-zinc-200 selection:bg-sky-500 selection:text-black outline-none resize-none"
+        ></textarea>
+        <span id="wb-d1-copied-badge" class="hidden absolute top-3 right-3 px-2 py-1 rounded bg-emerald-500 text-black font-mono font-bold text-[10px] shadow">
+          ✓ ¡COPIADO AL PORTAPAPELES!
+        </span>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-zinc-800">
+        <span class="text-[11px] text-zinc-500 font-mono">
+          Listo para inyectar vía scripts/db-tools/query_d1.js o /api/cypher-extract
+        </span>
+        <button 
+          id="wb-d1-copy-btn" 
+          type="button" 
+          class="w-full sm:w-auto px-4 py-2 rounded-xl bg-sky-400 hover:bg-sky-300 text-black font-semibold text-xs font-mono cursor-pointer transition shadow-sm active:scale-95"
+        >
+          📋 Copiar JSON al Portapapeles
+        </button>
+      </div>
     </div>
   </dialog>
 </section>
@@ -572,6 +642,104 @@ const {
         })
       );
       document.getElementById("wiki-cinematic-hero")?.scrollIntoView({ behavior: "smooth" });
+    });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // GUARDAR ARRAY EN NODO / FLECHA CLOUDFLARE D1
+    // ─────────────────────────────────────────────────────────────────────────
+    const d1Modal = document.getElementById("wb-d1-modal") as HTMLDialogElement | null;
+    const d1Textarea = document.getElementById("wb-d1-json-preview") as HTMLTextAreaElement | null;
+    const d1Count = document.getElementById("wb-d1-items-count");
+    const d1CopyBtn = document.getElementById("wb-d1-copy-btn");
+    const d1CloseBtn = document.getElementById("wb-d1-close-btn");
+    const d1CopiedBadge = document.getElementById("wb-d1-copied-badge");
+    const d1RadioModes = Array.from(root.querySelectorAll<HTMLInputElement>("input[name='d1-target-mode']"));
+
+    function formatD1ArrayPayload(targetMode: string = "node") {
+      const selected = getSelectedItems();
+      const cleanArray = selected.map((img) => ({
+        url: img.url,
+        thumbUrl: img.thumbUrl || img.url,
+        title: img.cleanTitle || img.title?.replace(/^File:/i, "") || "Imagen D1",
+        author: img.author || "Wikimedia Commons",
+        license: img.licenseShortName || img.license || "CC0",
+        aspectRatio: (img.width && img.height) ? Number((img.width / img.height).toFixed(2)) : 1.5,
+        width: img.width || 1200,
+        height: img.height || 800,
+        role: targetMode === "edge" ? "edge_illustration" : "node_gallery"
+      }));
+
+      const fieldName = targetMode === "edge" ? "edge_images_array_json" : "images_array_json";
+      return {
+        fieldName,
+        count: cleanArray.length,
+        jsonString: JSON.stringify(cleanArray, null, 2),
+        rawArray: cleanArray
+      };
+    }
+
+    function refreshD1Preview() {
+      if (!d1Modal?.open) return;
+      const selectedMode = d1RadioModes.find((r) => r.checked)?.value || "node";
+      const payload = formatD1ArrayPayload(selectedMode);
+      if (d1Count) d1Count.textContent = `${payload.count} (${payload.fieldName})`;
+      if (d1Textarea) d1Textarea.value = payload.jsonString;
+    }
+
+    d1RadioModes.forEach((radio) => {
+      radio.addEventListener("change", refreshD1Preview);
+    });
+
+    document.getElementById("wb-btn-save-d1")?.addEventListener("click", async () => {
+      const selected = getSelectedItems();
+      if (selected.length === 0) {
+        return alert("Seleccioná al menos 1 imagen con el checkbox para guardar en D1.");
+      }
+
+      const selectedMode = d1RadioModes.find((r) => r.checked)?.value || "node";
+      const payload = formatD1ArrayPayload(selectedMode);
+
+      if (d1Count) d1Count.textContent = `${payload.count} (${payload.fieldName})`;
+      if (d1Textarea) d1Textarea.value = payload.jsonString;
+
+      // Copiar automáticamente al portapapeles
+      try {
+        await navigator.clipboard.writeText(payload.jsonString);
+        if (d1CopiedBadge) {
+          d1CopiedBadge.classList.remove("hidden");
+          setTimeout(() => d1CopiedBadge?.classList.add("hidden"), 3000);
+        }
+      } catch (e) {
+        console.warn("No se pudo copiar automáticamente:", e);
+      }
+
+      // Disparar evento global para componentes de grafo / Scriptorium
+      window.dispatchEvent(
+        new CustomEvent("tgp:save-d1-array", {
+          detail: {
+            target: selectedMode,
+            fieldName: payload.fieldName,
+            images: payload.rawArray
+          }
+        })
+      );
+
+      d1Modal?.showModal();
+    });
+
+    d1CopyBtn?.addEventListener("click", async () => {
+      if (d1Textarea) {
+        await navigator.clipboard.writeText(d1Textarea.value);
+        if (d1CopiedBadge) {
+          d1CopiedBadge.classList.remove("hidden");
+          setTimeout(() => d1CopiedBadge?.classList.add("hidden"), 2500);
+        }
+      }
+    });
+
+    d1CloseBtn?.addEventListener("click", () => d1Modal?.close());
+    d1Modal?.addEventListener("click", (e) => {
+      if (e.target === d1Modal) d1Modal.close();
     });
 
     // Botonera desplegable Cloud Run
