@@ -1,0 +1,767 @@
+---
+/**
+ * ArchivoCollectionCrownGsap.astro
+ * Secuencia de 4 Cards Enormes con Push a la Izquierda + Keywords en Purple Grande + Pantalla Final de 4 Dossieres.
+ *
+ * Mecánica:
+ * 1. En vez de dejar una card esperando estática abajo, las 4 cards enormes van pasando una tras otra
+ *    con transición "push hacia la izquierda con fade" (Card 1 -> Card 2 -> Card 3 -> Card 4).
+ * 2. En los H1 (y el título de colección), solo un par de palabras con mayor carga de significado
+ *    (ej. Carl Jung, Arquetipos, Semiótica, Sombra, etc.) van en Purple/Mora y tamaño más grande (.kw-purple-giant),
+ *    mientras el resto del título mantiene su gradiente metálico original.
+ * 3. Los pasos son rápidos y breves: se presenta H1 + subs (bajada), y luego push hacia la izquierda al siguiente.
+ * 4. Finalmente, frena en la pantalla final donde se presentan los 4 dossieres juntos con su link interactivo.
+ */
+
+import { sanitizeImageUrl } from "../../lib/content-filter";
+
+export interface CrownCardItem {
+  slug: string;
+  title: string;
+  excerpt: string;
+  img: string;
+  href: string;
+  badge?: string;
+  date?: string;
+}
+
+interface Props {
+  catKey: string;
+  catLabel: string;
+  groupHref: string;
+  count: number;
+  cards: CrownCardItem[];
+}
+
+const {
+  catKey,
+  catLabel,
+  groupHref,
+  count,
+  cards = [],
+} = Astro.props;
+
+// Asegurar siempre un pool de 4 cards para la secuencia de 4 pasos y la pantalla final de 4
+const fourCards: CrownCardItem[] = (() => {
+  if (cards.length === 0) return [];
+  const pool: CrownCardItem[] = [];
+  for (let i = 0; i < 4; i++) {
+    pool.push(cards[i % cards.length]);
+  }
+  return pool;
+})();
+
+// Palabras vacías (stopwords) en español para no resaltar conectores
+const STOPWORDS = new Set([
+  "de", "del", "la", "las", "el", "los", "en", "y", "e", "o", "u", "a", "al",
+  "con", "sin", "por", "para", "un", "una", "unos", "unas", "su", "sus", "como",
+  "entre", "hacia", "hasta", "desde", "sobre", "tras", "que", "se", "es", "son",
+  "lo", "mas", "más", "pero", "bajo", "ante"
+]);
+
+// Términos de altísima carga semántica en TGP (prioridad máxima para ir en Purple y grande)
+const HIGH_MEANING_TERMS = [
+  "jung", "carl", "arquetipos", "arquetipo", "sombra", "inconsciente",
+  "arqueosemiótica", "arqueosemiotica", "semiótica", "semiotica", "símbolo", "simbolo", "signos",
+  "hegel", "nietzsche", "platón", "platon", "aristóteles", "hesíodo", "hesiodo", "homero",
+  "cátaros", "cataros", "bogomilismo", "gnosis", "gnóstico", "hermetismo",
+  "pumapunku", "tiwanaku", "giza", "esfinge", "osireion", "göbekli", "gobekli",
+  "derinkuyu", "barabar", "gunung", "nan", "madol", "moai", "olmeca", "diquís",
+  "babilonia", "babel", "sumeria", "egipto", "maya", "palenque", "atenea", "nefertiti",
+  "mito", "mitología", "rito", "sagrado", "abismo", "tártaro", "caos", "cosmos",
+  "memoria", "archivo", "sentido", "conciencia", "ontología", "piedra", "megalitismo"
+];
+
+interface TokenPiece {
+  text: string;
+  isPurple: boolean;
+}
+
+/**
+ * Selecciona solo 1 o 2 palabras de mayor carga de significado para pintarlas en Purple y más grandes,
+ * dejando el resto del H1 con el estilo metálico normal.
+ */
+function tokenizeWithPurpleKeywords(rawTitle: string): TokenPiece[] {
+  const cleaned = (rawTitle || "")
+    .replace(/\uFFFD/g, "")
+    .trim();
+  if (!cleaned) return [];
+
+  const rawTokens = cleaned.split(/\s+/);
+  const candidates: Array<{ idx: number; score: number }> = [];
+
+  rawTokens.forEach((tok, idx) => {
+    const bare = tok
+      .toLowerCase()
+      .replace(/[.,:;!¡?¿()"'«»[\]·—–-]/g, "")
+      .trim();
+
+    if (!bare || bare.length <= 2 || STOPWORDS.has(bare)) return;
+
+    let score = bare.length;
+    if (HIGH_MEANING_TERMS.some((term) => bare.includes(term) || term.includes(bare))) {
+      score += 30;
+    }
+    // Nombres propios o palabras capitalizadas ganan peso
+    if (/^[A-ZÁÉÍÓÚÑ]/.test(tok.replace(/^["'«(]+/, "")) && idx > 0) {
+      score += 8;
+    }
+    candidates.push({ idx, score });
+  });
+
+  candidates.sort((a, b) => b.score - a.score);
+  const maxHighlights = rawTokens.length <= 3 ? 1 : 2;
+  const chosenIndices = new Set(candidates.slice(0, maxHighlights).map((c) => c.idx));
+
+  // Si no se eligió ninguna (ej. título de 1-2 palabras cortas), elegir la última palabra
+  if (chosenIndices.size === 0 && rawTokens.length > 0) {
+    chosenIndices.add(rawTokens.length - 1);
+  }
+
+  return rawTokens.map((tok, idx) => ({
+    text: tok,
+    isPurple: chosenIndices.has(idx),
+  }));
+}
+
+const headerTokens = tokenizeWithPurpleKeywords(catLabel);
+---
+
+<div
+  class="archivo-four-push-showcase relative w-full select-none pt-6 pb-8 flex flex-col gap-6 overflow-hidden"
+  data-four-push-root
+  data-crown-cat={catKey}
+>
+  <!-- Lienzo de Polvo Estelar (Purple + Oro pálido) en el fondo de la colección -->
+  <canvas
+    class="crown-dust-canvas absolute inset-0 w-full h-full pointer-events-none z-0"
+    aria-hidden="true"
+  ></canvas>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       CABECERA COMPACTA DE COLECCIÓN (SOLO LA PALABRA CLAVE EN PURPLE GRANDE)
+  ═══════════════════════════════════════════════════════════════════ -->
+  <div class="relative z-10 flex flex-col items-center justify-center text-center gap-2 max-w-4xl mx-auto px-4">
+    <span class="font-metadata text-[11px] sm:text-xs uppercase tracking-[0.35em] text-rust-orange font-bold">
+      Colección Especializada · {count} {count === 1 ? "Dossier" : "Dossieres"}
+    </span>
+
+    <a href={groupHref} class="group/cattitle inline-block no-underline">
+      <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-gloock font-black tracking-tight leading-[1.06] uppercase transition-transform duration-500 group-hover/cattitle:scale-[1.02]">
+        {headerTokens.map((piece, idx) => (
+          <>
+            <span class={piece.isPurple ? "kw-purple-giant" : "gradient-general-h1 glow-metallic-gloock"}>
+              {piece.text}
+            </span>
+            {idx < headerTokens.length - 1 ? " " : ""}
+          </>
+        ))}
+      </h2>
+    </a>
+
+    <div class="flex items-center gap-4 justify-center mt-0.5">
+      <a
+        href={groupHref}
+        class="font-metadata text-[11px] sm:text-xs uppercase tracking-[0.25em] text-white/65 hover:text-rust-orange transition-colors flex items-center gap-2 group/arrow no-underline"
+      >
+        <span>Explorar Colección Completa</span>
+        <span class="text-rust-orange group-hover/arrow:translate-x-1 transition-transform">→</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       ESCENARIO CINEMÁTICO:
+       1) 4 CARDS ENORMES PASANDO CON PUSH HACIA LA IZQUIERDA + FADE (PASOS RÁPIDOS)
+       2) PANTALLA FINAL CON LOS 4 DOSSIERES Y LINK INTERACTIVO
+  ═══════════════════════════════════════════════════════════════════ -->
+  {fourCards.length > 0 && (
+    <div class="four-push-stage relative z-10 w-full aspect-4/3 sm:aspect-19/10 min-h-[54vh] md:min-h-135 max-h-175 rounded-2xl md:rounded-3xl overflow-hidden bg-[#0b0c0d] border border-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.85)] isolate">
+
+      {/* Indicadores superiores de paso (1..4 -> Vista de 4) */}
+      <div class="four-push-pills absolute top-4 right-5 z-40 flex items-center gap-2 pointer-events-auto">
+        {fourCards.map((_, idx) => (
+          <button
+            type="button"
+            class="four-step-dot w-6 h-1 rounded-full bg-white/25 transition-all duration-300 cursor-pointer"
+            data-step-dot={idx}
+            aria-label={`Ver carta ${idx + 1}`}
+          />
+        ))}
+        <button
+          type="button"
+          class="four-replay-btn ml-2 px-2.5 py-1 rounded-full bg-black/55 hover:bg-white/15 border border-white/15 font-metadata text-[9px] uppercase tracking-[0.22em] text-white/75 hover:text-white transition-all cursor-pointer backdrop-blur-md"
+          title="Repetir secuencia"
+        >
+          ↻ Secuencia
+        </button>
+      </div>
+
+      {/* CAPA A: LAS 4 CARDS ENORMES QUE PASAN CON PUSH HACIA LA IZQUIERDA */}
+      <div class="four-cards-track absolute inset-0 w-full h-full z-20 pointer-events-none">
+        {fourCards.map((card, idx) => {
+          const safeImg = sanitizeImageUrl(card.img);
+          const titlePieces = tokenizeWithPurpleKeywords(card.title);
+          const cleanSub = (card.excerpt || "")
+            .replace(/\*\*/g, "")
+            .replace(/\[\[|\]\]/g, "")
+            .replace(/\uFFFD/g, "")
+            .trim();
+          const isPortraitOrBust = /jung|hegel|homero|saturno|busto|estatua|retrato|filosofia|nefertiti|atenea|arquetipo|grabado|woodcut|tarot/i.test(`${card.title} ${safeImg}`);
+
+          return (
+            <article
+              class="four-giant-card absolute inset-0 w-full h-full overflow-hidden opacity-0 pointer-events-none flex flex-col justify-end"
+              data-giant-index={idx}
+            >
+              {/* Imagen de fondo con ligero paneo */}
+              {safeImg ? (
+                <img
+                  src={safeImg}
+                  alt={card.title}
+                  loading={idx === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                  class="four-giant-img absolute inset-0 w-full h-full object-cover brightness-95 contrast-[1.03] pointer-events-none"
+                  style={`object-position: ${isPortraitOrBust ? "50% 20%" : "50% 38%"};`}
+                />
+              ) : (
+                <div class="absolute inset-0 bg-stone-900" />
+              )}
+
+              {/* Viñeta y scrim cinematográfico para máxima legibilidad del H1 y subs */}
+              <div
+                class="absolute inset-0 pointer-events-none"
+                style="background: radial-gradient(ellipse at center, transparent 45%, rgba(8,9,10,0.45) 85%, rgba(8,9,10,0.88) 100%);"
+              />
+              <div
+                class="absolute inset-0 pointer-events-none"
+                style="background: linear-gradient(to top, rgba(8,9,10,0.94) 0%, rgba(8,9,10,0.58) 42%, rgba(8,9,10,0.18) 75%, transparent 100%);"
+              />
+
+              {/* Contenido rápido: H1 (con solo 1-2 palabras en Purple y grandes) + Subs */}
+              <div class="four-giant-caption relative z-20 w-full max-w-5xl mx-auto px-6 sm:px-10 md:px-14 pb-8 sm:pb-12 md:pb-14 flex flex-col items-center text-center gap-3">
+                <span class="font-mono text-[10px] uppercase tracking-[0.45em] text-rust-orange font-bold drop-shadow-md">
+                  {card.badge || `${catLabel} · Expediente 0${idx + 1}`}
+                </span>
+
+                <h3 class="four-giant-h1 font-gloock font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] leading-[1.06] tracking-tight drop-shadow-[0_6px_30px_rgba(0,0,0,0.95)] text-balance max-w-4xl">
+                  {titlePieces.map((piece, pIdx) => (
+                    <>
+                      <span class={piece.isPurple ? "kw-purple-giant" : "gradient-steel-titanium"}>
+                        {piece.text}
+                      </span>
+                      {pIdx < titlePieces.length - 1 ? " " : ""}
+                    </>
+                  ))}
+                </h3>
+
+                {cleanSub && (
+                  <p class="four-giant-sub font-['Proza_Libre'] text-sm sm:text-base md:text-lg lg:text-xl text-[#EFEBE3]/90 leading-relaxed max-w-3xl line-clamp-2 drop-shadow-[0_2px_16px_rgba(0,0,0,0.95)]">
+                    {cleanSub}
+                  </p>
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      {/* CAPA B: PANTALLA FINAL CON LOS 4 DOSSIERES Y LINK INTERACTIVO PARA IR */}
+      <div
+        class="four-final-grid-layer absolute inset-0 z-30 p-3 sm:p-5 md:p-6 bg-[#0b0c0d]/95 backdrop-blur-md opacity-0 pointer-events-none flex flex-col justify-between gap-4"
+      >
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 w-full h-full">
+          {fourCards.map((card, idx) => {
+            const safeImg = sanitizeImageUrl(card.img);
+            const titlePieces = tokenizeWithPurpleKeywords(card.title);
+            const cleanSub = (card.excerpt || "")
+              .replace(/\*\*/g, "")
+              .replace(/\[\[|\]\]/g, "")
+              .replace(/\uFFFD/g, "")
+              .trim();
+            const isPortraitOrBust = /jung|hegel|homero|saturno|busto|estatua|retrato|filosofia|nefertiti|atenea|arquetipo|grabado|woodcut|tarot/i.test(`${card.title} ${safeImg}`);
+
+            return (
+              <a
+                href={card.href}
+                class="four-final-card group relative overflow-hidden rounded-xl md:rounded-2xl border border-white/12 bg-[#141618] flex flex-col justify-end p-4 sm:p-5 transition-all duration-500 hover:border-[#c084fc]/60 hover:shadow-[0_12px_35px_rgba(168,85,247,0.22)] hover:-translate-y-1 no-underline"
+              >
+                {/* Imagen de la tarjeta */}
+                <div class="absolute inset-0 z-0 overflow-hidden">
+                  {safeImg && (
+                    <img
+                      src={safeImg}
+                      alt={card.title}
+                      loading="lazy"
+                      decoding="async"
+                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                      style={`object-position: ${isPortraitOrBust ? "50% 20%" : "50% 35%"};`}
+                    />
+                  )}
+                  <div class="absolute inset-0 bg-linear-to-t from-black/92 via-black/48 to-black/10 pointer-events-none" />
+                </div>
+
+                {/* Texto e interacción */}
+                <div class="relative z-10 flex flex-col gap-1.5 text-left">
+                  <span class="font-mono text-[8.5px] uppercase tracking-[0.4em] text-rust-orange font-bold opacity-90">
+                    Expediente 0{idx + 1}
+                  </span>
+
+                  <h4 class="font-gloock font-bold text-base sm:text-lg md:text-xl leading-snug line-clamp-2 drop-shadow-md">
+                    {titlePieces.map((piece, pIdx) => (
+                      <>
+                        <span class={piece.isPurple ? "kw-purple-giant-sm" : "gradient-steel-titanium"}>
+                          {piece.text}
+                        </span>
+                        {pIdx < titlePieces.length - 1 ? " " : ""}
+                      </>
+                    ))}
+                  </h4>
+
+                  {cleanSub && (
+                    <p class="font-serif text-xs text-white/75 leading-relaxed line-clamp-2 mt-0.5">
+                      {cleanSub}
+                    </p>
+                  )}
+
+                  <div class="mt-2 pt-2 border-t border-white/10 flex items-center justify-between">
+                    <span class="font-mono uppercase text-[9px] tracking-[0.3em] text-[#e9d5ff] group-hover:text-white font-bold transition-colors">
+                      Acceder al Dossier
+                    </span>
+                    <span class="text-rust-orange group-hover:translate-x-1 transition-transform text-xs">
+                      →
+                    </span>
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+
+    </div>
+  )}
+</div>
+
+<style>
+  /* ── Palabra Clave Semántica en Mora / Purple Amatista y Tamaño Mayor ── */
+  .kw-purple-giant {
+    display: inline-block;
+    font-size: 1.14em;
+    font-weight: 900;
+    background-image: linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #f5e8ff 18%,
+      #e9d5ff 36%,
+      #c084fc 62%,
+      #a855f7 82%,
+      #7e22ce 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 26px rgba(192, 132, 252, 0.58))
+            drop-shadow(0 0 55px rgba(147, 51, 234, 0.35))
+            drop-shadow(0 6px 20px rgba(0, 0, 0, 0.92));
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    line-height: 0.98;
+  }
+
+  .kw-purple-giant-sm {
+    display: inline;
+    font-size: 1.08em;
+    font-weight: 900;
+    background-image: linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #f3e8ff 22%,
+      #d8b4fe 55%,
+      #a855f7 88%,
+      #9333ea 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 14px rgba(192, 132, 252, 0.45));
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+
+  // ── MOTOR DE POLVO ESTELAR (TONOS AMATISTA + ORO PÁLIDO) ──
+  class CrownDustEffect {
+    private canvas: HTMLCanvasElement;
+    private ctx: CanvasRenderingContext2D;
+    private animationId: number | null = null;
+    private isRunning = false;
+    private boundResize: () => void;
+    private motes: Array<{
+      x: number;
+      y: number;
+      r: number;
+      alpha: number;
+      vx: number;
+      vy: number;
+      phase: number;
+      phaseSpeed: number;
+      isPurple: boolean;
+    }> = [];
+
+    constructor(canvas: HTMLCanvasElement) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext("2d")!;
+      this.boundResize = this.resize.bind(this);
+      this.resize();
+      window.addEventListener("resize", this.boundResize);
+    }
+
+    public resize() {
+      const parent = this.canvas.parentElement;
+      const rect = parent ? parent.getBoundingClientRect() : null;
+      this.canvas.width = rect && rect.width > 0 ? rect.width : window.innerWidth;
+      this.canvas.height = rect && rect.height > 0 ? rect.height : 520;
+    }
+
+    private spawnMote(fromLeft = false) {
+      const w = this.canvas.width;
+      const h = this.canvas.height;
+      return {
+        x: fromLeft ? -10 : Math.random() * w,
+        y: Math.random() * h,
+        r: 0.8 + Math.random() * 2.1,
+        alpha: 0.15 + Math.random() * 0.48,
+        vx: 0.2 + Math.random() * 0.5,
+        vy: (Math.random() - 0.5) * 0.14,
+        phase: Math.random() * Math.PI * 2,
+        phaseSpeed: 0.014 + Math.random() * 0.028,
+        isPurple: Math.random() > 0.38,
+      };
+    }
+
+    public start() {
+      if (this.isRunning) return;
+      this.isRunning = true;
+      this.resize();
+      this.motes = Array.from({ length: 44 }, () => this.spawnMote(false));
+      this.loop();
+    }
+
+    public stop() {
+      this.isRunning = false;
+      if (this.animationId) {
+        cancelAnimationFrame(this.animationId);
+        this.animationId = null;
+      }
+    }
+
+    public destroy() {
+      this.stop();
+      window.removeEventListener("resize", this.boundResize);
+    }
+
+    private loop() {
+      if (!this.isRunning) return;
+      const { width: w, height: h } = this.canvas;
+      this.ctx.clearRect(0, 0, w, h);
+
+      for (const m of this.motes) {
+        m.x += m.vx;
+        m.y += m.vy + Math.sin(m.phase) * 0.07;
+        m.phase += m.phaseSpeed;
+
+        if (m.x > w + 12) {
+          Object.assign(m, this.spawnMote(true));
+        }
+
+        const flick = 0.72 + 0.28 * Math.sin(m.phase);
+        const op = Math.min(1, m.alpha * flick);
+        const grad = this.ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r * 2.8);
+
+        if (m.isPurple) {
+          grad.addColorStop(0, `rgba(233, 213, 255, ${op.toFixed(3)})`);
+          grad.addColorStop(0.45, `rgba(192, 132, 252, ${(op * 0.65).toFixed(3)})`);
+          grad.addColorStop(1, "rgba(168, 85, 247, 0)");
+        } else {
+          grad.addColorStop(0, `rgba(223, 202, 157, ${op.toFixed(3)})`);
+          grad.addColorStop(0.45, `rgba(201, 168, 108, ${(op * 0.6).toFixed(3)})`);
+          grad.addColorStop(1, "rgba(201, 168, 108, 0)");
+        }
+
+        this.ctx.beginPath();
+        this.ctx.fillStyle = grad;
+        this.ctx.arc(m.x, m.y, m.r * 2.8, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+
+      this.animationId = requestAnimationFrame(this.loop.bind(this));
+    }
+  }
+
+  function initFourPushShowcases() {
+    const roots = document.querySelectorAll<HTMLElement>("[data-four-push-root]");
+    if (roots.length === 0) return;
+
+    roots.forEach((root) => {
+      if (root.dataset.fourPushInit === "true") return;
+      root.dataset.fourPushInit = "true";
+
+      const canvas = root.querySelector<HTMLCanvasElement>(".crown-dust-canvas");
+      const giantCards = gsap.utils.toArray<HTMLElement>(root.querySelectorAll<HTMLElement>(".four-giant-card"));
+      const finalGridLayer = root.querySelector<HTMLElement>(".four-final-grid-layer");
+      const finalCards = gsap.utils.toArray<HTMLElement>(root.querySelectorAll<HTMLElement>(".four-final-card"));
+      const stepDots = gsap.utils.toArray<HTMLElement>(root.querySelectorAll<HTMLElement>(".four-step-dot"));
+      const replayBtn = root.querySelector<HTMLButtonElement>(".four-replay-btn");
+
+      if (giantCards.length === 0 || !finalGridLayer) return;
+
+      let dust: CrownDustEffect | null = null;
+      if (canvas) {
+        dust = new CrownDustEffect(canvas);
+      }
+
+      const setActiveDot = (activeIdx: number) => {
+        stepDots.forEach((dot, i) => {
+          if (i === activeIdx) {
+            dot.classList.add("bg-[#c084fc]", "w-9");
+            dot.classList.remove("bg-white/25", "w-6");
+          } else {
+            dot.classList.remove("bg-[#c084fc]", "w-9");
+            dot.classList.add("bg-white/25", "w-6");
+          }
+        });
+      };
+
+      const buildTimeline = () => {
+        // Estado inicial limpio
+        gsap.set(finalGridLayer, { autoAlpha: 0, xPercent: 14, pointerEvents: "none" });
+        gsap.set(finalCards, { autoAlpha: 0, x: 28, scale: 0.96 });
+
+        giantCards.forEach((card, i) => {
+          const h1 = card.querySelector<HTMLElement>(".four-giant-h1");
+          const sub = card.querySelector<HTMLElement>(".four-giant-sub");
+          const img = card.querySelector<HTMLElement>(".four-giant-img");
+
+          gsap.set(card, {
+            autoAlpha: i === 0 ? 1 : 0,
+            xPercent: i === 0 ? 0 : 18,
+            scale: i === 0 ? 1 : 0.98,
+            zIndex: 20 + i,
+          });
+          if (img) gsap.set(img, { scale: 1.02 });
+          if (h1) gsap.set(h1, { autoAlpha: 0, x: 24, filter: "blur(8px)" });
+          if (sub) gsap.set(sub, { autoAlpha: 0, x: 28, filter: "blur(6px)" });
+        });
+
+        // Timings rápidos y breves por card (~1.85s cada una) + push hacia la izquierda con fade
+        const pushDuration = 0.55;
+        const holdDuration = 1.15;
+
+        const tl = gsap.timeline({ repeat: 0, paused: true });
+
+        giantCards.forEach((card, idx) => {
+          const h1 = card.querySelector<HTMLElement>(".four-giant-h1");
+          const sub = card.querySelector<HTMLElement>(".four-giant-sub");
+          const img = card.querySelector<HTMLElement>(".four-giant-img");
+          const prevCard = idx > 0 ? giantCards[idx - 1] : null;
+
+          tl.add(() => setActiveDot(idx));
+
+          if (idx === 0) {
+            // Card 1 ya está en pantalla (cero espera): presenta rápido H1 + subs
+            if (img) {
+              tl.to(img, { scale: 1.07, duration: holdDuration + 0.6, ease: "sine.out" }, 0);
+            }
+            if (h1) {
+              tl.to(
+                h1,
+                { autoAlpha: 1, x: 0, filter: "blur(0px)", duration: 0.42, ease: "power3.out" },
+                0.05
+              );
+            }
+            if (sub) {
+              tl.to(
+                sub,
+                { autoAlpha: 1, x: 0, filter: "blur(0px)", duration: 0.42, ease: "power3.out" },
+                0.18
+              );
+            }
+            tl.to({}, { duration: holdDuration });
+          } else {
+            // Transición PUSH HACIA LA IZQUIERDA CON FADE:
+            // La card anterior sale empujada hacia la izquierda (-18%) con fade out
+            // mientras la nueva card entra desde la derecha (+18% -> 0%) con fade in
+            if (prevCard) {
+              tl.to(
+                prevCard,
+                {
+                  xPercent: -18,
+                  autoAlpha: 0,
+                  scale: 0.96,
+                  filter: "blur(6px)",
+                  duration: pushDuration,
+                  ease: "power3.inOut",
+                }
+              );
+            }
+
+            tl.fromTo(
+              card,
+              { xPercent: 18, autoAlpha: 0, scale: 0.98, filter: "blur(6px)" },
+              {
+                xPercent: 0,
+                autoAlpha: 1,
+                scale: 1,
+                filter: "blur(0px)",
+                duration: pushDuration,
+                ease: "power3.inOut",
+              },
+              "<"
+            );
+
+            if (img) {
+              tl.fromTo(
+                img,
+                { scale: 1.01 },
+                { scale: 1.07, duration: holdDuration + pushDuration, ease: "sine.out" },
+                "<"
+              );
+            }
+
+            if (h1) {
+              tl.to(
+                h1,
+                { autoAlpha: 1, x: 0, filter: "blur(0px)", duration: 0.38, ease: "power3.out" },
+                "-=0.22"
+              );
+            }
+            if (sub) {
+              tl.to(
+                sub,
+                { autoAlpha: 1, x: 0, filter: "blur(0px)", duration: 0.38, ease: "power3.out" },
+                "-=0.24"
+              );
+            }
+
+            tl.to({}, { duration: holdDuration });
+          }
+        });
+
+        // PASO FINAL: La 4ta card hace push hacia la izquierda con fade y FRENA en la Pantalla Final con los 4 dossieres interactivos
+        const lastGiant = giantCards[giantCards.length - 1];
+        if (lastGiant) {
+          tl.to(lastGiant, {
+            xPercent: -18,
+            autoAlpha: 0,
+            scale: 0.96,
+            filter: "blur(8px)",
+            duration: 0.55,
+            ease: "power3.inOut",
+          });
+        }
+
+        tl.to(
+          finalGridLayer,
+          {
+            autoAlpha: 1,
+            xPercent: 0,
+            pointerEvents: "auto",
+            duration: 0.55,
+            ease: "power3.out",
+          },
+          "<+=0.08"
+        );
+
+        tl.to(
+          finalCards,
+          {
+            autoAlpha: 1,
+            x: 0,
+            scale: 1,
+            duration: 0.48,
+            stagger: 0.06,
+            ease: "power3.out",
+          },
+          "-=0.32"
+        );
+
+        return tl;
+      };
+
+      let tl = buildTimeline();
+      let hasStarted = false;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              dust?.start();
+              if (!hasStarted) {
+                hasStarted = true;
+                tl.restart();
+              } else {
+                tl.play();
+              }
+            } else {
+              dust?.stop();
+            }
+          });
+        },
+        { threshold: 0.22 }
+      );
+
+      observer.observe(root);
+
+      // Permitir repetir la secuencia o ir a una carta específica desde los dots
+      replayBtn?.addEventListener("click", () => {
+        tl.kill();
+        tl = buildTimeline();
+        tl.restart();
+      });
+
+      stepDots.forEach((dot, idx) => {
+        dot.addEventListener("click", () => {
+          tl.kill();
+          tl = buildTimeline();
+          tl. restart();
+          // Saltar al inicio de la card seleccionada
+          const approxTime = idx * 1.72;
+          tl.seek(approxTime);
+        });
+      });
+
+      const handleCategoryFiltered = (ev: Event) => {
+        const detail = (ev as CustomEvent).detail;
+        if (detail && detail.catKey === root.dataset.crownCat) {
+          tl.kill();
+          tl = buildTimeline();
+          dust?.start();
+          hasStarted = true;
+          tl.restart();
+        }
+      };
+      window.addEventListener("tgp:archive-category-selected", handleCategoryFiltered);
+
+      document.addEventListener(
+        "astro:before-swap",
+        () => {
+          observer.disconnect();
+          window.removeEventListener("tgp:archive-category-selected", handleCategoryFiltered);
+          dust?.destroy();
+          tl.kill();
+        },
+        { once: true }
+      );
+    });
+  }
+
+  document.addEventListener("astro:page-load", initFourPushShowcases);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFourPushShowcases);
+  } else {
+    initFourPushShowcases();
+  }
+</script>
+

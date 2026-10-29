@@ -15,6 +15,7 @@ import AppleBentoArchetypes from '../components/AppleBentoArchetypes.astro';
 import TgpHeroTriptych, { type TriptychPost } from '../components/TgpHeroTriptych.astro';
 import HeroSpotifyColecciones from '../components/HeroSpotifyColecciones.astro';
 import ArchivoManifestoGsap from '../components/archivo/ArchivoManifestoGsap.astro';
+import ArchivoCollectionCrownGsap from '../components/archivo/ArchivoCollectionCrownGsap.astro';
 import { customCollections } from '../lib/custom-collections';
 import {
   getPublishableEssays,
@@ -402,47 +403,29 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             const restEssays = group.essays.slice(1);
             const groupHref = group.href || `/colecciones/${group.catKey}/`;
 
+            const crownCards = group.essays.slice(0, 4).map((essay, idx) => {
+              const rawImg = essay.img || resolveEssayImage(essay.entry, essay.slug);
+              const cleanImg = sanitizeImageUrl(typeof rawImg === 'object' && (rawImg as any)?.src ? (rawImg as any).src : (typeof rawImg === 'string' ? rawImg : ''));
+              return {
+                slug: essay.slug,
+                title: essay.entry.title || 'Dossier del Archivo',
+                excerpt: (essay.entry as any).dek || essay.entry.excerpt || '',
+                img: cleanImg,
+                href: (essay as any).href || ((essay as any).isNota ? `/notas/${essay.slug}/` : (essay as any).isCinematicGSAP ? `/ensayos-cinematicos/${essay.slug}/` : `/hemeroteca/${essay.slug}/`),
+                badge: `${group.catLabel} · Expediente 0${idx + 1}`,
+              };
+            });
+
             return (
-              <div class="category-block flex flex-col gap-8" data-category-group={group.catKey}>
-                {/* Presentación Editorial de Colección Centrada (Tipografía Gloock con Gradiente Metálico Cálido) */}
-                <div class="editorial-bar flex flex-col items-center justify-center text-center pb-8 pt-4 gap-3 w-full max-w-4xl mx-auto">
-                  <span class="font-metadata text-[13px] sm:text-sm uppercase tracking-[0.35em] text-rust-orange font-bold">
-                    Colección Especializada · {group.essays.length} {group.essays.length === 1 ? 'Dossier' : 'Dossieres'}
-                  </span>
-
-                  <a href={groupHref} class="group/cattitle inline-block">
-                    <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-gloock font-black tracking-tight leading-[1.05] gradient-general-h1 glow-metallic-gloock uppercase transition-transform duration-500 group-hover/cattitle:scale-[1.02]">
-                      {group.catLabel}
-                    </h2>
-                  </a>
-
-                  <div class="flex items-center gap-4 justify-center mt-1">
-                    <a
-                      href={groupHref}
-                      class="font-metadata text-xs sm:text-[13px] uppercase tracking-[0.25em] text-white/60 hover:text-rust-orange transition-colors flex items-center gap-2 group/arrow"
-                    >
-                      <span>Explorar Colección Completa</span>
-                      <span class="text-rust-orange group-hover/arrow:translate-x-1 transition-transform">→</span>
-                    </a>
-                  </div>
-                </div>
-
-                {/* 1. Post Cover Cinemático de la Colección (Hero Full Bleed Proporcionado) */}
-                {coverEssay && (
-                  <div class="w-full">
-                    <CinematicArchiveCard
-                      slug={coverEssay.slug}
-                      entry={coverEssay.entry}
-                      img={coverEssay.img}
-                      href={(coverEssay as any).href}
-                      variant="hero"
-                      enableCinemagraph={true}
-                      hideExteriorTitle={true}
-                      centerCtaBelow={true}
-                      ctaLabel="VER REGISTRO"
-                    />
-                  </div>
-                )}
+              <div id={`coleccion-${group.catKey}`} class="category-block flex flex-col gap-6" data-category-group={group.catKey}>
+                {/* Showcase de 4 Cards Enormes con Push a la Izquierda + Keywords en Purple + Pantalla Final de 4 Dossieres */}
+                <ArchivoCollectionCrownGsap
+                  catKey={group.catKey}
+                  catLabel={group.catLabel}
+                  groupHref={groupHref}
+                  count={group.essays.length}
+                  cards={crownCards}
+                />
 
                 {/* 2. Resto de la Colección: Tríptico de Revelación en Modo Archivo (Gloock + Ancho Panorámico) */}
                 {restEssays.length > 0 && (() => {
@@ -736,6 +719,10 @@ function createPremierSequences(essays: typeof resolvedEssays) {
             block.style.display = 'none';
           }
         });
+
+        if (catValue !== 'all') {
+          window.dispatchEvent(new CustomEvent('tgp:archive-category-selected', { detail: { catKey: catValue } }));
+        }
       };
 
       // Función para filtrar años dentro de la solapa 2

@@ -194,10 +194,97 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
   </div>
 
   {/* ═══════════════════════════════════════════════════════════════════════
-      CONTENIDO HERO: H1 GLOOCK IMPACT CON TEXT HIGHLIGHT ANIMATION
+      PRESENTACIÓN ADVERTISING MARQUEE CINEMASCOPE (SIN LOOP · FADE OUT AL FINAL)
+      Secuencia: Duda. > Investiga. > CONECTA. (Mora/Purple) > The Great Puzzle > PROJECT (Scaling Out)
+      > 3s Masonry Iridiscente: "HISTORIA DE LA PRODUCCIÓN HUMANA DE SENTIDO" > Tapiz Final sin polvo
   ═══════════════════════════════════════════════════════════════════════ */}
   <div
-    class={`relative z-20 w-full px-6 sm:px-10 md:px-14 lg:px-16 pt-32 sm:pt-36 md:pt-40 lg:pt-44 pb-16 sm:pb-20 my-auto flex flex-col ${
+    id="hero-cinemascope-intro"
+    class="absolute inset-0 z-20 flex items-center justify-center bg-[#060608] overflow-hidden select-none"
+    aria-label="Presentación The Great Puzzle Project"
+  >
+    {/* Lienzo de Polvo Estelar Platinado / Iridiscente exclusivo del Telón Intro */}
+    <canvas
+      id="hero-platinum-dust-canvas"
+      class="absolute inset-0 w-full h-full pointer-events-none z-5"
+      aria-hidden="true"
+    ></canvas>
+
+    {/* Resplandor anamórfico central sutil */}
+    <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_75%_42%_at_50%_50%,rgba(226,232,240,0.07)_0%,rgba(167,139,250,0.03)_42%,transparent_75%)]"></div>
+
+    {/* Barras sutiles de encuadre CinemaScope 2.39:1 */}
+    <div class="cinemascope-bar-top absolute inset-x-0 top-0 h-8 sm:h-12 bg-black/90 border-b border-white/8 pointer-events-none z-10"></div>
+    <div class="cinemascope-bar-bottom absolute inset-x-0 bottom-0 h-8 sm:h-12 bg-black/90 border-t border-white/8 pointer-events-none z-10"></div>
+
+    {/* Escenario central de palabras H1 gigantes */}
+    <div class="relative z-15 w-full max-w-7xl mx-auto px-4 sm:px-8 h-72 sm:h-96 flex items-center justify-center text-center">
+      {/* Acto 1: Duda. (Mora / Purple original) */}
+      <div class="cscope-slide absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none" data-cscope-step="0">
+        <span class="cscope-word cscope-mora-purple font-['Gloock'] text-6xl sm:text-8xl md:text-9xl lg:text-[9.5rem] tracking-[-0.02em] leading-none">
+          Duda.
+        </span>
+      </div>
+
+      {/* Acto 2: Investiga. (Mora / Purple original) */}
+      <div class="cscope-slide absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none" data-cscope-step="1">
+        <span class="cscope-word cscope-mora-purple font-['Gloock'] text-6xl sm:text-8xl md:text-9xl lg:text-[9.5rem] tracking-[-0.02em] leading-none">
+          Investiga.
+        </span>
+      </div>
+
+      {/* Acto 3: CONECTA. (Mora / Purple original) */}
+      <div class="cscope-slide absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none" data-cscope-step="2">
+        <span class="cscope-word cscope-mora-purple font-['Gloock'] text-5xl sm:text-7xl md:text-8xl lg:text-[8.5rem] uppercase tracking-[0.02em] leading-none">
+          CONECTA.
+        </span>
+      </div>
+
+      {/* Acto 4: The Great Puzzle (Scaling Out) */}
+      <div class="cscope-slide absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none" data-cscope-step="3">
+        <span class="cscope-word cscope-platinum font-['Gloock'] text-5xl sm:text-7xl md:text-8xl lg:text-[7.5rem] leading-[1.04]">
+          The Great Puzzle
+        </span>
+      </div>
+
+      {/* Acto 5: PROJECT (Red Neon · Scaling Out y cercano en tiempo) */}
+      <div class="cscope-slide absolute inset-0 flex flex-col items-center justify-center opacity-0 pointer-events-none" data-cscope-step="4">
+        <div class="cscope-neon-streak absolute w-3/4 max-w-2xl h-0.5 bg-linear-to-r from-transparent via-[#ff1e27]/70 to-transparent blur-[1px]"></div>
+        <span class="cscope-word cscope-red-neon font-['Gloock'] text-6xl sm:text-8xl md:text-9xl lg:text-[9.5rem] uppercase leading-none">
+          PROJECT
+        </span>
+      </div>
+
+      {/* Acto 6: Cierre CinemaScope 3s — Masonry en tamaños desiguales fijados a tamaño final homogéneo */}
+      <div class="cscope-slide absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none px-4 sm:px-10" data-cscope-step="5">
+        <div class="cscope-masonry-stage max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-2 sm:gap-y-4 text-center">
+          <span class="cscope-masonry-piece cscope-platinum-upper font-['Gloock'] text-3xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-[0.05em] leading-[1.08]">HISTORIA</span>
+          <span class="cscope-masonry-piece cscope-platinum-upper font-['Gloock'] text-3xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-[0.05em] leading-[1.08]">DE</span>
+          <span class="cscope-masonry-piece cscope-platinum-upper font-['Gloock'] text-3xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-[0.05em] leading-[1.08]">LA</span>
+          <span class="cscope-masonry-piece cscope-platinum-upper font-['Gloock'] text-3xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-[0.05em] leading-[1.08]">PRODUCCIÓN</span>
+          <span class="cscope-masonry-piece cscope-platinum-upper font-['Gloock'] text-3xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-[0.05em] leading-[1.08]">HUMANA</span>
+          <span class="cscope-masonry-piece cscope-platinum-upper font-['Gloock'] text-3xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-[0.05em] leading-[1.08]">DE</span>
+          <span class="cscope-masonry-piece cscope-platinum-upper font-['Gloock'] text-3xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-[0.05em] leading-[1.08]">SENTIDO</span>
+        </div>
+      </div>
+    </div>
+
+    {/* Botón discreto para saltar la presentación */}
+    <button
+      type="button"
+      id="hero-cscope-skip"
+      class="absolute bottom-12 sm:bottom-16 right-6 sm:right-10 z-30 px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/12 border border-white/12 text-[10px] font-mono uppercase tracking-[0.25em] text-white/55 hover:text-white transition-all duration-300 cursor-pointer backdrop-blur-sm"
+    >
+      Saltar intro ›
+    </button>
+  </div>
+
+  {/* ═══════════════════════════════════════════════════════════════════════
+      CONTENIDO HERO PRINCIPAL (REVELADO TRAS EL FADE OUT DE LA PRESENTACIÓN)
+  ═══════════════════════════════════════════════════════════════════════ */}
+  <div
+    id="hero-main-screen"
+    class={`relative z-15 w-full px-6 sm:px-10 md:px-14 lg:px-16 pt-32 sm:pt-36 md:pt-40 lg:pt-44 pb-16 sm:pb-20 my-auto flex flex-col ${
       align === "left"
         ? "items-start text-left max-w-3xl"
         : "items-center text-center max-w-4xl mx-auto"
@@ -243,22 +330,8 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
       {bajada}
     </p>
 
-    {/* Typewriter interactivo del ADN TGP (Modo Cinemático de Alto Impacto) */}
-    {enableTypewriter && (
-      <div 
-        class="mt-6 sm:mt-8 flex items-center gap-3.5 font-['Proza_Libre'] text-base sm:text-xl md:text-2xl text-[#F3ECE0]/95 tracking-wide h-14 sm:h-16 drop-shadow-[0_2px_14px_rgba(0,0,0,0.95)]"
-        style="overflow-anchor: none;"
-        aria-live="polite"
-      >
-        <span class="font-mono text-amber-400 text-lg sm:text-2xl select-none font-bold" aria-hidden="true">›</span>
-        <span id="hero-typewriter-text" class="border-r-2 border-amber-400 pr-1.5 italic font-serif text-[#F3ECE0]">
-          Duda. Investiga. Conecta.
-        </span>
-      </div>
-    )}
-
     {/* Acciones principales estilo Pill con coherencia original */}
-    <div class="mt-7 sm:mt-8 flex flex-wrap items-center gap-3.5 sm:gap-4">
+    <div class="mt-8 sm:mt-10 flex flex-wrap items-center gap-3.5 sm:gap-4">
       <a
         href={ctaHref}
         class="group relative inline-flex items-center justify-center gap-2.5 px-8 sm:px-9 py-3.5 sm:py-4 rounded-full bg-[#E50914] text-white font-['Outfit'] font-bold text-base sm:text-lg tracking-wide shadow-[0_0_30px_rgba(229,9,20,0.45)] hover:bg-[#ff1e27] hover:scale-[1.03] active:scale-95 transition-all duration-300 no-underline cursor-pointer"
@@ -281,7 +354,7 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
   </div>
 
   {/* Indicador de scroll sutil hacia el catálogo */}
-  <div class="relative z-20 pb-6 sm:pb-8 flex justify-center w-full pointer-events-none opacity-60">
+  <div class="relative z-15 pb-6 sm:pb-8 flex justify-center w-full pointer-events-none opacity-60">
     <span class="font-['Outfit'] text-[11px] uppercase tracking-[0.3em] text-white/50 flex items-center gap-2 animate-bounce">
       <span>Deslizar para ver el catálogo</span>
       <span>↓</span>
@@ -389,6 +462,86 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
     filter: drop-shadow(0 0 18px rgba(229, 9, 20, 0.6));
   }
 
+  /* ── TIPOGRAFÍA H1 GIGANTE CINEMASCOPE (MORA/PURPLE, PLATINADO IRIDISCENTE & RED NEON) ── */
+  .cscope-word,
+  .cscope-masonry-piece {
+    display: inline-block;
+    will-change: transform, opacity, filter, letter-spacing;
+  }
+
+  /* Gradiente Mora / Purple Amatista original de AdnBentoGsap */
+  .cscope-mora-purple {
+    background-image: linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #f5e8ff 18%,
+      #e9d5ff 36%,
+      #c084fc 62%,
+      #a855f7 82%,
+      #7e22ce 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 28px rgba(192, 132, 252, 0.55))
+            drop-shadow(0 0 65px rgba(168, 85, 247, 0.35))
+            drop-shadow(0 8px 25px rgba(0, 0, 0, 0.92));
+  }
+
+  .cscope-platinum {
+    background-image: linear-gradient(
+      125deg,
+      #ffffff 0%,
+      #f1f5f9 18%,
+      #e2e8f0 34%,
+      #ddd6fe 52%,
+      #bae6fd 68%,
+      #f8fafc 84%,
+      #cbd5e1 100%
+    );
+    background-size: 220% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 32px rgba(226, 232, 240, 0.42))
+            drop-shadow(0 0 70px rgba(196, 181, 253, 0.25))
+            drop-shadow(0 10px 28px rgba(0, 0, 0, 0.95));
+  }
+
+  .cscope-platinum-upper {
+    background-image: linear-gradient(
+      125deg,
+      #ffffff 0%,
+      #f8fafc 25%,
+      #c4b5fd 50%,
+      #bae6fd 75%,
+      #ffffff 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 40px rgba(248, 250, 252, 0.55))
+            drop-shadow(0 0 85px rgba(186, 230, 253, 0.32))
+            drop-shadow(0 10px 30px rgba(0, 0, 0, 0.95));
+  }
+
+  .cscope-red-neon {
+    background-image: linear-gradient(
+      180deg,
+      #fff1f2 0%,
+      #ff4d58 28%,
+      #e50914 64%,
+      #b91c1c 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 22px rgba(255, 30, 39, 0.95))
+            drop-shadow(0 0 55px rgba(229, 9, 20, 0.85))
+            drop-shadow(0 0 110px rgba(229, 9, 20, 0.55))
+            drop-shadow(0 10px 30px rgba(0, 0, 0, 0.95));
+  }
+
   /* ── IGNICIÓN NEÓN DEL BRAND TITLE ── */
   .brand-title {
     animation: neon-pulse 3.5s ease-in-out infinite alternate;
@@ -405,59 +558,418 @@ const titleParts = typeof renderTitle(titulo, highlightWords) === 'object'
 </style>
 
 <script>
-  import { TGP_TYPEWRITER_PHRASES, TGP_TYPEWRITER_CONFIG } from '../lib/tgp-typewriter';
+  import { gsap } from 'gsap';
 
-  const initHeroTypewriter = () => {
-    const el = document.getElementById('hero-typewriter-text');
-    if (!el) return;
+  // ── 1. MOTOR DE POLVO ESTELAR PLATINADO / IRIDISCENTE PERMANENTE ──
+  class PlatinumStardustEngine {
+    private canvas: HTMLCanvasElement;
+    private ctx: CanvasRenderingContext2D;
+    private animationId: number | null = null;
+    private isRunning = false;
+    private boundResize: () => void;
+    private particles: Array<{
+      x: number;
+      y: number;
+      r: number;
+      alpha: number;
+      vx: number;
+      vy: number;
+      phase: number;
+      phaseSpeed: number;
+      hueShift: number;
+    }> = [];
 
-    // Respetar accesibilidad de reducción de movimiento
+    // Paleta platinada / iridiscente (plata pura, platino frío, lavanda perlado, hielo cian)
+    private static PALETTE = [
+      { r: 248, g: 250, b: 252 }, // Platino puro
+      { r: 226, g: 232, b: 240 }, // Plata helada
+      { r: 221, g: 214, b: 254 }, // Iridiscencia amatista suave
+      { r: 186, g: 230, b: 253 }, // Iridiscencia cian estelar
+      { r: 245, g: 208, b: 254 }, // Destello nacarado
+    ];
+
+    constructor(canvas: HTMLCanvasElement) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext('2d')!;
+      this.boundResize = this.resize.bind(this);
+      this.resize();
+      window.addEventListener('resize', this.boundResize);
+    }
+
+    public resize() {
+      const parent = this.canvas.parentElement;
+      const rect = parent ? parent.getBoundingClientRect() : null;
+      this.canvas.width = rect && rect.width > 0 ? rect.width : window.innerWidth;
+      this.canvas.height = rect && rect.height > 0 ? rect.height : window.innerHeight;
+    }
+
+    private spawnParticle(fromEdge = false) {
+      const w = this.canvas.width;
+      const h = this.canvas.height;
+      return {
+        x: fromEdge ? -12 : Math.random() * w,
+        y: Math.random() * h,
+        r: 0.7 + Math.random() * 2.3,
+        alpha: 0.18 + Math.random() * 0.62,
+        vx: 0.16 + Math.random() * 0.45,
+        vy: (Math.random() - 0.5) * 0.18,
+        phase: Math.random() * Math.PI * 2,
+        phaseSpeed: 0.015 + Math.random() * 0.035,
+        hueShift: Math.floor(Math.random() * PlatinumStardustEngine.PALETTE.length),
+      };
+    }
+
+    public start() {
+      if (this.isRunning) return;
+      this.isRunning = true;
+      this.particles = Array.from({ length: 78 }, () => this.spawnParticle(false));
+      this.tick();
+    }
+
+    public destroy() {
+      this.isRunning = false;
+      if (this.animationId) cancelAnimationFrame(this.animationId);
+      window.removeEventListener('resize', this.boundResize);
+    }
+
+    private tick() {
+      if (!this.isRunning) return;
+      const { width: w, height: h } = this.canvas;
+      this.ctx.clearRect(0, 0, w, h);
+
+      for (const p of this.particles) {
+        p.x += p.vx;
+        p.y += p.vy + Math.sin(p.phase) * 0.08;
+        p.phase += p.phaseSpeed;
+
+        if (p.x > w + 16) {
+          Object.assign(p, this.spawnParticle(true));
+        }
+        if (p.y < -16) p.y = h + 12;
+        if (p.y > h + 16) p.y = -12;
+
+        // Oscilación iridiscente entre tonos platinados
+        const shimmer = 0.65 + 0.35 * Math.sin(p.phase);
+        const finalAlpha = Math.min(1, p.alpha * shimmer);
+        const col = PlatinumStardustEngine.PALETTE[p.hueShift];
+
+        const grad = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3.1);
+        grad.addColorStop(0, `rgba(255, 255, 255, ${finalAlpha.toFixed(3)})`);
+        grad.addColorStop(0.38, `rgba(${col.r}, ${col.g}, ${col.b}, ${(finalAlpha * 0.72).toFixed(3)})`);
+        grad.addColorStop(1, `rgba(${col.r}, ${col.g}, ${col.b}, 0)`);
+
+        this.ctx.beginPath();
+        this.ctx.fillStyle = grad;
+        this.ctx.arc(p.x, p.y, p.r * 3.1, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+
+      this.animationId = requestAnimationFrame(this.tick.bind(this));
+    }
+  }
+
+  // ── 2. SECUENCIA CINEMASCOPE (SIN LOOP · 1 SOLA PRESENTACIÓN → FADE OUT) ──
+  function initHeroCinemaScope() {
+    const dustCanvas = document.getElementById('hero-platinum-dust-canvas') as HTMLCanvasElement | null;
+    const introOverlay = document.getElementById('hero-cinemascope-intro') as HTMLElement | null;
+    const mainScreen = document.getElementById('hero-main-screen') as HTMLElement | null;
+    const skipBtn = document.getElementById('hero-cscope-skip') as HTMLButtonElement | null;
+
+    let stardust: PlatinumStardustEngine | null = null;
+    if (dustCanvas) {
+      stardust = new PlatinumStardustEngine(dustCanvas);
+      stardust.start();
+    }
+
+    if (!introOverlay || !mainScreen) return;
+    if (introOverlay.dataset.cscopeInit === 'true') return;
+    introOverlay.dataset.cscopeInit = 'true';
+
+    const slides = Array.from(introOverlay.querySelectorAll<HTMLElement>('.cscope-slide'));
+    if (slides.length === 0) return;
+
+    // Respetar reducción de movimiento
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      el.textContent = TGP_TYPEWRITER_PHRASES[0] || 'Duda. Investiga. Conecta.';
+      introOverlay.style.display = 'none';
       return;
     }
 
-    let phraseIndex = 0;
-    let charIndex = 0;
-    let isDeleting = false;
-    let timer: number | null = null;
+    // Estado inicial de la pantalla principal debajo del telón CinemaScope
+    gsap.set(mainScreen, { autoAlpha: 0, y: 18, scale: 0.985 });
 
-    const tick = () => {
-      const current = TGP_TYPEWRITER_PHRASES[phraseIndex];
-      if (!current) return;
+    // Timings originales de AdnBentoGsap para Duda. / Investiga. / CONECTA.
+    const wordInTime = 0.85;
+    const wordDwellTime = 1.6;
+    const wordOutTime = 0.55;
+    const breathTime = 0.2;
 
-      if (isDeleting) {
-        charIndex--;
-        el.textContent = current.substring(0, charIndex);
-        if (charIndex <= 0) {
-          isDeleting = false;
-          phraseIndex = (phraseIndex + 1) % TGP_TYPEWRITER_PHRASES.length;
-          timer = window.setTimeout(tick, 350);
-          return;
-        }
-        timer = window.setTimeout(tick, TGP_TYPEWRITER_CONFIG.deleteSpeed);
-      } else {
-        charIndex++;
-        el.textContent = current.substring(0, charIndex);
-        if (charIndex >= current.length) {
-          isDeleting = true;
-          timer = window.setTimeout(tick, TGP_TYPEWRITER_CONFIG.pauseTime);
-          return;
-        }
-        timer = window.setTimeout(tick, TGP_TYPEWRITER_CONFIG.typeSpeed);
+    const tl = gsap.timeline({
+      repeat: 0, // Sin loop: solo presentación inaugural
+      defaults: { ease: 'power3.out' }
+    });
+
+    // Inicializar todos los slides ocultos
+    slides.forEach((s) => gsap.set(s, { autoAlpha: 0 }));
+
+    // ── ACTOS 0, 1, 2: Duda. > Investiga. > CONECTA. (Mora/Purple y modo/timing original) ──
+    [0, 1, 2].forEach((idx) => {
+      const slide = slides[idx];
+      if (!slide) return;
+      const word = slide.querySelector<HTMLElement>('.cscope-word');
+
+      if (word) {
+        gsap.set(word, { scale: 0.93, filter: 'blur(14px)', y: 12 });
       }
+
+      tl.to(slide, { autoAlpha: 1, duration: wordInTime, ease: 'power2.out' });
+      if (word) {
+        tl.to(
+          word,
+          { scale: 1, filter: 'blur(0px)', y: 0, duration: wordInTime, ease: 'power3.out' },
+          '<'
+        );
+      }
+
+      // Pausa de lectura idéntica al modo original
+      tl.to({}, { duration: wordDwellTime });
+
+      // Disolución suave hacia arriba
+      if (word) {
+        tl.to(word, {
+          scale: 1.04,
+          filter: 'blur(12px)',
+          y: -10,
+          duration: wordOutTime,
+          ease: 'power2.in'
+        });
+      }
+      tl.to(slide, { autoAlpha: 0, duration: wordOutTime, ease: 'power2.in' }, '<');
+      tl.to({}, { duration: breathTime });
+    });
+
+    // ── ACTO 3: The Great Puzzle (Efecto Scaling Out: desde escala mayor 1.55 -> 1.0) ──
+    const slideTgp = slides[3];
+    if (slideTgp) {
+      const wordTgp = slideTgp.querySelector<HTMLElement>('.cscope-word');
+      if (wordTgp) {
+        gsap.set(wordTgp, {
+          scale: 1.55,
+          filter: 'blur(18px)',
+          letterSpacing: '0.12em',
+          y: 0
+        });
+      }
+
+      tl.to(slideTgp, { autoAlpha: 1, duration: 0.55, ease: 'power2.out' });
+      if (wordTgp) {
+        tl.to(
+          wordTgp,
+          {
+            scale: 1.0,
+            filter: 'blur(0px)',
+            letterSpacing: '0.01em',
+            duration: 0.72,
+            ease: 'expo.out'
+          },
+          '<'
+        );
+        // Sigue haciendo scaling out suave mientras se lee (1.0 -> 0.96)
+        tl.to(wordTgp, {
+          scale: 0.96,
+          letterSpacing: '-0.01em',
+          duration: 0.75,
+          ease: 'sine.inOut'
+        });
+        // Salida rápida en scaling out (0.96 -> 0.84) para que PROJECT entre muy cerca en tiempo
+        tl.to(wordTgp, {
+          scale: 0.84,
+          filter: 'blur(10px)',
+          duration: 0.28,
+          ease: 'power2.in'
+        });
+      }
+      tl.to(slideTgp, { autoAlpha: 0, duration: 0.26, ease: 'power2.in' }, '<');
+    }
+
+    // ── ACTO 4: PROJECT (Red Neon · Scaling Out e inmediato tras The Great Puzzle) ──
+    const slideProj = slides[4];
+    if (slideProj) {
+      const wordProj = slideProj.querySelector<HTMLElement>('.cscope-word');
+      if (wordProj) {
+        gsap.set(wordProj, {
+          scale: 1.65,
+          filter: 'blur(20px)',
+          letterSpacing: '0.28em',
+          y: 0
+        });
+      }
+
+      // Entra casi pegado en tiempo (-=0.08s tras The Great Puzzle)
+      tl.to(slideProj, { autoAlpha: 1, duration: 0.45, ease: 'power2.out' }, '-=0.08');
+      if (wordProj) {
+        tl.to(
+          wordProj,
+          {
+            scale: 1.0,
+            filter: 'blur(0px)',
+            letterSpacing: '0.14em',
+            duration: 0.65,
+            ease: 'expo.out'
+          },
+          '<'
+        );
+        // Mantiene pulso scaling out (1.0 -> 0.95)
+        tl.to(wordProj, {
+          scale: 0.95,
+          letterSpacing: '0.10em',
+          duration: 0.95,
+          ease: 'sine.inOut'
+        });
+        // Fade-out dramático en scaling out antes del cierre de 3s
+        tl.to(wordProj, {
+          scale: 0.80,
+          filter: 'blur(18px)',
+          duration: 0.55,
+          ease: 'power3.in'
+        });
+      }
+      tl.to(slideProj, { autoAlpha: 0, duration: 0.55, ease: 'power3.in' }, '<');
+    }
+
+    // Apagar el polvo estelar justo al terminar el fade-out dramático de PROJECT (cero polvo en el telón final y tapiz)
+    if (dustCanvas) {
+      tl.to(
+        dustCanvas,
+        {
+          autoAlpha: 0,
+          duration: 0.5,
+          ease: 'power2.out',
+          onComplete: () => {
+            stardust?.destroy();
+          }
+        },
+        '<'
+      );
+    }
+
+    // ── ACTO 5 (CIERRE 3 SEGUNDOS): "HISTORIA DE LA PRODUCCIÓN HUMANA DE SENTIDO" ──
+    // Efecto Masonry de tamaños desiguales que encastran en el tapiz a tamaño final homogéneo (scale: 1)
+    const slideMasonry = slides[5];
+    if (slideMasonry) {
+      const pieces = Array.from(slideMasonry.querySelectorAll<HTMLElement>('.cscope-masonry-piece'));
+      const masonryPresets = [
+        { scale: 1.95, x: -36, y: -42 }, // HISTORIA (gigante arriba-izq)
+        { scale: 0.52, x: 18,  y: 30  }, // DE (pequeño abajo)
+        { scale: 1.45, x: -14, y: -26 }, // LA (mediano-grande arriba)
+        { scale: 2.15, x: 32,  y: 38  }, // PRODUCCIÓN (colosal abajo-der)
+        { scale: 0.62, x: -28, y: 26  }, // HUMANA (compacto abajo-izq)
+        { scale: 1.50, x: 20,  y: -30 }, // DE (mediano-grande arriba-der)
+        { scale: 1.88, x: 26,  y: -22 }, // SENTIDO (monumental cierre)
+      ];
+
+      pieces.forEach((piece, i) => {
+        const p = masonryPresets[i % masonryPresets.length];
+        gsap.set(piece, {
+          scale: p.scale,
+          x: p.x,
+          y: p.y,
+          autoAlpha: 0,
+          filter: 'blur(14px)'
+        });
+      });
+
+      tl.set(slideMasonry, { autoAlpha: 1 });
+
+      // Las piezas entran con tamaños desiguales (masonry) y se fijan al tapiz con tamaño final homogéneo (scale: 1)
+      tl.to(pieces, {
+        scale: 1,
+        x: 0,
+        y: 0,
+        autoAlpha: 1,
+        filter: 'blur(0px)',
+        duration: 0.85,
+        stagger: 0.055,
+        ease: 'expo.out'
+      });
+
+      // Quedan fijadas al tapiz con tamaño homogéneo durante 3 segundos exactos
+      tl.to({}, { duration: 3.0 });
+
+      // Disolución final hacia el tapiz de portadas
+      tl.to(pieces, {
+        scale: 0.96,
+        autoAlpha: 0,
+        filter: 'blur(12px)',
+        duration: 0.6,
+        stagger: 0.02,
+        ease: 'power2.in'
+      });
+      tl.to(slideMasonry, { autoAlpha: 0, duration: 0.55, ease: 'power2.in' }, '<');
+    }
+
+    // ── REVELACIÓN DEL TAPIZ FINAL (SIN POLVO ESTELAR) ──
+    tl.to(introOverlay, {
+      autoAlpha: 0,
+      duration: 0.85,
+      ease: 'power2.inOut',
+      onComplete: () => {
+        stardust?.destroy();
+        introOverlay.style.display = 'none';
+        introOverlay.style.pointerEvents = 'none';
+      }
+    });
+
+    tl.to(
+      mainScreen,
+      {
+        autoAlpha: 1,
+        y: 0,
+        scale: 1,
+        duration: 1.0,
+        ease: 'power3.out'
+      },
+      '-=0.6'
+    );
+
+    // Botón para saltar intro inmediatamente si el lector lo desea (también apaga el polvo)
+    const handleSkip = () => {
+      tl.kill();
+      stardust?.destroy();
+      gsap.to(introOverlay, {
+        autoAlpha: 0,
+        duration: 0.45,
+        ease: 'power2.out',
+        onComplete: () => {
+          introOverlay.style.display = 'none';
+          introOverlay.style.pointerEvents = 'none';
+        }
+      });
+      gsap.to(mainScreen, {
+        autoAlpha: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.55,
+        ease: 'power3.out'
+      });
     };
 
-    tick();
+    skipBtn?.addEventListener('click', handleSkip);
 
-    document.addEventListener('astro:before-swap', () => {
-      if (timer) clearTimeout(timer);
-    }, { once: true });
-  };
+    document.addEventListener(
+      'astro:before-swap',
+      () => {
+        tl.kill();
+        skipBtn?.removeEventListener('click', handleSkip);
+        stardust?.destroy();
+      },
+      { once: true }
+    );
+  }
 
+  document.addEventListener('astro:page-load', initHeroCinemaScope);
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initHeroTypewriter);
+    document.addEventListener('DOMContentLoaded', initHeroCinemaScope);
   } else {
-    initHeroTypewriter();
+    initHeroCinemaScope();
   }
 </script>
