@@ -117,9 +117,9 @@ export function resolveR2ImageUrl(pathOrUrl: string | any): string {
   const trimmed = rawStr.trim();
   if (!trimmed || !isValidImageSrc(trimmed)) return '';
 
-  // 1. Data URLs o URLs absolutas remotas (Wikimedia, R2, CDNs externos) → sin cambio
+  // 1. Data URLs o URLs absolutas remotas (Wikimedia, R2, CDNs externos) → normalizar subdominio R2 legado
   if (trimmed.startsWith('data:') || trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-    return trimmed;
+    return trimmed.replace(/^https?:\/\/assets\.thegreatpuzzleproject\.com\//i, `${R2_STORAGE_BASE_URL}/`);
   }
 
   // 2. Rutas generadas por Keystatic (/src/assets/... o src/assets/...) → R2

@@ -333,6 +333,13 @@ async function main() {
       });
     }
 
+    // 2C. Subdominio legado assets.thegreatpuzzleproject.com → storage.thegreatpuzzleproject.com
+    if (content.includes('https://assets.thegreatpuzzleproject.com/')) {
+      content = content.replace(/https:\/\/assets\.thegreatpuzzleproject\.com\//g, `${R2_PUBLIC_URL}/`);
+      changed = true;
+      totalReplaced++;
+    }
+
     if (changed) {
       fs.writeFileSync(filePath, content, 'utf-8');
       filesModified++;
