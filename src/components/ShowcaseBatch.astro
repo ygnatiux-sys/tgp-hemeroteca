@@ -1,0 +1,217 @@
+---
+/**
+ * src/components/ShowcaseBatch.astro
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Componente UI: Showcase Batch estilo HBO Max.
+ * FASE 1: Estructura HTML y Layout Tailwind con Mock Data estática.
+ * 
+ * Especificaciones:
+ * - Contenedor general oscuro (#0a0a0c) con padding generoso.
+ * - Header: Selector de categorías horizontal con chevrons y categoría activa centrada.
+ * - Grid: 2 columnas en mobile, 3 en desktop (máx 6 cards) en formato 16:9 (aspect-video).
+ * - Miniaturas estilo streaming: imagen neta, scrim degradado inferior y tipografía legible.
+ */
+
+interface ShowcaseItem {
+  id: string;
+  title: string;
+  dek?: string;
+  badge?: string;
+  image: string;
+  href: string;
+}
+
+interface ShowcaseCategory {
+  id: string;
+  name: string;
+  items: ShowcaseItem[];
+}
+
+// ── MOCK DATA EDITORIAL (COLECCIONES TGP) ────────────────────────────────────
+const mockCategories: ShowcaseCategory[] = [
+  {
+    id: "arqueosemiotica",
+    name: "Arqueosemiótica",
+    items: [
+      {
+        id: "derinkuyu",
+        title: "Derinkuyu: Acústica Subterránea",
+        dek: "Resonancia sónica y refugio telúrico en Capadocia.",
+        badge: "ARQUEOLOGÍA",
+        image: "https://storage.thegreatpuzzleproject.com/sinteticas-banana/1792996714137-derinkuyu-acustica-subterranea-banana-db7cc16c.webp",
+        href: "/hemeroteca/derinkuyu-acustica-subterranea/"
+      },
+      {
+        id: "bonampak",
+        title: "Bonampak: El Cinabrio y la Selva",
+        dek: "Pintura mural, liturgias mayas y el colapso clásico.",
+        badge: "MESOAMÉRICA",
+        image: "https://storage.thegreatpuzzleproject.com/Bonampak,_Chiapas._03.JPG",
+        href: "/hemeroteca/bonampak/"
+      },
+      {
+        id: "ankh",
+        title: "El Ankh Egipcio",
+        dek: "Geometría sagrada de la llave de la vida en el Nilo.",
+        badge: "EGIPTOLOGÍA",
+        image: "https://storage.thegreatpuzzleproject.com/ensayos/el-ankh-egipcio/coverImage.jpg",
+        href: "/hemeroteca/el-ankh-egipcio/"
+      },
+      {
+        id: "tarot-diablo",
+        title: "El Diablo en el Tarot",
+        dek: "Iconografía del Arcano XV y la materia aprisionada.",
+        badge: "ARQUETIPOS",
+        image: "https://storage.thegreatpuzzleproject.com/15_Devil_Tarot_Card.jpg",
+        href: "/hemeroteca/el-diablo-en-el-tarot/"
+      },
+      {
+        id: "orwell-1984",
+        title: "1984: La Predicción de Orwell",
+        dek: "Vigilancia, neolengua y la autopsia del totalitarismo.",
+        badge: "FILOSOFÍA",
+        image: "https://storage.thegreatpuzzleproject.com/ensayos/1984-la-prediccion-de-orwell/coverImage.jpg",
+        href: "/hemeroteca/1984-la-prediccion-de-orwell/"
+      },
+      {
+        id: "qapaq-nan",
+        title: "El Qapaq Ñan Arcaico",
+        dek: "Ingeniería de alta montaña en las entrañas de los Andes.",
+        badge: "INGENIERÍA",
+        image: "https://storage.thegreatpuzzleproject.com/ensayos/el-qapaq-nan-una-obra-de-ingenieria-arcaica-asombroso-en-las-entranas-de-sudamerica/coverImage.jpg",
+        href: "/hemeroteca/el-qapaq-nan-una-obra-de-ingenieria-arcaica-asombroso-en-las-entranas-de-sudamerica/"
+      }
+    ]
+  },
+  {
+    id: "historia-profunda",
+    name: "Historia Profunda",
+    items: []
+  },
+  {
+    id: "megalitos",
+    name: "Megalitos & Paisaje",
+    items: []
+  },
+  {
+    id: "arquetipos",
+    name: "Arquetipos Globales",
+    items: []
+  }
+];
+
+// Categoría seleccionada por defecto (primera)
+const activeIndex = 0;
+const activeCategory = mockCategories[activeIndex];
+
+// Categorías adyacentes visuales
+const prevCategory = mockCategories[mockCategories.length - 1]; // Arquetipos Globales
+const nextCategory = mockCategories[1]; // Historia Profunda
+---
+
+<section 
+  id="showcase-batch" 
+  class="relative w-full bg-[#0a0a0c] text-white py-16 md:py-24 border-t border-white/5 overflow-hidden select-none"
+>
+  <!-- Resplandor ambiental de fondo sutil -->
+  <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(120,119,198,0.12),transparent)]"></div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       1. HEADER / NAVEGADOR DE CATEGORÍAS (PATRÓN HBO MAX)
+       ══════════════════════════════════════════════════════════════════════════ -->
+  <div class="text-center max-w-5xl mx-auto px-4 mb-10 md:mb-14 relative z-10">
+    <!-- Subtítulo pequeño centrado arriba -->
+    <span class="block text-xs md:text-sm tracking-[0.25em] text-gray-400 uppercase font-mono font-medium mb-4 sm:mb-6">
+      DESCUBRE LO MEJOR EN
+    </span>
+
+    <!-- Selector de Categorías Horizontal con Chevrons -->
+    <div class="flex items-center justify-center gap-3 sm:gap-6 md:gap-10">
+      
+      <!-- Chevron Izquierdo (<) -->
+      <button 
+        type="button" 
+        class="w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 shrink-0"
+        aria-label="Categoría anterior"
+      >
+        <svg class="w-5 h-5 -translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <!-- Categoría Anterior (Atenuada, más pequeña) -->
+      <span class="hidden sm:inline-block text-lg md:text-2xl text-gray-500 opacity-60 font-light hover:opacity-90 transition-opacity cursor-pointer truncate max-w-[200px]">
+        {prevCategory.name}
+      </span>
+
+      <!-- Categoría Activa (Centrada, monumental) -->
+      <h2 class="text-2xl sm:text-4xl md:text-5xl font-light text-white tracking-tight px-2 sm:px-4 leading-tight">
+        {activeCategory.name}
+      </h2>
+
+      <!-- Categoría Siguiente (Atenuada, más pequeña) -->
+      <span class="hidden sm:inline-block text-lg md:text-2xl text-gray-500 opacity-60 font-light hover:opacity-90 transition-opacity cursor-pointer truncate max-w-[200px]">
+        {nextCategory.name}
+      </span>
+
+      <!-- Chevron Derecho (>) -->
+      <button 
+        type="button" 
+        class="w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 shrink-0"
+        aria-label="Categoría siguiente"
+      >
+        <svg class="w-5 h-5 translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       2. GRID DE POSTEOS (BATCH DE 6 MINIATURAS EN ASPECT-VIDEO 16:9)
+       ══════════════════════════════════════════════════════════════════════════ -->
+  <div class="max-w-6xl mx-auto px-4 relative z-10">
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 items-stretch">
+      {activeCategory.items.map((post) => (
+        <a 
+          href={post.href}
+          class="group relative block aspect-video w-full rounded-md md:rounded-lg overflow-hidden bg-neutral-900 border border-white/10 shadow-lg hover:shadow-[0_16px_36px_rgba(0,0,0,0.85)] hover:border-white/30 transition-all duration-300 hover:scale-105 cursor-pointer z-10 hover:z-20"
+        >
+          <!-- Imagen de fondo (aspect-video obligatorio) -->
+          <img 
+            src={post.image} 
+            alt={post.title}
+            loading="lazy"
+            decoding="async"
+            class="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-110 pointer-events-none"
+          />
+
+          <!-- Scrim degradado inferior para legibilidad cinematográfica -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 via-40% to-transparent pointer-events-none transition-opacity duration-300 group-hover:from-black"></div>
+
+          <!-- Badge de categoría sutil superior -->
+          {post.badge && (
+            <div class="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5 px-2 py-0.5 rounded bg-black/70 backdrop-blur-md border border-white/10 text-[9px] sm:text-[10px] font-mono tracking-wider text-gray-300 uppercase pointer-events-none">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+              <span>{post.badge}</span>
+            </div>
+          )}
+
+          <!-- Bloque de Título y Bajada anclado en la base -->
+          <div class="absolute inset-x-0 bottom-0 p-3 sm:p-4 md:p-5 z-10 flex flex-col justify-end pointer-events-none">
+            <h3 class="font-cinzel text-xs sm:text-sm md:text-base font-bold text-white tracking-wide uppercase line-clamp-2 drop-shadow-md group-hover:text-amber-200 transition-colors duration-200">
+              {post.title}
+            </h3>
+            {post.dek && (
+              <p class="hidden sm:block text-[11px] md:text-xs text-gray-300/80 font-sans line-clamp-1 mt-1 font-normal drop-shadow">
+                {post.dek}
+              </p>
+            )}
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+

@@ -15,6 +15,7 @@ import AppleBentoArchetypes from '../components/AppleBentoArchetypes.astro';
 import TgpHeroTriptych from '../components/TgpHeroTriptych.astro';
 import WikiGsapTimeline, { type WikiImage } from '../components/WikiGsapTimeline.astro';
 import AppleDualBentoDark from '../components/AppleDualBentoDark.astro';
+import ShowcaseBatch from '../components/ShowcaseBatch.astro';
 import { sanitizeImageUrl, getPublishableEssays, resolveEssayImage, isValidImageSrc, formatCategory, normalizeCategory } from '../lib/content-filter';
 
 // Portada Hero Cinemática (Monjes Novicios Leyendo en el Templo - Wikimedia Commons)
@@ -614,6 +615,11 @@ const cinemaShowcasePosts = publishable
   <section class="w-full max-w-7xl mx-auto px-4 md:px-8 my-20">
     <AppleDualBentoDark />
   </section>
+
+  {/* ═══════════════════════════════════════════════════════
+      SHOWCASE BATCH ESTILO HBO MAX (FASE 1: LAYOUT & ESTRUCTURA ESTÁTICA)
+      ═══════════════════════════════════════════════════════ */}
+  <ShowcaseBatch />
 
 </Layout>
 
