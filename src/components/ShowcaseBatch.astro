@@ -3,14 +3,17 @@
  * src/components/ShowcaseBatch.astro
  * ─────────────────────────────────────────────────────────────────────────────
  * Componente UI: Showcase Batch estilo HBO Max.
- * FASE 1: Estructura HTML y Layout Tailwind con Mock Data estática.
+ * FASE 2: Interactividad, Transiciones Fade In/Out y Rotación de Categorías (Vanilla JS).
  * 
  * Especificaciones:
  * - Contenedor general oscuro (#0a0a0c) con padding generoso.
  * - Header: Selector de categorías horizontal con chevrons y categoría activa centrada.
  * - Grid: 2 columnas en mobile, 3 en desktop (máx 6 cards) en formato 16:9 (aspect-video).
  * - Miniaturas estilo streaming: imagen neta, scrim degradado inferior y tipografía legible.
+ * - Fade Transition: 300ms de fade-out, inyección dinámica de datos y fade-in.
+ * - Emulación de Marca TGP: Firma institucional "THE GREAT PUZZLE PROJECT" en la base.
  */
+import { resolveR2ImageUrl } from '../lib/content-filter';
 
 interface ShowcaseItem {
   id: string;
@@ -27,7 +30,7 @@ interface ShowcaseCategory {
   items: ShowcaseItem[];
 }
 
-// ── MOCK DATA EDITORIAL (COLECCIONES TGP) ────────────────────────────────────
+// ── DATA EDITORIAL DE LAS 4 COLECCIONES TGP (6 POSTS POR COLECCIÓN) ─────────
 const mockCategories: ShowcaseCategory[] = [
   {
     id: "arqueosemiotica",
@@ -54,7 +57,7 @@ const mockCategories: ShowcaseCategory[] = [
         title: "El Ankh Egipcio",
         dek: "Geometría sagrada de la llave de la vida en el Nilo.",
         badge: "EGIPTOLOGÍA",
-        image: "https://storage.thegreatpuzzleproject.com/ensayos/el-ankh-egipcio/coverImage.jpg",
+        image: resolveR2ImageUrl("/src/assets/ensayos/el-ankh-egipcio/coverImage.jpg"),
         href: "/hemeroteca/el-ankh-egipcio/"
       },
       {
@@ -70,7 +73,7 @@ const mockCategories: ShowcaseCategory[] = [
         title: "1984: La Predicción de Orwell",
         dek: "Vigilancia, neolengua y la autopsia del totalitarismo.",
         badge: "FILOSOFÍA",
-        image: "https://storage.thegreatpuzzleproject.com/ensayos/1984-la-prediccion-de-orwell/coverImage.jpg",
+        image: resolveR2ImageUrl("/src/assets/ensayos/1984-la-prediccion-de-orwell/coverImage.jpg"),
         href: "/hemeroteca/1984-la-prediccion-de-orwell/"
       },
       {
@@ -78,7 +81,7 @@ const mockCategories: ShowcaseCategory[] = [
         title: "El Qapaq Ñan Arcaico",
         dek: "Ingeniería de alta montaña en las entrañas de los Andes.",
         badge: "INGENIERÍA",
-        image: "https://storage.thegreatpuzzleproject.com/ensayos/el-qapaq-nan-una-obra-de-ingenieria-arcaica-asombroso-en-las-entranas-de-sudamerica/coverImage.jpg",
+        image: resolveR2ImageUrl("/src/assets/ensayos/el-qapaq-nan-una-obra-de-ingenieria-arcaica-asombroso-en-las-entranas-de-sudamerica/coverImage.jpg"),
         href: "/hemeroteca/el-qapaq-nan-una-obra-de-ingenieria-arcaica-asombroso-en-las-entranas-de-sudamerica/"
       }
     ]
@@ -86,25 +89,170 @@ const mockCategories: ShowcaseCategory[] = [
   {
     id: "historia-profunda",
     name: "Historia Profunda",
-    items: []
+    items: [
+      {
+        id: "atila",
+        title: "Atila y el Papa León Magno",
+        dek: "El encuentro en el río Mincio que detuvo el fin de Roma.",
+        badge: "HISTORIA IMPERIAL",
+        image: resolveR2ImageUrl("/src/assets/ensayos/atila-y-el-papa/coverImage.jpeg"),
+        href: "/hemeroteca/atila-y-el-papa/"
+      },
+      {
+        id: "hegel",
+        title: "Hegel, la Historia y Dios",
+        dek: "La dialéctica del espíritu y el desarrollo de la conciencia.",
+        badge: "FILOSOFÍA",
+        image: resolveR2ImageUrl("/src/assets/ensayos/hegel-la-historia-y-dios/coverImage.webp"),
+        href: "/hemeroteca/hegel-la-historia-y-dios/"
+      },
+      {
+        id: "neron",
+        title: "Nerón y el Incendio de Roma",
+        dek: "Poder, exceso y la fractura escénica de la dinastía Julio-Claudia.",
+        badge: "ROMA CLÁSICA",
+        image: resolveR2ImageUrl("/src/assets/ensayos/neron-y-roma/coverImage.png"),
+        href: "/hemeroteca/neron-y-roma/"
+      },
+      {
+        id: "alejandro",
+        title: "Alejandro Magno: Geometría del Mito",
+        dek: "La desmesura del conquistador macedonio y el fin del orbe persa.",
+        badge: "CINEMÁTICO",
+        image: "https://storage.thegreatpuzzleproject.com/remotas/albertoolmedo.webp",
+        href: "/ensayos-cinematicos/alejandro-magno-la-geometria-del-mito-y-el-abismo-de-la-desmesura/"
+      },
+      {
+        id: "borges",
+        title: "Borges y el Porvenir Bifurcado",
+        dek: "El laberinto del tiempo, el archivo y la paradoja del infinito.",
+        badge: "LITERATURA",
+        image: resolveR2ImageUrl("/src/assets/ensayos/borges-y-su-obra-el-laberinto-del-infinito/coverImage.jpg"),
+        href: "/hemeroteca/borges-y-su-obra-el-laberinto-del-infinito/"
+      },
+      {
+        id: "darwin",
+        title: "Darwin y la Demolición del Diseño",
+        dek: "El origen de las especies y el colapso del teleologismo cósmico.",
+        badge: "EPISTEMOLOGÍA",
+        image: resolveR2ImageUrl("/src/assets/ensayos/darwin-y-el-evolucionismo-la-demolicion-del-diseno-cosmico/coverImage.jpg"),
+        href: "/hemeroteca/darwin-y-el-evolucionismo-la-demolicion-del-diseno-cosmico/"
+      }
+    ]
   },
   {
     id: "megalitos",
     name: "Megalitos & Paisaje",
-    items: []
+    items: [
+      {
+        id: "aramu-muru",
+        title: "Aramu Muru: El Umbral Pétreo",
+        dek: "El portal tallado en roca en las costas del lago Titicaca.",
+        badge: "ANDINO",
+        image: resolveR2ImageUrl("/src/assets/georreferencias/aramu-muru-puerta-de-los-dioses/coverImage.webp"),
+        href: "/hemeroteca/aramu-muru-puerta-de-los-dioses/"
+      },
+      {
+        id: "capacete",
+        title: "Capacete: Monolito de Pai Mateus",
+        dek: "Geología sagrada y piedras sonoras en el sertón brasileño.",
+        badge: "GEORREFERENCIA",
+        image: "https://storage.thegreatpuzzleproject.com/Lajedo_de_Pai_Mateus_-_Pedra_do_Capacete.jpg",
+        href: "/hemeroteca/capacete-brasil/"
+      },
+      {
+        id: "altamira",
+        title: "Cueva de Altamira: Capilla Sixtina",
+        dek: "Pigmentos ocres, bisontes y el despertar del arte paleolítico.",
+        badge: "ARTE RUPESTRE",
+        image: resolveR2ImageUrl("/src/assets/georreferencias/cueva-de-altamira/coverImage.jpg"),
+        href: "/hemeroteca/cueva-de-altamira/"
+      },
+      {
+        id: "cueva-manos",
+        title: "Cueva de las Manos: Patagonia",
+        dek: "Nueve mil años de siluetas humanas en el cañadón del Río Pinturas.",
+        badge: "PATAGONIA",
+        image: resolveR2ImageUrl("/src/assets/georreferencias/cueva-de-las-manos-patagonia/coverImage.jpg"),
+        href: "/hemeroteca/cueva-de-las-manos-patagonia/"
+      },
+      {
+        id: "ellora",
+        title: "Ellora: Templo de Kailasa",
+        dek: "El coloso monolítico tallado de arriba hacia abajo en la roca viva.",
+        badge: "INDIA MILENARIA",
+        image: resolveR2ImageUrl("/src/assets/georreferencias/ellora-caves/coverImage.webp"),
+        href: "/hemeroteca/ellora-caves/"
+      },
+      {
+        id: "isla-estados",
+        title: "Isla de los Estados: Mares del Sur",
+        dek: "El faro del fin del mundo y los confines tempestuosos de Tierra del Fuego.",
+        badge: "AUSTRAL",
+        image: resolveR2ImageUrl("/src/assets/georreferencias/isla-de-los-estados-en-tierra-del-fuego/coverImage.webp"),
+        href: "/hemeroteca/isla-de-los-estados-en-tierra-del-fuego/"
+      }
+    ]
   },
   {
     id: "arquetipos",
     name: "Arquetipos Globales",
-    items: []
+    items: [
+      {
+        id: "arquetipos-intro",
+        title: "Cartografía de la Memoria Colectiva",
+        dek: "Patrones primordiales que trascienden el tiempo y la geografía.",
+        badge: "DOCTRINA TGP",
+        image: resolveR2ImageUrl("/src/assets/arquetipos-globales/arquetipos-globales-introduccion/coverImage.jpg"),
+        href: "/arquetipos-globales/arquetipos-globales-introduccion/"
+      },
+      {
+        id: "jung",
+        title: "Carl Jung: Anatomía del Inconsciente",
+        dek: "El viaje del héroe, la sombra y los símbolos de transformación.",
+        badge: "PSICOLOGÍA",
+        image: resolveR2ImageUrl("/src/assets/arquetipos-globales/carl-jung-biografia/coverImage.jpg"),
+        href: "/arquetipos-globales/carl-jung-biografia/"
+      },
+      {
+        id: "babel",
+        title: "La Torre de Babel: Fractura del Sentido",
+        dek: "El zigurat como eje cósmico y la dispersión mítica de las lenguas.",
+        badge: "MITO & LENGUAJE",
+        image: resolveR2ImageUrl("/src/assets/arquetipos-globales/la-torre-de-babel/coverImage.jpg"),
+        href: "/arquetipos-globales/la-torre-de-babel/"
+      },
+      {
+        id: "orixas",
+        title: "Los Orixás: Fuerzas de la Naturaleza",
+        dek: "Energía vital, deidades tutelares y la liturgia africana en América.",
+        badge: "PANTEÓN YORUBA",
+        image: resolveR2ImageUrl("/src/assets/arquetipos-globales/los-orixas-africanos/coverImage.jpg"),
+        href: "/arquetipos-globales/los-orixas-africanos/"
+      },
+      {
+        id: "puma",
+        title: "El Puma Americano: Guardián Nocturno",
+        dek: "El depredador silencioso en la mitología andina y pampeana.",
+        badge: "TOTEMISMO",
+        image: resolveR2ImageUrl("/src/assets/arquetipos-globales/el-puma-americano/coverImage.jpg"),
+        href: "/arquetipos-globales/el-puma-americano/"
+      },
+      {
+        id: "venus",
+        title: "Venus: Metamorfosis de la Belleza",
+        dek: "Del culto telúrico de la fertilidad al canon estético del Renacimiento.",
+        badge: "ARQUETIPOS",
+        image: resolveR2ImageUrl("/src/assets/arquetipos-globales/venus/coverImage.jpg"),
+        href: "/arquetipos-globales/venus/"
+      }
+    ]
   }
 ];
 
-// Categoría seleccionada por defecto (primera)
+// Estado inicial en servidor
 const activeIndex = 0;
 const activeCategory = mockCategories[activeIndex];
-
-// Categorías adyacentes visuales
 const prevCategory = mockCategories[mockCategories.length - 1]; // Arquetipos Globales
 const nextCategory = mockCategories[1]; // Historia Profunda
 ---
@@ -112,6 +260,7 @@ const nextCategory = mockCategories[1]; // Historia Profunda
 <section 
   id="showcase-batch" 
   class="relative w-full bg-[#0a0a0c] text-white py-16 md:py-24 border-t border-white/5 overflow-hidden select-none"
+  data-showcase={JSON.stringify(mockCategories)}
 >
   <!-- Resplandor ambiental de fondo sutil -->
   <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(120,119,198,0.12),transparent)]"></div>
@@ -131,6 +280,7 @@ const nextCategory = mockCategories[1]; // Historia Profunda
       <!-- Chevron Izquierdo (<) -->
       <button 
         type="button" 
+        data-btn-prev
         class="w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 shrink-0"
         aria-label="Categoría anterior"
       >
@@ -139,24 +289,36 @@ const nextCategory = mockCategories[1]; // Historia Profunda
         </svg>
       </button>
 
-      <!-- Categoría Anterior (Atenuada, más pequeña) -->
-      <span class="hidden sm:inline-block text-lg md:text-2xl text-gray-500 opacity-60 font-light hover:opacity-90 transition-opacity cursor-pointer truncate max-w-[200px]">
+      <!-- Categoría Anterior (Atenuada, clickeable) -->
+      <span 
+        data-cat-prev
+        class="hidden sm:inline-block text-lg md:text-2xl text-gray-500 opacity-60 font-light hover:opacity-100 hover:text-gray-300 transition-all cursor-pointer truncate max-w-[200px]"
+        title="Ver categoría anterior"
+      >
         {prevCategory.name}
       </span>
 
       <!-- Categoría Activa (Centrada, monumental) -->
-      <h2 class="text-2xl sm:text-4xl md:text-5xl font-light text-white tracking-tight px-2 sm:px-4 leading-tight">
+      <h2 
+        data-cat-active
+        class="text-2xl sm:text-4xl md:text-5xl font-light text-white tracking-tight px-2 sm:px-4 leading-tight transition-transform duration-300"
+      >
         {activeCategory.name}
       </h2>
 
-      <!-- Categoría Siguiente (Atenuada, más pequeña) -->
-      <span class="hidden sm:inline-block text-lg md:text-2xl text-gray-500 opacity-60 font-light hover:opacity-90 transition-opacity cursor-pointer truncate max-w-[200px]">
+      <!-- Categoría Siguiente (Atenuada, clickeable) -->
+      <span 
+        data-cat-next
+        class="hidden sm:inline-block text-lg md:text-2xl text-gray-500 opacity-60 font-light hover:opacity-100 hover:text-gray-300 transition-all cursor-pointer truncate max-w-[200px]"
+        title="Ver categoría siguiente"
+      >
         {nextCategory.name}
       </span>
 
       <!-- Chevron Derecho (>) -->
       <button 
         type="button" 
+        data-btn-next
         class="w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 shrink-0"
         aria-label="Categoría siguiente"
       >
@@ -172,7 +334,10 @@ const nextCategory = mockCategories[1]; // Historia Profunda
        2. GRID DE POSTEOS (BATCH DE 6 MINIATURAS EN ASPECT-VIDEO 16:9)
        ══════════════════════════════════════════════════════════════════════════ -->
   <div class="max-w-6xl mx-auto px-4 relative z-10">
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 items-stretch">
+    <div 
+      data-showcase-grid
+      class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 items-stretch transition-all duration-300 ease-in-out opacity-100 transform scale-100"
+    >
       {activeCategory.items.map((post) => (
         <a 
           href={post.href}
@@ -213,5 +378,165 @@ const nextCategory = mockCategories[1]; // Historia Profunda
       ))}
     </div>
   </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       3. BRANDING TGP PROJECT (EMULANDO EL LOGO INFERIOR HBO)
+       ══════════════════════════════════════════════════════════════════════════ -->
+  <div class="mt-14 sm:mt-18 text-center flex flex-col items-center justify-center relative z-10">
+    <a 
+      href="/colecciones/" 
+      class="group inline-flex flex-col items-center justify-center transition-transform duration-300 hover:scale-105"
+      title="Explorar todas las colecciones"
+    >
+      <span class="font-gloock font-black text-2xl sm:text-3xl md:text-4xl tracking-wider text-transparent bg-clip-text bg-gradient-to-b from-stone-100 via-stone-300 to-stone-500 uppercase drop-shadow-[0_4px_24px_rgba(255,255,255,0.12)] group-hover:from-white group-hover:to-amber-200 transition-colors">
+        THE GREAT PUZZLE PROJECT
+      </span>
+      <span class="text-[10px] sm:text-xs font-mono uppercase tracking-[0.3em] text-amber-400/80 mt-1.5 group-hover:text-amber-300 transition-colors">
+        Hemeroteca • Memoria & Sentido Humano →
+      </span>
+    </a>
+  </div>
 </section>
 
+<!-- ════════════════════════════════════════════════════════════════════════════
+     4. CLIENT SCRIPT (INTERACTIVIDAD VANILLA JS CON FADE IN/OUT DE 300MS)
+     ════════════════════════════════════════════════════════════════════════════ -->
+<script>
+  function initShowcaseBatch() {
+    const container = document.getElementById('showcase-batch');
+    if (!container) return;
+
+    // Leer datos estructurados serializados desde el atributo data-showcase
+    const rawData = container.getAttribute('data-showcase');
+    if (!rawData) return;
+
+    let categories: Array<{
+      id: string;
+      name: string;
+      items: Array<{
+        id: string;
+        title: string;
+        dek?: string;
+        badge?: string;
+        image: string;
+        href: string;
+      }>;
+    }> = [];
+
+    try {
+      categories = JSON.parse(rawData);
+    } catch (e) {
+      console.error('[ShowcaseBatch] Error al parsear data-showcase:', e);
+      return;
+    }
+
+    if (!categories || categories.length === 0) return;
+
+    // Nodos del DOM vinculados por selectores data-*
+    const grid = container.querySelector<HTMLDivElement>('[data-showcase-grid]');
+    const btnPrev = container.querySelector<HTMLButtonElement>('[data-btn-prev]');
+    const btnNext = container.querySelector<HTMLButtonElement>('[data-btn-next]');
+    const catPrev = container.querySelector<HTMLSpanElement>('[data-cat-prev]');
+    const catActive = container.querySelector<HTMLHeadingElement>('[data-cat-active]');
+    const catNext = container.querySelector<HTMLSpanElement>('[data-cat-next]');
+
+    if (!grid) return;
+
+    // Estado del cliente
+    let currentCategoryIndex = 0;
+    let isTransitioning = false;
+
+    // Generador de plantillas HTML para cada tarjeta
+    const createCardHTML = (post: typeof categories[0]['items'][0]) => `
+      <a 
+        href="${post.href}"
+        class="group relative block aspect-video w-full rounded-md md:rounded-lg overflow-hidden bg-neutral-900 border border-white/10 shadow-lg hover:shadow-[0_16px_36px_rgba(0,0,0,0.85)] hover:border-white/30 transition-all duration-300 hover:scale-105 cursor-pointer z-10 hover:z-20"
+      >
+        <img 
+          src="${post.image}" 
+          alt="${post.title}"
+          loading="lazy"
+          decoding="async"
+          class="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-110 pointer-events-none"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 via-40% to-transparent pointer-events-none transition-opacity duration-300 group-hover:from-black"></div>
+        ${post.badge ? `
+          <div class="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5 px-2 py-0.5 rounded bg-black/70 backdrop-blur-md border border-white/10 text-[9px] sm:text-[10px] font-mono tracking-wider text-gray-300 uppercase pointer-events-none">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+            <span>${post.badge}</span>
+          </div>
+        ` : ''}
+        <div class="absolute inset-x-0 bottom-0 p-3 sm:p-4 md:p-5 z-10 flex flex-col justify-end pointer-events-none">
+          <h3 class="font-cinzel text-xs sm:text-sm md:text-base font-bold text-white tracking-wide uppercase line-clamp-2 drop-shadow-md group-hover:text-amber-200 transition-colors duration-200">
+            ${post.title}
+          </h3>
+          ${post.dek ? `
+            <p class="hidden sm:block text-[11px] md:text-xs text-gray-300/80 font-sans line-clamp-1 mt-1 font-normal drop-shadow">
+              ${post.dek}
+            </p>
+          ` : ''}
+        </div>
+      </a>
+    `;
+
+    // Función principal de transición con Fade Out/In
+    const navigateCategory = (delta: number) => {
+      if (isTransitioning) return;
+      isTransitioning = true;
+
+      // Cálculo del nuevo índice en bucle infinito
+      const total = categories.length;
+      currentCategoryIndex = (currentCategoryIndex + delta + total) % total;
+
+      const activeCat = categories[currentCategoryIndex];
+      const prevCat = categories[(currentCategoryIndex - 1 + total) % total];
+      const nextCat = categories[(currentCategoryIndex + 1) % total];
+
+      // ── PASO 1: FADE OUT (Opacidad a 0) ──
+      grid.classList.add('opacity-0', 'scale-[0.98]');
+
+      // ── PASO 2: INYECCIÓN DE DATOS TRAS 300MS ──
+      setTimeout(() => {
+        // Actualizar textos del header
+        if (catPrev) catPrev.textContent = prevCat.name;
+        if (catActive) catActive.textContent = activeCat.name;
+        if (catNext) catNext.textContent = nextCat.name;
+
+        // Renderizar las nuevas 6 tarjetas
+        grid.innerHTML = activeCat.items.map(createCardHTML).join('');
+
+        // ── PASO 3: FADE IN (Opacidad a 100) ──
+        requestAnimationFrame(() => {
+          grid.classList.remove('opacity-0', 'scale-[0.98]');
+          isTransitioning = false;
+        });
+      }, 300);
+    };
+
+    // Event Listeners de Chevrones
+    btnPrev?.addEventListener('click', () => navigateCategory(-1));
+    btnNext?.addEventListener('click', () => navigateCategory(1));
+
+    // Clic en los nombres de categorías adyacentes para navegación intuitiva
+    catPrev?.addEventListener('click', () => navigateCategory(-1));
+    catNext?.addEventListener('click', () => navigateCategory(1));
+
+    // Soporte para flechas del teclado cuando el componente está a la vista
+    const handleKeydown = (e: KeyboardEvent) => {
+      const rect = container.getBoundingClientRect();
+      const inView = rect.top < window.innerHeight && rect.bottom > 0;
+      if (!inView) return;
+
+      if (e.key === 'ArrowLeft') {
+        navigateCategory(-1);
+      } else if (e.key === 'ArrowRight') {
+        navigateCategory(1);
+      }
+    };
+    window.addEventListener('keydown', handleKeydown);
+  }
+
+  // Inicialización compatible con Astro y View Transitions
+  document.addEventListener('DOMContentLoaded', initShowcaseBatch);
+  document.addEventListener('astro:page-load', initShowcaseBatch);
+</script>
