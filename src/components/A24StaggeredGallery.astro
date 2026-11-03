@@ -272,7 +272,7 @@ const activeCollections: ActiveCollection[] = Object.entries(realCollectionsMap)
                 src={col.image} 
                 alt={col.label}
                 class="w-full h-full object-cover object-center transform scale-100 transition-transform duration-1000 ease-out pointer-events-none"
-                loading="eager" 
+                loading={cIdx === 0 ? "eager" : "lazy"} 
                 decoding="async" 
               />
             </div>
@@ -376,6 +376,8 @@ const activeCollections: ActiveCollection[] = Object.entries(realCollectionsMap)
                     src={post.image} 
                     alt="" 
                     aria-hidden="true"
+                    loading="lazy"
+                    decoding="async"
                     class="absolute inset-0 w-full h-full object-cover scale-150 blur-3xl brightness-75 saturate-150 pointer-events-none"
                   />
 

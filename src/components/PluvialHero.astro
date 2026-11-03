@@ -45,7 +45,9 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
   rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Cinzel:wght@800;900&family=Fraunces:opsz,wght,SOFT,WONK@9..144,900,0,1&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,900,0,1&display=swap"
+  media="print"
+  onload="this.media='all'"
 />
 
 <section class="pluvial-stage" aria-label={word} data-initial-speed={speed}>

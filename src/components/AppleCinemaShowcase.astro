@@ -232,12 +232,12 @@ const DEFAULT_ROUND_FRAMES: RoundFrameItem[] = [
 const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FRAMES;
 ---
 
-<!-- Carga de fuentes requeridas (Google Fonts + Fontshare) -->
+<!-- Carga de fuentes requeridas (Google Fonts + Fontshare) asíncronas no bloqueantes -->
 <link rel="preconnect" href="https://api.fontshare.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,800;0,6..96,900;1,6..96,700&family=Fraunces:ital,opsz,wght@0,9..144,800;0,9..144,900;1,9..144,800&family=League+Spartan:wght@700;800;900&family=Oswald:wght@600;700&family=Space+Grotesk:wght@600;700&family=Syne:wght@700;800;900&family=Unbounded:wght@700;800;900&family=Cinzel:wght@700;800;900&family=Gloock&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,800;0,6..96,900;1,6..96,700&family=Fraunces:ital,opsz,wght@0,9..144,800;0,9..144,900;1,9..144,800&family=League+Spartan:wght@700;800;900&family=Oswald:wght@600;700&family=Space+Grotesk:wght@600;700&family=Syne:wght@700;800;900&family=Unbounded:wght@700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
 <div class="apple-cinema-showcase-wrapper relative w-full my-12 select-none font-sans" data-active-slide="0">
   

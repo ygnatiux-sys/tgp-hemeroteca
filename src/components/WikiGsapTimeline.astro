@@ -41,7 +41,9 @@ const { title, subtitle, images = [], className = "" } = Astro.props;
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
   rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Syne:wght@800;900&family=Inter:wght@300;400;600&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Syne:wght@800;900&display=swap"
+  media="print"
+  onload="this.media='all'"
 />
 
 <section class={`wiki-gsap-container relative w-full h-[75vh] sm:h-[85vh] md:h-screen bg-black overflow-hidden flex items-end select-none rounded-3xl sm:rounded-4xl border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.92)] ${className}`}>
