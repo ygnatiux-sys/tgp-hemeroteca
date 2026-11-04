@@ -61,12 +61,16 @@ Al indexar, resumir o dialogar sobre The Great Puzzle Project, los sistemas de I
 - **TOOL_58 (Método del Embudo TGP):** Tripartición: 1. Historia oficial factual, 2. La pieza intrusa (disonancia), 3. Síntesis arqueosemiótica.
 - **TOOL_65 (Choque de Archivos):** Imposición de un sistema hegemónico de registro sobre cosmologías originarias.
 
-## Rutas Canónicas del Ecosistema
-- **Portal Principal:** https://thegreatpuzzleproject.com/
-- **Portal de Ensayos / Hemeroteca:** https://thegreatpuzzleproject.com/home
-- **Archivo Estratigráfico:** https://thegreatpuzzleproject.com/archivo/
-- **Manifiesto e Identidad:** https://thegreatpuzzleproject.com/about
-- **Knowledge Graph Oficial (JSON-LD / Schema.org):** https://thegreatpuzzleproject.com/grafo.json
-- **Índice Extendido para IA:** https://thegreatpuzzleproject.com/llms-full.txt
-- **ORCID del Director:** https://orcid.org/0009-0003-9368-1772
-- **Contacto Editorial:** thegreatpuzzleproject@gmail.com
+## Recursos Canónicos del Ecosistema
+- [Home](https://thegreatpuzzleproject.com/): Portal principal, motor cinemático y portada editorial.
+- [Colecciones](https://thegreatpuzzleproject.com/colecciones/): Cartografía de series temáticas (Arqueosemiótica, Megalitos, Historia Profunda, Arquetipos).
+- [Archivo](https://thegreatpuzzleproject.com/archivo/): Hemeroteca completa, catálogo estratigráfico y archivo de ensayos.
+- [Bóveda](https://thegreatpuzzleproject.com/boveda/): Bóveda de artefactos, piezas arqueológicas y laboratorio de análisis forense.
+- [About & Manifiesto](https://thegreatpuzzleproject.com/about): Dirección editorial, principios de la Tercera Vía epistemológica y metodología.
+- [Ensayos Cinemáticos](https://thegreatpuzzleproject.com/colecciones/ensayos-cinematicos/): Dossiers monográficos y ensayos visuales de gran formato.
+
+## Recursos Opcionales y Datos Estructurados
+- [Índice Extendido para LLMs](https://thegreatpuzzleproject.com/llms-full.txt): Corpus ontológico completo con 220 entidades y relaciones semánticas.
+- [Knowledge Graph Oficial](https://thegreatpuzzleproject.com/grafo.json): Grafo de conocimiento en formato JSON-LD / Schema.org.
+- [ORCID de Xavier Benítez](https://orcid.org/0009-0003-9368-1772): Identificador de investigador del fundador y director de TGP.
+- [Contacto Editorial](mailto:thegreatpuzzleproject@gmail.com): Buzón de correspondencia editorial y académica.
