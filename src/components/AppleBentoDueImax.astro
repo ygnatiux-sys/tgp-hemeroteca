@@ -216,6 +216,7 @@ const card2Artifacts: ImaxArtifact[] = [
         <div class="imax-meta-row flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-4">
           <a 
             href={card1Artifacts[0].ctaLink} 
+            aria-label={`Explorar investigación: ${card1Artifacts[0].titleLine1 || card1Artifacts[0].id}`}
             class="imax-cta-link inline-flex items-center gap-1.5 text-xs sm:text-sm font-normal text-[#2997ff] hover:text-[#52aaff] group/link transition-colors"
           >
             <span class="imax-cta-text">{card1Artifacts[0].ctaText}</span>
@@ -315,6 +316,7 @@ const card2Artifacts: ImaxArtifact[] = [
         <div class="imax-meta-row flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-4">
           <a 
             href={card2Artifacts[0].ctaLink} 
+            aria-label={`Explorar investigación: ${card2Artifacts[0].titleLine1 || card2Artifacts[0].id}`}
             class="imax-cta-link inline-flex items-center gap-1.5 text-xs sm:text-sm font-normal text-[#2997ff] hover:text-[#52aaff] group/link transition-colors"
           >
             <span class="imax-cta-text">{card2Artifacts[0].ctaText}</span>
@@ -420,7 +422,10 @@ const card2Artifacts: ImaxArtifact[] = [
         if (line2El) line2El.textContent = data.titleLine2;
         if (loglineEl) loglineEl.textContent = data.logline;
         if (ctaTextEl) ctaTextEl.textContent = data.ctaText;
-        if (ctaLinkEl) ctaLinkEl.setAttribute("href", data.ctaLink);
+        if (ctaLinkEl) {
+          ctaLinkEl.setAttribute("href", data.ctaLink);
+          ctaLinkEl.setAttribute("aria-label", "Explorar investigación: " + (data.titleLine1 || data.id));
+        }
         if (eraTextEl) eraTextEl.textContent = data.era;
       }
 

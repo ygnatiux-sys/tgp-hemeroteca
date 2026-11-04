@@ -36,22 +36,26 @@ const { className = "", autoPlay = true } = Astro.props;
   <!-- FILTRO SVG DE DISPERSIÓN ACUÁTICA / ONDULACIÓN FREÁTICA -->
   <svg class="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
     <defs>
-      <filter id="osireion-water-ripple" x="-10%" y="-10%" width="120%" height="120%">
+      <filter
+        id="osireion-water-ripple"
+        x="-10%"
+        y="-10%"
+        width="120%"
+        height="120%"
+      >
         <feTurbulence
           id="osireion-turb"
           type="fractalNoise"
           baseFrequency="0.015 0.04"
           numOctaves="3"
-          result="noise"
-        />
+          result="noise"></feTurbulence>
         <feDisplacementMap
           id="osireion-disp"
           in="SourceGraphic"
           in2="noise"
           scale="16"
           xChannelSelector="R"
-          yChannelSelector="G"
-        />
+          yChannelSelector="G"></feDisplacementMap>
       </filter>
     </defs>
   </svg>
@@ -68,36 +72,59 @@ const { className = "", autoPlay = true } = Astro.props;
   </div>
 
   <!-- SCRIMS PERIMETRALES LIGEROS (MÁXIMA NITIDEZ Y BRILLO DE LA FOTOGRAFÍA) -->
-  <div class="absolute inset-x-0 top-0 h-28 bg-linear-to-b from-[#0a0f0d]/75 to-transparent pointer-events-none"></div>
-  <div class="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-[#0a0f0d]/90 via-[#0a0f0d]/35 to-transparent pointer-events-none"></div>
-  <div class="absolute inset-0 pointer-events-none mix-blend-screen bg-[radial-gradient(circle_at_50%_45%,rgba(220,187,168,0.12)_0%,transparent_60%)]"></div>
+  <div
+    class="absolute inset-x-0 top-0 h-28 bg-linear-to-b from-[#0a0f0d]/75 to-transparent pointer-events-none"
+  >
+  </div>
+  <div
+    class="absolute inset-x-0 bottom-0 h-44 bg-linear-to-t from-[#0a0f0d]/90 via-[#0a0f0d]/35 to-transparent pointer-events-none"
+  >
+  </div>
+  <div
+    class="absolute inset-0 pointer-events-none mix-blend-screen bg-[radial-gradient(circle_at_50%_45%,rgba(220,187,168,0.12)_0%,transparent_60%)]"
+  >
+  </div>
 
   <!-- HUD SUPERIOR EDITORIAL -->
-  <div class="absolute top-6 inset-x-0 z-30 flex items-center justify-between px-6 sm:px-12 pointer-events-none">
+  <div
+    class="absolute top-6 inset-x-0 z-30 flex items-center justify-between px-6 sm:px-12 pointer-events-none"
+  >
     <div class="flex items-center gap-3">
-      <span class="w-2 h-2 rounded-full bg-[#8b5a45] shadow-[0_0_12px_#8b5a45] animate-pulse"></span>
-      <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.38em] uppercase text-[#dcbba8]/80 font-bold">
+      <span
+        class="w-2 h-2 rounded-full bg-[#8b5a45] shadow-[0_0_12px_#8b5a45] animate-pulse"
+      ></span>
+      <span
+        class="font-mono text-[9px] sm:text-[10px] tracking-[0.38em] uppercase text-[#dcbba8]/80 font-bold"
+      >
         Egipto Pre-Dinástico · Nivel Freático Activo
       </span>
     </div>
 
-    <div class="hidden sm:flex items-center gap-2 font-mono text-[9px] tracking-[0.25em] uppercase text-[#8b5a45] bg-[#0a0f0d]/80 px-3 py-1 rounded-full border border-[#8b5a45]/30 backdrop-blur-md">
+    <div
+      class="hidden sm:flex items-center gap-2 font-mono text-[9px] tracking-[0.25em] uppercase text-[#8b5a45] bg-[#0a0f0d]/80 px-3 py-1 rounded-full border border-[#8b5a45]/30 backdrop-blur-md"
+    >
       <span>Cota Subterránea: -18.40m</span>
     </div>
   </div>
 
   <!-- CÁMARA TIPOGRÁFICA PRINCIPAL -->
-  <div class="absolute inset-0 z-20 flex items-center justify-center px-4 sm:px-6 pointer-events-none">
-    <div class="osireion-chamber relative flex flex-col items-center text-center max-w-6xl w-full">
-      
+  <div
+    class="absolute inset-0 z-20 flex items-center justify-center px-4 sm:px-6 pointer-events-none"
+  >
+    <div
+      class="osireion-chamber relative flex flex-col items-center text-center max-w-6xl w-full"
+    >
       <!-- BADGE MONOLÍTICO -->
-      <span class="osireion-badge inline-block mb-3 sm:mb-4 font-mono text-[9.5px] sm:text-[11px] tracking-[0.42em] uppercase text-[#8b5a45] py-1 px-4 rounded-full border border-[#8b5a45]/40 bg-[#0a0f0d]/75 backdrop-blur-md opacity-0">
+      <span
+        class="osireion-badge inline-block mb-3 sm:mb-4 font-mono text-[9.5px] sm:text-[11px] tracking-[0.42em] uppercase text-[#8b5a45] py-1 px-4 rounded-full border border-[#8b5a45]/40 bg-[#0a0f0d]/75 backdrop-blur-md opacity-0"
+      >
         Abidos · Estanque Sagrado de Osiris
       </span>
 
       <!-- CONTENEDOR DEL TÍTULO BRUTALISTA CON MÁSCARA DE DESCENSO FREÁTICO -->
-      <div class="osireion-title-wrapper relative w-full flex items-center justify-center overflow-hidden py-2">
-        
+      <div
+        class="osireion-title-wrapper relative w-full flex items-center justify-center overflow-hidden py-2"
+      >
         <!-- TEXTO SOMBRA (Silueta en el agua estancada) -->
         <h1
           class="osireion-title-ghost font-black uppercase text-[clamp(2.5rem,8.6vw,9rem)] leading-[0.88] tracking-[-0.01em] text-[#dcbba8]/10 select-none pointer-events-none"
@@ -118,16 +145,27 @@ const { className = "", autoPlay = true } = Astro.props;
         </h1>
 
         <!-- LÍNEA LÁSER DE TENSIÓN DE SUPERFICIE DEL AGUA -->
-        <div class="osireion-water-line absolute inset-x-0 h-[1.5px] bg-linear-to-r from-transparent via-[#8b5a45] to-transparent pointer-events-none opacity-0 shadow-[0_0_15px_#8b5a45]"></div>
+        <div
+          class="osireion-water-line absolute inset-x-0 h-[1.5px] bg-linear-to-r from-transparent via-[#8b5a45] to-transparent pointer-events-none opacity-0 shadow-[0_0_15px_#8b5a45]"
+        >
+        </div>
       </div>
 
       <!-- H2 / H3: ECOS EN LA CAVERNA (FLOTANDO DESDE LA BASE) -->
       <div class="osireion-sub-wrap mt-5 sm:mt-7 flex flex-col items-center">
-        <h2 class="osireion-sub font-black text-[clamp(0.95rem,2.2vw,1.6rem)] tracking-[0.24em] uppercase text-[#dcbba8]/90 opacity-0">
-          La cronología sumergida de <span class="text-[#8b5a45] font-extrabold underline decoration-[#8b5a45]/50 underline-offset-4">Abidos</span>
+        <h2
+          class="osireion-sub font-black text-[clamp(0.95rem,2.2vw,1.6rem)] tracking-[0.24em] uppercase text-[#dcbba8]/90 opacity-0"
+        >
+          La cronología sumergida de <span
+            class="text-[#8b5a45] font-extrabold underline decoration-[#8b5a45]/50 underline-offset-4"
+            >Abidos</span
+          >
         </h2>
-        <p class="osireion-desc mt-2.5 max-w-xl font-mono text-[10px] sm:text-[11.5px] tracking-[0.22em] uppercase text-[#dcbba8]/60 opacity-0">
-          Bloques megalíticos de 100 toneladas · Arquitectura anepigráfica desnuda
+        <p
+          class="osireion-desc mt-2.5 max-w-xl font-mono text-[10px] sm:text-[11.5px] tracking-[0.22em] uppercase text-[#dcbba8]/60 opacity-0"
+        >
+          Bloques megalíticos de 100 toneladas · Arquitectura anepigráfica
+          desnuda
         </p>
       </div>
 
@@ -138,21 +176,30 @@ const { className = "", autoPlay = true } = Astro.props;
           class="group relative inline-flex items-center gap-3 px-8 sm:px-10 py-3.5 rounded-full font-mono text-[10.5px] uppercase tracking-[0.3em] font-bold text-[#0a0f0d] bg-[#dcbba8] shadow-[0_0_35px_rgba(220,187,168,0.3)] hover:bg-white hover:shadow-[0_0_45px_rgba(220,187,168,0.5)] active:scale-95 transition-all duration-300"
         >
           <span>Examinar El Osireion</span>
-          <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+          <span
+            class="transition-transform duration-300 group-hover:translate-x-1"
+            >→</span
+          >
         </a>
       </div>
-
     </div>
   </div>
 
   <!-- INDICADOR DE AGUA Y PROFUNDIDAD EN EL PIE -->
-  <div class="absolute bottom-6 inset-x-0 z-30 flex flex-col items-center pointer-events-none">
-    <div class="flex items-center gap-2 font-mono text-[8.5px] tracking-[0.32em] uppercase text-[#dcbba8]/50">
+  <div
+    class="absolute bottom-6 inset-x-0 z-30 flex flex-col items-center pointer-events-none"
+  >
+    <div
+      class="flex items-center gap-2 font-mono text-[8.5px] tracking-[0.32em] uppercase text-[#dcbba8]/50"
+    >
       <span>Nivel Freático Despejado</span>
       <span class="text-[#8b5a45]">•</span>
       <span>Piedra Monolítica Expuesta</span>
     </div>
-    <div class="w-px h-6 mt-2 bg-linear-to-b from-[#8b5a45] to-transparent animate-pulse"></div>
+    <div
+      class="w-px h-6 mt-2 bg-linear-to-b from-[#8b5a45] to-transparent animate-pulse"
+    >
+    </div>
   </div>
 </div>
 
@@ -169,11 +216,14 @@ const { className = "", autoPlay = true } = Astro.props;
     );
     -webkit-background-clip: text;
     background-clip: text;
-    filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 35px rgba(139, 90, 69, 0.25));
+    filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.95))
+      drop-shadow(0 0 35px rgba(139, 90, 69, 0.25));
   }
 
   .osireion-sub {
-    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.95), 0 0 25px rgba(139, 90, 69, 0.35);
+    text-shadow:
+      0 4px 20px rgba(0, 0, 0, 0.95),
+      0 0 25px rgba(139, 90, 69, 0.35);
   }
 
   /* Estado de refracción bajo el agua */

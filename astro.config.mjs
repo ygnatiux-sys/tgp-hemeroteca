@@ -22,6 +22,11 @@ export default defineConfig({
   site: 'https://thegreatpuzzleproject.com',
   output: 'server',  // CRÍTICO: genera _worker.js para Cloudflare Pages Functions
   trailingSlash: 'ignore',
+
+  // Inline CSS para eliminar peticiones bloqueantes de renderizado (PageSpeed Core Web Vitals)
+  build: {
+    inlineStylesheets: 'always',
+  },
   
   // Servicio de optimización passthrough: compatible con Cloudflare Workers y elimina cuellos de botella runtime
   image: {
