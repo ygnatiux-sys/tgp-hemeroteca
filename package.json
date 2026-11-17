@@ -6,7 +6,8 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "concurrently -c \"cyan,magenta\" -n \"WEB,MIND\" \"npm run optimize:remote && astro dev\" \"npm --prefix tgp-mind run dev\"",
+    "postinstall": "node scripts/patch-astro-environment.mjs",
+    "dev": "node scripts/patch-astro-environment.mjs && concurrently -c \"cyan,magenta\" -n \"WEB,MIND\" \"npm run optimize:remote && astro dev\" \"npm --prefix tgp-mind run dev\"",
     "start": "astro dev",
     "build": "astro build",
     "build:cloud": "node scripts/build-cloud.mjs",
