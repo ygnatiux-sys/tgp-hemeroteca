@@ -42,3 +42,4 @@ if (content.includes(originalNeedle)) {
 } else {
   console.log('[patch-astro-env] Patrón no encontrado en Astro (posible versión diferente).');
 }
+
