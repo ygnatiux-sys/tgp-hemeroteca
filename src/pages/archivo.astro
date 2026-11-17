@@ -16,6 +16,7 @@ import TgpHeroTriptych, { type TriptychPost } from '../components/TgpHeroTriptyc
 import HeroSpotifyColecciones from '../components/HeroSpotifyColecciones.astro';
 import ArchivoManifestoGsap from '../components/archivo/ArchivoManifestoGsap.astro';
 import ArchivoCollectionCrownGsap from '../components/archivo/ArchivoCollectionCrownGsap.astro';
+import ScrollNarrative from '../components/ScrollNarrative.astro';
 import { customCollections } from '../lib/custom-collections';
 import {
   getPublishableEssays,
@@ -645,6 +646,50 @@ function createPremierSequences(essays: typeof resolvedEssays) {
       />
     </div>
   </div>
+
+  {/* ─── SECUENCIA NARRATIVA STICKY 300VH (OLMECAS → MOÁI → GÖBEKLI TEPE) ─── */}
+  <ScrollNarrative />
+
+  {/* ─── PRE-FOOTER CTA (BOTTOM HERO EDITORIAL) ───────────────────────────── */}
+  <section
+    aria-label="Remate Editorial de Archivo"
+    class="relative w-full overflow-hidden bg-[#060709] border-t border-white/10 py-24 sm:py-32 px-6 text-center select-none"
+  >
+    {/* Textura mineral y viñeta sutil de fondo */}
+    <div
+      class="pointer-events-none absolute inset-0 opacity-20 bg-cover bg-center mix-blend-luminosity"
+      style="background-image: url('/images/gobekli-tepe-pilar43-dark.webp');"
+    ></div>
+    <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#060709] via-[#060709]/85 to-[#060709]"></div>
+
+    <div class="relative z-10 mx-auto flex max-w-4xl flex-col items-center">
+      <span class="mb-4 font-mono text-[10px] sm:text-xs uppercase tracking-[0.4em] text-rust-orange font-bold">
+        [ Fondo Documental · Homo Archivus ]
+      </span>
+      <h2 class="font-serif text-3xl sm:text-5xl md:text-6xl font-normal leading-[1.1] tracking-tight text-stone-200 max-w-3xl">
+        El rompecabezas es aún más vasto. Accedé a los documentos inéditos.
+      </h2>
+      <p class="mt-6 max-w-2xl font-sans text-sm sm:text-base md:text-lg text-stone-400 leading-relaxed">
+        Estratigrafía comparada, arqueosemiótica y dossiers de campo sin concesiones escolásticas. Continúa la inmersión en las colecciones continentales o explora la Bóveda documental.
+      </p>
+
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+        <a
+          href="/colecciones/"
+          class="inline-flex items-center gap-3 rounded-full bg-[#EFEBE3] px-8 py-4 font-sans text-xs sm:text-sm font-bold uppercase tracking-[0.18em] text-[#09090b] shadow-[0_8px_30px_rgba(239,235,227,0.18)] transition-all duration-300 hover:bg-white hover:scale-105 active:scale-95"
+        >
+          <span>Explorar la Hemeroteca</span>
+          <span aria-hidden="true">→</span>
+        </a>
+        <a
+          href="/boveda/"
+          class="inline-flex items-center gap-3 rounded-full border border-stone-200/25 bg-white/5 px-8 py-4 font-sans text-xs sm:text-sm font-bold uppercase tracking-[0.18em] text-stone-200 backdrop-blur-md transition-all duration-300 hover:border-stone-200/60 hover:bg-white/10 hover:scale-105 active:scale-95"
+        >
+          <span>Abrir la Bóveda</span>
+        </a>
+      </div>
+    </div>
+  </section>
 
   <script>
     const setupArchiveTabsAndFilters = () => {
