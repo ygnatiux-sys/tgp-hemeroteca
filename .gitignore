@@ -65,4 +65,9 @@ test_*.sql
 *.epub
 dossiers/
 
+# Python local runtime (tgp-editorial-core)
+tgp-editorial-core/.venv/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
 
