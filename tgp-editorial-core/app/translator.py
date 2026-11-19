@@ -54,12 +54,28 @@ Tu tarea es traducir una consulta histórica, arqueológica o codicológica en e
 3. En context_note (español, 1-2 frases concisas), resume el alcance archivístico y material de las consultas generadas."""
 
 
-def get_vertex_settings() -> tuple[str, str, str, str]:
+DEFAULT_VERTEX_LOCATION = "global"
+DEFAULT_FAST_CHAIN = ["gemini-3.8-flash", "gemini-3.5-flash-lite"]
+
+
+def get_vertex_settings() -> tuple[str, str, list[str]]:
     project = os.getenv("GOOGLE_CLOUD_PROJECT", "tgp-mind").strip() or "tgp-mind"
-    location = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1").strip() or "us-central1"
-    primary_model = os.getenv("TGP_CAPA0_MODEL", "gemini-2.5-flash").strip() or "gemini-2.5-flash"
-    fallback_model = os.getenv("TGP_CAPA0_FALLBACK_MODEL", "gemini-3.5-flash-lite").strip() or "gemini-3.5-flash-lite"
-    return project, location, primary_model, fallback_model
+    location = os.getenv("GOOGLE_CLOUD_LOCATION", DEFAULT_VERTEX_LOCATION).strip() or DEFAULT_VERTEX_LOCATION
+    raw_chain = os.getenv("MODEL_FAST_CHAIN", "").strip()
+    if raw_chain:
+        chain = [m.strip() for m in raw_chain.split(",") if m.strip()]
+    else:
+        primary_override = os.getenv("TGP_CAPA0_MODEL", "").strip()
+        fallback_override = os.getenv("TGP_CAPA0_FALLBACK_MODEL", "").strip()
+        chain = []
+        if primary_override:
+            chain.append(primary_override)
+        for m in DEFAULT_FAST_CHAIN:
+            if m not in chain:
+                chain.append(m)
+        if fallback_override and fallback_override not in chain:
+            chain.append(fallback_override)
+    return project, location, chain or list(DEFAULT_FAST_CHAIN)
 
 
 def _clean_queries(raw_queries: list[str], original_query: str) -> list[str]:
@@ -138,16 +154,13 @@ async def translate_editorial_query(
     if cached and (time.monotonic() - cached[0]) < _CACHE_TTL_SECONDS:
         return cached[1], f"{cached[2]} (cache)"
 
-    project, location, primary_model, fallback_model = get_vertex_settings()
+    project, location, model_chain = get_vertex_settings()
     system_prompt = _ALTERNATIVE_SYSTEM_PROMPT if editorial_line == "alternative" else _OFFICIAL_SYSTEM_PROMPT
 
-    attempts: list[tuple[str, str]] = [
-        (primary_model, location),
-        (fallback_model, location),
-    ]
+    attempts: list[tuple[str, str]] = [(m, location) for m in model_chain]
     if location != "global":
-        attempts.append((fallback_model, "global"))
-        attempts.append(("gemini-3.8-flash", "global"))
+        for m in model_chain:
+            attempts.append((m, "global"))
 
     # Desduplicar secuencia manteniendo el orden exacto.
     dedup_attempts: list[tuple[str, str]] = []
