@@ -20,6 +20,66 @@ const {
   data-cloudrun-url={cloudRunEndpoint}
   class="w-full max-w-7xl mx-auto my-10 bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden text-zinc-100 font-sans"
 >
+  <!-- 0. PANEL DESK-FIRST: TGP-EDITORIAL-CORE (127.0.0.1:8000) -->
+  <div id="wb-core-panel" class="p-4 sm:px-5 bg-zinc-900/70 border-b border-zinc-800 space-y-3">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <span class="font-mono text-[11px] uppercase tracking-widest text-amber-300 font-bold">
+          Desk-First · tgp-editorial-core
+        </span>
+        <button
+          id="wb-core-health-badge"
+          type="button"
+          title="Haz clic para re-verificar GET http://127.0.0.1:8000/health"
+          class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-zinc-800 text-zinc-300 border border-zinc-700 cursor-pointer hover:border-zinc-500 transition"
+        >
+          <span id="wb-core-health-dot" class="w-2 h-2 rounded-full bg-zinc-500"></span>
+          <span id="wb-core-health-text">Core 8000: Verificando...</span>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2 text-xs font-mono">
+        <span class="text-zinc-400">Línea editorial:</span>
+        <select
+          id="wb-editorial-line"
+          class="bg-zinc-950 border border-zinc-700 focus:border-amber-400 rounded-lg px-2.5 py-1 text-xs text-white outline-none cursor-pointer"
+        >
+          <option value="alternative" selected>alternative (TGP Alternative)</option>
+          <option value="official">official (TGP Hemeroteca)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 5 Botones Granulares hacia POST /api/v1/curate -->
+    <div class="flex flex-wrap items-center gap-2">
+      <button type="button" data-core-mode="hero" data-core-limit="5" class="wb-core-mode-btn px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-200 border border-amber-500/35 text-xs font-mono font-semibold cursor-pointer transition active:scale-95">
+        🏔️ Hero Post WOW (5)
+      </button>
+      <button type="button" data-core-mode="magazines" data-core-limit="35" class="wb-core-mode-btn px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-200 border border-emerald-500/35 text-xs font-mono font-semibold cursor-pointer transition active:scale-95">
+        📰 Magazines &amp; Flipbooks (35)
+      </button>
+      <button type="button" data-core-mode="ebooks_thesis" data-core-limit="40" class="wb-core-mode-btn px-3 py-1.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-200 border border-sky-500/35 text-xs font-mono font-semibold cursor-pointer transition active:scale-95">
+        📚 Ebooks Deep History (40)
+      </button>
+      <button type="button" data-core-mode="medieval" data-core-limit="15" class="wb-core-mode-btn px-3 py-1.5 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 text-purple-200 border border-purple-500/35 text-xs font-mono font-semibold cursor-pointer transition active:scale-95">
+        📜 Archivo Medieval CC0 (15)
+      </button>
+      <button type="button" data-core-mode="remotion" data-core-limit="5" class="wb-core-mode-btn px-3 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-200 border border-rose-500/35 text-xs font-mono font-semibold cursor-pointer transition active:scale-95">
+        🎬 Payload Loop Remotion (5)
+      </button>
+    </div>
+
+    <div id="wb-core-meta" class="hidden p-3 rounded-xl bg-zinc-950/90 border border-zinc-800 text-xs space-y-1.5">
+      <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-[11px]">
+        <span id="wb-core-status-summary" class="text-emerald-300 font-semibold"></span>
+        <span id="wb-core-model-used" class="text-zinc-400"></span>
+      </div>
+      <div id="wb-core-queries" class="flex flex-wrap gap-1.5"></div>
+      <p id="wb-core-context-note" class="text-zinc-300 leading-relaxed"></p>
+      <div id="wb-core-warnings" class="text-[11px] font-mono text-amber-300/90 space-y-0.5"></div>
+    </div>
+  </div>
+
   <!-- 1. BARRA DE CONTROL EDITORIAL APPLE TV: Buscador y Acciones -->
   <div class="p-4 sm:p-5 bg-zinc-950 border-b border-zinc-850 flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
     
@@ -104,6 +164,32 @@ const {
         <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         <span>Enviar a Hero</span>
       </button>
+
+      <!-- Copiar JSON de Láminas para Imprenta + Remotion -->
+      <button
+        id="wb-btn-copy-press"
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 font-semibold text-xs transition cursor-pointer shadow-sm active:scale-95"
+        title="Copia las láminas seleccionadas en formato config/issue_XX_autor.json"
+      >
+        <span>📋 Copiar JSON de Láminas para Imprenta</span>
+      </button>
+
+      <button
+        id="wb-btn-copy-remotion"
+        type="button"
+        class="hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-400/40 font-semibold text-xs transition cursor-pointer shadow-sm active:scale-95"
+        title="Copia el objeto completo remotion_payload devuelto en modo Remotion"
+      >
+        <span>🎬 Copiar Payload Remotion</span>
+      </button>
+
+      <span
+        id="wb-press-copied-toast"
+        class="hidden px-2.5 py-1 rounded-lg bg-emerald-500 text-black font-mono font-bold text-[11px] shadow"
+      >
+        ✓ JSON copiado
+      </span>
 
       <!-- Guardar Array en Nodo / Flecha D1 -->
       <button 
@@ -496,6 +582,288 @@ const {
       }
       checkboxes().forEach((cb) => (cb.checked = false));
       updateCounters();
+    });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // INTEGRACIÓN TGP-EDITORIAL-CORE (127.0.0.1:8000) — DESK-FIRST
+    // ─────────────────────────────────────────────────────────────────────────
+    const CORE_BASE_URL = "http://127.0.0.1:8000";
+    let lastRemotionPayload: any = null;
+    let toastTimer: any = null;
+
+    function escHtml(val: any): string {
+      return String(val ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function showJsonCopiedToast(msg = "✓ JSON copiado") {
+      const toast = document.getElementById("wb-press-copied-toast");
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.remove("hidden");
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.add("hidden"), 2600);
+    }
+
+    async function checkCoreHealth() {
+      const dot = document.getElementById("wb-core-health-dot");
+      const textEl = document.getElementById("wb-core-health-text");
+      const badge = document.getElementById("wb-core-health-badge");
+      if (!dot || !textEl || !badge) return;
+      try {
+        const res = await fetch(`${CORE_BASE_URL}/health`, { method: "GET" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const h = await res.json();
+        const isOk = h.status === "ok" && h.vertex_ready !== false;
+        dot.className = isOk ? "w-2 h-2 rounded-full bg-emerald-400 animate-pulse" : "w-2 h-2 rounded-full bg-amber-400";
+        textEl.textContent = isOk ? "Core 8000: Online" : "Core 8000: Degraded (ADC)";
+        badge.className = isOk
+          ? "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-emerald-950/70 text-emerald-300 border border-emerald-700/60 cursor-pointer hover:border-emerald-400 transition"
+          : "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-amber-950/70 text-amber-300 border border-amber-700/60 cursor-pointer transition";
+      } catch {
+        dot.className = "w-2 h-2 rounded-full bg-rose-500";
+        textEl.textContent = "Core 8000: Offline";
+        badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-rose-950/70 text-rose-300 border border-rose-700/60 cursor-pointer hover:border-rose-400 transition";
+      }
+    }
+
+    document.getElementById("wb-core-health-badge")?.addEventListener("click", checkCoreHealth);
+    checkCoreHealth();
+
+    function renderCoreGridItems(normalizedItems: any[], autoCheckedLimit = 12, queryTitle = "") {
+      const grid = document.getElementById("wb-grid-viewport");
+      if (!grid) return;
+
+      if (!normalizedItems.length) {
+        grid.innerHTML = `<div class="col-span-full py-12 text-center font-mono text-sm text-zinc-400">Sin láminas válidas tras el filtro comercial estricto.</div>`;
+        updateCounters();
+        return;
+      }
+
+      grid.innerHTML = normalizedItems.map((img, idx) => {
+        const isCC0 = /cc0|public domain|pdm?|no restrictions/i.test(img.license || "") || Boolean(img.isCC0OrPublicDomain);
+        const ratio = (img.width && img.height) ? (img.width / img.height).toFixed(2) : "1.50";
+        const aspectClass = Math.floor(idx / 4) % 2 === 0 ? "aspect-3/4" : "aspect-4/5";
+        const safeJson = escHtml(JSON.stringify(img));
+        const safeTitle = escHtml(img.cleanTitle || img.title || "Sin título");
+        const safeLic = escHtml(img.licenseShortName || img.license || "PD");
+        const safeAttr = escHtml(img.attribution_text || `${img.cleanTitle || img.title} — ${img.author || "Archivo"}`);
+        const scoreBadge = typeof img.score === "number"
+          ? `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-200 border border-amber-500/30 text-[10px] font-mono font-semibold">★ ${img.score}</span>`
+          : "";
+
+        return `
+          <article
+            class="wb-card group relative bg-zinc-900 border border-zinc-800 hover:border-amber-400/60 rounded-xl overflow-hidden flex flex-col transition"
+            data-id="${escHtml(img.id || `core-${idx}`)}"
+            data-index="${idx}"
+            data-cc0="${isCC0 ? "true" : "false"}"
+            data-landscape="${Number(ratio) >= 1.25 ? "true" : "false"}"
+            data-json="${safeJson}"
+          >
+            <div class="relative ${aspectClass} w-full bg-black overflow-hidden">
+              <img
+                src="${escHtml(img.thumbUrl || img.url)}"
+                alt="${safeTitle}"
+                loading="lazy"
+                class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+              />
+              <span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/75 text-[10px] font-mono text-zinc-300">
+                #${String(idx + 1).padStart(2, "0")}
+              </span>
+              <label class="absolute top-2 right-2 z-10 flex items-center justify-center w-7 h-7 rounded-lg bg-black/80 border border-white/20 cursor-pointer hover:border-amber-400">
+                <input
+                  type="checkbox"
+                  class="wb-card-checkbox w-4 h-4 accent-amber-400 cursor-pointer"
+                  ${idx < autoCheckedLimit ? "checked" : ""}
+                />
+              </label>
+              <button
+                type="button"
+                class="wb-open-lightbox opacity-0 group-hover:opacity-100 absolute inset-0 bg-black/45 flex items-center justify-center transition cursor-pointer"
+              >
+                <span class="px-3 py-1.5 rounded-full bg-black/85 border border-white/20 text-xs font-mono text-white">
+                  🔍 Inspeccionar HD
+                </span>
+              </button>
+            </div>
+            <div class="p-2.5 flex flex-col gap-1.5 justify-between flex-1 bg-zinc-900">
+              <div class="text-xs font-medium text-zinc-200 truncate" title="${safeTitle}">
+                ${safeTitle}
+              </div>
+              <div class="flex items-center justify-between gap-1 text-[10px] font-mono">
+                <span class="px-2 py-0.5 rounded-full font-semibold truncate ${isCC0 ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" : "bg-sky-500/15 text-sky-300 border border-sky-500/30"}">
+                  ${safeLic}
+                </span>
+                ${scoreBadge}
+                <span class="text-zinc-400 shrink-0">${img.width}×${img.height}</span>
+              </div>
+              <p class="text-[10px] text-zinc-400 line-clamp-2 leading-snug border-t border-zinc-800/80 pt-1" title="${safeAttr}">
+                ${safeAttr}
+              </p>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      bindCardEvents();
+      updateCounters();
+
+      window.dispatchEvent(
+        new CustomEvent("tgp:preview-batch", {
+          detail: { images: normalizedItems.slice(0, 12), queryTitle: queryTitle || "Curaduría TGP" },
+        })
+      );
+    }
+
+    root.querySelectorAll<HTMLButtonElement>(".wb-core-mode-btn").forEach((modeBtn) => {
+      modeBtn.addEventListener("click", async () => {
+        const input = document.getElementById("wb-search-input") as HTMLInputElement;
+        const lineSelect = document.getElementById("wb-editorial-line") as HTMLSelectElement;
+        const query = input?.value.trim();
+        if (!query) {
+          input?.focus();
+          return alert("Escribí una consulta primero en el buscador.");
+        }
+
+        const mode = modeBtn.getAttribute("data-core-mode") || "magazines";
+        const limit = Number(modeBtn.getAttribute("data-core-limit") || "35");
+        const editorialLine = lineSelect?.value === "official" ? "official" : "alternative";
+
+        const allModeBtns = Array.from(root.querySelectorAll<HTMLButtonElement>(".wb-core-mode-btn"));
+        const originalHtml = modeBtn.innerHTML;
+        allModeBtns.forEach((b) => (b.disabled = true));
+        modeBtn.innerHTML = `<span class="inline-block animate-spin mr-1">↻</span> Curando (${mode})...`;
+
+        try {
+          const res = await fetch(`${CORE_BASE_URL}/api/v1/curate`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-TGP-Site": editorialLine === "alternative" ? "tgp-alternative" : "tgp-hemeroteca",
+            },
+            body: JSON.stringify({
+              query,
+              editorial_line: editorialLine,
+              mode,
+              limit,
+            }),
+          });
+
+          if (!res.ok) {
+            const errJson = await res.json().catch(() => ({}));
+            throw new Error(errJson.detail || `HTTP ${res.status}`);
+          }
+
+          const data = await res.json();
+          lastRemotionPayload = data.remotion_payload || null;
+
+          const copyRemotionBtn = document.getElementById("wb-btn-copy-remotion");
+          if (copyRemotionBtn) {
+            if (mode === "remotion" && lastRemotionPayload) {
+              copyRemotionBtn.classList.remove("hidden");
+            } else {
+              copyRemotionBtn.classList.add("hidden");
+            }
+          }
+
+          const pill = document.getElementById("wb-translated-pill");
+          if (pill && data.canonical_queries?.[0]) {
+            pill.textContent = `EN: ${data.canonical_queries[0]}`;
+            pill.classList.remove("hidden");
+          }
+
+          const metaBox = document.getElementById("wb-core-meta");
+          const sumEl = document.getElementById("wb-core-status-summary");
+          const modelEl = document.getElementById("wb-core-model-used");
+          const qEl = document.getElementById("wb-core-queries");
+          const noteEl = document.getElementById("wb-core-context-note");
+          const warnEl = document.getElementById("wb-core-warnings");
+
+          if (metaBox) metaBox.classList.remove("hidden");
+          if (sumEl) sumEl.textContent = `Modo: ${data.mode} (${data.editorial_line}) · ${data.total_returned} válidas de ${data.total_scanned} escaneadas`;
+          if (modelEl) modelEl.textContent = `Capa 0: ${data.model_used}`;
+          if (qEl) {
+            qEl.innerHTML = (data.canonical_queries || [])
+              .map((q: string, i: number) => `<span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 border border-zinc-700 font-mono text-[10px]">[${i}] ${escHtml(q)}</span>`)
+              .join("");
+          }
+          if (noteEl) noteEl.textContent = data.context_note || "";
+          if (warnEl) {
+            warnEl.innerHTML = (data.warnings || [])
+              .map((w: string) => `<div>⚠ ${escHtml(w)}</div>`)
+              .join("");
+          }
+
+          const normalized = (data.images || []).map((img: any, idx: number) => ({
+            id: `core-${idx}-${img.source_repo}`,
+            title: img.title,
+            cleanTitle: img.title,
+            url: img.original_url,
+            original_url: img.original_url,
+            thumbUrl: img.thumb_url,
+            thumb_url: img.thumb_url,
+            width: img.width,
+            height: img.height,
+            aspect_ratio: img.aspect_ratio,
+            orientation: img.orientation,
+            license: img.license,
+            licenseShortName: img.license,
+            isCC0OrPublicDomain: /cc0|public domain|pdm?|no restrictions/i.test(img.license || ""),
+            author: img.author,
+            description: img.description,
+            description_url: img.description_url,
+            score: img.score,
+            source_repo: img.source_repo,
+            attribution_text: img.attribution_text,
+          }));
+
+          const autoCheck = mode === "hero" || mode === "remotion" ? 5 : mode === "medieval" ? 15 : 12;
+          renderCoreGridItems(normalized, autoCheck, query);
+          checkCoreHealth();
+        } catch (err: any) {
+          console.error("Error consultando tgp-editorial-core:", err);
+          alert(`Error conectando con tgp-editorial-core (127.0.0.1:8000): ${err?.message || err}`);
+          checkCoreHealth();
+        } finally {
+          allModeBtns.forEach((b) => (b.disabled = false));
+          modeBtn.innerHTML = originalHtml;
+        }
+      });
+    });
+
+    document.getElementById("wb-btn-copy-press")?.addEventListener("click", async () => {
+      const selected = getSelectedItems();
+      if (!selected.length) {
+        return alert("Seleccioná al menos 1 lámina con el checkbox para copiar el JSON de imprenta.");
+      }
+
+      const pressArray = selected.map((img, idx) => ({
+        plate_number: idx + 1,
+        title: img.cleanTitle || img.title?.replace(/^File:/i, "") || "Sin título",
+        original_url: img.original_url || img.url,
+        thumb_url: img.thumb_url || img.thumbUrl || img.url,
+        license: img.licenseShortName || img.license || "Public domain",
+        author: img.author || "Archivo Patrimonial",
+        attribution_text:
+          img.attribution_text ||
+          `${img.cleanTitle || img.title || "Sin título"} — ${img.author || "Archivo Patrimonial"} (${img.licenseShortName || img.license || "Public domain"})`,
+      }));
+
+      await navigator.clipboard.writeText(JSON.stringify(pressArray, null, 2));
+      showJsonCopiedToast(`✓ JSON copiado (${pressArray.length} láminas)`);
+    });
+
+    document.getElementById("wb-btn-copy-remotion")?.addEventListener("click", async () => {
+      if (!lastRemotionPayload) {
+        return alert("Ejecutá primero el modo 'Payload Loop Remotion'.");
+      }
+      await navigator.clipboard.writeText(JSON.stringify(lastRemotionPayload, null, 2));
+      showJsonCopiedToast("✓ JSON copiado (Remotion Payload)");
     });
 
     // ─────────────────────────────────────────────────────────────────────────
