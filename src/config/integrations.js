@@ -126,6 +126,13 @@ export const tgpViteConfig = {
   optimizeDeps: {
     // La lista nuclear de paquetes CommonJS que Vite debe traducir sí o sí
     include: [
+      'react',
+      'react-dom',
+      'react-dom/client',
+      'react/jsx-runtime',
+      'react/jsx-dev-runtime',
+      '@astrojs/react/client.js',
+      '@astrojs/react-renderer/client.js',
       'lodash/debounce', 
       'lodash', 
       'direction', 
