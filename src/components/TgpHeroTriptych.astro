@@ -486,7 +486,7 @@ const allSlides: SlideItem[] = computedSlides.length > 0
     if (contents.length <= 1) return;
 
     let currentIndex = 0;
-    let isAnimating = false;
+    let activeTl: gsap.core.Timeline | null = null;
     let loopCall: gsap.core.Tween | null = null;
     let isHovered = false;
 
@@ -501,34 +501,44 @@ const allSlides: SlideItem[] = computedSlides.length > 0
     }
 
     function goToSlide(nextIndex: number) {
-      if (nextIndex === currentIndex || isAnimating) return;
-      isAnimating = true;
+      if (nextIndex === currentIndex) return;
+      if (activeTl) {
+        activeTl.kill();
+      }
 
-      const currentBg = bgSlides[currentIndex];
+      const prevIndex = currentIndex;
+      const currentBg = bgSlides[prevIndex];
       const nextBg = bgSlides[nextIndex];
-      const currentCards = cardsSlides[currentIndex];
+      const currentCards = cardsSlides[prevIndex];
       const nextCards = cardsSlides[nextIndex];
-      const currentContent = contents[currentIndex];
+      const currentContent = contents[prevIndex];
       const nextContent = contents[nextIndex];
+
+      currentIndex = nextIndex;
+      updateDots(currentIndex);
 
       const tl = gsap.timeline({
         onComplete: () => {
-          isAnimating = false;
+          activeTl = null;
         }
       });
+      activeTl = tl;
 
-      // 1. Ocultar capa actual
+      // 1. Ocultar capa actual en plano inferior
+      tl.set(currentContent, { zIndex: '20', pointerEvents: 'none' }, 0);
+      tl.set(currentCards, { zIndex: '5', pointerEvents: 'none' }, 0);
+      tl.set(currentBg, { zIndex: '5' }, 0);
+
       tl.to(
         currentContent,
         {
           opacity: 0,
           y: -12,
-          duration: 0.45,
+          duration: 0.35,
           ease: 'power2.in',
           onComplete: () => {
             currentContent.style.display = 'none';
             currentContent.style.zIndex = '0';
-            currentContent.style.pointerEvents = 'none';
           }
         },
         0
@@ -539,12 +549,11 @@ const allSlides: SlideItem[] = computedSlides.length > 0
         {
           opacity: 0,
           scale: 0.98,
-          duration: 0.6,
+          duration: 0.45,
           ease: 'power3.inOut',
           onComplete: () => {
             currentCards.style.display = 'none';
             currentCards.style.zIndex = '0';
-            currentCards.style.pointerEvents = 'none';
           }
         },
         0
@@ -554,7 +563,7 @@ const allSlides: SlideItem[] = computedSlides.length > 0
         currentBg,
         {
           opacity: 0,
-          duration: 0.6,
+          duration: 0.45,
           ease: 'power2.inOut',
           onComplete: () => {
             currentBg.style.display = 'none';

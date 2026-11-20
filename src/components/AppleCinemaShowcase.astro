@@ -511,7 +511,7 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
       if (contents.length <= 1) return;
 
       let currentIndex = 0;
-      let isTransitioning = false;
+      let activeTl: gsap.core.Timeline | null = null;
       let autoTimer: gsap.core.Tween | null = null;
       let isHovering = false;
 
@@ -526,31 +526,42 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
       }
 
       function goToSlide(nextIdx: number) {
-        if (nextIdx === currentIndex || isTransitioning) return;
-        isTransitioning = true;
+        if (nextIdx === currentIndex) return;
+        if (activeTl) {
+          activeTl.kill();
+        }
 
-        const currentBg = bgs[currentIndex];
+        const prevIdx = currentIndex;
+        const currentBg = bgs[prevIdx];
         const nextBg = bgs[nextIdx];
-        const currentContent = contents[currentIndex];
+        const currentContent = contents[prevIdx];
         const nextContent = contents[nextIdx];
+
+        currentIndex = nextIdx;
+        wrapper.dataset.activeSlide = String(currentIndex);
+        updateDots(currentIndex);
 
         const tl = gsap.timeline({
           onComplete: () => {
-            isTransitioning = false;
+            activeTl = null;
           }
         });
+        activeTl = tl;
 
-        // 1. Apagar contenido y fondo actual
+        // 1. Apagar contenido y fondo actual en plano inferior
+        tl.set(currentContent, { zIndex: '20', pointerEvents: 'none' }, 0);
+        tl.set(currentBg, { zIndex: '5' }, 0);
+
         tl.to(
           currentContent,
           {
             opacity: 0,
             y: -12,
-            duration: 0.4,
+            duration: 0.35,
             ease: 'power2.in',
             onComplete: () => {
               currentContent.style.display = 'none';
-              currentContent.style.pointerEvents = 'none';
+              currentContent.style.zIndex = '0';
             }
           },
           0
@@ -560,10 +571,11 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
           currentBg,
           {
             opacity: 0,
-            duration: 0.6,
+            duration: 0.45,
             ease: 'power2.inOut',
             onComplete: () => {
               currentBg.style.display = 'none';
+              currentBg.style.zIndex = '0';
             }
           },
           0
@@ -618,11 +630,7 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
 
       wrapper.addEventListener('mouseleave', () => {
         isHovering = false;
-        if (autoTimer) {
-          autoTimer.resume();
-        } else {
-          scheduleTimer();
-        }
+        scheduleTimer();
       });
 
       scheduleTimer();
