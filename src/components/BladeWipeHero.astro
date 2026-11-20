@@ -1,0 +1,251 @@
+---
+/**
+ * src/components/BladeWipeHero.astro
+ * Motor cinemático "The Blade Wipe" (Barrido diagonal de filo SVG + GSAP + Camera Shake).
+ * Rescatado de laboratorio como componente reutilizable con showHud = false por defecto.
+ */
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  image: ImageMetadata;
+  word: string;
+  subtitle: string;
+  badge?: string;
+  monogram?: string;
+  teaserTitle?: string;
+  duration?: number;
+  showHud?: boolean;
+}
+
+const {
+  image,
+  word,
+  subtitle,
+  badge = 'Anomalía Metalúrgica · TGP FX',
+  monogram = 'Ψ',
+  teaserTitle = word,
+  duration = 1.4,
+  showHud = false,
+} = Astro.props;
+---
+
+<section class="relative w-full h-svh min-h-145 overflow-hidden bg-[#070709] text-white select-none" data-blade-duration={duration}>
+  <div id="blade-stage" class="relative w-full h-full overflow-hidden will-change-transform">
+    <!-- CAPA 0: ESTADO PREVIO -->
+    <div id="blade-layer-before" class="absolute inset-0 flex flex-col items-center justify-center bg-[#070709] z-10 pointer-events-none">
+      <div class="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.15)_0%,transparent_70%)]"></div>
+      <div class="text-center px-6 max-w-xl flex flex-col items-center gap-4">
+        <div class="w-16 h-16 rounded-full border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] font-serif text-2xl shadow-[0_0_25px_rgba(212,175,55,0.2)]">
+          {monogram}
+        </div>
+        <span class="font-mono text-xs uppercase tracking-[0.4em] text-[#d4af37]/70">
+          Sincronización Óptica · Blade Wipe
+        </span>
+        <h2 class="font-serif text-3xl md:text-5xl font-light text-stone-200 tracking-wide">
+          {teaserTitle}
+        </h2>
+      </div>
+    </div>
+
+    <!-- CAPA 1: ESTADO REVELADO -->
+    <div
+      id="blade-layer-after"
+      class="absolute inset-0 z-20 overflow-hidden will-change-[clip-path]"
+      style="clip-path: url(#blade-wipe-clip); -webkit-clip-path: url(#blade-wipe-clip);"
+    >
+      <img
+        id="blade-hero-img"
+        src={image.src}
+        alt={word}
+        class="absolute inset-0 w-full h-full object-cover object-center will-change-transform scale-100"
+        loading="eager"
+        decoding="async"
+      />
+      <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/35 to-black/30 pointer-events-none"></div>
+      <div class="absolute inset-0 bg-linear-to-r from-black/80 via-transparent to-black/40 pointer-events-none"></div>
+
+      <div id="blade-content-text" class="absolute bottom-16 md:bottom-24 left-6 md:left-16 max-w-2xl z-30 flex flex-col gap-3">
+        <span class="inline-flex items-center gap-2 font-mono text-[10px] md:text-xs uppercase tracking-[0.45em] text-[#d4af37]">
+          <span class="w-2 h-px bg-[#d4af37]"></span>
+          {badge}
+        </span>
+        <h1 class="font-serif text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-white via-[#f3ede2] to-[#c5b392] drop-shadow-[0_10px_30px_rgba(0,0,0,0.95)]">
+          {word}
+        </h1>
+        <p class="font-serif italic text-base md:text-xl text-stone-300/90 leading-relaxed max-w-xl drop-shadow-md">
+          {subtitle}
+        </p>
+      </div>
+    </div>
+
+    <!-- CAPA 2: MOTOR SVG -->
+    <svg
+      id="blade-svg-engine"
+      class="absolute inset-0 w-full h-full pointer-events-none z-30 overflow-visible"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <clipPath id="blade-wipe-clip" clipPathUnits="userSpaceOnUse">
+          <polygon id="blade-wipe-poly" points="0 0, 0 0, 0 0" />
+        </clipPath>
+        <filter id="ray-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur1" />
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur2" />
+          <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="blur3" />
+          <feMerge>
+            <feMergeNode in="blur3" />
+            <feMergeNode in="blur2" />
+            <feMergeNode in="blur1" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <line id="ray-aura" x1="0" y1="0" x2="0" y2="0" stroke="#d4af37" stroke-width="9" stroke-linecap="round" filter="url(#ray-glow)" opacity="0" />
+      <line id="ray-core" x1="0" y1="0" x2="0" y2="0" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0" />
+      <circle id="spark-a" cx="0" cy="0" r="6" fill="#fff" filter="url(#ray-glow)" opacity="0" />
+      <circle id="spark-b" cx="0" cy="0" r="6" fill="#fff" filter="url(#ray-glow)" opacity="0" />
+    </svg>
+
+    <button
+      type="button"
+      id="blade-replay-btn"
+      class="absolute bottom-6 right-6 z-40 w-10 h-10 rounded-full border border-white/20 bg-black/45 backdrop-blur-md text-white/75 hover:text-white hover:border-[#d4af37]/60 flex items-center justify-center transition-all cursor-pointer"
+      aria-label="Repetir barrido"
+    >
+      ↻
+    </button>
+
+    {showHud && import.meta.env.DEV && (
+      <div class="absolute top-20 right-6 z-40 px-3 py-1.5 rounded-full bg-black/75 border border-[#d4af37]/40 font-mono text-[10px] uppercase tracking-widest text-[#d4af37]">
+        Dev FX · Blade Wipe
+      </div>
+    )}
+  </div>
+</section>
+
+<script>
+  import gsap from 'gsap';
+
+  function initBladeWipeHero() {
+    const stage = document.getElementById('blade-stage');
+    const host = stage?.closest('section') as HTMLElement | null;
+    const poly = document.getElementById('blade-wipe-poly');
+    const rayAura = document.getElementById('ray-aura');
+    const rayCore = document.getElementById('ray-core');
+    const sparkA = document.getElementById('spark-a');
+    const sparkB = document.getElementById('spark-b');
+    const heroImg = document.getElementById('blade-hero-img');
+    const contentText = document.getElementById('blade-content-text');
+    const replayBtn = document.getElementById('blade-replay-btn');
+
+    if (!stage || !poly || !rayAura || !rayCore) return;
+    if (stage.dataset.bladeInit === 'true') return;
+    stage.dataset.bladeInit = 'true';
+
+    const currentDuration = parseFloat(host?.dataset.bladeDuration || '1.4');
+    let isCutting = false;
+
+    function updateBladeGeometry(progress: number) {
+      if (!poly || !rayAura || !rayCore || !stage) return;
+      const W = stage.clientWidth || window.innerWidth;
+      const H = stage.clientHeight || window.innerHeight;
+      const Lsq = W * W + H * H;
+
+      if (progress <= 0) {
+        poly.setAttribute('points', `0 ${H}, 0 ${H}, 0 ${H}`);
+        rayAura.setAttribute('opacity', '0');
+        rayCore.setAttribute('opacity', '0');
+        sparkA?.setAttribute('opacity', '0');
+        sparkB?.setAttribute('opacity', '0');
+        return;
+      }
+      if (progress >= 1) {
+        poly.setAttribute('points', `0 0, ${W} 0, ${W} ${H}, 0 ${H}`);
+        rayAura.setAttribute('opacity', '0');
+        rayCore.setAttribute('opacity', '0');
+        sparkA?.setAttribute('opacity', '0');
+        sparkB?.setAttribute('opacity', '0');
+        return;
+      }
+
+      const yL = H - progress * (Lsq / H);
+      const xB = progress * (Lsq / W);
+      const xT = W - (1 - progress) * (Lsq / W);
+      const yR = (1 - progress) * (Lsq / H);
+
+      const intersections: { x: number; y: number }[] = [];
+      if (yL >= 0 && yL <= H) intersections.push({ x: 0, y: yL });
+      if (xB >= 0 && xB <= W) intersections.push({ x: xB, y: H });
+      if (xT >= 0 && xT <= W) intersections.push({ x: xT, y: 0 });
+      if (yR >= 0 && yR <= H) intersections.push({ x: W, y: yR });
+
+      if (intersections.length >= 2) {
+        const p1 = intersections[0];
+        const p2 = intersections[1];
+        rayAura.setAttribute('x1', `${p1.x}`);
+        rayAura.setAttribute('y1', `${p1.y}`);
+        rayAura.setAttribute('x2', `${p2.x}`);
+        rayAura.setAttribute('y2', `${p2.y}`);
+        rayAura.setAttribute('opacity', '0.9');
+
+        rayCore.setAttribute('x1', `${p1.x}`);
+        rayCore.setAttribute('y1', `${p1.y}`);
+        rayCore.setAttribute('x2', `${p2.x}`);
+        rayCore.setAttribute('y2', `${p2.y}`);
+        rayCore.setAttribute('opacity', '1');
+
+        if (sparkA) { sparkA.setAttribute('cx', `${p1.x}`); sparkA.setAttribute('cy', `${p1.y}`); sparkA.setAttribute('opacity', '1'); }
+        if (sparkB) { sparkB.setAttribute('cx', `${p2.x}`); sparkB.setAttribute('cy', `${p2.y}`); sparkB.setAttribute('opacity', '1'); }
+
+        const pts: { x: number; y: number }[] = [{ x: 0, y: H }];
+        if (yL < 0) pts.push({ x: 0, y: 0 });
+        if (xT >= 0 && xT <= W) pts.push({ x: xT, y: 0 });
+        if (yR >= 0 && yR <= H) pts.push({ x: W, y: yR });
+        if (xB > W) pts.push({ x: W, y: H });
+        if (xB >= 0 && xB <= W) pts.push({ x: xB, y: H });
+        if (yL >= 0 && yL <= H) pts.push({ x: 0, y: yL });
+
+        poly.setAttribute('points', pts.map((pt) => `${Math.round(pt.x)} ${Math.round(pt.y)}`).join(', '));
+      }
+    }
+
+    function executeBladeSlash() {
+      if (isCutting) return;
+      isCutting = true;
+      gsap.killTweensOf([stage, heroImg, contentText]);
+      updateBladeGeometry(0);
+      gsap.set(heroImg, { scale: 1.05 });
+      gsap.set(contentText, { opacity: 0, y: 25 });
+
+      const tracker = { val: 0 };
+      const tl = gsap.timeline({
+        onComplete: () => {
+          updateBladeGeometry(1);
+          isCutting = false;
+        },
+      });
+
+      tl.to(tracker, {
+        val: 1,
+        duration: currentDuration,
+        ease: 'power4.out',
+        onUpdate: () => updateBladeGeometry(tracker.val),
+      }, 0)
+        .to(stage, { x: 4, y: -3, duration: 0.04, ease: 'power4.inOut' }, 0.04)
+        .to(stage, { x: -3, y: 2, duration: 0.04, ease: 'power4.inOut' })
+        .to(stage, { x: 0, y: 0, duration: 0.06, ease: 'power2.out' })
+        .to(heroImg, { scale: 1, duration: currentDuration * 2.1, ease: 'power3.out' }, 0)
+        .to(contentText, { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' }, currentDuration * 0.4);
+    }
+
+    replayBtn?.addEventListener('click', () => executeBladeSlash());
+    setTimeout(() => executeBladeSlash(), 350);
+  }
+
+  document.addEventListener('astro:page-load', initBladeWipeHero);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initBladeWipeHero);
+  } else {
+    initBladeWipeHero();
+  }
+</script>

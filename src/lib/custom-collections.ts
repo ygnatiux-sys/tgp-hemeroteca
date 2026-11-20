@@ -10,6 +10,7 @@ import imgGunungPadang from '../assets/alternativa/gunung-padang.jpg';
 import imgNanMadol from '../assets/alternativa/nan-madol.jpg';
 import imgBarabar from '../assets/alternativa/barabar.jpg';
 import imgDerinkuyu from '../assets/alternativa/derinkuyu.jpg';
+import { OOPART_ITEMS } from './ooparts-catalog';
 
 export interface CustomCollectionItem {
   slug: string;
@@ -37,6 +38,27 @@ export interface CustomCollectionGroup {
 }
 
 export const customCollections: CustomCollectionGroup[] = [
+  {
+    catKey: 'ooparts',
+    catLabel: 'OOPARTs & Anomalías',
+    href: '/colecciones/ooparts/',
+    entorno: 'Sudáfrica · Anticitera · California · Bagdad · Delhi',
+    essays: OOPART_ITEMS.map((item) => ({
+      slug: item.slug,
+      href: item.href,
+      img: item.image.src,
+      entry: {
+        title: item.title,
+        category: 'OOPARTs & Anomalías',
+        coverImage: item.image.src,
+        excerpt: item.excerpt,
+        dek: item.subtitle,
+        date: item.date,
+        themeColor: 'andesita',
+        sitio: item.location,
+      },
+    })),
+  },
   {
     catKey: 'america-secrets',
     catLabel: 'América Secrets',
@@ -181,7 +203,7 @@ export const customCollections: CustomCollectionGroup[] = [
       },
       {
         slug: 'nan-madol',
-        href: '/test-nan-madol',
+        href: '/colecciones/oceania-ancestral/nan-madol/',
         img: imgNanMadol.src,
         entry: {
           title: 'Nan Madol · La Ciudadela Flotante de Micronesia',
@@ -196,7 +218,7 @@ export const customCollections: CustomCollectionGroup[] = [
       },
       {
         slug: 'barabar-asia',
-        href: '/test-barabar',
+        href: '/colecciones/enigmas-subterraneos/barabar/',
         img: imgBarabar.src,
         entry: {
           title: 'Cuevas de Barabar · Cámaras de Resonancia Sonora',
@@ -264,7 +286,7 @@ export const customCollections: CustomCollectionGroup[] = [
       },
       {
         slug: 'baalbek',
-        href: '/test-baalbek',
+        href: '/colecciones/enigmas-subterraneos/baalbek/',
         img: imgBaalbek.src,
         entry: {
           title: 'Baalbek · Monolitos Titánicos del Líbano',

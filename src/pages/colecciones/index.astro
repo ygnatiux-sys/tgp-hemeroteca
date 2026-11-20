@@ -31,6 +31,7 @@ import imgGunungPadang from '../../assets/alternativa/gunung-padang.jpg';
 import imgEsfinge from '../../assets/alternativa/esfinge-erosion.jpg';
 import imgDerinkuyu from '../../assets/alternativa/derinkuyu.jpg';
 import imgNanMadol from '../../assets/alternativa/nan-madol.jpg';
+import { OOPART_ITEMS } from '../../lib/ooparts-catalog';
 
 // ─── CARGA Y FILTRADO ────────────────────────────────────────────────────────
 const allEssaysRaw = await getCollection('ensayos').catch(() => []);
@@ -170,6 +171,14 @@ const georefPosts: TriplicoPost[] = publishableGeorefs
   });
 // ─── COLECCIONES CONTINENTALES EDITORIALES TGP ───
 const continentalCollections = [
+  {
+    slug: 'ooparts',
+    title: 'OOPARTs & Anomalías',
+    subtitle: 'Artefactos Fuera de Lugar, Metalurgia Imposible & Expedientes de Cremo',
+    image: OOPART_ITEMS[1].image.src,
+    link: '/colecciones/ooparts/',
+    count: OOPART_ITEMS.length,
+  },
   {
     slug: 'america-secrets',
     title: 'América Secrets',

@@ -1,0 +1,84 @@
+---
+/**
+ * src/pages/colecciones/ooparts/index.astro
+ * COLECCIÓN MAESTRA: OOPARTs & ANOMALÍAS ESTRATIGRÁFICAS
+ */
+export const prerender = true;
+
+import Layout from '../../../layouts/Layout.astro';
+import BackSlideButton from '../../../components/BackSlideButton.astro';
+import PumapunkuHero from '../../../components/PumapunkuHero.astro';
+import { OOPART_ITEMS } from '../../../lib/ooparts-catalog';
+
+const heroSample = OOPART_ITEMS[1]; // Mecanismo de Anticitera
+---
+
+<Layout title="OOPARTs & Anomalías · Colección Arqueosemiótica | TGP" headerTransparentUntilScroll={true}>
+  <main class="w-full bg-[#060708] text-stone-200 min-h-screen pb-28">
+    <div class="fixed top-5 left-6 z-40">
+      <BackSlideButton fallbackUrl="/colecciones/" />
+    </div>
+
+    <PumapunkuHero
+      image={heroSample.image}
+      title="OOPARTS"
+      subtitleWord="ANOMALÍAS MATERIALES"
+      subtitle="Artefactos fuera de lugar, metalurgia anómala y los expedientes estratigráficos de Cremo"
+      badge="COLECCIÓN TEMÁTICA · ARCHIVO HETERODOXO · 8 EXPEDIENTES"
+      showHud={false}
+    />
+
+    <section class="max-w-7xl mx-auto px-6 py-20">
+      <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 border-b border-white/10 pb-6 gap-4">
+        <div>
+          <span class="font-mono text-xs uppercase tracking-[0.3em] text-amber-400">
+            8 Expedientes Documentales
+          </span>
+          <h2 class="font-serif text-3xl sm:text-5xl font-black uppercase tracking-tight text-white mt-2">
+            Artefactos Fuera de Tiempo
+          </h2>
+        </div>
+        <p class="font-sans text-sm text-stone-400 max-w-md">
+          Del archivo californiano de Michael Cremo a la mecánica helenística y la metalurgia pasivada: cada caso analizado en la frontera entre anomalía y tafonomía.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {OOPART_ITEMS.map((item, idx) => (
+          <a
+            href={item.href}
+            class="group flex flex-col rounded-2xl overflow-hidden border border-white/10 bg-[#0d1012] hover:border-amber-400/60 transition-all duration-300 shadow-xl"
+          >
+            <div class="aspect-video w-full overflow-hidden relative bg-black">
+              <img
+                src={item.image.src}
+                alt={item.title}
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+              <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/15 font-mono text-[10px] uppercase tracking-wider text-amber-300">
+                #{String(idx + 1).padStart(2, '0')} · {item.fxLabel.replace(/^\d+\.\s*/, '')}
+              </span>
+            </div>
+            <div class="p-5 flex-1 flex flex-col justify-between gap-3">
+              <div>
+                <p class="font-mono text-[10px] uppercase tracking-widest text-stone-400">
+                  {item.location}
+                </p>
+                <h3 class="font-serif text-xl font-bold text-white group-hover:text-amber-300 transition-colors mt-1.5">
+                  {item.title}
+                </h3>
+                <p class="font-sans text-xs text-stone-300/85 mt-2 leading-relaxed">
+                  {item.excerpt}
+                </p>
+              </div>
+              <span class="font-mono text-[11px] uppercase tracking-widest text-amber-400 pt-2 border-t border-white/10">
+                Abrir expediente →
+              </span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  </main>
+</Layout>

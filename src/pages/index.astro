@@ -27,6 +27,7 @@ import AppleDualBentoMuseum from '../components/AppleDualBentoMuseum.astro';
 import AppleDualBentoDark from '../components/AppleDualBentoDark.astro';
 import AppleBentoDueImax from '../components/AppleBentoDueImax.astro';
 import AdnBentoGsap from '../components/home/AdnBentoGsap.astro';
+import { OOPART_ITEMS } from '../lib/ooparts-catalog';
 import {
   type EssayEntry,
   getPublishableEssays,
@@ -285,10 +286,27 @@ const collections = Array.from(categoryGroups.entries())
 
 // ─── CARGA DE IMÁGENES EDITORIAL ──────────────────────────────────────────────
 
-const resolvedRecent = recentEssays.map(e => ({
-  ...e,
-  img: resolveEssayImage(e.entry, e.slug),
+const oopartRecentItems = OOPART_ITEMS.map(item => ({
+  slug: item.slug,
+  href: item.href,
+  img: item.image.src,
+  entry: {
+    title: item.title,
+    category: 'OOPARTs & Anomalías',
+    coverImage: item.image.src,
+    excerpt: item.excerpt,
+    dek: item.subtitle,
+    date: item.date,
+  },
 }));
+
+const resolvedRecent = [
+  ...oopartRecentItems,
+  ...recentEssays.map(e => ({
+    ...e,
+    img: resolveEssayImage(e.entry, e.slug),
+  })),
+];
 
 const resolvedArchiveRows = archiveRows.map(e => ({
   ...e,

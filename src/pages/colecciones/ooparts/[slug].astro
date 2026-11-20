@@ -1,0 +1,163 @@
+---
+/**
+ * src/pages/colecciones/ooparts/[slug].astro
+ * Dossiers individuales públicos de los 8 OOPARTs con su motor FX en modo normal (showHud={false}).
+ */
+export const prerender = true;
+
+import Layout from '../../../layouts/Layout.astro';
+import BackSlideButton from '../../../components/BackSlideButton.astro';
+import BarabarHero from '../../../components/BarabarHero.astro';
+import PumapunkuHero from '../../../components/PumapunkuHero.astro';
+import TectonicHero from '../../../components/TectonicHero.astro';
+import AbyssHero from '../../../components/AbyssHero.astro';
+import PluvialHero from '../../../components/PluvialHero.astro';
+import GunungPadangHero from '../../../components/GunungPadangHero.astro';
+import BladeWipeHero from '../../../components/BladeWipeHero.astro';
+import DiagonalScaleHero from '../../../components/DiagonalScaleHero.astro';
+import { OOPART_ITEMS, type OopartItem } from '../../../lib/ooparts-catalog';
+
+export function getStaticPaths() {
+  return OOPART_ITEMS.map((item, idx) => ({
+    params: { slug: item.slug },
+    props: {
+      item,
+      prevItem: OOPART_ITEMS[(idx - 1 + OOPART_ITEMS.length) % OOPART_ITEMS.length],
+      nextItem: OOPART_ITEMS[(idx + 1) % OOPART_ITEMS.length],
+    },
+  }));
+}
+
+interface Props {
+  item: OopartItem;
+  prevItem: OopartItem;
+  nextItem: OopartItem;
+}
+
+const { item, prevItem, nextItem } = Astro.props;
+---
+
+<Layout
+  title={`${item.title} · OOPARTs & Anomalías | TGP`}
+  description={item.excerpt}
+  headerTransparentUntilScroll={true}
+>
+  <main class="min-h-screen bg-[#07080a] text-stone-200 pb-24">
+    <div class="fixed top-5 left-6 z-40">
+      <BackSlideButton fallbackUrl="/colecciones/ooparts/" />
+    </div>
+
+    {item.fxKey === 'barabar' && (
+      <BarabarHero
+        image={item.image}
+        word={item.heroWord}
+        subtitle={item.subtitle}
+        badge={item.location}
+        showHud={false}
+      />
+    )}
+    {item.fxKey === 'pumapunku' && (
+      <PumapunkuHero
+        image={item.image}
+        title={item.heroWord}
+        subtitleWord={item.subtitleWord}
+        subtitle={item.subtitle}
+        badge={item.location}
+        showHud={false}
+      />
+    )}
+    {item.fxKey === 'tectonic' && (
+      <TectonicHero
+        image={item.image}
+        imageScale={1.12}
+        imageFilter="contrast(1.1) brightness(0.75)"
+        word={item.heroWord}
+        subtitle={item.subtitle}
+        fontHref="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,900&display=swap"
+        fontFamily="'Bodoni Moda', serif"
+        fontWeight={900}
+        gradient="linear-gradient(180deg, #F5E6C8 0%, #D4AF37 55%, #7A5C1B 100%)"
+        glow="rgba(212,175,55,0.45)"
+        accent="#D4AF37"
+        subColor="#E5DFD3"
+        align="center"
+        showHud={false}
+      />
+    )}
+    {item.fxKey === 'abyss' && (
+      <AbyssHero
+        image={item.image}
+        word={item.heroWord}
+        subtitle={item.subtitle}
+        showHud={false}
+      />
+    )}
+    {item.fxKey === 'pluvial' && (
+      <PluvialHero
+        image={item.image}
+        word={item.heroWord}
+        subtitle={item.subtitle}
+        badge={item.location}
+        showHud={false}
+      />
+    )}
+    {item.fxKey === 'stratigraphic' && (
+      <GunungPadangHero
+        image={item.image}
+        word={item.heroWord}
+        subtitle={item.subtitle}
+        align="center"
+        showHud={false}
+      />
+    )}
+    {item.fxKey === 'blade' && (
+      <BladeWipeHero
+        image={item.image}
+        word={item.heroWord}
+        subtitle={item.subtitle}
+        badge={item.location}
+        monogram={item.monogram}
+        teaserTitle={item.teaserTitle}
+        showHud={false}
+      />
+    )}
+    {item.fxKey === 'diagonal' && (
+      <DiagonalScaleHero
+        image={item.image}
+        word={item.heroWord}
+        subtitle={item.subtitle}
+        badge={item.location}
+        teaserTitle={item.teaserTitle}
+        showHud={false}
+      />
+    )}
+
+    <article class="max-w-3xl mx-auto px-6 pt-16 pb-12">
+      <div class="border-l-2 border-amber-400/70 pl-5 mb-8">
+        <p class="font-mono text-[11px] uppercase tracking-[0.25em] text-amber-400">
+          OOPARTs &amp; Anomalías · {item.location}
+        </p>
+        <h2 class="font-serif text-3xl sm:text-4xl font-bold text-white mt-1">
+          {item.title}
+        </h2>
+      </div>
+      <div class="space-y-5 font-serif text-lg leading-relaxed text-stone-300">
+        {item.paragraphs.map((p) => (
+          <p>{p}</p>
+        ))}
+      </div>
+
+      <nav class="mt-14 pt-8 border-t border-white/10 flex flex-wrap items-center justify-between gap-4 font-mono text-xs uppercase tracking-wider">
+        <a href={prevItem.href} class="text-stone-400 hover:text-amber-300 transition-colors">
+          ← {prevItem.title}
+        </a>
+        <a href="/colecciones/ooparts/" class="px-4 py-2 rounded-full border border-white/15 hover:border-amber-400/60 text-stone-200">
+          Ver los 8 OOPARTs
+        </a>
+        <a href={nextItem.href} class="text-stone-400 hover:text-amber-300 transition-colors">
+          {nextItem.title} →
+        </a>
+      </nav>
+    </article>
+  </main>
+</Layout>

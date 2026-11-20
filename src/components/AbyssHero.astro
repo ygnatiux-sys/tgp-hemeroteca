@@ -34,7 +34,7 @@ const {
   fontHref = "https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
   fontFamily = "'Clash Display', 'Inter', system-ui, sans-serif",
   speed = 1,
-  showHud = true,
+  showHud = false,
   hudLabel = "Paralaje de Abismo · Derinkuyu",
 } = Astro.props;
 ---
@@ -74,7 +74,7 @@ const {
   </div>
 
   {
-    showHud ? (
+    showHud && import.meta.env.DEV ? (
       <div class="abyss-hud">
         <div class="abyss-hud-head">
           <span class="abyss-hud-dot" />

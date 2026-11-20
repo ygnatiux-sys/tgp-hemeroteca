@@ -15,6 +15,7 @@ interface Props {
   image: ImageMetadata;
   word?: string;
   subtitle?: string;
+  badge?: string;
   speed?: number;
   showHud?: boolean;
   hudLabel?: string;
@@ -24,8 +25,9 @@ const {
   image,
   word = "BARABAR",
   subtitle = "El reflejo imposible de una tecnología perdida",
+  badge = "Cámara Subterránea de Bihar · Acústica de Granito",
   speed = 1,
-  showHud = true,
+  showHud = false,
   hudLabel = "Resonancia & Espejo · Barabar",
 } = Astro.props;
 ---
@@ -61,7 +63,7 @@ const {
       <!-- Badge de Cámara Sonora -->
       <span class="barabar-badge">
         <span class="barabar-badge-dot"></span>
-        Cámara Subterránea de Bihar · Acústica de Granito
+        {badge}
       </span>
 
       <!-- Bloque Tipográfico con Capas de Eco Acústico -->
@@ -89,7 +91,7 @@ const {
   </div>
 
   {
-    showHud ? (
+    showHud && import.meta.env.DEV ? (
       <div class="barabar-hud">
         <div class="barabar-hud-head">
           <span class="barabar-hud-dot" />

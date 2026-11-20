@@ -1,0 +1,46 @@
+---
+/**
+ * src/pages/colecciones/enigmas-subterraneos/baalbek.astro
+ * DOSSIER HIJO: BAALBEK Y EL TRILITÓN (LÍBANO)
+ */
+export const prerender = true;
+import Layout from '../../../layouts/Layout.astro';
+import BackSlideButton from '../../../components/BackSlideButton.astro';
+import TectonicHero from '../../../components/TectonicHero.astro';
+import imgBaalbek from '../../../assets/alternativa/baalbek.jpg';
+---
+
+<Layout title="Baalbek · Enigmas Subterráneos | TGP" headerTransparentUntilScroll={true}>
+  <main class="w-full bg-[#070605] text-stone-200 min-h-screen pb-24">
+    <div class="fixed top-5 left-6 z-40">
+      <BackSlideButton fallbackUrl="/colecciones/enigmas-subterraneos/" />
+    </div>
+
+    <TectonicHero
+      image={imgBaalbek}
+      imageScale={1.16}
+      imageFilter="contrast(1.1) brightness(0.75)"
+      word="BAALBEK"
+      subtitle="Bloques monolíticos de más de 800 toneladas en el Trilitón del Líbano"
+      fontHref="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,900&display=swap"
+      fontFamily="'Bodoni Moda', serif"
+      fontWeight={900}
+      gradient="linear-gradient(180deg, #F5E6C8 0%, #D4AF37 55%, #7A5C1B 100%)"
+      glow="rgba(212,175,55,0.45)"
+      accent="#D4AF37"
+      subColor="#E5DFD3"
+      align="center"
+      showHud={false}
+    />
+
+    <section class="max-w-4xl mx-auto px-6 py-16 font-serif leading-relaxed text-stone-200">
+      <div class="border-l-2 border-[#D4AF37] pl-6 py-2 mb-10">
+        <p class="font-mono text-xs uppercase tracking-widest text-[#D4AF37]">Expediente Lítico #04</p>
+        <h2 class="text-2xl font-bold text-white uppercase mt-1">El Trilitón y la Piedra de la Mujer Embarazada</h2>
+      </div>
+      <p class="text-lg text-stone-300 mb-6">
+        En el podio del Templo de Júpiter en Heliópolis (Baalbek), tres sillares colosales conocidos como el Trilitón superan las 800 toneladas cada uno, superados únicamente por los bloques aún mayores tallados en la cantera cercana del valle de Beqaa.
+      </p>
+    </section>
+  </main>
+</Layout>

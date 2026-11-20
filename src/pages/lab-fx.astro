@@ -1,0 +1,106 @@
+---
+/**
+ * src/pages/lab-fx.astro
+ * Visor dev-only de los 8 FX cinemáticos de TGP en modo normal (showHud={false}),
+ * alimentado desde la fuente única src/lib/ooparts-catalog.ts.
+ */
+export const prerender = false;
+
+if (!import.meta.env.DEV) {
+  return Astro.redirect('/');
+}
+
+import Layout from '../layouts/Layout.astro';
+import BarabarHero from '../components/BarabarHero.astro';
+import PumapunkuHero from '../components/PumapunkuHero.astro';
+import TectonicHero from '../components/TectonicHero.astro';
+import AbyssHero from '../components/AbyssHero.astro';
+import PluvialHero from '../components/PluvialHero.astro';
+import GunungPadangHero from '../components/GunungPadangHero.astro';
+import BladeWipeHero from '../components/BladeWipeHero.astro';
+import DiagonalScaleHero from '../components/DiagonalScaleHero.astro';
+import { OOPART_ITEMS } from '../lib/ooparts-catalog';
+
+const fxParam = Astro.url.searchParams.get('fx') || 'barabar';
+const active = OOPART_ITEMS.find((s) => s.fxKey === fxParam) || OOPART_ITEMS[0];
+---
+
+<Layout title={`${active.title} · Catálogo FX (${active.fxLabel}) | TGP`} headerTransparentUntilScroll={true}>
+  <main class="min-h-screen bg-[#07080a] text-stone-200">
+    <nav class="sticky top-0 z-50 bg-[#07080a]/90 backdrop-blur-md border-b border-white/10 px-4 py-2.5">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+        <a href="/tgp-app" class="font-mono text-[11px] uppercase tracking-widest text-amber-400 hover:text-amber-300">
+          ← TGP App Workbench
+        </a>
+        <div class="flex flex-wrap gap-1.5">
+          {OOPART_ITEMS.map((s) => (
+            <a
+              href={`/lab-fx?fx=${s.fxKey}`}
+              class={`px-2.5 py-1 rounded-full font-mono text-[10px] uppercase tracking-wider border transition-all ${
+                s.fxKey === active.fxKey
+                  ? 'bg-amber-400 text-black border-amber-400 font-bold'
+                  : 'bg-white/5 text-stone-300 border-white/10 hover:border-amber-400/50'
+              }`}
+            >
+              {s.fxLabel}
+            </a>
+          ))}
+        </div>
+      </div>
+    </nav>
+
+    {active.fxKey === 'barabar' && (
+      <BarabarHero image={active.image} word={active.heroWord} subtitle={active.subtitle} badge={active.location} showHud={false} />
+    )}
+    {active.fxKey === 'pumapunku' && (
+      <PumapunkuHero image={active.image} title={active.heroWord} subtitleWord={active.subtitleWord} subtitle={active.subtitle} badge={active.location} showHud={false} />
+    )}
+    {active.fxKey === 'tectonic' && (
+      <TectonicHero
+        image={active.image}
+        imageScale={1.12}
+        imageFilter="contrast(1.1) brightness(0.75)"
+        word={active.heroWord}
+        subtitle={active.subtitle}
+        fontHref="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,900&display=swap"
+        fontFamily="'Bodoni Moda', serif"
+        fontWeight={900}
+        gradient="linear-gradient(180deg, #F5E6C8 0%, #D4AF37 55%, #7A5C1B 100%)"
+        glow="rgba(212,175,55,0.45)"
+        accent="#D4AF37"
+        subColor="#E5DFD3"
+        align="center"
+        showHud={false}
+      />
+    )}
+    {active.fxKey === 'abyss' && (
+      <AbyssHero image={active.image} word={active.heroWord} subtitle={active.subtitle} showHud={false} />
+    )}
+    {active.fxKey === 'pluvial' && (
+      <PluvialHero image={active.image} word={active.heroWord} subtitle={active.subtitle} badge={active.location} showHud={false} />
+    )}
+    {active.fxKey === 'stratigraphic' && (
+      <GunungPadangHero image={active.image} word={active.heroWord} subtitle={active.subtitle} align="center" showHud={false} />
+    )}
+    {active.fxKey === 'blade' && (
+      <BladeWipeHero image={active.image} word={active.heroWord} subtitle={active.subtitle} badge={active.location} monogram={active.monogram} teaserTitle={active.teaserTitle} showHud={false} />
+    )}
+    {active.fxKey === 'diagonal' && (
+      <DiagonalScaleHero image={active.image} word={active.heroWord} subtitle={active.subtitle} badge={active.location} teaserTitle={active.teaserTitle} showHud={false} />
+    )}
+
+    <article class="max-w-3xl mx-auto px-6 py-16">
+      <div class="border-l-2 border-amber-400/70 pl-5 mb-8">
+        <p class="font-mono text-[11px] uppercase tracking-[0.25em] text-amber-400">
+          {active.fxLabel} · {active.location}
+        </p>
+        <h2 class="font-serif text-3xl font-bold text-white mt-1">{active.title}</h2>
+      </div>
+      <div class="space-y-5 font-serif text-lg leading-relaxed text-stone-300">
+        {active.paragraphs.map((p) => (
+          <p>{p}</p>
+        ))}
+      </div>
+    </article>
+  </main>
+</Layout>

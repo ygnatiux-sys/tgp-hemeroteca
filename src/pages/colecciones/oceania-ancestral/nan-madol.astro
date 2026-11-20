@@ -1,0 +1,48 @@
+---
+/**
+ * src/pages/colecciones/oceania-ancestral/nan-madol.astro
+ * DOSSIER HIJO: NAN MADOL (MICRONESIA)
+ */
+export const prerender = true;
+import Layout from '../../../layouts/Layout.astro';
+import BackSlideButton from '../../../components/BackSlideButton.astro';
+import TectonicHero from '../../../components/TectonicHero.astro';
+import imgNanMadol from '../../../assets/alternativa/nan-madol.jpg';
+---
+
+<Layout title="Nan Madol · Oceanía Ancestral | TGP" headerTransparentUntilScroll={true}>
+  <main class="w-full bg-[#030908] text-[#cde6e1] min-h-screen">
+    <div class="fixed top-5 left-6 z-40">
+      <BackSlideButton fallbackUrl="/colecciones/oceania-ancestral/" />
+    </div>
+
+    <TectonicHero
+      image={imgNanMadol}
+      imageScale={1.2}
+      imageFilter="saturate(0.9) contrast(1.1) brightness(0.75)"
+      overlay="linear-gradient(180deg, rgba(3,9,8,0.6) 0%, rgba(3,9,8,0.25) 50%, rgba(3,9,8,0.88) 100%)"
+      word="NAN MADOL"
+      subtitle="Basalto columnar ensamblado sobre arrecifes de coral en Pohnpei"
+      fontHref="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,900&display=swap"
+      fontFamily="'Bodoni Moda', serif"
+      fontWeight={900}
+      gradient="linear-gradient(180deg, #A6F3D8 0%, #4FC3A1 52%, #1F7A68 100%)"
+      glow="rgba(79,195,161,0.5)"
+      accent="#6FD1B5"
+      subColor="#CFE3DC"
+      size="clamp(3.2rem, 11vw, 10rem)"
+      align="center"
+      showHud={false}
+    />
+
+    <section class="max-w-4xl mx-auto px-6 py-16 font-serif leading-relaxed text-stone-200">
+      <div class="border-l-2 border-[#4FC3A1] pl-6 py-2 mb-10">
+        <p class="font-mono text-xs uppercase tracking-widest text-[#4FC3A1]">Expediente Oceánico #01</p>
+        <h2 class="text-2xl font-bold text-white uppercase mt-1">La Venecia de Basalto del Pacífico</h2>
+      </div>
+      <p class="text-lg text-stone-300 mb-6">
+        Levantada sobre casi un centenar de islotes artificiales frente a la costa de Pohnpei, Nan Madol apila vigas prismáticas de basalto volcánico de varias toneladas sin argamasa, formando canales, recintos funerarios y murallas ciclópeas directamente sobre el arrecife.
+      </p>
+    </section>
+  </main>
+</Layout>

@@ -17,6 +17,7 @@ import PolvoDorado from '../components/PolvoDorado.astro';
 import AppleCinemaShowcase, { type CinemaShowcaseItem } from '../components/AppleCinemaShowcase.astro';
 import AppleDualBentoDark from '../components/AppleDualBentoDark.astro';
 import curatedData from '../data/lost-posts-curated.json';
+import { OOPART_ITEMS } from '../lib/ooparts-catalog';
 
 const rawReel1 = (curatedData.reel1_arqueologia_litica || []).slice(0, 6);
 const rawReel2 = (curatedData.reel2_filosofia_gnosis || []).slice(0, 6);
@@ -188,6 +189,31 @@ const showcaseReel2: CinemaShowcaseItem[] = rawReel2.map((p, idx) => {
   };
 });
 
+const showcaseOoparts: CinemaShowcaseItem[] = OOPART_ITEMS.map((item, idx) => {
+  const preset = REEL1_PRESETS[idx % REEL1_PRESETS.length];
+  return {
+    title: item.title.toUpperCase(),
+    subtitle: item.excerpt,
+    category: "OOPARTs & Anomalías",
+    image: item.image.src,
+    href: item.href,
+    fontH1: preset.fontH1,
+    fontH2: preset.fontH2,
+    accentBadge: `Estreno 0${idx + 1} · ${item.location}`,
+    serviceColor: preset.serviceColor,
+    serviceIcon: preset.serviceIcon,
+    categoryLabel: `Estreno 0${idx + 1} · OOPARTs`,
+    samRating: "SAM 16",
+    ratingScore: preset.ratingScore,
+    ratingIcon: preset.ratingIcon,
+    techSpecs: ["4K", "IMAX 70MM", "ESTRENO 2026", "FX GSAP"],
+    duration: "12 min lectura",
+    author: "Xavier Benítez",
+    director: "The Great Puzzle Project",
+    actionLabel: "Abrir Dossier OOPART"
+  };
+});
+
 const allRecoveredPosts = [...rawReel1, ...rawReel2];
 ---
 
@@ -252,6 +278,36 @@ const allRecoveredPosts = [...rawReel1, ...rawReel2];
       </div>
 
     </header>
+
+    <!-- ══════════════════════════════════════════════════════════════════════════
+         SECCIÓN 0: VISOR DE NOVEDADES & ESTRENOS (OOPARTS & ANOMALÍAS · GSAP)
+         ══════════════════════════════════════════════════════════════════════════ -->
+    <section class="relative z-10 max-w-7xl mx-auto mb-20">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4 px-2">
+        <div>
+          <div class="inline-flex items-center gap-2 mb-2 font-mono text-[11px] tracking-[0.3em] uppercase text-[#d4af37]">
+            <span>ESTRENOS 2026</span>
+            <span>•</span>
+            <span>NOVEDADES &amp; DOSSIERS OOPART</span>
+          </div>
+          <h2 class="font-fraunces font-black uppercase text-2xl sm:text-3xl md:text-4xl text-[#F3EFE6] leading-none">
+            Novedades &amp; Post de Estreno
+          </h2>
+        </div>
+        <a href="/colecciones/ooparts/" class="font-mono text-xs uppercase tracking-widest text-[#d4af37] hover:text-white transition-colors">
+          Ver Colección OOPARTs (8) →
+        </a>
+      </div>
+
+      <AppleCinemaShowcase
+        items={showcaseOoparts}
+        isImax={true}
+        showBottomSection={false}
+        minimalist={true}
+        actionLabel="Abrir Dossier OOPART"
+        collectionTitle="OOPARTs & Anomalías · Estrenos"
+      />
+    </section>
 
     <!-- ══════════════════════════════════════════════════════════════════════════
          SECCIÓN 1: VISOR APPLE TV IMAX MAX (REEL 1 — LÍTICA & HEREJÍAS)

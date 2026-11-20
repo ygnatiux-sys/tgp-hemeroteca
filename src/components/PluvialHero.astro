@@ -15,6 +15,7 @@ interface Props {
   image: ImageMetadata;
   word?: string;
   subtitle?: string;
+  badge?: string;
   speed?: number;
   showHud?: boolean;
   hudLabel?: string;
@@ -24,8 +25,9 @@ const {
   image,
   word = "LA CICATRIZ DEL AGUA",
   subtitle = "La geología que reescribe la cronología humana",
+  badge = "Giza · Recinto de la Esfinge · Edad de Hielo",
   speed = 0.6,
-  showHud = true,
+  showHud = false,
   hudLabel = "Erosión Pluvial · Giza",
 } = Astro.props;
 
@@ -73,7 +75,7 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
       <!-- Badge Arqueogeológico -->
       <span class="pluvial-badge">
         <span class="pluvial-badge-dot"></span>
-        Giza · Recinto de la Esfinge · Edad de Hielo
+        {badge}
       </span>
 
       <!-- Bloque de Cascada Vertical (Estratos Pluviales) -->
@@ -108,7 +110,7 @@ const slices = Array.from({ length: sliceCount }, (_, i) => {
   </div>
 
   {
-    showHud ? (
+    showHud && import.meta.env.DEV ? (
       <div class="pluvial-hud">
         <div class="pluvial-hud-head">
           <span class="pluvial-hud-dot" />
