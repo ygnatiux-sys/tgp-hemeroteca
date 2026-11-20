@@ -32,61 +32,44 @@ export default function CoverflowCarousel({
   }
 
   const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState<boolean>(true);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
 
-  const stopAutoPlay = useCallback(() => {
-    setIsAutoPlaying(false);
-  }, []);
+  const stepSize = posts.length > 3 ? 3 : 1;
 
-  // Inicializar en el medio si hay al menos 3 posts
+  // Rotación automática en grupos de a 3 cada 4.5 segundos (solo pausa en hover)
   useEffect(() => {
-    if (posts.length >= 3) {
-      setActiveIndex(Math.floor(posts.length / 2));
-    } else {
-      setActiveIndex(0);
-    }
-  }, [posts.length]);
-
-  // Rotación automática por defecto cada 4.5 segundos
-  useEffect(() => {
-    if (!isAutoPlaying || posts.length <= 1) return;
+    if (isHovered || posts.length <= 1) return;
     const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev < posts.length - 1 ? prev + 1 : 0));
+      setActiveIndex((prev) => (prev + stepSize) % posts.length);
     }, 4500);
     return () => clearInterval(interval);
-  }, [isAutoPlaying, posts.length]);
+  }, [isHovered, posts.length, stepSize]);
 
   const handlePrev = useCallback(() => {
-    stopAutoPlay();
-    setActiveIndex((prev) => (prev > 0 ? prev - 1 : posts.length - 1));
-  }, [posts.length, stopAutoPlay]);
+    if (posts.length === 0) return;
+    setActiveIndex((prev) => (prev - stepSize + posts.length) % posts.length);
+  }, [posts.length, stepSize]);
 
   const handleNext = useCallback(() => {
-    stopAutoPlay();
-    setActiveIndex((prev) => (prev < posts.length - 1 ? prev + 1 : 0));
-  }, [posts.length, stopAutoPlay]);
+    if (posts.length === 0) return;
+    setActiveIndex((prev) => (prev + stepSize) % posts.length);
+  }, [posts.length, stepSize]);
 
   // Manejo de teclado
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
-        stopAutoPlay();
-        handlePrev();
-      }
-      if (e.key === 'ArrowRight') {
-        stopAutoPlay();
-        handleNext();
-      }
+      if (e.key === 'ArrowLeft') handlePrev();
+      if (e.key === 'ArrowRight') handleNext();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handlePrev, handleNext, stopAutoPlay]);
+  }, [handlePrev, handleNext]);
 
   // Soporte Touch / Swipe en móviles
   const onTouchStart = (e: React.TouchEvent) => {
-    stopAutoPlay();
+    setIsHovered(true);
     touchStartX.current = e.targetTouches[0].clientX;
   };
 
@@ -95,6 +78,7 @@ export default function CoverflowCarousel({
   };
 
   const onTouchEnd = () => {
+    setIsHovered(false);
     if (!touchStartX.current || !touchEndX.current) return;
     const distance = touchStartX.current - touchEndX.current;
     const minSwipeDistance = 45;
@@ -138,77 +122,66 @@ export default function CoverflowCarousel({
 
       {/* ── REGLA ESTRUCTURAL: Contenedor Padre Coverflow Ampliado a los Costados ── */}
       <div 
-        className="relative w-full h-135 sm:h-155 md:h-170 lg:h-185 flex justify-center items-center overflow-hidden bg-transparent"
+        className="relative w-full h-135 sm:h-150 md:h-165 lg:h-175 flex justify-center items-center overflow-hidden bg-transparent"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
         {/* ── FUNDIDOS LATERALES CON EL FONDO HEREDADO ── */}
-        <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-44 md:w-72 lg:w-96 bg-linear-to-r from-theme-dark via-theme-dark/85 via-40% to-transparent pointer-events-none z-30" />
-        <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-44 md:w-72 lg:w-96 bg-linear-to-l from-theme-dark via-theme-dark/85 via-40% to-transparent pointer-events-none z-30" />
+        <div className="absolute left-0 top-0 bottom-0 w-20 sm:w-36 md:w-56 lg:w-72 bg-linear-to-r from-theme-dark via-theme-dark/85 via-40% to-transparent pointer-events-none z-30" />
+        <div className="absolute right-0 top-0 bottom-0 w-20 sm:w-36 md:w-56 lg:w-72 bg-linear-to-l from-theme-dark via-theme-dark/85 via-40% to-transparent pointer-events-none z-30" />
 
-        {/* Pista de Tarjetas Coverflow Ampliada */}
+        {/* Pista de Tarjetas Coverflow Circular (siempre grupos de 3 equilibrados) */}
         <div className="relative w-full h-full flex justify-center items-center">
           {posts.map((post, idx) => {
-            const diff = idx - activeIndex;
+            let diff = idx - activeIndex;
+            if (posts.length > 2) {
+              if (diff > posts.length / 2) diff -= posts.length;
+              if (diff < -posts.length / 2) diff += posts.length;
+            }
             const isActive = diff === 0;
             const absDiff = Math.abs(diff);
 
-            // Permitir hasta 3 de cada lado (7 visibles en desktop)
-            if (absDiff > 3) {
+            if (absDiff > 2) {
               return null;
             }
 
-            // Cálculo dinámico de transformaciones con abanico amplio lateral y fundido al fondo
             let positionClasses = '';
             let visualClasses = '';
             let overlayOpacity = '';
 
             if (isActive) {
-              // ── Tarjeta Central (Activa) — Grande, destacada, nítida ──
+              // ── Tarjeta Central (Activa) — Vertical más ancha y protagonista ──
               positionClasses = 'scale-100 z-30 translate-x-0 cursor-default shadow-[0_30px_80px_-10px_rgba(0,0,0,0.98)]';
               visualClasses = 'opacity-100';
               overlayOpacity = 'bg-black/0';
             } else if (diff === -1) {
-              // Inmediata izquierda: fanned out hacia el costado
-              positionClasses = 'scale-[0.88] z-20 -translate-x-[68%] sm:-translate-x-[74%] md:-translate-x-[78%] lg:-translate-x-[82%] cursor-pointer shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9)]';
+              positionClasses = 'scale-[0.80] z-20 -translate-x-[76%] sm:-translate-x-[82%] md:-translate-x-[86%] lg:-translate-x-[90%] cursor-pointer shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9)]';
               visualClasses = 'opacity-85 brightness-80 hover:brightness-95';
               overlayOpacity = 'bg-black/25';
             } else if (diff === 1) {
-              // Inmediata derecha: fanned out hacia el costado
-              positionClasses = 'scale-[0.88] z-20 translate-x-[68%] sm:translate-x-[74%] md:translate-x-[78%] lg:translate-x-[82%] cursor-pointer shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9)]';
+              positionClasses = 'scale-[0.80] z-20 translate-x-[76%] sm:translate-x-[82%] md:translate-x-[86%] lg:translate-x-[90%] cursor-pointer shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9)]';
               visualClasses = 'opacity-85 brightness-80 hover:brightness-95';
               overlayOpacity = 'bg-black/25';
             } else if (diff === -2) {
-              // Segunda tarjeta a la izquierda: se funde más con el fondo
-              positionClasses = 'scale-[0.76] z-10 -translate-x-[132%] sm:-translate-x-[144%] md:-translate-x-[152%] lg:-translate-x-[160%] cursor-pointer shadow-[0_15px_40px_-10px_rgba(0,0,0,0.85)]';
-              visualClasses = 'opacity-60 brightness-50 hover:brightness-70';
-              overlayOpacity = 'bg-black/50';
+              positionClasses = 'scale-[0.66] z-10 -translate-x-[142%] sm:-translate-x-[154%] md:-translate-x-[162%] lg:-translate-x-[168%] cursor-pointer shadow-none hidden sm:block';
+              visualClasses = 'opacity-45 brightness-45 hover:brightness-65';
+              overlayOpacity = 'bg-black/55';
             } else if (diff === 2) {
-              // Segunda tarjeta a la derecha: se funde más con el fondo
-              positionClasses = 'scale-[0.76] z-10 translate-x-[132%] sm:translate-x-[144%] md:translate-x-[152%] lg:translate-x-[160%] cursor-pointer shadow-[0_15px_40px_-10px_rgba(0,0,0,0.85)]';
-              visualClasses = 'opacity-60 brightness-50 hover:brightness-70';
-              overlayOpacity = 'bg-black/50';
-            } else if (diff === -3) {
-              // Tercera tarjeta a la izquierda (extremo): casi disuelta en negro
-              positionClasses = 'scale-[0.64] z-0 -translate-x-[192%] sm:-translate-x-[210%] md:-translate-x-[222%] lg:-translate-x-[234%] cursor-pointer shadow-none';
-              visualClasses = 'opacity-30 brightness-30 hidden sm:block';
-              overlayOpacity = 'bg-black/75';
-            } else if (diff === 3) {
-              // Tercera tarjeta a la derecha (extremo): casi disuelta en negro
-              positionClasses = 'scale-[0.64] z-0 translate-x-[192%] sm:translate-x-[210%] md:translate-x-[222%] lg:translate-x-[234%] cursor-pointer shadow-none';
-              visualClasses = 'opacity-30 brightness-30 hidden sm:block';
-              overlayOpacity = 'bg-black/75';
+              positionClasses = 'scale-[0.66] z-10 translate-x-[142%] sm:translate-x-[154%] md:translate-x-[162%] lg:translate-x-[168%] cursor-pointer shadow-none hidden sm:block';
+              visualClasses = 'opacity-45 brightness-45 hover:brightness-65';
+              overlayOpacity = 'bg-black/55';
             }
 
             return (
               <div
                 key={post.id || idx}
                 onClick={() => {
-                  stopAutoPlay();
                   if (!isActive) setActiveIndex(idx);
                 }}
-                className={`absolute w-70 sm:w-85 md:w-100 lg:w-110 aspect-2/3 rounded-2xl md:rounded-3xl overflow-hidden border-0 transition-all duration-500 ease-out ${positionClasses} ${visualClasses}`}
+                className={`absolute w-[88vw] sm:w-[460px] md:w-[540px] lg:w-[620px] h-[480px] sm:h-[540px] md:h-[580px] lg:h-[620px] rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 transition-all duration-500 ease-out ${positionClasses} ${visualClasses}`}
               >
                 {/* Imagen de Portada Cinemática */}
                 <img
@@ -238,7 +211,7 @@ export default function CoverflowCarousel({
                   </h3>
 
                   {post.subtitle && (
-                    <p className="text-xs sm:text-sm text-white/70 font-light line-clamp-2 mb-3 leading-relaxed font-alegreya max-w-xs">
+                    <p className="text-xs sm:text-sm md:text-base text-white/80 font-light line-clamp-3 mb-4 leading-relaxed font-alegreya max-w-lg">
                       {post.subtitle}
                     </p>
                   )}
@@ -318,7 +291,6 @@ export default function CoverflowCarousel({
           <button
             key={idx}
             onClick={() => {
-              stopAutoPlay();
               setActiveIndex(idx);
             }}
             aria-label={`Ir a publicación ${idx + 1}`}
