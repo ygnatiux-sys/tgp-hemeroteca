@@ -181,7 +181,7 @@ export default function CoverflowCarousel({
                 onClick={() => {
                   if (!isActive) setActiveIndex(idx);
                 }}
-                className={`absolute w-[88vw] sm:w-[460px] md:w-[540px] lg:w-[620px] h-[480px] sm:h-[540px] md:h-[580px] lg:h-[620px] rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 transition-all duration-500 ease-out ${positionClasses} ${visualClasses}`}
+                className={`absolute w-[88vw] sm:w-115 md:w-135 lg:w-155 h-120 sm:h-135 md:h-145 lg:h-155 rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 transition-all duration-500 ease-out ${positionClasses} ${visualClasses}`}
               >
                 {/* Imagen de Portada Cinemática */}
                 <img
