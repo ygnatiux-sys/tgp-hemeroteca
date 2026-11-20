@@ -119,8 +119,8 @@ export const OOPART_ITEMS: OopartItem[] = [
     ],
     href: '/colecciones/ooparts/table-mountain-calaveras/',
     fontClass: "font-['Clash_Display',sans-serif] font-bold tracking-tight uppercase",
-    h1Style: "background: linear-gradient(180deg, #f5d0fe 0%, #e879f9 52%, #a21caf 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 28px rgba(232,121,249,0.6)) drop-shadow(0 10px 22px rgba(0,0,0,0.9));",
-    accentColor: '#e879f9',
+    h1Style: "background: linear-gradient(180deg, #f3e8ff 0%, #c084fc 52%, #7e22ce 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 28px rgba(192,132,252,0.55)) drop-shadow(0 10px 22px rgba(0,0,0,0.9));",
+    accentColor: '#c084fc',
   },
   {
     slug: 'bateria-de-bagdad',
@@ -206,3 +206,150 @@ export const OOPART_ITEMS: OopartItem[] = [
     accentColor: '#84cc16',
   },
 ];
+
+export interface ShowcaseH1Theme {
+  fontClass: string;
+  h1Style: string;
+  accentColor: string;
+  sizeClass?: string;
+}
+
+const LEGACY_POST_THEMES: Array<{
+  match: RegExp;
+  theme: ShowcaseH1Theme;
+}> = [
+  {
+    match: /pumapunku|puma-punku|andesita/i,
+    theme: {
+      fontClass: "font-['Panchang','Space_Grotesk',sans-serif] font-black tracking-[0.05em] uppercase",
+      h1Style: "background: linear-gradient(180deg, #f2f4f7 0%, #d4d7de 30%, #b0b4bd 65%, #6c707a 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 12px 30px rgba(0,0,0,0.98)) drop-shadow(0 0 26px rgba(78,242,210,0.45));",
+      accentColor: '#4ef2d2',
+      sizeClass: 'text-3xl sm:text-5xl md:text-6xl lg:text-[4.4rem]',
+    },
+  },
+  {
+    match: /osireion|abidos/i,
+    theme: {
+      fontClass: "font-['Cabinet_Grotesk',sans-serif] font-black tracking-[-0.01em] uppercase",
+      h1Style: "background: linear-gradient(180deg, #f2dfd5 0%, #dcbba8 45%, #c49f8a 85%, #8b5a45 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 20px 45px rgba(0,0,0,0.95)) drop-shadow(0 0 35px rgba(139,90,69,0.45));",
+      accentColor: '#dcbba8',
+      sizeClass: 'text-4xl sm:text-5xl md:text-6xl lg:text-[4.6rem]',
+    },
+  },
+  {
+    match: /barabar|resonancia/i,
+    theme: {
+      fontClass: "font-['Syne',sans-serif] font-black tracking-[-0.01em] uppercase",
+      h1Style: "background: linear-gradient(180deg, #ffffff 0%, #e8edf1 26%, #b0b7bd 62%, #6e777f 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 20px 45px rgba(0,0,0,0.98)) drop-shadow(0 0 42px rgba(243,156,18,0.38));",
+      accentColor: '#f39c12',
+      sizeClass: 'text-3xl sm:text-5xl md:text-6xl lg:text-[4.4rem]',
+    },
+  },
+  {
+    match: /gunung|padang/i,
+    theme: {
+      fontClass: "font-['Clash_Grotesk','Unbounded',sans-serif] font-bold tracking-tight uppercase",
+      h1Style: "background: linear-gradient(180deg, #f2f5f3 0%, #e0e3e1 55%, #a95a3f 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 16px 36px rgba(0,0,0,0.95)) drop-shadow(0 0 28px rgba(169,90,63,0.45));",
+      accentColor: '#a95a3f',
+      sizeClass: 'text-3xl sm:text-5xl md:text-6xl lg:text-[4.4rem]',
+    },
+  },
+  {
+    match: /derinkuyu|capadocia/i,
+    theme: {
+      fontClass: "font-['Clash_Display','Inter',sans-serif] font-bold tracking-[-0.03em] uppercase",
+      h1Style: "background: linear-gradient(180deg, #f2825c 0%, #d45632 32%, #9e2a18 70%, #4a0d06 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 20px 45px rgba(0,0,0,0.98)) drop-shadow(0 0 45px rgba(184,58,36,0.48));",
+      accentColor: '#d45632',
+      sizeClass: 'text-4xl sm:text-5xl md:text-6xl lg:text-[4.6rem]',
+    },
+  },
+  {
+    match: /diquis|diquís/i,
+    theme: {
+      fontClass: "font-['Fraunces',serif] font-black tracking-[-0.02em] uppercase",
+      h1Style: "background: linear-gradient(180deg, #ff4d55 0%, #e50914 42%, #9b0b11 78%, #4a0508 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 14px 38px rgba(0,0,0,0.9)) drop-shadow(0 0 35px rgba(229,9,20,0.45));",
+      accentColor: '#ff4d55',
+      sizeClass: 'text-4xl sm:text-5xl md:text-6xl lg:text-[4.6rem]',
+    },
+  },
+  {
+    match: /olmeca/i,
+    theme: {
+      fontClass: "font-['Fraunces',serif] font-black tracking-[-0.02em] uppercase",
+      h1Style: "background: linear-gradient(180deg, #f0c284 0%, #c98b4d 48%, #8a5328 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 14px 38px rgba(0,0,0,0.9)) drop-shadow(0 0 32px rgba(201,139,77,0.42));",
+      accentColor: '#f0c284',
+      sizeClass: 'text-3xl sm:text-5xl md:text-6xl lg:text-[4.4rem]',
+    },
+  },
+  {
+    match: /moai|rapa-nui|rapa nui/i,
+    theme: {
+      fontClass: "font-['Fraunces',serif] font-black tracking-[-0.02em] uppercase",
+      h1Style: "background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 35%, #94a3b8 70%, #475569 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 20px 45px rgba(0,0,0,0.98)) drop-shadow(0 0 35px rgba(78,242,210,0.35));",
+      accentColor: '#4ef2d2',
+      sizeClass: 'text-3xl sm:text-5xl md:text-6xl lg:text-[4.4rem]',
+    },
+  },
+  {
+    match: /giza|esfinge|cicatriz-del-agua|cicatriz del agua/i,
+    theme: {
+      fontClass: "font-['Cinzel',serif] font-black tracking-[0.03em] uppercase",
+      h1Style: "background: linear-gradient(180deg, #f7ecd6 0%, #d4b886 55%, #8c6d3f 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 18px 40px rgba(0,0,0,0.95)) drop-shadow(0 0 30px rgba(212,184,134,0.42));",
+      accentColor: '#d4b886',
+      sizeClass: 'text-3xl sm:text-5xl md:text-6xl lg:text-[4.4rem]',
+    },
+  },
+  {
+    match: /baalbek|triliton|trilitón/i,
+    theme: {
+      fontClass: "font-['Bodoni_Moda',serif] font-black tracking-tight uppercase",
+      h1Style: "background: linear-gradient(180deg, #F5E6C8 0%, #D4AF37 55%, #7A5C1B 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 18px 40px rgba(0,0,0,0.95)) drop-shadow(0 0 32px rgba(212,175,55,0.45));",
+      accentColor: '#D4AF37',
+      sizeClass: 'text-4xl sm:text-5xl md:text-6xl lg:text-[4.6rem]',
+    },
+  },
+  {
+    match: /nan-madol|nan madol|pohnpei/i,
+    theme: {
+      fontClass: "font-['Bodoni_Moda',serif] font-black tracking-tight uppercase",
+      h1Style: "background: linear-gradient(180deg, #A6F3D8 0%, #4FC3A1 52%, #1F7A68 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 18px 40px rgba(0,0,0,0.95)) drop-shadow(0 0 32px rgba(79,195,161,0.5));",
+      accentColor: '#4FC3A1',
+      sizeClass: 'text-3xl sm:text-5xl md:text-6xl lg:text-[4.4rem]',
+    },
+  },
+  {
+    match: /gobekli|göbekli/i,
+    theme: {
+      fontClass: "font-['Cinzel_Decorative',serif] font-black tracking-wide uppercase",
+      h1Style: "background: linear-gradient(180deg, #a7f3d0 0%, #34d399 52%, #065f46 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 16px 36px rgba(0,0,0,0.95)) drop-shadow(0 0 30px rgba(52,211,153,0.45));",
+      accentColor: '#34d399',
+      sizeClass: 'text-3xl sm:text-5xl md:text-6xl lg:text-[4.4rem]',
+    },
+  },
+];
+
+export function resolveShowcaseH1Theme(href?: string, title?: string, fallbackIdx: number = 0): ShowcaseH1Theme {
+  const exact = OOPART_ITEMS.find((o) => (href && (o.href === href || href.includes(o.slug))));
+  if (exact) {
+    return { fontClass: exact.fontClass, h1Style: exact.h1Style, accentColor: exact.accentColor };
+  }
+  const probe = `${href || ''} ${title || ''}`;
+  const legacy = LEGACY_POST_THEMES.find((item) => item.match.test(probe));
+  if (legacy) {
+    return legacy.theme;
+  }
+  let hash = fallbackIdx;
+  if (title) {
+    for (let i = 0; i < title.length; i++) {
+      hash = (hash * 31 + title.charCodeAt(i)) >>> 0;
+    }
+  }
+  const pool = [...OOPART_ITEMS, ...LEGACY_POST_THEMES.map((l) => l.theme)];
+  const picked = pool[hash % pool.length];
+  return {
+    fontClass: picked.fontClass,
+    h1Style: picked.h1Style,
+    accentColor: picked.accentColor,
+    sizeClass: 'sizeClass' in picked ? picked.sizeClass : undefined,
+  };
+}

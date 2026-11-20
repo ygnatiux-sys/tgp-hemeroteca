@@ -123,8 +123,6 @@ export default function CoverflowCarousel({
       {/* ── REGLA ESTRUCTURAL: Contenedor Padre Coverflow Ampliado a los Costados ── */}
       <div 
         className="relative w-full h-135 sm:h-150 md:h-165 lg:h-175 flex justify-center items-center overflow-hidden bg-transparent"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
@@ -178,6 +176,8 @@ export default function CoverflowCarousel({
             return (
               <div
                 key={post.id || idx}
+                onMouseEnter={() => { if (isActive) setIsHovered(true); }}
+                onMouseLeave={() => { if (isActive) setIsHovered(false); }}
                 onClick={() => {
                   if (!isActive) setActiveIndex(idx);
                 }}
@@ -247,9 +247,12 @@ export default function CoverflowCarousel({
         {/* ── Botón Anterior (<) Flotante con tono atenuado Gloock (#E3DDD3) ── */}
         <button
           type="button"
-          onClick={handlePrev}
+          onClick={(e) => {
+            e.stopPropagation();
+            handlePrev();
+          }}
           aria-label="Anterior"
-          className="group absolute left-3 sm:left-6 md:left-10 lg:left-14 top-1/2 -translate-y-1/2 z-40 p-2 text-[#E3DDD3]/50 hover:text-[#E3DDD3]/90 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none"
+          className="group absolute left-3 sm:left-6 md:left-10 lg:left-14 top-1/2 -translate-y-1/2 z-50 pointer-events-auto p-2 text-[#E3DDD3]/50 hover:text-[#E3DDD3]/90 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none"
         >
           <svg
             className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 transition-colors"
@@ -267,9 +270,12 @@ export default function CoverflowCarousel({
         {/* ── Botón Siguiente (>) Flotante con tono atenuado Gloock (#E3DDD3) ── */}
         <button
           type="button"
-          onClick={handleNext}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleNext();
+          }}
           aria-label="Siguiente"
-          className="group absolute right-3 sm:right-6 md:right-10 lg:right-14 top-1/2 -translate-y-1/2 z-40 p-2 text-[#E3DDD3]/50 hover:text-[#E3DDD3]/90 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none"
+          className="group absolute right-3 sm:right-6 md:right-10 lg:right-14 top-1/2 -translate-y-1/2 z-50 pointer-events-auto p-2 text-[#E3DDD3]/50 hover:text-[#E3DDD3]/90 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none"
         >
           <svg
             className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 transition-colors"

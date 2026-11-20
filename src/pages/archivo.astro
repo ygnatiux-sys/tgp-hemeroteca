@@ -280,6 +280,18 @@ function createPremierSequences(essays: typeof resolvedEssays) {
   description="Archivo general y catálogo cronológico de investigaciones, dossiers y ensayos de The Great Puzzle Project."
   image={archiveCoverUrl}
 >
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@900&family=Fraunces:ital,opsz,wght@0,9..144,900;1,9..144,900&family=Syne:wght@800&family=Unbounded:wght@900&display=swap"
+    media="print"
+    onload="this.media='all'"
+  />
+  <link
+    rel="stylesheet"
+    href="https://api.fontshare.com/v2/css?f[]=clash-display@700&f[]=clash-grotesk@700&display=swap"
+    media="print"
+    onload="this.media='all'"
+  />
   {/* ── HERO PRINCIPAL ESTILO SPOTIFY (H1) A FULL BLEED ── */}
   <HeroSpotifyColecciones
     isH1={true}
@@ -604,7 +616,7 @@ function createPremierSequences(essays: typeof resolvedEssays) {
     {coverflowPosts.length > 0 && (
       <section class="mt-20 md:mt-32 w-full bg-transparent relative overflow-hidden">
         <CoverflowCarousel 
-          client:visible 
+          client:load 
           posts={coverflowPosts}
           title="Explorador de Colecciones"
           eyebrow="Galería 3D del Archivo"

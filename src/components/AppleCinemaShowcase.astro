@@ -19,6 +19,7 @@
  *    - "Cómo ver" -> Card oscuro con logo TGP Project en tracking espaciado "C I N E M A T I C A".
  */
 import { sanitizeImageUrl, isValidImageSrc } from '../lib/content-filter';
+import { resolveShowcaseH1Theme } from '../lib/ooparts-catalog';
 
 export interface CinemaShowcaseItem {
   title: string;
@@ -184,7 +185,16 @@ const DEFAULT_HERO_ITEMS: CinemaShowcaseItem[] = [
   }
 ];
 
-const finalHeroItems = items && items.length > 0 ? items : DEFAULT_HERO_ITEMS;
+const rawHeroItems = items && items.length > 0 ? items : DEFAULT_HERO_ITEMS;
+const finalHeroItems = rawHeroItems.map((item, idx) => {
+  if (item.h1Style) return item;
+  const resolved = resolveShowcaseH1Theme(item.href, item.title, idx);
+  return {
+    ...item,
+    fontH1: resolved.fontClass || item.fontH1,
+    h1Style: resolved.h1Style,
+  };
+});
 
 // Frames redondos estilo Reparto y equipo (Autores / Arquetipos de las Colecciones)
 const DEFAULT_ROUND_FRAMES: RoundFrameItem[] = [
@@ -234,8 +244,8 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
 ---
 
 <!-- Carga de fuentes requeridas (Google Fonts + Fontshare) asíncronas no bloqueantes -->
-<link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,800;0,6..96,900;1,6..96,700&family=Fraunces:ital,opsz,wght@0,9..144,800;0,9..144,900;1,9..144,800&family=League+Spartan:wght@700;800;900&family=Oswald:wght@600;700&family=Space+Grotesk:wght@600;700&family=Syne:wght@700;800;900&family=Unbounded:wght@700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link href="https://api.fontshare.com/v2/css?f[]=panchang@700,800,900&f[]=cabinet-grotesk@800,900&f[]=clash-display@600,700&f[]=clash-grotesk@700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,800;0,6..96,900;1,6..96,700&family=Cinzel+Decorative:wght@900&family=Fraunces:ital,opsz,wght@0,9..144,800;0,9..144,900;1,9..144,800&family=League+Spartan:wght@700;800;900&family=Oswald:wght@600;700&family=Space+Grotesk:wght@600;700&family=Syne:wght@700;800;900&family=Unbounded:wght@700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
 <div class="apple-cinema-showcase-wrapper relative w-full my-12 select-none font-sans" data-active-slide="0">
   

@@ -12,6 +12,7 @@
  */
 
 import { isCriticalBust } from '../lib/aspect-system';
+import { resolveShowcaseH1Theme } from '../lib/ooparts-catalog';
 
 export interface TriplicoPost {
   title: string;
@@ -51,6 +52,7 @@ const {
 const isArchive = variant === 'archive';
 const stageId   = `triptico-stage-${instanceId}`;
 const hero = heroPost ?? posts[0] ?? null;
+const heroTheme = hero ? resolveShowcaseH1Theme(hero.href, hero.title, 0) : null;
 const slicedPosts = posts.slice(0, 3);
 
 // Helper para formateo editorial heredado de frases (CinematicArchiveCard)
@@ -117,6 +119,9 @@ if (headline.includes('.')) {
   headlinePart2 = `& ${parts[1].trim()}`;
 }
 ---
+
+<link href="https://api.fontshare.com/v2/css?f[]=panchang@700,800,900&f[]=cabinet-grotesk@800,900&f[]=clash-display@600,700&f[]=clash-grotesk@700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,900&family=Cinzel+Decorative:wght@900&family=Fraunces:ital,opsz,wght@0,9..144,900;1,9..144,900&family=Syne:wght@800;900&family=Unbounded:wght@800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
 
 <section
   id={`triptico-revelacion-${instanceId}`}
@@ -201,7 +206,10 @@ if (headline.includes('.')) {
                   <div class="w-8 h-px bg-rust-orange/50"></div>
                 </div>
 
-                <h1 class="font-gloock font-extrabold gradient-steel-titanium text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[4.2rem] leading-[0.98] tracking-tight drop-shadow-[0_6px_35px_rgba(0,0,0,0.95)] text-balance">
+                <h1
+                  class={`${heroTheme?.sizeClass || 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[4.2rem]'} leading-[0.98] tracking-tight drop-shadow-[0_6px_35px_rgba(0,0,0,0.95)] text-balance ${heroTheme ? heroTheme.fontClass : 'font-gloock font-extrabold gradient-steel-titanium'}`}
+                  style={heroTheme ? heroTheme.h1Style : undefined}
+                >
                   {cleanedHeroTitle}
                 </h1>
               </div>
@@ -318,9 +326,17 @@ if (headline.includes('.')) {
                     <div class="w-8 h-px bg-rust-orange/50"></div>
                   </div>
 
-                  <h1 class="font-gloock font-extrabold gradient-steel-titanium text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[4.2rem] leading-[0.98] tracking-tight drop-shadow-[0_6px_35px_rgba(0,0,0,0.95)] text-balance">
-                    {cleanedTitle}
-                  </h1>
+                  {(() => {
+                    const spotTheme = resolveShowcaseH1Theme(post.href, post.title, idx + 1);
+                    return (
+                      <h1
+                        class={`${spotTheme.sizeClass || 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[4.2rem]'} leading-[0.98] tracking-tight drop-shadow-[0_6px_35px_rgba(0,0,0,0.95)] text-balance ${spotTheme.fontClass}`}
+                        style={spotTheme.h1Style}
+                      >
+                        {cleanedTitle}
+                      </h1>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
@@ -690,12 +706,12 @@ if (headline.includes('.')) {
             const spotlightImg = card.querySelector<HTMLElement>('.spotlight-img');
             const isRightAligned = idx % 2 === 1;
             const cardStartTime = mainTl.duration();
-            const panDuration = isArchiveVariant ? 1.8 : 5.6;
-            const cardHold = isArchiveVariant ? 1.5 : 5.5;
+            const panDuration = isArchiveVariant ? 4.8 : 5.6;
+            const cardHold = isArchiveVariant ? 4.8 : 5.5;
 
             // Activar tarjeta con z-index superior
             mainTl.set(card, { zIndex: 25 }, cardStartTime);
-            mainTl.to(card, { autoAlpha: 1, pointerEvents: 'auto', duration: (isArchiveVariant ? 0.3 : 0.4) }, cardStartTime);
+            mainTl.to(card, { autoAlpha: 1, pointerEvents: 'auto', duration: 0.45 }, cardStartTime);
 
             // PANEO CINEMÁTICO DE CÁMARA (20% 50% + Zoom 1.08 estilo Vertical Stack)
             if (spotlightImg) {
@@ -707,24 +723,24 @@ if (headline.includes('.')) {
               );
             }
 
-            // ── SUB-STAGE 1: MODO CINEMÁTICO DE PRESENTACIÓN H1 (GRADIENTE TITANIUM EXTRA BOLD) ──
+            // ── SUB-STAGE 1: MODO CINEMÁTICO DE PRESENTACIÓN H1 ──
             if (titleStage && titleBox) {
               const titleXStart = isRightAligned ? 30 : -30;
               mainTl.set(titleStage, { zIndex: 30, autoAlpha: 1 }, cardStartTime);
               mainTl.fromTo(titleBox,
                 { autoAlpha: 0, x: titleXStart, filter: 'blur(6px)' },
-                { autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: (isArchiveVariant ? 0.35 : 0.8), ease: 'power2.out' },
+                { autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: 0.75, ease: 'power2.out' },
                 cardStartTime + 0.1
               );
               mainTl.to(titleBox,
-                { autoAlpha: 0, x: titleXStart / 2, duration: (isArchiveVariant ? 0.25 : 0.5), ease: 'power2.in' },
-                cardStartTime + (isArchiveVariant ? 0.6 : 1.9)
+                { autoAlpha: 0, x: titleXStart / 2, duration: 0.45, ease: 'power2.in' },
+                cardStartTime + (isArchiveVariant ? 1.65 : 1.9)
               );
               mainTl.to(titleStage,
-                { autoAlpha: 0, duration: (isArchiveVariant ? 0.25 : 0.4), ease: 'power2.inOut' },
-                cardStartTime + (isArchiveVariant ? 0.7 : 2.1)
+                { autoAlpha: 0, duration: 0.4, ease: 'power2.inOut' },
+                cardStartTime + (isArchiveVariant ? 1.85 : 2.1)
               );
-              mainTl.set(titleStage, { zIndex: 0 }, cardStartTime + (isArchiveVariant ? 0.8 : 2.5));
+              mainTl.set(titleStage, { zIndex: 0 }, cardStartTime + (isArchiveVariant ? 2.2 : 2.5));
             }
 
             // ── SUB-STAGE 2: ESCENA PRESERVADA INTACTA (FRASE SOBERANA + ARTEFACTO) ──
@@ -736,8 +752,8 @@ if (headline.includes('.')) {
             if (cinematicLayer) {
               mainTl.fromTo(cinematicLayer,
                 { autoAlpha: 0 },
-                { autoAlpha: 1, duration: (isArchiveVariant ? 0.35 : 0.8), ease: 'power2.out' },
-                cardStartTime + (isArchiveVariant ? 0.7 : 2.3)
+                { autoAlpha: 1, duration: 0.75, ease: 'power2.out' },
+                cardStartTime + (isArchiveVariant ? 2.0 : 2.3)
               );
             }
 
@@ -745,8 +761,8 @@ if (headline.includes('.')) {
               const xStart = isRightAligned ? 40 : -40;
               mainTl.fromTo(textContent,
                 { autoAlpha: 0, x: xStart, filter: 'blur(8px)' },
-                { autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: (isArchiveVariant ? 0.45 : 0.9), ease: 'power2.out' },
-                cardStartTime + (isArchiveVariant ? 0.7 : 2.3)
+                { autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: 0.85, ease: 'power2.out' },
+                cardStartTime + (isArchiveVariant ? 2.0 : 2.3)
               );
             }
 

@@ -15,6 +15,7 @@
  *   indicadores inferiores interactivos y pausa en hover/touch.
  */
 import { sanitizeImageUrl, isValidImageSrc } from '../lib/content-filter';
+import { resolveShowcaseH1Theme } from '../lib/ooparts-catalog';
 
 export interface TriptychPost {
   title: string;
@@ -42,6 +43,7 @@ export interface SlideItem {
   ctaText: string;
   ctaHref: string;
   fontH1: string;
+  h1Style?: string;
   fontH2: string;
   badgeImax: string;
   techSpecs: string[];
@@ -112,6 +114,7 @@ if (posts && posts.length >= 3) {
     const p3 = chunk[2];
     const slideNumber = String(Math.floor(i / 3) + 1).padStart(2, '0');
     const preset = FONT_PRESETS[(Math.floor(i / 3)) % FONT_PRESETS.length];
+    const h1Theme = resolveShowcaseH1Theme(p1.href, p1.title, Math.floor(i / 3));
 
     computedSlides.push({
       kicker: `${(p1.category || 'ARCHIVO TGP').toUpperCase()} // DOSSIER ${slideNumber}`,
@@ -120,7 +123,8 @@ if (posts && posts.length >= 3) {
       subtitle: p1.excerpt ? p1.excerpt.replace(/[#*_`]/g, '').slice(0, 160) + '…' : 'Investigación profunda y análisis documental del acervo.',
       ctaText: 'Ver investigación',
       ctaHref: p1.href,
-      fontH1: preset.fontH1,
+      fontH1: h1Theme.fontClass,
+      h1Style: h1Theme.h1Style,
       fontH2: preset.fontH2,
       badgeImax: preset.badgeImax,
       techSpecs: preset.techSpecs,
@@ -249,6 +253,8 @@ const allSlides: SlideItem[] = computedSlides.length > 0
           : defaultSlides));
 ---
 
+<link href="https://api.fontshare.com/v2/css?f[]=panchang@700,800,900&f[]=cabinet-grotesk@800,900&f[]=clash-display@600,700&f[]=clash-grotesk@700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,900&family=Cinzel+Decorative:wght@900&family=Fraunces:ital,opsz,wght@0,9..144,900;1,9..144,900&family=Syne:wght@800;900&family=Unbounded:wght@800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
 
 <section class="tgp-hero-triptych-container relative w-full h-[78vh] min-h-140 max-h-200 bg-[#07080a] text-white overflow-hidden rounded-3xl select-none shadow-[0_30px_90px_rgba(0,0,0,0.95)] border border-white/10 my-10">
   
@@ -371,7 +377,10 @@ const allSlides: SlideItem[] = computedSlides.length > 0
         </div>
 
         {/* TÍTULO MONUMENTAL H1 CON FONT EXTRABOLD / IMPACT ESPECÍFICA */}
-        <h1 class={`showcase-title text-2xl sm:text-3xl md:text-4xl lg:text-[42px] text-white leading-[1.02] tracking-tight drop-shadow-[0_4px_25px_rgba(0,0,0,0.9)] mb-3 ${slide.fontH1}`}>
+        <h1
+          class={`showcase-title text-2xl sm:text-3xl md:text-4xl lg:text-[42px] leading-[1.02] tracking-tight drop-shadow-[0_4px_25px_rgba(0,0,0,0.9)] mb-3 ${slide.h1Style ? '' : 'text-white'} ${slide.fontH1}`}
+          style={slide.h1Style}
+        >
           {slide.title}
         </h1>
 
@@ -587,7 +596,7 @@ const allSlides: SlideItem[] = computedSlides.length > 0
 
     function scheduleNext() {
       if (loopCall) loopCall.kill();
-      loopCall = gsap.delayedCall(5.0, () => {
+      loopCall = gsap.delayedCall(6.5, () => {
         if (!isHovered) {
           const next = (currentIndex + 1) % contents.length;
           goToSlide(next);
@@ -603,11 +612,7 @@ const allSlides: SlideItem[] = computedSlides.length > 0
 
     function resumeLoop() {
       isHovered = false;
-      if (loopCall) {
-        loopCall.resume();
-      } else {
-        scheduleNext();
-      }
+      scheduleNext();
     }
 
     dots.forEach((dot, idx) => {
