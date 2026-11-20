@@ -1,0 +1,501 @@
+---
+// src/components/PuzzleItineraryHub.astro
+// Escenario central del Home estilo MUBI / HBO Max 2026.
+// Full-bleed backdrop + filtros dinámicos + carril panorámico 16:9 con GSAP.
+
+import { getCollection } from 'astro:content';
+import {
+  formatCategory,
+  isValidImageSrc,
+  resolveEssayImage,
+  sanitizeImageUrl,
+} from '../lib/content-filter';
+
+interface Props {
+  sectionKicker?: string;
+  maxItems?: number;
+}
+
+const {
+  sectionKicker = 'ITINERARIO DEL GRAN PUZZLE',
+  maxItems = 8,
+} = Astro.props;
+
+interface ItineraryItem {
+  id: string;
+  title: string;
+  category: string;
+  readingTime: string;
+  abstract: string;
+  url: string;
+  imageUrl: string;
+}
+
+let posts: ItineraryItem[] = [];
+
+try {
+  const ensayos = await getCollection('ensayos', ({ data }) => !data.draft);
+  if (Array.isArray(ensayos) && ensayos.length > 0) {
+    posts = ensayos
+      .map((e) => {
+        const data = e.data as Record<string, any>;
+        const slug = e.id.replace(/\/index$/, '').replace(/\.(mdoc|md|mdx)$/, '');
+        const resolvedImg = resolveEssayImage(data, slug);
+        const rawImg =
+          typeof resolvedImg === 'object' && resolvedImg?.src
+            ? resolvedImg.src
+            : typeof resolvedImg === 'string'
+              ? resolvedImg
+              : data.coverImage || data.heroUrl || (Array.isArray(data.gallery) ? data.gallery[0] : '');
+        const imageUrl = sanitizeImageUrl(rawImg);
+
+        return {
+          id: slug,
+          title: data.title || 'Ensayo Histórico',
+          category: formatCategory(data.category || data.volanta || 'ARCHIVO').toUpperCase(),
+          readingTime: data.readingTime || '12 MIN',
+          abstract:
+            data.abstract ||
+            data.excerpt ||
+            data.dek ||
+            'Investigación arqueosemiótica sobre las estructuras materiales y simbólicas que reescriben la historia profunda.',
+          url: `/hemeroteca/${slug}/`,
+          imageUrl,
+        };
+      })
+      .filter((item) => Boolean(item.imageUrl) && isValidImageSrc(item.imageUrl))
+      .slice(0, maxItems);
+  }
+} catch (err) {
+  console.warn('[PuzzleItineraryHub] Error cargando ensayos:', err);
+}
+
+const fallbackPosts: ItineraryItem[] = [
+  {
+    id: 'derinkuyu',
+    title: 'Derinkuyu: La Geometría Ctoniana',
+    category: 'SUBTERRÁNEO',
+    readingTime: '11 MIN',
+    abstract:
+      'Una metrópolis excavada dieciocho niveles bajo la toba volcánica de Capadocia, diseñada como refugio civilizatorio ante el colapso de la superficie.',
+    url: '/colecciones/enigmas-subterraneos/derinkuyu/',
+    imageUrl: 'https://storage.thegreatpuzzleproject.com/vault-media/1792137342460-4f977b70.webp',
+  },
+  {
+    id: 'gobekli-tepe',
+    title: 'Göbekli Tepe: El Despertar',
+    category: 'MEGALITISMO',
+    readingTime: '14 MIN',
+    abstract:
+      'La primera arquitectura monumental de la especie desafía los límites del tiempo. Un templo alzado en el fin de la última glaciación que reescribe el inicio de la historia humana.',
+    url: '/colecciones/america-secrets/gobekli-tepe/',
+    imageUrl: 'https://images.unsplash.com/photo-1528164344705-475426879c0d?auto=format&fit=crop&w=1600&q=85',
+  },
+  {
+    id: 'nan-madol',
+    title: 'Nan Madol: Basalto sobre el Arrecife',
+    category: 'MEGALITISMO',
+    readingTime: '13 MIN',
+    abstract:
+      'Noventa y dos islotes artificiales ensamblados con prismas de basalto magnético en el Pacífico, desafiando la logística oceánica preindustrial.',
+    url: '/colecciones/oceania-ancestral/nan-madol/',
+    imageUrl: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1600&q=85',
+  },
+  {
+    id: 'masuda',
+    title: 'Masuda no Iwafune: La Nave de Roca',
+    category: 'ARQUEOSEMIÓTICA',
+    readingTime: '10 MIN',
+    abstract:
+      'Un monolito de granito de ochocientas toneladas tallado con cavidades geométricas exactas en las colinas boscosas de Asuka.',
+    url: '/colecciones/asia-secrets/',
+    imageUrl: 'https://storage.thegreatpuzzleproject.com/vault-media/1792133914689-44dd5943.webp',
+  },
+  {
+    id: 'pumapunku',
+    title: 'Pumapunku: La Geometría del Silencio',
+    category: 'ARQUEOSEMIÓTICA',
+    readingTime: '16 MIN',
+    abstract:
+      'Bloques de andesita y arenisca roja con ensambles modulares de precisión milimétrica a casi cuatro mil metros de altitud en el altiplano andino.',
+    url: '/colecciones/america-secrets/pumapunku/',
+    imageUrl: 'https://storage.thegreatpuzzleproject.com/vault-media/1792137345528-f304bb0d.webp',
+  },
+];
+
+const items = posts.length >= 3 ? posts : fallbackPosts;
+const uniqueCategories = ['TODOS', ...Array.from(new Set(items.map((p) => p.category))).slice(0, 4)];
+const initialItem = items[0];
+---
+
+<section
+  id="tgp-itinerary-hub"
+  tabindex="0"
+  class="relative w-full min-h-[92vh] bg-[#050508] text-[#E5E2D9] overflow-hidden flex flex-col justify-end select-none focus:outline-none"
+  aria-label="Itinerario Cinemático de The Great Puzzle Project"
+>
+  <!-- CAPA 0: Backdrops Full-Bleed Pre-cargados -->
+  <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+    {items.map((item, idx) => (
+      <div
+        class={`itinerary-backdrop absolute inset-0 will-change-transform ${idx === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+        data-backdrop-index={idx}
+      >
+        <img
+          src={item.imageUrl}
+          alt=""
+          class="w-full h-full object-cover object-center"
+          loading={idx < 2 ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      </div>
+    ))}
+
+    <!-- Viñetas direccionales estilo MUBI + fusión con el resto del Home -->
+    <div class="absolute inset-0 z-20 bg-linear-to-r from-[#050508] via-[#050508]/65 to-transparent"></div>
+    <div class="absolute inset-0 z-20 bg-linear-to-t from-[#050508] via-[#050508]/45 to-transparent"></div>
+    <div class="absolute inset-x-0 top-0 h-32 z-20 bg-linear-to-b from-[#050508] to-transparent"></div>
+    <div class="absolute inset-x-0 bottom-0 h-28 z-20 bg-linear-to-t from-[#050508] to-transparent"></div>
+
+    <!-- Grano fílmico 35mm sutil -->
+    <div class="film-grain-overlay absolute inset-0 z-20 opacity-[0.045] mix-blend-overlay"></div>
+  </div>
+
+  <!-- CAPA 1: Contenido Editorial + Carril Inferior -->
+  <div class="relative z-30 w-full max-w-400 mx-auto px-6 sm:px-12 lg:px-16 pt-28 pb-10 flex flex-col justify-end gap-10">
+    <!-- Bloque Editorial (Tercio inferior izquierdo) -->
+    <div id="itinerary-editorial-block" class="max-w-2xl">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#E4B04A]"></span>
+        <span class="text-[10px] font-mono tracking-[0.35em] uppercase text-white/50">
+          {sectionKicker}
+        </span>
+      </div>
+
+      <p
+        id="itinerary-meta"
+        class="text-xs font-mono tracking-[0.28em] uppercase text-[#E4B04A] mb-3"
+      >
+        01 · {initialItem.category} · DOSSIER {initialItem.readingTime}
+      </p>
+
+      <h2
+        id="itinerary-title"
+        class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.08] tracking-tight mb-4 drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)]"
+      >
+        {initialItem.title}
+      </h2>
+
+      <p
+        id="itinerary-abstract"
+        class="text-sm sm:text-base text-[#E5E2D9]/80 leading-relaxed line-clamp-2 mb-7 max-w-xl"
+      >
+        {initialItem.abstract}
+      </p>
+
+      <div class="flex items-center gap-4">
+        <a
+          id="itinerary-cta"
+          href={initialItem.url}
+          class="group inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/7 hover:bg-[#E4B04A]/20 backdrop-blur-md border border-[#E4B04A]/45 hover:border-[#E4B04A] text-[11px] font-mono tracking-[0.25em] uppercase text-[#E5E2D9] hover:text-white transition-all duration-300"
+        >
+          <span>Explorar Dossier</span>
+          <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Zona Inferior: Filtros + Carril Panorámico 16:9 -->
+    <div class="w-full space-y-4">
+      <!-- Filtros de Categoría -->
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-5" role="tablist" aria-label="Filtrar por categoría">
+          {uniqueCategories.map((cat, idx) => (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={idx === 0 ? 'true' : 'false'}
+              class={`itinerary-filter-btn text-[10px] sm:text-[11px] font-mono tracking-[0.25em] uppercase pb-1.5 transition-all duration-300 border-b cursor-pointer ${
+                idx === 0
+                  ? 'text-white border-[#E4B04A]'
+                  : 'text-white/45 border-transparent hover:text-white/80'
+              }`}
+              data-category={cat}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        <!-- Controles sutiles de desplazamiento del carril -->
+        <div class="hidden sm:flex items-center gap-2">
+          <button
+            id="itinerary-prev-btn"
+            type="button"
+            class="w-8 h-8 rounded-full border border-white/15 bg-black/40 hover:border-[#E4B04A]/60 text-white/70 hover:text-white flex items-center justify-center text-xs transition-all cursor-pointer"
+            aria-label="Ensayo anterior"
+          >
+            ←
+          </button>
+          <button
+            id="itinerary-next-btn"
+            type="button"
+            class="w-8 h-8 rounded-full border border-white/15 bg-black/40 hover:border-[#E4B04A]/60 text-white/70 hover:text-white flex items-center justify-center text-xs transition-all cursor-pointer"
+            aria-label="Ensayo siguiente"
+          >
+            →
+          </button>
+        </div>
+      </div>
+
+      <!-- Carril Horizontal 16:9 -->
+      <div
+        id="itinerary-rail"
+        class="flex items-center gap-4 overflow-x-auto pb-3 pt-2 hide-scrollbar snap-x snap-mandatory"
+      >
+        {items.map((item, idx) => (
+          <button
+            type="button"
+            class={`itinerary-thumb group relative shrink-0 w-55 sm:w-62.5 lg:w-68.75 aspect-video rounded-xl overflow-hidden text-left snap-start transition-all duration-500 border cursor-pointer ${
+              idx === 0
+                ? 'is-active border-[#E4B04A]/80 scale-105 shadow-[0_0_28px_rgba(228,176,74,0.22)]'
+                : 'border-white/10 opacity-65 hover:opacity-100 hover:border-white/30'
+            }`}
+            data-index={idx}
+            data-category={item.category}
+            data-title={item.title}
+            data-abstract={item.abstract}
+            data-reading={item.readingTime}
+            data-url={item.url}
+            aria-label={`Previsualizar ${item.title}`}
+          >
+            <img
+              src={item.imageUrl}
+              alt={item.title}
+              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              loading="lazy"
+              decoding="async"
+            />
+
+            <div class="absolute inset-0 bg-linear-to-t from-black/90 via-black/25 to-transparent"></div>
+
+            <!-- Badge de estado activo -->
+            <span class="active-pill absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md border border-[#E4B04A]/50 text-[8px] font-mono tracking-[0.2em] uppercase text-[#E4B04A] opacity-0 transition-opacity duration-300">
+              ● En foco
+            </span>
+
+            <!-- Pie de tarjeta -->
+            <div class="absolute bottom-2.5 left-3 right-3">
+              <p class="text-[11px] font-serif text-white font-medium truncate drop-shadow">
+                <span class="font-mono text-[10px] text-[#E4B04A] mr-1.5">
+                  {String(idx + 1).padStart(2, '0')} |
+                </span>
+                {item.title}
+              </p>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .itinerary-thumb.is-active .active-pill {
+    opacity: 1;
+  }
+
+  .film-grain-overlay {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 0);
+    background-size: 3px 3px;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  function initPuzzleItineraryHub() {
+    const root = document.getElementById('tgp-itinerary-hub');
+    if (!root || root.dataset.initialized === 'true') return;
+    root.dataset.initialized = 'true';
+
+    const backdrops = Array.from(root.querySelectorAll<HTMLElement>('.itinerary-backdrop'));
+    const thumbs = Array.from(root.querySelectorAll<HTMLButtonElement>('.itinerary-thumb'));
+    const filterBtns = Array.from(root.querySelectorAll<HTMLButtonElement>('.itinerary-filter-btn'));
+
+    const editorialBlock = document.getElementById('itinerary-editorial-block');
+    const metaEl = document.getElementById('itinerary-meta');
+    const titleEl = document.getElementById('itinerary-title');
+    const abstractEl = document.getElementById('itinerary-abstract');
+    const ctaEl = document.getElementById('itinerary-cta') as HTMLAnchorElement | null;
+    const prevBtn = document.getElementById('itinerary-prev-btn');
+    const nextBtn = document.getElementById('itinerary-next-btn');
+
+    let currentIndex = 0;
+    let hoverTimer: ReturnType<typeof setTimeout> | null = null;
+
+    function getVisibleThumbs(): HTMLButtonElement[] {
+      return thumbs.filter((t) => !t.classList.contains('hidden'));
+    }
+
+    function activateSlide(targetIndex: number) {
+      if (targetIndex === currentIndex) return;
+
+      const prevBackdrop = backdrops[currentIndex];
+      const nextBackdrop = backdrops[targetIndex];
+      const targetThumb = thumbs[targetIndex];
+      if (!nextBackdrop || !targetThumb) return;
+
+      // 1. Crossfade + contra-zoom lento del backdrop (1.08 -> 1, 1.4s)
+      gsap.killTweensOf([prevBackdrop, nextBackdrop]);
+      if (prevBackdrop) {
+        gsap.to(prevBackdrop, { opacity: 0, zIndex: 0, duration: 0.9, ease: 'power2.inOut' });
+      }
+      gsap.fromTo(
+        nextBackdrop,
+        { opacity: 0, scale: 1.08, zIndex: 10 },
+        { opacity: 1, scale: 1, duration: 1.4, ease: 'power2.out' }
+      );
+
+      // 2. Actualización del estado visual de las miniaturas
+      thumbs.forEach((btn, idx) => {
+        const isActive = idx === targetIndex;
+        btn.classList.toggle('is-active', isActive);
+        btn.classList.toggle('border-[#E4B04A]/80', isActive);
+        btn.classList.toggle('scale-105', isActive);
+        btn.classList.toggle('shadow-[0_0_28px_rgba(228,176,74,0.22)]', isActive);
+        btn.classList.toggle('border-white/10', !isActive);
+        btn.classList.toggle('opacity-65', !isActive);
+      });
+
+      targetThumb.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+
+      // 3. Coreografía limpia del bloque editorial izquierdo (y: 12 -> 0, opacity: 0 -> 1)
+      if (editorialBlock) {
+        gsap.killTweensOf(editorialBlock);
+        gsap.to(editorialBlock, {
+          opacity: 0,
+          y: 10,
+          duration: 0.22,
+          ease: 'power2.in',
+          onComplete: () => {
+            const num = String(targetIndex + 1).padStart(2, '0');
+            const category = targetThumb.dataset.category || '';
+            const reading = targetThumb.dataset.reading || '12 MIN';
+            const title = targetThumb.dataset.title || '';
+            const abstract = targetThumb.dataset.abstract || '';
+            const url = targetThumb.dataset.url || '#';
+
+            if (metaEl) metaEl.textContent = `${num} · ${category} · DOSSIER ${reading}`;
+            if (titleEl) titleEl.textContent = title;
+            if (abstractEl) abstractEl.textContent = abstract;
+            if (ctaEl) ctaEl.href = url;
+
+            gsap.fromTo(
+              editorialBlock,
+              { opacity: 0, y: 12 },
+              { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }
+            );
+          },
+        });
+      }
+
+      currentIndex = targetIndex;
+    }
+
+    // Eventos en miniaturas (clic inmediato + hover con debounce suave de 120ms en desktop)
+    thumbs.forEach((thumb) => {
+      const idx = Number(thumb.dataset.index);
+
+      thumb.addEventListener('click', () => {
+        if (hoverTimer) clearTimeout(hoverTimer);
+        activateSlide(idx);
+      });
+
+      thumb.addEventListener('mouseenter', () => {
+        if (window.matchMedia('(hover: hover)').matches) {
+          if (hoverTimer) clearTimeout(hoverTimer);
+          hoverTimer = setTimeout(() => activateSlide(idx), 120);
+        }
+      });
+
+      thumb.addEventListener('mouseleave', () => {
+        if (hoverTimer) clearTimeout(hoverTimer);
+      });
+    });
+
+    // Filtros por categoría
+    filterBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const selectedCat = btn.dataset.category || 'TODOS';
+
+        filterBtns.forEach((b) => {
+          const active = b === btn;
+          b.setAttribute('aria-selected', active ? 'true' : 'false');
+          b.classList.toggle('text-white', active);
+          b.classList.toggle('border-[#E4B04A]', active);
+          b.classList.toggle('text-white/45', !active);
+          b.classList.toggle('border-transparent', !active);
+        });
+
+        let firstVisibleIndex: number | null = null;
+        let currentStillVisible = false;
+
+        thumbs.forEach((thumb) => {
+          const idx = Number(thumb.dataset.index);
+          const matches = selectedCat === 'TODOS' || thumb.dataset.category === selectedCat;
+          thumb.classList.toggle('hidden', !matches);
+          if (matches) {
+            if (firstVisibleIndex === null) firstVisibleIndex = idx;
+            if (idx === currentIndex) currentStillVisible = true;
+          }
+        });
+
+        if (!currentStillVisible && firstVisibleIndex !== null) {
+          activateSlide(firstVisibleIndex);
+        }
+      });
+    });
+
+    // Navegación Prev / Next sobre los ítems visibles
+    function stepVisible(direction: 1 | -1) {
+      const visible = getVisibleThumbs();
+      if (visible.length <= 1) return;
+      const pos = visible.findIndex((t) => Number(t.dataset.index) === currentIndex);
+      const nextPos = (pos + direction + visible.length) % visible.length;
+      activateSlide(Number(visible[nextPos].dataset.index));
+    }
+
+    prevBtn?.addEventListener('click', () => stepVisible(-1));
+    nextBtn?.addEventListener('click', () => stepVisible(1));
+
+    // Navegación con flechas del teclado (ArrowLeft / ArrowRight) cuando la sección está en foco
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      const activeTag = document.activeElement?.tagName;
+      if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT') return;
+
+      const isFocusedWithin = root.contains(document.activeElement);
+      const rect = root.getBoundingClientRect();
+      const isInPrimaryViewport = rect.top < window.innerHeight * 0.55 && rect.bottom > window.innerHeight * 0.45;
+
+      if (!isFocusedWithin && !isInPrimaryViewport) return;
+
+      e.preventDefault();
+      stepVisible(e.key === 'ArrowRight' ? 1 : -1);
+    };
+
+    window.addEventListener('keydown', handleKeydown);
+  }
+
+  document.addEventListener('DOMContentLoaded', initPuzzleItineraryHub);
+  document.addEventListener('astro:page-load', initPuzzleItineraryHub);
+</script>

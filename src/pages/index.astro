@@ -27,6 +27,7 @@ import AppleDualBentoMuseum from '../components/AppleDualBentoMuseum.astro';
 import AppleDualBentoDark from '../components/AppleDualBentoDark.astro';
 import AppleBentoDueImax from '../components/AppleBentoDueImax.astro';
 import AdnBentoGsap from '../components/home/AdnBentoGsap.astro';
+import PuzzleItineraryHub from '../components/PuzzleItineraryHub.astro';
 import { OOPART_ITEMS } from '../lib/ooparts-catalog';
 import {
   type EssayEntry,
@@ -412,6 +413,11 @@ const archiveSequences = createPremierSequences(resolvedArchiveRows);
         secondaryCtaHref="/archivo/"
       />
     </div>
+
+    {/* ═══════════════════════════════════════════════════════════════════════
+        BLOQUE 0.5 (SEGUNDO LUGAR): ITINERARIO INTERACTIVO DEL GRAN PUZZLE
+    ═══════════════════════════════════════════════════════════════════════ */}
+    <PuzzleItineraryHub sectionKicker="ITINERARIO DEL GRAN PUZZLE" maxItems={8} />
 
     {/* ═══════════════════════════════════════════════════════════════════════
         BLOQUE 1: MOTOR CINEMÁTICO HERO — Slider multi-post tipo Netflix
