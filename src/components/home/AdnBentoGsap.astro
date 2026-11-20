@@ -118,6 +118,76 @@ const parsedBatches = rawBatches.map((item, bIdx) => {
     will-change: transform, opacity, filter;
   }
 
+  /* ── Aspecto 3D metálico profundo (9 capas de extrusión) post-fusión para "Conecta." ── */
+  .conecta-3d-text {
+    font-family: 'Gloock', serif;
+    font-weight: 900;
+    color: #f8f2ff;
+    background-image: linear-gradient(180deg, #ffffff 0%, #f5e8ff 28%, #d8b4fe 58%, #a855f7 82%, #6b21a8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter:
+      drop-shadow(0 1px 0 #7e22ce)
+      drop-shadow(0 2px 0 #6b21a8)
+      drop-shadow(0 3px 0 #581c87)
+      drop-shadow(0 4px 0 #4c1d95)
+      drop-shadow(0 5px 0 #3b0764)
+      drop-shadow(0 6px 0 #2e1065)
+      drop-shadow(0 7px 0 #1e083f)
+      drop-shadow(0 8px 0 #130429)
+      drop-shadow(0 22px 38px rgba(0, 0, 0, 0.98))
+      drop-shadow(0 0 48px rgba(192, 132, 252, 0.72));
+    transform-style: preserve-3d;
+    transform: perspective(900px);
+  }
+
+  .investiga-shockwave {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 260px;
+    height: 90px;
+    transform: translate(-50%, -50%) scale(0.2);
+    border-radius: 9999px;
+    border: 3px solid rgba(233, 213, 255, 0.9);
+    box-shadow: 0 0 36px 8px rgba(168, 85, 247, 0.85), inset 0 0 24px rgba(255, 255, 255, 0.6);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 5;
+  }
+
+  /* ── Hilo Láser CNC estilo Puma Punku adaptado al molde Amatista para "Conecta." ── */
+  .conecta-laser-beam {
+    position: absolute;
+    top: -12%;
+    bottom: -12%;
+    left: 0%;
+    width: 3px;
+    background: linear-gradient(180deg, transparent 0%, #ffffff 18%, #f3e8ff 50%, #ffffff 82%, transparent 100%);
+    box-shadow:
+      0 0 14px 4px #ffffff,
+      0 0 36px 12px rgba(192, 132, 252, 0.95),
+      0 0 75px 24px rgba(168, 85, 247, 0.75);
+    border-radius: 9999px;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 30;
+    transform: translateX(-50%);
+  }
+
+  .conecta-laser-spark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 18px;
+    height: 18px;
+    transform: translate(-50%, -50%);
+    border-radius: 9999px;
+    background: radial-gradient(circle, #ffffff 0%, #e9d5ff 45%, transparent 75%);
+    box-shadow: 0 0 28px 10px #ffffff, 0 0 54px 18px rgba(168, 85, 247, 0.9);
+  }
+
   /* ── Tipografía Gloock de la frase heredada en escala Cine Premier ── */
   .excerpt-phrase-text {
     font-family: 'Gloock', serif;
@@ -183,9 +253,9 @@ const parsedBatches = rawBatches.map((item, bIdx) => {
     filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 22px rgba(227, 221, 211, 0.2));
   }
 
-  /* ── Contenedor de Altura Bloqueada: Elimina 100% el salto del DOM ── */
+  /* ── Contenedor de Altura Bloqueada: Escala Monumental Sin Layout Shift ── */
   .adn-stage-container {
-    height: 320px;
+    height: 360px;
     position: relative;
     width: 100%;
     contain: layout size;
@@ -197,13 +267,13 @@ const parsedBatches = rawBatches.map((item, bIdx) => {
 
   @media (min-width: 640px) {
     .adn-stage-container {
-      height: 350px;
+      height: 430px;
     }
   }
 
   @media (min-width: 1024px) {
     .adn-stage-container {
-      height: 380px;
+      height: 500px;
     }
   }
 
@@ -230,8 +300,8 @@ const parsedBatches = rawBatches.map((item, bIdx) => {
   <!-- Lienzo de partículas de polvo dorado en suspensión -->
   <canvas class="excerpt-dust-canvas absolute inset-0 z-0 pointer-events-none" id={`${instanceId}-canvas`}></canvas>
 
-  <!-- Contenedor central con altura bloqueada (Zero Layout Shift) -->
-  <div class="excerpt-content relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 md:px-8 text-center">
+  <!-- Contenedor central amplio para tipografía monumental -->
+  <div class="excerpt-content relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 text-center">
     <div class="adn-stage-container">
       {parsedBatches.map((batch, idx) => (
         <div
@@ -239,13 +309,34 @@ const parsedBatches = rawBatches.map((item, bIdx) => {
           data-slide-index={idx}
           style="opacity: 1; visibility: visible;"
         >
-          <!-- 1. Palabra rectora destacada en púrpura monumental Cinemax H1 (centrada absoluta) -->
-          <div class="adn-lead-purple absolute inset-0 flex items-center justify-center text-center text-6xl sm:text-7xl md:text-8xl lg:text-[7.5rem] xl:text-[8.5rem] select-none pointer-events-auto">
-            {batch.leadWord}
-          </div>
+          {idx === 2 ? (
+            <div class="conecta-fx-group absolute inset-0 flex items-center justify-center select-none pointer-events-auto">
+              <div class="conecta-cnc-wrap relative inline-block">
+                <span class="conecta-ghost block text-[clamp(4.5rem,16.5vw,15rem)] leading-[0.92] tracking-[-0.03em] font-['Gloock',serif] font-black text-white/5 select-none" aria-hidden="true">
+                  {batch.leadWord}
+                </span>
+                <div
+                  class="conecta-revealed conecta-3d-text absolute inset-0 flex items-center justify-center text-center text-[clamp(4.5rem,16.5vw,15rem)] leading-[0.92] tracking-[-0.03em]"
+                  style="clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);"
+                >
+                  {batch.leadWord}
+                </div>
+                <div class="conecta-laser-beam" aria-hidden="true">
+                  <span class="conecta-laser-spark"></span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div class="relative w-full h-full flex items-center justify-center select-none pointer-events-auto">
+              {idx === 1 && <span class="investiga-shockwave" aria-hidden="true"></span>}
+              <div class="adn-lead-purple absolute inset-0 flex items-center justify-center text-center text-[clamp(4.5rem,16.5vw,15rem)]">
+                {batch.leadWord}
+              </div>
+            </div>
+          )}
 
-          <!-- 2. Frase heredada centrada Gloock metálica (centrada absoluta) -->
-          <div class="adn-phrase-block absolute inset-0 flex items-center justify-center text-center px-4 pointer-events-auto">
+          <!-- Discurso secundario oculto en esta instancia según directiva -->
+          <div class="adn-phrase-block hidden" aria-hidden="true">
             <h2 class="excerpt-phrase-text glow-metallic-gloock">
               {batch.wordsData.map((wd) => (
                 <span class="excerpt-word-wrapper">
@@ -408,98 +499,90 @@ const parsedBatches = rawBatches.map((item, bIdx) => {
       }
 
       const ctx = gsap.context(() => {
-        const slidesData = slides.map((slide) => ({
-          slide,
-          lead: slide.querySelector<HTMLElement>(".adn-lead-purple"),
-          phrase: slide.querySelector<HTMLElement>(".adn-phrase-block"),
-        }));
+        const dudaEl = slides[0]?.querySelector<HTMLElement>(".adn-lead-purple");
+        const investigaEl = slides[1]?.querySelector<HTMLElement>(".adn-lead-purple");
+        const shockwave = slides[1]?.querySelector<HTMLElement>(".investiga-shockwave");
+        const conectaWrap = slides[2]?.querySelector<HTMLElement>(".conecta-cnc-wrap");
+        const conectaRevealed = slides[2]?.querySelector<HTMLElement>(".conecta-revealed");
+        const conectaLaser = slides[2]?.querySelector<HTMLElement>(".conecta-laser-beam");
+        const stageBox = root.querySelector<HTMLElement>(".adn-stage-container");
 
-        // Reset inicial de capas (todas ocultas para comenzar limpias en t=0 al scrollear)
-        slidesData.forEach((item) => {
-          gsap.set(item.slide, { autoAlpha: 1 });
-          if (item.lead) {
-            gsap.set(item.lead, {
-              autoAlpha: 0,
-              scale: 0.93,
-              filter: "blur(14px)",
-              y: 12,
-            });
-          }
-          if (item.phrase) {
-            gsap.set(item.phrase, {
-              autoAlpha: 0,
-              y: 14,
-              filter: "blur(8px)",
-            });
-          }
-        });
+        const resetAll = () => {
+          slides.forEach((s) => gsap.set(s, { autoAlpha: 1 }));
+          if (dudaEl) gsap.set(dudaEl, { autoAlpha: 0, scale: 1.06, scaleX: 1, filter: "blur(10px)", y: 8 });
+          if (investigaEl) gsap.set(investigaEl, { autoAlpha: 0, y: -260, scale: 1.35, filter: "blur(3px)" });
+          if (shockwave) gsap.set(shockwave, { opacity: 0, scale: 0.2 });
+          if (conectaWrap) gsap.set(conectaWrap, { autoAlpha: 0 });
+          if (conectaRevealed) gsap.set(conectaRevealed, { clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)", x: 0, filter: "blur(0px)" });
+          if (conectaLaser) gsap.set(conectaLaser, { left: "0%", opacity: 0 });
+          if (stageBox) gsap.set(stageBox, { x: 0, y: 0, rotation: 0 });
+        };
+
+        resetAll();
 
         const tl = gsap.timeline({ repeat: -1, paused: true });
-        const wordInTime = 0.85;       // Aparición majestuosa de la palabra rectora
-        const wordDwellTime = 1.6;     // Pausa de impacto de la palabra
-        const wordOutTime = 0.55;      // Desvanecimiento completo de la palabra
-        const breathTime = 0.2;        // Silencio dramático
-        const phraseInTime = 0.95;     // Aparición suave de la frase centrada
-        const phraseDwellTime = 4.2;   // Lectura profunda de la frase
-        const phraseOutTime = 0.65;    // Desvanecimiento suave de la frase
 
-        for (let i = 0; i < count; i++) {
-          const current = slidesData[i];
-
-          // 1. La palabra rectora (Duda. / Investiga. / Conecta.) aparece en el centro exacto
-          if (current.lead) {
-            tl.to(current.lead, {
-              autoAlpha: 1,
-              scale: 1,
-              filter: "blur(0px)",
-              y: 0,
-              duration: wordInTime,
-              ease: "power3.out",
-            });
-            // Pausa para leer la palabra con peso visual
-            tl.to({}, { duration: wordDwellTime });
-            // La palabra desaparece completamente antes de que entre la frase
-            tl.to(current.lead, {
-              autoAlpha: 0,
-              y: -12,
-              scale: 0.96,
-              filter: "blur(10px)",
-              duration: wordOutTime,
-              ease: "power2.in",
-            });
-            // Reset off-screen para el próximo ciclo
-            tl.set(current.lead, { y: 12, scale: 0.93, filter: "blur(14px)" });
-          }
-
-          // Silencio / respiración
-          tl.to({}, { duration: breathTime });
-
-          // 2. La frase entra en el centro exacto del visor
-          if (current.phrase) {
-            tl.to(current.phrase, {
-              autoAlpha: 1,
-              y: 0,
-              filter: "blur(0px)",
-              duration: phraseInTime,
-              ease: "power2.out",
-            });
-            // Tiempo de lectura reflexiva
-            tl.to({}, { duration: phraseDwellTime });
-            // La frase desaparece por completo
-            tl.to(current.phrase, {
-              autoAlpha: 0,
-              y: -14,
-              filter: "blur(10px)",
-              duration: phraseOutTime,
-              ease: "power2.in",
-            });
-            // Reset off-screen para el próximo ciclo
-            tl.set(current.phrase, { y: 14, filter: "blur(8px)" });
-          }
-
-          // Silencio antes de la próxima palabra
-          tl.to({}, { duration: breathTime });
+        // ── 1. DUDA. → entrada monumental + RÁPIDO FADE OUT CON DESINTEGRACIÓN ──
+        if (dudaEl) {
+          tl.to(dudaEl, { autoAlpha: 1, scale: 1, filter: "blur(0px)", y: 0, duration: 0.42, ease: "power2.out" })
+            .to({}, { duration: 0.85 })
+            .to(dudaEl, { autoAlpha: 0, scaleX: 1.24, scaleY: 0.92, filter: "blur(18px)", duration: 0.18, ease: "power3.in" })
+            .set(dudaEl, { scale: 1.06, scaleX: 1, scaleY: 1, filter: "blur(10px)", y: 8 });
         }
+
+        tl.to({}, { duration: 0.14 });
+
+        // ── 2. INVESTIGA. → CAE COMO GRANITO CATASTRÓFICO + ONDA EXPANSIVA + TEMBLOR ──
+        if (investigaEl) {
+          tl.set(investigaEl, { autoAlpha: 1, y: -260, scale: 1.35, filter: "blur(3px)" })
+            .to(investigaEl, { y: 0, scale: 1, filter: "blur(0px)", duration: 0.34, ease: "power4.in" }, "graniteDrop");
+
+          if (shockwave) {
+            tl.set(shockwave, { opacity: 0.95, scale: 0.25 }, "graniteHit")
+              .to(shockwave, { opacity: 0, scale: 4.2, duration: 0.65, ease: "expo.out" }, "graniteHit");
+          }
+
+          if (stageBox) {
+            tl.to(stageBox, { y: 14, x: -6, rotation: -0.7, duration: 0.04, ease: "power4.out" }, "graniteHit")
+              .to(stageBox, { y: -9, x: 5, rotation: 0.6, duration: 0.05, ease: "power2.inOut" })
+              .to(stageBox, { y: 6, x: -3, rotation: -0.3, duration: 0.05, ease: "power2.inOut" })
+              .to(stageBox, { y: -3, x: 2, rotation: 0.15, duration: 0.05, ease: "power2.inOut" })
+              .to(stageBox, { y: 0, x: 0, rotation: 0, duration: 0.09, ease: "power2.out" });
+          }
+
+          tl.to({}, { duration: 1.3 })
+            .to(investigaEl, { autoAlpha: 0, y: 20, filter: "blur(6px)", duration: 0.28, ease: "power2.in" })
+            .set(investigaEl, { y: -260, scale: 1.35, filter: "blur(3px)" });
+        }
+
+        tl.to({}, { duration: 0.18 });
+
+        // ── 3. CONECTA. → ESCRITURA LÁSER CNC (ESTILO PUMA PUNKU) + ENCASTRE 3D ──
+        if (conectaWrap && conectaRevealed && conectaLaser) {
+          const cutProgress = { val: 0 };
+          tl.set(conectaWrap, { autoAlpha: 1 })
+            .set(conectaRevealed, { clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)", x: 0 })
+            .set(conectaLaser, { left: "0%", opacity: 1 })
+            .set(cutProgress, { val: 0 })
+            .to(cutProgress, {
+              val: 100,
+              duration: 1.35,
+              ease: "none",
+              onUpdate: () => {
+                const p = cutProgress.val;
+                conectaRevealed.style.clipPath = `polygon(0% 0%, ${p}% 0%, ${p}% 100%, 0% 100%)`;
+                conectaLaser.style.left = `${p}%`;
+              },
+            })
+            .to(conectaLaser, { opacity: 0, duration: 0.15 }, "cncLock")
+            .fromTo(conectaRevealed, { x: -4 }, { x: 0, duration: 0.12, ease: "power4.inOut" }, "cncLock")
+            .to({}, { duration: 1.75 })
+            .to(conectaWrap, { autoAlpha: 0, duration: 0.4, ease: "power2.in" })
+            .set(conectaRevealed, { clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)", x: 0 })
+            .set(conectaLaser, { left: "0%", opacity: 0 });
+        }
+
+        tl.to({}, { duration: 0.25 });
 
         // Pausa al posar el mouse para permitir lectura reflexiva
         const handleMouseEnter = () => tl.pause();

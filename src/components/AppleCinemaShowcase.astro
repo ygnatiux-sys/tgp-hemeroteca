@@ -28,6 +28,7 @@ export interface CinemaShowcaseItem {
   href: string;
   fontH1: string;
   fontH2: string;
+  h1Style?: string;
   accentBadge: string;
   serviceColor?: string;
   serviceIcon?: string;
@@ -276,7 +277,10 @@ const finalRoundFrames = frames && frames.length > 0 ? frames : DEFAULT_ROUND_FR
           style={sIdx === 0 ? 'display: flex;' : 'display: none;'}
         >
           <!-- TÍTULO MONUMENTAL H1 FILOSO (SHARP) Y PURO ESTILO APPLE TV (SIN CAJA NI FONDO ARTIFICIAL) -->
-          <h1 class={`mayday-title text-4xl sm:text-5xl md:text-6xl lg:text-[70px] text-white leading-[0.94] max-w-2xl select-none ${item.fontH1}`}>
+          <h1
+            class={`mayday-title text-4xl sm:text-5xl md:text-6xl lg:text-[70px] leading-[0.94] max-w-2xl select-none ${item.h1Style ? '' : 'text-white'} ${item.fontH1}`}
+            style={item.h1Style}
+          >
             {item.title}
           </h1>
 

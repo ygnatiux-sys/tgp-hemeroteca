@@ -42,7 +42,13 @@ const { item, prevItem, nextItem } = Astro.props;
   description={item.excerpt}
   headerTransparentUntilScroll={true}
 >
-  <main class="min-h-screen bg-[#07080a] text-stone-200 pb-24">
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@900&family=Fraunces:opsz,wght@9..144,900&family=Syne:wght@800&family=Unbounded:wght@900&display=swap"
+    media="print"
+    onload="this.media='all'"
+  />
+  <main class="oopart-hero-scope min-h-screen bg-[#07080a] text-stone-200 pb-24" data-oopart-slug={item.slug}>
     <div class="fixed top-5 left-6 z-40">
       <BackSlideButton fallbackUrl="/colecciones/ooparts/" />
     </div>
@@ -161,3 +167,98 @@ const { item, prevItem, nextItem } = Astro.props;
     </article>
   </main>
 </Layout>
+
+<style is:global>
+  /* Paletas vibrantes y tipografías exclusivas (test únicamente en /colecciones/ooparts/) */
+  .oopart-hero-scope[data-oopart-slug="esferas-de-klerksdorp"] .barabar-solid {
+    font-family: 'Syne', sans-serif !important;
+    font-weight: 800 !important;
+    background: linear-gradient(180deg, #fff3b0 0%, #ffb703 52%, #fb8500 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    filter: drop-shadow(0 0 28px rgba(255, 183, 3, 0.55)) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.9)) !important;
+  }
+
+  .oopart-hero-scope[data-oopart-slug="mecanismo-de-anticitera"] .pumapunku-solid-main {
+    font-family: 'Unbounded', sans-serif !important;
+    font-weight: 900 !important;
+    background: linear-gradient(180deg, #a5f3fc 0%, #06b6d4 52%, #0284c7 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    filter: drop-shadow(0 0 32px rgba(34, 211, 238, 0.6)) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.9)) !important;
+  }
+
+  .oopart-hero-scope[data-oopart-slug="martillo-de-londres"] .tec-title,
+  .oopart-hero-scope[data-oopart-slug="martillo-de-londres"] h1 {
+    font-family: 'Bodoni Moda', serif !important;
+    font-weight: 900 !important;
+    background: linear-gradient(180deg, #ff7b7b 0%, #ff1e2d 50%, #990011 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    filter: drop-shadow(0 0 32px rgba(255, 30, 45, 0.65)) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.9)) !important;
+  }
+
+  .oopart-hero-scope[data-oopart-slug="table-mountain-calaveras"] .abyss-h1 {
+    font-family: 'Clash Display', sans-serif !important;
+    font-weight: 700 !important;
+    background: linear-gradient(180deg, #f5d0fe 0%, #e879f9 52%, #a21caf 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    filter: drop-shadow(0 0 34px rgba(232, 121, 249, 0.6)) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.9)) !important;
+  }
+
+  .oopart-hero-scope[data-oopart-slug="bateria-de-bagdad"] .pluvial-master,
+  .oopart-hero-scope[data-oopart-slug="bateria-de-bagdad"] .pluvial-slice {
+    font-family: 'Fraunces', serif !important;
+    font-weight: 900 !important;
+    background: linear-gradient(180deg, #a7f3d0 0%, #10b981 52%, #047857 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    filter: drop-shadow(0 0 32px rgba(16, 185, 129, 0.58)) !important;
+  }
+
+  .oopart-hero-scope[data-oopart-slug="eolitos-valle-del-tajo"] .strat-word,
+  .oopart-hero-scope[data-oopart-slug="eolitos-valle-del-tajo"] h1 {
+    font-family: 'Clash Grotesk', sans-serif !important;
+    font-weight: 700 !important;
+    background: linear-gradient(180deg, #fed7aa 0%, #f97316 52%, #c2410c 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    filter: drop-shadow(0 0 30px rgba(249, 115, 22, 0.6)) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.9)) !important;
+  }
+
+  .oopart-hero-scope[data-oopart-slug="pilar-de-hierro-de-delhi"] #blade-content-text h1 {
+    font-family: 'Cinzel Decorative', serif !important;
+    font-weight: 900 !important;
+    background: linear-gradient(180deg, #bfdbfe 0%, #3b82f6 52%, #1d4ed8 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    filter: drop-shadow(0 0 34px rgba(59, 130, 246, 0.65)) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.95)) !important;
+  }
+
+  .oopart-hero-scope[data-oopart-slug="mapa-de-piri-reis"] #cosmos-content-text h1 {
+    font-family: 'Fraunces', serif !important;
+    font-style: italic !important;
+    font-weight: 900 !important;
+    background: linear-gradient(180deg, #fef08a 0%, #84cc16 52%, #0d9488 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    filter: drop-shadow(0 0 34px rgba(132, 204, 22, 0.6)) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.95)) !important;
+  }
+</style>

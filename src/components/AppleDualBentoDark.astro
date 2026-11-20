@@ -25,6 +25,19 @@ interface Artifact {
 
 const bentoLeftArtifacts: Artifact[] = [
   {
+    id: "nefertiti",
+    kickerIcon: "crown",
+    kicker: "AMARNA · EL ROSTRO DEL TIEMPO",
+    titleLine1: "El Silencio de Nefertiti.",
+    titleLine2: "La Mirada en la Fractura.",
+    logline: "Piedra caliza policromada y la cuenca vacía del ojo izquierdo: el rostro que emerge del polvo para interpelar la permanencia de la memoria.",
+    era: "Taller de Tutmose · c. 1345 a.C.",
+    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/1792979907494-5629ca02.webp",
+    alt: "Primerísimo plano del busto egipcio de la reina Nefertiti en caliza policromada",
+    ctaText: "Explorar ensayo",
+    ctaLink: "/ensayos/el-silencio-de-nefertiti-un-rostro-en-la-fractura-del-tiempo-6183"
+  },
+  {
     id: "hermes",
     kickerIcon: "mercury",
     kicker: "HERMES · EL PSICOPOMPO",
@@ -64,7 +77,7 @@ const bentoLeftArtifacts: Artifact[] = [
     fallbackWebp: "/images/museum/artifact-anticitera.webp",
     alt: "Fragmento principal A del Mecanismo de Anticitera con engranajes de bronce",
     ctaText: "Explorar archivo",
-    ctaLink: "/archivo"
+    ctaLink: "/colecciones/ooparts/mecanismo-de-anticitera/"
   },
   {
     id: "nike",
@@ -80,17 +93,32 @@ const bentoLeftArtifacts: Artifact[] = [
     ctaLink: "/ensayos/amnesia-programada"
   },
   {
-    id: "nefertiti",
+    id: "gudea",
     kickerIcon: "crown",
-    kicker: "AMARNA · EL ROSTRO DEL TIEMPO",
-    titleLine1: "El Silencio de Nefertiti.",
-    titleLine2: "La Mirada en la Fractura.",
-    logline: "Piedra caliza policromada y la cuenca vacía del ojo izquierdo: el rostro que emerge del polvo para interpelar la permanencia de la memoria.",
-    era: "Taller de Tutmose · c. 1345 a.C.",
-    imageWebp: "https://storage.thegreatpuzzleproject.com/vault-media/1792979907494-5629ca02.webp",
-    alt: "Busto egipcio de la reina Nefertiti en caliza policromada",
-    ctaText: "Explorar ensayo",
-    ctaLink: "/ensayos/el-silencio-de-nefertiti-un-rostro-en-la-fractura-del-tiempo-6183"
+    kicker: "LAGASH · DIORITA SUMERIA",
+    titleLine1: "El Príncipe de Diorita.",
+    titleLine2: "Gudea y la Norma.",
+    logline: "Esculpido en roca volcánica de extrema dureza con manos entrelazadas y plano arquitectónico sobre el regazo.",
+    era: "Mesopotamia · c. 2120 a.C.",
+    imageWebp: "/images/museum/statue-gudea.webp",
+    fallbackWebp: "/images/museum/statue-gudea.png",
+    alt: "Estatua sumeria en diorita de Gudea de Lagash",
+    ctaText: "Explorar archivo",
+    ctaLink: "/archivo/"
+  },
+  {
+    id: "venus",
+    kickerIcon: "mercury",
+    kicker: "ROMA · CANON DE PROCONESO",
+    titleLine1: "La Venus de Townley.",
+    titleLine2: "Anatomía en Mármol.",
+    logline: "Simetría helenística tallada en dos bloques acoplados para sostener la tensión entre deseo y forma inmóvil.",
+    era: "Museo Británico · Siglo I–II d.C.",
+    imageWebp: "/images/museum/statue-venus.webp",
+    fallbackWebp: "/images/museum/statue-venus.png",
+    alt: "Escultura clásica de la Venus de Townley en mármol",
+    ctaText: "Explorar archivo",
+    ctaLink: "/archivo/"
   }
 ];
 
@@ -161,6 +189,34 @@ const bentoRightArtifacts: Artifact[] = [
     alt: "Estatua romana de Júpiter entronizado con águila y rayo",
     ctaText: "Explorar ensayo",
     ctaLink: "/ensayos/pumapunku-la-geometria-del-silencio"
+  },
+  {
+    id: "olmeca",
+    kickerIcon: "shield",
+    kicker: "TABASCO · BASALTO COLOSAL",
+    titleLine1: "La Cabeza Olmeca.",
+    titleLine2: "Peso Sin Rueda.",
+    logline: "Veinte toneladas de basalto transportadas desde los Tuxtlas para esculpir rasgos soberanos con precisión lítica.",
+    era: "La Venta / San Lorenzo · c. 1000 a.C.",
+    imageWebp: "/images/museum/statue-olmeca.webp",
+    fallbackWebp: "/images/museum/statue-olmeca.png",
+    alt: "Cabeza colosal olmeca en basalto volcánico",
+    ctaText: "Explorar dossier",
+    ctaLink: "/colecciones/america-secrets/olmeca/"
+  },
+  {
+    id: "pazuzu",
+    kickerIcon: "mask",
+    kicker: "ASIRIA · BRONCE APOTROPAICO",
+    titleLine1: "El Demonio Pazuzu.",
+    titleLine2: "Escudo Contra la Peste.",
+    logline: "Figura de bronce invocada en amuletos domésticos para conjurar los vientos del desierto y proteger el umbral.",
+    era: "Imperio Neoasirio · c. 800–600 a.C.",
+    imageWebp: "/busts/busto-pazuzu.webp",
+    fallbackWebp: "/busts/busto-pazuzu.png",
+    alt: "Estatuilla asiria en bronce del demonio Pazuzu",
+    ctaText: "Explorar archivo",
+    ctaLink: "/archivo/"
   }
 ];
 
@@ -196,14 +252,24 @@ const {
     </div>
   )}
 
-  <!-- CONTENEDOR GRID DUAL CENTRADO -->
-  <div class="max-w-310 mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 items-stretch justify-items-center">
+  <!-- CONTENEDOR VERTICAL APILADO (CARDS ANCHAS PARA PRIMERÍSIMO PLANO SIN CONSTRICCIÓN) -->
+  <div class="max-w-6xl mx-auto w-full flex flex-col gap-12 sm:gap-16 items-center">
+
+    <!-- TÍTULO PREFACIO DE TRACKING DINÁMICO #1 -->
+    <div class="bento-tracking-interlude w-full text-center py-4 sm:py-6 overflow-hidden">
+      <span class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.45em] text-amber-400/80 block mb-2">
+        SALA I · ROSTROS DE LA ANTIGÜEDAD
+      </span>
+      <h3 class="bento-tracking-title font-gloock font-black uppercase text-[clamp(2rem,5.8vw,4.8rem)] leading-[0.95] text-transparent bg-clip-text bg-linear-to-b from-white via-[#f3ede2] to-[#9b8d75] tracking-[0.28em]">
+        EL ROSTRO DEL TIEMPO
+      </h3>
+    </div>
 
     <!-- ═══════════════════════════════════════════════════════
-         TARJETA BENTO DARK 1: HERMES / SAMOTRACIA / NEFERTITI
+         TARJETA BENTO DARK 1: NEFERTITI / HERMES / SAMOTRACIA (ANCHA + PRIMERÍSIMO PLANO)
          ═══════════════════════════════════════════════════════ -->
     <div 
-      class="bento-dark-card group/bento relative w-full rounded-4xl overflow-hidden bg-[#18181c] border border-white/10 text-[#f5f5f7] shadow-[0_24px_54px_rgba(0,0,0,0.65),inset_0_1px_1px_rgba(255,255,255,0.08)] flex flex-col justify-between h-[88vh] min-h-190 md:min-h-220 max-h-235 select-none transition-all duration-500 hover:shadow-[0_32px_70px_rgba(0,0,0,0.85)] hover:border-white/16 hover:-translate-y-1"
+      class="bento-dark-card group/bento relative w-full max-w-5xl rounded-4xl overflow-hidden bg-[#141418] border border-white/12 text-[#f5f5f7] shadow-[0_30px_80px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.1)] flex flex-col justify-between h-[92vh] min-h-205 md:min-h-235 max-h-255 select-none transition-all duration-500 hover:shadow-[0_36px_90px_rgba(0,0,0,0.95)] hover:border-amber-400/25"
       id="bento-dark-left"
       data-card-id="left"
     >
@@ -249,25 +315,24 @@ const {
         </div>
       </div>
 
-      <!-- STAGE: ESCENARIO INFERIOR CON LUZ AMBIENTAL Y SOMBRA PROFUNDA -->
-      <div class="bento-stage mt-auto w-full relative grow flex justify-center items-end px-6 pb-4 sm:pb-6 overflow-hidden min-h-115 sm:min-h-135 md:min-h-155 z-10">
-        <!-- HALO DE CONTRALUZ AMBIENTAL PARA RECORTES -->
-        <div class="bento-ambient-glow absolute inset-0 pointer-events-none"></div>
+      <!-- STAGE: PRIMERÍSIMO PRIMER PLANO MACRO CINEMATOGRÁFICO SIN CORTAR CABEZAS -->
+      <div class="bento-stage mt-auto w-full relative grow flex justify-center items-end px-4 pb-0 overflow-hidden min-h-135 sm:min-h-155 md:min-h-175 z-10">
+        <!-- CONTRALUZ DORADA + VIÑETA DRAMÁTICA -->
+        <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_42%,rgba(212,175,55,0.22)_0%,rgba(78,242,210,0.06)_40%,rgba(12,12,16,0.9)_78%)]"></div>
+        <div class="absolute inset-x-0 top-0 h-10 bg-linear-to-b from-[#141418] to-transparent pointer-events-none z-20"></div>
+        <div class="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-[#0b0b0e] via-[#0b0b0e]/45 to-transparent pointer-events-none z-20"></div>
 
-        <!-- SOMBRA DE CONTACTO BASE SOBRE FONDO GRAFITO -->
-        <div class="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 w-48 sm:w-60 h-6 bg-black/75 rounded-full blur-md pointer-events-none transform scale-y-50"></div>
-
-        <!-- ARRAY DE IMÁGENES RECORTADAS CON ROTACIÓN ASÍNCRONA -->
+        <!-- ARRAY DE IMÁGENES EN PRIMERÍSIMO PRIMER PLANO (7 TEMAS) -->
         {bentoLeftArtifacts.map((art, idx) => (
           <div
-            class={`bento-artifact-wrapper absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 w-full h-[90%] md:h-[94%] flex justify-center items-end transition-all duration-700 ease-out pointer-events-none ${
+            class={`bento-artifact-wrapper absolute inset-x-0 bottom-0 h-full flex justify-center items-end pt-3 transition-all duration-700 ease-out pointer-events-none ${
               idx === 0 
                 ? "opacity-100 translate-y-0 scale-100 z-10" 
                 : "opacity-0 translate-y-5 scale-[0.98] z-0 invisible"
             }`}
             data-index={idx}
           >
-            <picture class="h-full w-auto flex justify-center items-end">
+            <picture class="h-full w-full flex justify-center items-end overflow-hidden">
               <img 
                 src={art.imageWebp} 
                 data-fallback={art.fallbackWebp || ''}
@@ -275,7 +340,7 @@ const {
                 alt={art.alt}
                 loading="lazy"
                 decoding="async"
-                class="h-full w-auto max-w-[85%] object-contain object-bottom bento-dark-statue-shadow transition-transform duration-700 group-hover/bento:scale-[1.03]"
+                class="h-[112%] sm:h-[116%] w-auto max-w-[92%] object-contain object-top translate-y-6 bento-dark-statue-shadow transition-transform duration-700 scale-105 group-hover/bento:scale-[1.11]"
               />
             </picture>
           </div>
@@ -297,11 +362,22 @@ const {
       </div>
     </div>
 
+    <!-- TÍTULO INTERLUDIO DE TRACKING DINÁMICO #2 ENTRE CARDS -->
+    <div class="bento-tracking-interlude w-full text-center py-6 sm:py-10 overflow-hidden">
+      <div class="w-24 h-px bg-linear-to-r from-transparent via-amber-400/70 to-transparent mx-auto mb-6"></div>
+      <span class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.45em] text-[#4ef2d2]/80 block mb-2">
+        SALA II · CANON &amp; MATERIA
+      </span>
+      <h3 class="bento-tracking-title font-gloock font-black uppercase text-[clamp(2rem,5.8vw,4.8rem)] leading-[0.95] text-transparent bg-clip-text bg-linear-to-b from-white via-[#f3ede2] to-[#9b8d75] tracking-[0.28em]">
+        CANON DE LA SOMBRA
+      </h3>
+    </div>
+
     <!-- ═══════════════════════════════════════════════════════
-         TARJETA BENTO DARK 2: APOLO / ATENEA / JÚPITER
+         TARJETA BENTO DARK 2: SANXINGDUI / APOLO / OLMECA (ANCHA + PRIMERÍSIMO PLANO)
          ═══════════════════════════════════════════════════════ -->
     <div 
-      class="bento-dark-card group/bento relative w-full rounded-4xl overflow-hidden bg-[#18181c] border border-white/10 text-[#f5f5f7] shadow-[0_24px_54px_rgba(0,0,0,0.65),inset_0_1px_1px_rgba(255,255,255,0.08)] flex flex-col justify-between h-[88vh] min-h-190 md:min-h-220 max-h-235 select-none transition-all duration-500 hover:shadow-[0_32px_70px_rgba(0,0,0,0.85)] hover:border-white/16 hover:-translate-y-1"
+      class="bento-dark-card group/bento relative w-full max-w-5xl rounded-4xl overflow-hidden bg-[#141418] border border-white/12 text-[#f5f5f7] shadow-[0_30px_80px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.1)] flex flex-col justify-between h-[92vh] min-h-205 md:min-h-235 max-h-255 select-none transition-all duration-500 hover:shadow-[0_36px_90px_rgba(0,0,0,0.95)] hover:border-amber-400/25"
       id="bento-dark-right"
       data-card-id="right"
     >
@@ -347,25 +423,24 @@ const {
         </div>
       </div>
 
-      <!-- STAGE: ESCENARIO INFERIOR CON LUZ AMBIENTAL Y SOMBRA PROFUNDA -->
-      <div class="bento-stage mt-auto w-full relative grow flex justify-center items-end px-6 pb-4 sm:pb-6 overflow-hidden min-h-115 sm:min-h-135 md:min-h-155 z-10">
-        <!-- HALO DE CONTRALUZ AMBIENTAL PARA RECORTES -->
-        <div class="bento-ambient-glow absolute inset-0 pointer-events-none"></div>
+      <!-- STAGE: PRIMERÍSIMO PRIMER PLANO MACRO CINEMATOGRÁFICO SIN CORTAR CABEZAS -->
+      <div class="bento-stage mt-auto w-full relative grow flex justify-center items-end px-4 pb-0 overflow-hidden min-h-135 sm:min-h-155 md:min-h-175 z-10">
+        <!-- CONTRALUZ CIAN/DORADA + VIÑETA DRAMÁTICA -->
+        <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_42%,rgba(78,242,210,0.18)_0%,rgba(212,175,55,0.08)_40%,rgba(12,12,16,0.9)_78%)]"></div>
+        <div class="absolute inset-x-0 top-0 h-10 bg-linear-to-b from-[#141418] to-transparent pointer-events-none z-20"></div>
+        <div class="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-[#0b0b0e] via-[#0b0b0e]/45 to-transparent pointer-events-none z-20"></div>
 
-        <!-- SOMBRA DE CONTACTO BASE SOBRE FONDO GRAFITO -->
-        <div class="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 w-48 sm:w-60 h-6 bg-black/75 rounded-full blur-md pointer-events-none transform scale-y-50"></div>
-
-        <!-- ARRAY DE IMÁGENES RECORTADAS CON ROTACIÓN ASÍNCRONA -->
+        <!-- ARRAY DE IMÁGENES EN PRIMERÍSIMO PRIMER PLANO (7 TEMAS) -->
         {bentoRightArtifacts.map((art, idx) => (
           <div
-            class={`bento-artifact-wrapper absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 w-full h-[90%] md:h-[94%] flex justify-center items-end transition-all duration-700 ease-out pointer-events-none ${
+            class={`bento-artifact-wrapper absolute inset-x-0 bottom-0 h-full flex justify-center items-end pt-3 transition-all duration-700 ease-out pointer-events-none ${
               idx === 0 
                 ? "opacity-100 translate-y-0 scale-100 z-10" 
                 : "opacity-0 translate-y-5 scale-[0.98] z-0 invisible"
             }`}
             data-index={idx}
           >
-            <picture class="h-full w-auto flex justify-center items-end">
+            <picture class="h-full w-full flex justify-center items-end overflow-hidden">
               <img 
                 src={art.imageWebp} 
                 data-fallback={art.fallbackWebp || ''}
@@ -373,7 +448,7 @@ const {
                 alt={art.alt}
                 loading="lazy"
                 decoding="async"
-                class="h-full w-auto max-w-[85%] object-contain object-bottom bento-dark-statue-shadow transition-transform duration-700 group-hover/bento:scale-[1.03]"
+                class="h-[112%] sm:h-[116%] w-auto max-w-[92%] object-contain object-top translate-y-6 bento-dark-statue-shadow transition-transform duration-700 scale-105 group-hover/bento:scale-[1.11]"
               />
             </picture>
           </div>
@@ -504,10 +579,36 @@ const {
 
     setupBentoCard(cardLeft, bentoLeftArtifacts, 6000, 300);
     setupBentoCard(cardRight, bentoRightArtifacts, 6000, 3300);
+
+    // Tracking dinámico en los títulos grandes que median entre las cards apiladas
+    const trackingTitles = document.querySelectorAll(".bento-tracking-title");
+    if (trackingTitles.length > 0 && "IntersectionObserver" in window) {
+      const obs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-tracked");
+            } else {
+              entry.target.classList.remove("is-tracked");
+            }
+          });
+        },
+        { threshold: 0.35 }
+      );
+      trackingTitles.forEach((el) => obs.observe(el));
+    }
   });
 </script>
 
 <style>
+  .bento-tracking-title {
+    transition: letter-spacing 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.9s ease;
+    opacity: 0.72;
+  }
+  .bento-tracking-title.is-tracked {
+    letter-spacing: -0.015em;
+    opacity: 1;
+  }
   .apple-dual-bento-dark-section {
     contain: layout style;
   }

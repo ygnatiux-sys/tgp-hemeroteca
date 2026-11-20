@@ -35,6 +35,9 @@ export interface OopartItem {
   excerpt: string;
   paragraphs: string[];
   href: string;
+  fontClass: string;
+  h1Style: string;
+  accentColor: string;
 }
 
 export const OOPART_ITEMS: OopartItem[] = [
@@ -54,6 +57,9 @@ export const OOPART_ITEMS: OopartItem[] = [
       'Mientras Michael Cremo y Richard Thompson las catalogaron en Forbidden Archeology como vestigios de manufactura anómala en estratos de 2.800 millones de años, la petrología moderna (Paul V. Heinrich) demostró que se trata de concreciones minerales diagenéticas formadas por cristalización radial. La tensión entre la perfección aparente del contorno y la física mineral explica por qué este motivo exige el efecto de refracción espejo.',
     ],
     href: '/colecciones/ooparts/esferas-de-klerksdorp/',
+    fontClass: "font-['Syne',sans-serif] font-extrabold tracking-tight uppercase",
+    h1Style: "background: linear-gradient(180deg, #fff3b0 0%, #ffb703 52%, #fb8500 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 26px rgba(255,183,3,0.55)) drop-shadow(0 10px 22px rgba(0,0,0,0.9));",
+    accentColor: '#fb8500',
   },
   {
     slug: 'mecanismo-de-anticitera',
@@ -72,6 +78,9 @@ export const OOPART_ITEMS: OopartItem[] = [
       'Lejos de requerir tecnología perdida mística, el dispositivo confirma que la escuela de Arquímedes e Hiparco dominaba el cálculo epicicloidal para predecir eclipses y ciclos olímpicos. Su silueta técnica encaja de manera natural con la telemetría y el barrido láser de precisión.',
     ],
     href: '/colecciones/ooparts/mecanismo-de-anticitera/',
+    fontClass: "font-['Unbounded',sans-serif] font-black tracking-[-0.02em] uppercase",
+    h1Style: "background: linear-gradient(180deg, #a5f3fc 0%, #06b6d4 52%, #0284c7 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 28px rgba(34,211,238,0.6)) drop-shadow(0 10px 22px rgba(0,0,0,0.9));",
+    accentColor: '#06b6d4',
   },
   {
     slug: 'martillo-de-londres',
@@ -89,6 +98,9 @@ export const OOPART_ITEMS: OopartItem[] = [
       'El análisis geológico de Glen Kuban aclaró el enigma sin negar el dato material: los minerales disueltos de la formación Edwards pueden cementar sedimentos alrededor de una herramienta caída del siglo XIX en cuestión de décadas, sin que la edad de la roca madre se transfiera automáticamente al objeto intruso.',
     ],
     href: '/colecciones/ooparts/martillo-de-londres/',
+    fontClass: "font-['Bodoni_Moda',serif] font-black tracking-[0.02em] uppercase",
+    h1Style: "background: linear-gradient(180deg, #ff7b7b 0%, #ff1e2d 50%, #990011 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 28px rgba(255,30,45,0.65)) drop-shadow(0 10px 22px rgba(0,0,0,0.9));",
+    accentColor: '#ff1e2d',
   },
   {
     slug: 'table-mountain-calaveras',
@@ -106,6 +118,9 @@ export const OOPART_ITEMS: OopartItem[] = [
       'Las pruebas posteriores de flúor, nitrógeno y datación radiocarbónica revelaron que el cráneo era reciente (aproximadamente mil años) y había ingresado por intrusión minera o sepultura secundaria en las gravas auríferas. La perspectiva de caída hacia el túnel evoca esa ambigüedad subterránea del archivo minero decimonónico.',
     ],
     href: '/colecciones/ooparts/table-mountain-calaveras/',
+    fontClass: "font-['Clash_Display',sans-serif] font-bold tracking-tight uppercase",
+    h1Style: "background: linear-gradient(180deg, #f5d0fe 0%, #e879f9 52%, #a21caf 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 28px rgba(232,121,249,0.6)) drop-shadow(0 10px 22px rgba(0,0,0,0.9));",
+    accentColor: '#e879f9',
   },
   {
     slug: 'bateria-de-bagdad',
@@ -123,6 +138,9 @@ export const OOPART_ITEMS: OopartItem[] = [
       'Aunque la hipótesis de una pila galvánica para galvanoplastia compite con explicaciones más sobrias —como recipientes rituales para guardar rollos de papiro mágicos—, la corrosión del metal y la pátina húmeda encuentran en la cascada pluvial su contrapunto visual exacto.',
     ],
     href: '/colecciones/ooparts/bateria-de-bagdad/',
+    fontClass: "font-['Fraunces',serif] font-black tracking-[-0.02em] uppercase",
+    h1Style: "background: linear-gradient(180deg, #a7f3d0 0%, #10b981 52%, #047857 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 28px rgba(16,185,129,0.58)) drop-shadow(0 10px 22px rgba(0,0,0,0.9));",
+    accentColor: '#10b981',
   },
   {
     slug: 'eolitos-valle-del-tajo',
@@ -140,6 +158,9 @@ export const OOPART_ITEMS: OopartItem[] = [
       'Décadas después, la tafonomía experimental demostró que la presión glacial, el golpeteo fluvial y los movimientos de suelo producen lascas idénticas a los llamados eolitos. La lectura horizontal de cinco capas estratigráficas traduce visualmente ese debate sobre quién talla la piedra: la mano o el estrato.',
     ],
     href: '/colecciones/ooparts/eolitos-valle-del-tajo/',
+    fontClass: "font-['Clash_Grotesk',sans-serif] font-bold tracking-tight uppercase",
+    h1Style: "background: linear-gradient(180deg, #fed7aa 0%, #f97316 52%, #c2410c 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 28px rgba(249,115,22,0.6)) drop-shadow(0 10px 22px rgba(0,0,0,0.9));",
+    accentColor: '#f97316',
   },
   {
     slug: 'pilar-de-hierro-de-delhi',
@@ -159,6 +180,9 @@ export const OOPART_ITEMS: OopartItem[] = [
       'La metalurgia contemporánea identificó la causa material: un alto contenido de fósforo en la forja artesanal indujo la formación de una película pasivante cristalina de misawita y fosfatos férricos que sella el núcleo. El corte diagonal del filo luminoso subraya esa frontera exacta entre atmósfera hostil y metal incorrupto.',
     ],
     href: '/colecciones/ooparts/pilar-de-hierro-de-delhi/',
+    fontClass: "font-['Cinzel_Decorative',serif] font-black tracking-wide uppercase",
+    h1Style: "background: linear-gradient(180deg, #bfdbfe 0%, #3b82f6 52%, #1d4ed8 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 28px rgba(59,130,246,0.65)) drop-shadow(0 10px 22px rgba(0,0,0,0.9));",
+    accentColor: '#3b82f6',
   },
   {
     slug: 'mapa-de-piri-reis',
@@ -177,5 +201,8 @@ export const OOPART_ITEMS: OopartItem[] = [
       'Mientras Charles Hapgood interpretó esa curva inferior como la Antártida libre de hielos copiada de una civilización desaparecida, la cartografía histórica mostró que los navegantes del siglo XVI prolongaban Sudamérica hacia una Terra Australis teórica para cuadrar el globo. La apertura de ojo diagonal refleja ese salto entre la carta cerrada y el mundo abierto.',
     ],
     href: '/colecciones/ooparts/mapa-de-piri-reis/',
+    fontClass: "font-['Fraunces',serif] font-black italic tracking-[-0.02em] uppercase",
+    h1Style: "background: linear-gradient(180deg, #fef08a 0%, #84cc16 52%, #0d9488 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 28px rgba(132,204,22,0.6)) drop-shadow(0 10px 22px rgba(0,0,0,0.9));",
+    accentColor: '#84cc16',
   },
 ];

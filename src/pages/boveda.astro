@@ -139,6 +139,7 @@ const REEL2_PRESETS = [
 
 const showcaseReel1: CinemaShowcaseItem[] = rawReel1.map((p, idx) => {
   const preset = REEL1_PRESETS[idx % REEL1_PRESETS.length];
+  const oopartPalette = OOPART_ITEMS[idx % OOPART_ITEMS.length];
   return {
     title: p.title.toUpperCase(),
     subtitle: p.excerpt,
@@ -146,6 +147,7 @@ const showcaseReel1: CinemaShowcaseItem[] = rawReel1.map((p, idx) => {
     image: p.coverImage || "/images/placeholder-cover.png",
     href: `#modal-${p.id}`,
     fontH1: preset.fontH1,
+    h1Style: oopartPalette.h1Style,
     fontH2: preset.fontH2,
     accentBadge: `Expediente 0${idx + 1} · Arqueología Lítica`,
     serviceColor: preset.serviceColor,
@@ -165,6 +167,7 @@ const showcaseReel1: CinemaShowcaseItem[] = rawReel1.map((p, idx) => {
 
 const showcaseReel2: CinemaShowcaseItem[] = rawReel2.map((p, idx) => {
   const preset = REEL2_PRESETS[idx % REEL2_PRESETS.length];
+  const oopartPalette = OOPART_ITEMS[(idx + 3) % OOPART_ITEMS.length];
   return {
     title: p.title.toUpperCase(),
     subtitle: p.excerpt,
@@ -172,6 +175,7 @@ const showcaseReel2: CinemaShowcaseItem[] = rawReel2.map((p, idx) => {
     image: p.coverImage || "/images/placeholder-cover.png",
     href: `#modal-${p.id}`,
     fontH1: preset.fontH1,
+    h1Style: oopartPalette.h1Style,
     fontH2: preset.fontH2,
     accentBadge: `Expediente 0${idx + 1} · Gnosis & Tiempo`,
     serviceColor: preset.serviceColor,
@@ -197,10 +201,11 @@ const showcaseOoparts: CinemaShowcaseItem[] = OOPART_ITEMS.map((item, idx) => {
     category: "OOPARTs & Anomalías",
     image: item.image.src,
     href: item.href,
-    fontH1: preset.fontH1,
+    fontH1: item.fontClass,
+    h1Style: item.h1Style,
     fontH2: preset.fontH2,
     accentBadge: `Estreno 0${idx + 1} · ${item.location}`,
-    serviceColor: preset.serviceColor,
+    serviceColor: item.accentColor,
     serviceIcon: preset.serviceIcon,
     categoryLabel: `Estreno 0${idx + 1} · OOPARTs`,
     samRating: "SAM 16",
@@ -221,6 +226,18 @@ const allRecoveredPosts = [...rawReel1, ...rawReel2];
   title="Bóveda de Archivo · Posteos Recuperados | The Great Puzzle Project"
   description="Restitución monumental de ensayos históricos y filosóficos rescatados del archivo profundo en dos visores Apple TV IMAX MAX."
 >
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@900&family=Fraunces:ital,opsz,wght@0,9..144,900;1,9..144,900&family=Syne:wght@800&family=Unbounded:wght@900&display=swap"
+    media="print"
+    onload="this.media='all'"
+  />
+  <link
+    rel="stylesheet"
+    href="https://api.fontshare.com/v2/css?f[]=clash-display@700&f[]=clash-grotesk@700&display=swap"
+    media="print"
+    onload="this.media='all'"
+  />
   <PolvoDorado />
 
   <main class="min-h-screen bg-[#050706] text-[#EFEBE3] pt-24 sm:pt-28 pb-32 px-4 sm:px-6 md:px-10 lg:px-14 overflow-hidden relative">
