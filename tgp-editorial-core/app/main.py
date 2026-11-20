@@ -89,7 +89,9 @@ async def ensure_utf8_json_charset(request: Request, call_next):
 
 @app.get("/health", response_model=HealthResponse)
 async def health() -> HealthResponse:
-    project, location, primary_model, fallback_model = get_vertex_settings()
+    project, location, model_chain = get_vertex_settings()
+    primary_model = model_chain[0] if model_chain else "gemini-3.8-flash"
+    fallback_model = model_chain[1] if len(model_chain) > 1 else primary_model
     vertex = await check_vertex_health()
     return HealthResponse(
         status="ok" if vertex["vertex_ready"] else "degraded",

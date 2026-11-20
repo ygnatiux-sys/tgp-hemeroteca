@@ -216,7 +216,7 @@ const {
       <button
         id="wb-btn-copy-remotion"
         type="button"
-        class="hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-400/40 font-semibold text-xs transition cursor-pointer shadow-sm active:scale-95"
+        class="hidden items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-400/40 font-semibold text-xs transition cursor-pointer shadow-sm active:scale-95"
         title="Copia el objeto completo remotion_payload devuelto en modo Remotion"
       >
         <span>🎬 Copiar Payload Remotion</span>
@@ -882,8 +882,10 @@ const {
         if (copyRemotionBtn) {
           if (mode === "remotion" && lastRemotionPayload) {
             copyRemotionBtn.classList.remove("hidden");
+            copyRemotionBtn.classList.add("inline-flex");
           } else {
             copyRemotionBtn.classList.add("hidden");
+            copyRemotionBtn.classList.remove("inline-flex");
           }
         }
 
