@@ -14,51 +14,79 @@ dotenv.config();
 const R2_PUBLIC_BASE = 'https://storage.thegreatpuzzleproject.com';
 const BUCKET_NAME = process.env.R2_BUCKET_NAME || 'tgp-storage';
 
-function getS3Client() {
-  const accountId = process.env.R2_ACCOUNT_ID;
-  const accessKeyId = process.env.R2_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-  const endpoint = process.env.R2_ENDPOINT || (accountId ? `https://${accountId}.r2.cloudflarestorage.com` : null);
+function getS3Client(envOverride = {}) {
+  const accountId = envOverride?.R2_ACCOUNT_ID || process.env.R2_ACCOUNT_ID || import.meta.env?.R2_ACCOUNT_ID;
+  const accessKeyId = envOverride?.R2_ACCESS_KEY_ID || process.env.R2_ACCESS_KEY_ID || import.meta.env?.R2_ACCESS_KEY_ID;
+  const secretAccessKey = envOverride?.R2_SECRET_ACCESS_KEY || process.env.R2_SECRET_ACCESS_KEY || import.meta.env?.R2_SECRET_ACCESS_KEY;
+  const endpoint =
+    envOverride?.R2_ENDPOINT ||
+    process.env.R2_ENDPOINT ||
+    import.meta.env?.R2_ENDPOINT ||
+    (accountId ? `https://${accountId}.r2.cloudflarestorage.com` : null);
+  const bucketName = envOverride?.R2_BUCKET_NAME || BUCKET_NAME;
 
   if (!accessKeyId || !secretAccessKey || !endpoint) {
     throw new Error('Credenciales de Cloudflare R2 incompletas en variables de entorno (.env).');
   }
 
-  return new S3Client({
-    region: 'auto',
-    endpoint,
-    credentials: { accessKeyId, secretAccessKey },
-    forcePathStyle: false,
-  });
+  return {
+    client: new S3Client({
+      region: 'auto',
+      endpoint,
+      credentials: { accessKeyId, secretAccessKey },
+      forcePathStyle: false,
+    }),
+    bucket: bucketName,
+  };
 }
 
 /**
  * Transmuta cualquier buffer de imagen a WebP optimizado y lo sube a R2
  * @param {Buffer} buffer - Buffer binario de la imagen
- * @param {string} folder - Carpeta destino en R2 (ej: 'wikimedia', 'sinteticas-banana')
+ * @param {string} folder - Carpeta destino en R2 (ej: 'wikimedia', 'ediciones/002-cremo')
  * @param {string} customName - Nombre base del archivo (sin extensión)
+ * @param {string} [exactFilename] - Nombre exacto opcional (ej: 'plate_01.webp') para rutas deterministas
+ * @param {object} [envOverride] - Variables de entorno opcionales (Cloudflare runtime/locals)
  * @returns {Promise<{ url: string, key: string, width: number, height: number }>}
  */
-export async function uploadBufferToR2Webp(buffer, folder = 'wikimedia', customName = '') {
+export async function uploadBufferToR2Webp(
+  buffer,
+  folder = 'wikimedia',
+  customName = '',
+  exactFilename = '',
+  envOverride = {}
+) {
   const metadata = await sharp(buffer).metadata();
   const webpBuffer = await sharp(buffer)
     .webp({ quality: 85, effort: 4 })
     .toBuffer();
 
-  const hash = crypto.createHash('md5').update(webpBuffer).digest('hex').slice(0, 8);
-  const cleanBase = (customName || `tgp-${Date.now()}`)
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9_-]/g, '-')
-    .slice(0, 40);
+  const cleanFolder = String(folder || 'wikimedia').replace(/^\/+|\/+$/g, '');
+  let key;
 
-  const key = `${folder}/${Date.now()}-${cleanBase}-${hash}.webp`;
-  const s3 = getS3Client();
+  if (exactFilename) {
+    const cleanExact = String(exactFilename)
+      .trim()
+      .replace(/\.webp$/i, '')
+      .replace(/[^a-zA-Z0-9_-]/g, '_');
+    key = cleanFolder ? `${cleanFolder}/${cleanExact}.webp` : `${cleanExact}.webp`;
+  } else {
+    const hash = crypto.createHash('md5').update(webpBuffer).digest('hex').slice(0, 8);
+    const cleanBase = (customName || `tgp-${Date.now()}`)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9_-]/g, '-')
+      .slice(0, 40);
+
+    key = cleanFolder ? `${cleanFolder}/${Date.now()}-${cleanBase}-${hash}.webp` : `${Date.now()}-${cleanBase}-${hash}.webp`;
+  }
+
+  const { client: s3, bucket } = getS3Client(envOverride);
 
   await s3.send(
     new PutObjectCommand({
-      Bucket: BUCKET_NAME,
+      Bucket: bucket,
       Key: key,
       Body: webpBuffer,
       ContentType: 'image/webp',
@@ -76,13 +104,21 @@ export async function uploadBufferToR2Webp(buffer, folder = 'wikimedia', customN
 
 /**
  * Descarga una imagen remota (ej: Wikimedia Commons), la convierte a WebP y la sube a R2
- * @param {string} remoteUrl - URL original de Wikimedia
+ * @param {string} remoteUrl - URL original de Wikimedia o archivo patrimonial
  * @param {string} folder - Carpeta destino en R2
  * @param {string} titleHint - Título o tema para el nombre de archivo
+ * @param {string} [exactFilename] - Nombre exacto opcional (ej: 'plate_01.webp') para rutas deterministas
+ * @param {object} [envOverride] - Variables de entorno opcionales
  * @returns {Promise<string>} - URL pública final en R2
  */
-export async function transmuteRemoteToR2(remoteUrl, folder = 'wikimedia', titleHint = '') {
-  if (remoteUrl.includes('storage.thegreatpuzzleproject.com')) {
+export async function transmuteRemoteToR2(
+  remoteUrl,
+  folder = 'wikimedia',
+  titleHint = '',
+  exactFilename = '',
+  envOverride = {}
+) {
+  if (remoteUrl.includes('storage.thegreatpuzzleproject.com') && !exactFilename) {
     return remoteUrl; // Ya está alojada en R2
   }
 
@@ -99,6 +135,6 @@ export async function transmuteRemoteToR2(remoteUrl, folder = 'wikimedia', title
 
   const arrayBuffer = await res.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-  const result = await uploadBufferToR2Webp(buffer, folder, titleHint);
+  const result = await uploadBufferToR2Webp(buffer, folder, titleHint, exactFilename, envOverride);
   return result.url;
 }

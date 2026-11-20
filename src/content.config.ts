@@ -179,6 +179,26 @@ const notas = defineCollection({
   }),
 });
 
+const ediciones = defineCollection({
+  // Fichas livianas Zero-Bloat (.json o .md ~1 KB) sin binarios en Git; soporta informes/ o ediciones/
+  loader: glob({
+    pattern: "{ediciones/**/*.{json,md},informes/edicion-*.{json,md}}",
+    base: "src/content",
+  }),
+  schema: z.object({
+    title: z.string(),
+    subtitle: z.string().optional().nullable().default(""),
+    issueNumber: z.number().int().nonnegative().default(1),
+    editorialLine: z.enum(["official", "alternative"]).default("alternative"),
+    coverUrl: z.string(),
+    pdfA4Url: z.string().optional().nullable().default(null),
+    pdfA5Url: z.string().optional().nullable().default(null),
+    epubUrl: z.string().optional().nullable().default(null),
+    pages: z.number().int().positive().optional().default(24),
+    publishedAt: z.string(),
+  }),
+});
+
 export const collections = {
   ensayos,
   ensayosContent,
@@ -190,4 +210,5 @@ export const collections = {
   ensayosCinematicos,
   ensayosCinematicosContent,
   notas,
+  ediciones,
 };

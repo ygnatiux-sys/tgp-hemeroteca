@@ -1,5 +1,81 @@
 ---
+import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
+
+interface EdicionShelfItem {
+  id: string;
+  title: string;
+  subtitle?: string | null;
+  issueNumber: number;
+  editorialLine: 'official' | 'alternative';
+  coverUrl: string;
+  pdfA4Url?: string | null;
+  pdfA5Url?: string | null;
+  epubUrl?: string | null;
+  pages?: number;
+  publishedAt: string;
+  isFallback?: boolean;
+}
+
+const fallbackEdiciones: EdicionShelfItem[] = [
+  {
+    id: 'fallback-01-velikovsky',
+    title: 'Mundos en Colisión: Catastrofismo y Memoria Planetaria',
+    subtitle: 'Cuaderno #01 · Dossier editorial compilado en Typst (A4/A5) y Pandoc EPUB3.',
+    issueNumber: 1,
+    editorialLine: 'alternative',
+    coverUrl: 'https://storage.thegreatpuzzleproject.com/portadas/hero-chichen-itza.webp',
+    pdfA4Url: null,
+    pdfA5Url: null,
+    epubUrl: null,
+    pages: 32,
+    publishedAt: '2026-10-15',
+    isFallback: true,
+  },
+  {
+    id: 'fallback-02-cremo',
+    title: 'Arqueología Prohibida: Estratigrafías Anómalas',
+    subtitle: 'Cuaderno #02 · En forja (Michael Cremo · Mesa de Luz :8000 → R2 WebP → Typst/EPUB3).',
+    issueNumber: 2,
+    editorialLine: 'alternative',
+    coverUrl: 'https://storage.thegreatpuzzleproject.com/portadas/hero-tiwanaku.webp',
+    pdfA4Url: null,
+    pdfA5Url: null,
+    epubUrl: null,
+    pages: 28,
+    publishedAt: '2026-11-20',
+    isFallback: true,
+  },
+];
+
+let rawEdiciones: any[] = [];
+try {
+  rawEdiciones = await getCollection('ediciones');
+} catch {
+  rawEdiciones = [];
+}
+
+const edicionesShelf: EdicionShelfItem[] =
+  Array.isArray(rawEdiciones) && rawEdiciones.length > 0
+    ? rawEdiciones
+        .map((entry): EdicionShelfItem => ({
+          id: entry.id,
+          title: entry.data.title,
+          subtitle: entry.data.subtitle ?? '',
+          issueNumber: Number(entry.data.issueNumber ?? 1),
+          editorialLine: entry.data.editorialLine === 'official' ? 'official' : 'alternative',
+          coverUrl: entry.data.coverUrl,
+          pdfA4Url: entry.data.pdfA4Url ?? null,
+          pdfA5Url: entry.data.pdfA5Url ?? null,
+          epubUrl: entry.data.epubUrl ?? null,
+          pages: Number(entry.data.pages ?? 24),
+          publishedAt: entry.data.publishedAt,
+          isFallback: false,
+        }))
+        .sort((a, b) => a.issueNumber - b.issueNumber)
+    : fallbackEdiciones;
+
+const usingFallbackShelf = rawEdiciones.length === 0;
 ---
 
 <Layout title="Atelier de Imprenta & Loops Cinemáticos | TGP Scriptorium" bodyClass="bg-[#070b0a]">
@@ -68,6 +144,98 @@ import Layout from '../layouts/Layout.astro';
         </div>
       </div>
     </header>
+
+    <!-- Estantería Liviana de Ediciones (Zero-Bloat R2 CDN) -->
+    <section class="max-w-6xl w-full mb-10">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4 px-1">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <h2 class="text-sm sm:text-base font-mono uppercase tracking-widest text-[#ecefe0]">
+            Estantería de Ediciones · Zero-Bloat R2
+          </h2>
+        </div>
+        <span class="text-[11px] font-mono text-[#899c99]">
+          {usingFallbackShelf
+            ? 'Vista previa por defecto · Agregá fichas JSON/MD en src/content/informes/edicion-*.json'
+            : `${edicionesShelf.length} edición(es) leídas desde colección liviana 'ediciones'`}
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {edicionesShelf.map((ed) => (
+          <article class="bg-[#101615] border border-[#212c2a] hover:border-amber-500/45 rounded-xl p-4 flex gap-4 shadow-lg transition-colors">
+            <div class="w-24 sm:w-28 shrink-0 aspect-3/4 rounded-lg overflow-hidden border border-[#263533] bg-[#080d0c]">
+              <img
+                src={ed.coverUrl}
+                alt={ed.title}
+                loading="lazy"
+                class="w-full h-full object-cover"
+                onerror="this.src='https://storage.thegreatpuzzleproject.com/tgp-fallback.jpg'"
+              />
+            </div>
+
+            <div class="flex-1 min-w-0 flex flex-col justify-between gap-3">
+              <div>
+                <div class="flex flex-wrap items-center gap-2 text-[10px] font-mono mb-1.5">
+                  <span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/35 font-semibold">
+                    #{String(ed.issueNumber).padStart(2, '0')}
+                  </span>
+                  <span class={`px-2 py-0.5 rounded border ${
+                    ed.editorialLine === 'official'
+                      ? 'bg-emerald-950/70 text-emerald-300 border-emerald-700/50'
+                      : 'bg-purple-950/70 text-purple-300 border-purple-700/50'
+                  }`}>
+                    {ed.editorialLine}
+                  </span>
+                  <span class="text-[#788a87]">{ed.pages} págs · {ed.publishedAt}</span>
+                </div>
+
+                <h3 class="text-lg font-['Gloock',serif] text-[#f4f6f5] leading-snug">
+                  {ed.title}
+                </h3>
+                {ed.subtitle && (
+                  <p class="text-xs font-['Literata',serif] italic text-[#95a4a2] mt-1 line-clamp-2">
+                    {ed.subtitle}
+                  </p>
+                )}
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2 text-[11px] font-mono pt-2 border-t border-[#1c2624]">
+                {ed.pdfA4Url ? (
+                  <a href={ed.pdfA4Url} target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded bg-emerald-900/50 hover:bg-emerald-800/70 text-emerald-200 border border-emerald-700/50 transition">
+                    PDF A4 ↗
+                  </a>
+                ) : (
+                  <span class="px-2 py-1 rounded bg-[#0a0f0e] text-[#5e706d] border border-[#1d2826]">
+                    PDF A4 pendiente
+                  </span>
+                )}
+
+                {ed.pdfA5Url ? (
+                  <a href={ed.pdfA5Url} target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded bg-sky-900/50 hover:bg-sky-800/70 text-sky-200 border border-sky-700/50 transition">
+                    PDF A5 ↗
+                  </a>
+                ) : (
+                  <span class="px-2 py-1 rounded bg-[#0a0f0e] text-[#5e706d] border border-[#1d2826]">
+                    PDF A5 pendiente
+                  </span>
+                )}
+
+                {ed.epubUrl ? (
+                  <a href={ed.epubUrl} target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded bg-amber-900/50 hover:bg-amber-800/70 text-amber-200 border border-amber-700/50 transition">
+                    EPUB3 ↗
+                  </a>
+                ) : (
+                  <span class="px-2 py-1 rounded bg-[#0a0f0e] text-[#5e706d] border border-[#1d2826]">
+                    EPUB3 pendiente
+                  </span>
+                )}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
 
     <!-- Escenario Principal: Visor Flipbook 3D -->
     <section class="max-w-6xl w-full flex flex-col items-center">

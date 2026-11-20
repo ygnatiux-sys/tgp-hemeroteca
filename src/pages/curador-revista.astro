@@ -18,24 +18,80 @@ export const prerender = false;
 import Layout from '../layouts/Layout.astro';
 import WikiCinematicHero from '../components/WikiCinematicHero.astro';
 import WikiDeveloperLightbox from '../components/WikiDeveloperLightbox.astro';
-import { searchWikiCurator } from '../lib/wikiCuratorEngine';
 
-const queryParam = Astro.url.searchParams.get('q') || 'Saqqara pyramid';
+const CORE_API_URL = 'http://127.0.0.1:8000/api/v1/curate';
 
-// Pre-fetch inicial en el servidor vía Gemini Agente Documentalista + Commons
-const curatorResult = await searchWikiCurator({
-  query: queryParam,
-  limit: 40,
-  useGeminiAgent: true,
-});
+const queryParam = Astro.url.searchParams.get('q')?.trim() || 'Michael Cremo anomalous artifacts';
+const editorialLine = Astro.url.searchParams.get('line') === 'official' ? 'official' : 'alternative';
+const curateMode = Astro.url.searchParams.get('mode')?.trim() || 'ebooks_thesis';
+const issueSlugParam = Astro.url.searchParams.get('issue')?.trim() || '002-cremo';
 
-const initialImages = curatorResult.images;
+let initialImages: any[] = [];
+let primaryCanonicalQuery = queryParam;
+let coreModelUsed = 'Capa 0 (Vertex Gemini Flash)';
+let totalScanned = 0;
+let coreOfflineError: string | null = null;
+
+try {
+  const res = await fetch(CORE_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-TGP-Site': editorialLine === 'alternative' ? 'tgp-alternative' : 'tgp-hemeroteca',
+    },
+    body: JSON.stringify({
+      query: queryParam,
+      editorial_line: editorialLine,
+      mode: curateMode,
+      limit: 40,
+    }),
+    signal: AbortSignal.timeout(25000),
+  });
+
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => ({}));
+    throw new Error(errBody?.detail || `HTTP ${res.status} en tgp-editorial-core`);
+  }
+
+  const data = await res.json();
+  primaryCanonicalQuery = data.canonical_queries?.[0] || queryParam;
+  coreModelUsed = data.model_used || coreModelUsed;
+  totalScanned = Number(data.total_scanned || 0);
+
+  initialImages = (data.images || []).map((img: any, idx: number) => ({
+    id: `core-${idx}-${img.source_repo || 'wikimedia'}`,
+    title: img.title,
+    cleanTitle: img.title,
+    url: img.original_url,
+    original_url: img.original_url,
+    thumbUrl: img.thumb_url || img.original_url,
+    thumb_url: img.thumb_url || img.original_url,
+    width: img.width || 1200,
+    height: img.height || 800,
+    aspect_ratio: img.aspect_ratio,
+    orientation: img.orientation,
+    license: img.license || 'Public domain',
+    licenseShortName: img.license || 'Public domain',
+    isCC0OrPublicDomain: /cc0|public domain|pdm?|no restrictions/i.test(img.license || ''),
+    author: img.author || 'Archivo Patrimonial',
+    description: img.description || '',
+    description_url: img.description_url || '',
+    score: img.score,
+    source_repo: img.source_repo || 'wikimedia',
+    attribution_text: img.attribution_text || '',
+  }));
+} catch (err: any) {
+  coreOfflineError =
+    err?.message ||
+    'No se pudo conectar con tgp-editorial-core en http://127.0.0.1:8000.';
+}
+
 const initialHeroBatch = initialImages.slice(0, 12);
 ---
 
 <Layout 
   title="Curaduría Visual & Exhibición · TGP Scriptorium"
-  description="Mesa de curaduría fotográfica, Hero Apple 72vh y exportación Cloud Run para Revistas Digitales"
+  description="Mesa de curaduría fotográfica conectada exclusivamente a tgp-editorial-core (:8000) y Cloudflare R2"
   hideHeader={true}
   footerVariant="minimal"
 >
@@ -45,29 +101,59 @@ const initialHeroBatch = initialImages.slice(0, 12);
     <WikiCinematicHero 
       images={initialHeroBatch}
       headline={`Acervo Curado: ${queryParam}`}
-      tagline="Lote de Alta Resolución · Wikimedia Commons Scale"
+      tagline="Capa 0 Gemini Flash · Filtro Comercial Estricto (PD / CC0 / CC BY)"
     />
 
+    {coreOfflineError && (
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <div class="rounded-2xl border border-rose-500/40 bg-rose-950/35 p-4 sm:p-5 text-xs sm:text-sm text-rose-100 space-y-2 shadow-xl">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <strong class="font-mono uppercase tracking-wider text-rose-300">
+              ⚠ tgp-editorial-core (Puerto 8000) Apagado o Inalcanzable
+            </strong>
+            <span class="px-2 py-0.5 rounded bg-rose-900/70 border border-rose-500/40 font-mono text-[11px] text-rose-200">
+              Cero Fallback al Buscador Viejo
+            </span>
+          </div>
+          <p class="text-rose-200/90 leading-relaxed">
+            Por seguridad editorial (filtro comercial estricto PD / CC0 / CC BY y Capa 0 Vertex Gemini Flash), esta Mesa de Luz no retrocede al buscador antiguo. Levantá <code>tgp-editorial-core</code> en el puerto 8000 y recargá o presioná <strong>Buscar (40)</strong>.
+          </p>
+          <div class="font-mono text-[11px] bg-black/70 border border-rose-500/30 rounded-lg px-3 py-2 text-amber-200 overflow-x-auto">
+            cd C:\Users\ygnat\tgp-hemeroteca\tgp-editorial-core ; .\.venv\Scripts\Activate.ps1 ; uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+          </div>
+          <div class="text-[11px] font-mono text-rose-300/80">
+            Detalle técnico: {coreOfflineError}
+          </div>
+        </div>
+      </div>
+    )}
+
     <!-- Separador Sutil con Indicador de Flujo -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-2 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-2 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
         <span class="w-2 h-2 rounded-full bg-amber-400"></span>
         <h2 class="font-mono text-xs uppercase tracking-widest text-zinc-400">
-          Mesa de Luz y Selector de Revista (Lote de 40 fotos)
+          Mesa de Luz · tgp-editorial-core ({curateMode} · {editorialLine})
         </h2>
       </div>
 
-      <div class="flex items-center gap-2 font-mono text-[11px] text-zinc-500">
-        <span>Commons: <span class="text-amber-300">{curatorResult.searchTermEnglish}</span></span>
+      <div class="flex flex-wrap items-center gap-2 font-mono text-[11px] text-zinc-500">
+        <span>Capa 0: <span class="text-amber-300">{primaryCanonicalQuery}</span></span>
         <span class="text-zinc-700">·</span>
-        <span>Lote: <span class="text-emerald-400 font-semibold">{initialImages.length}</span> fotos</span>
+        <span class="text-zinc-400">{coreModelUsed}</span>
+        <span class="text-zinc-700">·</span>
+        <span>Lote: <span class="text-emerald-400 font-semibold">{initialImages.length}</span>/{totalScanned || initialImages.length} válidas</span>
       </div>
     </div>
 
-    <!-- 2. DEVELOPER LIGHTBOX CON EXPORTACIÓN CLOUD RUN -->
+    <!-- 2. DEVELOPER LIGHTBOX CON EXPORTACIÓN R2 Y CLOUD RUN -->
     <WikiDeveloperLightbox 
       initialQuery={queryParam}
       initialBatch={initialImages}
+      initialEditorialLine={editorialLine}
+      initialCoreMode={curateMode}
+      initialIssueSlug={issueSlugParam}
+      coreOfflineError={coreOfflineError}
       cloudRunEndpoint="/api/cloudrun-magazine-export"
     />
 
