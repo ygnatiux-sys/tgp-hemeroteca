@@ -28,6 +28,20 @@ export const SFX_NAMES = [
   'time_tick',
 ];
 
+export const VOICE_NAMES = [
+  'voice_insert_coin',
+  'voice_game_over',
+  'voice_finish_it',
+  'voice_stage_clear',
+  'voice_get_over_here',
+  'voice_test_your_might',
+  'voice_round_one_fight',
+  'voice_mission_start',
+  'voice_scramble_1942',
+  'voice_evil_laugh',
+  'voice_pyramid_awakens',
+];
+
 export const BGM_TRACKS = [
   'bgm_china',
   'swingArcade',
@@ -42,6 +56,9 @@ export const BGM_TRACKS = [
   'argentinaFm90',
   'cubaFm90',
   'greeceFm90',
+  'starforceFork',
+  'commandoFork',
+  'aero1942Fork',
 ];
 
 const BGM_TRACKS_CONFIG = {
@@ -58,6 +75,9 @@ const BGM_TRACKS_CONFIG = {
   argentinaFm90: 'bgm_argentina_fm90.wav',
   cubaFm90: 'bgm_cuba_fm90.wav',
   greeceFm90: 'bgm_greece_fm90.wav',
+  starforceFork: 'bgm_starforce_fork.wav',
+  commandoFork: 'bgm_commando_fork.wav',
+  aero1942Fork: 'bgm_1942_fork.wav',
 };
 
 const BGM_ALIASES = {
@@ -73,6 +93,9 @@ const BGM_ALIASES = {
   bgm_greece_fm90: 'greeceFm90',
   bgm_swing_arcade: 'swingArcade',
   bgm_cat_ragtime: 'catRagtime',
+  bgm_starforce_fork: 'starforceFork',
+  bgm_commando_fork: 'commandoFork',
+  bgm_1942_fork: 'aero1942Fork',
 };
 
 const bgmInstances = new Map();
@@ -128,6 +151,7 @@ export function preloadAllAudio() {
   if (typeof window === 'undefined') return;
   BGM_TRACKS.forEach((key) => getBgmTrack(key));
   SFX_NAMES.forEach((name) => getOrCreateSfx(name));
+  VOICE_NAMES.forEach((name) => getOrCreateSfx(name, { volume: 0.85 }));
 }
 
 /**
@@ -256,6 +280,12 @@ export function playSfx(name) {
 
 export const playSound = playSfx;
 
+export function playVoice(name) {
+  const voice = getOrCreateSfx(name, { volume: 0.85 });
+  if (!voice) return null;
+  return voice.play();
+}
+
 /**
  * Desbloquea el AudioContext en navegadores modernos al primer clic o tecla del usuario.
  */
@@ -281,6 +311,7 @@ export function unlockAudioOnFirstInteraction(autoPlayBgm = true, trackKey = 'bg
 export default {
   BGM_TRACKS,
   SFX_NAMES,
+  VOICE_NAMES,
   preloadAllAudio,
   playMusic,
   switchMusic,
@@ -297,5 +328,6 @@ export default {
   registerSfx,
   playSfx,
   playSound,
+  playVoice,
   unlockAudioOnFirstInteraction,
 };
